@@ -4,7 +4,7 @@
 [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.17.svg)](https://www.scala-js.org)
 
 ## FARc
-[FAR](https://farmanager.com/index.php?l=en) clone build with [Electron](https://electronjs.org/)
+File and Archive Commander ([FAR](https://farmanager.com/index.php?l=en) clone) build on [Electron](https://electronjs.org/)
 
 ### How to Build
 
@@ -15,10 +15,14 @@ sbt test
 
 ### How to Run
 
-To run the app use the following command:
+To run the app use the following commands:
 ```bash
-sbt "project scommons-farc-app" run
+sbt "project scommons-farc-app" fastOptJS
+
+node ./app/target/scala-2.12/scalajs-bundler/main/scommons-farc-app-fastopt.js
 ```
+
+To exit the application press `F10` on the keyboard.
 
 ## Documentation
 
