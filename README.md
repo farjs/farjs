@@ -17,7 +17,7 @@ sbt test
 
 To run the app use the following commands:
 ```bash
-sbt "project scommons-farc-app" fastOptJS
+sbt "project scommons-farc-app" fastOptJS::webpack
 
 node ./app/target/scala-2.12/scalajs-bundler/main/scommons-farc-app-fastopt.js
 ```
