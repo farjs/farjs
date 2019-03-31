@@ -44,32 +44,22 @@ object FarcAppRoot extends FunctionComponent[Unit] {
       s"$demo",
       
       <.button(
-        ^("mouse") := "true",
+        ^.mouse := true,
         ^.rbBorder := new BlessedBorder {
           override val `type` = "line"
         },
-        ^.onPress := { () =>
-          setDemo(demo + 1)
-        }
-      )(s"Increment Me, $demo"),
-      
-      <.button(
-        ^("mouse") := "true",
-        ^.rbBorder := new BlessedBorder {
-          override val `type` = "line"
-        },
-        ^.height := 3, ^.width := 3, ^.top := 2, ^.left := 4,
+        ^.rbHeight := 3, ^.rbWidth := 3, ^.rbTop := 2, ^.rbLeft := 4,
         ^.onPress := { () =>
           setDemo(demo + 1)
         }
       )("+"),
-      
+
       <.button(
-        ^("mouse") := "true",
+        ^.mouse := true,
         ^.rbBorder := new BlessedBorder {
           override val `type` = "line"
         },
-        ^.height := 3, ^.width := 3, ^.top := 2,
+        ^.rbHeight := 3, ^.rbWidth := 3, ^.rbTop := 2,
         ^.onPress := { () =>
           setDemo(demo - 1)
         }

@@ -23,8 +23,7 @@ object FarcApp extends ScalaJsModule {
       publishM2 := ((): Unit),
 
       coverageExcludedPackages := {
-        "scommons.blessed.raw" +
-          ";scommons.blessed.react.raw" +
+        "scommons.react.blessed.raw" +
           ";scommons.nodejs.raw"
       },
 

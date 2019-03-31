@@ -31,6 +31,11 @@ package object blessed {
       def :=(value: BlessedBorder): Attribute[BlessedBorder] = Attribute(name, value, AS_IS)
     }
 
+    case class BlessedPositionAttributeSpec(name: String) extends AttributeSpec {
+      def :=(value: String): Attribute[String] = Attribute(name, value, AS_IS)
+      def :=(value: Int): Attribute[Int] = Attribute(name, value, AS_IS)
+    }
+
     type OnPress = js.Function0[Unit]
     case class OnPressEventAttribute(name: String) extends AttributeSpec {
       def :=(onEvent: OnPress): Attribute[OnPress] = Attribute(name, onEvent, AS_IS)
@@ -43,8 +48,12 @@ package object blessed {
 
     lazy val rbStyle = BlessedStyleAttributeSpec("style")
     lazy val rbBorder = BlessedBorderAttributeSpec("border")
-    lazy val top = IntegerAttributeSpec("top")
-    lazy val left = IntegerAttributeSpec("left")
+    lazy val rbHeight = BlessedPositionAttributeSpec("height")
+    lazy val rbWidth = BlessedPositionAttributeSpec("width")
+    lazy val rbTop = BlessedPositionAttributeSpec("top")
+    lazy val rbLeft = BlessedPositionAttributeSpec("left")
+    lazy val mouse = BooleanAttributeSpec("mouse")
+    lazy val keys = BooleanAttributeSpec("keys")
     
     lazy val onPress = OnPressEventAttribute("onPress")
   }
