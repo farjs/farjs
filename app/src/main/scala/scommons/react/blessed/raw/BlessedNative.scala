@@ -1,4 +1,4 @@
-package scommons.blessed.raw
+package scommons.react.blessed.raw
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport

@@ -1,12 +1,19 @@
-package scommons.blessed
+package scommons.react
 
 import io.github.shogowada.scalajs.reactjs.VirtualDOM._
 import io.github.shogowada.statictags._
 
 import scala.scalajs.js
 
-package object react {
+package object blessed {
 
+  type BlessedScreenConfig = blessed.raw.BlessedScreenConfig
+  type BlessedScreen = blessed.raw.BlessedScreen
+
+  type BlessedStyle = blessed.raw.BlessedStyle
+  type BlessedBorder = blessed.raw.BlessedBorder
+  type BlessedBorderStyle = blessed.raw.BlessedBorderStyle
+  
   implicit class BlessedVirtualDOMElements(elements: VirtualDOMElements) {
     lazy val box: ElementSpec = elements("box")
   }

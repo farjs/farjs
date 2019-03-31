@@ -1,7 +1,6 @@
-package scommons.blessed.react.raw
+package scommons.react.blessed.raw
 
 import io.github.shogowada.scalajs.reactjs.elements.ReactElement
-import scommons.blessed.raw.BlessedScreen
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport

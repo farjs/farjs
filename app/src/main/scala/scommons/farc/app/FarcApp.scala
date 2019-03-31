@@ -1,9 +1,8 @@
 package scommons.farc.app
 
-import scommons.blessed._
-import scommons.blessed.react._
 import scommons.nodejs._
 import scommons.react._
+import scommons.react.blessed._
 import scommons.react.hooks._
 
 import scala.scalajs.js
