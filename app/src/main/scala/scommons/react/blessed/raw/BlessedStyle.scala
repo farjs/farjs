@@ -12,9 +12,10 @@ trait BlessedStyle extends js.Object {
   val inverse: js.UndefOr[Boolean] = js.undefined
   val invisible: js.UndefOr[Boolean] = js.undefined
   val transparent: js.UndefOr[Boolean] = js.undefined
-  val shadow: js.UndefOr[Boolean] = js.undefined
   val border: js.UndefOr[BlessedBorderStyle] = js.undefined
   val scrollbar: js.UndefOr[BlessedScrollBarStyle] = js.undefined
+  
+  val focus: js.UndefOr[BlessedStyle] = js.undefined
 }
 
 trait BlessedBorderStyle extends js.Object {

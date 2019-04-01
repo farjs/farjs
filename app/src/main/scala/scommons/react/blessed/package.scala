@@ -13,9 +13,12 @@ package object blessed {
   type BlessedStyle = blessed.raw.BlessedStyle
   type BlessedBorder = blessed.raw.BlessedBorder
   type BlessedBorderStyle = blessed.raw.BlessedBorderStyle
+  type BlessedScrollBarStyle = blessed.raw.BlessedScrollBarStyle
   
   implicit class BlessedVirtualDOMElements(elements: VirtualDOMElements) {
     lazy val box: ElementSpec = elements("box")
+    lazy val text: ElementSpec = elements("text")
+    lazy val log: ElementSpec = elements("log")
   }
 
   object BlessedVirtualDOMAttributes {
@@ -36,6 +39,10 @@ package object blessed {
       def :=(value: Int): Attribute[Int] = Attribute(name, value, AS_IS)
     }
 
+    case class BlessedBooleanAttributeSpec(name: String) extends AttributeSpec {
+      def :=(value: Boolean): Attribute[Boolean] = Attribute(name, value, AS_IS)
+    }
+
     type OnPress = js.Function0[Unit]
     case class OnPressEventAttribute(name: String) extends AttributeSpec {
       def :=(onEvent: OnPress): Attribute[OnPress] = Attribute(name, onEvent, AS_IS)
@@ -52,8 +59,11 @@ package object blessed {
     lazy val rbWidth = BlessedPositionAttributeSpec("width")
     lazy val rbTop = BlessedPositionAttributeSpec("top")
     lazy val rbLeft = BlessedPositionAttributeSpec("left")
-    lazy val mouse = BooleanAttributeSpec("mouse")
-    lazy val keys = BooleanAttributeSpec("keys")
+    lazy val mouse = BlessedBooleanAttributeSpec("mouse")
+    lazy val scrollable = BlessedBooleanAttributeSpec("scrollable")
+    lazy val alwaysScroll = BlessedBooleanAttributeSpec("alwaysScroll")
+    lazy val scrollbar = BlessedBooleanAttributeSpec("scrollbar")
+    lazy val shadow = BlessedBooleanAttributeSpec("shadow")
     
     lazy val onPress = OnPressEventAttribute("onPress")
   }
