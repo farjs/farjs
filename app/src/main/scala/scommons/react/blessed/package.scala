@@ -9,6 +9,7 @@ package object blessed {
 
   type BlessedScreenConfig = blessed.raw.BlessedScreenConfig
   type BlessedScreen = blessed.raw.BlessedScreen
+  type BlessedElement = blessed.raw.BlessedElement
 
   type BlessedStyle = blessed.raw.BlessedStyle
   type BlessedBorder = blessed.raw.BlessedBorder
@@ -43,9 +44,9 @@ package object blessed {
       def :=(value: Boolean): Attribute[Boolean] = Attribute(name, value, AS_IS)
     }
 
-    type OnPress = js.Function0[Unit]
-    case class OnPressEventAttribute(name: String) extends AttributeSpec {
-      def :=(onEvent: OnPress): Attribute[OnPress] = Attribute(name, onEvent, AS_IS)
+    type OnEvent0 = js.Function0[Unit]
+    case class OnEvent0Attribute(name: String) extends AttributeSpec {
+      def :=(onEvent: OnEvent0): Attribute[OnEvent0] = Attribute(name, onEvent, AS_IS)
     }
   }
 
@@ -60,11 +61,16 @@ package object blessed {
     lazy val rbTop = BlessedPositionAttributeSpec("top")
     lazy val rbLeft = BlessedPositionAttributeSpec("left")
     lazy val mouse = BlessedBooleanAttributeSpec("mouse")
+    lazy val tags = BlessedBooleanAttributeSpec("tags")
     lazy val scrollable = BlessedBooleanAttributeSpec("scrollable")
     lazy val alwaysScroll = BlessedBooleanAttributeSpec("alwaysScroll")
     lazy val scrollbar = BlessedBooleanAttributeSpec("scrollbar")
     lazy val shadow = BlessedBooleanAttributeSpec("shadow")
     
-    lazy val onPress = OnPressEventAttribute("onPress")
+    lazy val onPress = OnEvent0Attribute("onPress")
+    lazy val onClick = OnEvent0Attribute("onClick")
+    lazy val onResize = OnEvent0Attribute("onResize")
+    lazy val onMousedown = OnEvent0Attribute("onMousedown")
+    lazy val onMouseup = OnEvent0Attribute("onMouseup")
   }
 }

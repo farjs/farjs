@@ -1,5 +1,6 @@
 package scommons.farc.app
 
+import scommons.farc.ui._
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
@@ -108,12 +109,11 @@ object FarcAppRoot extends FunctionComponent[Unit] {
         ^.content := logs.mkString("\n")
       )(),
 
-      <.box(
-        ^.rbTop := "100%-1",
-        ^.scrollable := true
-      )(
-        "menu bar"
-      )
+      <(BottomMenuBar())(^.wrapped := BottomMenuBarProps(
+        onClick = { msg =>
+          setLogs(logs :+ msg)
+        }
+      ))()
     )
   }
 }

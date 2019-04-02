@@ -15,3 +15,10 @@ trait BlessedScreen extends js.Object {
   
   def key(keys: js.Array[String], onKey: js.Function2[js.Object, js.Object, Unit]): Unit = js.native
 }
+
+@js.native
+trait BlessedElement extends js.Object {
+  
+  val width: Int = js.native
+  val height: Int = js.native
+}
