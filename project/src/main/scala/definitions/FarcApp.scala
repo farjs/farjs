@@ -24,20 +24,22 @@ object FarcApp extends ScalaJsModule {
 
       coverageExcludedPackages := {
         "scommons.react.blessed.raw" +
-          ";scommons.nodejs.raw"
+          ";scommons.nodejs.raw" +
+          ";scommons.farc.app.FarcApp"
       },
 
       scalaJSUseMainModuleInitializer := true,
       webpackBundlingMode := BundlingMode.LibraryOnly(),
 
       useYarn := true,
+      yarnExtraArgs := Seq("--frozen-lockfile"),
       
       npmDependencies in Compile ++= Seq(
         "blessed" -> "0.1.81",
         //"neo-blessed" -> "0.2.0",
         //"@medv/blessed" -> "2.0.0",
         "react-blessed" -> "0.5.0",
-        "react-reconciler" -> "~0.20.3"
+        "react-reconciler" -> "0.20.4"
       ),
 
       npmDevDependencies in Compile ++= Seq(

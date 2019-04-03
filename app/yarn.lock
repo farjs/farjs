@@ -2538,7 +2538,7 @@ react-blessed@0.5.0:
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/react-blessed/-/react-blessed-0.5.0.tgz#c8228d5e5251232ce542c5e6b443694f84e1be74"
   dependencies:
-    react-reconciler "~0.20.3"
+    react-reconciler "0.20.4"
 
 react-dom@^16.8.0:
   version "16.8.6"
@@ -2553,7 +2553,7 @@ react-is@^16.8.1, react-is@^16.8.6:
   version "16.8.6"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.8.6.tgz#5bbc1e2d29141c9fbdfed456343fe2bc430a6a16"
 
-react-reconciler@~0.20.3:
+react-reconciler@0.20.4:
   version "0.20.4"
   resolved "https://registry.yarnpkg.com/react-reconciler/-/react-reconciler-0.20.4.tgz#3da6a95841592f849cb4edd3d38676c86fd920b2"
   dependencies:
