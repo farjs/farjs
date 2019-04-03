@@ -2,7 +2,7 @@ import definitions._
 import scommons.sbtplugin.project.CommonModule
 import scommons.sbtplugin.project.CommonModule.ideExcludedDirectories
 
-lazy val `scommons-farc` = (project in file("."))
+lazy val `farclone` = (project in file("."))
   .settings(CommonModule.settings: _*)
   .settings(FarcModule.settings: _*)
   .settings(
@@ -15,7 +15,7 @@ lazy val `scommons-farc` = (project in file("."))
     ideExcludedDirectories += baseDirectory.value / "docs" / "_site"
   )
   .aggregate(
-  `scommons-farc-app`
+  `farclone-app`
 )
 
-lazy val `scommons-farc-app` = FarcApp.definition
+lazy val `farclone-app` = FarcApp.definition

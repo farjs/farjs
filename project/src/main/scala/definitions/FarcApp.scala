@@ -11,7 +11,7 @@ import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
 
 object FarcApp extends ScalaJsModule {
 
-  override val id = "scommons-farc-app"
+  override val id = "farclone-app"
 
   override val base: File = file("app")
 

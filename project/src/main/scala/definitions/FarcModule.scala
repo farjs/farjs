@@ -6,7 +6,7 @@ import scommons.sbtplugin.project.CommonModule
 
 trait FarcModule extends CommonModule {
 
-  override val repoName = "scommons-farc"
+  override val repoName = "farclone"
 
   override def definition: Project = {
     super.definition
@@ -17,7 +17,7 @@ trait FarcModule extends CommonModule {
 object FarcModule {
 
   val settings: Seq[Setting[_]] = Seq(
-    organization := "org.scommons.farc",
+    organization := "org.scommons.farclone",
     
     //
     // publish/release related settings:
@@ -31,7 +31,7 @@ object FarcModule {
         Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
     },
     pomExtra := {
-      <url>https://github.com/scommons/scommons-farc</url>
+      <url>https://github.com/scommons/farclone</url>
         <licenses>
           <license>
             <name>The MIT License</name>
@@ -40,8 +40,8 @@ object FarcModule {
           </license>
         </licenses>
         <scm>
-          <url>git@github.com:scommons/scommons-farc.git</url>
-          <connection>scm:git@github.com:scommons/scommons-farc.git</connection>
+          <url>git@github.com:scommons/farclone.git</url>
+          <connection>scm:git@github.com:scommons/farclone.git</connection>
         </scm>
         <developers>
           <developer>
