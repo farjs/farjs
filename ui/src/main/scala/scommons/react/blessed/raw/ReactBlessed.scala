@@ -7,7 +7,7 @@ import scala.scalajs.js.annotation.JSImport
 
 @js.native
 @JSImport("react-blessed", JSImport.Default)
-object ReactBlessedNative extends js.Object {
+object ReactBlessed extends js.Object {
 
   def render(element: ReactElement, screen: BlessedScreen): Unit = js.native
 }

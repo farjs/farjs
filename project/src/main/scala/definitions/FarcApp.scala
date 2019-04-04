@@ -1,6 +1,6 @@
 package definitions
 
-import common.{Libs, TestLibs}
+import common.TestLibs
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
 import sbt._
@@ -23,8 +23,7 @@ object FarcApp extends ScalaJsModule {
       publishM2 := ((): Unit),
 
       coverageExcludedPackages := {
-        "scommons.react.blessed.raw" +
-          ";scommons.nodejs.raw" +
+        "scommons.nodejs.raw" +
           ";scommons.farc.app.FarcApp"
       },
 
@@ -34,14 +33,6 @@ object FarcApp extends ScalaJsModule {
       useYarn := true,
       yarnExtraArgs := Seq("--frozen-lockfile"),
       
-      npmDependencies in Compile ++= Seq(
-        "blessed" -> "0.1.81",
-        //"neo-blessed" -> "0.2.0",
-        //"@medv/blessed" -> "2.0.0",
-        "react-blessed" -> "0.5.0",
-        "react-reconciler" -> "0.20.4"
-      ),
-
       npmDevDependencies in Compile ++= Seq(
         "webpack-merge" -> "4.1.0",
         "webpack-node-externals" -> "1.7.2"
@@ -55,7 +46,9 @@ object FarcApp extends ScalaJsModule {
       //webpackConfigFile in Test := Some(baseDirectory.value / "test.webpack.config.js")
     )
 
-  override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Nil
+  override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Seq(
+    FarcUi.definition
+  )
 
   override val superRepoProjectsDependencies: Seq[(String, String, Option[String])] = Seq(
     ("scommons-react", "scommons-react-core", None),
@@ -63,9 +56,7 @@ object FarcApp extends ScalaJsModule {
     ("scommons-react", "scommons-react-test", Some("test"))
   )
 
-  override val runtimeDependencies: Def.Initialize[Seq[ModuleID]] = Def.setting(Seq(
-    Libs.scommonsReactCore.value
-  ))
+  override val runtimeDependencies: Def.Initialize[Seq[ModuleID]] = Def.setting(Nil)
 
   override val testDependencies: Def.Initialize[Seq[ModuleID]] = Def.setting(Seq(
     TestLibs.scommonsReactTest.value
