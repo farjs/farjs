@@ -57,7 +57,7 @@ object FarcApp {
           )(),
 
           <.button(
-            ^.mouse := true,
+            ^.rbMouse := true,
             ^.rbStyle := new BlessedStyle {
               override val fg = "black"
               override val bg = "cyan"
@@ -65,9 +65,9 @@ object FarcApp {
                 override val fg = "white"
               }
             },
-            ^.shadow := true,
+            ^.rbShadow := true,
             ^.rbHeight := 1, ^.rbWidth := 3, ^.rbTop := 2, ^.rbLeft := 6,
-            ^.onPress := { () =>
+            ^.rbOnPress := { () =>
               setDemo(demo + 1)
               setLogs(logs :+ "increment")
             },
@@ -75,7 +75,7 @@ object FarcApp {
           )(),
 
           <.button(
-            ^.mouse := true,
+            ^.rbMouse := true,
             ^.rbStyle := new BlessedStyle {
               override val fg = "black"
               override val bg = "cyan"
@@ -83,9 +83,9 @@ object FarcApp {
                 override val fg = "white"
               }
             },
-            ^.shadow := true,
+            ^.rbShadow := true,
             ^.rbHeight := 1, ^.rbWidth := 3, ^.rbTop := 2,
-            ^.onPress := { () =>
+            ^.rbOnPress := { () =>
               setDemo(demo - 1)
               setLogs(logs :+ "decrement")
             },
@@ -94,7 +94,7 @@ object FarcApp {
         ),
 
         <.log(
-          ^.mouse := true,
+          ^.rbMouse := true,
           ^.rbWidth := "50%",
           ^.rbHeight := "100%-1",
           ^.rbLeft := "50%",
@@ -103,17 +103,19 @@ object FarcApp {
               override val bg = "cyan"
             }
           },
-          ^.scrollbar := true,
-          ^.scrollable := true,
-          ^.alwaysScroll := true,
+          ^.rbScrollbar := true,
+          ^.rbScrollable := true,
+          ^.rbAlwaysScroll := true,
           ^.content := logs.mkString("\n")
         )(),
 
-        <(BottomMenuBar())(^.wrapped := BottomMenuBarProps(
-          onClick = { msg =>
-            setLogs(logs :+ msg)
-          }
-        ))()
+        <.box(^.rbTop := "100%-1")(
+          <(BottomMenuBar())(^.wrapped := BottomMenuBarProps(
+            onClick = { msg =>
+              setLogs(logs :+ msg)
+            }
+          ))()
+        )
       )
     }
   }

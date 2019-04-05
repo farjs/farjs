@@ -10,14 +10,14 @@ object BottomMenuBar extends FunctionComponent[BottomMenuBarProps] {
   protected def render(props: Props): ReactElement = {
     val data = props.wrapped
     
-    <.box(^.rbTop := "100%-1")(
+    <.>()(
       items.map { case (id, key, name, pos) =>
         <.button(
           ^.key := id,
-          ^.tags := true,
-          ^.mouse := true,
+          ^.rbTags := true,
+          ^.rbMouse := true,
           ^.rbLeft := pos,
-          ^.onClick := { () =>
+          ^.rbOnClick := { () =>
             data.onClick(id)
           },
           ^.content := s"{white-fg}{black-bg}$key{/}{black-fg}{cyan-bg}$name{/}"

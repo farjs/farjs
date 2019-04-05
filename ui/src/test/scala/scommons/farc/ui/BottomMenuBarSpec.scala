@@ -1,5 +1,6 @@
 package scommons.farc.ui
 
+import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
 import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
@@ -12,7 +13,7 @@ class BottomMenuBarSpec extends TestSpec
     //given
     val onClick = mockFunction[String, Unit]
     val props = BottomMenuBarProps(onClick = onClick)
-    val buttons = testRender(<(BottomMenuBar())(^.wrapped := props)()).children
+    val buttons = createTestRenderer(<(BottomMenuBar())(^.wrapped := props)()).root.children
     
     //then
     inSequence {
@@ -51,12 +52,12 @@ class BottomMenuBarSpec extends TestSpec
 
     //then
     assertNativeComponent(result,
-      <.box(^.rbTop := "100%-1")(
+      <.>()(
         items.map { case (id, k, name, pos) =>
           <.button(
             ^.key := id,
-            ^.tags := true,
-            ^.mouse := true,
+            ^.rbTags := true,
+            ^.rbMouse := true,
             ^.rbLeft := pos,
             ^.content := s"{white-fg}{black-bg}$k{/}{black-fg}{cyan-bg}$name{/}"
           )()
