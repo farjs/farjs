@@ -108,6 +108,13 @@ object FarcApp {
           ^.rbAlwaysScroll := true,
           ^.content := logs.mkString("\n")
         )(),
+//        <.box(
+//          ^.rbWidth := "50%",
+//          ^.rbHeight := "100%-1",
+//          ^.rbLeft := "50%"
+//        )(
+//          <(ColorPanel())()()
+//        ),
 
         <.box(^.rbTop := "100%-1")(
           <(BottomMenuBar())(^.wrapped := BottomMenuBarProps(
