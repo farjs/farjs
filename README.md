@@ -19,10 +19,26 @@ To run the app use the following commands:
 ```bash
 sbt "project farclone-app" fastOptJS::webpack
 
-node ./app/target/scala-2.12/scalajs-bundler/main/farclone-app-fastopt.js
+node ./app/target/scala-2.12/scalajs-bundler/main/reload.index.js
 ```
 
 To exit the application press `F10` on the keyboard.
+
+### How to Run with Reload Workflow
+
+```bash
+#console 1:
+cd ./app/target/scala-2.12/scalajs-bundler/main/
+./node_modules/webpack/bin/webpack.js --watch --config ./reload.webpack.config.js
+
+#console 2:
+node ./app/target/scala-2.12/scalajs-bundler/main/dist/bundle.js
+
+#console 3:
+sbt
+>project farclone-app
+>~fastOptJS
+```
 
 ## Documentation
 

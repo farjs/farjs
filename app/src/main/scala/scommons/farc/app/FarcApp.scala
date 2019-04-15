@@ -8,11 +8,13 @@ import scommons.react.blessed.raw.{Blessed, ReactBlessed}
 import scommons.react.hooks._
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
+@JSExportTopLevel(name = "FarcApp")
 object FarcApp {
 
-  def main(args: Array[String]): Unit = {
-
+  @JSExport("start")
+  def start(): BlessedScreen = {
     val screen = Blessed.screen(new BlessedScreenConfig {
       override val autoPadding = true
       override val smartCSR = true
@@ -24,6 +26,7 @@ object FarcApp {
     })
 
     ReactBlessed.render(<(FarcAppRoot())()(), screen)
+    screen
   }
 
   object FarcAppRoot extends FunctionComponent[Unit] {

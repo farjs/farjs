@@ -14,6 +14,7 @@ object Blessed extends js.Object {
 trait BlessedScreen extends js.Object {
   
   def key(keys: js.Array[String], onKey: js.Function2[js.Object, js.Object, Unit]): Unit = js.native
+  def destroy(): Unit = js.native
 }
 
 @js.native

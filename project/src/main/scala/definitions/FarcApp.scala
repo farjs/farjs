@@ -27,8 +27,9 @@ object FarcApp extends ScalaJsModule {
           ";scommons.farc.app.FarcApp"
       },
 
-      scalaJSUseMainModuleInitializer := true,
+      scalaJSUseMainModuleInitializer := false,
       webpackBundlingMode := BundlingMode.LibraryOnly(),
+      version in webpack := "4.29.0",
 
       useYarn := true,
       yarnExtraArgs := Seq("--frozen-lockfile"),
