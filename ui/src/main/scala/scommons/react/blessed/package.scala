@@ -48,6 +48,11 @@ package object blessed {
     case class OnEvent0Attribute(name: String) extends AttributeSpec {
       def :=(onEvent: OnEvent0): Attribute[OnEvent0] = Attribute(name, onEvent, AS_IS)
     }
+    
+    type OnEvent2 = js.Function2[js.Dynamic, js.Dynamic, Unit]
+    case class OnEvent2Attribute(name: String) extends AttributeSpec {
+      def :=(onEvent: OnEvent2): Attribute[OnEvent2] = Attribute(name, onEvent, AS_IS)
+    }
   }
 
   implicit class BlessedVirtualDOMAttributes(attributes: VirtualDOMAttributes) {
@@ -62,11 +67,13 @@ package object blessed {
     lazy val rbLeft = BlessedPositionAttributeSpec("left")
     lazy val rbMouse = BlessedBooleanAttributeSpec("mouse")
     lazy val rbTags = BlessedBooleanAttributeSpec("tags")
+    lazy val rbKeyable = BlessedBooleanAttributeSpec("keyable")
     lazy val rbScrollable = BlessedBooleanAttributeSpec("scrollable")
     lazy val rbAlwaysScroll = BlessedBooleanAttributeSpec("alwaysScroll")
     lazy val rbScrollbar = BlessedBooleanAttributeSpec("scrollbar")
     lazy val rbShadow = BlessedBooleanAttributeSpec("shadow")
     
+    lazy val rbOnKeyPress = OnEvent2Attribute("onKeypress")
     lazy val rbOnPress = OnEvent0Attribute("onPress")
     lazy val rbOnClick = OnEvent0Attribute("onClick")
     lazy val rbOnResize = OnEvent0Attribute("onResize")

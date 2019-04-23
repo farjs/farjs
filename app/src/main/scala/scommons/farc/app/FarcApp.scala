@@ -1,6 +1,7 @@
 package scommons.farc.app
 
 import scommons.farc.ui._
+import scommons.farc.ui.list._
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
@@ -37,7 +38,7 @@ object FarcApp {
 
       <.>()(
         <.box(
-          ^.rbWidth := "50%",
+          ^.rbWidth := "25%",
           ^.rbHeight := "100%-1",
           ^.rbBorder := new BlessedBorder {
             override val `type` = "line"
@@ -94,6 +95,21 @@ object FarcApp {
             },
             ^.content := " - "
           )()
+        ),
+        <.box(
+          ^.rbWidth := "25%",
+          ^.rbHeight := "100%-1",
+          ^.rbLeft := "25%"
+        )(
+          <(VerticalList())(^.wrapped := VerticalListProps(
+            items = List(
+              "item 1",
+              "item 2",
+              "item 3",
+              "item 4",
+              "item 5"
+            )
+          ))()
         ),
 
         <.log(
