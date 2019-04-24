@@ -34,7 +34,6 @@ object FarcApp {
 
     protected def render(props: Props): ReactElement = {
       val (demo, setDemo) = useState(0)
-      val (logs, setLogs) = useState(List.empty[String])
 
       <.>()(
         <.box(
@@ -73,7 +72,7 @@ object FarcApp {
             ^.rbHeight := 1, ^.rbWidth := 3, ^.rbTop := 2, ^.rbLeft := 6,
             ^.rbOnPress := { () =>
               setDemo(demo + 1)
-              setLogs(logs :+ "increment")
+              println("increment")
             },
             ^.content := " + "
           )(),
@@ -91,7 +90,7 @@ object FarcApp {
             ^.rbHeight := 1, ^.rbWidth := 3, ^.rbTop := 2,
             ^.rbOnPress := { () =>
               setDemo(demo - 1)
-              setLogs(logs :+ "decrement")
+              println("decrement")
             },
             ^.content := " - "
           )()
@@ -112,33 +111,19 @@ object FarcApp {
           ))()
         ),
 
-        <.log(
-          ^.rbMouse := true,
+        <.box(
           ^.rbWidth := "50%",
           ^.rbHeight := "100%-1",
-          ^.rbLeft := "50%",
-          ^.rbStyle := new BlessedStyle {
-            override val scrollbar = new BlessedScrollBarStyle {
-              override val bg = "cyan"
-            }
-          },
-          ^.rbScrollbar := true,
-          ^.rbScrollable := true,
-          ^.rbAlwaysScroll := true,
-          ^.content := logs.mkString("\n")
-        )(),
-//        <.box(
-//          ^.rbWidth := "50%",
-//          ^.rbHeight := "100%-1",
-//          ^.rbLeft := "50%"
-//        )(
+          ^.rbLeft := "50%"
+        )(
+          <(LogPanel())()()
 //          <(ColorPanel())()()
-//        ),
+        ),
 
         <.box(^.rbTop := "100%-1")(
           <(BottomMenuBar())(^.wrapped := BottomMenuBarProps(
             onClick = { msg =>
-              setLogs(logs :+ msg)
+              println(msg)
             }
           ))()
         )
