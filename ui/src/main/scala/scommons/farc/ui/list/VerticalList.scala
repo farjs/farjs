@@ -11,41 +11,37 @@ case class VerticalListProps(items: List[String])
 object VerticalList extends FunctionComponent[VerticalListProps] {
   
   protected def render(props: Props): ReactElement = {
-    val (selectedIndex, setSelectedIndex) = useState(0)
+    val (focusedIndex, setFocusedIndex) = useState(-1)
     val items = props.wrapped.items
     
-    def setSelected(index: Int): Unit = {
-      if (index != selectedIndex && index >= 0 && index < items.size) {
-        setSelectedIndex(index)
+    def focusItem(currIndex: Int, currEl: BlessedElement, offset: Int): Unit = {
+      val newIndex = currIndex + offset
+      if (newIndex != focusedIndex && newIndex >= 0 && newIndex < items.size) {
+        currEl.screen.focusOffset(offset)
       }
     }
     
-    def renderItem(text: String, index: Int): ReactElement = {
-      val isSelected = selectedIndex == index
-      
-      <.button(
-        ^.key := s"$index",
-        ^.rbTop := index,
-        ^.rbHeight := 1,
-        ^.rbStyle := (if (isSelected) styles.selectedItem else styles.normalItem),
-        ^.rbMouse := true,
-        ^.rbOnClick := { () =>
-          setSelected(index)
-        },
-        ^.rbOnKeyPress := { (_, key) =>
-          s"${key.name}" match {
-            case "up" => setSelected(selectedIndex - 1)
-            case "down" => setSelected(selectedIndex + 1)
-            case _ =>
-          }
-        },
-        ^.content := text
-      )()
-    }
-
     <.>()(
       items.zipWithIndex.map { case (text, index) =>
-        renderItem(text, index)
+        <(ListItem())(
+          ^.key := s"$index",
+          ^.wrapped := ListItemProps(
+            pos = index,
+            style = styles.normalItem,
+            text = text,
+            focused = focusedIndex == index,
+            onFocus = { () =>
+              setFocusedIndex(index)
+            },
+            onKeyPress = { (el, key) =>
+              key.full match {
+                case "up" => focusItem(index, el, - 1)
+                case "down" => focusItem(index, el, 1)
+                case _ =>
+              }
+            }
+          )
+        )()
       }
     )
   }
@@ -56,10 +52,10 @@ object VerticalList extends FunctionComponent[VerticalListProps] {
     val normalItem: BlessedStyle = new BlessedStyle {
       override val fg = "white"
       override val bg = "blue"
-    }
-    val selectedItem: BlessedStyle = new BlessedStyle {
-      override val fg = "black"
-      override val bg = "cyan"
+      override val focus = new BlessedStyle {
+        override val fg = "black"
+        override val bg = "cyan"
+      }
     }
   }
 }

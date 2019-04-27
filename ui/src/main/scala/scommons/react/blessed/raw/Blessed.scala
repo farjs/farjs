@@ -13,7 +13,8 @@ object Blessed extends js.Object {
 @js.native
 trait BlessedScreen extends js.Object {
   
-  def key(keys: js.Array[String], onKey: js.Function2[js.Object, js.Object, Unit]): Unit = js.native
+  def focusOffset(offset: Int): Unit = js.native
+  def key(keys: js.Array[String], onKey: js.Function2[js.Object, KeyboardKey, Unit]): Unit = js.native
   def destroy(): Unit = js.native
 }
 
@@ -22,4 +23,16 @@ trait BlessedElement extends js.Object {
   
   val width: Int = js.native
   val height: Int = js.native
+  
+  val screen: BlessedScreen = js.native
+}
+
+@js.native
+trait KeyboardKey extends js.Object {
+  
+  val name: String = js.native
+  val full: String = js.native
+  val shift: Boolean = js.native
+  val ctrl: Boolean = js.native
+  val meta: Boolean = js.native
 }

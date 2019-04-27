@@ -1,92 +1,152 @@
 package scommons.farc.ui.list
 
+import org.scalatest.Succeeded
+import scommons.farc.ui.list.VerticalListSpec._
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
-import scommons.react.test.raw.TestRenderer
+import scommons.react.test.raw.{ShallowInstance, TestRenderer}
 import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
 
-import scala.scalajs.js
+import scala.scalajs.js.annotation.JSExportAll
 
 class VerticalListSpec extends TestSpec
   with ShallowRendererUtils
   with TestRendererUtils {
 
-  it should "select item when onClick" in {
+  it should "focus item when onFocus" in {
     //given
     val props = VerticalListProps(List("item 1", "item 2", "item 3"))
     val root = createTestRenderer(<(VerticalList())(^.wrapped := props)()).root
-    root.children(0).props.style shouldBe VerticalList.styles.selectedItem
+    findProps(root, ListItem)(1).focused shouldBe false
 
     //when & then
     TestRenderer.act { () =>
-      root.children(1).props.onClick()
+      findProps(root, ListItem)(1).onFocus()
     }
-    root.children(0).props.style shouldBe VerticalList.styles.normalItem
-    root.children(1).props.style shouldBe VerticalList.styles.selectedItem
+    findProps(root, ListItem)(1).focused shouldBe true
     
     //when & then
     TestRenderer.act { () =>
-      root.children(2).props.onClick()
+      findProps(root, ListItem)(2).onFocus()
     }
-    root.children(1).props.style shouldBe VerticalList.styles.normalItem
-    root.children(2).props.style shouldBe VerticalList.styles.selectedItem
+    findProps(root, ListItem)(1).focused shouldBe false
+    findProps(root, ListItem)(2).focused shouldBe true
     
     //when & then
     TestRenderer.act { () =>
-      root.children(2).props.onClick()
+      findProps(root, ListItem)(2).onFocus()
     }
-    root.children(1).props.style shouldBe VerticalList.styles.normalItem
-    root.children(2).props.style shouldBe VerticalList.styles.selectedItem
+    findProps(root, ListItem)(1).focused shouldBe false
+    findProps(root, ListItem)(2).focused shouldBe true
   }
 
-  it should "select item when onKeypress" in {
+  it should "do nothing when onKeyPress(up) on first item" in {
     //given
     val props = VerticalListProps(List("item 1", "item 2", "item 3"))
     val root = createTestRenderer(<(VerticalList())(^.wrapped := props)()).root
-    root.children(0).props.style shouldBe VerticalList.styles.selectedItem
+    TestRenderer.act { () =>
+      findProps(root, ListItem).head.onFocus()
+    }
+    findProps(root, ListItem).head.focused shouldBe true
 
-    //when & then
+    val screenMock = mock[BlessedScreenMock]
+    val elementMock = mock[BlessedElementMock]
+    val keyMock = mock[KeyboardKeyMock]
+
+    //then
+    (elementMock.screen _).expects().never()
+    (screenMock.focusOffset _).expects(*).never()
+    (keyMock.full _).expects().returning("up")
+
+    //when
     TestRenderer.act { () =>
-      root.children(0).props.onKeypress(null, js.Dynamic.literal(name = "up"))
+      findProps(root, ListItem).head.onKeyPress(
+        elementMock.asInstanceOf[BlessedElement],
+        keyMock.asInstanceOf[KeyboardKey]
+      )
     }
-    root.children(0).props.style shouldBe VerticalList.styles.selectedItem
-    root.children(1).props.style shouldBe VerticalList.styles.normalItem
-    
-    //when & then
+  }
+
+  it should "do nothing when onKeyPress(down) on last item" in {
+    //given
+    val props = VerticalListProps(List("item 1", "item 2", "item 3"))
+    val root = createTestRenderer(<(VerticalList())(^.wrapped := props)()).root
     TestRenderer.act { () =>
-      root.children(0).props.onKeypress(null, js.Dynamic.literal(name = "down"))
+      findProps(root, ListItem).last.onFocus()
     }
-    root.children(0).props.style shouldBe VerticalList.styles.normalItem
-    root.children(1).props.style shouldBe VerticalList.styles.selectedItem
-    
-    //when & then
+    findProps(root, ListItem).last.focused shouldBe true
+
+    val screenMock = mock[BlessedScreenMock]
+    val elementMock = mock[BlessedElementMock]
+    val keyMock = mock[KeyboardKeyMock]
+
+    //then
+    (elementMock.screen _).expects().never()
+    (screenMock.focusOffset _).expects(*).never()
+    (keyMock.full _).expects().returning("down")
+
+    //when
     TestRenderer.act { () =>
-      root.children(0).props.onKeypress(null, js.Dynamic.literal(name = "down"))
+      findProps(root, ListItem).last.onKeyPress(
+        elementMock.asInstanceOf[BlessedElement],
+        keyMock.asInstanceOf[KeyboardKey]
+      )
     }
-    root.children(1).props.style shouldBe VerticalList.styles.normalItem
-    root.children(2).props.style shouldBe VerticalList.styles.selectedItem
-    
-    //when & then
+  }
+
+  it should "focus previous item when onKeyPress(up)" in {
+    //given
+    val props = VerticalListProps(List("item 1", "item 2", "item 3"))
+    val root = createTestRenderer(<(VerticalList())(^.wrapped := props)()).root
     TestRenderer.act { () =>
-      root.children(0).props.onKeypress(null, js.Dynamic.literal(name = "down"))
+      findProps(root, ListItem)(1).onFocus()
     }
-    root.children(1).props.style shouldBe VerticalList.styles.normalItem
-    root.children(2).props.style shouldBe VerticalList.styles.selectedItem
-    
-    //when & then
+    findProps(root, ListItem)(1).focused shouldBe true
+
+    val screenMock = mock[BlessedScreenMock]
+    val elementMock = mock[BlessedElementMock]
+    val keyMock = mock[KeyboardKeyMock]
+
+    //then
+    (elementMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.focusOffset _).expects(-1)
+    (keyMock.full _).expects().returning("up")
+
+    //when
     TestRenderer.act { () =>
-      root.children(0).props.onKeypress(null, js.Dynamic.literal(name = "up"))
+      findProps(root, ListItem)(1).onKeyPress(
+        elementMock.asInstanceOf[BlessedElement],
+        keyMock.asInstanceOf[KeyboardKey]
+      )
     }
-    root.children(1).props.style shouldBe VerticalList.styles.selectedItem
-    root.children(2).props.style shouldBe VerticalList.styles.normalItem
-    
-    //when & then
+  }
+
+  it should "focus next item when onKeyPress(down)" in {
+    //given
+    val props = VerticalListProps(List("item 1", "item 2", "item 3"))
+    val root = createTestRenderer(<(VerticalList())(^.wrapped := props)()).root
     TestRenderer.act { () =>
-      root.children(0).props.onKeypress(null, js.Dynamic.literal(name = "unknown"))
+      findProps(root, ListItem)(1).onFocus()
     }
-    root.children(1).props.style shouldBe VerticalList.styles.selectedItem
-    root.children(2).props.style shouldBe VerticalList.styles.normalItem
+    findProps(root, ListItem)(1).focused shouldBe true
+
+    val screenMock = mock[BlessedScreenMock]
+    val elementMock = mock[BlessedElementMock]
+    val keyMock = mock[KeyboardKeyMock]
+
+    //then
+    (elementMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.focusOffset _).expects(1)
+    (keyMock.full _).expects().returning("down")
+
+    //when
+    TestRenderer.act { () =>
+      findProps(root, ListItem)(1).onKeyPress(
+        elementMock.asInstanceOf[BlessedElement],
+        keyMock.asInstanceOf[KeyboardKey]
+      )
+    }
   }
 
   it should "render component" in {
@@ -98,24 +158,39 @@ class VerticalListSpec extends TestSpec
     val result = shallowRender(comp)
 
     //then
-    assertNativeComponent(result,
-      <.>()(
-        props.items.zipWithIndex.map { case (text, index) =>
-          val isSelected = index == 0
-          
-          <.button(
-            ^.key := s"$index",
-            ^.rbTop := index,
-            ^.rbHeight := 1,
-            ^.rbStyle := {
-              if (isSelected) VerticalList.styles.selectedItem
-              else VerticalList.styles.normalItem
-            },
-            ^.rbMouse := true,
-            ^.content := text
-          )()
+    assertNativeComponent(result, <.>()(), { items: List[ShallowInstance] =>
+      items.zipWithIndex.map { case (item, index) =>
+        item.key shouldBe s"$index"
+        assertComponent(item, ListItem) { case ListItemProps(pos, style, text, focused, _, _) =>
+          pos shouldBe index
+          style shouldBe VerticalList.styles.normalItem
+          text shouldBe props.items(index)
+          focused shouldBe false
         }
-      )
-    )
+      }
+      
+      Succeeded
+    })
+  }
+}
+
+object VerticalListSpec {
+
+  @JSExportAll
+  trait KeyboardKeyMock {
+
+    def full: String
+  }
+
+  @JSExportAll
+  trait BlessedScreenMock {
+
+    def focusOffset(offset: Int): Unit
+  }
+
+  @JSExportAll
+  trait BlessedElementMock {
+
+    def screen: BlessedScreen
   }
 }

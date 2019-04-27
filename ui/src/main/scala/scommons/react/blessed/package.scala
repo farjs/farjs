@@ -10,6 +10,7 @@ package object blessed {
   type BlessedScreenConfig = blessed.raw.BlessedScreenConfig
   type BlessedScreen = blessed.raw.BlessedScreen
   type BlessedElement = blessed.raw.BlessedElement
+  type KeyboardKey = blessed.raw.KeyboardKey
 
   type BlessedStyle = blessed.raw.BlessedStyle
   type BlessedBorder = blessed.raw.BlessedBorder
@@ -49,9 +50,9 @@ package object blessed {
       def :=(onEvent: OnEvent0): Attribute[OnEvent0] = Attribute(name, onEvent, AS_IS)
     }
     
-    type OnEvent2 = js.Function2[js.Dynamic, js.Dynamic, Unit]
-    case class OnEvent2Attribute(name: String) extends AttributeSpec {
-      def :=(onEvent: OnEvent2): Attribute[OnEvent2] = Attribute(name, onEvent, AS_IS)
+    type OnKeypress = js.Function2[js.Dynamic, KeyboardKey, Unit]
+    case class OnKeypressAttribute(name: String) extends AttributeSpec {
+      def :=(onEvent: OnKeypress): Attribute[OnKeypress] = Attribute(name, onEvent, AS_IS)
     }
   }
 
@@ -73,11 +74,12 @@ package object blessed {
     lazy val rbScrollbar = BlessedBooleanAttributeSpec("scrollbar")
     lazy val rbShadow = BlessedBooleanAttributeSpec("shadow")
     
-    lazy val rbOnKeyPress = OnEvent2Attribute("onKeypress")
+    lazy val rbOnKeypress = OnKeypressAttribute("onKeypress")
     lazy val rbOnPress = OnEvent0Attribute("onPress")
+    lazy val rbOnFocus = OnEvent0Attribute("onFocus")
     lazy val rbOnClick = OnEvent0Attribute("onClick")
     lazy val rbOnResize = OnEvent0Attribute("onResize")
-    lazy val rbOnMouseDown = OnEvent0Attribute("onMousedown")
-    lazy val rbOnMouseUp = OnEvent0Attribute("onMouseup")
+    lazy val rbOnMousedown = OnEvent0Attribute("onMousedown")
+    lazy val rbOnMouseup = OnEvent0Attribute("onMouseup")
   }
 }
