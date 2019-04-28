@@ -3,11 +3,14 @@ package scommons.farc.ui.list
 import scommons.farc.ui.list.ListItemSpec._
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
-import scommons.react.test.util.ShallowRendererUtils
+import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
 
+import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportAll
 
-class ListItemSpec extends TestSpec with ShallowRendererUtils {
+class ListItemSpec extends TestSpec
+  with ShallowRendererUtils
+  with TestRendererUtils {
 
   it should "call onFocus callback when onFocus" in {
     //given
@@ -41,11 +44,18 @@ class ListItemSpec extends TestSpec with ShallowRendererUtils {
       onFocus = () => (),
       onKeyPress = onKeyPress
     )
-    val comp = shallowRender(<(ListItem())(^.wrapped := props)())
+    val buttonMock = mock[BlessedElementMock]
+    val buttonElement = buttonMock.asInstanceOf[BlessedElement]
+    val comp = testRender(<(ListItem())(^.wrapped := props)(), { el =>
+      if (el.`type` == "button".asInstanceOf[js.Any]) {
+        buttonElement
+      }
+      else null
+    })
     val key = keyMock.asInstanceOf[KeyboardKey]
     
     //then
-    onKeyPress.expects(null, key)
+    onKeyPress.expects(buttonElement, key)
     
     //when
     comp.props.onKeypress(null, key)
@@ -85,5 +95,12 @@ object ListItemSpec {
   trait KeyboardKeyMock {
 
     def full: String
+  }
+
+  @JSExportAll
+  trait BlessedElementMock {
+
+    def width: Int
+    def height: Int
   }
 }
