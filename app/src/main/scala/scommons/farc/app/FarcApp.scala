@@ -97,18 +97,25 @@ object FarcApp {
         ),
         <.box(
           ^.rbWidth := "25%",
-          ^.rbHeight := "100%-1",
+//          ^.rbHeight := "100%-1",
+          ^.rbHeight := "20%",
           ^.rbLeft := "25%"
         )(
-          <(VerticalList())(^.wrapped := VerticalListProps(
-            items = List(
-              "item 1",
-              "item 2",
-              "item 3",
-              "item 4",
-              "item 5"
-            )
-          ))()
+          <(WithSize())(^.wrapped := WithSizeProps({ (width, height) =>
+            <(VerticalList())(^.wrapped := VerticalListProps(
+              size = (width, height),
+              columns = 2,
+              items = List(
+                "item 1",
+                "item 2",
+                "item 3",
+                "item 4",
+                "item 5",
+                "item 6",
+                "item 7"
+              )
+            ))()
+          }))()
         ),
 
         <.box(

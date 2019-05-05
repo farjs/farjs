@@ -30,16 +30,16 @@ class BottomMenuBarSpec extends TestSpec
     }
     
     //when
-    buttons(0).props.onClick()
-    buttons(1).props.onClick()
-    buttons(2).props.onClick()
-    buttons(3).props.onClick()
-    buttons(4).props.onClick()
-    buttons(5).props.onClick()
-    buttons(6).props.onClick()
-    buttons(7).props.onClick()
-    buttons(8).props.onClick()
-    buttons(9).props.onClick()
+    buttons(0).props.onClick(null)
+    buttons(1).props.onClick(null)
+    buttons(2).props.onClick(null)
+    buttons(3).props.onClick(null)
+    buttons(4).props.onClick(null)
+    buttons(5).props.onClick(null)
+    buttons(6).props.onClick(null)
+    buttons(7).props.onClick(null)
+    buttons(8).props.onClick(null)
+    buttons(9).props.onClick(null)
   }
   
   it should "render component" in {

@@ -21,10 +21,25 @@ trait BlessedScreen extends js.Object {
 @js.native
 trait BlessedElement extends js.Object {
   
-  val width: Int = js.native
-  val height: Int = js.native
+  val width: Int = js.native  //Calculated width
+  val height: Int = js.native //Calculated height
+  val left: Int = js.native   //Calculated relative left offset
+  val top: Int = js.native    //Calculated relative top offset
+  val aleft: Int = js.native  //Calculated absolute left offset
+  val atop: Int = js.native   //Calculated absolute top offset
   
   val screen: BlessedScreen = js.native
+}
+
+@js.native
+trait MouseData extends js.Object {
+
+  val button: String = js.native
+  val x: Int = js.native
+  val y: Int = js.native
+  val shift: Boolean = js.native
+  val ctrl: Boolean = js.native
+  val meta: Boolean = js.native
 }
 
 @js.native

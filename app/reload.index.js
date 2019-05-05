@@ -13,10 +13,9 @@ if (module.hot) {
   
   module.hot.accept("./farclone-app-fastopt", function () {
     const oldScreen = screen
+    oldScreen.destroy()
     
     const {FarcApp} = require("./farclone-app-fastopt")
     screen = FarcApp.start()
-    
-    oldScreen.destroy()
   })
 }

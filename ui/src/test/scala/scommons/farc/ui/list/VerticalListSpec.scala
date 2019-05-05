@@ -1,196 +1,169 @@
 package scommons.farc.ui.list
 
-import org.scalatest.Succeeded
-import scommons.farc.ui.list.VerticalListSpec._
-import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
 import scommons.react.test.raw.{ShallowInstance, TestRenderer}
 import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
 
-import scala.scalajs.js.annotation.JSExportAll
+import scala.scalajs.js
+import scala.scalajs.js.Dynamic.literal
 
 class VerticalListSpec extends TestSpec
   with ShallowRendererUtils
   with TestRendererUtils {
 
-  it should "focus item when onFocus" in {
+  it should "focus item when onClick" in {
     //given
-    val props = VerticalListProps(List("item 1", "item 2", "item 3"))
-    val root = createTestRenderer(<(VerticalList())(^.wrapped := props)()).root
-    findProps(root, ListItem)(1).focused shouldBe false
+    val props = VerticalListProps((7, 2), columns = 2, items = List("item 1", "item 2", "item 3"))
+    val root = createTestRenderer(<(VerticalList())(^.wrapped := props)(), { el =>
+      if (el.`type` == "button".asInstanceOf[js.Any]) {
+        literal(aleft = 5, atop = 3)
+      }
+      else null
+    }).root
+    findProps(root, VerticalItems).head.focusedIndex shouldBe -1
 
-    //when & then
-    TestRenderer.act { () =>
-      findProps(root, ListItem)(1).onFocus()
+    def check(x: Int, y: Int, focusedIndex: Int): Unit = {
+      TestRenderer.act { () =>
+        root.children(0).props.onClick(literal(x = x, y = y))
+      }
+      
+      findProps(root, VerticalItems).head.focusedIndex shouldBe focusedIndex
     }
-    findProps(root, ListItem)(1).focused shouldBe true
     
     //when & then
-    TestRenderer.act { () =>
-      findProps(root, ListItem)(2).onFocus()
+    check(x = 6, y = 3, focusedIndex = 0)
+    check(x = 6, y = 4, focusedIndex = 1)
+    check(x = 8, y = 3, focusedIndex = 2)
+    check(x = 8, y = 4, focusedIndex = 2)
+  }
+
+  it should "focus item when onKeypress" in {
+    //given
+    val props = VerticalListProps((7, 1), columns = 2, items = List("item 1", "item 2", "item 3"))
+    val renderer = createRenderer()
+    renderer.render(<(VerticalList())(^.wrapped := props)())
+    findProps(renderer.getRenderOutput(), VerticalItems).head.focusedIndex shouldBe -1
+    
+    def check(keyFull: String, focusedIndex: Int, items1: List[(String, Int)], items2: List[(String, Int)]): Unit = {
+      renderer.getRenderOutput().props.onKeypress(null, literal(full = keyFull))
+      
+      val items = findProps(renderer.getRenderOutput(), VerticalItems)
+      items.head.focusedIndex shouldBe focusedIndex
+      items.head.items shouldBe items1
+      items(1).focusedIndex shouldBe focusedIndex
+      items(1).items shouldBe items2
     }
-    findProps(root, ListItem)(1).focused shouldBe false
-    findProps(root, ListItem)(2).focused shouldBe true
     
     //when & then
-    TestRenderer.act { () =>
-      findProps(root, ListItem)(2).onFocus()
-    }
-    findProps(root, ListItem)(1).focused shouldBe false
-    findProps(root, ListItem)(2).focused shouldBe true
+    check("down", focusedIndex = 0, items1 = List(("item 1", 0)), items2 = List(("item 2", 1)))
+    check("down", focusedIndex = 1, items1 = List(("item 1", 0)), items2 = List(("item 2", 1)))
+    check("down", focusedIndex = 1, items1 = List(("item 2", 0)), items2 = List(("item 3", 1)))
+    check("down", focusedIndex = 1, items1 = List(("item 2", 0)), items2 = List(("item 3", 1))) //noop
+    check("up", focusedIndex = 0, items1 = List(("item 2", 0)), items2 = List(("item 3", 1)))
+    check("up", focusedIndex = 0, items1 = List(("item 1", 0)), items2 = List(("item 2", 1)))
+    check("up", focusedIndex = 0, items1 = List(("item 1", 0)), items2 = List(("item 2", 1))) //noop
+    check("unknown", focusedIndex = 0, items1 = List(("item 1", 0)), items2 = List(("item 2", 1))) //noop
   }
 
-  it should "do nothing when onKeyPress(up) on first item" in {
+  it should "render empty component when height = 0" in {
     //given
-    val props = VerticalListProps(List("item 1", "item 2", "item 3"))
-    val root = createTestRenderer(<(VerticalList())(^.wrapped := props)()).root
-    TestRenderer.act { () =>
-      findProps(root, ListItem).head.onFocus()
-    }
-    findProps(root, ListItem).head.focused shouldBe true
-
-    val screenMock = mock[BlessedScreenMock]
-    val elementMock = mock[BlessedElementMock]
-    val keyMock = mock[KeyboardKeyMock]
-
-    //then
-    (elementMock.screen _).expects().never()
-    (screenMock.focusOffset _).expects(*).never()
-    (keyMock.full _).expects().returning("up")
+    val props = VerticalListProps((1, 0), columns = 2, items = List("item 1", "item 2", "item 3"))
 
     //when
-    TestRenderer.act { () =>
-      findProps(root, ListItem).head.onKeyPress(
-        elementMock.asInstanceOf[BlessedElement],
-        keyMock.asInstanceOf[KeyboardKey]
-      )
-    }
-  }
-
-  it should "do nothing when onKeyPress(down) on last item" in {
-    //given
-    val props = VerticalListProps(List("item 1", "item 2", "item 3"))
-    val root = createTestRenderer(<(VerticalList())(^.wrapped := props)()).root
-    TestRenderer.act { () =>
-      findProps(root, ListItem).last.onFocus()
-    }
-    findProps(root, ListItem).last.focused shouldBe true
-
-    val screenMock = mock[BlessedScreenMock]
-    val elementMock = mock[BlessedElementMock]
-    val keyMock = mock[KeyboardKeyMock]
+    val result = shallowRender(<(VerticalList())(^.wrapped := props)())
 
     //then
-    (elementMock.screen _).expects().never()
-    (screenMock.focusOffset _).expects(*).never()
-    (keyMock.full _).expects().returning("down")
+    assertNativeComponent(result, <.button(^.rbMouse := true)())
+  }
+  
+  it should "render empty component when columns = 0" in {
+    //given
+    val props = VerticalListProps((1, 2), columns = 0, items = List("item 1", "item 2", "item 3"))
 
     //when
-    TestRenderer.act { () =>
-      findProps(root, ListItem).last.onKeyPress(
-        elementMock.asInstanceOf[BlessedElement],
-        keyMock.asInstanceOf[KeyboardKey]
-      )
-    }
-  }
-
-  it should "focus previous item when onKeyPress(up)" in {
-    //given
-    val props = VerticalListProps(List("item 1", "item 2", "item 3"))
-    val root = createTestRenderer(<(VerticalList())(^.wrapped := props)()).root
-    TestRenderer.act { () =>
-      findProps(root, ListItem)(1).onFocus()
-    }
-    findProps(root, ListItem)(1).focused shouldBe true
-
-    val screenMock = mock[BlessedScreenMock]
-    val elementMock = mock[BlessedElementMock]
-    val keyMock = mock[KeyboardKeyMock]
+    val result = shallowRender(<(VerticalList())(^.wrapped := props)())
 
     //then
-    (elementMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.focusOffset _).expects(-1)
-    (keyMock.full _).expects().returning("up")
-
-    //when
-    TestRenderer.act { () =>
-      findProps(root, ListItem)(1).onKeyPress(
-        elementMock.asInstanceOf[BlessedElement],
-        keyMock.asInstanceOf[KeyboardKey]
-      )
-    }
+    assertNativeComponent(result, <.button(^.rbMouse := true)())
   }
-
-  it should "focus next item when onKeyPress(down)" in {
+  
+  it should "render component with 2 columns" in {
     //given
-    val props = VerticalListProps(List("item 1", "item 2", "item 3"))
-    val root = createTestRenderer(<(VerticalList())(^.wrapped := props)()).root
-    TestRenderer.act { () =>
-      findProps(root, ListItem)(1).onFocus()
-    }
-    findProps(root, ListItem)(1).focused shouldBe true
-
-    val screenMock = mock[BlessedScreenMock]
-    val elementMock = mock[BlessedElementMock]
-    val keyMock = mock[KeyboardKeyMock]
-
-    //then
-    (elementMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.focusOffset _).expects(1)
-    (keyMock.full _).expects().returning("down")
-
-    //when
-    TestRenderer.act { () =>
-      findProps(root, ListItem)(1).onKeyPress(
-        elementMock.asInstanceOf[BlessedElement],
-        keyMock.asInstanceOf[KeyboardKey]
-      )
-    }
-  }
-
-  it should "render component" in {
-    //given
-    val props = VerticalListProps(List("item 1", "item 2", "item 3"))
+    val props = VerticalListProps((7, 1), columns = 2, items = List("item 1", "item 2", "item 3"))
     val comp = <(VerticalList())(^.wrapped := props)()
 
     //when
     val result = shallowRender(comp)
 
     //then
-    assertNativeComponent(result, <.>()(), { items: List[ShallowInstance] =>
-      items.zipWithIndex.map { case (item, index) =>
-        item.key shouldBe s"$index"
-        assertComponent(item, ListItem) { case ListItemProps(pos, style, text, focused, _, _) =>
-          pos shouldBe index
-          style shouldBe VerticalList.styles.normalItem
-          text shouldBe props.items(index)
-          focused shouldBe false
-        }
+    assertNativeComponent(result, <.button(^.rbMouse := true)(), { children: List[ShallowInstance] =>
+      val List(col1, col2) = children
+      col1.key shouldBe "0"
+      assertComponent(col1, VerticalItems) {
+        case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedIndex) =>
+          resSize shouldBe 3 -> 1
+          left shouldBe 0
+          boxStyle shouldBe VerticalList.styles.normalItem
+          itemStyle shouldBe VerticalList.styles.normalItem
+          items shouldBe List(("item 1", 0))
+          focusedIndex shouldBe -1
       }
-      
-      Succeeded
+
+      col2.key shouldBe "3"
+      assertComponent(col2, VerticalItems) {
+        case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedIndex) =>
+          resSize shouldBe 4 -> 1
+          left shouldBe 3
+          boxStyle shouldBe VerticalList.styles.normalItem
+          itemStyle shouldBe VerticalList.styles.normalItem
+          items shouldBe List(("item 2", 1))
+          focusedIndex shouldBe -1
+      }
     })
   }
-}
+  
+  it should "render component with 3 columns" in {
+    //given
+    val props = VerticalListProps((9, 1), columns = 3, items = List("item 1", "item 2", "item 3"))
+    val comp = <(VerticalList())(^.wrapped := props)()
 
-object VerticalListSpec {
+    //when
+    val result = shallowRender(comp)
 
-  @JSExportAll
-  trait KeyboardKeyMock {
-
-    def full: String
-  }
-
-  @JSExportAll
-  trait BlessedScreenMock {
-
-    def focusOffset(offset: Int): Unit
-  }
-
-  @JSExportAll
-  trait BlessedElementMock {
-
-    def screen: BlessedScreen
+    //then
+    assertNativeComponent(result, <.button(^.rbMouse := true)(), { children: List[ShallowInstance] =>
+      val List(col1, col2, col3) = children
+      col1.key shouldBe "0"
+      assertComponent(col1, VerticalItems) {
+        case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedIndex) =>
+          resSize shouldBe 3 -> 1
+          left shouldBe 0
+          boxStyle shouldBe VerticalList.styles.normalItem
+          itemStyle shouldBe VerticalList.styles.normalItem
+          items shouldBe List(("item 1", 0))
+          focusedIndex shouldBe -1
+      }
+      col2.key shouldBe "3"
+      assertComponent(col2, VerticalItems) {
+        case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedIndex) =>
+          resSize shouldBe 3 -> 1
+          left shouldBe 3
+          boxStyle shouldBe VerticalList.styles.normalItem
+          itemStyle shouldBe VerticalList.styles.normalItem
+          items shouldBe List(("item 2", 1))
+          focusedIndex shouldBe -1
+      }
+      col3.key shouldBe "6"
+      assertComponent(col3, VerticalItems) {
+        case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedIndex) =>
+          resSize shouldBe 3 -> 1
+          left shouldBe 6
+          boxStyle shouldBe VerticalList.styles.normalItem
+          itemStyle shouldBe VerticalList.styles.normalItem
+          items shouldBe List(("item 3", 2))
+          focusedIndex shouldBe -1
+      }
+    })
   }
 }

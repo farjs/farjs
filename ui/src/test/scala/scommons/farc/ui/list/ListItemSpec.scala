@@ -1,75 +1,18 @@
 package scommons.farc.ui.list
 
-import scommons.farc.ui.list.ListItemSpec._
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
-import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
+import scommons.react.test.util.ShallowRendererUtils
 
-import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExportAll
+class ListItemSpec extends TestSpec with ShallowRendererUtils {
 
-class ListItemSpec extends TestSpec
-  with ShallowRendererUtils
-  with TestRendererUtils {
-
-  it should "call onFocus callback when onFocus" in {
-    //given
-    val onFocus = mockFunction[Unit]
-    val props = ListItemProps(
-      pos = 1,
-      style = new BlessedStyle {},
-      text = "test item",
-      focused = true,
-      onFocus = onFocus,
-      onKeyPress = (_, _) => ()
-    )
-    val comp = shallowRender(<(ListItem())(^.wrapped := props)())
-    
-    //then
-    onFocus.expects()
-    
-    //when
-    comp.props.onFocus()
-  }
-  
-  it should "call onKeyPress callback when onKeypress" in {
-    //given
-    val onKeyPress = mockFunction[BlessedElement, KeyboardKey, Unit]
-    val keyMock = mock[KeyboardKeyMock]
-    val props = ListItemProps(
-      pos = 1,
-      style = new BlessedStyle {},
-      text = "test item",
-      focused = true,
-      onFocus = () => (),
-      onKeyPress = onKeyPress
-    )
-    val buttonMock = mock[BlessedElementMock]
-    val buttonElement = buttonMock.asInstanceOf[BlessedElement]
-    val comp = testRender(<(ListItem())(^.wrapped := props)(), { el =>
-      if (el.`type` == "button".asInstanceOf[js.Any]) {
-        buttonElement
-      }
-      else null
-    })
-    val key = keyMock.asInstanceOf[KeyboardKey]
-    
-    //then
-    onKeyPress.expects(buttonElement, key)
-    
-    //when
-    comp.props.onKeypress(null, key)
-  }
-  
-  it should "render component" in {
+  it should "render not focused component" in {
     //given
     val props = ListItemProps(
-      pos = 1,
+      top = 1,
       style = new BlessedStyle {},
       text = "test item",
-      focused = true,
-      onFocus = () => (),
-      onKeyPress = (_, _) => ()
+      focused = false
     )
     val comp = <(ListItem())(^.wrapped := props)()
 
@@ -78,29 +21,38 @@ class ListItemSpec extends TestSpec
 
     //then
     assertNativeComponent(result,
-      <.button(
-        ^.rbTop := props.pos,
+      <.box(
+        ^.rbTop := props.top,
         ^.rbHeight := 1,
         ^.rbStyle := props.style,
-        ^.rbMouse := true,
         ^.content := props.text
       )()
     )
   }
-}
+  
+  it should "render focused component" in {
+    //given
+    val props = ListItemProps(
+      top = 1,
+      style = new BlessedStyle {
+        override val focus = new BlessedStyle {}
+      },
+      text = "test item",
+      focused = true
+    )
+    val comp = <(ListItem())(^.wrapped := props)()
 
-object ListItemSpec {
+    //when
+    val result = shallowRender(comp)
 
-  @JSExportAll
-  trait KeyboardKeyMock {
-
-    def full: String
-  }
-
-  @JSExportAll
-  trait BlessedElementMock {
-
-    def width: Int
-    def height: Int
+    //then
+    assertNativeComponent(result,
+      <.box(
+        ^.rbTop := props.top,
+        ^.rbHeight := 1,
+        ^.rbStyle := props.style.focus,
+        ^.content := props.text
+      )()
+    )
   }
 }

@@ -17,7 +17,7 @@ object BottomMenuBar extends FunctionComponent[BottomMenuBarProps] {
           ^.rbTags := true,
           ^.rbMouse := true,
           ^.rbLeft := pos,
-          ^.rbOnClick := { () =>
+          ^.rbOnClick := { _ =>
             data.onClick(id)
           },
           ^.content := s"{white-fg}{black-bg}$key{/}{black-fg}{cyan-bg}$name{/}"
