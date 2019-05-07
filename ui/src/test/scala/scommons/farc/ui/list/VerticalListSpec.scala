@@ -1,5 +1,7 @@
 package scommons.farc.ui.list
 
+import scommons.farc.ui.border._
+import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
 import scommons.react.test.raw.{ShallowInstance, TestRenderer}
@@ -98,72 +100,43 @@ class VerticalListSpec extends TestSpec
 
     //then
     assertNativeComponent(result, <.button(^.rbMouse := true)(), { children: List[ShallowInstance] =>
-      val List(col1, col2) = children
-      col1.key shouldBe "0"
-      assertComponent(col1, VerticalItems) {
-        case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedIndex) =>
-          resSize shouldBe 3 -> 1
-          left shouldBe 0
-          boxStyle shouldBe VerticalList.styles.normalItem
-          itemStyle shouldBe VerticalList.styles.normalItem
-          items shouldBe List(("item 1", 0))
-          focusedIndex shouldBe -1
-      }
-
-      col2.key shouldBe "3"
-      assertComponent(col2, VerticalItems) {
-        case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedIndex) =>
-          resSize shouldBe 4 -> 1
-          left shouldBe 3
-          boxStyle shouldBe VerticalList.styles.normalItem
-          itemStyle shouldBe VerticalList.styles.normalItem
-          items shouldBe List(("item 2", 1))
-          focusedIndex shouldBe -1
-      }
-    })
-  }
-  
-  it should "render component with 3 columns" in {
-    //given
-    val props = VerticalListProps((9, 1), columns = 3, items = List("item 1", "item 2", "item 3"))
-    val comp = <(VerticalList())(^.wrapped := props)()
-
-    //when
-    val result = shallowRender(comp)
-
-    //then
-    assertNativeComponent(result, <.button(^.rbMouse := true)(), { children: List[ShallowInstance] =>
-      val List(col1, col2, col3) = children
-      col1.key shouldBe "0"
-      assertComponent(col1, VerticalItems) {
-        case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedIndex) =>
-          resSize shouldBe 3 -> 1
-          left shouldBe 0
-          boxStyle shouldBe VerticalList.styles.normalItem
-          itemStyle shouldBe VerticalList.styles.normalItem
-          items shouldBe List(("item 1", 0))
-          focusedIndex shouldBe -1
-      }
-      col2.key shouldBe "3"
-      assertComponent(col2, VerticalItems) {
-        case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedIndex) =>
-          resSize shouldBe 3 -> 1
-          left shouldBe 3
-          boxStyle shouldBe VerticalList.styles.normalItem
-          itemStyle shouldBe VerticalList.styles.normalItem
-          items shouldBe List(("item 2", 1))
-          focusedIndex shouldBe -1
-      }
-      col3.key shouldBe "6"
-      assertComponent(col3, VerticalItems) {
-        case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedIndex) =>
-          resSize shouldBe 3 -> 1
-          left shouldBe 6
-          boxStyle shouldBe VerticalList.styles.normalItem
-          itemStyle shouldBe VerticalList.styles.normalItem
-          items shouldBe List(("item 3", 2))
-          focusedIndex shouldBe -1
-      }
+      val List(colWrap1, colWrap2) = children
+      assertNativeComponent(colWrap1, <.>()(), { children: List[ShallowInstance] =>
+        val List(sep, colItems) = children
+        sep.key shouldBe "sep0"
+        assertComponent(sep, VerticalLine) {
+          case VerticalLineProps(pos, resLength, ch, style, start, end) =>
+            pos shouldBe 2 -> -1
+            resLength shouldBe 3
+            ch shouldBe "\u2502"
+            style shouldBe VerticalList.styles.normalItem
+            start shouldBe Some("\u2564")
+            end shouldBe Some("\u2567")
+        }
+        colItems.key shouldBe "col0"
+        assertComponent(colItems, VerticalItems) {
+          case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedIndex) =>
+            resSize shouldBe 2 -> 1
+            left shouldBe 0
+            boxStyle shouldBe VerticalList.styles.normalItem
+            itemStyle shouldBe VerticalList.styles.normalItem
+            items shouldBe List(("item 1", 0))
+            focusedIndex shouldBe -1
+        }
+      })
+      assertNativeComponent(colWrap2, <.>()(), { children: List[ShallowInstance] =>
+        val List(col2) = children
+        col2.key shouldBe "col1"
+        assertComponent(col2, VerticalItems) {
+          case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedIndex) =>
+            resSize shouldBe 4 -> 1
+            left shouldBe 3
+            boxStyle shouldBe VerticalList.styles.normalItem
+            itemStyle shouldBe VerticalList.styles.normalItem
+            items shouldBe List(("item 2", 1))
+            focusedIndex shouldBe -1
+        }
+      })
     })
   }
 }

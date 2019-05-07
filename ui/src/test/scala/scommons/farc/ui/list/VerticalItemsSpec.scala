@@ -9,7 +9,7 @@ class VerticalItemsSpec extends TestSpec with ShallowRendererUtils {
   it should "render component" in {
     //given
     val props = VerticalItemsProps(
-      size = (1, 2),
+      size = (5, 2),
       left = 3,
       boxStyle = new BlessedStyle {},
       itemStyle = new BlessedStyle {},
@@ -32,19 +32,22 @@ class VerticalItemsSpec extends TestSpec with ShallowRendererUtils {
       ^.rbLeft := props.left,
       ^.rbStyle := props.boxStyle
     )(), { case List(comp1, comp2, comp3) =>
-      assertComponent(comp1, ListItem) { case ListItemProps(top, style, text, focused) =>
+      assertComponent(comp1, ListItem) { case ListItemProps(width, top, style, text, focused) =>
+        width shouldBe props.size._1
         top shouldBe 0
         style shouldBe props.itemStyle
         text shouldBe "item 1"
         focused shouldBe false
       }
-      assertComponent(comp2, ListItem) { case ListItemProps(top, style, text, focused) =>
+      assertComponent(comp2, ListItem) { case ListItemProps(width, top, style, text, focused) =>
+        width shouldBe props.size._1
         top shouldBe 1
         style shouldBe props.itemStyle
         text shouldBe "item 2"
         focused shouldBe true
       }
-      assertComponent(comp3, ListItem) { case ListItemProps(top, style, text, focused) =>
+      assertComponent(comp3, ListItem) { case ListItemProps(width, top, style, text, focused) =>
+        width shouldBe props.size._1
         top shouldBe 2
         style shouldBe props.itemStyle
         text shouldBe "item 3"

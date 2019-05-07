@@ -1,5 +1,6 @@
 package scommons.farc.ui.list
 
+import scommons.farc.ui.border._
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
@@ -41,14 +42,14 @@ object VerticalList extends FunctionComponent[VerticalListProps] {
       setFocusedIndex(newIndex)
     }
     
-    val columnsPos: Seq[(Int, Int)] = (0 until columns).map { colIndex =>
+    val columnsPos: Seq[(Int, Int, Int)] = (0 until columns).map { colIndex =>
       val colWidth = width / columns
       val colLeft = colIndex * colWidth
       val finalWidth =
         if (colIndex == columns - 1) width - colLeft
-        else colWidth
+        else colWidth - 1
       
-      (colLeft, finalWidth)
+      (colLeft, finalWidth, colIndex)
     }
     
     <.button(
@@ -58,7 +59,7 @@ object VerticalList extends FunctionComponent[VerticalListProps] {
         val curr = elementRef.current
         val x = data.x - curr.aleft
         val y = data.y - curr.atop
-        val colIndex = columnsPos.indexWhere { case (left, len) =>
+        val colIndex = columnsPos.indexWhere { case (left, len, _) =>
           left <= x && x < (left + len)
         }
         if (colIndex != -1) {
@@ -75,19 +76,33 @@ object VerticalList extends FunctionComponent[VerticalListProps] {
     )(
       if (height > 0) {
         val columnsItems = items.zipWithIndex.grouped(height).toSeq
-        columnsItems.zipAll(columnsPos, Nil, (0, 0)).map {
-          case (colItems, (colLeft, colWidth)) =>
-            <(VerticalItems())(
-              ^.key := s"$colLeft",
-              ^.wrapped := VerticalItemsProps(
-                size = (colWidth, height),
-                left = colLeft,
-                boxStyle = styles.normalItem,
-                itemStyle = styles.normalItem,
-                items = colItems,
-                focusedIndex = focusedIndex
+        columnsItems.zipAll(columnsPos, Nil, (0, 0, 0)).map {
+          case (colItems, (colLeft, colWidth, colIndex)) =>
+            <.>()(
+              if (colIndex != columns - 1) Some(
+                <(VerticalLine())(^.key := s"sep$colIndex", ^.wrapped := VerticalLineProps(
+                  pos = (colLeft + colWidth, -1),
+                  length = height + 2,
+                  ch = "\u2502",
+                  style = styles.normalItem,
+                  start = Some("\u2564"),
+                  end = Some("\u2567")
+                ))()
               )
-            )()
+              else None,
+
+              <(VerticalItems())(
+                ^.key := s"col$colIndex",
+                ^.wrapped := VerticalItemsProps(
+                  size = (colWidth, height),
+                  left = colLeft,
+                  boxStyle = styles.normalItem,
+                  itemStyle = styles.normalItem,
+                  items = colItems,
+                  focusedIndex = focusedIndex
+                )
+              )()
+            )
         }
       }
       else Nil

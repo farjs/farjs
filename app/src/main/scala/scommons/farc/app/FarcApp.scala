@@ -1,12 +1,12 @@
 package scommons.farc.app
 
 import scommons.farc.ui._
+import scommons.farc.ui.border._
 import scommons.farc.ui.list._
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.blessed.raw.{Blessed, ReactBlessed}
-import scommons.react.hooks._
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -33,88 +33,42 @@ object FarcApp {
   object FarcAppRoot extends FunctionComponent[Unit] {
 
     protected def render(props: Props): ReactElement = {
-      val (demo, setDemo) = useState(0)
-
       <.>()(
         <.box(
-          ^.rbWidth := "25%",
-          ^.rbHeight := "100%-1",
-          ^.rbBorder := new BlessedBorder {
-            override val `type` = "line"
-          },
-          ^.rbStyle := new BlessedStyle {
-            override val fg = "white"
-            override val bg = "blue"
-            override val border = new BlessedBorderStyle {
-              override val fg = "white"
-              override val bg = "blue"
-            }
-          }
-        )(
-          <.text(
-            ^.rbStyle := new BlessedStyle {
-              override val fg = "black"
-              override val bg = "cyan"
-            },
-            ^.content := s" $demo "
-          )(),
-
-          <.button(
-            ^.rbMouse := true,
-            ^.rbStyle := new BlessedStyle {
-              override val fg = "black"
-              override val bg = "cyan"
-              override val focus = new BlessedStyle {
-                override val fg = "white"
-              }
-            },
-            ^.rbShadow := true,
-            ^.rbHeight := 1, ^.rbWidth := 3, ^.rbTop := 2, ^.rbLeft := 6,
-            ^.rbOnPress := { () =>
-              setDemo(demo + 1)
-              println("increment")
-            },
-            ^.content := " + "
-          )(),
-
-          <.button(
-            ^.rbMouse := true,
-            ^.rbStyle := new BlessedStyle {
-              override val fg = "black"
-              override val bg = "cyan"
-              override val focus = new BlessedStyle {
-                override val fg = "white"
-              }
-            },
-            ^.rbShadow := true,
-            ^.rbHeight := 1, ^.rbWidth := 3, ^.rbTop := 2,
-            ^.rbOnPress := { () =>
-              setDemo(demo - 1)
-              println("decrement")
-            },
-            ^.content := " - "
-          )()
-        ),
-        <.box(
-          ^.rbWidth := "25%",
-//          ^.rbHeight := "100%-1",
-          ^.rbHeight := "20%",
-          ^.rbLeft := "25%"
+          ^.rbWidth := "50%",
+          ^.rbHeight := "100%-1"
+//          ^.rbBorder := new BlessedBorder {
+//            override val `type` = "bg"
+//            override val ch = "\u2502"
+//          },
+//          ^.rbStyle := new BlessedStyle {
+////            override val fg = "white"
+////            override val bg = "blue"
+//            override val border = new BlessedBorderStyle {
+//              override val fg = "white"
+//              override val bg = "blue"
+//            }
+//          }
         )(
           <(WithSize())(^.wrapped := WithSizeProps({ (width, height) =>
-            <(VerticalList())(^.wrapped := VerticalListProps(
-              size = (width, height),
-              columns = 2,
-              items = List(
-                "item 1",
-                "item 2",
-                "item 3",
-                "item 4",
-                "item 5",
-                "item 6",
-                "item 7"
+            <.>()(
+              <(DoubleBorder())(^.wrapped := DoubleBorderProps((width, height), borderStyle))(),
+              <.box(
+                ^.rbWidth := width - 2,
+                ^.rbHeight := height - 2,
+                ^.rbLeft := 1,
+                ^.rbTop := 1
+              )(
+                <(VerticalList())(^.wrapped := VerticalListProps(
+                  size = (width - 2, height - 2),
+                  columns = 3,
+                  items = (1 to 1000).toList.map { i =>
+                    if (i % 10 == 0) s"item $i tooo loooooooooooooooooooooooooooooooooooooong"
+                    else s"item $i"
+                  }
+                ))()
               )
-            ))()
+            )
           }))()
         ),
 
@@ -135,6 +89,11 @@ object FarcApp {
           ))()
         )
       )
+    }
+
+    private val borderStyle = new BlessedStyle {
+      override val bg = "blue"
+      override val fg = "white"
     }
   }
 }

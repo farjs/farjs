@@ -32,5 +32,6 @@ trait BlessedScrollBarStyle extends js.Object {
 
 trait BlessedBorder extends js.Object {
 
-  val `type`: js.UndefOr[String] = js.undefined
+  val `type`: js.UndefOr[String] = js.undefined // Type of border (line or bg). bg by default
+  val ch: js.UndefOr[String] = js.undefined     // Character to use if bg type, default is space
 }
