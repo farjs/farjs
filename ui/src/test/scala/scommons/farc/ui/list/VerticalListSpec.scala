@@ -101,9 +101,8 @@ class VerticalListSpec extends TestSpec
     //then
     assertNativeComponent(result, <.button(^.rbMouse := true)(), { children: List[ShallowInstance] =>
       val List(colWrap1, colWrap2) = children
-      assertNativeComponent(colWrap1, <.>()(), { children: List[ShallowInstance] =>
+      assertNativeComponent(colWrap1, <.>(^.key := "0")(), { children: List[ShallowInstance] =>
         val List(sep, colItems) = children
-        sep.key shouldBe "sep0"
         assertComponent(sep, VerticalLine) {
           case VerticalLineProps(pos, resLength, ch, style, start, end) =>
             pos shouldBe 2 -> -1
@@ -113,7 +112,6 @@ class VerticalListSpec extends TestSpec
             start shouldBe Some("\u2564")
             end shouldBe Some("\u2567")
         }
-        colItems.key shouldBe "col0"
         assertComponent(colItems, VerticalItems) {
           case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedIndex) =>
             resSize shouldBe 2 -> 1
@@ -124,9 +122,8 @@ class VerticalListSpec extends TestSpec
             focusedIndex shouldBe -1
         }
       })
-      assertNativeComponent(colWrap2, <.>()(), { children: List[ShallowInstance] =>
+      assertNativeComponent(colWrap2, <.>(^.key := "1")(), { children: List[ShallowInstance] =>
         val List(col2) = children
-        col2.key shouldBe "col1"
         assertComponent(col2, VerticalItems) {
           case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedIndex) =>
             resSize shouldBe 4 -> 1

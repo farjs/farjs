@@ -3,10 +3,10 @@ package scommons.farc.ui.border
 import scommons.react._
 import scommons.react.blessed._
 
-case class DoubleBorderProps(size: (Int, Int),
+case class SingleBorderProps(size: (Int, Int),
                              style: BlessedStyle)
 
-object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
+object SingleBorder extends FunctionComponent[SingleBorderProps] {
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -48,29 +48,29 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
   }
 
   // lines
-  val horizontalCh = "\u2550"
-  val verticalCh = "\u2551"
-
+  val horizontalCh = "\u2500"
+  val verticalCh = "\u2502"
+  
   // corners
-  val topLeftCh = "\u2554"
-  val topRightCh = "\u2557"
-  val bottomLeftCh = "\u255a"
-  val bottomRightCh = "\u255d"
-  
+  val topLeftCh = "\u250c"
+  val topRightCh = "\u2510"
+  val bottomLeftCh = "\u2514"
+  val bottomRightCh = "\u2518"
+
   // connectors
-  val topCh = "\u2566"
-  val bottomCh = "\u2569"
-  val leftCh = "\u2560"
-  val rightCh = "\u2563"
-  
-  // single connectors
-  val topSingleCh = "\u2564"
-  val bottomSingleCh = "\u2567"
-  val leftSingleCh = "\u255f"
-  val rightSingleCh = "\u2562"
+  val topCh = "\u252c"
+  val bottomCh = "\u2534"
+  val leftCh = "\u251c"
+  val rightCh = "\u2524"
+
+  // double connectors
+  val topDoubleCh = "\u2565"
+  val bottomDoubleCh = "\u2568"
+  val leftDoubleCh = "\u255e"
+  val rightDoubleCh = "\u2561"
 
   // crosses
-  val crossCh = "\u256c"
-  val crossSingleVertCh = "\u256a"
-  val crossSingleHorizCh = "\u256b"
+  val crossCh = "\u253c"
+  val crossDoubleVertCh = "\u256b"
+  val crossDoubleHorizCh = "\u256a"
 }

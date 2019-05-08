@@ -78,30 +78,27 @@ object VerticalList extends FunctionComponent[VerticalListProps] {
         val columnsItems = items.zipWithIndex.grouped(height).toSeq
         columnsItems.zipAll(columnsPos, Nil, (0, 0, 0)).map {
           case (colItems, (colLeft, colWidth, colIndex)) =>
-            <.>()(
+            <.>(^.key := s"$colIndex")(
               if (colIndex != columns - 1) Some(
-                <(VerticalLine())(^.key := s"sep$colIndex", ^.wrapped := VerticalLineProps(
+                <(VerticalLine())(^.wrapped := VerticalLineProps(
                   pos = (colLeft + colWidth, -1),
                   length = height + 2,
-                  ch = "\u2502",
+                  lineCh = SingleBorder.verticalCh,
                   style = styles.normalItem,
-                  start = Some("\u2564"),
-                  end = Some("\u2567")
+                  startCh = Some(DoubleBorder.topSingleCh),
+                  endCh = Some(DoubleBorder.bottomSingleCh)
                 ))()
               )
               else None,
 
-              <(VerticalItems())(
-                ^.key := s"col$colIndex",
-                ^.wrapped := VerticalItemsProps(
-                  size = (colWidth, height),
-                  left = colLeft,
-                  boxStyle = styles.normalItem,
-                  itemStyle = styles.normalItem,
-                  items = colItems,
-                  focusedIndex = focusedIndex
-                )
-              )()
+              <(VerticalItems())(^.wrapped := VerticalItemsProps(
+                size = (colWidth, height),
+                left = colLeft,
+                boxStyle = styles.normalItem,
+                itemStyle = styles.normalItem,
+                items = colItems,
+                focusedIndex = focusedIndex
+              ))()
             )
         }
       }

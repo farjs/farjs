@@ -37,18 +37,6 @@ object FarcApp {
         <.box(
           ^.rbWidth := "50%",
           ^.rbHeight := "100%-1"
-//          ^.rbBorder := new BlessedBorder {
-//            override val `type` = "bg"
-//            override val ch = "\u2502"
-//          },
-//          ^.rbStyle := new BlessedStyle {
-////            override val fg = "white"
-////            override val bg = "blue"
-//            override val border = new BlessedBorderStyle {
-//              override val fg = "white"
-//              override val bg = "blue"
-//            }
-//          }
         )(
           <(WithSize())(^.wrapped := WithSizeProps({ (width, height) =>
             <.>()(

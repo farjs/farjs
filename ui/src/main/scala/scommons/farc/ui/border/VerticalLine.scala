@@ -5,10 +5,10 @@ import scommons.react.blessed._
 
 case class VerticalLineProps(pos: (Int, Int),
                              length: Int,
-                             ch: String,
+                             lineCh: String,
                              style: BlessedStyle,
-                             start: Option[String] = None,
-                             end: Option[String] = None)
+                             startCh: Option[String] = None,
+                             endCh: Option[String] = None)
 
 object VerticalLine extends FunctionComponent[VerticalLineProps] {
   
@@ -23,11 +23,11 @@ object VerticalLine extends FunctionComponent[VerticalLineProps] {
       ^.rbTop := top,
       ^.rbStyle := props.style,
       ^.content := {
-        val startCh = props.start.getOrElse("")
-        val endCh = props.end.getOrElse("")
+        val startCh = props.startCh.getOrElse("")
+        val endCh = props.endCh.getOrElse("")
 
         startCh +
-          props.ch * (props.length - startCh.length - endCh.length) +
+          props.lineCh * (props.length - startCh.length - endCh.length) +
           endCh
       }
     )()
