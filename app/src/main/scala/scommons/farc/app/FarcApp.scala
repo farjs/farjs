@@ -50,7 +50,7 @@ object FarcApp {
                 <(VerticalList())(^.wrapped := VerticalListProps(
                   size = (width - 2, height - 2),
                   columns = 3,
-                  items = (1 to 1000).toList.map { i =>
+                  items = (1 to 10000).toList.map { i =>
                     if (i % 10 == 0) s"item $i tooo loooooooooooooooooooooooooooooooooooooong"
                     else s"item $i"
                   }

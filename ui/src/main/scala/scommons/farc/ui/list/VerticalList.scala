@@ -97,7 +97,14 @@ object VerticalList extends FunctionComponent[VerticalListProps] {
                 boxStyle = styles.normalItem,
                 itemStyle = styles.normalItem,
                 items = colItems,
-                focusedIndex = focusedIndex
+                focusedPos = {
+                  val firstIndex = colItems.headOption.map(_._2).getOrElse(-1)
+                  val lastIndex = colItems.lastOption.map(_._2).getOrElse(-1)
+                  if (firstIndex >= 0 && firstIndex <= focusedIndex && focusedIndex <= lastIndex) {
+                    focusedIndex - firstIndex
+                  }
+                  else -1
+                }
               ))()
             )
         }

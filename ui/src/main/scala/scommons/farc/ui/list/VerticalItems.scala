@@ -8,24 +8,30 @@ case class VerticalItemsProps(size: (Int, Int),
                               boxStyle: BlessedStyle,
                               itemStyle: BlessedStyle,
                               items: Seq[(String, Int)],
-                              focusedIndex: Int)
+                              focusedPos: Int)
 
 object VerticalItems extends FunctionComponent[VerticalItemsProps] {
+
+  override protected def create(): ReactClass = {
+    ReactMemo[Props](super.create(), { (prevProps, nextProps) =>
+      prevProps.wrapped == nextProps.wrapped
+    })
+  }
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val (width, height) = props.size
 
     def renderItems(items: Seq[(String, Int)]): Seq[ReactElement] = {
-      items.zipWithIndex.map { case ((text, index), top) =>
+      items.zipWithIndex.map { case ((text, _), pos) =>
         <(ListItem())(
-          ^.key := s"$top",
+          ^.key := s"$pos",
           ^.wrapped := ListItemProps(
             width = width,
-            top = top,
+            top = pos,
             style = props.itemStyle,
             text = text,
-            focused = props.focusedIndex == index
+            focused = props.focusedPos == pos
           )
         )()
       }

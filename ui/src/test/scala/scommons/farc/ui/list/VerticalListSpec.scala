@@ -23,21 +23,23 @@ class VerticalListSpec extends TestSpec
       }
       else null
     }).root
-    findProps(root, VerticalItems).head.focusedIndex shouldBe -1
+    findProps(root, VerticalItems).head.focusedPos shouldBe -1
+    findProps(root, VerticalItems)(1).focusedPos shouldBe -1
 
-    def check(x: Int, y: Int, focusedIndex: Int): Unit = {
+    def check(x: Int, y: Int, focused1: Int, focused2: Int): Unit = {
       TestRenderer.act { () =>
         root.children(0).props.onClick(literal(x = x, y = y))
       }
       
-      findProps(root, VerticalItems).head.focusedIndex shouldBe focusedIndex
+      findProps(root, VerticalItems).head.focusedPos shouldBe focused1
+      findProps(root, VerticalItems)(1).focusedPos shouldBe focused2
     }
     
     //when & then
-    check(x = 6, y = 3, focusedIndex = 0)
-    check(x = 6, y = 4, focusedIndex = 1)
-    check(x = 8, y = 3, focusedIndex = 2)
-    check(x = 8, y = 4, focusedIndex = 2)
+    check(x = 6, y = 3, focused1 = 0, focused2 = -1)
+    check(x = 6, y = 4, focused1 = 1, focused2 = -1)
+    check(x = 8, y = 3, focused1 = -1, focused2 = 0)
+    check(x = 8, y = 4, focused1 = -1, focused2 = 0)
   }
 
   it should "focus item when onKeypress" in {
@@ -45,27 +47,27 @@ class VerticalListSpec extends TestSpec
     val props = VerticalListProps((7, 1), columns = 2, items = List("item 1", "item 2", "item 3"))
     val renderer = createRenderer()
     renderer.render(<(VerticalList())(^.wrapped := props)())
-    findProps(renderer.getRenderOutput(), VerticalItems).head.focusedIndex shouldBe -1
+    findProps(renderer.getRenderOutput(), VerticalItems).head.focusedPos shouldBe -1
     
-    def check(keyFull: String, focusedIndex: Int, items1: List[(String, Int)], items2: List[(String, Int)]): Unit = {
+    def check(keyFull: String, focused1: Int, focused2: Int, items1: List[(String, Int)], items2: List[(String, Int)]): Unit = {
       renderer.getRenderOutput().props.onKeypress(null, literal(full = keyFull))
       
       val items = findProps(renderer.getRenderOutput(), VerticalItems)
-      items.head.focusedIndex shouldBe focusedIndex
+      items.head.focusedPos shouldBe focused1
       items.head.items shouldBe items1
-      items(1).focusedIndex shouldBe focusedIndex
+      items(1).focusedPos shouldBe focused2
       items(1).items shouldBe items2
     }
     
     //when & then
-    check("down", focusedIndex = 0, items1 = List(("item 1", 0)), items2 = List(("item 2", 1)))
-    check("down", focusedIndex = 1, items1 = List(("item 1", 0)), items2 = List(("item 2", 1)))
-    check("down", focusedIndex = 1, items1 = List(("item 2", 0)), items2 = List(("item 3", 1)))
-    check("down", focusedIndex = 1, items1 = List(("item 2", 0)), items2 = List(("item 3", 1))) //noop
-    check("up", focusedIndex = 0, items1 = List(("item 2", 0)), items2 = List(("item 3", 1)))
-    check("up", focusedIndex = 0, items1 = List(("item 1", 0)), items2 = List(("item 2", 1)))
-    check("up", focusedIndex = 0, items1 = List(("item 1", 0)), items2 = List(("item 2", 1))) //noop
-    check("unknown", focusedIndex = 0, items1 = List(("item 1", 0)), items2 = List(("item 2", 1))) //noop
+    check("down", focused1 = 0, focused2 = -1, items1 = List(("item 1", 0)), items2 = List(("item 2", 1)))
+    check("down", focused1 = -1, focused2 = 0, items1 = List(("item 1", 0)), items2 = List(("item 2", 1)))
+    check("down", focused1 = -1, focused2 = 0, items1 = List(("item 2", 0)), items2 = List(("item 3", 1)))
+    check("down", focused1 = -1, focused2 = 0, items1 = List(("item 2", 0)), items2 = List(("item 3", 1))) //noop
+    check("up", focused1 = 0, focused2 = -1, items1 = List(("item 2", 0)), items2 = List(("item 3", 1)))
+    check("up", focused1 = 0, focused2 = -1, items1 = List(("item 1", 0)), items2 = List(("item 2", 1)))
+    check("up", focused1 = 0, focused2 = -1, items1 = List(("item 1", 0)), items2 = List(("item 2", 1))) //noop
+    check("unknown", focused1 = 0, focused2 = -1, items1 = List(("item 1", 0)), items2 = List(("item 2", 1))) //noop
   }
 
   it should "render empty component when height = 0" in {
@@ -113,25 +115,25 @@ class VerticalListSpec extends TestSpec
             end shouldBe Some("\u2567")
         }
         assertComponent(colItems, VerticalItems) {
-          case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedIndex) =>
+          case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedPos) =>
             resSize shouldBe 2 -> 1
             left shouldBe 0
             boxStyle shouldBe VerticalList.styles.normalItem
             itemStyle shouldBe VerticalList.styles.normalItem
             items shouldBe List(("item 1", 0))
-            focusedIndex shouldBe -1
+            focusedPos shouldBe -1
         }
       })
       assertNativeComponent(colWrap2, <.>(^.key := "1")(), { children: List[ShallowInstance] =>
         val List(col2) = children
         assertComponent(col2, VerticalItems) {
-          case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedIndex) =>
+          case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedPos) =>
             resSize shouldBe 4 -> 1
             left shouldBe 3
             boxStyle shouldBe VerticalList.styles.normalItem
             itemStyle shouldBe VerticalList.styles.normalItem
             items shouldBe List(("item 2", 1))
-            focusedIndex shouldBe -1
+            focusedPos shouldBe -1
         }
       })
     })

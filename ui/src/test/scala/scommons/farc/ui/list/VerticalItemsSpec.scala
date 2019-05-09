@@ -18,7 +18,7 @@ class VerticalItemsSpec extends TestSpec with ShallowRendererUtils {
         ("item 2", 11),
         ("item 3", 12)
       ),
-      focusedIndex = 11
+      focusedPos = 1
     )
     val comp = <(VerticalItems())(^.wrapped := props)()
 
