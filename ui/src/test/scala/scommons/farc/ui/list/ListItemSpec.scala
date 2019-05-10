@@ -88,6 +88,7 @@ class ListItemSpec extends TestSpec with ShallowRendererUtils {
     assertNativeComponent(result,
       <.>()(
         <.text(
+          ^.key := "text",
           ^.rbWidth := props.width,
           ^.rbHeight := 1,
           ^.rbTop := props.top,
@@ -100,6 +101,7 @@ class ListItemSpec extends TestSpec with ShallowRendererUtils {
         
         if (longItem) Some(
           <.text(
+            ^.key := "longMark",
             ^.rbHeight := 1,
             ^.rbLeft := props.width,
             ^.rbTop := props.top,

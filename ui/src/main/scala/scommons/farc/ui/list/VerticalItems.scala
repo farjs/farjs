@@ -23,9 +23,9 @@ object VerticalItems extends FunctionComponent[VerticalItemsProps] {
     val (width, height) = props.size
 
     def renderItems(items: Seq[(String, Int)]): Seq[ReactElement] = {
-      items.zipWithIndex.map { case ((text, _), pos) =>
+      items.zipWithIndex.map { case ((text, index), pos) =>
         <(ListItem())(
-          ^.key := s"$pos",
+          ^.key := s"$index",
           ^.wrapped := ListItemProps(
             width = width,
             top = pos,

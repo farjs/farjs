@@ -41,21 +41,53 @@ object FarcApp {
           <(WithSize())(^.wrapped := WithSizeProps({ (width, height) =>
             <.>()(
               <(DoubleBorder())(^.wrapped := DoubleBorderProps((width, height), borderStyle))(),
+              <(HorizontalLine())(^.wrapped := HorizontalLineProps(
+                pos = (0, 2),
+                length = width,
+                lineCh = SingleBorder.horizontalCh,
+                style = borderStyle,
+                startCh = Some(DoubleBorder.leftSingleCh),
+                endCh = Some(DoubleBorder.rightSingleCh)
+              ))(),
+              <(HorizontalLine())(^.wrapped := HorizontalLineProps(
+                pos = (0, height - 4),
+                length = width,
+                lineCh = SingleBorder.horizontalCh,
+                style = borderStyle,
+                startCh = Some(DoubleBorder.leftSingleCh),
+                endCh = Some(DoubleBorder.rightSingleCh)
+              ))(),
+              <.text(
+                ^.rbWidth := width - 2,
+                ^.rbHeight := 1,
+                ^.rbLeft := 1,
+                ^.rbTop := 1,
+                ^.rbStyle := textStyle,
+                ^.content := "n /current/folder"
+              )(),
               <.box(
                 ^.rbWidth := width - 2,
-                ^.rbHeight := height - 2,
+                ^.rbHeight := height - 7,
                 ^.rbLeft := 1,
-                ^.rbTop := 1
+                ^.rbTop := 3
               )(
                 <(VerticalList())(^.wrapped := VerticalListProps(
-                  size = (width - 2, height - 2),
+                  size = (width - 2, height - 7),
                   columns = 3,
                   items = (1 to 10000).toList.map { i =>
-                    if (i % 10 == 0) s"item $i tooo loooooooooooooooooooooooooooooooooooooong"
-                    else s"item $i"
+                    if (i % 10 == 0) s"file $i tooo loooooooooooooooooooooooooooooooooooooong"
+                    else s"file $i"
                   }
                 ))()
-              )
+              ),
+              <.text(
+                ^.rbWidth := width - 2,
+                ^.rbHeight := 2,
+                ^.rbLeft := 1,
+                ^.rbTop := height - 3,
+                ^.rbStyle := textStyle,
+                ^.content := "info"
+              )()
             )
           }))()
         ),
@@ -80,6 +112,11 @@ object FarcApp {
     }
 
     private val borderStyle = new BlessedStyle {
+      override val bg = "blue"
+      override val fg = "white"
+    }
+    
+    private val textStyle = new BlessedStyle {
       override val bg = "blue"
       override val fg = "white"
     }

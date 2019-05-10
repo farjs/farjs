@@ -85,8 +85,8 @@ object VerticalList extends FunctionComponent[VerticalListProps] {
                   length = height + 2,
                   lineCh = SingleBorder.verticalCh,
                   style = styles.normalItem,
-                  startCh = Some(DoubleBorder.topSingleCh),
-                  endCh = Some(DoubleBorder.bottomSingleCh)
+                  startCh = Some(SingleBorder.topCh),
+                  endCh = Some(SingleBorder.bottomCh)
                 ))()
               )
               else None,

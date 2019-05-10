@@ -109,10 +109,10 @@ class VerticalListSpec extends TestSpec
           case VerticalLineProps(pos, resLength, ch, style, start, end) =>
             pos shouldBe 2 -> -1
             resLength shouldBe 3
-            ch shouldBe "\u2502"
+            ch shouldBe SingleBorder.verticalCh
             style shouldBe VerticalList.styles.normalItem
-            start shouldBe Some("\u2564")
-            end shouldBe Some("\u2567")
+            start shouldBe Some(SingleBorder.topCh)
+            end shouldBe Some(SingleBorder.bottomCh)
         }
         assertComponent(colItems, VerticalItems) {
           case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedPos) =>

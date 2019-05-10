@@ -17,6 +17,7 @@ object ListItem extends FunctionComponent[ListItemProps] {
     
     <.>()(
       <.text(
+        ^.key := "text",
         ^.rbWidth := props.width,
         ^.rbHeight := 1,
         ^.rbTop := props.top,
@@ -29,6 +30,7 @@ object ListItem extends FunctionComponent[ListItemProps] {
 
       if (longItem) Some(
         <.text(
+          ^.key := "longMark",
           ^.rbHeight := 1,
           ^.rbLeft := props.width,
           ^.rbTop := props.top,
