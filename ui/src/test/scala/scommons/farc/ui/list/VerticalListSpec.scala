@@ -44,30 +44,80 @@ class VerticalListSpec extends TestSpec
 
   it should "focus item when onKeypress" in {
     //given
-    val props = VerticalListProps((7, 1), columns = 2, items = List("item 1", "item 2", "item 3"))
+    val props = VerticalListProps((7, 2), columns = 2, items = List(
+      "item 1",
+      "item 2",
+      "item 3",
+      "item 4",
+      "item 5",
+      "item 6",
+      "item 7"
+    ))
     val renderer = createRenderer()
     renderer.render(<(VerticalList())(^.wrapped := props)())
     findProps(renderer.getRenderOutput(), VerticalItems).head.focusedPos shouldBe -1
     
-    def check(keyFull: String, focused1: Int, focused2: Int, items1: List[(String, Int)], items2: List[(String, Int)]): Unit = {
+    def check(keyFull: String, f1: Int, f2: Int, i1: List[(String, Int)], i2: List[(String, Int)]): Unit = {
       renderer.getRenderOutput().props.onKeypress(null, literal(full = keyFull))
       
       val items = findProps(renderer.getRenderOutput(), VerticalItems)
-      items.head.focusedPos shouldBe focused1
-      items.head.items shouldBe items1
-      items(1).focusedPos shouldBe focused2
-      items(1).items shouldBe items2
+      items.head.focusedPos shouldBe f1
+      items.head.items shouldBe i1
+      items(1).focusedPos shouldBe f2
+      items(1).items shouldBe i2
     }
     
     //when & then
-    check("down", focused1 = 0, focused2 = -1, items1 = List(("item 1", 0)), items2 = List(("item 2", 1)))
-    check("down", focused1 = -1, focused2 = 0, items1 = List(("item 1", 0)), items2 = List(("item 2", 1)))
-    check("down", focused1 = -1, focused2 = 0, items1 = List(("item 2", 0)), items2 = List(("item 3", 1)))
-    check("down", focused1 = -1, focused2 = 0, items1 = List(("item 2", 0)), items2 = List(("item 3", 1))) //noop
-    check("up", focused1 = 0, focused2 = -1, items1 = List(("item 2", 0)), items2 = List(("item 3", 1)))
-    check("up", focused1 = 0, focused2 = -1, items1 = List(("item 1", 0)), items2 = List(("item 2", 1)))
-    check("up", focused1 = 0, focused2 = -1, items1 = List(("item 1", 0)), items2 = List(("item 2", 1))) //noop
-    check("unknown", focused1 = 0, focused2 = -1, items1 = List(("item 1", 0)), items2 = List(("item 2", 1))) //noop
+    check("unknown", f1 = -1, f2 = -1, i1 = List(("item 1", 0), ("item 2", 1)), i2 = List(("item 3", 2), ("item 4", 3))) //noop
+    
+    //when & then
+    check("down", f1 = 0, f2 = -1, i1 = List(("item 1", 0), ("item 2", 1)), i2 = List(("item 3", 2), ("item 4", 3)))
+    check("down", f1 = 1, f2 = -1, i1 = List(("item 1", 0), ("item 2", 1)), i2 = List(("item 3", 2), ("item 4", 3)))
+    check("down", f1 = -1, f2 = 0, i1 = List(("item 1", 0), ("item 2", 1)), i2 = List(("item 3", 2), ("item 4", 3)))
+    check("down", f1 = -1, f2 = 1, i1 = List(("item 1", 0), ("item 2", 1)), i2 = List(("item 3", 2), ("item 4", 3)))
+    check("down", f1 = -1, f2 = 1, i1 = List(("item 2", 0), ("item 3", 1)), i2 = List(("item 4", 2), ("item 5", 3)))
+    check("down", f1 = -1, f2 = 1, i1 = List(("item 3", 0), ("item 4", 1)), i2 = List(("item 5", 2), ("item 6", 3)))
+    check("down", f1 = -1, f2 = 1, i1 = List(("item 4", 0), ("item 5", 1)), i2 = List(("item 6", 2), ("item 7", 3)))
+    check("down", f1 = -1, f2 = 1, i1 = List(("item 4", 0), ("item 5", 1)), i2 = List(("item 6", 2), ("item 7", 3))) //noop
+
+    //when & then
+    check("up", f1 = -1, f2 = 0, i1 = List(("item 4", 0), ("item 5", 1)), i2 = List(("item 6", 2), ("item 7", 3)))
+    check("up", f1 = 1, f2 = -1, i1 = List(("item 4", 0), ("item 5", 1)), i2 = List(("item 6", 2), ("item 7", 3)))
+    check("up", f1 = 0, f2 = -1, i1 = List(("item 4", 0), ("item 5", 1)), i2 = List(("item 6", 2), ("item 7", 3)))
+    check("up", f1 = 0, f2 = -1, i1 = List(("item 3", 0), ("item 4", 1)), i2 = List(("item 5", 2), ("item 6", 3)))
+    check("up", f1 = 0, f2 = -1, i1 = List(("item 2", 0), ("item 3", 1)), i2 = List(("item 4", 2), ("item 5", 3)))
+    check("up", f1 = 0, f2 = -1, i1 = List(("item 1", 0), ("item 2", 1)), i2 = List(("item 3", 2), ("item 4", 3)))
+    check("up", f1 = 0, f2 = -1, i1 = List(("item 1", 0), ("item 2", 1)), i2 = List(("item 3", 2), ("item 4", 3))) //noop
+
+    //when & then
+    check("right", f1 = -1, f2 = 0, i1 = List(("item 1", 0), ("item 2", 1)), i2 = List(("item 3", 2), ("item 4", 3)))
+    check("right", f1 = -1, f2 = 1, i1 = List(("item 3", 0), ("item 4", 1)), i2 = List(("item 5", 2), ("item 6", 3)))
+    check("right", f1 = -1, f2 = 1, i1 = List(("item 4", 0), ("item 5", 1)), i2 = List(("item 6", 2), ("item 7", 3)))
+    check("right", f1 = -1, f2 = 1, i1 = List(("item 4", 0), ("item 5", 1)), i2 = List(("item 6", 2), ("item 7", 3))) //noop
+
+    //when & then
+    check("left", f1 = 1, f2 = -1, i1 = List(("item 4", 0), ("item 5", 1)), i2 = List(("item 6", 2), ("item 7", 3)))
+    check("left", f1 = 0, f2 = -1, i1 = List(("item 2", 0), ("item 3", 1)), i2 = List(("item 4", 2), ("item 5", 3)))
+    check("left", f1 = 0, f2 = -1, i1 = List(("item 1", 0), ("item 2", 1)), i2 = List(("item 3", 2), ("item 4", 3)))
+    check("left", f1 = 0, f2 = -1, i1 = List(("item 1", 0), ("item 2", 1)), i2 = List(("item 3", 2), ("item 4", 3))) //noop
+
+    //when & then
+    check("pagedown", f1 = -1, f2 = 1, i1 = List(("item 1", 0), ("item 2", 1)), i2 = List(("item 3", 2), ("item 4", 3)))
+    check("pagedown", f1 = -1, f2 = 1, i1 = List(("item 4", 0), ("item 5", 1)), i2 = List(("item 6", 2), ("item 7", 3)))
+    check("pagedown", f1 = -1, f2 = 1, i1 = List(("item 4", 0), ("item 5", 1)), i2 = List(("item 6", 2), ("item 7", 3))) //noop
+
+    //when & then
+    check("pageup", f1 = 0, f2 = -1, i1 = List(("item 4", 0), ("item 5", 1)), i2 = List(("item 6", 2), ("item 7", 3)))
+    check("pageup", f1 = 0, f2 = -1, i1 = List(("item 1", 0), ("item 2", 1)), i2 = List(("item 3", 2), ("item 4", 3)))
+    check("pageup", f1 = 0, f2 = -1, i1 = List(("item 1", 0), ("item 2", 1)), i2 = List(("item 3", 2), ("item 4", 3))) //noop
+
+    //when & then
+    check("end", f1 = -1, f2 = 1, i1 = List(("item 4", 0), ("item 5", 1)), i2 = List(("item 6", 2), ("item 7", 3)))
+    check("end", f1 = -1, f2 = 1, i1 = List(("item 4", 0), ("item 5", 1)), i2 = List(("item 6", 2), ("item 7", 3))) //noop
+
+    //when & then
+    check("home", f1 = 0, f2 = -1, i1 = List(("item 1", 0), ("item 2", 1)), i2 = List(("item 3", 2), ("item 4", 3)))
+    check("home", f1 = 0, f2 = -1, i1 = List(("item 1", 0), ("item 2", 1)), i2 = List(("item 3", 2), ("item 4", 3))) //noop
   }
 
   it should "render empty component when height = 0" in {

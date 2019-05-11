@@ -24,9 +24,9 @@ object VerticalList extends FunctionComponent[VerticalListProps] {
     val items: Seq[String] = {
       props.items.view(viewOffset, viewOffset + viewSize)
     }
+    val itemsSize = items.size
 
     def focusItem(index: Int): Unit = {
-      val itemsSize = items.size
       if (index < 0 || index >= itemsSize) {
         val offset = index - focusedIndex
         setViewOffset(
@@ -70,6 +70,18 @@ object VerticalList extends FunctionComponent[VerticalListProps] {
         key.full match {
           case "up" => focusItem(focusedIndex - 1)
           case "down" => focusItem(focusedIndex + 1)
+          case "left" => focusItem(focusedIndex - height)
+          case "right" => focusItem(focusedIndex + height)
+          case "pageup" => focusItem(
+            if (focusedIndex > 0) 0
+            else -height * columns
+          )
+          case "pagedown" => focusItem(
+            if (focusedIndex < itemsSize - 1) itemsSize - 1
+            else focusedIndex + height * columns
+          )
+          case "home" => focusItem(-viewOffset)
+          case "end" => focusItem(totalSize - 1)
           case _ =>
         }
       }
