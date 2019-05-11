@@ -7,7 +7,9 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class VerticalListProps(size: (Int, Int), columns: Int, items: List[String])
+case class VerticalListProps(size: (Int, Int),
+                             columns: Int,
+                             items: List[(Int, String)])
 
 object VerticalList extends FunctionComponent[VerticalListProps] {
   
@@ -21,7 +23,7 @@ object VerticalList extends FunctionComponent[VerticalListProps] {
     val columns = props.columns
     val totalSize = props.items.size
     val viewSize = height * columns
-    val items: Seq[String] = {
+    val items: Seq[(Int, String)] = {
       props.items.view(viewOffset, viewOffset + viewSize)
     }
     val itemsSize = items.size
@@ -74,11 +76,11 @@ object VerticalList extends FunctionComponent[VerticalListProps] {
           case "right" => focusItem(focusedIndex + height)
           case "pageup" => focusItem(
             if (focusedIndex > 0) 0
-            else -height * columns
+            else -viewSize
           )
           case "pagedown" => focusItem(
             if (focusedIndex < itemsSize - 1) itemsSize - 1
-            else focusedIndex + height * columns
+            else focusedIndex + viewSize
           )
           case "home" => focusItem(-viewOffset)
           case "end" => focusItem(totalSize - 1)
@@ -87,7 +89,7 @@ object VerticalList extends FunctionComponent[VerticalListProps] {
       }
     )(
       if (height > 0) {
-        val columnsItems = items.zipWithIndex.grouped(height).toSeq
+        val columnsItems = items.grouped(height).toSeq
         columnsItems.zipAll(columnsPos, Nil, (0, 0, 0)).map {
           case (colItems, (colLeft, colWidth, colIndex)) =>
             <.>(^.key := s"$colIndex")(
@@ -110,9 +112,9 @@ object VerticalList extends FunctionComponent[VerticalListProps] {
                 itemStyle = styles.normalItem,
                 items = colItems,
                 focusedPos = {
-                  val firstIndex = colItems.headOption.map(_._2).getOrElse(-1)
-                  val lastIndex = colItems.lastOption.map(_._2).getOrElse(-1)
-                  if (firstIndex >= 0 && firstIndex <= focusedIndex && focusedIndex <= lastIndex) {
+                  val firstIndex = height * colIndex
+                  val lastIndex = firstIndex + colItems.size - 1
+                  if (firstIndex <= focusedIndex && focusedIndex <= lastIndex) {
                     focusedIndex - firstIndex
                   }
                   else -1

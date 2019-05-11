@@ -75,8 +75,10 @@ object FarcApp {
                   size = (width - 2, height - 7),
                   columns = 3,
                   items = (1 to 10000).toList.map { i =>
-                    if (i % 10 == 0) s"file $i tooo loooooooooooooooooooooooooooooooooooooong"
-                    else s"file $i"
+                    i -> {
+                      if (i % 10 == 0) s"file $i tooo loooooooooooooooooooooooooooooooooooooong"
+                      else s"file $i"
+                    }
                   }
                 ))()
               ),

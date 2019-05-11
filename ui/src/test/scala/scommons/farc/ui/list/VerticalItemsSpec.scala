@@ -14,9 +14,9 @@ class VerticalItemsSpec extends TestSpec with ShallowRendererUtils {
       boxStyle = new BlessedStyle {},
       itemStyle = new BlessedStyle {},
       items = List(
-        ("item 1", 10),
-        ("item 2", 11),
-        ("item 3", 12)
+        10 -> "item 1",
+        11 -> "item 2",
+        12 -> "item 3"
       ),
       focusedPos = 1
     )
@@ -32,7 +32,7 @@ class VerticalItemsSpec extends TestSpec with ShallowRendererUtils {
       ^.rbLeft := props.left,
       ^.rbStyle := props.boxStyle
     )(), { case List(comp1, comp2, comp3) =>
-      comp1.key shouldBe "10"
+      comp1.key shouldBe "0"
       assertComponent(comp1, ListItem) { case ListItemProps(width, top, style, text, focused) =>
         width shouldBe props.size._1
         top shouldBe 0
@@ -40,7 +40,7 @@ class VerticalItemsSpec extends TestSpec with ShallowRendererUtils {
         text shouldBe "item 1"
         focused shouldBe false
       }
-      comp2.key shouldBe "11"
+      comp2.key shouldBe "1"
       assertComponent(comp2, ListItem) { case ListItemProps(width, top, style, text, focused) =>
         width shouldBe props.size._1
         top shouldBe 1
@@ -48,7 +48,7 @@ class VerticalItemsSpec extends TestSpec with ShallowRendererUtils {
         text shouldBe "item 2"
         focused shouldBe true
       }
-      comp3.key shouldBe "12"
+      comp3.key shouldBe "2"
       assertComponent(comp3, ListItem) { case ListItemProps(width, top, style, text, focused) =>
         width shouldBe props.size._1
         top shouldBe 2

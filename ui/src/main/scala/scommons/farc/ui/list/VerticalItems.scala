@@ -7,7 +7,7 @@ case class VerticalItemsProps(size: (Int, Int),
                               left: Int,
                               boxStyle: BlessedStyle,
                               itemStyle: BlessedStyle,
-                              items: Seq[(String, Int)],
+                              items: Seq[(Int, String)],
                               focusedPos: Int)
 
 object VerticalItems extends FunctionComponent[VerticalItemsProps] {
@@ -22,10 +22,14 @@ object VerticalItems extends FunctionComponent[VerticalItemsProps] {
     val props = compProps.wrapped
     val (width, height) = props.size
 
-    def renderItems(items: Seq[(String, Int)]): Seq[ReactElement] = {
-      items.zipWithIndex.map { case ((text, index), pos) =>
+    def renderItems(items: Seq[(Int, String)]): Seq[ReactElement] = {
+      var pos = -1
+      
+      items.map { case (_, text) =>
+        pos += 1
+        
         <(ListItem())(
-          ^.key := s"$index",
+          ^.key := s"$pos",
           ^.wrapped := ListItemProps(
             width = width,
             top = pos,
