@@ -1,15 +1,15 @@
-package scommons.farc.ui.list
+package scommons.farc.ui.filelist
 
 import scommons.react._
 import scommons.react.blessed._
 
-case class ListItemProps(width: Int,
-                         top: Int,
-                         style: BlessedStyle,
-                         text: String,
-                         focused: Boolean)
+case class FileListItemProps(width: Int,
+                             top: Int,
+                             style: BlessedStyle,
+                             text: String,
+                             focused: Boolean)
 
-object ListItem extends FunctionComponent[ListItemProps] {
+object FileListItem extends FunctionComponent[FileListItemProps] {
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped

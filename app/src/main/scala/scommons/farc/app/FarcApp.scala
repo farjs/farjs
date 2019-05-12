@@ -2,7 +2,7 @@ package scommons.farc.app
 
 import scommons.farc.ui._
 import scommons.farc.ui.border._
-import scommons.farc.ui.list._
+import scommons.farc.ui.filelist._
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
@@ -71,7 +71,7 @@ object FarcApp {
                 ^.rbLeft := 1,
                 ^.rbTop := 3
               )(
-                <(VerticalList())(^.wrapped := VerticalListProps(
+                <(FileList())(^.wrapped := FileListProps(
                   size = (width - 2, height - 7),
                   columns = 3,
                   items = (1 to 10000).toList.map { i =>

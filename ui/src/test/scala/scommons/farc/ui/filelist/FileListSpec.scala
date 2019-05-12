@@ -1,4 +1,4 @@
-package scommons.farc.ui.list
+package scommons.farc.ui.filelist
 
 import scommons.farc.ui.border._
 import scommons.react._
@@ -10,33 +10,33 @@ import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
 
-class VerticalListSpec extends TestSpec
+class FileListSpec extends TestSpec
   with ShallowRendererUtils
   with TestRendererUtils {
 
   it should "focus item when onClick" in {
     //given
-    val props = VerticalListProps((7, 2), columns = 2, items = List(
+    val props = FileListProps((7, 2), columns = 2, items = List(
       1 -> "item 1",
       2 -> "item 2",
       3 -> "item 3"
     ))
-    val root = createTestRenderer(<(VerticalList())(^.wrapped := props)(), { el =>
+    val root = createTestRenderer(<(FileList())(^.wrapped := props)(), { el =>
       if (el.`type` == "button".asInstanceOf[js.Any]) {
         literal(aleft = 5, atop = 3)
       }
       else null
     }).root
-    findProps(root, VerticalItems).head.focusedPos shouldBe -1
-    findProps(root, VerticalItems)(1).focusedPos shouldBe -1
+    findProps(root, FileListColumn).head.focusedPos shouldBe -1
+    findProps(root, FileListColumn)(1).focusedPos shouldBe -1
 
     def check(x: Int, y: Int, focused1: Int, focused2: Int): Unit = {
       TestRenderer.act { () =>
         root.children(0).props.onClick(literal(x = x, y = y))
       }
       
-      findProps(root, VerticalItems).head.focusedPos shouldBe focused1
-      findProps(root, VerticalItems)(1).focusedPos shouldBe focused2
+      findProps(root, FileListColumn).head.focusedPos shouldBe focused1
+      findProps(root, FileListColumn)(1).focusedPos shouldBe focused2
     }
     
     //when & then
@@ -48,7 +48,7 @@ class VerticalListSpec extends TestSpec
 
   it should "focus item when onKeypress" in {
     //given
-    val props = VerticalListProps((7, 2), columns = 2, items = List(
+    val props = FileListProps((7, 2), columns = 2, items = List(
       1 -> "item 1",
       2 -> "item 2",
       3 -> "item 3",
@@ -58,13 +58,13 @@ class VerticalListSpec extends TestSpec
       7 -> "item 7"
     ))
     val renderer = createRenderer()
-    renderer.render(<(VerticalList())(^.wrapped := props)())
-    findProps(renderer.getRenderOutput(), VerticalItems).head.focusedPos shouldBe -1
+    renderer.render(<(FileList())(^.wrapped := props)())
+    findProps(renderer.getRenderOutput(), FileListColumn).head.focusedPos shouldBe -1
     
     def check(keyFull: String, f1: Int, f2: Int, i1: List[(Int, String)], i2: List[(Int, String)]): Unit = {
       renderer.getRenderOutput().props.onKeypress(null, literal(full = keyFull))
       
-      val items = findProps(renderer.getRenderOutput(), VerticalItems)
+      val items = findProps(renderer.getRenderOutput(), FileListColumn)
       items.head.focusedPos shouldBe f1
       items.head.items shouldBe i1
       items(1).focusedPos shouldBe f2
@@ -126,14 +126,14 @@ class VerticalListSpec extends TestSpec
 
   it should "render empty component when height = 0" in {
     //given
-    val props = VerticalListProps((1, 0), columns = 2, items = List(
+    val props = FileListProps((1, 0), columns = 2, items = List(
       1 -> "item 1",
       2 -> "item 2",
       3 -> "item 3"
     ))
 
     //when
-    val result = shallowRender(<(VerticalList())(^.wrapped := props)())
+    val result = shallowRender(<(FileList())(^.wrapped := props)())
 
     //then
     assertNativeComponent(result, <.button(^.rbMouse := true)())
@@ -141,14 +141,14 @@ class VerticalListSpec extends TestSpec
   
   it should "render empty component when columns = 0" in {
     //given
-    val props = VerticalListProps((1, 2), columns = 0, items = List(
+    val props = FileListProps((1, 2), columns = 0, items = List(
       1 -> "item 1",
       2 -> "item 2",
       3 -> "item 3"
     ))
 
     //when
-    val result = shallowRender(<(VerticalList())(^.wrapped := props)())
+    val result = shallowRender(<(FileList())(^.wrapped := props)())
 
     //then
     assertNativeComponent(result, <.button(^.rbMouse := true)())
@@ -156,12 +156,12 @@ class VerticalListSpec extends TestSpec
   
   it should "render component with 2 columns" in {
     //given
-    val props = VerticalListProps((7, 1), columns = 2, items = List(
+    val props = FileListProps((7, 1), columns = 2, items = List(
       1 -> "item 1",
       2 -> "item 2",
       3 -> "item 3"
     ))
-    val comp = <(VerticalList())(^.wrapped := props)()
+    val comp = <(FileList())(^.wrapped := props)()
 
     //when
     val result = shallowRender(comp)
@@ -176,28 +176,28 @@ class VerticalListSpec extends TestSpec
             pos shouldBe 2 -> -1
             resLength shouldBe 3
             ch shouldBe SingleBorder.verticalCh
-            style shouldBe VerticalList.styles.normalItem
+            style shouldBe FileList.styles.normalItem
             start shouldBe Some(SingleBorder.topCh)
             end shouldBe Some(SingleBorder.bottomCh)
         }
-        assertComponent(colItems, VerticalItems) {
-          case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedPos) =>
+        assertComponent(colItems, FileListColumn) {
+          case FileListColumnProps(resSize, left, boxStyle, itemStyle, items, focusedPos) =>
             resSize shouldBe 2 -> 1
             left shouldBe 0
-            boxStyle shouldBe VerticalList.styles.normalItem
-            itemStyle shouldBe VerticalList.styles.normalItem
+            boxStyle shouldBe FileList.styles.normalItem
+            itemStyle shouldBe FileList.styles.normalItem
             items shouldBe List(1 -> "item 1")
             focusedPos shouldBe -1
         }
       })
       assertNativeComponent(colWrap2, <.>(^.key := "1")(), { children: List[ShallowInstance] =>
         val List(col2) = children
-        assertComponent(col2, VerticalItems) {
-          case VerticalItemsProps(resSize, left, boxStyle, itemStyle, items, focusedPos) =>
+        assertComponent(col2, FileListColumn) {
+          case FileListColumnProps(resSize, left, boxStyle, itemStyle, items, focusedPos) =>
             resSize shouldBe 4 -> 1
             left shouldBe 3
-            boxStyle shouldBe VerticalList.styles.normalItem
-            itemStyle shouldBe VerticalList.styles.normalItem
+            boxStyle shouldBe FileList.styles.normalItem
+            itemStyle shouldBe FileList.styles.normalItem
             items shouldBe List(2 -> "item 2")
             focusedPos shouldBe -1
         }

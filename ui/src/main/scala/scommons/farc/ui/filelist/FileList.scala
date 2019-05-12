@@ -1,4 +1,4 @@
-package scommons.farc.ui.list
+package scommons.farc.ui.filelist
 
 import scommons.farc.ui.border._
 import scommons.react._
@@ -7,11 +7,11 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class VerticalListProps(size: (Int, Int),
-                             columns: Int,
-                             items: List[(Int, String)])
+case class FileListProps(size: (Int, Int),
+                         columns: Int,
+                         items: List[(Int, String)])
 
-object VerticalList extends FunctionComponent[VerticalListProps] {
+object FileList extends FunctionComponent[FileListProps] {
   
   protected def render(compProps: Props): ReactElement = {
     val elementRef = useRef[BlessedElement](null)
@@ -105,7 +105,7 @@ object VerticalList extends FunctionComponent[VerticalListProps] {
               )
               else None,
 
-              <(VerticalItems())(^.wrapped := VerticalItemsProps(
+              <(FileListColumn())(^.wrapped := FileListColumnProps(
                 size = (colWidth, height),
                 left = colLeft,
                 boxStyle = styles.normalItem,
@@ -127,9 +127,9 @@ object VerticalList extends FunctionComponent[VerticalListProps] {
     )
   }
   
-  private[list] lazy val styles = Styles
+  private[filelist] lazy val styles = Styles
   
-  private[list] object Styles extends js.Object {
+  private[filelist] object Styles extends js.Object {
     val normalItem: BlessedStyle = new BlessedStyle {
       override val fg = "white"
       override val bg = "blue"

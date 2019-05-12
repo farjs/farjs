@@ -1,14 +1,14 @@
-package scommons.farc.ui.list
+package scommons.farc.ui.filelist
 
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
 import scommons.react.test.util.ShallowRendererUtils
 
-class VerticalItemsSpec extends TestSpec with ShallowRendererUtils {
+class FileListColumnSpec extends TestSpec with ShallowRendererUtils {
 
   it should "render component" in {
     //given
-    val props = VerticalItemsProps(
+    val props = FileListColumnProps(
       size = (5, 2),
       left = 3,
       boxStyle = new BlessedStyle {},
@@ -20,7 +20,7 @@ class VerticalItemsSpec extends TestSpec with ShallowRendererUtils {
       ),
       focusedPos = 1
     )
-    val comp = <(VerticalItems())(^.wrapped := props)()
+    val comp = <(FileListColumn())(^.wrapped := props)()
 
     //when
     val result = shallowRender(comp)
@@ -33,7 +33,7 @@ class VerticalItemsSpec extends TestSpec with ShallowRendererUtils {
       ^.rbStyle := props.boxStyle
     )(), { case List(comp1, comp2, comp3) =>
       comp1.key shouldBe "0"
-      assertComponent(comp1, ListItem) { case ListItemProps(width, top, style, text, focused) =>
+      assertComponent(comp1, FileListItem) { case FileListItemProps(width, top, style, text, focused) =>
         width shouldBe props.size._1
         top shouldBe 0
         style shouldBe props.itemStyle
@@ -41,7 +41,7 @@ class VerticalItemsSpec extends TestSpec with ShallowRendererUtils {
         focused shouldBe false
       }
       comp2.key shouldBe "1"
-      assertComponent(comp2, ListItem) { case ListItemProps(width, top, style, text, focused) =>
+      assertComponent(comp2, FileListItem) { case FileListItemProps(width, top, style, text, focused) =>
         width shouldBe props.size._1
         top shouldBe 1
         style shouldBe props.itemStyle
@@ -49,7 +49,7 @@ class VerticalItemsSpec extends TestSpec with ShallowRendererUtils {
         focused shouldBe true
       }
       comp3.key shouldBe "2"
-      assertComponent(comp3, ListItem) { case ListItemProps(width, top, style, text, focused) =>
+      assertComponent(comp3, FileListItem) { case FileListItemProps(width, top, style, text, focused) =>
         width shouldBe props.size._1
         top shouldBe 2
         style shouldBe props.itemStyle

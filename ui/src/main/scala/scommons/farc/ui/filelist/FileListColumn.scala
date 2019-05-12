@@ -1,16 +1,16 @@
-package scommons.farc.ui.list
+package scommons.farc.ui.filelist
 
 import scommons.react._
 import scommons.react.blessed._
 
-case class VerticalItemsProps(size: (Int, Int),
-                              left: Int,
-                              boxStyle: BlessedStyle,
-                              itemStyle: BlessedStyle,
-                              items: Seq[(Int, String)],
-                              focusedPos: Int)
+case class FileListColumnProps(size: (Int, Int),
+                               left: Int,
+                               boxStyle: BlessedStyle,
+                               itemStyle: BlessedStyle,
+                               items: Seq[(Int, String)],
+                               focusedPos: Int)
 
-object VerticalItems extends FunctionComponent[VerticalItemsProps] {
+object FileListColumn extends FunctionComponent[FileListColumnProps] {
 
   override protected def create(): ReactClass = {
     ReactMemo[Props](super.create(), { (prevProps, nextProps) =>
@@ -28,9 +28,9 @@ object VerticalItems extends FunctionComponent[VerticalItemsProps] {
       items.map { case (_, text) =>
         pos += 1
         
-        <(ListItem())(
+        <(FileListItem())(
           ^.key := s"$pos",
-          ^.wrapped := ListItemProps(
+          ^.wrapped := FileListItemProps(
             width = width,
             top = pos,
             style = props.itemStyle,

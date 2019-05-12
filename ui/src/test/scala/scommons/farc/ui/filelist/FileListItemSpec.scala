@@ -1,4 +1,4 @@
-package scommons.farc.ui.list
+package scommons.farc.ui.filelist
 
 import scommons.react._
 import scommons.react.blessed._
@@ -6,73 +6,73 @@ import scommons.react.test.TestSpec
 import scommons.react.test.raw.ShallowInstance
 import scommons.react.test.util.ShallowRendererUtils
 
-class ListItemSpec extends TestSpec with ShallowRendererUtils {
+class FileListItemSpec extends TestSpec with ShallowRendererUtils {
 
   it should "render not focused short item" in {
     //given
-    val props = getListItemProps.copy(
+    val props = getFileListItemProps.copy(
       width = 10,
       text = "short item",
       focused = false
     )
-    val comp = <(ListItem())(^.wrapped := props)()
+    val comp = <(FileListItem())(^.wrapped := props)()
 
     //when
     val result = shallowRender(comp)
 
     //then
-    assertListItem(result, props, longItem = false)
+    assertFileListItem(result, props, longItem = false)
   }
   
   it should "render not focused too long item" in {
     //given
-    val props = getListItemProps.copy(
+    val props = getFileListItemProps.copy(
       width = 3,
       text = "too long item",
       focused = false
     )
-    val comp = <(ListItem())(^.wrapped := props)()
+    val comp = <(FileListItem())(^.wrapped := props)()
 
     //when
     val result = shallowRender(comp)
 
     //then
-    assertListItem(result, props, longItem = true)
+    assertFileListItem(result, props, longItem = true)
   }
   
   it should "render focused short item" in {
     //given
-    val props = getListItemProps.copy(
+    val props = getFileListItemProps.copy(
       width = 10,
       text = "short item",
       focused = true
     )
-    val comp = <(ListItem())(^.wrapped := props)()
+    val comp = <(FileListItem())(^.wrapped := props)()
 
     //when
     val result = shallowRender(comp)
 
     //then
-    assertListItem(result, props, longItem = false)
+    assertFileListItem(result, props, longItem = false)
   }
   
   it should "render focused long item" in {
     //given
-    val props = getListItemProps.copy(
+    val props = getFileListItemProps.copy(
       width = 3,
       text = "too long item",
       focused = true
     )
-    val comp = <(ListItem())(^.wrapped := props)()
+    val comp = <(FileListItem())(^.wrapped := props)()
 
     //when
     val result = shallowRender(comp)
 
     //then
-    assertListItem(result, props, longItem = true)
+    assertFileListItem(result, props, longItem = true)
   }
   
-  private def getListItemProps: ListItemProps = ListItemProps(
+  private def getFileListItemProps: FileListItemProps = FileListItemProps(
     width = 5,
     top = 2,
     style = new BlessedStyle {
@@ -84,7 +84,9 @@ class ListItemSpec extends TestSpec with ShallowRendererUtils {
     focused = true
   )
 
-  private def assertListItem(result: ShallowInstance, props: ListItemProps, longItem: Boolean): Unit = {
+  private def assertFileListItem(result: ShallowInstance,
+                                 props: FileListItemProps,
+                                 longItem: Boolean): Unit = {
     assertNativeComponent(result,
       <.>()(
         <.text(
