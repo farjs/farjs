@@ -54,22 +54,6 @@ object FarcApp {
       
       <.box(^.rbStyle := textStyle)(
         <(DoubleBorder())(^.wrapped := DoubleBorderProps((width, height), borderStyle))(),
-        <(TextLine())(^.wrapped := TextLineProps(
-          align = TextLine.Center,
-          pos = (1, 0),
-          width = width - 2,
-          text = "/current/folder",
-          style = textStyle,
-          focused = true
-        ))(),
-        <(HorizontalLine())(^.wrapped := HorizontalLineProps(
-          pos = (0, 2),
-          length = width,
-          lineCh = SingleBorder.horizontalCh,
-          style = borderStyle,
-          startCh = Some(DoubleBorder.leftSingleCh),
-          endCh = Some(DoubleBorder.rightSingleCh)
-        ))(),
         <(HorizontalLine())(^.wrapped := HorizontalLineProps(
           pos = (0, height - 4),
           length = width,
@@ -80,12 +64,12 @@ object FarcApp {
         ))(),
         <.box(
           ^.rbWidth := width - 2,
-          ^.rbHeight := height - 7,
+          ^.rbHeight := height - 5,
           ^.rbLeft := 1,
-          ^.rbTop := 3
+          ^.rbTop := 1
         )(
           <(FileList())(^.wrapped := FileListProps(
-            size = (width - 2, height - 7),
+            size = (width - 2, height - 5),
             columns = 3,
             items = (1 to 10000).toList.map { i =>
               i -> {
@@ -95,6 +79,14 @@ object FarcApp {
             }
           ))()
         ),
+        <(TextLine())(^.wrapped := TextLineProps(
+          align = TextLine.Center,
+          pos = (1, 0),
+          width = width - 2,
+          text = "/current/folder",
+          style = textStyle,
+          focused = true
+        ))(),
         <(TextLine())(^.wrapped := TextLineProps(
           align = TextLine.Left,
           pos = (1, height - 3),

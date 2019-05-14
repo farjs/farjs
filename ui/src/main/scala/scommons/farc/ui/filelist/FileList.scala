@@ -22,7 +22,8 @@ object FileList extends FunctionComponent[FileListProps] {
     val (width, height) = props.size
     val columns = props.columns
     val totalSize = props.items.size
-    val viewSize = height * columns
+    val columnSize = height - 1 // excluding column header
+    val viewSize = columnSize * columns
     val items: Seq[(Int, String)] = {
       props.items.view(viewOffset, viewOffset + viewSize)
     }
@@ -65,15 +66,16 @@ object FileList extends FunctionComponent[FileListProps] {
           left <= x && x < (left + len)
         }
         if (colIndex != -1) {
-          focusItem(colIndex * height + y)
+          val itemPos = if (y > 0) y - 1 else y // exclude column header
+          focusItem(colIndex * columnSize + itemPos)
         }
       },
       ^.rbOnKeypress := { (_, key) =>
         key.full match {
           case "up" => focusItem(focusedIndex - 1)
           case "down" => focusItem(focusedIndex + 1)
-          case "left" => focusItem(focusedIndex - height)
-          case "right" => focusItem(focusedIndex + height)
+          case "left" => focusItem(focusedIndex - columnSize)
+          case "right" => focusItem(focusedIndex + columnSize)
           case "pageup" => focusItem(
             if (focusedIndex > 0) 0
             else -viewSize
@@ -88,8 +90,8 @@ object FileList extends FunctionComponent[FileListProps] {
         }
       }
     )(
-      if (height > 0) {
-        val columnsItems = items.grouped(height).toSeq
+      if (columnSize > 0) {
+        val columnsItems = items.grouped(columnSize).toSeq
         columnsItems.zipAll(columnsPos, Nil, (0, 0, 0)).map {
           case (colItems, (colLeft, colWidth, colIndex)) =>
             <.>(^.key := s"$colIndex")(
@@ -99,7 +101,7 @@ object FileList extends FunctionComponent[FileListProps] {
                   length = height + 2,
                   lineCh = SingleBorder.verticalCh,
                   style = styles.normalItem,
-                  startCh = Some(SingleBorder.topCh),
+                  startCh = Some(DoubleBorder.topSingleCh),
                   endCh = Some(SingleBorder.bottomCh)
                 ))()
               )
@@ -112,7 +114,7 @@ object FileList extends FunctionComponent[FileListProps] {
                 itemStyle = styles.normalItem,
                 items = colItems,
                 focusedPos = {
-                  val firstIndex = height * colIndex
+                  val firstIndex = columnSize * colIndex
                   val lastIndex = firstIndex + colItems.size - 1
                   if (firstIndex <= focusedIndex && focusedIndex <= lastIndex) {
                     focusedIndex - firstIndex

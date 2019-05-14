@@ -16,7 +16,7 @@ class FileListSpec extends TestSpec
 
   it should "focus item when onClick" in {
     //given
-    val props = FileListProps((7, 2), columns = 2, items = List(
+    val props = FileListProps((7, 3), columns = 2, items = List(
       1 -> "item 1",
       2 -> "item 2",
       3 -> "item 3"
@@ -40,15 +40,19 @@ class FileListSpec extends TestSpec
     }
     
     //when & then
-    check(x = 6, y = 3, focused1 = 0, focused2 = -1)
-    check(x = 6, y = 4, focused1 = 1, focused2 = -1)
-    check(x = 8, y = 3, focused1 = -1, focused2 = 0)
-    check(x = 8, y = 4, focused1 = -1, focused2 = 0)
+    check(x = 6, y = 3, focused1 = 0, focused2 = -1) // header in col 1
+    check(x = 6, y = 4, focused1 = 0, focused2 = -1) // first item in col 1
+    check(x = 6, y = 5, focused1 = 1, focused2 = -1) // second item in col 1
+
+    //when & then
+    check(x = 8, y = 3, focused1 = -1, focused2 = 0) // header in col 2
+    check(x = 8, y = 4, focused1 = -1, focused2 = 0) // first item in col 2
+    check(x = 8, y = 5, focused1 = -1, focused2 = 0) // last item in col 2
   }
 
   it should "focus item when onKeypress" in {
     //given
-    val props = FileListProps((7, 2), columns = 2, items = List(
+    val props = FileListProps((7, 3), columns = 2, items = List(
       1 -> "item 1",
       2 -> "item 2",
       3 -> "item 3",
@@ -124,9 +128,9 @@ class FileListSpec extends TestSpec
     check("home", f1 = 0, f2 = -1, i1 = List(1 -> "item 1", 2 -> "item 2"), i2 = List(3 -> "item 3", 4 -> "item 4")) //noop
   }
 
-  it should "render empty component when height = 0" in {
+  it should "render empty component when height < 2" in {
     //given
-    val props = FileListProps((1, 0), columns = 2, items = List(
+    val props = FileListProps((1, 1), columns = 2, items = List(
       1 -> "item 1",
       2 -> "item 2",
       3 -> "item 3"
@@ -156,7 +160,7 @@ class FileListSpec extends TestSpec
   
   it should "render component with 2 columns" in {
     //given
-    val props = FileListProps((7, 1), columns = 2, items = List(
+    val props = FileListProps((7, 2), columns = 2, items = List(
       1 -> "item 1",
       2 -> "item 2",
       3 -> "item 3"
@@ -174,15 +178,15 @@ class FileListSpec extends TestSpec
         assertComponent(sep, VerticalLine) {
           case VerticalLineProps(pos, resLength, ch, style, start, end) =>
             pos shouldBe 2 -> -1
-            resLength shouldBe 3
+            resLength shouldBe 4
             ch shouldBe SingleBorder.verticalCh
             style shouldBe FileList.styles.normalItem
-            start shouldBe Some(SingleBorder.topCh)
+            start shouldBe Some(DoubleBorder.topSingleCh)
             end shouldBe Some(SingleBorder.bottomCh)
         }
         assertComponent(colItems, FileListColumn) {
           case FileListColumnProps(resSize, left, boxStyle, itemStyle, items, focusedPos) =>
-            resSize shouldBe 2 -> 1
+            resSize shouldBe 2 -> 2
             left shouldBe 0
             boxStyle shouldBe FileList.styles.normalItem
             itemStyle shouldBe FileList.styles.normalItem
@@ -194,7 +198,7 @@ class FileListSpec extends TestSpec
         val List(col2) = children
         assertComponent(col2, FileListColumn) {
           case FileListColumnProps(resSize, left, boxStyle, itemStyle, items, focusedPos) =>
-            resSize shouldBe 4 -> 1
+            resSize shouldBe 4 -> 2
             left shouldBe 3
             boxStyle shouldBe FileList.styles.normalItem
             itemStyle shouldBe FileList.styles.normalItem
