@@ -14,6 +14,49 @@ class FileListSpec extends TestSpec
   with ShallowRendererUtils
   with TestRendererUtils {
 
+  it should "focus item when onWheelup/onWheeldown" in {
+    //given
+    val props = FileListProps((7, 7), columns = 2, items = List(
+      1 -> "item 1",
+      2 -> "item 2",
+      3 -> "item 3",
+      4 -> "item 4",
+      5 -> "item 5",
+      6 -> "item 6",
+      7 -> "item 7",
+      8 -> "item 8",
+      9 -> "item 9"
+    ))
+    val root = createTestRenderer(<(FileList())(^.wrapped := props)(), { el =>
+      if (el.`type` == "button".asInstanceOf[js.Any]) {
+        literal(aleft = 5, atop = 3)
+      }
+      else null
+    }).root
+    findProps(root, FileListColumn).head.focusedPos shouldBe -1
+    findProps(root, FileListColumn)(1).focusedPos shouldBe -1
+
+    def check(up: Boolean, focused1: Int, focused2: Int): Unit = {
+      TestRenderer.act { () =>
+        if (up) root.children(0).props.onWheelup(literal())
+        else root.children(0).props.onWheeldown(literal())
+      }
+      
+      findProps(root, FileListColumn).head.focusedPos shouldBe focused1
+      findProps(root, FileListColumn)(1).focusedPos shouldBe focused2
+    }
+    
+    //when & then
+    check(up = false, focused1 = 4, focused2 = -1)
+    check(up = false, focused1 = -1, focused2 = 2)
+    check(up = false, focused1 = -1, focused2 = 2) //noop
+
+    //when & then
+    check(up = true, focused1 = 3, focused2 = -1)
+    check(up = true, focused1 = 0, focused2 = -1)
+    check(up = true, focused1 = 0, focused2 = -1) //noop
+  }
+
   it should "focus item when onClick" in {
     //given
     val props = FileListProps((7, 3), columns = 2, items = List(

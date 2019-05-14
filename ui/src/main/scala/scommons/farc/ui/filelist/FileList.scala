@@ -58,6 +58,12 @@ object FileList extends FunctionComponent[FileListProps] {
     <.button(
       ^.reactRef := elementRef,
       ^.rbMouse := true,
+      ^.rbOnWheelup := { _ =>
+        focusItem(focusedIndex - 5)
+      },
+      ^.rbOnWheeldown := { _ =>
+        focusItem(focusedIndex + 5)
+      },
       ^.rbOnClick := { data =>
         val curr = elementRef.current
         val x = data.x - curr.aleft

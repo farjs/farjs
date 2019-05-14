@@ -85,6 +85,8 @@ package object blessed {
     lazy val rbOnPress = OnEvent0Attribute("onPress")
     lazy val rbOnFocus = OnEvent0Attribute("onFocus")
     lazy val rbOnClick = OnMouseEventAttribute("onClick")
+    lazy val rbOnWheeldown = OnMouseEventAttribute("onWheeldown")
+    lazy val rbOnWheelup = OnMouseEventAttribute("onWheelup")
     lazy val rbOnResize = OnEvent0Attribute("onResize")
     lazy val rbOnMousedown = OnMouseEventAttribute("onMousedown")
     lazy val rbOnMouseup = OnMouseEventAttribute("onMouseup")
