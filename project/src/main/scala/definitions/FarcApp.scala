@@ -31,8 +31,8 @@ object FarcApp extends ScalaJsModule {
       webpackBundlingMode := BundlingMode.LibraryOnly(),
       version in webpack := "4.29.0",
 
-      useYarn := true,
-      yarnExtraArgs := Seq("--frozen-lockfile"),
+      //useYarn := true,
+      //yarnExtraArgs := Seq("--frozen-lockfile"),
       
       npmDevDependencies in Compile ++= Seq(
         "webpack-merge" -> "4.1.0",
