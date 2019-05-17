@@ -214,7 +214,13 @@ class FileListSpec extends TestSpec
     val result = shallowRender(comp)
 
     //then
-    assertNativeComponent(result, <.button(^.rbMouse := true)(), { children: List[ShallowInstance] =>
+    assertNativeComponent(result, <.button(
+      ^.rbWidth := props.size._1,
+      ^.rbHeight := props.size._2,
+      ^.rbLeft := 1,
+      ^.rbTop := 1,
+      ^.rbMouse := true
+    )(), { children: List[ShallowInstance] =>
       val List(colWrap1, colWrap2) = children
       assertNativeComponent(colWrap1, <.>(^.key := "0")(), { children: List[ShallowInstance] =>
         val List(sep, colItems) = children

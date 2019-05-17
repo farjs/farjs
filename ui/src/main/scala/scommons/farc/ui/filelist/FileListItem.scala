@@ -25,7 +25,7 @@ object FileListItem extends FunctionComponent[FileListItemProps] {
           if (props.focused) props.style.focus.orNull
           else props.style
         },
-        ^.content := props.text
+        ^.content := props.text.take(props.width)
       )(),
 
       if (longItem) Some(

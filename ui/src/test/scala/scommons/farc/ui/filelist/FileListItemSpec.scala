@@ -98,7 +98,7 @@ class FileListItemSpec extends TestSpec with ShallowRendererUtils {
             if (props.focused) props.style.focus.asInstanceOf[BlessedStyle]
             else props.style
           },
-          ^.content := props.text
+          ^.content := props.text.take(props.width)
         )(),
         
         if (longItem) Some(

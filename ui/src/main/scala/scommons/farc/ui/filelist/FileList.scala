@@ -57,6 +57,10 @@ object FileList extends FunctionComponent[FileListProps] {
     
     <.button(
       ^.reactRef := elementRef,
+      ^.rbWidth := width,
+      ^.rbHeight := height,
+      ^.rbLeft := 1,
+      ^.rbTop := 1,
       ^.rbMouse := true,
       ^.rbOnWheelup := { _ =>
         focusItem(focusedIndex - 5)

@@ -47,7 +47,8 @@ trait KeyboardKey extends js.Object {
   
   val name: String = js.native
   val full: String = js.native
-  val shift: Boolean = js.native
-  val ctrl: Boolean = js.native
-  val meta: Boolean = js.native
+  
+  val shift: js.UndefOr[Boolean] = js.native
+  val ctrl: js.UndefOr[Boolean] = js.native
+  val meta: js.UndefOr[Boolean] = js.native
 }
