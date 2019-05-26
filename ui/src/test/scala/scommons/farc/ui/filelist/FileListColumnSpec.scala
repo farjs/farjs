@@ -19,7 +19,8 @@ class FileListColumnSpec extends TestSpec with ShallowRendererUtils {
         11 -> "item 2",
         12 -> "item 3"
       ),
-      focusedPos = 1
+      focusedPos = 1,
+      selectedIds = Set(11, 12)
     )
     val comp = <(FileListColumn())(^.wrapped := props)()
 
@@ -34,39 +35,43 @@ class FileListColumnSpec extends TestSpec with ShallowRendererUtils {
       ^.rbStyle := props.boxStyle
     )(), { case List(header, item1, item2, item3) =>
       header.key shouldBe null
-      assertComponent(header, TextLine) { case TextLineProps(align, pos, width, text, style, focused, padding) =>
-        align shouldBe TextLine.Center
-        pos shouldBe 0 -> 0
-        width shouldBe props.size._1
-        text shouldBe "Name"
-        style shouldBe FileListColumn.headerStyle
-        focused shouldBe false
-        padding shouldBe 0
+      assertComponent(header, TextLine) {
+        case TextLineProps(align, pos, width, text, style, focused, padding) =>
+          align shouldBe TextLine.Center
+          pos shouldBe 0 -> 0
+          width shouldBe props.size._1
+          text shouldBe "Name"
+          style shouldBe FileListColumn.headerStyle
+          focused shouldBe false
+          padding shouldBe 0
       }
       
       item1.key shouldBe "0"
-      assertComponent(item1, FileListItem) { case FileListItemProps(width, top, style, text, focused) =>
-        width shouldBe props.size._1
-        top shouldBe 1
-        style shouldBe props.itemStyle
-        text shouldBe "item 1"
-        focused shouldBe false
+      assertComponent(item1, FileListItem) {
+        case FileListItemProps(width, top, style, text, focused) =>
+          width shouldBe props.size._1
+          top shouldBe 1
+          style shouldBe props.itemStyle
+          text shouldBe "item 1"
+          focused shouldBe false
       }
       item2.key shouldBe "1"
-      assertComponent(item2, FileListItem) { case FileListItemProps(width, top, style, text, focused) =>
-        width shouldBe props.size._1
-        top shouldBe 2
-        style shouldBe props.itemStyle
-        text shouldBe "item 2"
-        focused shouldBe true
+      assertComponent(item2, FileListItem) {
+        case FileListItemProps(width, top, style, text, focused) =>
+          width shouldBe props.size._1
+          top shouldBe 2
+          text shouldBe "item 2"
+          style shouldBe FileListColumn.selectedItem
+          focused shouldBe true
       }
       item3.key shouldBe "2"
-      assertComponent(item3, FileListItem) { case FileListItemProps(width, top, style, text, focused) =>
-        width shouldBe props.size._1
-        top shouldBe 3
-        style shouldBe props.itemStyle
-        text shouldBe "item 3"
-        focused shouldBe false
+      assertComponent(item3, FileListItem) {
+        case FileListItemProps(width, top, style, text, focused) =>
+          width shouldBe props.size._1
+          top shouldBe 3
+          style shouldBe FileListColumn.selectedItem
+          text shouldBe "item 3"
+          focused shouldBe false
       }
     })
   }

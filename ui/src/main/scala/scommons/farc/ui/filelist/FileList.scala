@@ -17,6 +17,7 @@ object FileList extends FunctionComponent[FileListProps] {
     val elementRef = useRef[BlessedElement](null)
     val (viewOffset, setViewOffset) = useState(0)
     val (focusedIndex, setFocusedIndex) = useState(-1)
+    val (selectedIds, setSelectedIds) = useState(Set.empty[Int])
     val props = compProps.wrapped
 
     val (width, height) = props.size
@@ -27,22 +28,51 @@ object FileList extends FunctionComponent[FileListProps] {
     val items: Seq[(Int, String)] = {
       props.items.view(viewOffset, viewOffset + viewSize)
     }
-    val itemsSize = items.size
+    val maxOffset = totalSize - items.size
+    val maxIndex = math.max(items.size - 1, 0)
 
-    def focusItem(index: Int): Unit = {
-      if (index < 0 || index >= itemsSize) {
-        val offset = index - focusedIndex
-        setViewOffset(
-          math.min(math.max(viewOffset + offset, 0), totalSize - itemsSize)
-        )
+    def focusDx(dx: Int, select: Boolean): Unit = {
+      val index = focusedIndex + dx
+      if (index < 0 || index > maxIndex) {
+        val newOffset = viewOffset + dx
+        val newIndex =
+          if (newOffset < 0) 0
+          else if (newOffset > maxOffset) maxIndex
+          else focusedIndex
+
+        focusItem(newOffset, newIndex, select)
       }
-
-      val newIndex =
-        if (index <= 0) 0
-        else if (index >= itemsSize) itemsSize - 1
-        else index
+      else focusItem(viewOffset, index, select)
+    }
+    
+    def focusItem(offset: Int, index: Int, select: Boolean = false): Unit = {
+      val newOffset = math.min(math.max(offset, 0), maxOffset)
+      setViewOffset(newOffset)
       
+      val newIndex = math.min(math.max(index, 0), maxIndex)
       setFocusedIndex(newIndex)
+
+      if (select && props.items.nonEmpty) {
+        val currIndex = viewOffset + math.min(math.max(focusedIndex, 0), maxIndex)
+        val selectIndex = newOffset + newIndex
+        
+        val isFirst = selectIndex == 0
+        val isLast = selectIndex == totalSize - 1
+        val selectionIds = {
+          if (isFirst && selectIndex < currIndex) props.items.view(selectIndex, currIndex + 1)
+          else if (selectIndex < currIndex) props.items.view(selectIndex + 1, currIndex + 1)
+          else if (isLast && selectIndex > currIndex) props.items.view(currIndex, selectIndex + 1)
+          else if (selectIndex > currIndex) props.items.view(currIndex, selectIndex)
+          else props.items.view(currIndex, selectIndex + 1)
+        }.map(_._1).toSet
+
+        val currId = props.items(currIndex)._1
+        val newSelectedIds =
+          if (selectedIds.contains(currId)) selectedIds -- selectionIds
+          else selectedIds ++ selectionIds
+
+        setSelectedIds(newSelectedIds)
+      }
     }
     
     val columnsPos: Seq[(Int, Int, Int)] = (0 until columns).map { colIndex =>
@@ -62,11 +92,17 @@ object FileList extends FunctionComponent[FileListProps] {
       ^.rbLeft := 1,
       ^.rbTop := 1,
       ^.rbMouse := true,
-      ^.rbOnWheelup := { _ =>
-        focusItem(focusedIndex - 5)
+      ^.rbOnWheelup := { data =>
+        if (!data.shift) {
+          if (viewOffset > 0) focusItem(viewOffset - 5, focusedIndex)
+          else focusItem(viewOffset, focusedIndex - 5)
+        }
       },
-      ^.rbOnWheeldown := { _ =>
-        focusItem(focusedIndex + 5)
+      ^.rbOnWheeldown := { data =>
+        if (!data.shift) {
+          if (viewOffset < maxOffset) focusItem(viewOffset + 5, focusedIndex)
+          else focusItem(viewOffset, focusedIndex + 5)
+        }
       },
       ^.rbOnClick := { data =>
         val curr = elementRef.current
@@ -77,25 +113,19 @@ object FileList extends FunctionComponent[FileListProps] {
         }
         if (colIndex != -1) {
           val itemPos = if (y > 0) y - 1 else y // exclude column header
-          focusItem(colIndex * columnSize + itemPos)
+          focusItem(viewOffset, colIndex * columnSize + itemPos)
         }
       },
       ^.rbOnKeypress := { (_, key) =>
         key.full match {
-          case "up" => focusItem(focusedIndex - 1)
-          case "down" => focusItem(focusedIndex + 1)
-          case "left" => focusItem(focusedIndex - columnSize)
-          case "right" => focusItem(focusedIndex + columnSize)
-          case "pageup" => focusItem(
-            if (focusedIndex > 0) 0
-            else -viewSize
-          )
-          case "pagedown" => focusItem(
-            if (focusedIndex < itemsSize - 1) itemsSize - 1
-            else focusedIndex + viewSize
-          )
-          case "home" => focusItem(-viewOffset)
-          case "end" => focusItem(totalSize - 1)
+          case k if k == "up" || k == "S-up" => focusDx(- 1, k == "S-up")
+          case k if k == "down" || k == "S-down" => focusDx(1, k == "S-down")
+          case k if k == "left" || k == "S-left" => focusDx(-columnSize, k == "S-left")
+          case k if k == "right" || k == "S-right" => focusDx(columnSize, k == "S-right")
+          case k if k == "pageup" || k == "S-pageup" => focusDx(-viewSize + 1, k == "S-pageup")
+          case k if k == "pagedown" || k == "S-pagedown" => focusDx(viewSize - 1, k == "S-pagedown")
+          case k if k == "home" || k == "S-home" => focusItem(0, 0, k == "S-home")
+          case k if k == "end" || k == "S-end" => focusItem(maxOffset, maxIndex, k == "S-end")
           case _ =>
         }
       }
@@ -130,7 +160,8 @@ object FileList extends FunctionComponent[FileListProps] {
                     focusedIndex - firstIndex
                   }
                   else -1
-                }
+                },
+                selectedIds = selectedIds.intersect(colItems.map(_._1).toSet)
               ))()
             )
         }
@@ -143,11 +174,13 @@ object FileList extends FunctionComponent[FileListProps] {
   
   private[filelist] object Styles extends js.Object {
     val normalItem: BlessedStyle = new BlessedStyle {
-      override val fg = "white"
+      override val bold = false
       override val bg = "blue"
+      override val fg = "white"
       override val focus = new BlessedStyle {
-        override val fg = "black"
+        override val bold = false
         override val bg = "cyan"
+        override val fg = "black"
       }
     }
   }

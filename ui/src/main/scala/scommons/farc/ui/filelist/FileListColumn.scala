@@ -9,7 +9,8 @@ case class FileListColumnProps(size: (Int, Int),
                                boxStyle: BlessedStyle,
                                itemStyle: BlessedStyle,
                                items: Seq[(Int, String)],
-                               focusedPos: Int)
+                               focusedPos: Int,
+                               selectedIds: Set[Int])
 
 object FileListColumn extends FunctionComponent[FileListColumnProps] {
 
@@ -26,7 +27,7 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
     def renderItems(items: Seq[(Int, String)]): Seq[ReactElement] = {
       var pos = -1
       
-      items.map { case (_, text) =>
+      items.map { case (id, text) =>
         pos += 1
         
         <(FileListItem())(
@@ -34,7 +35,9 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
           ^.wrapped := FileListItemProps(
             width = width,
             top = pos + 1,
-            style = props.itemStyle,
+            style =
+              if (props.selectedIds.contains(id)) selectedItem
+              else props.itemStyle,
             text = text,
             focused = props.focusedPos == pos
           )
@@ -65,5 +68,16 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
     override val bold = true
     override val bg = "blue"
     override val fg = "yellow"
+  }
+
+  private[filelist] val selectedItem = new BlessedStyle {
+    override val bold = true
+    override val bg = "blue"
+    override val fg = "yellow"
+    override val focus = new BlessedStyle {
+      override val bold = true
+      override val bg = "cyan"
+      override val fg = "yellow"
+    }
   }
 }

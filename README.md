@@ -28,16 +28,16 @@ To exit the application press `F10` on the keyboard.
 
 ```bash
 #console 1:
-cd ./app/target/scala-2.12/scalajs-bundler/main/
-./node_modules/webpack/bin/webpack.js --watch --config ./reload.webpack.config.js
-
-#console 2:
-node ./app/target/scala-2.12/scalajs-bundler/main/dist/bundle.js
-
-#console 3:
 sbt
 >project farclone-app
 >~fastOptJS
+
+#console 2:
+cd ./app/target/scala-2.12/scalajs-bundler/main/
+./node_modules/webpack/bin/webpack.js --watch --config ./reload.webpack.config.js
+
+#console 3:
+node ./app/target/scala-2.12/scalajs-bundler/main/dist/bundle.js
 ```
 
 ## Documentation
