@@ -9,17 +9,12 @@ class FileListSpec extends TestSpec with ShallowRendererUtils {
 
   it should "focus item when onWheelup/onWheeldown" in {
     //given
-    val props = FileListProps((7, 7), columns = 2, items = List(
+    val props = FileListProps((7, 3), columns = 2, items = List(
       1 -> "item 1",
       2 -> "item 2",
       3 -> "item 3",
       4 -> "item 4",
-      5 -> "item 5",
-      6 -> "item 6",
-      7 -> "item 7",
-      8 -> "item 8",
-      9 -> "item 9",
-      10 -> "item 10"
+      5 -> "item 5"
     ))
     val renderer = createRenderer()
     renderer.render(<(FileList())(^.wrapped := props)())
@@ -34,12 +29,17 @@ class FileListSpec extends TestSpec with ShallowRendererUtils {
     }
     
     //when & then
-    check(up = false, focusedIndex = 4)
-    check(up = false, focusedIndex = 9)
-    check(up = false, focusedIndex = 9) //noop
+    check(up = false, focusedIndex = 0)
+    check(up = false, focusedIndex = 1)
+    check(up = false, focusedIndex = 2)
+    check(up = false, focusedIndex = 3)
+    check(up = false, focusedIndex = 3)
+    check(up = false, focusedIndex = 3) //noop
 
     //when & then
-    check(up = true, focusedIndex = 4)
+    check(up = true, focusedIndex = 3)
+    check(up = true, focusedIndex = 2)
+    check(up = true, focusedIndex = 1)
     check(up = true, focusedIndex = 0)
     check(up = true, focusedIndex = 0) //noop
   }

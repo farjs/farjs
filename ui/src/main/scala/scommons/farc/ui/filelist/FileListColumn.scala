@@ -3,13 +3,13 @@ package scommons.farc.ui.filelist
 import scommons.farc.ui._
 import scommons.react._
 import scommons.react.blessed._
+import scommons.react.blessed.raw.Blessed
 
 case class FileListColumnProps(size: (Int, Int),
                                left: Int,
-                               boxStyle: BlessedStyle,
-                               itemStyle: BlessedStyle,
+                               borderCh: String,
                                items: Seq[(Int, String)],
-                               focusedPos: Int,
+                               focusedIndex: Int,
                                selectedIds: Set[Int])
 
 object FileListColumn extends FunctionComponent[FileListColumnProps] {
@@ -23,61 +23,79 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val (width, height) = props.size
+    val styles = FileListView.styles
+    
+    val borderEnd = renderText(
+      isBold = false,
+      fgColor = styles.normalItem.fg.orNull,
+      bgColor = styles.normalItem.bg.orNull,
+      text = props.borderCh
+    )
+    val overlapEnd = renderText(
+      isBold = false,
+      fgColor = styles.overlapColor,
+      bgColor = styles.normalItem.bg.orNull,
+      text = "}"
+    )
 
-    def renderItems(items: Seq[(Int, String)]): Seq[ReactElement] = {
-      var pos = -1
-      
-      items.map { case (id, text) =>
-        pos += 1
-        
-        <(FileListItem())(
-          ^.key := s"$pos",
-          ^.wrapped := FileListItemProps(
-            width = width,
-            top = pos + 1,
-            style =
-              if (props.selectedIds.contains(id)) selectedItem
-              else props.itemStyle,
-            text = text,
-            focused = props.focusedPos == pos
-          )
-        )()
-      }
+    def renderItems(): Seq[String] = props.items.zipWithIndex.map {
+      case ((id, text), index) =>
+        val style = {
+          val style =
+            if (props.selectedIds.contains(id)) styles.selectedItem
+            else styles.normalItem
+          
+          val focused = props.focusedIndex == index
+          if (focused) style.focus.getOrElse(null)
+          else style
+        }
+
+        renderText(
+          isBold = style.bold.getOrElse(false),
+          fgColor = style.fg.orNull,
+          bgColor = style.bg.orNull,
+          text = text.take(width).padTo(width, ' '),
+          ending = if (text.length > width) overlapEnd else borderEnd
+        )
     }
+
+    val itemsContent = renderItems().mkString("\n")
 
     <.box(
       ^.rbWidth := width,
       ^.rbHeight := height,
       ^.rbLeft := props.left,
-      ^.rbStyle := props.boxStyle
+      ^.rbStyle := styles.normalItem
     )(
       <(TextLine())(^.wrapped := TextLineProps(
         align = TextLine.Center,
         pos = (0, 0),
         width = width,
         text = "Name",
-        style = headerStyle,
+        style = styles.headerStyle,
         padding = 0
       ))(),
       
-      renderItems(props.items)
+      if (itemsContent.nonEmpty) Some(
+        <.text(
+          ^.rbWidth := width + 1,
+          ^.rbTop := 1,
+          ^.rbTags := true,
+          ^.content := itemsContent
+        )()
+      )
+      else None
     )
   }
 
-  private[filelist] val headerStyle = new BlessedStyle {
-    override val bold = true
-    override val bg = "blue"
-    override val fg = "yellow"
-  }
+  private def renderText(isBold: Boolean,
+                         fgColor: String,
+                         bgColor: String,
+                         text: String,
+                         ending: String = ""): String = {
 
-  private[filelist] val selectedItem = new BlessedStyle {
-    override val bold = true
-    override val bg = "blue"
-    override val fg = "yellow"
-    override val focus = new BlessedStyle {
-      override val bold = true
-      override val bg = "cyan"
-      override val fg = "yellow"
-    }
+    val bold = if (isBold) "{bold}" else ""
+
+    s"$bold{$fgColor-fg}{$bgColor-bg}${Blessed.escape(text)}{/}$ending"
   }
 }

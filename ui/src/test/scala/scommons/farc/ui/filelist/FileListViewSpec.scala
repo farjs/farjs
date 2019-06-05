@@ -181,22 +181,20 @@ class FileListViewSpec extends TestSpec
             end shouldBe Some(SingleBorder.bottomCh)
         }
         assertComponent(col1, FileListColumn) {
-          case FileListColumnProps(resSize, left, boxStyle, itemStyle, items, focusedPos, selectedIds) =>
+          case FileListColumnProps(resSize, left, borderCh, items, focusedPos, selectedIds) =>
             resSize shouldBe 2 -> 2
             left shouldBe 0
-            boxStyle shouldBe FileListView.styles.normalItem
-            itemStyle shouldBe FileListView.styles.normalItem
+            borderCh shouldBe SingleBorder.verticalCh
             (items, focusedPos, selectedIds) shouldBe expectedData.head
         }
       })
       assertNativeComponent(colWrap2, <.>(^.key := "1")(), { children: List[ShallowInstance] =>
         val List(col2) = children
         assertComponent(col2, FileListColumn) {
-          case FileListColumnProps(resSize, left, boxStyle, itemStyle, items, focusedPos, selectedIds) =>
+          case FileListColumnProps(resSize, left, borderCh, items, focusedPos, selectedIds) =>
             resSize shouldBe 4 -> 2
             left shouldBe 3
-            boxStyle shouldBe FileListView.styles.normalItem
-            itemStyle shouldBe FileListView.styles.normalItem
+            borderCh shouldBe DoubleBorder.verticalCh
             (items, focusedPos, selectedIds) shouldBe expectedData(1)
         }
       })

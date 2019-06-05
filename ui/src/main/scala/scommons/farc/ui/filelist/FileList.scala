@@ -56,8 +56,7 @@ object FileList extends FunctionComponent[FileListProps] {
           if (isFirst && selectIndex < currIndex) items.view(selectIndex, currIndex + 1)
           else if (selectIndex < currIndex) items.view(selectIndex + 1, currIndex + 1)
           else if (isLast && selectIndex > currIndex) items.view(currIndex, selectIndex + 1)
-          else if (selectIndex > currIndex) items.view(currIndex, selectIndex)
-          else items.view(currIndex, selectIndex + 1)
+          else items.view(currIndex, selectIndex)
         }.map(_._1).toSet
 
         val currId = items(currIndex)._1
@@ -76,12 +75,12 @@ object FileList extends FunctionComponent[FileListProps] {
       focusedIndex = focusedIndex,
       selectedIds = selectedIds,
       onWheelUp = { () =>
-        if (viewOffset > 0) focusItem(viewOffset - 5, focusedIndex)
-        else focusItem(viewOffset, focusedIndex - 5)
+        if (viewOffset > 0) focusItem(viewOffset - 1, focusedIndex)
+        else focusItem(viewOffset, focusedIndex - 1)
       },
       onWheelDown = { () =>
-        if (viewOffset < maxOffset) focusItem(viewOffset + 5, focusedIndex)
-        else focusItem(viewOffset, focusedIndex + 5)
+        if (viewOffset < maxOffset) focusItem(viewOffset + 1, focusedIndex)
+        else focusItem(viewOffset, focusedIndex + 1)
       },
       onClick = { index =>
         focusItem(viewOffset, index)

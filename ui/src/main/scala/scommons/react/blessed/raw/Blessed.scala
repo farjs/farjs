@@ -8,6 +8,8 @@ import scala.scalajs.js.annotation.JSImport
 object Blessed extends js.Object {
 
   def screen(config: BlessedScreenConfig): BlessedScreen = js.native
+  
+  def escape(text: String): String = js.native
 }
 
 @js.native

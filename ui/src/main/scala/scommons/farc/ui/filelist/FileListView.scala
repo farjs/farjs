@@ -94,10 +94,11 @@ object FileListView extends FunctionComponent[FileListViewProps] {
               <(FileListColumn())(^.wrapped := FileListColumnProps(
                 size = (colWidth, height),
                 left = colLeft,
-                boxStyle = styles.normalItem,
-                itemStyle = styles.normalItem,
+                borderCh =
+                  if (colIndex != columns - 1) SingleBorder.verticalCh
+                  else DoubleBorder.verticalCh,
                 items = colItems,
-                focusedPos = {
+                focusedIndex = {
                   val firstIndex = columnSize * colIndex
                   val lastIndex = firstIndex + colItems.size - 1
                   if (firstIndex <= focusedIndex && focusedIndex <= lastIndex) {
@@ -117,6 +118,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
   private[filelist] lazy val styles = Styles
   
   private[filelist] object Styles extends js.Object {
+    
     val normalItem: BlessedStyle = new BlessedStyle {
       override val bold = false
       override val bg = "blue"
@@ -125,6 +127,25 @@ object FileListView extends FunctionComponent[FileListViewProps] {
         override val bold = false
         override val bg = "cyan"
         override val fg = "black"
+      }
+    }
+    
+    val overlapColor = "red"
+
+    val headerStyle: BlessedStyle = new BlessedStyle {
+      override val bold = true
+      override val bg = "blue"
+      override val fg = "yellow"
+    }
+
+    val selectedItem: BlessedStyle = new BlessedStyle {
+      override val bold = true
+      override val bg = "blue"
+      override val fg = "yellow"
+      override val focus = new BlessedStyle {
+        override val bold = true
+        override val bg = "cyan"
+        override val fg = "yellow"
       }
     }
   }

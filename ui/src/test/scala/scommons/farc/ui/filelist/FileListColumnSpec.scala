@@ -1,25 +1,86 @@
 package scommons.farc.ui.filelist
 
+import org.scalatest.Assertion
 import scommons.farc.ui._
+import scommons.farc.ui.border.SingleBorder
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
-import scommons.react.test.util.ShallowRendererUtils
+import scommons.react.test.raw.ShallowInstance
+import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
 
-class FileListColumnSpec extends TestSpec with ShallowRendererUtils {
+class FileListColumnSpec extends TestSpec
+  with ShallowRendererUtils
+  with TestRendererUtils {
 
-  it should "render component" in {
+  it should "not re-render component if the same props" in {
     //given
     val props = FileListColumnProps(
-      size = (5, 3),
-      left = 3,
-      boxStyle = new BlessedStyle {},
-      itemStyle = new BlessedStyle {},
+      size = (14, 3),
+      left = 2,
+      borderCh = SingleBorder.verticalCh,
       items = List(
         10 -> "item 1",
         11 -> "item 2",
         12 -> "item 3"
       ),
-      focusedPos = 1,
+      focusedIndex = 1,
+      selectedIds = Set(11, 12)
+    )
+    val renderer = createTestRenderer(<(FileListColumn())(^.wrapped := props)())
+    val textEl = renderer.root.children.head.children.head.children(1)
+    textEl.`type` shouldBe "text"
+    val textContent = textEl.props.content
+    textContent.toString should not be empty
+
+    //when
+    renderer.update(<(FileListColumn())(^.wrapped := props.copy(selectedIds = Set(12, 11)))())
+
+    //then
+    val updatedTextEl = renderer.root.children.head.children.head.children(1)
+    updatedTextEl.`type` shouldBe "text"
+    updatedTextEl.props.content should be theSameInstanceAs textContent
+  }
+  
+  it should "re-render component if different props" in {
+    //given
+    val props = FileListColumnProps(
+      size = (14, 3),
+      left = 2,
+      borderCh = SingleBorder.verticalCh,
+      items = List(
+        10 -> "item 1",
+        11 -> "item 2",
+        12 -> "item 3"
+      ),
+      focusedIndex = 1,
+      selectedIds = Set(11, 12)
+    )
+    val renderer = createTestRenderer(<(FileListColumn())(^.wrapped := props)())
+    val textEl = renderer.root.children.head.children.head.children(1)
+    textEl.`type` shouldBe "text"
+    val textContent = textEl.props.content
+
+    //when
+    renderer.update(<(FileListColumn())(^.wrapped := props.copy(selectedIds = Set(12)))())
+
+    //then
+    val updatedTextEl = renderer.root.children.head.children.head.children(1)
+    updatedTextEl.`type` shouldBe "text"
+    updatedTextEl.props.content should not be theSameInstanceAs(textContent)
+  }
+  
+  it should "render non-empty component" in {
+    //given
+    val props = FileListColumnProps(
+      size = (14, 3),
+      left = 2,
+      borderCh = SingleBorder.verticalCh,
+      items = List(
+        10 -> "item 1 {bold}",
+        11 -> "item 2 looooooong",
+        12 -> "item 3"
+      ),
+      focusedIndex = 1,
       selectedIds = Set(11, 12)
     )
     val comp = <(FileListColumn())(^.wrapped := props)()
@@ -28,50 +89,70 @@ class FileListColumnSpec extends TestSpec with ShallowRendererUtils {
     val result = shallowRender(comp)
 
     //then
-    assertNativeComponent(result, <.box(
-      ^.rbWidth := props.size._1,
-      ^.rbHeight := props.size._2,
-      ^.rbLeft := props.left,
-      ^.rbStyle := props.boxStyle
-    )(), { case List(header, item1, item2, item3) =>
-      header.key shouldBe null
+    assertFileListColumn(result, props, Some(
+      """{white-fg}{blue-bg}item 1 {open}bold{close} {/}{white-fg}{blue-bg}│{/}
+        |{bold}{yellow-fg}{cyan-bg}item 2 loooooo{/}{red-fg}{blue-bg}{close}{/}
+        |{bold}{yellow-fg}{blue-bg}item 3        {/}{white-fg}{blue-bg}│{/}""".stripMargin
+    ))
+  }
+  
+  it should "render empty component" in {
+    //given
+    val props = FileListColumnProps(
+      size = (6, 3),
+      left = 2,
+      borderCh = SingleBorder.verticalCh,
+      items = Nil,
+      focusedIndex = -1,
+      selectedIds = Set.empty
+    )
+    val comp = <(FileListColumn())(^.wrapped := props)()
+
+    //when
+    val result = shallowRender(comp)
+
+    //then
+    assertFileListColumn(result, props, None)
+  }
+  
+  private def assertFileListColumn(result: ShallowInstance,
+                                   props: FileListColumnProps,
+                                   expectedContent: Option[String]): Unit = {
+    
+    def assertElements(header: ShallowInstance, itemsText: Option[ShallowInstance]): Assertion = {
       assertComponent(header, TextLine) {
         case TextLineProps(align, pos, width, text, style, focused, padding) =>
           align shouldBe TextLine.Center
           pos shouldBe 0 -> 0
           width shouldBe props.size._1
           text shouldBe "Name"
-          style shouldBe FileListColumn.headerStyle
+          style shouldBe FileListView.styles.headerStyle
           focused shouldBe false
           padding shouldBe 0
       }
-      
-      item1.key shouldBe "0"
-      assertComponent(item1, FileListItem) {
-        case FileListItemProps(width, top, style, text, focused) =>
-          width shouldBe props.size._1
-          top shouldBe 1
-          style shouldBe props.itemStyle
-          text shouldBe "item 1"
-          focused shouldBe false
+
+      expectedContent.foreach { content =>
+        val Some(textEl) = itemsText
+        
+        assertNativeComponent(textEl, <.text(
+          ^.rbWidth := props.size._1 + 1,
+          ^.rbTop := 1,
+          ^.rbTags := true,
+          ^.content := content
+        )())
       }
-      item2.key shouldBe "1"
-      assertComponent(item2, FileListItem) {
-        case FileListItemProps(width, top, style, text, focused) =>
-          width shouldBe props.size._1
-          top shouldBe 2
-          text shouldBe "item 2"
-          style shouldBe FileListColumn.selectedItem
-          focused shouldBe true
-      }
-      item3.key shouldBe "2"
-      assertComponent(item3, FileListItem) {
-        case FileListItemProps(width, top, style, text, focused) =>
-          width shouldBe props.size._1
-          top shouldBe 3
-          style shouldBe FileListColumn.selectedItem
-          text shouldBe "item 3"
-          focused shouldBe false
+      expectedContent.size shouldBe itemsText.size
+    }
+    
+    assertNativeComponent(result, <.box(
+      ^.rbWidth := props.size._1,
+      ^.rbHeight := props.size._2,
+      ^.rbLeft := props.left,
+      ^.rbStyle := FileListView.styles.normalItem
+    )(), { children: List[ShallowInstance] =>
+      children match {
+        case List(header, itemsText) => assertElements(header, Some(itemsText))
+        case List(header) => assertElements(header, None)
       }
     })
   }
