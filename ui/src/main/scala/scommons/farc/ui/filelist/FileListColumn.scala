@@ -84,7 +84,9 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
           ^.content := itemsContent
         )()
       )
-      else None
+      else None,
+
+      compProps.children // just for testing memo/re-render
     )
   }
 

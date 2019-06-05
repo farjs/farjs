@@ -12,14 +12,15 @@ object FilePanel extends FunctionComponent[FilePanelProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val (width, height) = props.size
+    val styles = FileListView.styles
 
-    <.box(^.rbStyle := textStyle)(
-      <(DoubleBorder())(^.wrapped := DoubleBorderProps((width, height), borderStyle))(),
+    <.box(^.rbStyle := styles.normalItem)(
+      <(DoubleBorder())(^.wrapped := DoubleBorderProps((width, height), styles.normalItem))(),
       <(HorizontalLine())(^.wrapped := HorizontalLineProps(
         pos = (0, height - 4),
         length = width,
         lineCh = SingleBorder.horizontalCh,
-        style = borderStyle,
+        style = styles.normalItem,
         startCh = Some(DoubleBorder.leftSingleCh),
         endCh = Some(DoubleBorder.rightSingleCh)
       ))(),
@@ -34,58 +35,44 @@ object FilePanel extends FunctionComponent[FilePanelProps] {
           }
         }
       ))(),
-      <(TextLine())(^.key := "currFolder", ^.wrapped := TextLineProps(
+      <(TextLine())(^.wrapped := TextLineProps(
         align = TextLine.Center,
         pos = (1, 0),
         width = width - 2,
         text = "/current/folder",
-        style = textStyle,
+        style = styles.normalItem,
         focused = true
       ))(),
-      <(TextLine())(^.key := "currFile", ^.wrapped := TextLineProps(
+      <(TextLine())(^.wrapped := TextLineProps(
         align = TextLine.Left,
         pos = (1, height - 3),
         width = width - 2 - 12,
         text = "current.file",
-        style = textStyle,
+        style = styles.normalItem,
         padding = 0
       ))(),
-      <(TextLine())(^.key := "fileSize", ^.wrapped := TextLineProps(
+      <(TextLine())(^.wrapped := TextLineProps(
         align = TextLine.Right,
         pos = (1 + width - 2 - 12, height - 3),
         width = 12,
         text = "123456",
-        style = textStyle,
+        style = styles.normalItem,
         padding = 0
       ))(),
-      <(TextLine())(^.key := "folderSize", ^.wrapped := TextLineProps(
+      <(TextLine())(^.wrapped := TextLineProps(
         align = TextLine.Center,
         pos = (1, height - 1),
         width = (width - 2) / 2,
         text = "123 4567 890 (3)",
-        style = textStyle
+        style = styles.normalItem
       ))(),
-      <(TextLine())(^.key := "freeSpace", ^.wrapped := TextLineProps(
+      <(TextLine())(^.wrapped := TextLineProps(
         align = TextLine.Center,
         pos = ((width - 2) / 2, height - 1),
         width = (width - 2) / 2,
         text = "123 4567 890",
-        style = textStyle
+        style = styles.normalItem
       ))()
     )
-  }
-
-  private[filelist] val borderStyle = new BlessedStyle {
-    override val bg = "blue"
-    override val fg = "white"
-  }
-
-  private[filelist] val textStyle = new BlessedStyle {
-    override val bg = "blue"
-    override val fg = "white"
-    override val focus = new BlessedStyle {
-      override val fg = "black"
-      override val bg = "cyan"
-    }
   }
 }

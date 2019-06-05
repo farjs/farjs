@@ -26,19 +26,25 @@ class FileListColumnSpec extends TestSpec
       focusedIndex = 1,
       selectedIds = Set(11, 12)
     )
-    val renderer = createTestRenderer(<(FileListColumn())(^.wrapped := props)())
-    val textEl = renderer.root.children.head.children.head.children(1)
-    textEl.`type` shouldBe "text"
-    val textContent = textEl.props.content
-    textContent.toString should not be empty
+    val renderer = createTestRenderer(<(FileListColumn())(^.wrapped := props)(
+      <.text(^.content := "initial")()
+    ))
+    val testEl = renderer.root.children.head.children.head.children(2)
+    testEl.`type` shouldBe "text"
+    testEl.props.content shouldBe "initial"
 
     //when
-    renderer.update(<(FileListColumn())(^.wrapped := props.copy(selectedIds = Set(12, 11)))())
+    renderer.update(<(FileListColumn())(^.wrapped := props.copy(selectedIds = Set(12, 11)))(
+      <.text(^.content := "update")()
+    ))
 
     //then
-    val updatedTextEl = renderer.root.children.head.children.head.children(1)
-    updatedTextEl.`type` shouldBe "text"
-    updatedTextEl.props.content should be theSameInstanceAs textContent
+    val sameEl = renderer.root.children.head.children.head.children(2)
+    sameEl.`type` shouldBe "text"
+    sameEl.props.content shouldBe "initial"
+    
+    //cleanup
+    renderer.unmount()
   }
   
   it should "re-render component if different props" in {
@@ -55,18 +61,25 @@ class FileListColumnSpec extends TestSpec
       focusedIndex = 1,
       selectedIds = Set(11, 12)
     )
-    val renderer = createTestRenderer(<(FileListColumn())(^.wrapped := props)())
-    val textEl = renderer.root.children.head.children.head.children(1)
-    textEl.`type` shouldBe "text"
-    val textContent = textEl.props.content
+    val renderer = createTestRenderer(<(FileListColumn())(^.wrapped := props)(
+      <.text(^.content := "initial")()
+    ))
+    val testEl = renderer.root.children.head.children.head.children(2)
+    testEl.`type` shouldBe "text"
+    testEl.props.content shouldBe "initial"
 
     //when
-    renderer.update(<(FileListColumn())(^.wrapped := props.copy(selectedIds = Set(12)))())
+    renderer.update(<(FileListColumn())(^.wrapped := props.copy(selectedIds = Set(12)))(
+      <.text(^.content := "update")()
+    ))
 
     //then
-    val updatedTextEl = renderer.root.children.head.children.head.children(1)
-    updatedTextEl.`type` shouldBe "text"
-    updatedTextEl.props.content should not be theSameInstanceAs(textContent)
+    val updatedEl = renderer.root.children.head.children.head.children(2)
+    updatedEl.`type` shouldBe "text"
+    updatedEl.props.content shouldBe "update"
+
+    //cleanup
+    renderer.unmount()
   }
   
   it should "render non-empty component" in {
@@ -151,8 +164,8 @@ class FileListColumnSpec extends TestSpec
       ^.rbStyle := FileListView.styles.normalItem
     )(), { children: List[ShallowInstance] =>
       children match {
-        case List(header, itemsText) => assertElements(header, Some(itemsText))
-        case List(header) => assertElements(header, None)
+        case List(header, itemsText, _) => assertElements(header, Some(itemsText))
+        case List(header, _) => assertElements(header, None)
       }
     })
   }
