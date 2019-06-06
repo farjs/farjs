@@ -4,16 +4,27 @@ import scommons.farc.ui._
 import scommons.farc.ui.border._
 import scommons.react._
 import scommons.react.blessed._
+import scommons.react.hooks._
 
 case class FilePanelProps(size: (Int, Int))
 
 object FilePanel extends FunctionComponent[FilePanelProps] {
 
   protected def render(compProps: Props): ReactElement = {
+    val (state, setState) = useState(() => FileListState())
+    
     val props = compProps.wrapped
     val (width, height) = props.size
     val styles = FileListView.styles
 
+    def getCurrentItem: String = {
+      val itemIndex = state.offset + state.index
+      if (itemIndex >= 0 && itemIndex < items.size) {
+        items(itemIndex)._2
+      }
+      else ""
+    }
+    
     <.box(^.rbStyle := styles.normalItem)(
       <(DoubleBorder())(^.wrapped := DoubleBorderProps((width, height), styles.normalItem))(),
       <(HorizontalLine())(^.wrapped := HorizontalLineProps(
@@ -27,13 +38,9 @@ object FilePanel extends FunctionComponent[FilePanelProps] {
       <(FileList())(^.wrapped := FileListProps(
         size = (width - 2, height - 5),
         columns = 3,
-        items = (1 to 10000).toList.map { i =>
-          i -> {
-            if (i % 7 == 0) s"file $i {bold} bold"
-            else if (i % 10 == 0) s"file $i tooo loooooooooooooooooooooooooooooooooooooong"
-            else s"file $i"
-          }
-        }
+        items = items,
+        state = state,
+        onStateChanged = setState
       ))(),
       <(TextLine())(^.wrapped := TextLineProps(
         align = TextLine.Center,
@@ -47,7 +54,7 @@ object FilePanel extends FunctionComponent[FilePanelProps] {
         align = TextLine.Left,
         pos = (1, height - 3),
         width = width - 2 - 12,
-        text = "current.file",
+        text = getCurrentItem,
         style = styles.normalItem,
         padding = 0
       ))(),
@@ -74,5 +81,13 @@ object FilePanel extends FunctionComponent[FilePanelProps] {
         style = styles.normalItem
       ))()
     )
+  }
+
+  private val items: List[(Int, String)] = (1 to 10000).toList.map { i =>
+    i -> {
+      if (i % 7 == 0) s"file $i {bold} bold"
+      else if (i % 10 == 0) s"file $i tooo loooooooooooooooooooooooooooooooooooooong"
+      else s"file $i"
+    }
   }
 }

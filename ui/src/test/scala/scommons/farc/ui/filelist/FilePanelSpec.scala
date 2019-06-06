@@ -8,6 +8,22 @@ import scommons.react.test.util.ShallowRendererUtils
 
 class FilePanelSpec extends TestSpec with ShallowRendererUtils {
 
+  it should "set state when onStateChanged" in {
+    //given
+    val props = FilePanelProps(size = (25, 15))
+    val renderer = createRenderer()
+    renderer.render(<(FilePanel())(^.wrapped := props)())
+    val listProps = findComponentProps(renderer.getRenderOutput(), FileList)
+    listProps.state shouldBe FileListState()
+    val newState = FileListState(1, 2, Set(3))
+
+    //when
+    listProps.onStateChanged(newState)
+
+    //then
+    findComponentProps(renderer.getRenderOutput(), FileList).state shouldBe newState
+  }
+  
   it should "render component" in {
     //given
     val props = FilePanelProps(size = (25, 15))
@@ -34,10 +50,12 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
             endCh shouldBe Some(DoubleBorder.rightSingleCh)
         }
         
-        assertComponent(list, FileList) { case FileListProps(resSize, columns, items) =>
-          resSize shouldBe (width - 2) -> (height - 5)
-          columns shouldBe 3
-          items should not be empty
+        assertComponent(list, FileList) {
+          case FileListProps(resSize, columns, items, state, _) =>
+            resSize shouldBe (width - 2) -> (height - 5)
+            columns shouldBe 3
+            items should not be empty
+            state shouldBe FileListState()
         }
         
         assertComponent(currFolder, TextLine) {
@@ -56,7 +74,7 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
             align shouldBe TextLine.Left
             pos shouldBe 1 -> (height - 3)
             resWidth shouldBe (width - 2 - 12)
-            text shouldBe "current.file"
+            text shouldBe "file 1"
             style shouldBe styles.normalItem
             focused shouldBe false
             padding shouldBe 0
