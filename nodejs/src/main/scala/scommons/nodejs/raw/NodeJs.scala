@@ -5,7 +5,7 @@ import scala.scalajs.js.annotation.JSGlobal
 
 @js.native
 @JSGlobal("global")
-object NodeJsNative extends js.Object {
+object NodeJs extends js.Object {
   
   val process: NodeProcess = js.native
 }

@@ -23,8 +23,7 @@ object FarcApp extends ScalaJsModule {
       publishM2 := ((): Unit),
 
       coverageExcludedPackages := {
-        "scommons.nodejs.raw" +
-          ";scommons.farc.app.FarcApp"
+        "scommons.farc.app.FarcApp"
       },
 
       scalaJSUseMainModuleInitializer := false,
@@ -48,7 +47,8 @@ object FarcApp extends ScalaJsModule {
     )
 
   override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Seq(
-    FarcUi.definition
+    FarcUi.definition,
+    FarcNodeJs.definition
   )
 
   override val superRepoProjectsDependencies: Seq[(String, String, Option[String])] = Seq(
