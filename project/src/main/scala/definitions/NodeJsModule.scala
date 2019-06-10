@@ -1,5 +1,6 @@
 package definitions
 
+import common.{Libs, TestLibs}
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
@@ -16,6 +17,20 @@ trait NodeJsModule extends FarcModule {
       .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
       .settings(NodeJsModule.settings: _*)
   }
+
+  override def superRepoProjectsDependencies: Seq[(String, String, Option[String])] = Seq(
+    ("scommons-nodejs", "scommons-nodejs-core", None),
+
+    ("scommons-nodejs", "scommons-nodejs-test", Some("test"))
+  )
+
+  override def runtimeDependencies: Def.Initialize[Seq[ModuleID]] = Def.setting(Seq(
+    Libs.scommonsNodejsCore.value
+  ))
+
+  override def testDependencies: Def.Initialize[Seq[ModuleID]] = Def.setting(Seq(
+    TestLibs.scommonsNodejsTest.value
+  ).map(_ % "test"))
 }
 
 object NodeJsModule {

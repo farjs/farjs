@@ -1,6 +1,5 @@
 package definitions
 
-import common.TestLibs
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
 import sbt._
@@ -47,19 +46,6 @@ object FarcApp extends ScalaJsModule {
     )
 
   override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Seq(
-    FarcUi.definition,
-    FarcNodeJs.definition
+    FarcUi.definition
   )
-
-  override val superRepoProjectsDependencies: Seq[(String, String, Option[String])] = Seq(
-    ("scommons-react", "scommons-react-core", None),
-
-    ("scommons-react", "scommons-react-test", Some("test"))
-  )
-
-  override val runtimeDependencies: Def.Initialize[Seq[ModuleID]] = Def.setting(Nil)
-
-  override val testDependencies: Def.Initialize[Seq[ModuleID]] = Def.setting(Seq(
-    TestLibs.scommonsReactTest.value
-  ).map(_ % "test"))
 }

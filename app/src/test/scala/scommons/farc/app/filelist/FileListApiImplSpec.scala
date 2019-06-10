@@ -1,14 +1,9 @@
 package scommons.farc.app.filelist
 
-import org.scalatest.{AsyncFlatSpec, Matchers}
 import scommons.nodejs._
+import scommons.nodejs.test.AsyncTestSpec
 
-import scala.concurrent.ExecutionContext
-import scala.scalajs.concurrent.JSExecutionContext
-
-class FileListApiImplSpec extends AsyncFlatSpec with Matchers {
-
-  implicit override val executionContext: ExecutionContext = JSExecutionContext.queue
+class FileListApiImplSpec extends AsyncTestSpec {
   
   private val apiImp = new FileListApiImpl
   

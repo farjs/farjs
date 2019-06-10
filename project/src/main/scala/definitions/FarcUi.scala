@@ -1,6 +1,5 @@
 package definitions
 
-import common.{Libs, TestLibs}
 import sbt._
 import scoverage.ScoverageKeys.coverageExcludedPackages
 
@@ -28,18 +27,4 @@ object FarcUi extends ScalaJsModule {
   override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Seq(
     FarcApi.definition
   )
-
-  override val superRepoProjectsDependencies: Seq[(String, String, Option[String])] = Seq(
-    ("scommons-react", "scommons-react-core", None),
-
-    ("scommons-react", "scommons-react-test", Some("test"))
-  )
-
-  override val runtimeDependencies: Def.Initialize[Seq[ModuleID]] = Def.setting(Seq(
-    Libs.scommonsReactCore.value
-  ))
-
-  override val testDependencies: Def.Initialize[Seq[ModuleID]] = Def.setting(Seq(
-    TestLibs.scommonsReactTest.value
-  ).map(_ % "test"))
 }
