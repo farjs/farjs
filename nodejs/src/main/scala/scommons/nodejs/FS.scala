@@ -5,7 +5,7 @@ import scala.scalajs.js
 
 sealed trait FS {
 
-  def readdir(path: URL): Future[Seq[String]] = {
+  def readdir(path: String): Future[Seq[String]] = {
     val p = Promise[Seq[String]]()
     raw.FS.readdir(path, { (error, files) =>
       if (error != null && !js.isUndefined(error)) p.failure(js.JavaScriptException(error))
@@ -14,7 +14,7 @@ sealed trait FS {
     p.future
   }
 
-  def lstatSync(path: URL): Stats = raw.FS.lstatSync(path)
+  def lstatSync(path: String): Stats = raw.FS.lstatSync(path)
 }
 
 object FS extends FS

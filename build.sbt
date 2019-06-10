@@ -15,11 +15,13 @@ lazy val `farclone` = (project in file("."))
     ideExcludedDirectories += baseDirectory.value / "docs" / "_site"
   )
   .aggregate(
+    `farclone-api`,
     `farclone-ui`,
     `farclone-nodejs`,
     `farclone-app`
   )
 
+lazy val `farclone-api` = FarcApi.definition
 lazy val `farclone-ui` = FarcUi.definition
 lazy val `farclone-nodejs` = FarcNodeJs.definition
 lazy val `farclone-app` = FarcApp.definition

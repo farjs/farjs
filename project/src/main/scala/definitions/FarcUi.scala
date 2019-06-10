@@ -25,7 +25,9 @@ object FarcUi extends ScalaJsModule {
       )
     )
 
-  override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Nil
+  override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Seq(
+    FarcApi.definition
+  )
 
   override val superRepoProjectsDependencies: Seq[(String, String, Option[String])] = Seq(
     ("scommons-react", "scommons-react-core", None),
