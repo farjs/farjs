@@ -1,21 +1,38 @@
 package scommons.farc.ui.filelist
 
+import scommons.farc.api.filelist._
 import scommons.react._
+import scommons.react.hooks._
 
-case class FileListProps(size: (Int, Int),
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.scalajs.js
+import scala.util.Success
+
+case class FileListProps(api: FileListApi,
+                         size: (Int, Int),
                          columns: Int,
-                         items: List[(Int, String)],
                          state: FileListState,
-                         onStateChanged: FileListState => Unit)
+                         onStateChanged: js.Function1[FileListState, Unit])
 
 object FileList extends FunctionComponent[FileListProps] {
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     
+    useLayoutEffect({ () =>
+      props.api.listFiles(props.state.currDir).andThen {
+        case Success(files) => props.onStateChanged(props.state.copy(
+          offset = 0,
+          index = 0,
+          items = files.sortBy(_.name),
+          selectedNames = Set.empty
+        ))
+      }: Unit
+    }, List(props.state.currDir, props.onStateChanged))
+    
     val (_, height) = props.size
     val columns = props.columns
-    val items = props.items
+    val items = props.state.items
     val columnSize = height - 1 // excluding column header
     
     val viewOffset = props.state.offset
@@ -43,28 +60,28 @@ object FileList extends FunctionComponent[FileListProps] {
       val newOffset = math.min(math.max(offset, 0), maxOffset)
       val newIndex = math.min(math.max(index, 0), maxIndex)
       
-      val currSelectedIds = props.state.selectedIds
-      val newSelectedIds =
+      val currSelected = props.state.selectedNames
+      val newSelected =
         if (select && items.nonEmpty) {
           val currIndex = viewOffset + math.min(math.max(focusedIndex, 0), maxIndex)
           val selectIndex = newOffset + newIndex
           
           val isFirst = selectIndex == 0
           val isLast = selectIndex == items.size - 1
-          val selectionIds = {
+          val selection = {
             if (isFirst && selectIndex < currIndex) items.view(selectIndex, currIndex + 1)
             else if (selectIndex < currIndex) items.view(selectIndex + 1, currIndex + 1)
             else if (isLast && selectIndex > currIndex) items.view(currIndex, selectIndex + 1)
             else items.view(currIndex, selectIndex)
-          }.map(_._1).toSet
+          }.map(_.name).toSet
   
-          val currId = items(currIndex)._1
-          if (currSelectedIds.contains(currId)) currSelectedIds -- selectionIds
-          else currSelectedIds ++ selectionIds
+          val currId = items(currIndex).name
+          if (currSelected.contains(currId)) currSelected -- selection
+          else currSelected ++ selection
         }
-        else currSelectedIds
+        else currSelected
 
-      val state = FileListState(newOffset, newIndex, newSelectedIds)
+      val state = props.state.copy(offset = newOffset, index = newIndex, selectedNames = newSelected)
       if (props.state != state) {
         props.onStateChanged(state)
       }
@@ -75,7 +92,7 @@ object FileList extends FunctionComponent[FileListProps] {
       columns = props.columns,
       items = viewItems,
       focusedIndex = focusedIndex,
-      selectedIds = props.state.selectedIds,
+      selectedNames = props.state.selectedNames,
       onWheelUp = { () =>
         if (viewOffset > 0) focusItem(viewOffset - 1, focusedIndex)
         else focusItem(viewOffset, focusedIndex - 1)

@@ -1,12 +1,13 @@
 package scommons.farc.ui.filelist
 
+import scommons.farc.api.filelist.{FileListApi, FileListItem}
 import scommons.farc.ui._
 import scommons.farc.ui.border._
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
 
-case class FilePanelProps(size: (Int, Int))
+case class FilePanelProps(api: FileListApi, size: (Int, Int))
 
 object FilePanel extends FunctionComponent[FilePanelProps] {
 
@@ -17,12 +18,12 @@ object FilePanel extends FunctionComponent[FilePanelProps] {
     val (width, height) = props.size
     val styles = FileListView.styles
 
-    def getCurrentItem: String = {
+    def getCurrentItem: Option[FileListItem] = {
       val itemIndex = state.offset + state.index
-      if (itemIndex >= 0 && itemIndex < items.size) {
-        items(itemIndex)._2
+      if (itemIndex >= 0 && itemIndex < state.items.size) {
+        Some(state.items(itemIndex))
       }
-      else ""
+      else None
     }
     
     <.box(^.rbStyle := styles.normalItem)(
@@ -36,9 +37,9 @@ object FilePanel extends FunctionComponent[FilePanelProps] {
         endCh = Some(DoubleBorder.rightSingleCh)
       ))(),
       <(FileList())(^.wrapped := FileListProps(
+        api = props.api,
         size = (width - 2, height - 5),
         columns = 3,
-        items = items,
         state = state,
         onStateChanged = setState
       ))(),
@@ -46,7 +47,7 @@ object FilePanel extends FunctionComponent[FilePanelProps] {
         align = TextLine.Center,
         pos = (1, 0),
         width = width - 2,
-        text = "/current/folder",
+        text = state.currDir,
         style = styles.normalItem,
         focused = true
       ))(),
@@ -54,7 +55,7 @@ object FilePanel extends FunctionComponent[FilePanelProps] {
         align = TextLine.Left,
         pos = (1, height - 3),
         width = width - 2 - 12,
-        text = getCurrentItem,
+        text = getCurrentItem.map(_.name).getOrElse(""),
         style = styles.normalItem,
         padding = 0
       ))(),
@@ -81,13 +82,5 @@ object FilePanel extends FunctionComponent[FilePanelProps] {
         style = styles.normalItem
       ))()
     )
-  }
-
-  private val items: List[(Int, String)] = (1 to 10000).toList.map { i =>
-    i -> {
-      if (i % 7 == 0) s"file $i {bold} bold"
-      else if (i % 10 == 0) s"file $i tooo loooooooooooooooooooooooooooooooooooooong"
-      else s"file $i"
-    }
   }
 }

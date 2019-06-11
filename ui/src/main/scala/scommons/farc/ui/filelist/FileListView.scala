@@ -1,5 +1,6 @@
 package scommons.farc.ui.filelist
 
+import scommons.farc.api.filelist.FileListItem
 import scommons.farc.ui.border._
 import scommons.react._
 import scommons.react.blessed._
@@ -9,9 +10,9 @@ import scala.scalajs.js
 
 case class FileListViewProps(size: (Int, Int),
                              columns: Int,
-                             items: Seq[(Int, String)],
+                             items: Seq[FileListItem],
                              focusedIndex: Int = -1,
-                             selectedIds: Set[Int] = Set.empty,
+                             selectedNames: Set[String] = Set.empty,
                              onWheelUp: () => Unit = () => (),
                              onWheelDown: () => Unit = () => (),
                              onClick: Int => Unit = _ => (),
@@ -23,8 +24,6 @@ object FileListView extends FunctionComponent[FileListViewProps] {
     val elementRef = useRef[BlessedElement](null)
     
     val props = compProps.wrapped
-    val focusedIndex = props.focusedIndex
-    val selectedIds = props.selectedIds
 
     val (width, height) = props.size
     val columns = props.columns
@@ -101,12 +100,13 @@ object FileListView extends FunctionComponent[FileListViewProps] {
                 focusedIndex = {
                   val firstIndex = columnSize * colIndex
                   val lastIndex = firstIndex + colItems.size - 1
+                  val focusedIndex = props.focusedIndex
                   if (firstIndex <= focusedIndex && focusedIndex <= lastIndex) {
                     focusedIndex - firstIndex
                   }
                   else -1
                 },
-                selectedIds = selectedIds.intersect(colItems.map(_._1).toSet)
+                selectedNames = props.selectedNames.intersect(colItems.map(_.name).toSet)
               ))()
             )
         }

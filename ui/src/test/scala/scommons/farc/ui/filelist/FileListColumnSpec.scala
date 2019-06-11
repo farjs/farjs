@@ -1,6 +1,7 @@
 package scommons.farc.ui.filelist
 
 import org.scalatest.Assertion
+import scommons.farc.api.filelist.FileListItem
 import scommons.farc.ui._
 import scommons.farc.ui.border.SingleBorder
 import scommons.react.blessed._
@@ -19,12 +20,12 @@ class FileListColumnSpec extends TestSpec
       left = 2,
       borderCh = SingleBorder.verticalCh,
       items = List(
-        10 -> "item 1",
-        11 -> "item 2",
-        12 -> "item 3"
+        FileListItem("item 1"),
+        FileListItem("item 2"),
+        FileListItem("item 3")
       ),
       focusedIndex = 1,
-      selectedIds = Set(11, 12)
+      selectedNames = Set("item 2", "item 3")
     )
     val renderer = createTestRenderer(<(FileListColumn())(^.wrapped := props)(
       <.text(^.content := "initial")()
@@ -34,7 +35,7 @@ class FileListColumnSpec extends TestSpec
     testEl.props.content shouldBe "initial"
 
     //when
-    renderer.update(<(FileListColumn())(^.wrapped := props.copy(selectedIds = Set(12, 11)))(
+    renderer.update(<(FileListColumn())(^.wrapped := props.copy(selectedNames = Set("item 3", "item 2")))(
       <.text(^.content := "update")()
     ))
 
@@ -54,12 +55,12 @@ class FileListColumnSpec extends TestSpec
       left = 2,
       borderCh = SingleBorder.verticalCh,
       items = List(
-        10 -> "item 1",
-        11 -> "item 2",
-        12 -> "item 3"
+        FileListItem("item 1"),
+        FileListItem("item 2"),
+        FileListItem("item 3")
       ),
       focusedIndex = 1,
-      selectedIds = Set(11, 12)
+      selectedNames = Set("item 2", "item 3")
     )
     val renderer = createTestRenderer(<(FileListColumn())(^.wrapped := props)(
       <.text(^.content := "initial")()
@@ -69,7 +70,7 @@ class FileListColumnSpec extends TestSpec
     testEl.props.content shouldBe "initial"
 
     //when
-    renderer.update(<(FileListColumn())(^.wrapped := props.copy(selectedIds = Set(12)))(
+    renderer.update(<(FileListColumn())(^.wrapped := props.copy(selectedNames = Set("item 3")))(
       <.text(^.content := "update")()
     ))
 
@@ -89,12 +90,12 @@ class FileListColumnSpec extends TestSpec
       left = 2,
       borderCh = SingleBorder.verticalCh,
       items = List(
-        10 -> "item 1 {bold}",
-        11 -> "item 2 looooooong",
-        12 -> "item 3"
+        FileListItem("item 1 {bold}"),
+        FileListItem("item 2 looooooong"),
+        FileListItem("item 3")
       ),
       focusedIndex = 1,
-      selectedIds = Set(11, 12)
+      selectedNames = Set("item 2 looooooong", "item 3")
     )
     val comp = <(FileListColumn())(^.wrapped := props)()
 
@@ -117,7 +118,7 @@ class FileListColumnSpec extends TestSpec
       borderCh = SingleBorder.verticalCh,
       items = Nil,
       focusedIndex = -1,
-      selectedIds = Set.empty
+      selectedNames = Set.empty
     )
     val comp = <(FileListColumn())(^.wrapped := props)()
 

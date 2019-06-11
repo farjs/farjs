@@ -1,5 +1,7 @@
 package scommons.farc.app
 
+import scommons.farc.api.filelist.FileListApi
+import scommons.farc.app.filelist.FileListApiImpl
 import scommons.farc.ui._
 import scommons.farc.ui.filelist._
 import scommons.nodejs._
@@ -25,20 +27,26 @@ object FarcApp {
       process.exit(0)
     })
 
-    ReactBlessed.render(<(FarcAppRoot())()(), screen)
+    val api = new FileListApiImpl
+    
+    ReactBlessed.render(<(FarcAppRoot())(^.wrapped := FarcAppRootProps(api))(), screen)
     screen
   }
 
-  object FarcAppRoot extends FunctionComponent[Unit] {
+  case class FarcAppRootProps(fileListApi: FileListApi)
+  
+  object FarcAppRoot extends FunctionComponent[FarcAppRootProps] {
 
-    protected def render(props: Props): ReactElement = {
+    protected def render(compProps: Props): ReactElement = {
+      val props = compProps.wrapped
+      
       <.>()(
         <.box(
           ^.rbWidth := "50%",
           ^.rbHeight := "100%-1"
         )(
           <(WithSize())(^.wrapped := WithSizeProps({ (width, height) =>
-            <(FilePanel())(^.wrapped := FilePanelProps(size = (width, height)))()
+            <(FilePanel())(^.wrapped := FilePanelProps(props.fileListApi, size = (width, height)))()
           }))()
         ),
 

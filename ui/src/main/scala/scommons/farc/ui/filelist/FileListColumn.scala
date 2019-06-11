@@ -1,5 +1,6 @@
 package scommons.farc.ui.filelist
 
+import scommons.farc.api.filelist.FileListItem
 import scommons.farc.ui._
 import scommons.react._
 import scommons.react.blessed._
@@ -8,9 +9,9 @@ import scommons.react.blessed.raw.Blessed
 case class FileListColumnProps(size: (Int, Int),
                                left: Int,
                                borderCh: String,
-                               items: Seq[(Int, String)],
+                               items: Seq[FileListItem],
                                focusedIndex: Int,
-                               selectedIds: Set[Int])
+                               selectedNames: Set[String])
 
 object FileListColumn extends FunctionComponent[FileListColumnProps] {
 
@@ -39,10 +40,10 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
     )
 
     def renderItems(): Seq[String] = props.items.zipWithIndex.map {
-      case ((id, text), index) =>
+      case (item, index) =>
         val style = {
           val style =
-            if (props.selectedIds.contains(id)) styles.selectedItem
+            if (props.selectedNames.contains(item.name)) styles.selectedItem
             else styles.normalItem
           
           val focused = props.focusedIndex == index
@@ -54,8 +55,8 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
           isBold = style.bold.getOrElse(false),
           fgColor = style.fg.orNull,
           bgColor = style.bg.orNull,
-          text = text.take(width).padTo(width, ' '),
-          ending = if (text.length > width) overlapEnd else borderEnd
+          text = item.name.take(width).padTo(width, ' '),
+          ending = if (item.name.length > width) overlapEnd else borderEnd
         )
     }
 

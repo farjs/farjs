@@ -1,28 +1,65 @@
 package scommons.farc.ui.filelist
 
 import org.scalactic.source.Position
-import scommons.react.test.TestSpec
+import org.scalatest.{Assertion, Succeeded}
+import scommons.farc.api.filelist._
+import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.test.BaseTestSpec
 import scommons.react.test.raw.ShallowInstance
-import scommons.react.test.util.ShallowRendererUtils
+import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
 
-class FileListSpec extends TestSpec with ShallowRendererUtils {
+import scala.concurrent.Future
+
+class FileListSpec extends AsyncTestSpec with BaseTestSpec
+  with ShallowRendererUtils
+  with TestRendererUtils {
+
+  it should "call api and onStateChanged when mount/update" in {
+    //given
+    val api = mock[FileListApi]
+    val onStateChanged = mockFunction[FileListState, Unit]
+    val props1 = FileListProps(api, (7, 2), columns = 2, FileListState(), onStateChanged = onStateChanged)
+    val state1 = FileListState(items = List(FileListItem("item 1")))
+    val future1 = Future.successful(state1.items)
+    val state2 = state1.copy(currDir = "/changed", items = List(FileListItem("item 2")))
+    val future2 = Future.successful(state2.items)
+    val props2 = props1.copy(state = state1)
+    val props3 = props1.copy(state = state2)
+    
+    //then
+    (api.listFiles _).expects(props1.state.currDir).returning(future1)
+    (api.listFiles _).expects(props3.state.currDir).returning(future2)
+    onStateChanged.expects(state1)
+    onStateChanged.expects(state2)
+    
+    //when
+    val renderer = createTestRenderer(<(FileList())(^.wrapped := props1)())
+    renderer.update(<(FileList())(^.wrapped := props2)()) //noop
+    renderer.update(<(FileList())(^.wrapped := props3)())
+    
+    //cleanup
+    renderer.unmount()
+
+    Future.sequence(List(future1, future2)).map(_ => Succeeded)
+  }
 
   it should "focus item when onWheelup/onWheeldown" in {
     //given
+    val api = mock[FileListApi]
     val onStateChanged = mockFunction[FileListState, Unit]
-    val props = FileListProps((7, 3), columns = 2, items = List(
-      1 -> "item 1",
-      2 -> "item 2",
-      3 -> "item 3",
-      4 -> "item 4",
-      5 -> "item 5"
-    ), FileListState(), onStateChanged = onStateChanged)
+    val props = FileListProps(api, (7, 3), columns = 2, FileListState(items = List(
+      FileListItem("item 1"),
+      FileListItem("item 2"),
+      FileListItem("item 3"),
+      FileListItem("item 4"),
+      FileListItem("item 5")
+    )), onStateChanged = onStateChanged)
     val renderer = createRenderer()
     renderer.render(<(FileList())(^.wrapped := props)())
     findComponentProps(renderer.getRenderOutput(), FileListView).focusedIndex shouldBe 0
 
-    def check(up: Boolean, offset: Int, index: Int, changed: Boolean = true)(implicit pos: Position): Unit = {
-      val state = FileListState(offset, index)
+    def check(up: Boolean, offset: Int, index: Int, changed: Boolean = true)(implicit pos: Position): Assertion = {
+      val state = props.state.copy(offset = offset, index = index)
       if (changed) {
         //then
         onStateChanged.expects(state)
@@ -35,8 +72,8 @@ class FileListSpec extends TestSpec with ShallowRendererUtils {
       renderer.render(<(FileList())(^.wrapped := props.copy(state = state))())
 
       //then
-      val viewProps = findComponentProps(renderer.getRenderOutput(), FileListView)
-      viewProps.focusedIndex shouldBe index
+      val res = findComponentProps(renderer.getRenderOutput(), FileListView)
+      res.focusedIndex shouldBe index
     }
     
     //when & then
@@ -56,18 +93,19 @@ class FileListSpec extends TestSpec with ShallowRendererUtils {
 
   it should "focus item when onClick" in {
     //given
+    val api = mock[FileListApi]
     val onStateChanged = mockFunction[FileListState, Unit]
-    val props = FileListProps((7, 3), columns = 2, items = List(
-      1 -> "item 1",
-      2 -> "item 2",
-      3 -> "item 3"
-    ), FileListState(), onStateChanged = onStateChanged)
+    val props = FileListProps(api, (7, 3), columns = 2, FileListState(items = List(
+      FileListItem("item 1"),
+      FileListItem("item 2"),
+      FileListItem("item 3")
+    )), onStateChanged = onStateChanged)
     val renderer = createRenderer()
     renderer.render(<(FileList())(^.wrapped := props)())
     findComponentProps(renderer.getRenderOutput(), FileListView).focusedIndex shouldBe 0
 
-    def check(clickIndex: Int, index: Int, changed: Boolean = true)(implicit pos: Position): Unit = {
-      val state = FileListState(0, index)
+    def check(clickIndex: Int, index: Int, changed: Boolean = true)(implicit pos: Position): Assertion = {
+      val state = props.state.copy(offset = 0, index = index)
       if (changed) {
         //then
         onStateChanged.expects(state)
@@ -78,8 +116,8 @@ class FileListSpec extends TestSpec with ShallowRendererUtils {
       renderer.render(<(FileList())(^.wrapped := props.copy(state = state))())
 
       //then
-      val viewProps = findComponentProps(renderer.getRenderOutput(), FileListView)
-      viewProps.focusedIndex shouldBe index
+      val res = findComponentProps(renderer.getRenderOutput(), FileListView)
+      res.focusedIndex shouldBe index
     }
     
     //when & then
@@ -91,29 +129,30 @@ class FileListSpec extends TestSpec with ShallowRendererUtils {
 
   it should "focus and select item when onKeypress" in {
     //given
+    val api = mock[FileListApi]
     val onStateChanged = mockFunction[FileListState, Unit]
-    val props = FileListProps((7, 3), columns = 2, items = List(
-      1 -> "item 1",
-      2 -> "item 2",
-      3 -> "item 3",
-      4 -> "item 4",
-      5 -> "item 5",
-      6 -> "item 6",
-      7 -> "item 7"
-    ), FileListState(), onStateChanged = onStateChanged)
+    val props = FileListProps(api, (7, 3), columns = 2, FileListState(items = List(
+      FileListItem("item 1"),
+      FileListItem("item 2"),
+      FileListItem("item 3"),
+      FileListItem("item 4"),
+      FileListItem("item 5"),
+      FileListItem("item 6"),
+      FileListItem("item 7")
+    )), onStateChanged = onStateChanged)
     val renderer = createRenderer()
     renderer.render(<(FileList())(^.wrapped := props)())
     findComponentProps(renderer.getRenderOutput(), FileListView).focusedIndex shouldBe 0
     
     def check(keyFull: String,
-              items: List[(Int, String)],
+              items: List[String],
               offset: Int,
               index: Int,
-              selectedIds: Set[Int],
+              selected: Set[String],
               changed: Boolean = true
-             )(implicit pos: Position): Unit = {
+             )(implicit pos: Position): Assertion = {
 
-      val state = FileListState(offset, index, selectedIds)
+      val state = props.state.copy(offset = offset, index = index, selectedNames = selected)
       if (changed) {
         //then
         onStateChanged.expects(state)
@@ -124,73 +163,75 @@ class FileListSpec extends TestSpec with ShallowRendererUtils {
       renderer.render(<(FileList())(^.wrapped := props.copy(state = state))())
 
       //then
-      val viewProps = findComponentProps(renderer.getRenderOutput(), FileListView)
-      (viewProps.items, viewProps.focusedIndex, viewProps.selectedIds) shouldBe ((items, index, selectedIds))
+      val res = findComponentProps(renderer.getRenderOutput(), FileListView)
+      val fileListItems = items.map(FileListItem(_))
+      (res.items, res.focusedIndex, res.selectedNames) shouldBe ((fileListItems, index, selected))
     }
     
     //when & then
-    check("unknown", List(1 -> "item 1", 2 -> "item 2", 3 -> "item 3", 4 -> "item 4"), 0, 0, Set.empty, changed = false)
+    check("unknown", List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
     
     //when & then
-    check("S-down",  List(1 -> "item 1", 2 -> "item 2", 3 -> "item 3", 4 -> "item 4"), 0, 1, Set(1))
-    check("S-down",  List(1 -> "item 1", 2 -> "item 2", 3 -> "item 3", 4 -> "item 4"), 0, 2, Set(1, 2))
-    check("down",    List(1 -> "item 1", 2 -> "item 2", 3 -> "item 3", 4 -> "item 4"), 0, 3, Set(1, 2))
-    check("down",    List(2 -> "item 2", 3 -> "item 3", 4 -> "item 4", 5 -> "item 5"), 1, 3, Set(1, 2))
-    check("S-down",  List(3 -> "item 3", 4 -> "item 4", 5 -> "item 5", 6 -> "item 6"), 2, 3, Set(1, 2, 5))
-    check("S-down",  List(4 -> "item 4", 5 -> "item 5", 6 -> "item 6", 7 -> "item 7"), 3, 3, Set(1, 2, 5, 6, 7))
-    check("down",    List(4 -> "item 4", 5 -> "item 5", 6 -> "item 6", 7 -> "item 7"), 3, 3, Set(1, 2, 5, 6, 7), changed = false)
+    check("S-down",  List("item 1", "item 2", "item 3", "item 4"), 0, 1, Set("item 1"))
+    check("S-down",  List("item 1", "item 2", "item 3", "item 4"), 0, 2, Set("item 1", "item 2"))
+    check("down",    List("item 1", "item 2", "item 3", "item 4"), 0, 3, Set("item 1", "item 2"))
+    check("down",    List("item 2", "item 3", "item 4", "item 5"), 1, 3, Set("item 1", "item 2"))
+    check("S-down",  List("item 3", "item 4", "item 5", "item 6"), 2, 3, Set("item 1", "item 2", "item 5"))
+    check("S-down",  List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6", "item 7"))
+    check("down",    List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6", "item 7"), changed = false)
 
     //when & then
-    check("S-up",    List(4 -> "item 4", 5 -> "item 5", 6 -> "item 6", 7 -> "item 7"), 3, 2, Set(1, 2, 5, 6))
-    check("S-up",    List(4 -> "item 4", 5 -> "item 5", 6 -> "item 6", 7 -> "item 7"), 3, 1, Set(1, 2, 5))
-    check("S-up",    List(4 -> "item 4", 5 -> "item 5", 6 -> "item 6", 7 -> "item 7"), 3, 0, Set(1, 2))
-    check("up",      List(3 -> "item 3", 4 -> "item 4", 5 -> "item 5", 6 -> "item 6"), 2, 0, Set(1, 2))
-    check("up",      List(2 -> "item 2", 3 -> "item 3", 4 -> "item 4", 5 -> "item 5"), 1, 0, Set(1, 2))
-    check("S-up",    List(1 -> "item 1", 2 -> "item 2", 3 -> "item 3", 4 -> "item 4"), 0, 0, Set.empty)
-    check("up",      List(1 -> "item 1", 2 -> "item 2", 3 -> "item 3", 4 -> "item 4"), 0, 0, Set.empty, changed = false)
+    check("S-up",    List("item 4", "item 5", "item 6", "item 7"), 3, 2, Set("item 1", "item 2", "item 5", "item 6"))
+    check("S-up",    List("item 4", "item 5", "item 6", "item 7"), 3, 1, Set("item 1", "item 2", "item 5"))
+    check("S-up",    List("item 4", "item 5", "item 6", "item 7"), 3, 0, Set("item 1", "item 2"))
+    check("up",      List("item 3", "item 4", "item 5", "item 6"), 2, 0, Set("item 1", "item 2"))
+    check("up",      List("item 2", "item 3", "item 4", "item 5"), 1, 0, Set("item 1", "item 2"))
+    check("S-up",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
+    check("up",      List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
 
     //when & then
-    check("S-right", List(1 -> "item 1", 2 -> "item 2", 3 -> "item 3", 4 -> "item 4"), 0, 2, Set(1, 2))
-    check("right",   List(3 -> "item 3", 4 -> "item 4", 5 -> "item 5", 6 -> "item 6"), 2, 2, Set(1, 2))
-    check("S-right", List(4 -> "item 4", 5 -> "item 5", 6 -> "item 6", 7 -> "item 7"), 3, 3, Set(1, 2, 5, 6, 7))
-    check("right",   List(4 -> "item 4", 5 -> "item 5", 6 -> "item 6", 7 -> "item 7"), 3, 3, Set(1, 2, 5, 6, 7), changed = false)
+    check("S-right", List("item 1", "item 2", "item 3", "item 4"), 0, 2, Set("item 1", "item 2"))
+    check("right",   List("item 3", "item 4", "item 5", "item 6"), 2, 2, Set("item 1", "item 2"))
+    check("S-right", List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6", "item 7"))
+    check("right",   List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6", "item 7"), changed = false)
 
     //when & then
-    check("S-left",  List(4 -> "item 4", 5 -> "item 5", 6 -> "item 6", 7 -> "item 7"), 3, 1, Set(1, 2, 5))
-    check("left",    List(2 -> "item 2", 3 -> "item 3", 4 -> "item 4", 5 -> "item 5"), 1, 1, Set(1, 2, 5))
-    check("S-left",  List(1 -> "item 1", 2 -> "item 2", 3 -> "item 3", 4 -> "item 4"), 0, 0, Set(1, 2, 3, 5))
-    check("left",    List(1 -> "item 1", 2 -> "item 2", 3 -> "item 3", 4 -> "item 4"), 0, 0, Set(1, 2, 3, 5), changed = false)
+    check("S-left",  List("item 4", "item 5", "item 6", "item 7"), 3, 1, Set("item 1", "item 2", "item 5"))
+    check("left",    List("item 2", "item 3", "item 4", "item 5"), 1, 1, Set("item 1", "item 2", "item 5"))
+    check("S-left",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set("item 1", "item 2", "item 3", "item 5"))
+    check("left",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set("item 1", "item 2", "item 3", "item 5"), changed = false)
 
     //when & then
-    check("S-pagedown", List(1 -> "item 1", 2 -> "item 2", 3 -> "item 3", 4 -> "item 4"), 0, 3, Set(5))
-    check("S-pagedown", List(4 -> "item 4", 5 -> "item 5", 6 -> "item 6", 7 -> "item 7"), 3, 3, Set(4, 5, 6, 7))
-    check("pagedown",   List(4 -> "item 4", 5 -> "item 5", 6 -> "item 6", 7 -> "item 7"), 3, 3, Set(4, 5, 6, 7), changed = false)
+    check("S-pagedown", List("item 1", "item 2", "item 3", "item 4"), 0, 3, Set("item 5"))
+    check("S-pagedown", List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 4", "item 5", "item 6", "item 7"))
+    check("pagedown",   List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 4", "item 5", "item 6", "item 7"), changed = false)
 
     //when & then
-    check("S-pageup",List(4 -> "item 4", 5 -> "item 5", 6 -> "item 6", 7 -> "item 7"), 3, 0, Set(4))
-    check("S-pageup",List(1 -> "item 1", 2 -> "item 2", 3 -> "item 3", 4 -> "item 4"), 0, 0, Set.empty)
-    check("pageup",  List(1 -> "item 1", 2 -> "item 2", 3 -> "item 3", 4 -> "item 4"), 0, 0, Set.empty, changed = false)
+    check("S-pageup",List("item 4", "item 5", "item 6", "item 7"), 3, 0, Set("item 4"))
+    check("S-pageup",List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
+    check("pageup",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
 
     //when & then
-    check("end",     List(4 -> "item 4", 5 -> "item 5", 6 -> "item 6", 7 -> "item 7"), 3, 3, Set.empty)
-    check("end",     List(4 -> "item 4", 5 -> "item 5", 6 -> "item 6", 7 -> "item 7"), 3, 3, Set.empty, changed = false)
+    check("end",     List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set.empty)
+    check("end",     List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set.empty, changed = false)
 
     //when & then
-    check("home",    List(1 -> "item 1", 2 -> "item 2", 3 -> "item 3", 4 -> "item 4"), 0, 0, Set.empty)
-    check("home",    List(1 -> "item 1", 2 -> "item 2", 3 -> "item 3", 4 -> "item 4"), 0, 0, Set.empty, changed = false)
+    check("home",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
+    check("home",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
     
     //when & then
-    check("S-end",   List(4 -> "item 4", 5 -> "item 5", 6 -> "item 6", 7 -> "item 7"), 3, 3, Set(1, 2, 3, 4, 5, 6, 7))
-    check("S-end",   List(4 -> "item 4", 5 -> "item 5", 6 -> "item 6", 7 -> "item 7"), 3, 3, Set(1, 2, 3, 4, 5, 6, 7), changed = false)
+    check("S-end",   List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 3", "item 4", "item 5", "item 6", "item 7"))
+    check("S-end",   List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 3", "item 4", "item 5", "item 6", "item 7"), changed = false)
 
     //when & then
-    check("S-home",  List(1 -> "item 1", 2 -> "item 2", 3 -> "item 3", 4 -> "item 4"), 0, 0, Set.empty)
-    check("S-home",  List(1 -> "item 1", 2 -> "item 2", 3 -> "item 3", 4 -> "item 4"), 0, 0, Set.empty, changed = false)
+    check("S-home",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
+    check("S-home",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
   }
 
   it should "render empty component" in {
     //given
-    val props = FileListProps((7, 2), columns = 2, items = Nil, FileListState(), _ => ())
+    val api = mock[FileListApi]
+    val props = FileListProps(api, (7, 2), columns = 2, FileListState(), _ => ())
     val comp = <(FileList())(^.wrapped := props)()
 
     //when
@@ -200,17 +241,18 @@ class FileListSpec extends TestSpec with ShallowRendererUtils {
     assertFileList(result, props,
       viewItems = Nil,
       focusedIndex = 0,
-      selectedIds = Set.empty
+      selectedNames = Set.empty
     )
   }
   
   it should "render non-empty component" in {
     //given
-    val props = FileListProps((7, 2), columns = 2, items = List(
-      1 -> "item 1",
-      2 -> "item 2",
-      3 -> "item 3"
-    ), FileListState(), _ => ())
+    val api = mock[FileListApi]
+    val props = FileListProps(api, (7, 2), columns = 2, FileListState(items = List(
+      FileListItem("item 1"),
+      FileListItem("item 2"),
+      FileListItem("item 3")
+    )), _ => ())
     val comp = <(FileList())(^.wrapped := props)()
 
     //when
@@ -218,25 +260,25 @@ class FileListSpec extends TestSpec with ShallowRendererUtils {
 
     //then
     assertFileList(result, props,
-      viewItems = List(1 -> "item 1", 2 -> "item 2"),
+      viewItems = List(FileListItem("item 1"), FileListItem("item 2")),
       focusedIndex = 0,
-      selectedIds = Set.empty
+      selectedNames = Set.empty
     )
   }
   
   private def assertFileList(result: ShallowInstance,
                              props: FileListProps,
-                             viewItems: List[(Int, String)],
+                             viewItems: List[FileListItem],
                              focusedIndex: Int,
-                             selectedIds: Set[Int]): Unit = {
+                             selectedNames: Set[Int]): Assertion = {
     
     assertComponent(result, FileListView) {
-      case FileListViewProps(resSize, columns, items, resFocusedIndex, resSelectedIds, _, _, _, _) =>
+      case FileListViewProps(resSize, columns, items, resFocusedIndex, resSelectedNames, _, _, _, _) =>
         resSize shouldBe props.size
         columns shouldBe props.columns
         items shouldBe viewItems
         resFocusedIndex shouldBe focusedIndex
-        resSelectedIds shouldBe selectedIds
+        resSelectedNames shouldBe selectedNames
     }
   }
 }

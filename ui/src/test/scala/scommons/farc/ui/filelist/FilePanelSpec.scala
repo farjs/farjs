@@ -1,7 +1,9 @@
 package scommons.farc.ui.filelist
 
+import scommons.farc.api.filelist.FileListApi
 import scommons.farc.ui._
 import scommons.farc.ui.border._
+import scommons.nodejs._
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
 import scommons.react.test.util.ShallowRendererUtils
@@ -10,12 +12,13 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
 
   it should "set state when onStateChanged" in {
     //given
-    val props = FilePanelProps(size = (25, 15))
+    val api = mock[FileListApi]
+    val props = FilePanelProps(api, size = (25, 15))
     val renderer = createRenderer()
     renderer.render(<(FilePanel())(^.wrapped := props)())
     val listProps = findComponentProps(renderer.getRenderOutput(), FileList)
     listProps.state shouldBe FileListState()
-    val newState = FileListState(1, 2, Set(3))
+    val newState = FileListState(offset = 1, index = 2, currDir = "", selectedNames = Set(""))
 
     //when
     listProps.onStateChanged(newState)
@@ -26,7 +29,8 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
   
   it should "render component" in {
     //given
-    val props = FilePanelProps(size = (25, 15))
+    val api = mock[FileListApi]
+    val props = FilePanelProps(api, size = (25, 15))
 
     //when
     val result = shallowRender(<(FilePanel())(^.wrapped := props)())
@@ -51,10 +55,10 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
         }
         
         assertComponent(list, FileList) {
-          case FileListProps(resSize, columns, items, state, _) =>
+          case FileListProps(resApi, resSize, columns, state, _) =>
+            resApi shouldBe props.api
             resSize shouldBe (width - 2) -> (height - 5)
             columns shouldBe 3
-            items should not be empty
             state shouldBe FileListState()
         }
         
@@ -63,7 +67,7 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
             align shouldBe TextLine.Center
             pos shouldBe 1 -> 0
             resWidth shouldBe (width - 2)
-            text shouldBe "/current/folder"
+            text shouldBe os.homedir()
             style shouldBe styles.normalItem
             focused shouldBe true
             padding shouldBe 1
@@ -74,7 +78,7 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
             align shouldBe TextLine.Left
             pos shouldBe 1 -> (height - 3)
             resWidth shouldBe (width - 2 - 12)
-            text shouldBe "file 1"
+            text shouldBe ""
             style shouldBe styles.normalItem
             focused shouldBe false
             padding shouldBe 0

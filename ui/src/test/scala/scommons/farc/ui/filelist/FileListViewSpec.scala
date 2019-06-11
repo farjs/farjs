@@ -1,5 +1,6 @@
 package scommons.farc.ui.filelist
 
+import scommons.farc.api.filelist.FileListItem
 import scommons.farc.ui.border._
 import scommons.react._
 import scommons.react.blessed._
@@ -19,8 +20,8 @@ class FileListViewSpec extends TestSpec
     val onWheelUp = mockFunction[Unit]
     val onWheelDown = mockFunction[Unit]
     val props = FileListViewProps((7, 7), columns = 2, items = List(
-      1 -> "item 1",
-      2 -> "item 2"
+      FileListItem("item 1"),
+      FileListItem("item 2")
     ), onWheelUp = onWheelUp, onWheelDown = onWheelDown)
     val root = createTestRenderer(<(FileListView())(^.wrapped := props)(), { el =>
       if (el.`type` == "button".asInstanceOf[js.Any]) literal(aleft = 5, atop = 3)
@@ -52,9 +53,9 @@ class FileListViewSpec extends TestSpec
     //given
     val onClick = mockFunction[Int, Unit]
     val props = FileListViewProps((7, 3), columns = 2, items = List(
-      1 -> "item 1",
-      2 -> "item 2",
-      3 -> "item 3"
+      FileListItem("item 1"),
+      FileListItem("item 2"),
+      FileListItem("item 3")
     ), onClick = onClick)
     val root = createTestRenderer(<(FileListView())(^.wrapped := props)(), { el =>
       if (el.`type` == "button".asInstanceOf[js.Any]) literal(aleft = 5, atop = 3)
@@ -86,8 +87,8 @@ class FileListViewSpec extends TestSpec
     //given
     val onKeypress = mockFunction[String, Unit]
     val props = FileListViewProps((7, 3), columns = 2, items = List(
-      1 -> "item 1",
-      2 -> "item 2"
+      FileListItem("item 1"),
+      FileListItem("item 2")
     ), onKeypress = onKeypress)
     val comp = shallowRender(<(FileListView())(^.wrapped := props)())
     val keyFull = "some-key"
@@ -102,7 +103,7 @@ class FileListViewSpec extends TestSpec
   it should "render empty component when height < 2" in {
     //given
     val props = FileListViewProps((1, 1), columns = 2,
-      items = List(1 -> "item 1", 2 -> "item 2")
+      items = List(FileListItem("item 1"), FileListItem("item 2"))
     )
 
     //when
@@ -141,9 +142,9 @@ class FileListViewSpec extends TestSpec
   it should "render non-empty component with 2 columns" in {
     //given
     val props = FileListViewProps((7, 2), columns = 2,
-      items = List(1 -> "item 1", 2 -> "item 2"),
+      items = List(FileListItem("item 1"), FileListItem("item 2")),
       focusedIndex = 1,
-      selectedIds = Set(2)
+      selectedNames = Set("item 2")
     )
     val comp = <(FileListView())(^.wrapped := props)()
 
@@ -152,14 +153,14 @@ class FileListViewSpec extends TestSpec
 
     //then
     assertFileListView(result, props, List(
-      (List(1 -> "item 1"), -1, Set.empty),
-      (List(2 -> "item 2"), 0, Set(2))
+      (List(FileListItem("item 1")), -1, Set.empty),
+      (List(FileListItem("item 2")), 0, Set("item 2"))
     ))
   }
   
   private def assertFileListView(result: ShallowInstance,
                                  props: FileListViewProps,
-                                 expectedData: List[(List[(Int, String)], Int, Set[Int])]): Unit = {
+                                 expectedData: List[(List[FileListItem], Int, Set[String])]): Unit = {
     
     assertNativeComponent(result, <.button(
       ^.rbWidth := props.size._1,
@@ -181,21 +182,21 @@ class FileListViewSpec extends TestSpec
             end shouldBe Some(SingleBorder.bottomCh)
         }
         assertComponent(col1, FileListColumn) {
-          case FileListColumnProps(resSize, left, borderCh, items, focusedPos, selectedIds) =>
+          case FileListColumnProps(resSize, left, borderCh, items, focusedPos, selectedNames) =>
             resSize shouldBe 2 -> 2
             left shouldBe 0
             borderCh shouldBe SingleBorder.verticalCh
-            (items, focusedPos, selectedIds) shouldBe expectedData.head
+            (items, focusedPos, selectedNames) shouldBe expectedData.head
         }
       })
       assertNativeComponent(colWrap2, <.>(^.key := "1")(), { children: List[ShallowInstance] =>
         val List(col2) = children
         assertComponent(col2, FileListColumn) {
-          case FileListColumnProps(resSize, left, borderCh, items, focusedPos, selectedIds) =>
+          case FileListColumnProps(resSize, left, borderCh, items, focusedPos, selectedNames) =>
             resSize shouldBe 4 -> 2
             left shouldBe 3
             borderCh shouldBe DoubleBorder.verticalCh
-            (items, focusedPos, selectedIds) shouldBe expectedData(1)
+            (items, focusedPos, selectedNames) shouldBe expectedData(1)
         }
       })
     })
