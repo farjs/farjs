@@ -5,8 +5,9 @@ import scommons.react._
 import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.scalajs.js
-import scala.util.Success
+import scala.scalajs.js.JavaScriptException
 
 case class FileListProps(api: FileListApi,
                          size: (Int, Int),
@@ -20,15 +21,10 @@ object FileList extends FunctionComponent[FileListProps] {
     val props = compProps.wrapped
     
     useLayoutEffect({ () =>
-      props.api.listFiles(props.state.currDir).andThen {
-        case Success(files) => props.onStateChanged(props.state.copy(
-          offset = 0,
-          index = 0,
-          items = files.sortBy(_.name),
-          selectedNames = Set.empty
-        ))
-      }: Unit
-    }, List(props.state.currDir, props.onStateChanged))
+      if (props.state.currDir.isEmpty) {
+        onChangeDir(props, props.api.rootDir)
+      }
+    }, Nil)
     
     val (_, height) = props.size
     val columns = props.columns
@@ -75,9 +71,12 @@ object FileList extends FunctionComponent[FileListProps] {
             else items.view(currIndex, selectIndex)
           }.map(_.name).toSet
   
-          val currId = items(currIndex).name
-          if (currSelected.contains(currId)) currSelected -- selection
-          else currSelected ++ selection
+          val currName = items(currIndex).name
+          val newSelected =
+            if (currSelected.contains(currName)) currSelected -- selection
+            else currSelected ++ selection
+          
+          newSelected - FileListItem.up.name
         }
         else currSelected
 
@@ -113,8 +112,56 @@ object FileList extends FunctionComponent[FileListProps] {
         case k if k == "pagedown" || k == "S-pagedown" => focusDx(viewSize - 1, k == "S-pagedown")
         case k if k == "home" || k == "S-home" => focusItem(0, 0, k == "S-home")
         case k if k == "end" || k == "S-end" => focusItem(maxOffset, maxIndex, k == "S-end")
+        case "enter" =>
+          props.state.currentItem.filter(_.isDir).foreach { dir =>
+            onChangeDir(props, dir.name)
+          }
         case _ =>
       }
     ))()
+  }
+  
+  private def onChangeDir(props: FileListProps, dir: String): Unit = {
+    
+    def recover[T](f: Future[T], value: T): Future[T] = f.recover {
+      case JavaScriptException(error) =>
+        println(s"$error")
+        value
+      case error =>
+        println(s"$error")
+        value
+    }
+    
+    val future = for {
+      currDir <- props.api.changeDir(dir)
+      files <- recover(props.api.listFiles, Nil)
+    } yield {
+      val items = {
+        val sorted = files.sortBy(item => (!item.isDir, item.name))
+
+        if (currDir == props.api.rootDir) sorted
+        else FileListItem.up +: sorted
+      }
+      val index = 
+        if (dir == FileListItem.up.name) {
+          val focusedDir = props.state.currDir
+            .stripPrefix(currDir)
+            .stripPrefix("/")
+            .stripPrefix("\\")
+          
+          items.indexWhere(_.name == focusedDir)
+        }
+        else -1
+      
+      props.onStateChanged(props.state.copy(
+        offset = 0,
+        index = if (index >= 0) index else 0,
+        currDir = currDir,
+        items = items,
+        selectedNames = Set.empty
+      ))
+    }
+
+    recover(future, ())
   }
 }

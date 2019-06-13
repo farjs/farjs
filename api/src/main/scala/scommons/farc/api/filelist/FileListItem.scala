@@ -8,3 +8,8 @@ case class FileListItem(name: String,
                         mtimeMs: Double = 0.0,
                         ctimeMs: Double = 0.0,
                         birthtimeMs: Double = 0.0)
+
+object FileListItem {
+
+  val up = FileListItem("..", isDir = true)
+}

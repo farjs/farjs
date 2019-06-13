@@ -8,20 +8,33 @@ import scala.concurrent.Future
 
 class FileListApiImpl extends FileListApi {
 
-  def listFiles(dir: String): Future[Seq[FileListItem]] = fs.readdir(dir).map { files =>
-    files.map { name =>
-      val stats = fs.lstatSync(path.join(dir, name))
+  def rootDir: String = {
+    path.parse(process.cwd()).root.getOrElse("")
+  }
+  
+  def changeDir(dir: String): Future[String] = Future {
+    process.chdir(path.resolve(dir))
+    process.cwd()
+  }
+  
+  def listFiles: Future[Seq[FileListItem]] = {
+    val dir = process.cwd()
+    
+    fs.readdir(dir).map { files =>
+      files.map { name =>
+        val stats = fs.lstatSync(path.join(dir, name))
 
-      FileListItem(
-        name = name,
-        isDir = stats.isDirectory(),
-        isSymLink = stats.isSymbolicLink(),
-        size = stats.size,
-        atimeMs = stats.atimeMs,
-        mtimeMs = stats.mtimeMs,
-        ctimeMs = stats.ctimeMs,
-        birthtimeMs = stats.birthtimeMs
-      )
+        FileListItem(
+          name = name,
+          isDir = stats.isDirectory(),
+          isSymLink = stats.isSymbolicLink(),
+          size = stats.size,
+          atimeMs = stats.atimeMs,
+          mtimeMs = stats.mtimeMs,
+          ctimeMs = stats.ctimeMs,
+          birthtimeMs = stats.birthtimeMs
+        )
+      }
     }
   }
 }

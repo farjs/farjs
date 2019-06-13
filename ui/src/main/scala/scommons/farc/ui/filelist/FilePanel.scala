@@ -1,6 +1,6 @@
 package scommons.farc.ui.filelist
 
-import scommons.farc.api.filelist.{FileListApi, FileListItem}
+import scommons.farc.api.filelist.FileListApi
 import scommons.farc.ui._
 import scommons.farc.ui.border._
 import scommons.react._
@@ -18,14 +18,6 @@ object FilePanel extends FunctionComponent[FilePanelProps] {
     val (width, height) = props.size
     val styles = FileListView.styles
 
-    def getCurrentItem: Option[FileListItem] = {
-      val itemIndex = state.offset + state.index
-      if (itemIndex >= 0 && itemIndex < state.items.size) {
-        Some(state.items(itemIndex))
-      }
-      else None
-    }
-    
     <.box(^.rbStyle := styles.normalItem)(
       <(DoubleBorder())(^.wrapped := DoubleBorderProps((width, height), styles.normalItem))(),
       <(HorizontalLine())(^.wrapped := HorizontalLineProps(
@@ -55,7 +47,7 @@ object FilePanel extends FunctionComponent[FilePanelProps] {
         align = TextLine.Left,
         pos = (1, height - 3),
         width = width - 2 - 12,
-        text = getCurrentItem.map(_.name).getOrElse(""),
+        text = state.currentItem.map(_.name).getOrElse(""),
         style = styles.normalItem,
         padding = 0
       ))(),

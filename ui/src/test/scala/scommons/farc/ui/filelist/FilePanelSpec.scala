@@ -3,7 +3,6 @@ package scommons.farc.ui.filelist
 import scommons.farc.api.filelist.FileListApi
 import scommons.farc.ui._
 import scommons.farc.ui.border._
-import scommons.nodejs._
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
 import scommons.react.test.util.ShallowRendererUtils
@@ -18,7 +17,7 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
     renderer.render(<(FilePanel())(^.wrapped := props)())
     val listProps = findComponentProps(renderer.getRenderOutput(), FileList)
     listProps.state shouldBe FileListState()
-    val newState = FileListState(offset = 1, index = 2, currDir = "", selectedNames = Set(""))
+    val newState = FileListState(offset = 1, index = 2)
 
     //when
     listProps.onStateChanged(newState)
@@ -67,7 +66,7 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
             align shouldBe TextLine.Center
             pos shouldBe 1 -> 0
             resWidth shouldBe (width - 2)
-            text shouldBe os.homedir()
+            text shouldBe ""
             style shouldBe styles.normalItem
             focused shouldBe true
             padding shouldBe 1

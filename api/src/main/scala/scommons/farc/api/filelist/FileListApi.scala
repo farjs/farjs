@@ -4,5 +4,9 @@ import scala.concurrent.Future
 
 trait FileListApi {
 
-  def listFiles(dir: String): Future[Seq[FileListItem]]
+  def rootDir: String
+  
+  def changeDir(dir: String): Future[String]
+  
+  def listFiles: Future[Seq[FileListItem]]
 }
