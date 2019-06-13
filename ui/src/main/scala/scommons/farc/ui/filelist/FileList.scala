@@ -20,24 +20,23 @@ object FileList extends FunctionComponent[FileListProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     
-    useLayoutEffect({ () =>
-      if (props.state.currDir.isEmpty) {
-        onChangeDir(props, props.api.rootDir)
-      }
-    }, Nil)
-    
     val (_, height) = props.size
-    val columns = props.columns
     val items = props.state.items
     val columnSize = height - 1 // excluding column header
+    val viewSize = columnSize * props.columns
     
     val viewOffset = props.state.offset
     val focusedIndex = props.state.index
-    val viewSize = columnSize * columns
     val viewItems = items.view(viewOffset, viewOffset + viewSize)
     val maxOffset = items.size - viewItems.size
     val maxIndex = math.max(viewItems.size - 1, 0)
 
+    useLayoutEffect({ () =>
+      if (props.state.currDir.isEmpty) {
+        onChangeDir(props, viewSize, props.api.rootDir)
+      }
+    }, Nil)
+    
     def focusDx(dx: Int, select: Boolean): Unit = {
       val index = focusedIndex + dx
       if (index < 0 || index > maxIndex) {
@@ -114,14 +113,14 @@ object FileList extends FunctionComponent[FileListProps] {
         case k if k == "end" || k == "S-end" => focusItem(maxOffset, maxIndex, k == "S-end")
         case "enter" =>
           props.state.currentItem.filter(_.isDir).foreach { dir =>
-            onChangeDir(props, dir.name)
+            onChangeDir(props, viewSize, dir.name)
           }
         case _ =>
       }
     ))()
   }
   
-  private def onChangeDir(props: FileListProps, dir: String): Unit = {
+  private def onChangeDir(props: FileListProps, viewSize: Int, dir: String): Unit = {
     
     def recover[T](f: Future[T], value: T): Future[T] = f.recover {
       case JavaScriptException(error) =>
@@ -142,20 +141,25 @@ object FileList extends FunctionComponent[FileListProps] {
         if (currDir == props.api.rootDir) sorted
         else FileListItem.up +: sorted
       }
-      val index = 
+      val (offset, index) = 
         if (dir == FileListItem.up.name) {
           val focusedDir = props.state.currDir
             .stripPrefix(currDir)
             .stripPrefix("/")
             .stripPrefix("\\")
           
-          items.indexWhere(_.name == focusedDir)
+          val index = math.max(items.indexWhere(_.name == focusedDir), 0)
+          if (viewSize <= 0 || index < viewSize) (0, index)
+          else {
+            val viewIndex = index % viewSize
+            (index - viewIndex, viewIndex)
+          }
         }
-        else -1
+        else (0, 0)
       
       props.onStateChanged(props.state.copy(
-        offset = 0,
-        index = if (index >= 0) index else 0,
+        offset = offset,
+        index = index,
         currDir = currDir,
         items = items,
         selectedNames = Set.empty

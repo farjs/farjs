@@ -14,11 +14,11 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
   with ShallowRendererUtils
   with TestRendererUtils {
 
-  it should "call api and onStateChanged when mount but not when update" in {
+  it should "call api if currDir is empty when mount" in {
     //given
     val api = mock[FileListApi]
     val onStateChanged = mockFunction[FileListState, Unit]
-    val props1 = FileListProps(api, (7, 2), columns = 2, FileListState(), onStateChanged = onStateChanged)
+    val props1 = FileListProps(api, (7, 2), columns = 2, FileListState(), onStateChanged)
     val state1 = FileListState(items = List(FileListItem("item 1")))
     val root = "/"
     val future1 = Future.successful(root)
@@ -40,6 +40,27 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     renderer.unmount()
 
     Future.sequence(List(future1, future2)).map(_ => Succeeded)
+  }
+
+  it should "not call api if currDir is non-empty when mount" in {
+    //given
+    val api = mock[FileListApi]
+    val onStateChanged = mockFunction[FileListState, Unit]
+    val props = FileListProps(api, (7, 2), columns = 2, FileListState(currDir = "/"), onStateChanged)
+    
+    //then
+    (api.rootDir _).expects().never()
+    (api.changeDir _).expects(*).never()
+    (api.listFiles _).expects().never()
+    onStateChanged.expects(*).never()
+    
+    //when
+    val renderer = createTestRenderer(<(FileList())(^.wrapped := props)())
+    
+    //cleanup
+    renderer.unmount()
+
+    Succeeded
   }
 
   it should "call api and onStateChanged when onKeypress(enter)" in {
@@ -112,7 +133,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
           name = name,
           isDir = name == FileListItem.up.name || name.startsWith("dir")
         ))
-        (res.items, res.focusedIndex) shouldBe ((viewItems, index))
+        (res.items.toList, res.focusedIndex) shouldBe ((viewItems, index))
       }.flatMap(_ => checkF)
     }
 
@@ -126,15 +147,15 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       prepare(3, 3, "/", props.state.items),
       check("enter", "file 7","/",      List("dir 4", "dir 5", "dir 6", "file 7"), 3, 3, changed = false),
       
-      prepare(0, 1, "/", props.state.items),
-      check("enter", "dir 2", "/dir 2", List("..", "dir 1", "dir 2", "dir 3"), 0, 0),
+      prepare(3, 2, "/", props.state.items),
+      check("enter", "dir 6", "/dir 6", List("..", "dir 1", "dir 2", "dir 3"), 0, 0),
       
-      prepare(0, 3, "/dir 2", FileListItem.up +: props.state.items),
-      check("enter", "dir 3", "/dir 2/dir 3", List("..", "dir 1", "dir 2", "dir 3"), 0, 0),
-      check("enter", "..",    "/dir 2",       List("..", "dir 1", "dir 2", "dir 3"), 0, 3),
+      prepare(3, 1, "/dir 6", FileListItem.up +: props.state.items),
+      check("enter", "dir 4", "/dir 6/dir 4", List("..", "dir 1", "dir 2", "dir 3"), 0, 0),
+      check("enter", "..",    "/dir 6",       List("dir 4", "dir 5", "dir 6", "file 7"), 4, 0),
       
-      prepare(0, 0, "/dir 2", FileListItem.up +: props.state.items),
-      check("enter", "..",    "/",            List("dir 1", "dir 2", "dir 3", "dir 4"), 0, 1)
+      prepare(0, 0, "/dir 6", FileListItem.up +: props.state.items),
+      check("enter", "..",    "/",            List("dir 5", "dir 6", "file 7"), 4, 1)
       
     )).map(_ => Succeeded)
   }
