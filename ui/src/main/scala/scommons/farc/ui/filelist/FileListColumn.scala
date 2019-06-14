@@ -41,9 +41,12 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
 
     def renderItems(): Seq[String] = props.items.zipWithIndex.map {
       case (item, index) =>
+        val name = item.name
         val style = {
           val style =
-            if (props.selectedNames.contains(item.name)) styles.selectedItem
+            if (props.selectedNames.contains(name)) styles.selectedItem
+            else if (name.startsWith(".") && name != FileListItem.up.name) styles.hiddenItem
+            else if (item.isDir && name != FileListItem.up.name) styles.dirItem
             else styles.normalItem
           
           val focused = props.focusedIndex == index
@@ -55,8 +58,8 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
           isBold = style.bold.getOrElse(false),
           fgColor = style.fg.orNull,
           bgColor = style.bg.orNull,
-          text = item.name.take(width).padTo(width, ' '),
-          ending = if (item.name.length > width) overlapEnd else borderEnd
+          text = name.take(width).padTo(width, ' '),
+          ending = if (name.length > width) overlapEnd else borderEnd
         )
     }
 

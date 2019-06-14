@@ -90,12 +90,16 @@ class FileListColumnSpec extends TestSpec
       left = 2,
       borderCh = SingleBorder.verticalCh,
       items = List(
-        FileListItem("item 1 {bold}"),
-        FileListItem("item 2 looooooong"),
-        FileListItem("item 3")
+        FileListItem.up,
+        FileListItem("dir 1 {bold}", isDir = true),
+        FileListItem(".dir 2 looooooong", isDir = true),
+        FileListItem("file 3"),
+        FileListItem(".dir 4", isDir = true),
+        FileListItem(".file 5"),
+        FileListItem("file 6")
       ),
-      focusedIndex = 1,
-      selectedNames = Set("item 2 looooooong", "item 3")
+      focusedIndex = 2,
+      selectedNames = Set(".dir 2 looooooong", "file 3")
     )
     val comp = <(FileListColumn())(^.wrapped := props)()
 
@@ -104,9 +108,13 @@ class FileListColumnSpec extends TestSpec
 
     //then
     assertFileListColumn(result, props, Some(
-      """{white-fg}{blue-bg}item 1 {open}bold{close} {/}{white-fg}{blue-bg}│{/}
-        |{bold}{yellow-fg}{cyan-bg}item 2 loooooo{/}{red-fg}{blue-bg}{close}{/}
-        |{bold}{yellow-fg}{blue-bg}item 3        {/}{white-fg}{blue-bg}│{/}""".stripMargin
+      """{white-fg}{blue-bg}..            {/}{white-fg}{blue-bg}│{/}
+        |{bold}{white-fg}{blue-bg}dir 1 {open}bold{close}  {/}{white-fg}{blue-bg}│{/}
+        |{bold}{yellow-fg}{cyan-bg}.dir 2 loooooo{/}{red-fg}{blue-bg}{close}{/}
+        |{bold}{yellow-fg}{blue-bg}file 3        {/}{white-fg}{blue-bg}│{/}
+        |{bold}{black-fg}{blue-bg}.dir 4        {/}{white-fg}{blue-bg}│{/}
+        |{bold}{black-fg}{blue-bg}.file 5       {/}{white-fg}{blue-bg}│{/}
+        |{white-fg}{blue-bg}file 6        {/}{white-fg}{blue-bg}│{/}""".stripMargin
     ))
   }
   

@@ -1,5 +1,6 @@
 package scommons.farc.ui
 
+import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
 import scommons.react.test.raw.ShallowInstance
@@ -52,10 +53,34 @@ class TextLineSpec extends TestSpec with ShallowRendererUtils {
     )
 
     //when
-    val result = shallowRender(<(TextLine())(^.wrapped := props)())
+    inside(shallowRender(<(TextLine())(^.wrapped := props)())) { case result =>
+      //then
+      //       10|  15|
+      //     test item 
+      assertTextLine(result, props, left + 4, " test item ")
+    }
 
-    //then
-    assertTextLine(result, props, left + 4, " test item ")
+    //when empty
+    inside(shallowRender(<(TextLine())(^.wrapped := props.copy(text = ""))())) { case result =>
+      //then
+      //       10|  15|
+      //               
+      assertTextLine(result, props, left + 13, "  ")
+    }
+
+    //when without padding
+    inside(shallowRender(<(TextLine())(^.wrapped := props.copy(padding = 0))())) { case result =>
+      //then
+      //       10|  15|
+      //      test item
+      assertTextLine(result, props, left + 6, "test item")
+    }
+    
+    //when empty text without padding
+    inside(shallowRender(<(TextLine())(^.wrapped := props.copy(text = "", padding = 0))())) { case result =>
+      //then
+      assertTextLine(result, props, 0, "")
+    }
   }
 
   it should "render focused text" in {
@@ -127,18 +152,21 @@ class TextLineSpec extends TestSpec with ShallowRendererUtils {
                              text: String): Unit = {
     val (_, top) = props.pos
     
-    assertNativeComponent(result,
-      <.text(
-        ^.rbWidth := text.length,
-        ^.rbHeight := 1,
-        ^.rbLeft := left,
-        ^.rbTop := top,
-        ^.rbStyle := {
-          if (props.focused) props.style.focus.orNull
-          else props.style
-        },
-        ^.content := text
-      )()
-    )
+    assertNativeComponent(result, <.>()(
+      if (text.nonEmpty) Some(
+        <.text(
+          ^.rbWidth := text.length,
+          ^.rbHeight := 1,
+          ^.rbLeft := left,
+          ^.rbTop := top,
+          ^.rbStyle := {
+            if (props.focused) props.style.focus.orNull
+            else props.style
+          },
+          ^.content := text
+        )()
+      )
+      else None
+    ))
   }
 }

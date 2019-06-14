@@ -24,11 +24,12 @@ class FileListApiImpl extends FileListApi {
       files.map { name =>
         val stats = fs.lstatSync(path.join(dir, name))
 
+        val isDir = stats.isDirectory()
         FileListItem(
           name = name,
-          isDir = stats.isDirectory(),
+          isDir = isDir,
           isSymLink = stats.isSymbolicLink(),
-          size = stats.size,
+          size = if (isDir) 0.0 else stats.size,
           atimeMs = stats.atimeMs,
           mtimeMs = stats.mtimeMs,
           ctimeMs = stats.ctimeMs,

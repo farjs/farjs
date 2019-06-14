@@ -129,15 +129,26 @@ object FileListView extends FunctionComponent[FileListViewProps] {
         override val fg = "black"
       }
     }
-    
-    val overlapColor = "red"
-
-    val headerStyle: BlessedStyle = new BlessedStyle {
+    val dirItem: BlessedStyle = new BlessedStyle {
       override val bold = true
       override val bg = "blue"
-      override val fg = "yellow"
+      override val fg = "white"
+      override val focus = new BlessedStyle {
+        override val bold = true
+        override val bg = "cyan"
+        override val fg = "white"
+      }
     }
-
+    val hiddenItem: BlessedStyle = new BlessedStyle {
+      override val bold = true
+      override val bg = "blue"
+      override val fg = "black"
+      override val focus = new BlessedStyle {
+        override val bold = true
+        override val bg = "cyan"
+        override val fg = "black"
+      }
+    }
     val selectedItem: BlessedStyle = new BlessedStyle {
       override val bold = true
       override val bg = "blue"
@@ -147,6 +158,14 @@ object FileListView extends FunctionComponent[FileListViewProps] {
         override val bg = "cyan"
         override val fg = "yellow"
       }
+    }
+    
+    val overlapColor = "red"
+
+    val headerStyle: BlessedStyle = new BlessedStyle {
+      override val bold = true
+      override val bg = "blue"
+      override val fg = "yellow"
     }
   }
 }

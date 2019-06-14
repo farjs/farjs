@@ -34,22 +34,27 @@ object TextLine extends FunctionComponent[TextLineProps] {
       else s"$padding${props.text}$padding"
     }
     
-    <.text(
-      ^.rbWidth := text.length,
-      ^.rbHeight := 1,
-      ^.rbLeft := {
-        props.align match {
-          case Left => left
-          case Center => left + (props.width - text.length) / 2
-          case Right => left + props.width - text.length
-        }
-      },
-      ^.rbTop := top,
-      ^.rbStyle := {
-        if (props.focused) props.style.focus.orNull
-        else props.style
-      },
-      ^.content := text
-    )()
+    <.>()(
+      if (text.nonEmpty) Some(
+        <.text(
+          ^.rbWidth := text.length,
+          ^.rbHeight := 1,
+          ^.rbLeft := {
+            props.align match {
+              case Left => left
+              case Center => left + (props.width - text.length) / 2
+              case Right => left + props.width - text.length
+            }
+          },
+          ^.rbTop := top,
+          ^.rbStyle := {
+            if (props.focused) props.style.focus.orNull
+            else props.style
+          },
+          ^.content := text
+        )()
+      )
+      else None
+    )
   }
 }
