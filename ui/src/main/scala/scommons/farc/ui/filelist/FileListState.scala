@@ -1,10 +1,10 @@
 package scommons.farc.ui.filelist
 
-import scommons.farc.api.filelist.FileListItem
+import scommons.farc.api.filelist.{FileListDir, FileListItem}
 
 case class FileListState(offset: Int = 0,
                          index: Int = 0,
-                         currDir: String = "",
+                         currDir: FileListDir = FileListDir("", isRoot = false),
                          items: Seq[FileListItem] = Nil,
                          selectedNames: Set[String] = Set.empty) {
 

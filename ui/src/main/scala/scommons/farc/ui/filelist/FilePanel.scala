@@ -47,7 +47,7 @@ object FilePanel extends FunctionComponent[FilePanelProps] {
         align = TextLine.Center,
         pos = (1, 0),
         width = width - 2,
-        text = state.currDir,
+        text = state.currDir.path,
         style = styles.normalItem,
         focused = true
       ))(),

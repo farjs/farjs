@@ -1,7 +1,7 @@
 package scommons.farc.ui.filelist
 
 import org.scalatest.Assertion
-import scommons.farc.api.filelist.{FileListApi, FileListItem}
+import scommons.farc.api.filelist._
 import scommons.farc.ui._
 import scommons.farc.ui.border._
 import scommons.react.blessed._
@@ -44,7 +44,7 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
     //given
     val api = mock[FileListApi]
     val props = FilePanelProps(api, size = (25, 15))
-    val state = FileListState(index = 2, currDir = "/", items = List(
+    val state = FileListState(index = 2, currDir = FileListDir("/", isRoot = true), items = List(
       FileListItem("dir 1", isDir = true, size = 1),
       FileListItem("dir 2", isDir = true, size = 2),
       FileListItem("file", size = 3)
@@ -65,7 +65,7 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
     //given
     val api = mock[FileListApi]
     val props = FilePanelProps(api, size = (25, 15))
-    val state = FileListState(index = 1, currDir = "/", items = List(
+    val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true), items = List(
       FileListItem("file 1", size = 1),
       FileListItem("file 2", size = 2, permissions = "drwxr-xr-x"),
       FileListItem("file 3", size = 3)
@@ -85,7 +85,7 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
     //given
     val api = mock[FileListApi]
     val props = FilePanelProps(api, size = (25, 15))
-    val state = FileListState(index = 1, currDir = "/sub-dir", items = List(
+    val state = FileListState(index = 1, currDir = FileListDir("/sub-dir", isRoot = false), items = List(
       FileListItem.up,
       FileListItem("dir", isDir = true, size = 1, permissions = "dr--r--r--"),
       FileListItem("file", size = 2)
@@ -105,7 +105,7 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
     //given
     val api = mock[FileListApi]
     val props = FilePanelProps(api, size = (25, 15))
-    val state = FileListState(currDir = "/sub-dir", items = List(
+    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false), items = List(
       FileListItem.up,
       FileListItem("dir", isDir = true, size = 1),
       FileListItem("file", size = 2)
@@ -170,7 +170,7 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
           align shouldBe TextLine.Center
           pos shouldBe 1 -> 0
           resWidth shouldBe (width - 2)
-          text shouldBe state.currDir
+          text shouldBe state.currDir.path
           style shouldBe styles.normalItem
           focused shouldBe true
           padding shouldBe 1

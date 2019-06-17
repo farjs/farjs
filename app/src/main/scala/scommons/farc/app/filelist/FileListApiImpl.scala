@@ -9,14 +9,18 @@ import scala.concurrent.Future
 
 class FileListApiImpl extends FileListApi {
 
-  def rootDir: String = {
-    path.parse(process.cwd()).root.getOrElse("")
+  def currDir: Future[FileListDir] = Future {
+    val pathObject = path.parse(process.cwd())
+    FileListDir(
+      path = process.cwd(),
+      isRoot = pathObject.root == pathObject.dir &&
+        pathObject.base.getOrElse("").isEmpty
+    )
   }
   
-  def changeDir(dir: String): Future[String] = Future {
+  def changeDir(dir: String): Future[FileListDir] = Future {
     process.chdir(path.resolve(dir))
-    process.cwd()
-  }
+  }.flatMap(_ => currDir)
   
   def listFiles: Future[Seq[FileListItem]] = {
     val dir = process.cwd()

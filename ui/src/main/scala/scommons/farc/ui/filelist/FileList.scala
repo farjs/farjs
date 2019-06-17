@@ -32,9 +32,7 @@ object FileList extends FunctionComponent[FileListProps] {
     val maxIndex = math.max(viewItems.size - 1, 0)
 
     useLayoutEffect({ () =>
-      if (props.state.currDir.isEmpty) {
-        onChangeDir(props, viewSize, props.api.rootDir)
-      }
+      onChangeDir(props, viewSize, None)
     }, Nil)
     
     def focusDx(dx: Int, select: Boolean): Unit = {
@@ -113,14 +111,14 @@ object FileList extends FunctionComponent[FileListProps] {
         case k if k == "end" || k == "S-end" => focusItem(maxOffset, maxIndex, k == "S-end")
         case "enter" =>
           props.state.currentItem.filter(_.isDir).foreach { dir =>
-            onChangeDir(props, viewSize, dir.name)
+            onChangeDir(props, viewSize, Some(dir.name))
           }
         case _ =>
       }
     ))()
   }
   
-  private def onChangeDir(props: FileListProps, viewSize: Int, dir: String): Unit = {
+  private def onChangeDir(props: FileListProps, viewSize: Int, dir: Option[String]): Unit = {
     
     def recover[T](f: Future[T], value: T): Future[T] = f.recover {
       case JavaScriptException(error) =>
@@ -132,19 +130,22 @@ object FileList extends FunctionComponent[FileListProps] {
     }
     
     val future = for {
-      currDir <- props.api.changeDir(dir)
+      currDir <- dir match {
+        case None => props.api.currDir
+        case Some(d) => props.api.changeDir(d)
+      }
       files <- recover(props.api.listFiles, Nil)
     } yield {
       val items = {
         val sorted = files.sortBy(item => (!item.isDir, item.name))
 
-        if (currDir == props.api.rootDir) sorted
+        if (currDir.isRoot) sorted
         else FileListItem.up +: sorted
       }
       val (offset, index) = 
-        if (dir == FileListItem.up.name) {
-          val focusedDir = props.state.currDir
-            .stripPrefix(currDir)
+        if (dir.contains(FileListItem.up.name)) {
+          val focusedDir = props.state.currDir.path
+            .stripPrefix(currDir.path)
             .stripPrefix("/")
             .stripPrefix("\\")
           

@@ -1,7 +1,7 @@
 package scommons.farc.app.filelist
 
 import org.scalatest.Succeeded
-import scommons.farc.api.filelist.FileListItem
+import scommons.farc.api.filelist._
 import scommons.nodejs._
 import scommons.nodejs.raw.FSConstants
 import scommons.nodejs.test.AsyncTestSpec
@@ -10,33 +10,68 @@ class FileListApiImplSpec extends AsyncTestSpec {
   
   private val apiImp = new FileListApiImpl
 
-  it should "return root directory" in {
-    //given
-    val root = path.parse(process.cwd()).root.getOrElse("")
-
-    //when & then
-    apiImp.rootDir shouldBe root
+  it should "return current directory" in {
+    //when
+    val resultF = apiImp.currDir
+    
+    //then
+    resultF.map { dir =>
+      inside(dir) { case FileListDir(dirPath, isRoot) =>
+        dirPath shouldBe process.cwd()
+        isRoot shouldBe false
+      }
+    }
   }
   
   it should "change current directory" in {
     //given
     val curr = process.cwd()
     val newDir = os.homedir()
-    val newParent = path.parse(newDir).dir.getOrElse("")
+    val newDirObj = path.parse(newDir)
+    val newRoot = newDirObj.root.getOrElse("")
+    val newParent = newDirObj.dir.getOrElse("")
     newDir should not be curr
     newParent should not be empty
 
     //when
-    val resultF = apiImp.changeDir(newDir).flatMap { dir =>
+    val resultF = (for {
+      dir <- apiImp.changeDir(newDir)
+      currDir <- apiImp.currDir
+    } yield {
       //then
-      dir shouldBe newDir
       process.cwd() shouldBe newDir
-    
+      dir shouldBe currDir
+      inside(dir) { case FileListDir(dirPath, isRoot) =>
+        dirPath shouldBe newDir
+        isRoot shouldBe false
+      }
+    }).flatMap { _ =>
       //when
-      apiImp.changeDir(FileListItem.up.name).map { dir =>
+      (for {
+        dir <- apiImp.changeDir(FileListItem.up.name)
+        currDir <- apiImp.currDir
+      } yield {
         //then
-        dir shouldBe newParent
         process.cwd() shouldBe newParent
+        dir shouldBe currDir
+        inside(dir) { case FileListDir(dirPath, isRoot) =>
+          dirPath shouldBe newParent
+          isRoot shouldBe false
+        }
+      }).flatMap { _ =>
+        //when
+        for {
+          dir <- apiImp.changeDir(newRoot)
+          currDir <- apiImp.currDir
+        } yield {
+          //then
+          process.cwd() shouldBe newRoot
+          dir shouldBe currDir
+          inside(dir) { case FileListDir(dirPath, isRoot) =>
+            dirPath shouldBe newRoot
+            isRoot shouldBe true
+          }
+        }
       }
     }
     

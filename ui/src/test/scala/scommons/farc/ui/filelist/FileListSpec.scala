@@ -14,23 +14,27 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
   with ShallowRendererUtils
   with TestRendererUtils {
 
-  it should "call api if currDir is empty when mount" in {
+  it should "call api only once when mount (not when update)" in {
     //given
     val api = mock[FileListApi]
     val onStateChanged = mockFunction[FileListState, Unit]
-    val props1 = FileListProps(api, (7, 2), columns = 2, FileListState(), onStateChanged)
-    val state1 = FileListState(items = List(FileListItem("item 1")))
-    val root = "/"
-    val future1 = Future.successful(root)
+    val state1 = FileListState(
+      currDir = FileListDir("/sub-dir", isRoot = false),
+      items = List(FileListItem("item 1"))
+    )
+    val props1 = FileListProps(api, (7, 2), columns = 2, state1, onStateChanged)
+    val future1 = Future.successful(state1.currDir)
     val future2 = Future.successful(state1.items)
-    val state2 = state1.copy(currDir = "/changed", items = List(FileListItem("item 2")))
+    val state2 = state1.copy(
+      currDir = FileListDir("/changed", isRoot = false),
+      items = List(FileListItem("item 2"))
+    )
     val props2 = props1.copy(state = state2)
     
     //then
-    (api.rootDir _).expects().returning(root).twice()
-    (api.changeDir _).expects(root).returning(future1)
+    (api.currDir _).expects().returning(future1)
     (api.listFiles _).expects().returning(future2)
-    onStateChanged.expects(state1.copy(currDir = root))
+    onStateChanged.expects(state1.copy(items = FileListItem.up +: state1.items))
     
     //when
     val renderer = createTestRenderer(<(FileList())(^.wrapped := props1)())
@@ -42,33 +46,12 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     Future.sequence(List(future1, future2)).map(_ => Succeeded)
   }
 
-  it should "not call api if currDir is non-empty when mount" in {
-    //given
-    val api = mock[FileListApi]
-    val onStateChanged = mockFunction[FileListState, Unit]
-    val props = FileListProps(api, (7, 2), columns = 2, FileListState(currDir = "/"), onStateChanged)
-    
-    //then
-    (api.rootDir _).expects().never()
-    (api.changeDir _).expects(*).never()
-    (api.listFiles _).expects().never()
-    onStateChanged.expects(*).never()
-    
-    //when
-    val renderer = createTestRenderer(<(FileList())(^.wrapped := props)())
-    
-    //cleanup
-    renderer.unmount()
-
-    Succeeded
-  }
-
   it should "call api and onStateChanged when onKeypress(enter)" in {
     //given
     val api = mock[FileListApi]
     val onStateChanged = mockFunction[FileListState, Unit]
     val props = FileListProps(api, (7, 3), columns = 2, FileListState(
-      currDir = "/",
+      currDir = FileListDir("/", isRoot = true),
       items = List(
         FileListItem("dir 1", isDir = true),
         FileListItem("dir 2", isDir = true),
@@ -88,7 +71,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       renderer.render(<(FileList())(^.wrapped := props.copy(state = props.state.copy(
         offset = offset,
         index = index,
-        currDir = currDir,
+        currDir = FileListDir(currDir, currDir == "/"),
         items = items
       )))())
       
@@ -97,15 +80,17 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
 
     def check(keyFull: String,
               pressItem: String,
-              currDir: String,
+              currDirPath: String,
               items: List[String],
               offset: Int,
               index: Int,
               changed: Boolean = true
              )(implicit pos: Position): Future[Assertion] = {
 
-      val state = props.state.copy(offset = offset, index = index, currDir = currDir,
-        items = if (currDir == "/") props.state.items else FileListItem.up +: props.state.items
+      val currDir = FileListDir(currDirPath, currDirPath == "/")
+      val state = props.state.copy(offset = offset, index = index,
+        currDir = currDir,
+        items = if (currDir.isRoot) props.state.items else FileListItem.up +: props.state.items
       )
       val checkF =
         if (changed) {
@@ -113,7 +98,6 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
           val future2 = Future.successful(props.state.items)
 
           //then
-          (api.rootDir _).expects().returning("/")
           (api.changeDir _).expects(pressItem).returning(future1)
           (api.listFiles _).expects().returning(future2)
           onStateChanged.expects(state)
