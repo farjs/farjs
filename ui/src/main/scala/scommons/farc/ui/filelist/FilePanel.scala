@@ -86,6 +86,14 @@ object FilePanel extends FunctionComponent[FilePanelProps] {
       ))(),
       
       <(TextLine())(^.wrapped := TextLineProps(
+        align = TextLine.Left,
+        pos = (1, height - 2),
+        width = 10,
+        text = currItem.map(_.permissions).getOrElse(""),
+        style = styles.normalItem,
+        padding = 0
+      ))(),
+      <(TextLine())(^.wrapped := TextLineProps(
         align = TextLine.Right,
         pos = (1 + width - 2 - 25, height - 2),
         width = 25,
@@ -100,19 +108,12 @@ object FilePanel extends FunctionComponent[FilePanelProps] {
       <(TextLine())(^.wrapped := TextLineProps(
         align = TextLine.Center,
         pos = (1, height - 1),
-        width = (width - 2) / 2,
+        width = width - 2,
         text = {
           val files = state.items.filter(!_.isDir)
           val filesSize = files.foldLeft(0.0)((res, f) => res + f.size)
           f"$filesSize%,.0f (${files.size}%d)"
         },
-        style = styles.normalItem
-      ))(),
-      <(TextLine())(^.wrapped := TextLineProps(
-        align = TextLine.Center,
-        pos = ((width - 2) / 2, height - 1),
-        width = (width - 2) / 2,
-        text = "123 4567 890",
         style = styles.normalItem
       ))()
     )

@@ -7,7 +7,8 @@ case class FileListItem(name: String,
                         atimeMs: Double = 0.0,
                         mtimeMs: Double = 0.0,
                         ctimeMs: Double = 0.0,
-                        birthtimeMs: Double = 0.0)
+                        birthtimeMs: Double = 0.0,
+                        permissions: String = "") //optional, format: drwx---rwx
 
 object FileListItem {
 
