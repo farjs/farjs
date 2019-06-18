@@ -14,7 +14,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
   with ShallowRendererUtils
   with TestRendererUtils {
 
-  it should "call api only once when mount (not when update)" in {
+  it should "call api only once when mount but not when update" in {
     //given
     val api = mock[FileListApi]
     val onStateChanged = mockFunction[FileListState, Unit]
@@ -88,7 +88,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
              )(implicit pos: Position): Future[Assertion] = {
 
       val currDir = FileListDir(currDirPath, currDirPath == "/")
-      val state = props.state.copy(offset = offset, index = index,
+      val state = props.state.copy(offset = 0, index = offset + index,
         currDir = currDir,
         items = if (currDir.isRoot) props.state.items else FileListItem.up +: props.state.items
       )
@@ -129,7 +129,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       check("enter", "..",    "/",      List("dir 1", "dir 2", "dir 3", "dir 4"), 0, 0),
       
       prepare(3, 3, "/", props.state.items),
-      check("enter", "file 7","/",      List("dir 4", "dir 5", "dir 6", "file 7"), 3, 3, changed = false),
+      check("enter", "file 7","/",      List("dir 5", "dir 6", "file 7"), 4, 2, changed = false),
       
       prepare(3, 2, "/", props.state.items),
       check("enter", "dir 6", "/dir 6", List("..", "dir 1", "dir 2", "dir 3"), 0, 0),

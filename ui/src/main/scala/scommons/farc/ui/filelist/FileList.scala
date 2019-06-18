@@ -25,14 +25,23 @@ object FileList extends FunctionComponent[FileListProps] {
     val columnSize = height - 1 // excluding column header
     val viewSize = columnSize * props.columns
     
-    val viewOffset = props.state.offset
-    val focusedIndex = props.state.index
+    val (viewOffset, focusedIndex) = {
+      val offset = math.max(props.state.offset, 0)
+      val index = math.max(props.state.index, 0)
+      
+      if (viewSize <= 0 || index < viewSize) (offset, index)
+      else {
+        val viewIndex = index % viewSize
+        (index - viewIndex, viewIndex)
+      }
+    }
+    
     val viewItems = items.view(viewOffset, viewOffset + viewSize)
     val maxOffset = items.size - viewItems.size
     val maxIndex = math.max(viewItems.size - 1, 0)
 
     useLayoutEffect({ () =>
-      onChangeDir(props, viewSize, None)
+      onChangeDir(props, None)
     }, Nil)
     
     def focusDx(dx: Int, select: Boolean): Unit = {
@@ -111,14 +120,14 @@ object FileList extends FunctionComponent[FileListProps] {
         case k if k == "end" || k == "S-end" => focusItem(maxOffset, maxIndex, k == "S-end")
         case "enter" =>
           props.state.currentItem.filter(_.isDir).foreach { dir =>
-            onChangeDir(props, viewSize, Some(dir.name))
+            onChangeDir(props, Some(dir.name))
           }
         case _ =>
       }
     ))()
   }
   
-  private def onChangeDir(props: FileListProps, viewSize: Int, dir: Option[String]): Unit = {
+  private def onChangeDir(props: FileListProps, dir: Option[String]): Unit = {
     
     def recover[T](f: Future[T], value: T): Future[T] = f.recover {
       case JavaScriptException(error) =>
@@ -142,24 +151,19 @@ object FileList extends FunctionComponent[FileListProps] {
         if (currDir.isRoot) sorted
         else FileListItem.up +: sorted
       }
-      val (offset, index) = 
+      val index = 
         if (dir.contains(FileListItem.up.name)) {
           val focusedDir = props.state.currDir.path
             .stripPrefix(currDir.path)
             .stripPrefix("/")
             .stripPrefix("\\")
           
-          val index = math.max(items.indexWhere(_.name == focusedDir), 0)
-          if (viewSize <= 0 || index < viewSize) (0, index)
-          else {
-            val viewIndex = index % viewSize
-            (index - viewIndex, viewIndex)
-          }
+          math.max(items.indexWhere(_.name == focusedDir), 0)
         }
-        else (0, 0)
+        else 0
       
       props.onStateChanged(props.state.copy(
-        offset = offset,
+        offset = 0,
         index = index,
         currDir = currDir,
         items = items,
