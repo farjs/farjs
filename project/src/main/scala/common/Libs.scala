@@ -11,4 +11,5 @@ object Libs extends CommonLibs {
 
   lazy val scommonsNodejsCore = Def.setting("org.scommons.nodejs" %%% "scommons-nodejs-core" % scommonsNodejsVersion)
   lazy val scommonsReactCore = Def.setting("org.scommons.react" %%% "scommons-react-core" % scommonsReactVersion)
+  lazy val scommonsReactRedux = Def.setting("org.scommons.react" %%% "scommons-react-redux" % scommonsReactVersion)
 }

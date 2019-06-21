@@ -1,7 +1,7 @@
 package scommons.farc.app
 
-import scommons.farc.api.filelist.FileListApi
-import scommons.farc.app.filelist.FileListApiImpl
+import io.github.shogowada.scalajs.reactjs.redux.ReactRedux._
+import io.github.shogowada.scalajs.reactjs.redux.Redux
 import scommons.farc.ui._
 import scommons.farc.ui.filelist._
 import scommons.nodejs._
@@ -27,13 +27,20 @@ object FarcApp {
       process.exit(0)
     })
 
-    val api = new FileListApiImpl
+    val store = Redux.createStore(FarcStateReducer.reduce)
+    val actions = FarcActions
+    val fileListController = new FileListController(actions)
     
-    ReactBlessed.render(<(FarcAppRoot())(^.wrapped := FarcAppRootProps(api))(), screen)
+    ReactBlessed.render(
+      <.Provider(^.store := store)(
+        <(FarcAppRoot())(^.wrapped := FarcAppRootProps(fileListController))()
+      ),
+      screen
+    )
     screen
   }
 
-  case class FarcAppRootProps(fileListApi: FileListApi)
+  case class FarcAppRootProps(fileListController: FileListController)
   
   object FarcAppRoot extends FunctionComponent[FarcAppRootProps] {
 
@@ -45,9 +52,7 @@ object FarcApp {
           ^.rbWidth := "50%",
           ^.rbHeight := "100%-1"
         )(
-          <(WithSize())(^.wrapped := WithSizeProps({ (width, height) =>
-            <(FilePanel())(^.wrapped := FilePanelProps(props.fileListApi, size = (width, height)))()
-          }))()
+          <(props.fileListController()).empty
         ),
 
         <.box(

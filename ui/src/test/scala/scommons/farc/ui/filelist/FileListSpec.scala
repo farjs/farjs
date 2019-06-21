@@ -3,7 +3,9 @@ package scommons.farc.ui.filelist
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.farc.api.filelist._
+import scommons.farc.ui.filelist.FileListActions._
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.redux.task.FutureTask
 import scommons.react.test.BaseTestSpec
 import scommons.react.test.raw.ShallowInstance
 import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
@@ -14,27 +16,27 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
   with ShallowRendererUtils
   with TestRendererUtils {
 
-  it should "call api only once when mount but not when update" in {
+  it should "dispatch actions only once when mount but not when update" in {
     //given
-    val api = mock[FileListApi]
-    val onStateChanged = mockFunction[FileListState, Unit]
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
     val state1 = FileListState(
       currDir = FileListDir("/sub-dir", isRoot = false),
       items = List(FileListItem("item 1"))
     )
-    val props1 = FileListProps(api, (7, 2), columns = 2, state1, onStateChanged)
-    val future1 = Future.successful(state1.currDir)
-    val future2 = Future.successful(state1.items)
+    val props1 = FileListProps(dispatch, actions, state1, (7, 2), columns = 2)
     val state2 = state1.copy(
       currDir = FileListDir("/changed", isRoot = false),
       items = List(FileListItem("item 2"))
     )
     val props2 = props1.copy(state = state2)
+    val action = FileListDirChangeAction(
+      FutureTask("Changing dir", Future.successful((state1.currDir, state1.items)))
+    )
     
     //then
-    (api.currDir _).expects().returning(future1)
-    (api.listFiles _).expects().returning(future2)
-    onStateChanged.expects(state1.copy(items = FileListItem.up +: state1.items))
+    (actions.changeDir _).expects(dispatch, None).returning(action)
+    dispatch.expects(action)
     
     //when
     val renderer = createTestRenderer(<(FileList())(^.wrapped := props1)())
@@ -43,14 +45,14 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     //cleanup
     renderer.unmount()
 
-    Future.sequence(List(future1, future2)).map(_ => Succeeded)
+    action.task.future.map(_ => Succeeded)
   }
 
-  it should "call api and onStateChanged when onKeypress(enter)" in {
+  it should "dispatch actions when onKeypress(enter)" in {
     //given
-    val api = mock[FileListApi]
-    val onStateChanged = mockFunction[FileListState, Unit]
-    val props = FileListProps(api, (7, 3), columns = 2, FileListState(
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val props = FileListProps(dispatch, actions, FileListState(
       currDir = FileListDir("/", isRoot = true),
       items = List(
         FileListItem("dir 1", isDir = true),
@@ -61,7 +63,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
         FileListItem("dir 6", isDir = true),
         FileListItem("file 7")
       )
-    ), onStateChanged)
+    ), (7, 3), columns = 2)
 
     val renderer = createRenderer()
     renderer.render(<(FileList())(^.wrapped := props)())
@@ -74,7 +76,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
         currDir = FileListDir(currDir, currDir == "/"),
         items = items
       )))())
-      
+
       Succeeded
     }
 
@@ -94,15 +96,15 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       )
       val checkF =
         if (changed) {
-          val future1 = Future.successful(currDir)
-          val future2 = Future.successful(props.state.items)
+          val action = FileListDirChangeAction(
+            FutureTask("Changing dir", Future.successful((currDir, props.state.items)))
+          )
 
           //then
-          (api.changeDir _).expects(pressItem).returning(future1)
-          (api.listFiles _).expects().returning(future2)
-          onStateChanged.expects(state)
+          (actions.changeDir _).expects(dispatch, Some(pressItem)).returning(action)
+          dispatch.expects(action)
 
-          Future.sequence(List(future1, future2)).map(_ => Succeeded)
+          action.task.future.map(_ => Succeeded)
         }
         else Future.successful(Succeeded)
 
@@ -146,15 +148,15 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "focus item when onWheelup/onWheeldown" in {
     //given
-    val api = mock[FileListApi]
-    val onStateChanged = mockFunction[FileListState, Unit]
-    val props = FileListProps(api, (7, 3), columns = 2, FileListState(items = List(
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val props = FileListProps(dispatch, actions, FileListState(items = List(
       FileListItem("item 1"),
       FileListItem("item 2"),
       FileListItem("item 3"),
       FileListItem("item 4"),
       FileListItem("item 5")
-    )), onStateChanged = onStateChanged)
+    )), (7, 3), columns = 2)
     val renderer = createRenderer()
     renderer.render(<(FileList())(^.wrapped := props)())
     findComponentProps(renderer.getRenderOutput(), FileListView).focusedIndex shouldBe 0
@@ -163,7 +165,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       val state = props.state.copy(offset = offset, index = index)
       if (changed) {
         //then
-        onStateChanged.expects(state)
+        dispatch.expects(FileListParamsChangedAction(offset, index, Set.empty))
       }
       
       //when
@@ -194,13 +196,13 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "focus item when onClick" in {
     //given
-    val api = mock[FileListApi]
-    val onStateChanged = mockFunction[FileListState, Unit]
-    val props = FileListProps(api, (7, 3), columns = 2, FileListState(items = List(
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val props = FileListProps(dispatch, actions, FileListState(items = List(
       FileListItem("item 1"),
       FileListItem("item 2"),
       FileListItem("item 3")
-    )), onStateChanged = onStateChanged)
+    )), (7, 3), columns = 2)
     val renderer = createRenderer()
     renderer.render(<(FileList())(^.wrapped := props)())
     findComponentProps(renderer.getRenderOutput(), FileListView).focusedIndex shouldBe 0
@@ -209,7 +211,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       val state = props.state.copy(offset = 0, index = index)
       if (changed) {
         //then
-        onStateChanged.expects(state)
+        dispatch.expects(FileListParamsChangedAction(0, index, Set.empty))
       }
 
       //when
@@ -230,8 +232,8 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "focus and select item when onKeypress" in {
     //given
-    val api = mock[FileListApi]
-    val onStateChanged = mockFunction[FileListState, Unit]
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
     val items = List(
       FileListItem("item 1"),
       FileListItem("item 2"),
@@ -241,7 +243,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("item 6"),
       FileListItem("item 7")
     )
-    val rootProps = FileListProps(api, (7, 3), columns = 2, FileListState(items = items), onStateChanged)
+    val rootProps = FileListProps(dispatch, actions, FileListState(items = items), (7, 3), columns = 2)
     val renderer = createRenderer()
     renderer.render(<(FileList())(^.wrapped := rootProps)())
     findComponentProps(renderer.getRenderOutput(), FileListView).focusedIndex shouldBe 0
@@ -258,7 +260,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       val state = props.state.copy(offset = offset, index = index, selectedNames = selected)
       if (changed) {
         //then
-        onStateChanged.expects(state)
+        dispatch.expects(FileListParamsChangedAction(offset, index, selected))
       }
       
       //when
@@ -344,8 +346,9 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "render empty component" in {
     //given
-    val api = mock[FileListApi]
-    val props = FileListProps(api, (7, 2), columns = 2, FileListState(), _ => ())
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val props = FileListProps(dispatch, actions, FileListState(), (7, 2), columns = 2)
     val comp = <(FileList())(^.wrapped := props)()
 
     //when
@@ -361,12 +364,13 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
   
   it should "render non-empty component" in {
     //given
-    val api = mock[FileListApi]
-    val props = FileListProps(api, (7, 2), columns = 2, FileListState(items = List(
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val props = FileListProps(dispatch, actions, FileListState(items = List(
       FileListItem("item 1"),
       FileListItem("item 2"),
       FileListItem("item 3")
-    )), _ => ())
+    )), (7, 2), columns = 2)
     val comp = <(FileList())(^.wrapped := props)()
 
     //when
