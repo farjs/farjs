@@ -13,7 +13,7 @@ class FileListControllerSpec extends TestSpec {
     val controller = new FileListController(actions)
     
     //when & then
-    controller.uiComponent shouldBe FilePanel
+    controller.uiComponent shouldBe FileListPanel
   }
   
   it should "map state to props" in {
@@ -30,7 +30,7 @@ class FileListControllerSpec extends TestSpec {
     val result = controller.mapStateToProps(dispatch, state, props)
     
     //then
-    inside(result) { case FilePanelProps(disp, resActions, resFileListState) =>
+    inside(result) { case FileListPanelProps(disp, resActions, resFileListState) =>
       disp shouldBe dispatch
       resActions shouldBe resActions
       resFileListState shouldBe fileListState

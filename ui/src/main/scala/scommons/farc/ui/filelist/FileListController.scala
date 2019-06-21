@@ -7,11 +7,11 @@ import scommons.react.UiComponent
 import scommons.react.redux.BaseStateController
 
 class FileListController(actions: FileListActions)
-  extends BaseStateController[FarcStateDef, FilePanelProps] {
+  extends BaseStateController[FarcStateDef, FileListPanelProps] {
 
-  lazy val uiComponent: UiComponent[FilePanelProps] = FilePanel
+  lazy val uiComponent: UiComponent[FileListPanelProps] = FileListPanel
 
-  def mapStateToProps(dispatch: Dispatch, state: FarcStateDef, props: Props[Unit]): FilePanelProps = {
-    FilePanelProps(dispatch, actions, state.fileListState)
+  def mapStateToProps(dispatch: Dispatch, state: FarcStateDef, props: Props[Unit]): FileListPanelProps = {
+    FileListPanelProps(dispatch, actions, state.fileListState)
   }
 }

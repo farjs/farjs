@@ -10,19 +10,19 @@ import scommons.react.test.TestSpec
 import scommons.react.test.raw.ShallowInstance
 import scommons.react.test.util.ShallowRendererUtils
 
-class FilePanelSpec extends TestSpec with ShallowRendererUtils {
+class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
 
   it should "render empty component" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val props = FilePanelProps(dispatch, actions, FileListState())
+    val props = FileListPanelProps(dispatch, actions, FileListState())
 
     //when
-    val result = shallowRender(<(FilePanel())(^.wrapped := props)())
+    val result = shallowRender(<(FileListPanel())(^.wrapped := props)())
 
     //then
-    assertFilePanel(result, props, FileListState())
+    assertFileListPanel(result, props, FileListState())
   }
   
   it should "render component with selected files" in {
@@ -34,13 +34,13 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
       FileListItem("dir 2", isDir = true, size = 2),
       FileListItem("file", size = 3)
     ), selectedNames = Set("dir 2", "file"))
-    val props = FilePanelProps(dispatch, actions, state)
+    val props = FileListPanelProps(dispatch, actions, state)
 
     //when
-    val result = shallowRender(<(FilePanel())(^.wrapped := props)())
+    val result = shallowRender(<(FileListPanel())(^.wrapped := props)())
 
     //then
-    assertFilePanel(result, props, state, "file", "3", showDate = true,
+    assertFileListPanel(result, props, state, "file", "3", showDate = true,
       selected = Some("5 in 2 file(s)"), dirSize = "3 (1)")
   }
   
@@ -53,13 +53,13 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
       FileListItem("file 2", size = 2, permissions = "drwxr-xr-x"),
       FileListItem("file 3", size = 3)
     ))
-    val props = FilePanelProps(dispatch, actions, state)
+    val props = FileListPanelProps(dispatch, actions, state)
 
     //when
-    val result = shallowRender(<(FilePanel())(^.wrapped := props)())
+    val result = shallowRender(<(FileListPanel())(^.wrapped := props)())
 
     //then
-    assertFilePanel(result, props, state, "file 2", "2", permissions = "drwxr-xr-x", showDate = true, dirSize = "6 (3)")
+    assertFileListPanel(result, props, state, "file 2", "2", permissions = "drwxr-xr-x", showDate = true, dirSize = "6 (3)")
   }
   
   it should "render component with sub-dir and focused dir" in {
@@ -71,13 +71,13 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
       FileListItem("dir", isDir = true, size = 1, permissions = "dr--r--r--"),
       FileListItem("file", size = 2)
     ))
-    val props = FilePanelProps(dispatch, actions, state)
+    val props = FileListPanelProps(dispatch, actions, state)
 
     //when
-    val result = shallowRender(<(FilePanel())(^.wrapped := props)())
+    val result = shallowRender(<(FileListPanel())(^.wrapped := props)())
 
     //then
-    assertFilePanel(result, props, state, "dir", "1", permissions = "dr--r--r--", showDate = true, dirSize = "2 (1)")
+    assertFileListPanel(result, props, state, "dir", "1", permissions = "dr--r--r--", showDate = true, dirSize = "2 (1)")
   }
   
   it should "render component with sub-dir and focused .." in {
@@ -89,24 +89,24 @@ class FilePanelSpec extends TestSpec with ShallowRendererUtils {
       FileListItem("dir", isDir = true, size = 1),
       FileListItem("file", size = 2)
     ))
-    val props = FilePanelProps(dispatch, actions, state)
+    val props = FileListPanelProps(dispatch, actions, state)
 
     //when
-    val result = shallowRender(<(FilePanel())(^.wrapped := props)())
+    val result = shallowRender(<(FileListPanel())(^.wrapped := props)())
 
     //then
-    assertFilePanel(result, props, state, "..", dirSize = "2 (1)")
+    assertFileListPanel(result, props, state, "..", dirSize = "2 (1)")
   }
   
-  private def assertFilePanel(result: ShallowInstance,
-                              props: FilePanelProps,
-                              state: FileListState,
-                              expectedFile: String = "",
-                              expectedFileSize: String = "",
-                              permissions: String = "",
-                              showDate: Boolean = false,
-                              selected: Option[String] = None,
-                              dirSize: String = "0 (0)"): Unit = {
+  private def assertFileListPanel(result: ShallowInstance,
+                                  props: FileListPanelProps,
+                                  state: FileListState,
+                                  expectedFile: String = "",
+                                  expectedFileSize: String = "",
+                                  permissions: String = "",
+                                  showDate: Boolean = false,
+                                  selected: Option[String] = None,
+                                  dirSize: String = "0 (0)"): Unit = {
     
     val (width, height) = (25, 15)
     val styles = FileListView.styles

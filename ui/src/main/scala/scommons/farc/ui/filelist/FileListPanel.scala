@@ -9,11 +9,11 @@ import scommons.react.blessed._
 
 import scala.scalajs.js
 
-case class FilePanelProps(dispatch: Dispatch,
-                          actions: FileListActions,
-                          state: FileListState)
+case class FileListPanelProps(dispatch: Dispatch,
+                              actions: FileListActions,
+                              state: FileListState)
 
-object FilePanel extends FunctionComponent[FilePanelProps] {
+object FileListPanel extends FunctionComponent[FileListPanelProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
