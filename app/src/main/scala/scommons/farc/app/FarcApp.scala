@@ -29,18 +29,23 @@ object FarcApp {
 
     val store = Redux.createStore(FarcStateReducer.reduce)
     val actions = FarcActions
-    val fileListController = new FileListController(actions)
+    val leftPanelController = new FileListController(actions, isRight = false)
+    val rightPanelController = new FileListController(actions, isRight = true)
     
     ReactBlessed.render(
       <.Provider(^.store := store)(
-        <(FarcAppRoot())(^.wrapped := FarcAppRootProps(fileListController))()
+        <(FarcAppRoot())(^.wrapped := FarcAppRootProps(
+          leftPanelController,
+          rightPanelController
+        ))()
       ),
       screen
     )
     screen
   }
 
-  case class FarcAppRootProps(fileListController: FileListController)
+  case class FarcAppRootProps(leftPanelController: FileListController,
+                              rightPanelController: FileListController)
   
   object FarcAppRoot extends FunctionComponent[FarcAppRootProps] {
 
@@ -49,16 +54,22 @@ object FarcApp {
       
       <.>()(
         <.box(
-          ^.rbWidth := "50%",
+          ^.rbWidth := "35%",
           ^.rbHeight := "100%-1"
         )(
-          <(props.fileListController()).empty
+          <(props.leftPanelController()).empty
         ),
-
         <.box(
-          ^.rbWidth := "50%",
+          ^.rbWidth := "35%",
           ^.rbHeight := "100%-1",
-          ^.rbLeft := "50%"
+          ^.rbLeft := "35%"
+        )(
+          <(props.rightPanelController()).empty
+        ),
+        <.box(
+          ^.rbWidth := "30%",
+          ^.rbHeight := "100%-1",
+          ^.rbLeft := "70%"
         )(
           <(LogPanel())()()
           //<(ColorPanel())()()

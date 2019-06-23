@@ -38,7 +38,7 @@ object FileList extends FunctionComponent[FileListProps] {
     val maxIndex = math.max(viewItems.size - 1, 0)
 
     useLayoutEffect({ () =>
-      props.dispatch(props.actions.changeDir(props.dispatch, None)): Unit
+      props.dispatch(props.actions.changeDir(props.dispatch, props.state.isRight, None)): Unit
     }, Nil)
     
     def focusDx(dx: Int, select: Boolean): Unit = {
@@ -87,7 +87,7 @@ object FileList extends FunctionComponent[FileListProps] {
         || props.state.index != newIndex
         || props.state.selectedNames != newSelected) {
         
-        props.dispatch(FileListParamsChangedAction(newOffset, newIndex, newSelected))
+        props.dispatch(FileListParamsChangedAction(props.state.isRight, newOffset, newIndex, newSelected))
       }
     }
     
@@ -119,7 +119,7 @@ object FileList extends FunctionComponent[FileListProps] {
         case k if k == "end" || k == "S-end" => focusItem(maxOffset, maxIndex, k == "S-end")
         case "enter" =>
           props.state.currentItem.filter(_.isDir).foreach { dir =>
-            props.dispatch(props.actions.changeDir(props.dispatch, Some(dir.name)))
+            props.dispatch(props.actions.changeDir(props.dispatch, props.state.isRight, Some(dir.name)))
           }
         case _ =>
       }

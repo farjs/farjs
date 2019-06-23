@@ -21,16 +21,18 @@ class FileListActionsSpec extends AsyncTestSpec {
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true)
     val files = List(FileListItem("file 1"))
+    val isRight = true
     val dir: Option[String] = None
 
     (api.currDir _).expects().returning(Future.successful(currDir))
     (api.listFiles _).expects().returning(Future.successful(files))
     
     //then
-    dispatch.expects(FileListDirChangedAction(dir, currDir, files))
+    dispatch.expects(FileListDirChangedAction(isRight, dir, currDir, files))
     
     //when
-    val FileListDirChangeAction(FutureTask(msg, future)) = actions.changeDir(dispatch, dir)
+    val FileListDirChangeAction(FutureTask(msg, future)) =
+      actions.changeDir(dispatch, isRight, dir)
     
     //then
     msg shouldBe "Changing Dir"
@@ -44,16 +46,18 @@ class FileListActionsSpec extends AsyncTestSpec {
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true)
     val files = List(FileListItem("file 1"))
+    val isRight = true
     val dir = "test dir"
 
     (api.changeDir _).expects(dir).returning(Future.successful(currDir))
     (api.listFiles _).expects().returning(Future.successful(files))
     
     //then
-    dispatch.expects(FileListDirChangedAction(Some(dir), currDir, files))
+    dispatch.expects(FileListDirChangedAction(isRight, Some(dir), currDir, files))
     
     //when
-    val FileListDirChangeAction(FutureTask(msg, future)) = actions.changeDir(dispatch, Some(dir))
+    val FileListDirChangeAction(FutureTask(msg, future)) =
+      actions.changeDir(dispatch, isRight, Some(dir))
     
     //then
     msg shouldBe "Changing Dir"
@@ -67,6 +71,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     val actions = new FileListActionsTest(api, Some(errHandler))
     val dispatch = mockFunction[Any, Any]
     val e = new Exception("test error")
+    val isRight = true
     val dir = "test dir"
 
     (api.changeDir _).expects(dir).returning(Future.failed(e))
@@ -77,7 +82,8 @@ class FileListActionsSpec extends AsyncTestSpec {
     dispatch.expects(*).never()
     
     //when
-    val FileListDirChangeAction(FutureTask(_, future)) = actions.changeDir(dispatch, Some(dir))
+    val FileListDirChangeAction(FutureTask(_, future)) =
+      actions.changeDir(dispatch, isRight, Some(dir))
     
     //then
     future.failed.map(_ => Succeeded)
@@ -91,6 +97,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true)
     val e = new Exception("test error")
+    val isRight = true
     val dir = "test dir"
 
     (api.changeDir _).expects(dir).returning(Future.successful(currDir))
@@ -98,10 +105,11 @@ class FileListActionsSpec extends AsyncTestSpec {
     
     //then
     errHandler.expects(e)
-    dispatch.expects(FileListDirChangedAction(Some(dir), currDir, Nil))
+    dispatch.expects(FileListDirChangedAction(isRight, Some(dir), currDir, Nil))
     
     //when
-    val FileListDirChangeAction(FutureTask(_, future)) = actions.changeDir(dispatch, Some(dir))
+    val FileListDirChangeAction(FutureTask(_, future)) =
+      actions.changeDir(dispatch, isRight, Some(dir))
     
     //then
     future.map(_ => Succeeded)

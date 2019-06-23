@@ -14,7 +14,7 @@ trait FileListActions {
 
   protected def api: FileListApi
 
-  def changeDir(dispatch: Dispatch, dir: Option[String]): FileListDirChangeAction = {
+  def changeDir(dispatch: Dispatch, isRight: Boolean, dir: Option[String]): FileListDirChangeAction = {
     val future = {
       for {
         currDir <- dir match {
@@ -26,7 +26,7 @@ trait FileListActions {
         }
       } yield (currDir, files)
     }.andThen {
-      case Success((currDir, files)) => dispatch(FileListDirChangedAction(dir, currDir, files))
+      case Success((currDir, files)) => dispatch(FileListDirChangedAction(isRight, dir, currDir, files))
       case Failure(e) => onError(())(e)
     }
 
@@ -45,8 +45,14 @@ trait FileListActions {
 
 object FileListActions {
 
-  case class FileListParamsChangedAction(offset: Int, index: Int, selectedNames: Set[String]) extends Action
+  case class FileListParamsChangedAction(isRight: Boolean,
+                                         offset: Int,
+                                         index: Int,
+                                         selectedNames: Set[String]) extends Action
 
   case class FileListDirChangeAction(task: FutureTask[(FileListDir, Seq[FileListItem])]) extends TaskAction
-  case class FileListDirChangedAction(dir: Option[String], currDir: FileListDir, files: Seq[FileListItem]) extends Action
+  case class FileListDirChangedAction(isRight: Boolean,
+                                      dir: Option[String],
+                                      currDir: FileListDir,
+                                      files: Seq[FileListItem]) extends Action
 }

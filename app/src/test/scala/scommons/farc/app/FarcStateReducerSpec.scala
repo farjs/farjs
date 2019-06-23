@@ -2,7 +2,7 @@ package scommons.farc.app
 
 import scommons.farc.api.filelist.{FileListDir, FileListItem}
 import scommons.farc.ui.filelist.FileListActions._
-import scommons.farc.ui.filelist.FileListState
+import scommons.farc.ui.filelist.FileListsState
 import scommons.react.redux.task.{AbstractTask, FutureTask}
 import scommons.react.test.TestSpec
 
@@ -16,16 +16,16 @@ class FarcStateReducerSpec extends TestSpec {
     
     //then
     inside(result) {
-      case FarcState(currentTask, fileListState) =>
+      case FarcState(currentTask, fileListsState) =>
         currentTask shouldBe None
-        fileListState shouldBe FileListState()
+        fileListsState shouldBe FileListsState()
     }
   }
   
   it should "set currentTask when TaskAction" in {
     //given
     val currTask = mock[AbstractTask]
-    val state = FarcState(Some(currTask), FileListState())
+    val state = FarcState(Some(currTask), FileListsState())
     val task = FutureTask("test task", Future.successful(
       (FileListDir("/", isRoot = true), Seq.empty[FileListItem]))
     )

@@ -141,7 +141,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
           actions shouldBe props.actions
           resState shouldBe state
           resSize shouldBe (width - 2) -> (height - 5)
-          columns shouldBe 3
+          columns shouldBe 2
       }
       assertComponent(currFolder, TextLine) {
         case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>

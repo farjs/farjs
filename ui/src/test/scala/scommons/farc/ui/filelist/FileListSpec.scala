@@ -35,7 +35,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     )
     
     //then
-    (actions.changeDir _).expects(dispatch, None).returning(action)
+    (actions.changeDir _).expects(dispatch, state1.isRight, None).returning(action)
     dispatch.expects(action)
     
     //when
@@ -101,7 +101,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
           )
 
           //then
-          (actions.changeDir _).expects(dispatch, Some(pressItem)).returning(action)
+          (actions.changeDir _).expects(dispatch, state.isRight, Some(pressItem)).returning(action)
           dispatch.expects(action)
 
           action.task.future.map(_ => Succeeded)
@@ -165,7 +165,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       val state = props.state.copy(offset = offset, index = index)
       if (changed) {
         //then
-        dispatch.expects(FileListParamsChangedAction(offset, index, Set.empty))
+        dispatch.expects(FileListParamsChangedAction(state.isRight, offset, index, Set.empty))
       }
       
       //when
@@ -211,7 +211,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       val state = props.state.copy(offset = 0, index = index)
       if (changed) {
         //then
-        dispatch.expects(FileListParamsChangedAction(0, index, Set.empty))
+        dispatch.expects(FileListParamsChangedAction(state.isRight, 0, index, Set.empty))
       }
 
       //when
@@ -260,7 +260,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       val state = props.state.copy(offset = offset, index = index, selectedNames = selected)
       if (changed) {
         //then
-        dispatch.expects(FileListParamsChangedAction(offset, index, selected))
+        dispatch.expects(FileListParamsChangedAction(state.isRight, offset, index, selected))
       }
       
       //when

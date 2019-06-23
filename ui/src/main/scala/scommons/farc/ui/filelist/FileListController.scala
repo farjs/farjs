@@ -6,12 +6,15 @@ import scommons.farc.ui.FarcStateDef
 import scommons.react.UiComponent
 import scommons.react.redux.BaseStateController
 
-class FileListController(actions: FileListActions)
+class FileListController(actions: FileListActions, isRight: Boolean)
   extends BaseStateController[FarcStateDef, FileListPanelProps] {
 
   lazy val uiComponent: UiComponent[FileListPanelProps] = FileListPanel
 
   def mapStateToProps(dispatch: Dispatch, state: FarcStateDef, props: Props[Unit]): FileListPanelProps = {
-    FileListPanelProps(dispatch, actions, state.fileListState)
+    FileListPanelProps(dispatch, actions,
+      if (isRight) state.fileListsState.right
+      else state.fileListsState.left
+    )
   }
 }

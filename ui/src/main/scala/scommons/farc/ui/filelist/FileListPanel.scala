@@ -42,7 +42,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           actions = props.actions,
           state = props.state,
           size = (width - 2, height - 5),
-          columns = 3
+          columns = 2
         ))(),
         <(TextLine())(^.wrapped := TextLineProps(
           align = TextLine.Center,
