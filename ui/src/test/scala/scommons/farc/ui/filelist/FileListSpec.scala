@@ -21,21 +21,19 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val state1 = FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false),
-      items = List(FileListItem("item 1"))
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
     )
     val props1 = FileListProps(dispatch, actions, state1, (7, 2), columns = 2)
     val state2 = state1.copy(
-      currDir = FileListDir("/changed", isRoot = false),
-      items = List(FileListItem("item 2"))
+      currDir = FileListDir("/changed", isRoot = false, items = List(FileListItem("item 2")))
     )
     val props2 = props1.copy(state = state2)
     val action = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful((state1.currDir, state1.items)))
+      FutureTask("Changing dir", Future.successful(state1.currDir))
     )
     
     //then
-    (actions.changeDir _).expects(dispatch, state1.isRight, None).returning(action)
+    (actions.changeDir _).expects(dispatch, state1.isRight, None, FileListDir.curr).returning(action)
     dispatch.expects(action)
     
     //when
@@ -53,8 +51,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val props = FileListProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/", isRoot = true),
-      items = List(
+      currDir = FileListDir("/", isRoot = true, items = List(
         FileListItem("dir 1", isDir = true),
         FileListItem("dir 2", isDir = true),
         FileListItem("dir 3", isDir = true),
@@ -62,7 +59,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
         FileListItem("dir 5", isDir = true),
         FileListItem("dir 6", isDir = true),
         FileListItem("file 7")
-      )
+      ))
     ), (7, 3), columns = 2)
 
     val renderer = createRenderer()
@@ -73,35 +70,46 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       renderer.render(<(FileList())(^.wrapped := props.copy(state = props.state.copy(
         offset = offset,
         index = index,
-        currDir = FileListDir(currDir, currDir == "/"),
-        items = items
+        currDir = FileListDir(currDir, currDir == "/", items = items)
       )))())
 
       Succeeded
     }
 
     def check(keyFull: String,
+              parent: String,
               pressItem: String,
-              currDirPath: String,
               items: List[String],
               offset: Int,
               index: Int,
               changed: Boolean = true
              )(implicit pos: Position): Future[Assertion] = {
 
-      val currDir = FileListDir(currDirPath, currDirPath == "/")
-      val state = props.state.copy(offset = 0, index = offset + index,
-        currDir = currDir,
-        items = if (currDir.isRoot) props.state.items else FileListItem.up +: props.state.items
+      val currDirPath =
+        if (changed) {
+          if (pressItem == FileListItem.up.name) {
+            val index = parent.lastIndexOf('/')
+            parent.take(if (index > 0) index else 1)
+          }
+          else if (parent == "/") s"$parent$pressItem"
+          else s"$parent/$pressItem"
+        }
+        else parent
+      
+      val isRoot = currDirPath == "/"
+      val currDir = FileListDir(currDirPath, isRoot, items =
+        if (isRoot) props.state.currDir.items
+        else FileListItem.up +: props.state.currDir.items
       )
+      val state = props.state.copy(offset = 0, index = offset + index, currDir = currDir)
       val checkF =
         if (changed) {
           val action = FileListDirChangeAction(
-            FutureTask("Changing dir", Future.successful((currDir, props.state.items)))
+            FutureTask("Changing dir", Future.successful(currDir))
           )
 
           //then
-          (actions.changeDir _).expects(dispatch, state.isRight, Some(pressItem)).returning(action)
+          (actions.changeDir _).expects(dispatch, state.isRight, Some(parent), pressItem).returning(action)
           dispatch.expects(action)
 
           action.task.future.map(_ => Succeeded)
@@ -125,23 +133,23 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
 
     Future.sequence(List(
       //when & then
-      check("unknown", "", "/", List("dir 1", "dir 2", "dir 3", "dir 4"), 0, 0, changed = false),
+      check("unknown", "/",    "123",         List("dir 1", "dir 2", "dir 3", "dir 4"), 0, 0, changed = false),
       
-      check("enter", "dir 1", "/dir 1", List("..", "dir 1", "dir 2", "dir 3"), 0, 0),
-      check("enter", "..",    "/",      List("dir 1", "dir 2", "dir 3", "dir 4"), 0, 0),
+      check("enter", "/",      "dir 1",       List("..", "dir 1", "dir 2", "dir 3"), 0, 0),
+      check("enter", "/dir 1", "..",          List("dir 1", "dir 2", "dir 3", "dir 4"), 0, 0),
       
-      prepare(3, 3, "/", props.state.items),
-      check("enter", "file 7","/",      List("dir 5", "dir 6", "file 7"), 4, 2, changed = false),
+      prepare(3, 3, "/", props.state.currDir.items),
+      check("enter", "/",      "file 7",      List("dir 5", "dir 6", "file 7"), 4, 2, changed = false),
       
-      prepare(3, 2, "/", props.state.items),
-      check("enter", "dir 6", "/dir 6", List("..", "dir 1", "dir 2", "dir 3"), 0, 0),
+      prepare(3, 2, "/", props.state.currDir.items),
+      check("enter", "/",      "dir 6",       List("..", "dir 1", "dir 2", "dir 3"), 0, 0),
       
-      prepare(3, 1, "/dir 6", FileListItem.up +: props.state.items),
-      check("enter", "dir 4", "/dir 6/dir 4", List("..", "dir 1", "dir 2", "dir 3"), 0, 0),
-      check("enter", "..",    "/dir 6",       List("dir 4", "dir 5", "dir 6", "file 7"), 4, 0),
+      prepare(3, 1, "/dir 6", FileListItem.up +: props.state.currDir.items),
+      check("enter", "/dir 6",       "dir 4", List("..", "dir 1", "dir 2", "dir 3"), 0, 0),
+      check("enter", "/dir 6/dir 4", "..",    List("dir 4", "dir 5", "dir 6", "file 7"), 4, 0),
       
-      prepare(0, 0, "/dir 6", FileListItem.up +: props.state.items),
-      check("enter", "..",    "/",            List("dir 5", "dir 6", "file 7"), 4, 1)
+      prepare(0, 0, "/dir 6", FileListItem.up +: props.state.currDir.items),
+      check("enter", "/dir 6",       "..",    List("dir 5", "dir 6", "file 7"), 4, 1)
       
     )).map(_ => Succeeded)
   }
@@ -150,13 +158,15 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val props = FileListProps(dispatch, actions, FileListState(items = List(
-      FileListItem("item 1"),
-      FileListItem("item 2"),
-      FileListItem("item 3"),
-      FileListItem("item 4"),
-      FileListItem("item 5")
-    )), (7, 3), columns = 2)
+    val props = FileListProps(dispatch, actions, FileListState(
+      currDir = FileListDir("/", isRoot = true, items = List(
+        FileListItem("item 1"),
+        FileListItem("item 2"),
+        FileListItem("item 3"),
+        FileListItem("item 4"),
+        FileListItem("item 5")
+      ))
+    ), (7, 3), columns = 2)
     val renderer = createRenderer()
     renderer.render(<(FileList())(^.wrapped := props)())
     findComponentProps(renderer.getRenderOutput(), FileListView).focusedIndex shouldBe 0
@@ -198,11 +208,13 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val props = FileListProps(dispatch, actions, FileListState(items = List(
-      FileListItem("item 1"),
-      FileListItem("item 2"),
-      FileListItem("item 3")
-    )), (7, 3), columns = 2)
+    val props = FileListProps(dispatch, actions, FileListState(
+      currDir = FileListDir("/", isRoot = true, items = List(
+        FileListItem("item 1"),
+        FileListItem("item 2"),
+        FileListItem("item 3")
+      ))
+    ), (7, 3), columns = 2)
     val renderer = createRenderer()
     renderer.render(<(FileList())(^.wrapped := props)())
     findComponentProps(renderer.getRenderOutput(), FileListView).focusedIndex shouldBe 0
@@ -243,7 +255,9 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("item 6"),
       FileListItem("item 7")
     )
-    val rootProps = FileListProps(dispatch, actions, FileListState(items = items), (7, 3), columns = 2)
+    val rootProps = FileListProps(dispatch, actions, FileListState(
+      currDir = FileListDir("/", isRoot = true, items = items)
+    ), (7, 3), columns = 2)
     val renderer = createRenderer()
     renderer.render(<(FileList())(^.wrapped := rootProps)())
     findComponentProps(renderer.getRenderOutput(), FileListView).focusedIndex shouldBe 0
@@ -333,7 +347,9 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     check("S-home",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
 
     //given
-    val nonRootProps = rootProps.copy(state = rootProps.state.copy(items = FileListItem.up +: items))
+    val nonRootProps = rootProps.copy(state = rootProps.state.copy(
+      currDir = rootProps.state.currDir.copy(items = FileListItem.up +: items)
+    ))
     renderer.render(<(FileList())(^.wrapped := nonRootProps)())
     findComponentProps(renderer.getRenderOutput(), FileListView).focusedIndex shouldBe 0
 
@@ -366,11 +382,13 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val props = FileListProps(dispatch, actions, FileListState(items = List(
-      FileListItem("item 1"),
-      FileListItem("item 2"),
-      FileListItem("item 3")
-    )), (7, 2), columns = 2)
+    val props = FileListProps(dispatch, actions, FileListState(
+      currDir = FileListDir("/", isRoot = true, items = List(
+        FileListItem("item 1"),
+        FileListItem("item 2"),
+        FileListItem("item 3")
+      ))
+    ), (7, 2), columns = 2)
     val comp = <(FileList())(^.wrapped := props)()
 
     //when

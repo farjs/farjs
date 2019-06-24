@@ -29,11 +29,11 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val state = FileListState(index = 2, currDir = FileListDir("/", isRoot = true), items = List(
+    val state = FileListState(index = 2, currDir = FileListDir("/", isRoot = true, items = List(
       FileListItem("dir 1", isDir = true, size = 1),
       FileListItem("dir 2", isDir = true, size = 2),
       FileListItem("file", size = 3)
-    ), selectedNames = Set("dir 2", "file"))
+    )), selectedNames = Set("dir 2", "file"))
     val props = FileListPanelProps(dispatch, actions, state)
 
     //when
@@ -48,11 +48,11 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true), items = List(
+    val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = List(
       FileListItem("file 1", size = 1),
       FileListItem("file 2", size = 2, permissions = "drwxr-xr-x"),
       FileListItem("file 3", size = 3)
-    ))
+    )))
     val props = FileListPanelProps(dispatch, actions, state)
 
     //when
@@ -66,11 +66,11 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val state = FileListState(index = 1, currDir = FileListDir("/sub-dir", isRoot = false), items = List(
+    val state = FileListState(index = 1, currDir = FileListDir("/sub-dir", isRoot = false, items = List(
       FileListItem.up,
       FileListItem("dir", isDir = true, size = 1, permissions = "dr--r--r--"),
       FileListItem("file", size = 2)
-    ))
+    )))
     val props = FileListPanelProps(dispatch, actions, state)
 
     //when
@@ -84,11 +84,11 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false), items = List(
+    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
       FileListItem.up,
       FileListItem("dir", isDir = true, size = 1),
       FileListItem("file", size = 2)
-    ))
+    )))
     val props = FileListPanelProps(dispatch, actions, state)
 
     //when

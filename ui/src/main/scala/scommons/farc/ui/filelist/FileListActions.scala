@@ -14,19 +14,9 @@ trait FileListActions {
 
   protected def api: FileListApi
 
-  def changeDir(dispatch: Dispatch, isRight: Boolean, dir: Option[String]): FileListDirChangeAction = {
-    val future = {
-      for {
-        currDir <- dir match {
-          case None => api.currDir
-          case Some(d) => api.changeDir(d)
-        }
-        files <- api.listFiles.recover {
-          case e => onError(Nil)(e)
-        }
-      } yield (currDir, files)
-    }.andThen {
-      case Success((currDir, files)) => dispatch(FileListDirChangedAction(isRight, dir, currDir, files))
+  def changeDir(dispatch: Dispatch, isRight: Boolean, parent: Option[String], dir: String): FileListDirChangeAction = {
+    val future = api.readDir(parent, dir).andThen {
+      case Success(currDir) => dispatch(FileListDirChangedAction(isRight, dir, currDir))
       case Failure(e) => onError(())(e)
     }
 
@@ -50,9 +40,6 @@ object FileListActions {
                                          index: Int,
                                          selectedNames: Set[String]) extends Action
 
-  case class FileListDirChangeAction(task: FutureTask[(FileListDir, Seq[FileListItem])]) extends TaskAction
-  case class FileListDirChangedAction(isRight: Boolean,
-                                      dir: Option[String],
-                                      currDir: FileListDir,
-                                      files: Seq[FileListItem]) extends Action
+  case class FileListDirChangeAction(task: FutureTask[FileListDir]) extends TaskAction
+  case class FileListDirChangedAction(isRight: Boolean, dir: String, currDir: FileListDir) extends Action
 }

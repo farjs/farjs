@@ -9,25 +9,12 @@ import scala.concurrent.Future
 
 class FileListApiImpl extends FileListApi {
 
-  def currDir: Future[FileListDir] = Future {
-    val pathObject = path.parse(process.cwd())
-    FileListDir(
-      path = process.cwd(),
-      isRoot = pathObject.root == pathObject.dir &&
-        pathObject.base.getOrElse("").isEmpty
-    )
-  }
-  
-  def changeDir(dir: String): Future[FileListDir] = Future {
-    process.chdir(path.resolve(dir))
-  }.flatMap(_ => currDir)
-  
-  def listFiles: Future[Seq[FileListItem]] = {
-    val dir = process.cwd()
+  def readDir(parent: Option[String], dir: String): Future[FileListDir] = {
+    val targetDir = path.resolve(parent.toList :+ dir: _*)
     
-    fs.readdir(dir).map { files =>
-      files.map { name =>
-        val stats = fs.lstatSync(path.join(dir, name))
+    fs.readdir(targetDir).map { files =>
+      val items = files.map { name =>
+        val stats = fs.lstatSync(path.join(targetDir, name))
 
         val isDir = stats.isDirectory()
         FileListItem(
@@ -42,6 +29,13 @@ class FileListApiImpl extends FileListApi {
           permissions = getPermissions(stats.mode)
         )
       }
+
+      val pathObj = path.parse(targetDir)
+      FileListDir(
+        path = targetDir,
+        isRoot = pathObj.root == pathObj.dir && pathObj.base.getOrElse("").isEmpty,
+        items = items
+      )
     }
   }
   

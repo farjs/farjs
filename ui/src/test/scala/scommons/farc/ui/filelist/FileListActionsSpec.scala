@@ -19,20 +19,19 @@ class FileListActionsSpec extends AsyncTestSpec {
     val api = mock[FileListApi]
     val actions = new FileListActionsTest(api)
     val dispatch = mockFunction[Any, Any]
-    val currDir = FileListDir("/", isRoot = true)
-    val files = List(FileListItem("file 1"))
+    val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
     val isRight = true
-    val dir: Option[String] = None
+    val parent: Option[String] = None
+    val dir = FileListDir.curr
 
-    (api.currDir _).expects().returning(Future.successful(currDir))
-    (api.listFiles _).expects().returning(Future.successful(files))
+    (api.readDir _).expects(parent, dir).returning(Future.successful(currDir))
     
     //then
-    dispatch.expects(FileListDirChangedAction(isRight, dir, currDir, files))
+    dispatch.expects(FileListDirChangedAction(isRight, dir, currDir))
     
     //when
     val FileListDirChangeAction(FutureTask(msg, future)) =
-      actions.changeDir(dispatch, isRight, dir)
+      actions.changeDir(dispatch, isRight, parent, dir)
     
     //then
     msg shouldBe "Changing Dir"
@@ -44,27 +43,26 @@ class FileListActionsSpec extends AsyncTestSpec {
     val api = mock[FileListApi]
     val actions = new FileListActionsTest(api)
     val dispatch = mockFunction[Any, Any]
-    val currDir = FileListDir("/", isRoot = true)
-    val files = List(FileListItem("file 1"))
+    val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
     val isRight = true
+    val parent: Option[String] = Some("/")
     val dir = "test dir"
 
-    (api.changeDir _).expects(dir).returning(Future.successful(currDir))
-    (api.listFiles _).expects().returning(Future.successful(files))
+    (api.readDir _).expects(parent, dir).returning(Future.successful(currDir))
     
     //then
-    dispatch.expects(FileListDirChangedAction(isRight, Some(dir), currDir, files))
+    dispatch.expects(FileListDirChangedAction(isRight, dir, currDir))
     
     //when
     val FileListDirChangeAction(FutureTask(msg, future)) =
-      actions.changeDir(dispatch, isRight, Some(dir))
+      actions.changeDir(dispatch, isRight, parent, dir)
     
     //then
     msg shouldBe "Changing Dir"
     future.map(_ => Succeeded)
   }
   
-  it should "fail when api.changeDir failed" in {
+  it should "fail when api.readDir failed" in {
     //given
     val api = mock[FileListApi]
     val errHandler = mockFunction[Throwable, Unit]
@@ -72,47 +70,21 @@ class FileListActionsSpec extends AsyncTestSpec {
     val dispatch = mockFunction[Any, Any]
     val e = new Exception("test error")
     val isRight = true
+    val parent: Option[String] = Some("/")
     val dir = "test dir"
 
-    (api.changeDir _).expects(dir).returning(Future.failed(e))
+    (api.readDir _).expects(parent, dir).returning(Future.failed(e))
     
     //then
     errHandler.expects(e)
-    (api.listFiles _).expects().never()
     dispatch.expects(*).never()
     
     //when
     val FileListDirChangeAction(FutureTask(_, future)) =
-      actions.changeDir(dispatch, isRight, Some(dir))
+      actions.changeDir(dispatch, isRight, parent, dir)
     
     //then
     future.failed.map(_ => Succeeded)
-  }
-  
-  it should "return Nil when api.listFiles failed" in {
-    //given
-    val api = mock[FileListApi]
-    val errHandler = mockFunction[Throwable, Unit]
-    val actions = new FileListActionsTest(api, Some(errHandler))
-    val dispatch = mockFunction[Any, Any]
-    val currDir = FileListDir("/", isRoot = true)
-    val e = new Exception("test error")
-    val isRight = true
-    val dir = "test dir"
-
-    (api.changeDir _).expects(dir).returning(Future.successful(currDir))
-    (api.listFiles _).expects().returning(Future.failed(e))
-    
-    //then
-    errHandler.expects(e)
-    dispatch.expects(FileListDirChangedAction(isRight, Some(dir), currDir, Nil))
-    
-    //when
-    val FileListDirChangeAction(FutureTask(_, future)) =
-      actions.changeDir(dispatch, isRight, Some(dir))
-    
-    //then
-    future.map(_ => Succeeded)
   }
   
   it should "log error when onError" in {

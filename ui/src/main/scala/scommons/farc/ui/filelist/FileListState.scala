@@ -5,15 +5,14 @@ import scommons.farc.ui.filelist.FileListActions._
 
 case class FileListState(offset: Int = 0,
                          index: Int = 0,
-                         currDir: FileListDir = FileListDir("", isRoot = false),
-                         items: Seq[FileListItem] = Nil,
+                         currDir: FileListDir = FileListDir("", isRoot = false, Seq.empty),
                          selectedNames: Set[String] = Set.empty,
                          isRight: Boolean = false) {
 
   def currentItem: Option[FileListItem] = {
     val itemIndex = offset + index
-    if (itemIndex >= 0 && itemIndex < items.size) {
-      Some(items(itemIndex))
+    if (itemIndex >= 0 && itemIndex < currDir.items.size) {
+      Some(currDir.items(itemIndex))
     }
     else None
   }
@@ -49,9 +48,9 @@ object FileListsStateReducer {
           index = index,
           selectedNames = selectedNames
         ))
-      case FileListDirChangedAction(isRight, dir, currDir, files) =>
+      case FileListDirChangedAction(isRight, dir, currDir) =>
         val items = {
-          val sorted = files.sortBy(item => (!item.isDir, item.name))
+          val sorted = currDir.items.sortBy(item => (!item.isDir, item.name))
 
           if (currDir.isRoot) sorted
           else FileListItem.up +: sorted
@@ -59,7 +58,7 @@ object FileListsStateReducer {
 
         withState(isRight) { state =>
           val index =
-            if (dir.contains(FileListItem.up.name)) {
+            if (dir == FileListItem.up.name) {
               val focusedDir = state.currDir.path
                 .stripPrefix(currDir.path)
                 .stripPrefix("/")
@@ -72,8 +71,7 @@ object FileListsStateReducer {
           state.copy(
             offset = 0,
             index = index,
-            currDir = currDir,
-            items = items,
+            currDir = currDir.copy(items = items),
             selectedNames = Set.empty
           )
         }

@@ -1,6 +1,6 @@
 package scommons.farc.app
 
-import scommons.farc.api.filelist.{FileListDir, FileListItem}
+import scommons.farc.api.filelist.FileListDir
 import scommons.farc.ui.filelist.FileListActions._
 import scommons.farc.ui.filelist.FileListsState
 import scommons.react.redux.task.{AbstractTask, FutureTask}
@@ -26,9 +26,7 @@ class FarcStateReducerSpec extends TestSpec {
     //given
     val currTask = mock[AbstractTask]
     val state = FarcState(Some(currTask), FileListsState())
-    val task = FutureTask("test task", Future.successful(
-      (FileListDir("/", isRoot = true), Seq.empty[FileListItem]))
-    )
+    val task = FutureTask("test task", Future.successful(FileListDir("/", isRoot = true, Seq.empty)))
     
     //when
     val result = FarcStateReducer.reduce(Some(state), FileListDirChangeAction(task))

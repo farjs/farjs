@@ -10,89 +10,74 @@ class FileListApiImplSpec extends AsyncTestSpec {
   
   private val apiImp = new FileListApiImpl
 
-  it should "return current directory" in {
+  it should "return current dir info and files when readDir(None, .)" in {
     //when
-    val resultF = apiImp.currDir
-    
-    //then
-    resultF.map { dir =>
-      inside(dir) { case FileListDir(dirPath, isRoot) =>
+    apiImp.readDir(None, FileListDir.curr).map { dir =>
+      //then
+      inside(dir) { case FileListDir(dirPath, isRoot, items) =>
         dirPath shouldBe process.cwd()
         isRoot shouldBe false
+        items should not be empty
       }
     }
   }
   
-  it should "change current directory" in {
+  it should "return parent dir info and files when readDir(Some(dir), ..)" in {
     //given
     val curr = process.cwd()
-    val newDir = os.homedir()
-    val newDirObj = path.parse(newDir)
-    val newRoot = newDirObj.root.getOrElse("")
-    val newParent = newDirObj.dir.getOrElse("")
-    newDir should not be curr
-    newParent should not be empty
+    val currDirObj = path.parse(curr)
+    val parentDir = currDirObj.dir.getOrElse("")
+    val currDir = currDirObj.base.getOrElse("")
+    parentDir should not be empty
+    currDir should not be empty
 
     //when
-    val resultF = (for {
-      dir <- apiImp.changeDir(newDir)
-      currDir <- apiImp.currDir
-    } yield {
+    apiImp.readDir(Some(curr), FileListItem.up.name).map { dir =>
       //then
-      process.cwd() shouldBe newDir
-      dir shouldBe currDir
-      inside(dir) { case FileListDir(dirPath, isRoot) =>
-        dirPath shouldBe newDir
+      inside(dir) { case FileListDir(dirPath, isRoot, items) =>
+        dirPath shouldBe parentDir
         isRoot shouldBe false
-      }
-    }).flatMap { _ =>
-      //when
-      (for {
-        dir <- apiImp.changeDir(FileListItem.up.name)
-        currDir <- apiImp.currDir
-      } yield {
-        //then
-        process.cwd() shouldBe newParent
-        dir shouldBe currDir
-        inside(dir) { case FileListDir(dirPath, isRoot) =>
-          dirPath shouldBe newParent
-          isRoot shouldBe false
-        }
-      }).flatMap { _ =>
-        //when
-        for {
-          dir <- apiImp.changeDir(newRoot)
-          currDir <- apiImp.currDir
-        } yield {
-          //then
-          process.cwd() shouldBe newRoot
-          dir shouldBe currDir
-          inside(dir) { case FileListDir(dirPath, isRoot) =>
-            dirPath shouldBe newRoot
-            isRoot shouldBe true
-          }
-        }
+        items should not be empty
       }
     }
-    
-    //cleanup
-    resultF.flatMap(_ => apiImp.changeDir(curr).map(_ => Succeeded))
   }
   
-  it should "return file list when listFiles()" in {
+  it should "return target dir info and files when readDir(Some(dir), sub-dir)" in {
     //given
-    val curr = os.homedir()
-    
-    val resultF = apiImp.changeDir(curr).flatMap { _ =>
-      //when
-      apiImp.listFiles.map { files =>
-        //then
-        files should not be empty
+    val curr = process.cwd()
+    val currDirObj = path.parse(curr)
+    val parentDir = currDirObj.dir.getOrElse("")
+    val subDir = currDirObj.base.getOrElse("")
+    parentDir should not be empty
+    subDir should not be empty
+
+    //when
+    apiImp.readDir(Some(parentDir), subDir).map { dir =>
+      //then
+      inside(dir) { case FileListDir(dirPath, isRoot, items) =>
+        dirPath shouldBe curr
+        isRoot shouldBe false
+        items should not be empty
       }
     }
-    
-    //cleanup
-    resultF.flatMap(_ => apiImp.changeDir(curr).map(_ => Succeeded))
+  }
+  
+  it should "return root dir info and files when readDir(Some(root), .)" in {
+    //given
+    val curr = process.cwd()
+    val currDirObj = path.parse(curr)
+    val currRoot = currDirObj.root.getOrElse("")
+    currRoot should not be empty
+
+    //when
+    apiImp.readDir(Some(currRoot), FileListDir.curr).map { dir =>
+      //then
+      inside(dir) { case FileListDir(dirPath, isRoot, items) =>
+        dirPath shouldBe currRoot
+        isRoot shouldBe true
+        items should not be empty
+      }
+    }
   }
   
   it should "return file permissions" in {

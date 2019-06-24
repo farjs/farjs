@@ -22,7 +22,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
     val currItem = props.state.currentItem
     val selectedItems =
       if (props.state.selectedNames.nonEmpty) {
-        props.state.items.filter(i => props.state.selectedNames.contains(i.name))
+        props.state.currDir.items.filter(i => props.state.selectedNames.contains(i.name))
       }
       else Nil
 
@@ -111,7 +111,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           pos = (1, height - 1),
           width = width - 2,
           text = {
-            val files = props.state.items.filter(!_.isDir)
+            val files = props.state.currDir.items.filter(!_.isDir)
             val filesSize = files.foldLeft(0.0)((res, f) => res + f.size)
             f"$filesSize%,.0f (${files.size}%d)"
           },
