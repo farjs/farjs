@@ -95,7 +95,7 @@ class FileListColumnSpec extends TestSpec
         FileListItem(".dir 2 looooooong", isDir = true),
         FileListItem("file 3"),
         FileListItem(".dir 4", isDir = true),
-        FileListItem(".file 5"),
+        FileListItem(".file 5\n"),
         FileListItem("file 6")
       ),
       focusedIndex = 2,

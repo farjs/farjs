@@ -54,12 +54,13 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
           else style
         }
 
+        val text = name.trim
         renderText(
           isBold = style.bold.getOrElse(false),
           fgColor = style.fg.orNull,
           bgColor = style.bg.orNull,
-          text = name.take(width).padTo(width, ' '),
-          ending = if (name.length > width) overlapEnd else borderEnd
+          text = text.take(width).padTo(width, ' '),
+          ending = if (text.length > width) overlapEnd else borderEnd
         )
     }
 
