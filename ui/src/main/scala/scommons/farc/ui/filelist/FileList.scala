@@ -92,7 +92,13 @@ object FileList extends FunctionComponent[FileListProps] {
         || props.state.index != newIndex
         || props.state.selectedNames != newSelected) {
         
-        props.dispatch(FileListParamsChangedAction(props.state.isRight, newOffset, newIndex, newSelected))
+        props.dispatch(FileListParamsChangedAction(
+          isRight = props.state.isRight,
+          isActive = props.state.isActive,
+          offset = newOffset,
+          index = newIndex,
+          selectedNames = newSelected
+        ))
       }
     }
     
@@ -100,15 +106,30 @@ object FileList extends FunctionComponent[FileListProps] {
       size = props.size,
       columns = props.columns,
       items = viewItems,
-      focusedIndex = focusedIndex,
+      focusedIndex = if (props.state.isActive) focusedIndex else -1,
       selectedNames = props.state.selectedNames,
-      onWheelUp = { () =>
-        if (viewOffset > 0) focusItem(viewOffset - 1, focusedIndex)
-        else focusItem(viewOffset, focusedIndex - 1)
+      onActivate = { active =>
+        if (props.state.isActive != active) {
+          props.dispatch(FileListParamsChangedAction(
+            isRight = props.state.isRight,
+            isActive = active,
+            offset = props.state.offset,
+            index = props.state.index,
+            selectedNames = props.state.selectedNames
+          ))
+        }
       },
-      onWheelDown = { () =>
-        if (viewOffset < maxOffset) focusItem(viewOffset + 1, focusedIndex)
-        else focusItem(viewOffset, focusedIndex + 1)
+      onWheel = { up =>
+        if (props.state.isActive) {
+          if (up) {
+            if (viewOffset > 0) focusItem(viewOffset - 1, focusedIndex)
+            else focusItem(viewOffset, focusedIndex - 1)
+          }
+          else {
+            if (viewOffset < maxOffset) focusItem(viewOffset + 1, focusedIndex)
+            else focusItem(viewOffset, focusedIndex + 1)
+          }
+        }
       },
       onClick = { index =>
         focusItem(viewOffset, index)

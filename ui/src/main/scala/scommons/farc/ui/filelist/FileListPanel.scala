@@ -50,7 +50,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           width = width - 2,
           text = props.state.currDir.path,
           style = styles.normalItem,
-          focused = true
+          focused = props.state.isActive
         ))(),
 
         if (selectedItems.nonEmpty) Some(

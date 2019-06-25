@@ -15,14 +15,38 @@ class FileListViewSpec extends TestSpec
   with ShallowRendererUtils
   with TestRendererUtils {
 
-  it should "call onWheelup/onWheeldown" in {
+  it should "call onActivate when onFocus/onBlur" in {
     //given
-    val onWheelUp = mockFunction[Unit]
-    val onWheelDown = mockFunction[Unit]
+    val onActivate = mockFunction[Boolean, Unit]
     val props = FileListViewProps((7, 7), columns = 2, items = List(
       FileListItem("item 1"),
       FileListItem("item 2")
-    ), onWheelUp = onWheelUp, onWheelDown = onWheelDown)
+    ), onActivate = onActivate)
+    val comp = shallowRender(<(FileListView())(^.wrapped := props)())
+
+    def check(active: Boolean, shift: Boolean = false): Unit = {
+      //then
+      if (!shift) {
+        onActivate.expects(active)
+      }
+      
+      //when
+      if (active) comp.props.onFocus()
+      else comp.props.onBlur()
+    }
+    
+    //when & then
+    check(active = false)
+    check(active = true)
+  }
+
+  it should "call onWheel when onWheelup/onWheeldown" in {
+    //given
+    val onWheel = mockFunction[Boolean, Unit]
+    val props = FileListViewProps((7, 7), columns = 2, items = List(
+      FileListItem("item 1"),
+      FileListItem("item 2")
+    ), onWheel = onWheel)
     val root = createTestRenderer(<(FileListView())(^.wrapped := props)(), { el =>
       if (el.`type` == "button".asInstanceOf[js.Any]) literal(aleft = 5, atop = 3)
       else null
@@ -31,8 +55,7 @@ class FileListViewSpec extends TestSpec
     def check(up: Boolean, shift: Boolean = false): Unit = {
       //then
       if (!shift) {
-        if (up) onWheelUp.expects()
-        else onWheelDown.expects()
+        onWheel.expects(up)
       }
       
       //when

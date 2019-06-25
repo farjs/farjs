@@ -16,7 +16,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
   with ShallowRendererUtils
   with TestRendererUtils {
 
-  it should "dispatch actions only once when mount but not when update" in {
+  it should "dispatch action only once when mount but not when update" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -46,7 +46,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     action.task.future.map(_ => Succeeded)
   }
 
-  it should "dispatch actions when onKeypress(enter)" in {
+  it should "dispatch action when onKeypress(enter)" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -59,7 +59,8 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
         FileListItem("dir 5", isDir = true),
         FileListItem("dir 6", isDir = true),
         FileListItem("file 7")
-      ))
+      )),
+      isActive = true
     ), (7, 3), columns = 2)
 
     val renderer = createRenderer()
@@ -154,7 +155,55 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     )).map(_ => Succeeded)
   }
 
-  it should "focus item when onWheelup/onWheeldown" in {
+  it should "dispatch action when onActivate" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val props = FileListProps(dispatch, actions, FileListState(
+      currDir = FileListDir("/", isRoot = true, items = List(
+        FileListItem("item 1"),
+        FileListItem("item 2")
+      ))
+    ), (7, 3), columns = 2)
+    val renderer = createRenderer()
+    renderer.render(<(FileList())(^.wrapped := props)())
+    findComponentProps(renderer.getRenderOutput(), FileListView).focusedIndex shouldBe -1
+
+    def check(active: Boolean, changed: Boolean = true)(implicit pos: Position): Assertion = {
+      val state = props.state.copy(isActive = active)
+      if (changed) {
+        //then
+        dispatch.expects(FileListParamsChangedAction(
+          isRight = state.isRight,
+          isActive = active,
+          offset = state.offset,
+          index = state.index,
+          selectedNames = state.selectedNames
+        ))
+      }
+      
+      //when
+      findComponentProps(renderer.getRenderOutput(), FileListView).onActivate(active)
+      renderer.render(<(FileList())(^.wrapped := props.copy(state = state))())
+
+      //then
+      val res = findComponentProps(renderer.getRenderOutput(), FileListView)
+      res.focusedIndex shouldBe {
+        if (active) 0
+        else -1
+      }
+    }
+    
+    //when & then
+    check(active = true)
+    check(active = true, changed = false)
+    
+    //when & then
+    check(active = false)
+    check(active = false, changed = false)
+  }
+
+  it should "focus item when onWheel and active" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -165,7 +214,8 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
         FileListItem("item 3"),
         FileListItem("item 4"),
         FileListItem("item 5")
-      ))
+      )),
+      isActive = true
     ), (7, 3), columns = 2)
     val renderer = createRenderer()
     renderer.render(<(FileList())(^.wrapped := props)())
@@ -175,13 +225,11 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       val state = props.state.copy(offset = offset, index = index)
       if (changed) {
         //then
-        dispatch.expects(FileListParamsChangedAction(state.isRight, offset, index, Set.empty))
+        dispatch.expects(FileListParamsChangedAction(state.isRight, state.isActive, offset, index, Set.empty))
       }
       
       //when
-      if (up) findComponentProps(renderer.getRenderOutput(), FileListView).onWheelUp()
-      else findComponentProps(renderer.getRenderOutput(), FileListView).onWheelDown()
-
+      findComponentProps(renderer.getRenderOutput(), FileListView).onWheel(up)
       renderer.render(<(FileList())(^.wrapped := props.copy(state = state))())
 
       //then
@@ -204,6 +252,30 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     check(up = true, offset = 0, index = 0, changed = false)
   }
 
+  it should "not focus item when onWheel and not active" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val props = FileListProps(dispatch, actions, FileListState(
+      currDir = FileListDir("/", isRoot = true, items = List(
+        FileListItem("item 1"),
+        FileListItem("item 2")
+      ))
+    ), (7, 3), columns = 2)
+    val comp = shallowRender(<(FileList())(^.wrapped := props)())
+    val viewProps = findComponentProps(comp, FileListView)
+    viewProps.focusedIndex shouldBe -1
+
+    //then
+    dispatch.expects(*).never()
+    
+    //when
+    viewProps.onWheel(false)
+    viewProps.onWheel(true)
+    
+    Succeeded
+  }
+
   it should "focus item when onClick" in {
     //given
     val dispatch = mockFunction[Any, Any]
@@ -213,7 +285,8 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
         FileListItem("item 1"),
         FileListItem("item 2"),
         FileListItem("item 3")
-      ))
+      )),
+      isActive = true
     ), (7, 3), columns = 2)
     val renderer = createRenderer()
     renderer.render(<(FileList())(^.wrapped := props)())
@@ -223,7 +296,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       val state = props.state.copy(offset = 0, index = index)
       if (changed) {
         //then
-        dispatch.expects(FileListParamsChangedAction(state.isRight, 0, index, Set.empty))
+        dispatch.expects(FileListParamsChangedAction(state.isRight, state.isActive, 0, index, Set.empty))
       }
 
       //when
@@ -256,7 +329,8 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("item 7")
     )
     val rootProps = FileListProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/", isRoot = true, items = items)
+      currDir = FileListDir("/", isRoot = true, items = items),
+      isActive = true
     ), (7, 3), columns = 2)
     val renderer = createRenderer()
     renderer.render(<(FileList())(^.wrapped := rootProps)())
@@ -274,7 +348,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       val state = props.state.copy(offset = offset, index = index, selectedNames = selected)
       if (changed) {
         //then
-        dispatch.expects(FileListParamsChangedAction(state.isRight, offset, index, selected))
+        dispatch.expects(FileListParamsChangedAction(state.isRight, state.isActive, offset, index, selected))
       }
       
       //when
@@ -373,7 +447,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     //then
     assertFileList(result, props,
       viewItems = Nil,
-      focusedIndex = 0,
+      focusedIndex = -1,
       selectedNames = Set.empty
     )
   }
@@ -387,7 +461,8 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
         FileListItem("item 1"),
         FileListItem("item 2"),
         FileListItem("item 3")
-      ))
+      )),
+      isActive = true
     ), (7, 2), columns = 2)
     val comp = <(FileList())(^.wrapped := props)()
 

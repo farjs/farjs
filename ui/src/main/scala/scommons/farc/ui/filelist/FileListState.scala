@@ -7,7 +7,8 @@ case class FileListState(offset: Int = 0,
                          index: Int = 0,
                          currDir: FileListDir = FileListDir("", isRoot = false, Seq.empty),
                          selectedNames: Set[String] = Set.empty,
-                         isRight: Boolean = false) {
+                         isRight: Boolean = false,
+                         isActive: Boolean = false) {
 
   def currentItem: Option[FileListItem] = {
     val itemIndex = offset + index
@@ -42,11 +43,12 @@ object FileListsStateReducer {
     }
     
     action match {
-      case FileListParamsChangedAction(isRight, offset, index, selectedNames) =>
+      case FileListParamsChangedAction(isRight, isActive, offset, index, selectedNames) =>
         withState(isRight)(_.copy(
           offset = offset,
           index = index,
-          selectedNames = selectedNames
+          selectedNames = selectedNames,
+          isActive = isActive
         ))
       case FileListDirChangedAction(isRight, dir, currDir) =>
         val items = {

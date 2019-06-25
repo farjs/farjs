@@ -16,25 +16,39 @@ class FileListsStateReducerSpec extends TestSpec {
   it should "set params when FileListParamsChangedAction" in {
     //given
     val state = FileListsState()
-    val offset = 1
-    val index = 2
-    val selectedNames = Set("test")
+    val action = FileListParamsChangedAction(
+      isRight = false,
+      isActive = false,
+      offset = 1,
+      index = 2,
+      selectedNames = Set("test")
+    )
     
     //when & then
-    reduce(Some(state), FileListParamsChangedAction(isRight = false, offset, index, selectedNames)) shouldBe {
+    reduce(Some(state), action) shouldBe {
       state.copy(left = FileListState(
-        offset = offset,
-        index = index,
-        selectedNames = selectedNames
+        offset = action.offset,
+        index = action.index,
+        selectedNames = action.selectedNames
       ))
     }
     //when & then
-    reduce(Some(state), FileListParamsChangedAction(isRight = true, offset, index, selectedNames)) shouldBe {
+    reduce(Some(state), action.copy(isRight = true)) shouldBe {
       state.copy(right = FileListState(
-        offset = offset,
-        index = index,
-        selectedNames = selectedNames,
+        offset = action.offset,
+        index = action.index,
+        selectedNames = action.selectedNames,
         isRight = true
+      ))
+    }
+    //when & then
+    reduce(Some(state), action.copy(isRight = true, isActive = true)) shouldBe {
+      state.copy(right = FileListState(
+        offset = action.offset,
+        index = action.index,
+        selectedNames = action.selectedNames,
+        isRight = true,
+        isActive = true
       ))
     }
   }

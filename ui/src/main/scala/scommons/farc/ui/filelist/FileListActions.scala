@@ -36,6 +36,7 @@ trait FileListActions {
 object FileListActions {
 
   case class FileListParamsChangedAction(isRight: Boolean,
+                                         isActive: Boolean,
                                          offset: Int,
                                          index: Int,
                                          selectedNames: Set[String]) extends Action
