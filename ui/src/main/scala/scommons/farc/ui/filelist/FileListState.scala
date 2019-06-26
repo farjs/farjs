@@ -25,7 +25,7 @@ trait FileListsStateDef {
   def right: FileListState
 }
 
-case class FileListsState(left: FileListState = FileListState(),
+case class FileListsState(left: FileListState = FileListState(isActive = true),
                           right: FileListState = FileListState(isRight = true)
                          ) extends FileListsStateDef
 

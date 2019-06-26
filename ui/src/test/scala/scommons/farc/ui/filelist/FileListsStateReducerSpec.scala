@@ -72,7 +72,8 @@ class FileListsStateReducerSpec extends TestSpec {
           FileListItem("file 1"),
           FileListItem("file 2")
         )),
-        selectedNames = Set.empty
+        selectedNames = Set.empty,
+        isActive = true
       ))
     }
     //when & then

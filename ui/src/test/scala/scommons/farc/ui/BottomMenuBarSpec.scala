@@ -13,7 +13,7 @@ class BottomMenuBarSpec extends TestSpec
     //given
     val onClick = mockFunction[String, Unit]
     val props = BottomMenuBarProps(onClick = onClick)
-    val buttons = createTestRenderer(<(BottomMenuBar())(^.wrapped := props)()).root.children
+    val items = createTestRenderer(<(BottomMenuBar())(^.wrapped := props)()).root.children
     
     //then
     inSequence {
@@ -30,16 +30,16 @@ class BottomMenuBarSpec extends TestSpec
     }
     
     //when
-    buttons(0).props.onClick(null)
-    buttons(1).props.onClick(null)
-    buttons(2).props.onClick(null)
-    buttons(3).props.onClick(null)
-    buttons(4).props.onClick(null)
-    buttons(5).props.onClick(null)
-    buttons(6).props.onClick(null)
-    buttons(7).props.onClick(null)
-    buttons(8).props.onClick(null)
-    buttons(9).props.onClick(null)
+    items(0).props.onClick(null)
+    items(1).props.onClick(null)
+    items(2).props.onClick(null)
+    items(3).props.onClick(null)
+    items(4).props.onClick(null)
+    items(5).props.onClick(null)
+    items(6).props.onClick(null)
+    items(7).props.onClick(null)
+    items(8).props.onClick(null)
+    items(9).props.onClick(null)
   }
   
   it should "render component" in {
@@ -54,8 +54,10 @@ class BottomMenuBarSpec extends TestSpec
     assertNativeComponent(result,
       <.>()(
         items.map { case (id, k, name, pos) =>
-          <.button(
+          <.text(
             ^.key := id,
+            ^.rbAutoFocus := false,
+            ^.rbClickable := true,
             ^.rbTags := true,
             ^.rbMouse := true,
             ^.rbLeft := pos,

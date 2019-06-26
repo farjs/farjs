@@ -15,8 +15,11 @@ object Blessed extends js.Object {
 @js.native
 trait BlessedScreen extends js.Object {
   
-  def focusOffset(offset: Int): Unit = js.native
+  def focusPrevious(): Unit = js.native
+  def focusNext(): Unit = js.native
+  
   def key(keys: js.Array[String], onKey: js.Function2[js.Object, KeyboardKey, Unit]): Unit = js.native
+  
   def destroy(): Unit = js.native
 }
 
@@ -31,6 +34,8 @@ trait BlessedElement extends js.Object {
   val atop: Int = js.native   //Calculated absolute top offset
   
   val screen: BlessedScreen = js.native
+  
+  def focus(): Unit = js.native
 }
 
 @js.native

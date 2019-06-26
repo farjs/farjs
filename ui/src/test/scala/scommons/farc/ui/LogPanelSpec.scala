@@ -19,6 +19,7 @@ class LogPanelSpec extends TestSpec with TestRendererUtils {
     g.console.log should not be oldLog
     assertNativeComponent(renderer.root.children(0),
       <.log(
+        ^.rbAutoFocus := false,
         ^.rbMouse := true,
         ^.rbStyle := LogPanel.styles.container,
         ^.rbScrollbar := true,

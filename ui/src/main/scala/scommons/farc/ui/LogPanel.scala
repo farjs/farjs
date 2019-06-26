@@ -27,6 +27,7 @@ object LogPanel extends FunctionComponent[Unit] {
     }, Nil)
     
     <.log(
+      ^.rbAutoFocus := false,
       ^.rbMouse := true,
       ^.rbStyle := styles.container,
       ^.rbScrollbar := true,

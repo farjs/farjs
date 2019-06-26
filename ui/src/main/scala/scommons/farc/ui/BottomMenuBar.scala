@@ -12,8 +12,10 @@ object BottomMenuBar extends FunctionComponent[BottomMenuBarProps] {
     
     <.>()(
       items.map { case (id, key, name, pos) =>
-        <.button(
+        <.text(
           ^.key := id,
+          ^.rbAutoFocus := false,
+          ^.rbClickable := true,
           ^.rbTags := true,
           ^.rbMouse := true,
           ^.rbLeft := pos,

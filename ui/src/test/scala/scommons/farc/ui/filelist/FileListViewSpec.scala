@@ -2,6 +2,7 @@ package scommons.farc.ui.filelist
 
 import scommons.farc.api.filelist.FileListItem
 import scommons.farc.ui.border._
+import scommons.farc.ui.filelist.FileListViewSpec._
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
@@ -10,10 +11,55 @@ import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
+import scala.scalajs.js.annotation.JSExportAll
 
 class FileListViewSpec extends TestSpec
   with ShallowRendererUtils
   with TestRendererUtils {
+
+  it should "set focus if focused when mount but not when update" in {
+    //given
+    val props = FileListViewProps((7, 7), columns = 2, items = List(
+      FileListItem("item 1"),
+      FileListItem("item 2")
+    ), focusedIndex = 0)
+    val buttonMock = mock[BlessedElementMock]
+    
+    //then
+    (buttonMock.focus _).expects()
+
+    //when
+    val renderer = createTestRenderer(<(FileListView())(^.wrapped := props)(), { el =>
+      if (el.`type` == "button".asInstanceOf[js.Any]) buttonMock.asInstanceOf[js.Any]
+      else null
+    })
+    renderer.update(<(FileListView())(^.wrapped := props.copy(columns = 1))()) //noop
+
+    //cleanup
+    renderer.unmount()
+  }
+
+  it should "not set focus if not focused when mount and not when update" in {
+    //given
+    val props = FileListViewProps((7, 7), columns = 2, items = List(
+      FileListItem("item 1"),
+      FileListItem("item 2")
+    ), focusedIndex = -1)
+    val buttonMock = mock[BlessedElementMock]
+    
+    //then
+    (buttonMock.focus _).expects().never()
+
+    //when
+    val renderer = createTestRenderer(<(FileListView())(^.wrapped := props)(), { el =>
+      if (el.`type` == "button".asInstanceOf[js.Any]) buttonMock.asInstanceOf[js.Any]
+      else null
+    })
+    renderer.update(<(FileListView())(^.wrapped := props.copy(columns = 1))()) //noop
+
+    //cleanup
+    renderer.unmount()
+  }
 
   it should "call onActivate when onFocus/onBlur" in {
     //given
@@ -106,7 +152,49 @@ class FileListViewSpec extends TestSpec
     check(x = 8, y = 5, index = 3) // last item in col 2
   }
 
-  it should "call onKeypress when onKeypress" in {
+  it should "focus next element when onKeypress(tab)" in {
+    //given
+    val props = FileListViewProps((7, 3), columns = 2, items = List(
+      FileListItem("item 1"),
+      FileListItem("item 2")
+    ))
+    val screenMock = mock[BlessedScreenMock]
+    val buttonMock = mock[BlessedElementMock]
+    val comp = testRender(<(FileListView())(^.wrapped := props)(), { el =>
+      if (el.`type` == "button".asInstanceOf[js.Any]) buttonMock.asInstanceOf[js.Any]
+      else null
+    })
+
+    //then
+    (buttonMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.focusNext _).expects()
+
+    //when
+    comp.props.onKeypress(null, literal(full = "tab"))
+  }
+
+  it should "focus previous element when onKeypress(S-tab)" in {
+    //given
+    val props = FileListViewProps((7, 3), columns = 2, items = List(
+      FileListItem("item 1"),
+      FileListItem("item 2")
+    ))
+    val screenMock = mock[BlessedScreenMock]
+    val buttonMock = mock[BlessedElementMock]
+    val comp = testRender(<(FileListView())(^.wrapped := props)(), { el =>
+      if (el.`type` == "button".asInstanceOf[js.Any]) buttonMock.asInstanceOf[js.Any]
+      else null
+    })
+
+    //then
+    (buttonMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.focusPrevious _).expects()
+
+    //when
+    comp.props.onKeypress(null, literal(full = "S-tab"))
+  }
+
+  it should "call onKeypress when onKeypress(...)" in {
     //given
     val onKeypress = mockFunction[String, Unit]
     val props = FileListViewProps((7, 3), columns = 2, items = List(
@@ -223,5 +311,23 @@ class FileListViewSpec extends TestSpec
         }
       })
     })
+  }
+}
+
+object FileListViewSpec {
+
+  @JSExportAll
+  trait BlessedScreenMock {
+
+    def focusPrevious(): Unit
+    def focusNext(): Unit
+  }
+  
+  @JSExportAll
+  trait BlessedElementMock {
+
+    def screen: BlessedScreen
+
+    def focus(): Unit
   }
 }

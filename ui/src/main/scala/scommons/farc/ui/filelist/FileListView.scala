@@ -39,6 +39,12 @@ object FileListView extends FunctionComponent[FileListViewProps] {
       (colLeft, finalWidth, colIndex)
     }
     
+    useLayoutEffect({ () =>
+      if (props.focusedIndex != -1) {
+        elementRef.current.focus()
+      }
+    }, Nil)
+    
     <.button(
       ^.reactRef := elementRef,
       ^.rbWidth := width,
@@ -75,7 +81,12 @@ object FileListView extends FunctionComponent[FileListViewProps] {
         }
       },
       ^.rbOnKeypress := { (_, key) =>
-        props.onKeypress(key.full)
+        val keyFull = key.full
+        if (keyFull == "tab") elementRef.current.screen.focusNext()
+        else if (keyFull == "S-tab") elementRef.current.screen.focusPrevious()
+        else {
+          props.onKeypress(keyFull)
+        }
       }
     )(
       if (columnSize > 0) {
