@@ -4,6 +4,7 @@ import io.github.shogowada.scalajs.reactjs.redux.ReactRedux._
 import io.github.shogowada.scalajs.reactjs.redux.Redux
 import scommons.farc.ui._
 import scommons.farc.ui.filelist._
+import scommons.farc.ui.menu._
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
@@ -76,11 +77,7 @@ object FarcApp {
         ),
 
         <.box(^.rbTop := "100%-1")(
-          <(BottomMenuBar())(^.wrapped := BottomMenuBarProps(
-            onClick = { msg =>
-              println(msg)
-            }
-          ))()
+          <(BottomMenu())()()
         )
       )
     }
