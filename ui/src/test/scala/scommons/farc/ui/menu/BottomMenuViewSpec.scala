@@ -2,15 +2,69 @@ package scommons.farc.ui.menu
 
 import org.scalatest.Succeeded
 import scommons.farc.ui.menu.BottomMenuView.styles
+import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
 import scommons.react.test.raw.ShallowInstance
 import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
 
+import scala.scalajs.js
+
 class BottomMenuViewSpec extends TestSpec
   with ShallowRendererUtils
   with TestRendererUtils {
+
+  it should "emit keypress event when onClick" in {
+    //given
+    val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
+    val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
+      onKey(
+        key.name,
+        key.ctrl.getOrElse(false),
+        key.meta.getOrElse(false),
+        key.shift.getOrElse(false)
+      )
+    }
+    process.stdin.on("keypress", listener)
+    
+    val props = BottomMenuViewProps(width = 80, items = BottomMenu.items)
+    val clickables = createTestRenderer(<(BottomMenuView())(^.wrapped := props)())
+      .root.children.head.children
+
+    //then
+    inSequence {
+      onKey.expects("f1", false, false, false)
+      onKey.expects("f2", false, false, false)
+      onKey.expects("f3", false, false, false)
+      onKey.expects("f4", false, false, false)
+      onKey.expects("f5", false, false, false)
+      onKey.expects("f6", false, false, false)
+      onKey.expects("f7", false, false, false)
+      onKey.expects("f8", false, false, false)
+      onKey.expects("f9", false, false, false)
+      onKey.expects("f10", false, false, false)
+      onKey.expects("f11", false, false, false)
+      onKey.expects("f12", false, false, false)
+    }
+
+    //when
+    clickables(0).props.onClick(null)
+    clickables(1).props.onClick(null)
+    clickables(2).props.onClick(null)
+    clickables(3).props.onClick(null)
+    clickables(4).props.onClick(null)
+    clickables(5).props.onClick(null)
+    clickables(6).props.onClick(null)
+    clickables(7).props.onClick(null)
+    clickables(8).props.onClick(null)
+    clickables(9).props.onClick(null)
+    clickables(10).props.onClick(null)
+    clickables(11).props.onClick(null)
+    
+    //cleanup
+    process.stdin.removeListener("keypress", listener)
+  }
 
   it should "not re-render component if the same props" in {
     //given

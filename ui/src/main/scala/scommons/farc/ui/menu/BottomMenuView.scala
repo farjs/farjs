@@ -1,7 +1,10 @@
 package scommons.farc.ui.menu
 
+import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
+
+import scala.scalajs.js
 
 case class BottomMenuViewProps(width: Int, items: List[String])
 
@@ -58,7 +61,12 @@ object BottomMenuView extends FunctionComponent[BottomMenuViewProps] {
           ^.rbMouse := true,
           ^.rbLeft := pos,
           ^.rbOnClick := { _ =>
-            println(s"$key")
+            process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
+              name = s"f$key",
+              ctrl = false,
+              meta = false,
+              shift = false
+            ))
           },
           ^.content := f"{$keyFg-fg}{$keyBg-bg}$key%2d{/}{$itemFg-fg}{$itemBg-bg}$item{/}"
         )()
