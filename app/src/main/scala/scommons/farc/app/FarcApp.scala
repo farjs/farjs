@@ -8,6 +8,7 @@ import scommons.farc.ui.menu._
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
+import scommons.react.blessed.portal.WithPortals
 import scommons.react.blessed.raw.{Blessed, ReactBlessed}
 
 import scala.scalajs.js
@@ -35,10 +36,12 @@ object FarcApp {
     
     ReactBlessed.render(
       <.Provider(^.store := store)(
-        <(FarcAppRoot())(^.wrapped := FarcAppRootProps(
-          leftPanelController,
-          rightPanelController
-        ))()
+        <(WithPortals())()(
+          <(FarcAppRoot())(^.wrapped := FarcAppRootProps(
+            leftPanelController,
+            rightPanelController
+          ))()
+        )
       ),
       screen
     )
