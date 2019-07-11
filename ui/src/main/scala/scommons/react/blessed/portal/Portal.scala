@@ -8,7 +8,7 @@ import scala.scalajs.js.{Error, JavaScriptException}
 
 private[portal] case class PortalProps(content: ReactElement)
 
-private[portal] case class PortalContext(onAdd: js.Function1[ReactElement, Int],
+private[portal] case class PortalContext(onRender: js.Function2[Int, ReactElement, Unit],
                                          onRemove: js.Function1[Int, Unit])
 
 object Portal extends FunctionComponent[PortalProps] {
@@ -20,6 +20,7 @@ object Portal extends FunctionComponent[PortalProps] {
   }
   
   protected def render(compProps: Props): ReactElement = {
+    val (portalId, _) = useState(() => getNextPortalId)
     val ctx = useContext(Context)
     if (ctx == null) {
       throw JavaScriptException(Error(
@@ -30,12 +31,23 @@ object Portal extends FunctionComponent[PortalProps] {
     val props = compProps.wrapped
     
     useLayoutEffect({ () =>
-      val portalId = ctx.onAdd(props.content)
-      () => {
+      val cleanup = () => {
         ctx.onRemove(portalId)
       }
+      cleanup
+    }, Nil)
+
+    useLayoutEffect({ () =>
+      ctx.onRender(portalId, props.content)
     }, List(props.content))
 
     <.>()()
+  }
+
+  private[portal] var nextPortalId = 0
+  private def getNextPortalId: Int = {
+    nextPortalId += 1
+    println(s"nextPortalId: $nextPortalId")
+    nextPortalId
   }
 }

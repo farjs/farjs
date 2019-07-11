@@ -1,15 +1,15 @@
 package scommons.react.blessed.portal
 
 import scommons.react._
-import scommons.react.blessed.portal.WithPortals._
 import scommons.react.hooks._
 import scommons.react.test.TestSpec
-import scommons.react.test.util.TestRendererUtils
+import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
 
 class WithPortalsSpec extends TestSpec
-  with TestRendererUtils {
+  with TestRendererUtils
+  with ShallowRendererUtils {
 
-  it should "add new portals when onAdd" in {
+  it should "add new portals when onRender" in {
     //given
     var ctx: PortalContext = null
     val ctxHook = new FunctionComponent[Unit] {
@@ -24,7 +24,7 @@ class WithPortalsSpec extends TestSpec
     )).root
 
     //when & then
-    ctx.onAdd(<.>()("portal content 1"))
+    ctx.onRender(1, <.>()("portal content 1"))
     inside(root.children.toList) { case List(resCtxHook, otherContent, portal1) =>
       resCtxHook.`type` shouldBe ctxHook()
       otherContent shouldBe "some other content"
@@ -32,12 +32,47 @@ class WithPortalsSpec extends TestSpec
     }
     
     //when & then
-    ctx.onAdd(<.>()("portal content 2"))
+    ctx.onRender(2, <.>()("portal content 2"))
     inside(root.children.toList) { case List(resCtxHook, otherContent, portal1, portal2) =>
       resCtxHook.`type` shouldBe ctxHook()
       otherContent shouldBe "some other content"
       portal1 shouldBe "portal content 1"
       portal2 shouldBe "portal content 2"
+    }
+  }
+  
+  it should "update existing portals when onRender" in {
+    //given
+    var ctx: PortalContext = null
+    val ctxHook = new FunctionComponent[Unit] {
+      protected def render(props: Props): ReactElement = {
+        ctx = useContext(Portal.Context)
+        <.>()()
+      }
+    }
+    val root = createTestRenderer(<(WithPortals())()(
+      <(ctxHook()).empty,
+      <.>()("some other content")
+    )).root
+    ctx.onRender(1, <.>()("portal content 1"))
+    ctx.onRender(2, <.>()("portal content 2"))
+
+    //when & then
+    ctx.onRender(1, <.>()("updated content 1"))
+    inside(root.children.toList) { case List(resCtxHook, otherContent, portal1, portal2) =>
+      resCtxHook.`type` shouldBe ctxHook()
+      otherContent shouldBe "some other content"
+      portal1 shouldBe "updated content 1"
+      portal2 shouldBe "portal content 2"
+    }
+    
+    //when & then
+    ctx.onRender(2, <.>()("updated content 2"))
+    inside(root.children.toList) { case List(resCtxHook, otherContent, portal1, portal2) =>
+      resCtxHook.`type` shouldBe ctxHook()
+      otherContent shouldBe "some other content"
+      portal1 shouldBe "updated content 1"
+      portal2 shouldBe "updated content 2"
     }
   }
   
@@ -54,11 +89,11 @@ class WithPortalsSpec extends TestSpec
       <(ctxHook()).empty,
       <.>()("some other content")
     )).root
-    val portalId1 = ctx.onAdd(<.>()("portal content 1"))
-    val portalId2 = ctx.onAdd(<.>()("portal content 2"))
+    ctx.onRender(1, <.>()("portal content 1"))
+    ctx.onRender(2, <.>()("portal content 2"))
 
     //when & then
-    ctx.onRemove(portalId1)
+    ctx.onRemove(1)
     inside(root.children.toList) { case List(resCtxHook, otherContent, portal2) =>
       resCtxHook.`type` shouldBe ctxHook()
       otherContent shouldBe "some other content"
@@ -66,25 +101,31 @@ class WithPortalsSpec extends TestSpec
     }
     
     //when & then
-    ctx.onRemove(portalId2)
+    ctx.onRemove(2)
     inside(root.children.toList) { case List(resCtxHook, otherContent) =>
       resCtxHook.`type` shouldBe ctxHook()
       otherContent shouldBe "some other content"
     }
   }
-
-  it should "return next portalId when getNextPortalId" in {
+  
+  it should "set key when renderPortal" in {
     //given
-    val content = <.>()()
-    var currId = getNextPortalId(Nil)
+    val id = 123
+    val content = <.>()("some portal content")
     
-    //when & then
-    getNextPortalId(List(currId -> content)) shouldBe (currId + 1)
-    currId = currId + 1
-    getNextPortalId(List((currId + 1) -> content)) shouldBe (currId + 2)
-    currId = currId + 2
-    getNextPortalId(List(currId -> content)) shouldBe (currId + 1)
-    getNextPortalId(List(currId -> content)) shouldBe (currId + 2)
-    getNextPortalId(List(currId -> content)) shouldBe (currId + 3)
+    //when
+    val result = WithPortals.renderPortal(id, content)
+    
+    //then
+    val wrapper = new FunctionComponent[Unit] {
+      protected def render(props: Props): ReactElement = {
+        result
+      }
+    }
+    assertNativeComponent(shallowRender(<(wrapper()).empty),
+      <.>(
+        ^.key := s"$id"
+      )(content)
+    )
   }
 }

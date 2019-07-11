@@ -26,20 +26,20 @@ class PortalSpec extends TestSpec
     }
   }
   
-  it should "call onAdd/onRemove when mount/un-mount" in {
+  it should "call onRender/onRemove when mount/un-mount" in {
     //given
-    val onAdd = mockFunction[ReactElement, Int]
+    val onRender = mockFunction[Int, ReactElement, Unit]
     val onRemove = mockFunction[Int, Unit]
-    val portalId = 123
+    val portalId = Portal.nextPortalId + 1
     val content = <.>()()
     
     //then
-    onAdd.expects(content).returning(portalId)
+    onRender.expects(portalId, content)
     onRemove.expects(portalId)
     
     //when
     val renderer = createTestRenderer {
-      <(Portal.Context.Provider)(^.contextValue := PortalContext(onAdd, onRemove))(
+      <(Portal.Context.Provider)(^.contextValue := PortalContext(onRender, onRemove))(
         Portal.create(content)
       )
     }
@@ -48,67 +48,65 @@ class PortalSpec extends TestSpec
     renderer.unmount()
   }
   
-  it should "call onAdd/onRemove if different content when update" in {
+  it should "call onRender if different content when update" in {
     //given
-    val onAdd = mockFunction[ReactElement, Int]
+    val onRender = mockFunction[Int, ReactElement, Unit]
     val onRemove = mockFunction[Int, Unit]
-    val onAddJs: js.Function1[ReactElement, Int] = onAdd
+    val onRenderJs: js.Function2[Int, ReactElement, Unit] = onRender
     val onRemoveJs: js.Function1[Int, Unit] = onRemove
-    val portalId1 = 1
-    val portalId2 = 1
+    val portalId = Portal.nextPortalId + 1
     val content1 = <.>()()
     val content2 = <.>()()
-    
-    onAdd.expects(content1).returning(portalId1)
+
+    onRender.expects(portalId, content1)
     val renderer = createTestRenderer {
-      <(Portal.Context.Provider)(^.contextValue := PortalContext(onAddJs, onRemoveJs))(
+      <(Portal.Context.Provider)(^.contextValue := PortalContext(onRenderJs, onRemoveJs))(
         Portal.create(content1)
       )
     }
 
     //then
-    onRemove.expects(portalId1)
-    onAdd.expects(content2).returning(portalId2)
+    onRender.expects(portalId, content2)
 
     //when
     renderer.update {
-      <(Portal.Context.Provider)(^.contextValue := PortalContext(onAddJs, onRemoveJs))(
+      <(Portal.Context.Provider)(^.contextValue := PortalContext(onRenderJs, onRemoveJs))(
         Portal.create(content2)
       )
     }
     
     //cleanup
-    onRemove.expects(portalId2)
+    onRemove.expects(portalId)
     renderer.unmount()
   }
   
-  it should "not call onAdd/onRemove if the same content when update" in {
+  it should "not call onRender if the same content when update" in {
     //given
-    val onAdd = mockFunction[ReactElement, Int]
+    val onRender = mockFunction[Int, ReactElement, Unit]
     val onRemove = mockFunction[Int, Unit]
-    val onAddJs: js.Function1[ReactElement, Int] = onAdd
+    val onRenderJs: js.Function2[Int, ReactElement, Unit] = onRender
     val onRemoveJs: js.Function1[Int, Unit] = onRemove
-    val portalId = 123
+    val portalId = Portal.nextPortalId + 1
     val content = <.>()()
     
     //then
-    onAdd.expects(content).returning(portalId).once()
-    onRemove.expects(portalId).once()
+    onRender.expects(portalId, content).once()
     
     val renderer = createTestRenderer {
-      <(Portal.Context.Provider)(^.contextValue := PortalContext(onAddJs, onRemoveJs))(
+      <(Portal.Context.Provider)(^.contextValue := PortalContext(onRenderJs, onRemoveJs))(
         Portal.create(content)
       )
     }
 
     //when
     renderer.update {
-      <(Portal.Context.Provider)(^.contextValue := PortalContext(onAddJs, onRemoveJs))(
+      <(Portal.Context.Provider)(^.contextValue := PortalContext(onRenderJs, onRemoveJs))(
         Portal.create(content)
       )
     }
     
     //cleanup
+    onRemove.expects(portalId)
     renderer.unmount()
   }
 }
