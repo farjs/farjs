@@ -12,7 +12,7 @@ class DoubleBorderSpec extends TestSpec with ShallowRendererUtils {
     val props = DoubleBorderProps((3, 4), style = new BlessedStyle {
       override val fg = "black"
       override val bg = "cyan"
-    })
+    }, pos = (1, 2))
     val comp = <(DoubleBorder())(^.wrapped := props)()
 
     //when
@@ -23,7 +23,7 @@ class DoubleBorderSpec extends TestSpec with ShallowRendererUtils {
       line1.key shouldBe "0"
       assertComponent(line1, HorizontalLine) {
         case HorizontalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
-          pos shouldBe 0 -> 0
+          pos shouldBe 1 -> 2
           resLength shouldBe 3
           lineCh shouldBe DoubleBorder.horizontalCh
           style shouldBe props.style
@@ -33,7 +33,7 @@ class DoubleBorderSpec extends TestSpec with ShallowRendererUtils {
       line2.key shouldBe "1"
       assertComponent(line2, VerticalLine) {
         case VerticalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
-          pos shouldBe 0 -> 1
+          pos shouldBe 1 -> 3
           resLength shouldBe 2
           lineCh shouldBe DoubleBorder.verticalCh
           style shouldBe props.style
@@ -43,7 +43,7 @@ class DoubleBorderSpec extends TestSpec with ShallowRendererUtils {
       line3.key shouldBe "2"
       assertComponent(line3, VerticalLine) {
         case VerticalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
-          pos shouldBe 2 -> 1
+          pos shouldBe 3 -> 3
           resLength shouldBe 2
           lineCh shouldBe DoubleBorder.verticalCh
           style shouldBe props.style
@@ -53,7 +53,7 @@ class DoubleBorderSpec extends TestSpec with ShallowRendererUtils {
       line4.key shouldBe "3"
       assertComponent(line4, HorizontalLine) {
         case HorizontalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
-          pos shouldBe 0 -> 3
+          pos shouldBe 1 -> 5
           resLength shouldBe 3
           lineCh shouldBe DoubleBorder.horizontalCh
           style shouldBe props.style

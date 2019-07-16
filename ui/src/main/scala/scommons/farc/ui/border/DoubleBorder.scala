@@ -4,17 +4,19 @@ import scommons.react._
 import scommons.react.blessed._
 
 case class DoubleBorderProps(size: (Int, Int),
-                             style: BlessedStyle)
+                             style: BlessedStyle,
+                             pos: (Int, Int) = (0, 0))
 
 object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val (width, height) = props.size
+    val (left, top) = props.pos
 
     <.>()(
       <(HorizontalLine())(^.key := "0", ^.wrapped := HorizontalLineProps(
-        pos = (0, 0),
+        pos = props.pos,
         length = width,
         lineCh = horizontalCh,
         style = props.style,
@@ -23,21 +25,21 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
       ))(),
       
       <(VerticalLine())(^.key := "1", ^.wrapped := VerticalLineProps(
-        pos = (0, 1),
+        pos = (left, top + 1),
         length = height - 2,
         lineCh = verticalCh,
         style = props.style
       ))(),
       
       <(VerticalLine())(^.key := "2", ^.wrapped := VerticalLineProps(
-        pos = (width - 1, 1),
+        pos = (left + width - 1, top + 1),
         length = height - 2,
         lineCh = verticalCh,
         style = props.style
       ))(),
 
       <(HorizontalLine())(^.key := "3", ^.wrapped := HorizontalLineProps(
-        pos = (0, height - 1),
+        pos = (left, top + height - 1),
         length = width,
         lineCh = horizontalCh,
         style = props.style,
