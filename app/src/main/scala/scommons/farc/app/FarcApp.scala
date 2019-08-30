@@ -4,6 +4,7 @@ import io.github.shogowada.scalajs.reactjs.redux.ReactRedux._
 import io.github.shogowada.scalajs.reactjs.redux.Redux
 import scommons.farc.ui._
 import scommons.farc.ui.filelist._
+import scommons.farc.ui.filelist.popups.FileListPopupsController
 import scommons.farc.ui.menu._
 import scommons.nodejs._
 import scommons.react._
@@ -36,12 +37,10 @@ object FarcApp {
     
     ReactBlessed.render(
       <.Provider(^.store := store)(
-        <(WithPortals())()(
-          <(FarcAppRoot())(^.wrapped := FarcAppRootProps(
-            leftPanelController,
-            rightPanelController
-          ))()
-        )
+        <(FarcAppRoot())(^.wrapped := FarcAppRootProps(
+          leftPanelController,
+          rightPanelController
+        ))()
       ),
       screen
     )
@@ -58,29 +57,38 @@ object FarcApp {
       
       <.>()(
         <.box(
-          ^.rbWidth := "35%",
-          ^.rbHeight := "100%-1"
+          ^.rbWidth := "70%"
         )(
-          <(props.leftPanelController()).empty
-        ),
-        <.box(
-          ^.rbWidth := "35%",
-          ^.rbHeight := "100%-1",
-          ^.rbLeft := "35%"
-        )(
-          <(props.rightPanelController()).empty
+          <(WithPortals())()(
+            <.box()(
+              <.box(
+                ^.rbWidth := "50%",
+                ^.rbHeight := "100%-1"
+              )(
+                <(props.leftPanelController()).empty
+              ),
+              <.box(
+                ^.rbWidth := "50%",
+                ^.rbHeight := "100%-1",
+                ^.rbLeft := "50%"
+              )(
+                <(props.rightPanelController()).empty
+              ),
+              <(FileListPopupsController()).empty,
+    
+              <.box(^.rbTop := "100%-1")(
+                <(BottomMenu())()()
+              )
+            )
+          )
         ),
         <.box(
           ^.rbWidth := "30%",
-          ^.rbHeight := "100%-1",
+          ^.rbHeight := "100%",
           ^.rbLeft := "70%"
         )(
           <(LogPanel())()()
           //<(ColorPanel())()()
-        ),
-
-        <.box(^.rbTop := "100%-1")(
-          <(BottomMenu())()()
         )
       )
     }

@@ -4,6 +4,7 @@ import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.farc.api.filelist._
 import scommons.farc.ui.filelist.FileListActions._
+import scommons.farc.ui.filelist.popups.FileListPopupsActions
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.redux.task.FutureTask
 import scommons.react.test.BaseTestSpec
@@ -16,6 +17,25 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
   with ShallowRendererUtils
   with TestRendererUtils {
 
+  it should "dispatch FileListHelpAction when F1" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val state = FileListState(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
+    )
+    val props = FileListProps(dispatch, actions, state, (5, 5), columns = 2)
+    val comp = shallowRender(<(FileList())(^.wrapped := props)())
+
+    //then
+    dispatch.expects(FileListPopupsActions.FileListHelpAction(show = true))
+    
+    //when
+    findComponentProps(comp, FileListView).onKeypress("f1")
+    
+    Succeeded
+  }
+  
   it should "dispatch action only once when mount but not when update" in {
     //given
     val dispatch = mockFunction[Any, Any]

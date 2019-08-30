@@ -15,6 +15,9 @@ object Blessed extends js.Object {
 @js.native
 trait BlessedScreen extends js.Object {
   
+  val focused: BlessedElement = js.native
+  def focused_=(el: BlessedElement): Unit = js.native
+  
   def focusPrevious(): Unit = js.native
   def focusNext(): Unit = js.native
   

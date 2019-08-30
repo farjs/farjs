@@ -3,6 +3,7 @@ package scommons.farc.ui.filelist
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.farc.api.filelist._
 import scommons.farc.ui.filelist.FileListActions._
+import scommons.farc.ui.filelist.popups.FileListPopupsActions
 import scommons.react._
 import scommons.react.hooks._
 
@@ -152,6 +153,7 @@ object FileList extends FunctionComponent[FileListProps] {
               dir = dir.name
             ))
           }
+        case "f1" => props.dispatch(FileListPopupsActions.FileListHelpAction(show = true))
         case _ =>
       }
     ))()

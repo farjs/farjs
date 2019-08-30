@@ -2,6 +2,7 @@ package scommons.farc.ui.filelist
 
 import scommons.farc.api.filelist._
 import scommons.farc.ui.filelist.FileListActions._
+import scommons.farc.ui.filelist.popups._
 
 case class FileListState(offset: Int = 0,
                          index: Int = 0,
@@ -23,61 +24,61 @@ trait FileListsStateDef {
 
   def left: FileListState
   def right: FileListState
+  def popups: FileListPopupsState
 }
 
 case class FileListsState(left: FileListState = FileListState(isActive = true),
-                          right: FileListState = FileListState(isRight = true)
+                          right: FileListState = FileListState(isRight = true),
+                          popups: FileListPopupsState = FileListPopupsState()
                          ) extends FileListsStateDef
 
 object FileListsStateReducer {
 
   def apply(state: Option[FileListsState], action: Any): FileListsState = {
-    reduce(state.getOrElse(FileListsState()), action)
+    val newState = FileListsState(
+      left = reduce(isRight = false, state.map(_.left).getOrElse(FileListState(isActive = true)), action),
+      right = reduce(isRight = true, state.map(_.right).getOrElse(FileListState(isRight = true)), action),
+      popups = FileListPopupsStateReducer(state.map(_.popups), action)
+    )
+    state match {
+      case Some(currState) if currState == newState => currState
+      case _ => newState
+    }
   }
 
-  private def reduce(state: FileListsState, action: Any): FileListsState = {
+  private def reduce(isRight: Boolean, state: FileListState, action: Any): FileListState = action match {
+    case FileListParamsChangedAction(`isRight`, isActive, offset, index, selectedNames) =>
+      state.copy(
+        offset = offset,
+        index = index,
+        selectedNames = selectedNames,
+        isActive = isActive
+      )
+    case FileListDirChangedAction(`isRight`, dir, currDir) =>
+      val items = {
+        val sorted = currDir.items.sortBy(item => (!item.isDir, item.name))
 
-    def withState(isRight: Boolean)(copyState: FileListState => FileListState): FileListsState = {
-      if (isRight) state.copy(right = copyState(state.right))
-      else state.copy(left = copyState(state.left))
-    }
-    
-    action match {
-      case FileListParamsChangedAction(isRight, isActive, offset, index, selectedNames) =>
-        withState(isRight)(_.copy(
-          offset = offset,
-          index = index,
-          selectedNames = selectedNames,
-          isActive = isActive
-        ))
-      case FileListDirChangedAction(isRight, dir, currDir) =>
-        val items = {
-          val sorted = currDir.items.sortBy(item => (!item.isDir, item.name))
+        if (currDir.isRoot) sorted
+        else FileListItem.up +: sorted
+      }
 
-          if (currDir.isRoot) sorted
-          else FileListItem.up +: sorted
+      val index =
+        if (dir == FileListItem.up.name) {
+          val focusedDir = state.currDir.path
+            .stripPrefix(currDir.path)
+            .stripPrefix("/")
+            .stripPrefix("\\")
+
+          math.max(items.indexWhere(_.name == focusedDir), 0)
         }
+        else 0
 
-        withState(isRight) { state =>
-          val index =
-            if (dir == FileListItem.up.name) {
-              val focusedDir = state.currDir.path
-                .stripPrefix(currDir.path)
-                .stripPrefix("/")
-                .stripPrefix("\\")
-
-              math.max(items.indexWhere(_.name == focusedDir), 0)
-            }
-            else 0
-
-          state.copy(
-            offset = 0,
-            index = index,
-            currDir = currDir.copy(items = items),
-            selectedNames = Set.empty
-          )
-        }
-      case _ => state
-    }
+      state.copy(
+        offset = 0,
+        index = index,
+        currDir = currDir.copy(items = items),
+        selectedNames = Set.empty
+      )
+    case _ => state
   }
 }
