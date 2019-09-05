@@ -95,7 +95,6 @@ object FileList extends FunctionComponent[FileListProps] {
         
         props.dispatch(FileListParamsChangedAction(
           isRight = props.state.isRight,
-          isActive = props.state.isActive,
           offset = newOffset,
           index = newIndex,
           selectedNames = newSelected
@@ -109,15 +108,9 @@ object FileList extends FunctionComponent[FileListProps] {
       items = viewItems,
       focusedIndex = if (props.state.isActive) focusedIndex else -1,
       selectedNames = props.state.selectedNames,
-      onActivate = { active =>
-        if (props.state.isActive != active) {
-          props.dispatch(FileListParamsChangedAction(
-            isRight = props.state.isRight,
-            isActive = active,
-            offset = props.state.offset,
-            index = props.state.index,
-            selectedNames = props.state.selectedNames
-          ))
+      onActivate = { () =>
+        if (!props.state.isActive) {
+          props.dispatch(FileListActivateAction(props.state.isRight))
         }
       },
       onWheel = { up =>

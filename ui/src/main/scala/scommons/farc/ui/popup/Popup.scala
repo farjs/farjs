@@ -15,26 +15,12 @@ object Popup extends FunctionComponent[PopupProps] {
     val props = compProps.wrapped
 
     Portal.create(
-      <.box(
-        ^.rbClickable := true,
-        ^.rbMouse := true,
-        ^.rbAutoFocus := false,
-        ^.rbStyle := overlayStyle,
-        ^.rbOnClick := { _ =>
-          if (props.closable) {
-            props.onClose()
-          }
-        }
-      )(
+      <(PopupOverlay())(^.wrapped := props)(
         compProps.children
       )
     )
   }
   
-  private[popup] lazy val overlayStyle = new BlessedStyle {
-    override val transparent = true
-  }
-
   object Styles {
 
     val normal: BlessedStyle = new BlessedStyle {

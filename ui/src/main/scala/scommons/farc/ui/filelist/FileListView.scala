@@ -13,7 +13,7 @@ case class FileListViewProps(size: (Int, Int),
                              items: Seq[FileListItem],
                              focusedIndex: Int = -1,
                              selectedNames: Set[String] = Set.empty,
-                             onActivate: Boolean => Unit = _ => (),
+                             onActivate: () => Unit = () => (),
                              onWheel: Boolean => Unit = _ => (),
                              onClick: Int => Unit = _ => (),
                              onKeypress: String => Unit = _ => ())
@@ -53,10 +53,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
       ^.rbTop := 1,
       ^.rbMouse := true,
       ^.rbOnFocus := { () =>
-        props.onActivate(true)
-      },
-      ^.rbOnBlur := { () =>
-        props.onActivate(false)
+        props.onActivate()
       },
       ^.rbOnWheelup := { data =>
         if (!data.shift) {

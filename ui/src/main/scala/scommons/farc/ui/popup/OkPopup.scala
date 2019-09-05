@@ -15,12 +15,7 @@ object OkPopup extends FunctionComponent[OkPopupProps] {
     val (width, height) = (50, 6)
     val style = Popup.Styles.normal
 
-    <(Popup())(^.wrapped := PopupProps(
-      onClose = props.onClose,
-      onOpen = { () =>
-        //TODO: focus Ok btn
-      }
-    ))(
+    <(Popup())(^.wrapped := PopupProps(onClose = props.onClose))(
       <.box(
         ^.rbClickable := true,
         ^.rbAutoFocus := false,

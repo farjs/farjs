@@ -193,17 +193,11 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       val state = props.state.copy(isActive = active)
       if (changed) {
         //then
-        dispatch.expects(FileListParamsChangedAction(
-          isRight = state.isRight,
-          isActive = active,
-          offset = state.offset,
-          index = state.index,
-          selectedNames = state.selectedNames
-        ))
+        dispatch.expects(FileListActivateAction(isRight = state.isRight))
       }
       
       //when
-      findComponentProps(renderer.getRenderOutput(), FileListView).onActivate(active)
+      findComponentProps(renderer.getRenderOutput(), FileListView).onActivate()
       renderer.render(<(FileList())(^.wrapped := props.copy(state = state))())
 
       //then
@@ -245,7 +239,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       val state = props.state.copy(offset = offset, index = index)
       if (changed) {
         //then
-        dispatch.expects(FileListParamsChangedAction(state.isRight, state.isActive, offset, index, Set.empty))
+        dispatch.expects(FileListParamsChangedAction(state.isRight, offset, index, Set.empty))
       }
       
       //when
@@ -316,7 +310,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       val state = props.state.copy(offset = 0, index = index)
       if (changed) {
         //then
-        dispatch.expects(FileListParamsChangedAction(state.isRight, state.isActive, 0, index, Set.empty))
+        dispatch.expects(FileListParamsChangedAction(state.isRight, 0, index, Set.empty))
       }
 
       //when
@@ -368,7 +362,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       val state = props.state.copy(offset = offset, index = index, selectedNames = selected)
       if (changed) {
         //then
-        dispatch.expects(FileListParamsChangedAction(state.isRight, state.isActive, offset, index, selected))
+        dispatch.expects(FileListParamsChangedAction(state.isRight, offset, index, selected))
       }
       
       //when

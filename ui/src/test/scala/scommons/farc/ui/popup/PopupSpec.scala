@@ -9,36 +9,6 @@ import scommons.react.test.util.ShallowRendererUtils
 
 class PopupSpec extends TestSpec with ShallowRendererUtils {
 
-  it should "call onClose if closable" in {
-    //given
-    val onClose = mockFunction[Unit]
-    val props = PopupProps(onClose = onClose)
-    val comp = shallowRender(<(Popup())(^.wrapped := props)())
-    val portalProps = findComponentProps(comp, Portal)
-    val box = renderPortalContent(portalProps.content)
-
-    //then
-    onClose.expects()
-    
-    //when
-    box.props.onClick()
-  }
-  
-  it should "not call onClose if non-closable" in {
-    //given
-    val onClose = mockFunction[Unit]
-    val props = PopupProps(onClose = onClose, closable = false)
-    val comp = shallowRender(<(Popup())(^.wrapped := props)())
-    val portalProps = findComponentProps(comp, Portal)
-    val box = renderPortalContent(portalProps.content)
-
-    //then
-    onClose.expects().never()
-    
-    //when
-    box.props.onClick()
-  }
-  
   it should "render component" in {
     //given
     val children: ReactElement = <.box()("test popup child")
@@ -66,16 +36,11 @@ class PopupSpec extends TestSpec with ShallowRendererUtils {
                           children: ReactElement): Unit = {
     
     assertComponent(result, Portal) { case PortalProps(content) =>
-      assertNativeComponent(renderPortalContent(content),
-        <.box(
-          ^.rbClickable := true,
-          ^.rbMouse := true,
-          ^.rbAutoFocus := false,
-          ^.rbStyle := Popup.overlayStyle
-        )(), {
-          case List(child) => child shouldBe children
-        }
-      )
+      assertComponent(renderPortalContent(content), PopupOverlay)({ resProps =>
+        resProps shouldBe props
+      }, {
+        case List(child) => child shouldBe children
+      })
     }
   }
 }

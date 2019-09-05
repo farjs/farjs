@@ -61,29 +61,20 @@ class FileListViewSpec extends TestSpec
     renderer.unmount()
   }
 
-  it should "call onActivate when onFocus/onBlur" in {
+  it should "call onActivate when onFocus" in {
     //given
-    val onActivate = mockFunction[Boolean, Unit]
+    val onActivate = mockFunction[Unit]
     val props = FileListViewProps((7, 7), columns = 2, items = List(
       FileListItem("item 1"),
       FileListItem("item 2")
     ), onActivate = onActivate)
     val comp = shallowRender(<(FileListView())(^.wrapped := props)())
 
-    def check(active: Boolean, shift: Boolean = false): Unit = {
-      //then
-      if (!shift) {
-        onActivate.expects(active)
-      }
-      
-      //when
-      if (active) comp.props.onFocus()
-      else comp.props.onBlur()
-    }
+    //then
+    onActivate.expects()
     
-    //when & then
-    check(active = false)
-    check(active = true)
+    //when
+    comp.props.onFocus()
   }
 
   it should "call onWheel when onWheelup/onWheeldown" in {

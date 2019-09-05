@@ -13,12 +13,32 @@ class FileListsStateReducerSpec extends TestSpec {
     reduce(None, "") shouldBe FileListsState()
   }
   
+  it should "set isActive when FileListActivateAction" in {
+    //given
+    val state = FileListsState()
+    val action = FileListActivateAction(isRight = false)
+    
+    //when & then
+    reduce(Some(state), action) shouldBe {
+      state.copy(
+        left = FileListState(isActive = true),
+        right = FileListState(isRight = true)
+      )
+    }
+    //when & then
+    reduce(Some(state), action.copy(isRight = true)) shouldBe {
+      state.copy(
+        left = FileListState(),
+        right = FileListState(isRight = true, isActive = true)
+      )
+    }
+  }
+  
   it should "set params when FileListParamsChangedAction" in {
     //given
     val state = FileListsState()
     val action = FileListParamsChangedAction(
       isRight = false,
-      isActive = false,
       offset = 1,
       index = 2,
       selectedNames = Set("test")
@@ -29,7 +49,8 @@ class FileListsStateReducerSpec extends TestSpec {
       state.copy(left = FileListState(
         offset = action.offset,
         index = action.index,
-        selectedNames = action.selectedNames
+        selectedNames = action.selectedNames,
+        isActive = true
       ))
     }
     //when & then
@@ -39,16 +60,6 @@ class FileListsStateReducerSpec extends TestSpec {
         index = action.index,
         selectedNames = action.selectedNames,
         isRight = true
-      ))
-    }
-    //when & then
-    reduce(Some(state), action.copy(isRight = true, isActive = true)) shouldBe {
-      state.copy(right = FileListState(
-        offset = action.offset,
-        index = action.index,
-        selectedNames = action.selectedNames,
-        isRight = true,
-        isActive = true
       ))
     }
   }
