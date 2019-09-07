@@ -4,8 +4,11 @@ import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.farc.api.filelist._
 import scommons.farc.ui.filelist.FileListActions._
 import scommons.farc.ui.filelist.popups.FileListPopupsActions
+import scommons.nodejs._
 import scommons.react._
 import scommons.react.hooks._
+
+import scala.scalajs.js
 
 case class FileListProps(dispatch: Dispatch,
                          actions: FileListActions,
@@ -147,6 +150,13 @@ object FileList extends FunctionComponent[FileListProps] {
             ))
           }
         case "f1" => props.dispatch(FileListPopupsActions.FileListHelpAction(show = true))
+        case "f10" =>
+          process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
+            name = "c",
+            ctrl = true,
+            meta = false,
+            shift = false
+          ))
         case _ =>
       }
     ))()

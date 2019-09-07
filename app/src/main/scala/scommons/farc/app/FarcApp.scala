@@ -26,7 +26,7 @@ object FarcApp {
       override val title = "FARc"
     })
 
-    screen.key(js.Array("C-c", "f10"), { (_, _) =>
+    screen.key(js.Array("C-c"), { (_, _) =>
       process.exit(0)
     })
 
