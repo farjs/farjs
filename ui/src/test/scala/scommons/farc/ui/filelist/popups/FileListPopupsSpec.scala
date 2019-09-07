@@ -45,8 +45,10 @@ class FileListPopupsSpec extends TestSpec with ShallowRendererUtils {
 
     //then
     assertNativeComponent(result, <.>()(), { case List(helpPopup) =>
-      assertComponent(helpPopup, OkPopup) { case OkPopupProps(message, _) =>
-        message shouldBe "//TODO: show help popup"
+      assertComponent(helpPopup, OkPopup) { case OkPopupProps(title, message, style, _) =>
+        title shouldBe "Help"
+        message shouldBe "//TODO: show help/about info"
+        style shouldBe Popup.Styles.normal
       }
     })
   }

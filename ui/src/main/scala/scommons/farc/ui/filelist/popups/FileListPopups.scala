@@ -16,7 +16,8 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
     <.>()(
       if (props.data.showHelpPopup) Some(
         <(OkPopup())(^.wrapped := OkPopupProps(
-          message = "//TODO: show help popup",
+          title = "Help",
+          message = "//TODO: show help/about info",
           onClose = { () =>
             props.dispatch(FileListHelpAction(show = false))
           }

@@ -5,15 +5,16 @@ import scommons.farc.ui.border._
 import scommons.react._
 import scommons.react.blessed._
 
-case class OkPopupProps(message: String,
+case class OkPopupProps(title: String,
+                        message: String,
+                        style: BlessedStyle = Popup.Styles.normal,
                         onClose: () => Unit = () => ())
 
 object OkPopup extends FunctionComponent[OkPopupProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val (width, height) = (50, 6)
-    val style = Popup.Styles.normal
+    val (width, height) = (60, 6)
 
     <(Popup())(^.wrapped := PopupProps(onClose = props.onClose))(
       <.box(
@@ -24,15 +25,19 @@ object OkPopup extends FunctionComponent[OkPopupProps] {
         ^.rbTop := "center",
         ^.rbLeft := "center",
         ^.rbShadow := true,
-        ^.rbStyle := style
+        ^.rbStyle := props.style
       )(
-        <(DoubleBorder())(^.wrapped := DoubleBorderProps((width - 6, height - 2), style, (3, 1)))(),
+        <(DoubleBorder())(^.wrapped := DoubleBorderProps(
+          size = (width - 6, height - 2),
+          style = props.style,
+          pos = (3, 1))
+        )(),
         <(TextLine())(^.wrapped := TextLineProps(
           align = TextLine.Center,
           pos = (3, 1),
           width = width - 6,
-          text = "Title",
-          style = style
+          text = props.title,
+          style = props.style
         ))(),
         
         <(TextLine())(^.wrapped := TextLineProps(
@@ -40,7 +45,7 @@ object OkPopup extends FunctionComponent[OkPopupProps] {
           pos = (3, 2),
           width = width - 6,
           text = props.message,
-          style = style
+          style = props.style
         ))(),
         
         <.button(
@@ -49,10 +54,8 @@ object OkPopup extends FunctionComponent[OkPopupProps] {
           ^.rbHeight := 1,
           ^.rbTop := height - 3,
           ^.rbLeft := "center",
-          ^.rbStyle := style,
-          ^.rbOnPress := { () =>
-            println("OnPress")
-          },
+          ^.rbStyle := props.style,
+          ^.rbOnPress := props.onClose,
           ^.content := " OK "
         )()
       )

@@ -3,6 +3,7 @@ package scommons.farc.ui.popup
 import org.scalatest.Assertion
 import scommons.farc.ui._
 import scommons.farc.ui.border._
+import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
 import scommons.react.test.raw.ShallowInstance
@@ -10,9 +11,23 @@ import scommons.react.test.util.ShallowRendererUtils
 
 class OkPopupSpec extends TestSpec with ShallowRendererUtils {
 
+  it should "call onClose when onPress Ok button" in {
+    //given
+    val onClose = mockFunction[Unit]
+    val props = OkPopupProps("test title", "test message", onClose = onClose)
+    val comp = shallowRender(<(OkPopup())(^.wrapped := props)())
+    val okButton = findComponents(comp, "button".asInstanceOf[ReactClass]).head
+
+    //then
+    onClose.expects()
+    
+    //when
+    okButton.props.onPress()
+  }
+  
   it should "render component" in {
     //given
-    val props = OkPopupProps("test message")
+    val props = OkPopupProps("test title", "test message")
 
     //when
     val result = shallowRender(<(OkPopup())(^.wrapped := props)())
@@ -22,8 +37,7 @@ class OkPopupSpec extends TestSpec with ShallowRendererUtils {
   }
   
   private def assertOkPopup(result: ShallowInstance, props: OkPopupProps): Unit = {
-    val (width, height) = (50, 6)
-    val expectedStyle = Popup.Styles.normal
+    val (width, height) = (60, 6)
     
     def assertComponents(border: ShallowInstance,
                          title: ShallowInstance,
@@ -32,7 +46,7 @@ class OkPopupSpec extends TestSpec with ShallowRendererUtils {
 
       assertComponent(border, DoubleBorder) { case DoubleBorderProps(resSize, style, pos) =>
         resSize shouldBe (width - 6) -> (height - 2)
-        style shouldBe expectedStyle
+        style shouldBe props.style
         pos shouldBe 3 -> 1
       }
       assertComponent(title, TextLine) {
@@ -40,8 +54,8 @@ class OkPopupSpec extends TestSpec with ShallowRendererUtils {
           align shouldBe TextLine.Center
           pos shouldBe 3 -> 1
           resWidth shouldBe (width - 6)
-          text shouldBe "Title"
-          style shouldBe expectedStyle
+          text shouldBe props.title
+          style shouldBe props.style
           focused shouldBe false
           padding shouldBe 1
       }
@@ -51,7 +65,7 @@ class OkPopupSpec extends TestSpec with ShallowRendererUtils {
           pos shouldBe 3 -> 2
           resWidth shouldBe (width - 6)
           text shouldBe props.message
-          style shouldBe expectedStyle
+          style shouldBe props.style
           focused shouldBe false
           padding shouldBe 1
       }
@@ -62,7 +76,7 @@ class OkPopupSpec extends TestSpec with ShallowRendererUtils {
           ^.rbHeight := 1,
           ^.rbTop := height - 3,
           ^.rbLeft := "center",
-          ^.rbStyle := expectedStyle,
+          ^.rbStyle := props.style,
           ^.content := " OK "
         )()
       )
@@ -82,7 +96,7 @@ class OkPopupSpec extends TestSpec with ShallowRendererUtils {
           ^.rbTop := "center",
           ^.rbLeft := "center",
           ^.rbShadow := true,
-          ^.rbStyle := expectedStyle
+          ^.rbStyle := props.style
         )(), {
           case List(border, title, message, btn) => assertComponents(border, title, message, btn)
         }
