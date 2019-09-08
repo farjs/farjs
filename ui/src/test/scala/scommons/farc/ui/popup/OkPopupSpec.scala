@@ -3,7 +3,6 @@ package scommons.farc.ui.popup
 import org.scalatest.Assertion
 import scommons.farc.ui._
 import scommons.farc.ui.border._
-import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
 import scommons.react.test.raw.ShallowInstance
@@ -16,7 +15,7 @@ class OkPopupSpec extends TestSpec with ShallowRendererUtils {
     val onClose = mockFunction[Unit]
     val props = OkPopupProps("test title", "test message", onClose = onClose)
     val comp = shallowRender(<(OkPopup())(^.wrapped := props)())
-    val okButton = findComponents(comp, "button".asInstanceOf[ReactClass]).head
+    val okButton = findComponents(comp, "button").head
 
     //then
     onClose.expects()
