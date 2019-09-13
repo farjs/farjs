@@ -4,7 +4,12 @@
 [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.17.svg)](https://www.scala-js.org)
 
 ## FARc
-File and Archive Manager [FAR](https://farmanager.com/index.php?l=en) clone app build on [Electron](https://electronjs.org/)
+Clone of File and Archive Manager [FAR](https://farmanager.com/index.php?l=en) application build with:
+  - [Electron](https://electronjs.org/)
+  - [Scala.js](https://www.scala-js.org/)
+  - [React.js](https://reactjs.org/)
+  - [react-blessed](https://github.com/Yomguithereal/react-blessed)
+  - [blessed](https://github.com/chjj/blessed)
 
 ### How to Build
 

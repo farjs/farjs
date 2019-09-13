@@ -22,8 +22,8 @@ object FarcApp extends ScalaJsModule {
       publishM2 := ((): Unit),
 
       coverageExcludedPackages := {
-        "scommons.farc.app.FarcApp" +
-          ";scommons.farc.app.FarcActions"
+        "farclone.app.FarcApp" +
+          ";farclone.app.FarcActions"
       },
 
       scalaJSUseMainModuleInitializer := false,
