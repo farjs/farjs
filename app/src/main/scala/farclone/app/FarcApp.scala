@@ -75,6 +75,7 @@ object FarcApp {
                 <(props.rightPanelController()).empty
               ),
               <(FileListPopupsController()).empty,
+              <(FarcTaskController()).empty,
     
               <.box(^.rbTop := "100%-1")(
                 <(BottomMenu())()()
