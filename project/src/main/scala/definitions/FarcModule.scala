@@ -18,6 +18,8 @@ object FarcModule {
 
   val settings: Seq[Setting[_]] = Seq(
     organization := "org.scommons.farclone",
+
+    scalaVersion := "2.12.10",
     
     //
     // publish/release related settings:
