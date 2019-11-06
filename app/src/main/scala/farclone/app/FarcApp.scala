@@ -1,11 +1,11 @@
 package farclone.app
 
-import io.github.shogowada.scalajs.reactjs.redux.ReactRedux._
-import io.github.shogowada.scalajs.reactjs.redux.Redux
 import farclone.ui._
 import farclone.ui.filelist._
 import farclone.ui.filelist.popups.FileListPopupsController
 import farclone.ui.menu._
+import io.github.shogowada.scalajs.reactjs.redux.ReactRedux._
+import io.github.shogowada.scalajs.reactjs.redux.Redux
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._

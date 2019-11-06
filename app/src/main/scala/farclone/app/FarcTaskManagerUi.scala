@@ -2,7 +2,7 @@ package farclone.app
 
 import farclone.ui.popup.{OkPopup, OkPopupProps, Popup}
 import scommons.react._
-import scommons.react.redux.task.TaskManagerUiProps
+import scommons.react.redux.task.{TaskManager, TaskManagerUiProps}
 
 import scala.scalajs.js.JavaScriptException
 import scala.util.{Failure, Try}
@@ -12,13 +12,17 @@ import scala.util.{Failure, Try}
   */
 object FarcTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
 
-  var errorHandler: PartialFunction[Try[_], (Option[String], Option[String])] = {
-    case Failure(JavaScriptException(error)) =>
-      println(s"$error")
-      (Some(s"$error"), None)
-    case Failure(error) =>
-      println(s"$error")
-      (Some(s"$error"), None)
+  private[app] var logger: String => Unit = println
+  
+  val errorHandler: PartialFunction[Try[_], (Option[String], Option[String])] = {
+    case Failure(ex@JavaScriptException(error)) =>
+      val stackTrace = TaskManager.printStackTrace(ex, sep = " ")
+      logger(stackTrace)
+      (Some(s"$error"), Some(stackTrace))
+    case Failure(ex) =>
+      val stackTrace = TaskManager.printStackTrace(ex, sep = " ")
+      logger(stackTrace)
+      (Some(s"$ex"), Some(stackTrace))
   }
 
   protected def render(compProps: Props): ReactElement = {
@@ -30,7 +34,7 @@ object FarcTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
       if (showError) Some(
         <(OkPopup())(^.wrapped := OkPopupProps(
           title = "Error",
-          message = errorMessage, //props.errorDetails
+          message = s"$errorMessage${props.errorDetails.map(d => s"\n\n$d").getOrElse("")}",
           style = Popup.Styles.error,
           onClose = props.onCloseErrorPopup
         ))()

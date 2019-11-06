@@ -3,7 +3,7 @@ package farclone.app
 import farclone.ui.popup.{OkPopup, OkPopupProps, Popup}
 import org.scalatest.Succeeded
 import scommons.react._
-import scommons.react.redux.task.TaskManagerUiProps
+import scommons.react.redux.task.{TaskManager, TaskManagerUiProps}
 import scommons.react.test.TestSpec
 import scommons.react.test.raw.ShallowInstance
 import scommons.react.test.util.ShallowRendererUtils
@@ -15,28 +15,48 @@ class FarcTaskManagerUiSpec extends TestSpec with ShallowRendererUtils {
 
   it should "return error if JavaScriptException in errorHandler" in {
     //given
+    val currLogger = FarcTaskManagerUi.logger
+    val logger = mockFunction[String, Unit]
+    FarcTaskManagerUi.logger = logger
     val ex = JavaScriptException("test error")
     val value = Failure(ex)
+    val stackTrace = TaskManager.printStackTrace(ex, sep = " ")
 
+    //then
+    logger.expects(stackTrace)
+    
     //when
     val (error, errorDetails) = FarcTaskManagerUi.errorHandler(value)
 
     //then
     error shouldBe Some("test error")
-    errorDetails shouldBe None
+    errorDetails shouldBe Some(stackTrace)
+    
+    //cleanup
+    FarcTaskManagerUi.logger = currLogger
   }
 
   it should "return error if non-JavaScriptException in errorHandler" in {
     //given
+    val currLogger = FarcTaskManagerUi.logger
+    val logger = mockFunction[String, Unit]
+    FarcTaskManagerUi.logger = logger
     val ex = new Exception("test error")
     val value = Failure(ex)
+    val stackTrace = TaskManager.printStackTrace(ex, sep = " ")
+
+    //then
+    logger.expects(stackTrace)
 
     //when
     val (error, errorDetails) = FarcTaskManagerUi.errorHandler(value)
 
     //then
     error shouldBe Some(s"$ex")
-    errorDetails shouldBe None
+    errorDetails shouldBe Some(stackTrace)
+
+    //cleanup
+    FarcTaskManagerUi.logger = currLogger
   }
 
   it should "call onCloseErrorPopup function when onClose error popup" in {
@@ -100,7 +120,7 @@ class FarcTaskManagerUiSpec extends TestSpec with ShallowRendererUtils {
         errorPopup should not be None
         assertComponent(errorPopup.get, OkPopup) { case OkPopupProps(title, message, style, onClose) =>
           title shouldBe "Error"
-          message shouldBe props.error.getOrElse("")
+          message shouldBe s"${props.error.getOrElse("")}${props.errorDetails.map(d => s"\n\n$d").getOrElse("")}"
           //details shouldBe props.errorDetails
           style shouldBe Popup.Styles.error
           onClose shouldBe props.onCloseErrorPopup
