@@ -5,7 +5,12 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
+private[portal] case class WithPortalsContext(onRender: js.Function2[Int, ReactElement, Unit],
+                                              onRemove: js.Function1[Int, Unit])
+
 object WithPortals extends FunctionComponent[Unit] {
+
+  private[portal] val Context = ReactContext[WithPortalsContext](defaultValue = null)
 
   protected def render(props: Props): ReactElement = {
     val (portals, setPortals) = useStateUpdater(List.empty[(Int, ReactElement)])
@@ -30,7 +35,7 @@ object WithPortals extends FunctionComponent[Unit] {
       }
     }, Nil)
 
-    <(Portal.Context.Provider)(^.contextValue := PortalContext(onRender, onRemove))(
+    <(Context.Provider)(^.contextValue := WithPortalsContext(onRender, onRemove))(
       props.children,
       
       portals.map { case (id, content) =>

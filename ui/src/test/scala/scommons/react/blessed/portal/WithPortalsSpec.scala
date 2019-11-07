@@ -11,10 +11,10 @@ class WithPortalsSpec extends TestSpec
 
   it should "add new portals when onRender" in {
     //given
-    var ctx: PortalContext = null
+    var ctx: WithPortalsContext = null
     val ctxHook = new FunctionComponent[Unit] {
       protected def render(props: Props): ReactElement = {
-        ctx = useContext(Portal.Context)
+        ctx = useContext(WithPortals.Context)
         <.>()()
       }
     }
@@ -43,10 +43,10 @@ class WithPortalsSpec extends TestSpec
   
   it should "update existing portals when onRender" in {
     //given
-    var ctx: PortalContext = null
+    var ctx: WithPortalsContext = null
     val ctxHook = new FunctionComponent[Unit] {
       protected def render(props: Props): ReactElement = {
-        ctx = useContext(Portal.Context)
+        ctx = useContext(WithPortals.Context)
         <.>()()
       }
     }
@@ -78,10 +78,10 @@ class WithPortalsSpec extends TestSpec
   
   it should "remove portals when onRemove" in {
     //given
-    var ctx: PortalContext = null
+    var ctx: WithPortalsContext = null
     val ctxHook = new FunctionComponent[Unit] {
       protected def render(props: Props): ReactElement = {
-        ctx = useContext(Portal.Context)
+        ctx = useContext(WithPortals.Context)
         <.>()()
       }
     }

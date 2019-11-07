@@ -3,17 +3,11 @@ package scommons.react.blessed.portal
 import scommons.react._
 import scommons.react.hooks._
 
-import scala.scalajs.js
 import scala.scalajs.js.{Error, JavaScriptException}
 
 case class PortalProps(content: ReactElement)
 
-private[portal] case class PortalContext(onRender: js.Function2[Int, ReactElement, Unit],
-                                         onRemove: js.Function1[Int, Unit])
-
 object Portal extends FunctionComponent[PortalProps] {
-  
-  private[portal] val Context = ReactContext[PortalContext](defaultValue = null)
   
   def create(content: ReactElement): ReactElement = {
     <(Portal())(^.wrapped := PortalProps(content))()
@@ -22,10 +16,10 @@ object Portal extends FunctionComponent[PortalProps] {
   protected def render(compProps: Props): ReactElement = {
     val (portalId, _) = useState(() => getNextPortalId)
     
-    val ctx = useContext(Context)
+    val ctx = useContext(WithPortals.Context)
     if (ctx == null) {
       throw JavaScriptException(Error(
-        "PortalContext is not specified, use WithPortals to wrap your root component"
+        "WithPortals.Context is not specified, use WithPortals to wrap your root component"
       ))
     }
     

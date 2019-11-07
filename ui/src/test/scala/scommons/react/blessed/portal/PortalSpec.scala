@@ -22,7 +22,7 @@ class PortalSpec extends TestSpec
     
     //then
     s"$error" shouldBe {
-      "Error: PortalContext is not specified, use WithPortals to wrap your root component"
+      "Error: WithPortals.Context is not specified, use WithPortals to wrap your root component"
     }
   }
   
@@ -39,7 +39,7 @@ class PortalSpec extends TestSpec
     
     //when
     val renderer = createTestRenderer {
-      <(Portal.Context.Provider)(^.contextValue := PortalContext(onRender, onRemove))(
+      <(WithPortals.Context.Provider)(^.contextValue := WithPortalsContext(onRender, onRemove))(
         Portal.create(content)
       )
     }
@@ -60,7 +60,7 @@ class PortalSpec extends TestSpec
 
     onRender.expects(portalId, content1)
     val renderer = createTestRenderer {
-      <(Portal.Context.Provider)(^.contextValue := PortalContext(onRenderJs, onRemoveJs))(
+      <(WithPortals.Context.Provider)(^.contextValue := WithPortalsContext(onRenderJs, onRemoveJs))(
         Portal.create(content1)
       )
     }
@@ -70,7 +70,7 @@ class PortalSpec extends TestSpec
 
     //when
     renderer.update {
-      <(Portal.Context.Provider)(^.contextValue := PortalContext(onRenderJs, onRemoveJs))(
+      <(WithPortals.Context.Provider)(^.contextValue := WithPortalsContext(onRenderJs, onRemoveJs))(
         Portal.create(content2)
       )
     }
@@ -93,14 +93,14 @@ class PortalSpec extends TestSpec
     onRender.expects(portalId, content).once()
     
     val renderer = createTestRenderer {
-      <(Portal.Context.Provider)(^.contextValue := PortalContext(onRenderJs, onRemoveJs))(
+      <(WithPortals.Context.Provider)(^.contextValue := WithPortalsContext(onRenderJs, onRemoveJs))(
         Portal.create(content)
       )
     }
 
     //when
     renderer.update {
-      <(Portal.Context.Provider)(^.contextValue := PortalContext(onRenderJs, onRemoveJs))(
+      <(WithPortals.Context.Provider)(^.contextValue := WithPortalsContext(onRenderJs, onRemoveJs))(
         Portal.create(content)
       )
     }
