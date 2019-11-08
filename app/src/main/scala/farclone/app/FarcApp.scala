@@ -9,8 +9,9 @@ import io.github.shogowada.scalajs.reactjs.redux.Redux
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.blessed.portal.WithPortals
+import scommons.react.blessed.portal.{Portal, WithPortals}
 import scommons.react.blessed.raw.{Blessed, ReactBlessed}
+import scommons.react.hooks._
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -50,6 +51,35 @@ object FarcApp {
   case class FarcAppRootProps(leftPanelController: FileListController,
                               rightPanelController: FileListController)
   
+  object FarcAppMain extends FunctionComponent[FarcAppRootProps] {
+
+    protected def render(compProps: Props): ReactElement = {
+      val props = compProps.wrapped
+
+      useContext(Portal.Context)
+      
+      <.>()(
+        <.box(
+          ^.rbWidth := "50%",
+          ^.rbHeight := "100%-1"
+        )(
+          <(props.leftPanelController()).empty
+        ),
+        <.box(
+          ^.rbWidth := "50%",
+          ^.rbHeight := "100%-1",
+          ^.rbLeft := "50%"
+        )(
+          <(props.rightPanelController()).empty
+        ),
+
+        <.box(^.rbTop := "100%-1")(
+          <(BottomMenu())()()
+        )
+      )
+    }
+  }
+  
   object FarcAppRoot extends FunctionComponent[FarcAppRootProps] {
 
     protected def render(compProps: Props): ReactElement = {
@@ -60,26 +90,12 @@ object FarcApp {
           ^.rbWidth := "70%"
         )(
           <(WithPortals())()(
-            <.box()(
-              <.box(
-                ^.rbWidth := "50%",
-                ^.rbHeight := "100%-1"
-              )(
-                <(props.leftPanelController()).empty
-              ),
-              <.box(
-                ^.rbWidth := "50%",
-                ^.rbHeight := "100%-1",
-                ^.rbLeft := "50%"
-              )(
-                <(props.rightPanelController()).empty
+            <.>()(
+              Portal.create(
+                <(FarcAppMain())(^.wrapped := props)()
               ),
               <(FileListPopupsController()).empty,
-              <(FarcTaskController()).empty,
-    
-              <.box(^.rbTop := "100%-1")(
-                <(BottomMenu())()()
-              )
+              <(FarcTaskController()).empty
             )
           )
         ),

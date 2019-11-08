@@ -11,7 +11,7 @@ class PortalSpec extends TestSpec
   with TestRendererUtils
   with ShallowRendererUtils {
 
-  it should "fail if no PortalContext when render" in {
+  it should "fail if no WithPortals.Context when render" in {
     //given
     val portal = Portal.create(<.>()())
     
@@ -22,7 +22,8 @@ class PortalSpec extends TestSpec
     
     //then
     s"$error" shouldBe {
-      "Error: WithPortals.Context is not specified, use WithPortals to wrap your root component"
+      "Error: WithPortals.Context is not found." +
+        "\nPlease, make sure you use WithPortals and not creating nested portals."
     }
   }
   

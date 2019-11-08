@@ -7,7 +7,13 @@ import scala.scalajs.js.{Error, JavaScriptException}
 
 case class PortalProps(content: ReactElement)
 
+case class PortalContext(isActive: Boolean)
+
 object Portal extends FunctionComponent[PortalProps] {
+
+  val Context: ReactContext[PortalContext] = ReactContext(
+    defaultValue = PortalContext(isActive = false)
+  )
   
   def create(content: ReactElement): ReactElement = {
     <(Portal())(^.wrapped := PortalProps(content))()
@@ -19,7 +25,8 @@ object Portal extends FunctionComponent[PortalProps] {
     val ctx = useContext(WithPortals.Context)
     if (ctx == null) {
       throw JavaScriptException(Error(
-        "WithPortals.Context is not specified, use WithPortals to wrap your root component"
+        "WithPortals.Context is not found." +
+          "\nPlease, make sure you use WithPortals and not creating nested portals."
       ))
     }
     

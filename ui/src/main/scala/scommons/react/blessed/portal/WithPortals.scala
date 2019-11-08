@@ -35,18 +35,23 @@ object WithPortals extends FunctionComponent[Unit] {
       }
     }, Nil)
 
-    <(Context.Provider)(^.contextValue := WithPortalsContext(onRender, onRemove))(
-      props.children,
-      
-      portals.map { case (id, content) =>
-        renderPortal(id, content)
+    val lastPortalIndex = portals.size - 1
+    
+    <.>()(
+      <(WithPortals.Context.Provider)(^.contextValue := WithPortalsContext(onRender, onRemove))(
+        props.children
+      ),
+      portals.zipWithIndex.map { case ((id, content), index) =>
+        renderPortal(id, content, index == lastPortalIndex)
       }
     )
   }
   
-  private[portal] def renderPortal(id: Int, content: ReactElement): ReactElement = {
-    <.>(
-      ^.key := s"$id"
-    )(content)
+  private[portal] def renderPortal(id: Int, content: ReactElement, isActive: Boolean): ReactElement = {
+    <.>(^.key := s"$id")(
+      <(Portal.Context.Provider)(^.contextValue := PortalContext(isActive))(
+        content
+      )
+    )
   }
 }
