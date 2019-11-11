@@ -120,7 +120,7 @@ class FarcTaskManagerUiSpec extends TestSpec with ShallowRendererUtils {
         errorPopup should not be None
         assertComponent(errorPopup.get, OkPopup) { case OkPopupProps(title, message, style, onClose) =>
           title shouldBe "Error"
-          message shouldBe s"${props.error.getOrElse("")}${props.errorDetails.map(d => s"\n\n$d").getOrElse("")}"
+          message shouldBe props.error.getOrElse("")
           //details shouldBe props.errorDetails
           style shouldBe Popup.Styles.error
           onClose shouldBe props.onCloseErrorPopup

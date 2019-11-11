@@ -34,7 +34,8 @@ object FarcTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
       if (showError) Some(
         <(OkPopup())(^.wrapped := OkPopupProps(
           title = "Error",
-          message = s"$errorMessage${props.errorDetails.map(d => s"\n\n$d").getOrElse("")}",
+          message = errorMessage,
+          //message = s"$errorMessage${props.errorDetails.map(d => s"\n\n$d").getOrElse("")}",
           style = Popup.Styles.error,
           onClose = props.onCloseErrorPopup
         ))()
