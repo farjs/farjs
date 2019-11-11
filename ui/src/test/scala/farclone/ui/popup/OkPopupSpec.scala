@@ -3,6 +3,7 @@ package farclone.ui.popup
 import org.scalatest.Assertion
 import farclone.ui._
 import farclone.ui.border._
+import farclone.ui.popup.OkPopup.splitText
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
 import scommons.react.test.raw.ShallowInstance
@@ -26,7 +27,10 @@ class OkPopupSpec extends TestSpec with ShallowRendererUtils {
   
   it should "render component" in {
     //given
-    val props = OkPopupProps("test title", "test message")
+    val props = OkPopupProps(
+      title = "test title",
+      message = "Toooooooooooooooooooooooooooooo looooooooooooooooooooooooong test message"
+    )
 
     //when
     val result = shallowRender(<(OkPopup())(^.wrapped := props)())
@@ -35,12 +39,23 @@ class OkPopupSpec extends TestSpec with ShallowRendererUtils {
     assertOkPopup(result, props)
   }
   
+  it should "split text when splitText" in {
+    //when & then
+    splitText("", 2) shouldBe List("")
+    splitText("test", 2) shouldBe List("test")
+    splitText("test1, test2", 11) shouldBe List("test1,", "test2")
+    splitText("test1, test2", 12) shouldBe List("test1, test2")
+    splitText("test1, test2, test3", 12) shouldBe List("test1,", "test2, test3")
+    splitText("test1, test2, test3", 13) shouldBe List("test1, test2,", "test3")
+  }
+  
   private def assertOkPopup(result: ShallowInstance, props: OkPopupProps): Unit = {
-    val (width, height) = (60, 6)
+    val (width, height) = (60, 7)
     
     def assertComponents(border: ShallowInstance,
                          title: ShallowInstance,
-                         message: ShallowInstance,
+                         msg1: ShallowInstance,
+                         msg2: ShallowInstance,
                          btn: ShallowInstance): Assertion = {
 
       assertComponent(border, DoubleBorder) { case DoubleBorderProps(resSize, style, pos) =>
@@ -51,23 +66,37 @@ class OkPopupSpec extends TestSpec with ShallowRendererUtils {
       assertComponent(title, TextLine) {
         case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
           align shouldBe TextLine.Center
-          pos shouldBe 3 -> 1
-          resWidth shouldBe (width - 6)
+          pos shouldBe 4 -> 1
+          resWidth shouldBe (width - 8)
           text shouldBe props.title
           style shouldBe props.style
           focused shouldBe false
           padding shouldBe 1
       }
-      assertComponent(message, TextLine) {
+      
+      msg1.key shouldBe "0"
+      assertComponent(msg1, TextLine) {
         case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
           align shouldBe TextLine.Center
-          pos shouldBe 3 -> 2
-          resWidth shouldBe (width - 6)
-          text shouldBe props.message
+          pos shouldBe 4 -> 2
+          resWidth shouldBe (width - 8)
+          text shouldBe "Toooooooooooooooooooooooooooooo"
           style shouldBe props.style
           focused shouldBe false
           padding shouldBe 1
       }
+      msg2.key shouldBe "1"
+      assertComponent(msg2, TextLine) {
+        case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
+          align shouldBe TextLine.Center
+          pos shouldBe 4 -> 3
+          resWidth shouldBe (width - 8)
+          text shouldBe "looooooooooooooooooooooooong test message"
+          style shouldBe props.style
+          focused shouldBe false
+          padding shouldBe 1
+      }
+      
       assertNativeComponent(btn,
         <.button(
           ^.rbMouse := true,
@@ -97,7 +126,8 @@ class OkPopupSpec extends TestSpec with ShallowRendererUtils {
           ^.rbShadow := true,
           ^.rbStyle := props.style
         )(), {
-          case List(border, title, message, btn) => assertComponents(border, title, message, btn)
+          case List(border, title, msg1, msg2, btn) =>
+            assertComponents(border, title, msg1, msg2, btn)
         }
       )
     })

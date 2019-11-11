@@ -14,7 +14,10 @@ object OkPopup extends FunctionComponent[OkPopupProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val (width, height) = (60, 6)
+    val width = 60
+    val textWidth = width - 8
+    val textLines = splitText(props.message, textWidth - 2) //exclude padding
+    val height = 5 + textLines.size
 
     <(Popup())(^.wrapped := PopupProps(onClose = props.onClose))(
       <.box(
@@ -34,19 +37,21 @@ object OkPopup extends FunctionComponent[OkPopupProps] {
         )(),
         <(TextLine())(^.wrapped := TextLineProps(
           align = TextLine.Center,
-          pos = (3, 1),
-          width = width - 6,
+          pos = (4, 1),
+          width = textWidth,
           text = props.title,
           style = props.style
         ))(),
         
-        <(TextLine())(^.wrapped := TextLineProps(
-          align = TextLine.Center,
-          pos = (3, 2),
-          width = width - 6,
-          text = props.message,
-          style = props.style
-        ))(),
+        textLines.zipWithIndex.map { case (text, index) =>
+          <(TextLine())(^.key := s"$index", ^.wrapped := TextLineProps(
+            align = TextLine.Center,
+            pos = (4, 2 + index),
+            width = textWidth,
+            text = text,
+            style = props.style
+          ))()
+        },
         
         <.button(
           ^.rbMouse := true,
@@ -60,5 +65,19 @@ object OkPopup extends FunctionComponent[OkPopupProps] {
         )()
       )
     )
+  }
+  
+  private[popup] def splitText(text: String, maxLen: Int): List[String] = {
+    val parts = text.split(" ")
+    
+    parts.foldLeft(List.empty[String]) {
+      case (Nil, item) => List(item)
+      case (head::tail, item) =>
+        if ((head.length + item.length + 1) > maxLen) {
+          item :: head :: tail
+        } else {
+          s"$head $item" :: tail
+        }
+    }.reverse
   }
 }
