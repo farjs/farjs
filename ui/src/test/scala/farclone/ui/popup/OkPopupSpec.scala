@@ -53,25 +53,16 @@ class OkPopupSpec extends TestSpec with ShallowRendererUtils {
     val (width, height) = (60, 7)
     
     def assertComponents(border: ShallowInstance,
-                         title: ShallowInstance,
                          msg1: ShallowInstance,
                          msg2: ShallowInstance,
                          btn: ShallowInstance): Assertion = {
 
-      assertComponent(border, DoubleBorder) { case DoubleBorderProps(resSize, style, pos) =>
-        resSize shouldBe (width - 6) -> (height - 2)
-        style shouldBe props.style
-        pos shouldBe 3 -> 1
-      }
-      assertComponent(title, TextLine) {
-        case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-          align shouldBe TextLine.Center
-          pos shouldBe 4 -> 1
-          resWidth shouldBe (width - 8)
-          text shouldBe props.title
+      assertComponent(border, DoubleBorder) {
+        case DoubleBorderProps(resSize, style, pos, title) =>
+          resSize shouldBe (width - 6) -> (height - 2)
           style shouldBe props.style
-          focused shouldBe false
-          padding shouldBe 1
+          pos shouldBe 3 -> 1
+          title shouldBe Some(props.title)
       }
       
       msg1.key shouldBe "0"
@@ -126,8 +117,7 @@ class OkPopupSpec extends TestSpec with ShallowRendererUtils {
           ^.rbShadow := true,
           ^.rbStyle := props.style
         )(), {
-          case List(border, title, msg1, msg2, btn) =>
-            assertComponents(border, title, msg1, msg2, btn)
+          case List(border, msg1, msg2, btn) => assertComponents(border, msg1, msg2, btn)
         }
       )
     })

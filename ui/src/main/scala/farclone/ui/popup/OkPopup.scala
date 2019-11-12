@@ -33,14 +33,8 @@ object OkPopup extends FunctionComponent[OkPopupProps] {
         <(DoubleBorder())(^.wrapped := DoubleBorderProps(
           size = (width - 6, height - 2),
           style = props.style,
-          pos = (3, 1))
-        )(),
-        <(TextLine())(^.wrapped := TextLineProps(
-          align = TextLine.Center,
-          pos = (4, 1),
-          width = textWidth,
-          text = props.title,
-          style = props.style
+          pos = (3, 1),
+          title = Some(props.title)
         ))(),
         
         textLines.zipWithIndex.map { case (text, index) =>

@@ -140,10 +140,12 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
                          fileDate: ShallowInstance,
                          folderSize: ShallowInstance): Assertion = {
 
-      assertComponent(border, DoubleBorder) { case DoubleBorderProps(resSize, style, pos) =>
-        resSize shouldBe width -> height
-        style shouldBe styles.normalItem
-        pos shouldBe 0 -> 0
+      assertComponent(border, DoubleBorder) {
+        case DoubleBorderProps(resSize, style, pos, title) =>
+          resSize shouldBe width -> height
+          style shouldBe styles.normalItem
+          pos shouldBe 0 -> 0
+          title shouldBe None
       }
       assertComponent(line, HorizontalLine) {
         case HorizontalLineProps(pos, len, lineCh, style, startCh, endCh) =>

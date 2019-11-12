@@ -1,11 +1,13 @@
 package farclone.ui.border
 
+import farclone.ui.{TextLine, TextLineProps}
 import scommons.react._
 import scommons.react.blessed._
 
 case class DoubleBorderProps(size: (Int, Int),
                              style: BlessedStyle,
-                             pos: (Int, Int) = (0, 0))
+                             pos: (Int, Int) = (0, 0),
+                             title: Option[String] = None)
 
 object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
   
@@ -15,7 +17,7 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
     val (left, top) = props.pos
 
     <.>()(
-      <(HorizontalLine())(^.key := "0", ^.wrapped := HorizontalLineProps(
+      <(HorizontalLine())(^.wrapped := HorizontalLineProps(
         pos = props.pos,
         length = width,
         lineCh = horizontalCh,
@@ -24,21 +26,31 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
         endCh = Some(topRightCh)
       ))(),
       
-      <(VerticalLine())(^.key := "1", ^.wrapped := VerticalLineProps(
+      props.title.map { title =>
+        <(TextLine())(^.wrapped := TextLineProps(
+          align = TextLine.Center,
+          pos = props.pos,
+          width = width,
+          text = title,
+          style = props.style
+        ))()
+      },
+
+      <(VerticalLine())(^.wrapped := VerticalLineProps(
         pos = (left, top + 1),
         length = height - 2,
         lineCh = verticalCh,
         style = props.style
       ))(),
       
-      <(VerticalLine())(^.key := "2", ^.wrapped := VerticalLineProps(
+      <(VerticalLine())(^.wrapped := VerticalLineProps(
         pos = (left + width - 1, top + 1),
         length = height - 2,
         lineCh = verticalCh,
         style = props.style
       ))(),
 
-      <(HorizontalLine())(^.key := "3", ^.wrapped := HorizontalLineProps(
+      <(HorizontalLine())(^.wrapped := HorizontalLineProps(
         pos = (left, top + height - 1),
         length = width,
         lineCh = horizontalCh,
