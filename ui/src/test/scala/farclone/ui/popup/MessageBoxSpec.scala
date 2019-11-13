@@ -3,19 +3,19 @@ package farclone.ui.popup
 import org.scalatest.Assertion
 import farclone.ui._
 import farclone.ui.border._
-import farclone.ui.popup.OkPopup.splitText
+import farclone.ui.popup.MessageBox.splitText
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
 import scommons.react.test.raw.ShallowInstance
 import scommons.react.test.util.ShallowRendererUtils
 
-class OkPopupSpec extends TestSpec with ShallowRendererUtils {
+class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
 
   it should "call onClose when onPress Ok button" in {
     //given
     val onClose = mockFunction[Unit]
-    val props = OkPopupProps("test title", "test message", onClose = onClose)
-    val comp = shallowRender(<(OkPopup())(^.wrapped := props)())
+    val props = MessageBoxProps("test title", "test message", onClose = onClose)
+    val comp = shallowRender(<(MessageBox())(^.wrapped := props)())
     val okButton = findComponents(comp, "button").head
 
     //then
@@ -27,16 +27,16 @@ class OkPopupSpec extends TestSpec with ShallowRendererUtils {
   
   it should "render component" in {
     //given
-    val props = OkPopupProps(
+    val props = MessageBoxProps(
       title = "test title",
       message = "Toooooooooooooooooooooooooooooo looooooooooooooooooooooooong test message"
     )
 
     //when
-    val result = shallowRender(<(OkPopup())(^.wrapped := props)())
+    val result = shallowRender(<(MessageBox())(^.wrapped := props)())
 
     //then
-    assertOkPopup(result, props)
+    assertMessageBox(result, props)
   }
   
   it should "split text when splitText" in {
@@ -49,7 +49,7 @@ class OkPopupSpec extends TestSpec with ShallowRendererUtils {
     splitText("test1, test2, test3", 13) shouldBe List("test1, test2,", "test3")
   }
   
-  private def assertOkPopup(result: ShallowInstance, props: OkPopupProps): Unit = {
+  private def assertMessageBox(result: ShallowInstance, props: MessageBoxProps): Unit = {
     val (width, height) = (60, 7)
     
     def assertComponents(border: ShallowInstance,

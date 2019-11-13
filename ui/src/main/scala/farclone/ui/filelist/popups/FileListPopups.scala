@@ -2,7 +2,7 @@ package farclone.ui.filelist.popups
 
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import farclone.ui.filelist.popups.FileListPopupsActions._
-import farclone.ui.popup.{OkPopup, OkPopupProps}
+import farclone.ui.popup.{MessageBox, MessageBoxProps}
 import scommons.react._
 
 case class FileListPopupsProps(dispatch: Dispatch,
@@ -15,7 +15,7 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
 
     <.>()(
       if (props.data.showHelpPopup) Some(
-        <(OkPopup())(^.wrapped := OkPopupProps(
+        <(MessageBox())(^.wrapped := MessageBoxProps(
           title = "Help",
           message = "//TODO: show help/about info",
           onClose = { () =>

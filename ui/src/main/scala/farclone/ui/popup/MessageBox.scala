@@ -5,12 +5,12 @@ import farclone.ui.border._
 import scommons.react._
 import scommons.react.blessed._
 
-case class OkPopupProps(title: String,
-                        message: String,
-                        style: BlessedStyle = Popup.Styles.normal,
-                        onClose: () => Unit = () => ())
+case class MessageBoxProps(title: String,
+                           message: String,
+                           style: BlessedStyle = Popup.Styles.normal,
+                           onClose: () => Unit = () => ())
 
-object OkPopup extends FunctionComponent[OkPopupProps] {
+object MessageBox extends FunctionComponent[MessageBoxProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped

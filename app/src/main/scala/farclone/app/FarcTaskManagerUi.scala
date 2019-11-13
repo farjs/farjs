@@ -1,6 +1,6 @@
 package farclone.app
 
-import farclone.ui.popup.{OkPopup, OkPopupProps, Popup}
+import farclone.ui.popup.{MessageBox, MessageBoxProps, Popup}
 import scommons.react._
 import scommons.react.redux.task.{TaskManager, TaskManagerUiProps}
 
@@ -32,7 +32,7 @@ object FarcTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
 
     <.>()(
       if (showError) Some(
-        <(OkPopup())(^.wrapped := OkPopupProps(
+        <(MessageBox())(^.wrapped := MessageBoxProps(
           title = "Error",
           message = errorMessage,
           //message = s"$errorMessage${props.errorDetails.map(d => s"\n\n$d").getOrElse("")}",

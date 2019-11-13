@@ -1,6 +1,6 @@
 package farclone.app
 
-import farclone.ui.popup.{OkPopup, OkPopupProps, Popup}
+import farclone.ui.popup.{MessageBox, MessageBoxProps, Popup}
 import org.scalatest.Succeeded
 import scommons.react._
 import scommons.react.redux.task.{TaskManager, TaskManagerUiProps}
@@ -67,13 +67,13 @@ class FarcTaskManagerUiSpec extends TestSpec with ShallowRendererUtils {
       onCloseErrorPopup = onCloseErrorPopup
     )
     val comp = shallowRender(<(FarcTaskManagerUi())(^.wrapped := props)())
-    val errorProps = findComponentProps(comp, OkPopup)
+    val msgBox = findComponentProps(comp, MessageBox)
 
     //then
     onCloseErrorPopup.expects()
 
     //when
-    errorProps.onClose()
+    msgBox.onClose()
   }
 
   it should "render error" in {
@@ -96,8 +96,8 @@ class FarcTaskManagerUiSpec extends TestSpec with ShallowRendererUtils {
                                     onHideStatus: () => Unit = () => (),
                                     error: Option[String],
                                     errorDetails: Option[String] = None,
-                                    onCloseErrorPopup: () => Unit = () => ()): TaskManagerUiProps = {
-
+                                    onCloseErrorPopup: () => Unit = () => ()
+                                   ): TaskManagerUiProps = {
     TaskManagerUiProps(
       showLoading,
       status,
@@ -118,12 +118,13 @@ class FarcTaskManagerUiSpec extends TestSpec with ShallowRendererUtils {
 
       if (showError) {
         errorPopup should not be None
-        assertComponent(errorPopup.get, OkPopup) { case OkPopupProps(title, message, style, onClose) =>
-          title shouldBe "Error"
-          message shouldBe props.error.getOrElse("")
-          //details shouldBe props.errorDetails
-          style shouldBe Popup.Styles.error
-          onClose shouldBe props.onCloseErrorPopup
+        assertComponent(errorPopup.get, MessageBox) {
+          case MessageBoxProps(title, message, style, onClose) =>
+            title shouldBe "Error"
+            message shouldBe props.error.getOrElse("")
+            //details shouldBe props.errorDetails
+            style shouldBe Popup.Styles.error
+            onClose shouldBe props.onCloseErrorPopup
         }
       }
       

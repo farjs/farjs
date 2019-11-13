@@ -13,7 +13,7 @@ class FileListPopupsSpec extends TestSpec with ShallowRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val props = FileListPopupsProps(dispatch, FileListPopupsState(showHelpPopup = true))
     val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
-    val popupProps = findComponentProps(comp, OkPopup)
+    val popupProps = findComponentProps(comp, MessageBox)
     val action = FileListHelpAction(show = false)
 
     //then
@@ -45,10 +45,11 @@ class FileListPopupsSpec extends TestSpec with ShallowRendererUtils {
 
     //then
     assertNativeComponent(result, <.>()(), { case List(helpPopup) =>
-      assertComponent(helpPopup, OkPopup) { case OkPopupProps(title, message, style, _) =>
-        title shouldBe "Help"
-        message shouldBe "//TODO: show help/about info"
-        style shouldBe Popup.Styles.normal
+      assertComponent(helpPopup, MessageBox) {
+        case MessageBoxProps(title, message, style, _) =>
+          title shouldBe "Help"
+          message shouldBe "//TODO: show help/about info"
+          style shouldBe Popup.Styles.normal
       }
     })
   }
