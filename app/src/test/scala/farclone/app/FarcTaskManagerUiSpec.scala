@@ -1,6 +1,6 @@
 package farclone.app
 
-import farclone.ui.popup.{MessageBox, MessageBoxProps, Popup}
+import farclone.ui.popup._
 import org.scalatest.Succeeded
 import scommons.react._
 import scommons.react.redux.task.{TaskManager, TaskManagerUiProps}
@@ -59,7 +59,7 @@ class FarcTaskManagerUiSpec extends TestSpec with ShallowRendererUtils {
     FarcTaskManagerUi.logger = currLogger
   }
 
-  it should "call onCloseErrorPopup function when onClose error popup" in {
+  it should "call onCloseErrorPopup function when OK action in error popup" in {
     //given
     val onCloseErrorPopup = mockFunction[Unit]
     val props = getTaskManagerUiProps(
@@ -73,7 +73,7 @@ class FarcTaskManagerUiSpec extends TestSpec with ShallowRendererUtils {
     onCloseErrorPopup.expects()
 
     //when
-    msgBox.onClose()
+    msgBox.actions.head.onAction()
   }
 
   it should "render error" in {
@@ -119,12 +119,12 @@ class FarcTaskManagerUiSpec extends TestSpec with ShallowRendererUtils {
       if (showError) {
         errorPopup should not be None
         assertComponent(errorPopup.get, MessageBox) {
-          case MessageBoxProps(title, message, style, onClose) =>
+          case MessageBoxProps(title, message, actions, style) =>
             title shouldBe "Error"
             message shouldBe props.error.getOrElse("")
             //details shouldBe props.errorDetails
+            actions shouldBe List(MessageBoxAction.OK(props.onCloseErrorPopup))
             style shouldBe Popup.Styles.error
-            onClose shouldBe props.onCloseErrorPopup
         }
       }
       

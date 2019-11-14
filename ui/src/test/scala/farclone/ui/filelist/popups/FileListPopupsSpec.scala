@@ -8,19 +8,19 @@ import scommons.react.test.util.ShallowRendererUtils
 
 class FileListPopupsSpec extends TestSpec with ShallowRendererUtils {
 
-  it should "dispatch FileListHelpAction when onClose in helpPopup" in {
+  it should "dispatch FileListHelpAction when OK action in helpPopup" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val props = FileListPopupsProps(dispatch, FileListPopupsState(showHelpPopup = true))
     val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
-    val popupProps = findComponentProps(comp, MessageBox)
+    val msgBox = findComponentProps(comp, MessageBox)
     val action = FileListHelpAction(show = false)
 
     //then
     dispatch.expects(action)
 
     //when
-    popupProps.onClose()
+    msgBox.actions.head.onAction()
   }
 
   it should "render empty component" in {
@@ -46,9 +46,12 @@ class FileListPopupsSpec extends TestSpec with ShallowRendererUtils {
     //then
     assertNativeComponent(result, <.>()(), { case List(helpPopup) =>
       assertComponent(helpPopup, MessageBox) {
-        case MessageBoxProps(title, message, style, _) =>
+        case MessageBoxProps(title, message, actions, style) =>
           title shouldBe "Help"
           message shouldBe "//TODO: show help/about info"
+          inside(actions) {
+            case List(MessageBoxAction("OK", _, true)) =>
+          }
           style shouldBe Popup.Styles.normal
       }
     })

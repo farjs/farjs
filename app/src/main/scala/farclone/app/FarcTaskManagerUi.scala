@@ -1,6 +1,6 @@
 package farclone.app
 
-import farclone.ui.popup.{MessageBox, MessageBoxProps, Popup}
+import farclone.ui.popup._
 import scommons.react._
 import scommons.react.redux.task.{TaskManager, TaskManagerUiProps}
 
@@ -36,8 +36,8 @@ object FarcTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
           title = "Error",
           message = errorMessage,
           //message = s"$errorMessage${props.errorDetails.map(d => s"\n\n$d").getOrElse("")}",
-          style = Popup.Styles.error,
-          onClose = props.onCloseErrorPopup
+          actions = List(MessageBoxAction.OK(props.onCloseErrorPopup)),
+          style = Popup.Styles.error
         ))()
       ) else None
     )

@@ -11,10 +11,14 @@ import scommons.react.test.util.ShallowRendererUtils
 
 class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
 
-  it should "call onClose when onPress Ok button" in {
+  it should "call onAction when onPress button" in {
     //given
     val onClose = mockFunction[Unit]
-    val props = MessageBoxProps("test title", "test message", onClose = onClose)
+    val props = MessageBoxProps(
+      title = "test title",
+      message = "test message",
+      actions = List(MessageBoxAction.OK(onClose))
+    )
     val comp = shallowRender(<(MessageBox())(^.wrapped := props)())
     val okButton = findComponents(comp, "button").head
 
@@ -25,11 +29,12 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
     okButton.props.onPress()
   }
   
-  it should "render component" in {
+  it should "render OK popup" in {
     //given
     val props = MessageBoxProps(
       title = "test title",
-      message = "Toooooooooooooooooooooooooooooo looooooooooooooooooooooooong test message"
+      message = "Toooooooooooooooooooooooooooooo looooooooooooooooooooooooong test message",
+      actions = List(MessageBoxAction.OK(() => ()))
     )
 
     //when
@@ -50,12 +55,14 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
   }
   
   private def assertMessageBox(result: ShallowInstance, props: MessageBoxProps): Unit = {
-    val (width, height) = (60, 7)
+    val width = 60
+    val textWidth = width - 8
+    val textLines = splitText(props.message, textWidth - 2) //exclude padding
+    val height = 5 + textLines.size
     
     def assertComponents(border: ShallowInstance,
-                         msg1: ShallowInstance,
-                         msg2: ShallowInstance,
-                         btn: ShallowInstance): Assertion = {
+                         msgs: List[ShallowInstance],
+                         actionsBox: ShallowInstance): Assertion = {
 
       assertComponent(border, DoubleBorder) {
         case DoubleBorderProps(resSize, style, pos, title) =>
@@ -65,44 +72,45 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
           title shouldBe Some(props.title)
       }
       
-      msg1.key shouldBe "0"
-      assertComponent(msg1, TextLine) {
-        case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-          align shouldBe TextLine.Center
-          pos shouldBe 4 -> 2
-          resWidth shouldBe (width - 8)
-          text shouldBe "Toooooooooooooooooooooooooooooo"
-          style shouldBe props.style
-          focused shouldBe false
-          padding shouldBe 1
-      }
-      msg2.key shouldBe "1"
-      assertComponent(msg2, TextLine) {
-        case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-          align shouldBe TextLine.Center
-          pos shouldBe 4 -> 3
-          resWidth shouldBe (width - 8)
-          text shouldBe "looooooooooooooooooooooooong test message"
-          style shouldBe props.style
-          focused shouldBe false
-          padding shouldBe 1
+      msgs.size shouldBe textLines.size
+      msgs.zip(textLines).zipWithIndex.foreach { case ((msg, textLine), index) =>
+        msg.key shouldBe s"$index"
+        assertComponent(msg, TextLine) {
+          case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
+            align shouldBe TextLine.Center
+            pos shouldBe 4 -> (2 + index)
+            resWidth shouldBe (width - 8)
+            text shouldBe textLine
+            style shouldBe props.style
+            focused shouldBe false
+            padding shouldBe 1
+        }
       }
       
-      assertNativeComponent(btn,
-        <.button(
-          ^.rbMouse := true,
+      assertNativeComponent(actionsBox,
+        <.box(
           ^.rbWidth := 4,
           ^.rbHeight := 1,
           ^.rbTop := height - 3,
           ^.rbLeft := "center",
-          ^.rbStyle := props.style,
-          ^.content := " OK "
-        )()
+          ^.rbStyle := props.style
+        )(), { case List(okBtn) =>
+          assertNativeComponent(okBtn,
+            <.button(
+              ^.key := "0",
+              ^.rbMouse := true,
+              ^.rbWidth := 4,
+              ^.rbHeight := 1,
+              ^.rbLeft := 0,
+              ^.rbStyle := props.style,
+              ^.content := " OK "
+            )()
+          )
+        }
       )
     }
     
-    assertComponent(result, Popup)({ case PopupProps(onClose, closable, focusable, _) =>
-      onClose shouldBe props.onClose
+    assertComponent(result, Popup)({ case PopupProps(_, closable, focusable, _) =>
       closable shouldBe true
       focusable shouldBe true
     }, { case List(box) =>
@@ -117,7 +125,12 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
           ^.rbShadow := true,
           ^.rbStyle := props.style
         )(), {
-          case List(border, msg1, msg2, btn) => assertComponents(border, msg1, msg2, btn)
+          inside(_) {
+            case List(border, msg, actionsBox) if textLines.size == 1 =>
+              assertComponents(border, List(msg), actionsBox)
+            case List(border, msg1, msg2, actionsBox) if textLines.size == 2 =>
+              assertComponents(border, List(msg1, msg2), actionsBox)
+          }
         }
       )
     })
