@@ -19,35 +19,30 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
     val textLines = splitText(props.message, textWidth - 2) //exclude padding
     val height = 5 + textLines.size
     val onClose = props.actions.find(_.triggeredOnClose).map(_.onAction)
-      .getOrElse(() => ())
 
     val buttons = props.actions.foldLeft(List.empty[(String, () => Unit, Int)]) {
-      case (res, action) =>
-        val pos =
-          if (res.isEmpty) 0
-          else {
-            val (content, _, pos) = res.last
-            pos + content.length
-          }
-        
-        val content = s" ${action.label} "
-        res :+ ((content, action.onAction, pos))
-    }.map {
-      case (content, onAction, pos) =>
-        val width = content.length
-        (width, <.button(
-          ^.key := s"$pos",
-          ^.rbMouse := true,
-          ^.rbWidth := width,
-          ^.rbHeight := 1,
-          ^.rbLeft := pos,
-          ^.rbStyle := props.style,
-          ^.rbOnPress := onAction,
-          ^.content := content
-        )())
+      case (result, action) =>
+        val nextPos = result match {
+          case Nil => 0
+          case (content, _, pos) :: _ => pos + content.length
+        }
+        (s" ${action.label} ", action.onAction, nextPos) :: result
+    }.reverse.map {
+      case (content, onAction, pos) => (content.length, <.button(
+        ^.key := s"$pos",
+        ^.rbMouse := true,
+        ^.rbHeight := 1,
+        ^.rbLeft := pos,
+        ^.rbStyle := props.style,
+        ^.rbOnPress := onAction,
+        ^.content := content
+      )())
     }
 
-    <(Popup())(^.wrapped := PopupProps(onClose = onClose))(
+    <(Popup())(^.wrapped := PopupProps(
+      onClose = onClose.getOrElse(() => ()),
+      closable = onClose.isDefined
+    ))(
       <.box(
         ^.rbClickable := true,
         ^.rbAutoFocus := false,
