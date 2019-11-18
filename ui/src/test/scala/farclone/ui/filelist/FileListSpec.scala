@@ -5,16 +5,13 @@ import org.scalatest.{Assertion, Succeeded}
 import farclone.api.filelist._
 import farclone.ui.filelist.FileListActions._
 import farclone.ui.filelist.popups.FileListPopupsActions
-import scommons.nodejs._
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react.blessed._
 import scommons.react.redux.task.FutureTask
 import scommons.react.test.BaseTestSpec
 import scommons.react.test.raw.ShallowInstance
 import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
 
 import scala.concurrent.Future
-import scala.scalajs.js
 
 class FileListSpec extends AsyncTestSpec with BaseTestSpec
   with ShallowRendererUtils
@@ -35,11 +32,10 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     
     //when
     findComponentProps(comp, FileListView).onKeypress("f1")
-    
     Succeeded
   }
   
-  it should "emit keypress (Ctrl+C) event when F10" in {
+  it should "dispatch FileListExitAction when F10" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -48,26 +44,12 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     )
     val props = FileListProps(dispatch, actions, state, (5, 5), columns = 2)
     val comp = shallowRender(<(FileList())(^.wrapped := props)())
-    
-    val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
-    val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
-      onKey(
-        key.name,
-        key.ctrl.getOrElse(false),
-        key.meta.getOrElse(false),
-        key.shift.getOrElse(false)
-      )
-    }
-    process.stdin.on("keypress", listener)
 
     //then
-    onKey.expects("c", true, false, false)
+    dispatch.expects(FileListPopupsActions.FileListExitAction(show = true))
     
     //when
     findComponentProps(comp, FileListView).onKeypress("f10")
-
-    //cleanup
-    process.stdin.removeListener("keypress", listener)
     Succeeded
   }
   

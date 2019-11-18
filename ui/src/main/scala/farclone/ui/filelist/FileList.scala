@@ -1,14 +1,11 @@
 package farclone.ui.filelist
 
-import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import farclone.api.filelist._
 import farclone.ui.filelist.FileListActions._
 import farclone.ui.filelist.popups.FileListPopupsActions
-import scommons.nodejs._
+import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.react._
 import scommons.react.hooks._
-
-import scala.scalajs.js
 
 case class FileListProps(dispatch: Dispatch,
                          actions: FileListActions,
@@ -150,13 +147,7 @@ object FileList extends FunctionComponent[FileListProps] {
             ))
           }
         case "f1" => props.dispatch(FileListPopupsActions.FileListHelpAction(show = true))
-        case "f10" =>
-          process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
-            name = "c",
-            ctrl = true,
-            meta = false,
-            shift = false
-          ))
+        case "f10" => props.dispatch(FileListPopupsActions.FileListExitAction(show = true))
         case _ =>
       }
     ))()
