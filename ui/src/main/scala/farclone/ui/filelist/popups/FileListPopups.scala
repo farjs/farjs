@@ -46,6 +46,22 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
             }
           )
         ))()
+      ) else None,
+      
+      if (props.data.showDeletePopup) Some(
+        <(MessageBox())(^.wrapped := MessageBoxProps(
+          title = "Delete",
+          message = "Do you really want to delete selected item(s)?",
+          actions = List(
+            MessageBoxAction.YES { () =>
+              //props.dispatch(FileListDeleteAction(show = false))
+              //TODO: add api call
+            },
+            MessageBoxAction.NO { () =>
+              props.dispatch(FileListDeleteAction(show = false))
+            }
+          )
+        ))()
       ) else None
     )
   }

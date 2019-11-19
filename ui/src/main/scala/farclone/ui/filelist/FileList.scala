@@ -147,6 +147,7 @@ object FileList extends FunctionComponent[FileListProps] {
             ))
           }
         case "f1" => props.dispatch(FileListPopupsActions.FileListHelpAction(show = true))
+        case "f8" => props.dispatch(FileListPopupsActions.FileListDeleteAction(show = true))
         case "f10" => props.dispatch(FileListPopupsActions.FileListExitAction(show = true))
         case _ =>
       }

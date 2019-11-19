@@ -24,7 +24,7 @@ object BottomMenu extends FunctionComponent[Unit] {
     /*  F5 */ "",
     /*  F6 */ "",
     /*  F7 */ "",
-    /*  F8 */ "",
+    /*  F8 */ "Del",
     /*  F9 */ "",
     /* F10 */ "Exit",
     /* F11 */ "",

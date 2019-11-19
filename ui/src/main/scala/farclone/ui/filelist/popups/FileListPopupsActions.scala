@@ -6,4 +6,5 @@ object FileListPopupsActions {
 
   case class FileListHelpAction(show: Boolean) extends Action
   case class FileListExitAction(show: Boolean) extends Action
+  case class FileListDeleteAction(show: Boolean) extends Action
 }

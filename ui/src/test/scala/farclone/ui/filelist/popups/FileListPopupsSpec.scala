@@ -127,4 +127,59 @@ class FileListPopupsSpec extends TestSpec with ShallowRendererUtils {
       }
     })
   }
+  
+  behavior of "Delete popup" 
+  
+  ignore should "dispatch FileListDeleteAction and call api when YES action" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val props = FileListPopupsProps(dispatch, FileListPopupsState(showDeletePopup = true))
+    val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
+    val msgBox = findComponentProps(comp, MessageBox)
+    val action = FileListDeleteAction(show = false)
+
+    //then
+    dispatch.expects(action)
+    //TODO: check api call
+
+    //when
+    msgBox.actions.head.onAction()
+  }
+
+  it should "dispatch FileListDeleteAction when NO action" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val props = FileListPopupsProps(dispatch, FileListPopupsState(showDeletePopup = true))
+    val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
+    val msgBox = findComponentProps(comp, MessageBox)
+    val action = FileListDeleteAction(show = false)
+
+    //then
+    dispatch.expects(action)
+
+    //when
+    msgBox.actions(1).onAction()
+  }
+
+  it should "render component" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val props = FileListPopupsProps(dispatch, FileListPopupsState(showDeletePopup = true))
+
+    //when
+    val result = shallowRender(<(FileListPopups())(^.wrapped := props)())
+
+    //then
+    assertNativeComponent(result, <.>()(), { case List(helpPopup) =>
+      assertComponent(helpPopup, MessageBox) {
+        case MessageBoxProps(title, message, actions, style) =>
+          title shouldBe "Delete"
+          message shouldBe "Do you really want to delete selected item(s)?"
+          inside(actions) {
+            case List(MessageBoxAction("YES", _, false), MessageBoxAction("NO", _, true)) =>
+          }
+          style shouldBe Popup.Styles.normal
+      }
+    })
+  }
 }

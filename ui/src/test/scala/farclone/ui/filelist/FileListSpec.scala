@@ -35,6 +35,24 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     Succeeded
   }
   
+  it should "dispatch FileListDeleteAction when F8" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val state = FileListState(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
+    )
+    val props = FileListProps(dispatch, actions, state, (5, 5), columns = 2)
+    val comp = shallowRender(<(FileList())(^.wrapped := props)())
+
+    //then
+    dispatch.expects(FileListPopupsActions.FileListDeleteAction(show = true))
+    
+    //when
+    findComponentProps(comp, FileListView).onKeypress("f8")
+    Succeeded
+  }
+  
   it should "dispatch FileListExitAction when F10" in {
     //given
     val dispatch = mockFunction[Any, Any]
