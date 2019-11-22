@@ -38,6 +38,33 @@ class FileListApiImpl extends FileListApi {
       )
     }
   }
+
+  def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = {
+    
+    def delDirItems(parent: String, items: Seq[(String, Boolean)]): Future[Unit] = {
+      items.foldLeft(Future.successful(())) { case (res, (name, isDir)) =>
+        res.flatMap { _ =>
+          if (isDir) {
+            val dir = path.join(parent, name)
+            fs.readdir(dir).flatMap { files =>
+              val items = files.map { name =>
+                val stats = fs.lstatSync(path.join(dir, name))
+                (name, stats.isDirectory())
+              }
+              delDirItems(dir, items).map { _ =>
+                fs.rmdirSync(dir)
+              }
+            }
+          }
+          else Future.successful {
+            fs.unlinkSync(path.join(parent, name))
+          }
+        }
+      }
+    }
+
+    delDirItems(parent, items.map(i => (i.name, i.isDir)))
+  }
   
   private[filelist] def getPermissions(mode: Int): String = {
     

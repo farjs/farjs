@@ -80,6 +80,62 @@ class FileListApiImplSpec extends AsyncTestSpec {
     }
   }
   
+  it should "delete items when delete" in {
+    //given
+    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farclone-test-"))
+    fs.existsSync(tmpDir) shouldBe true
+
+    def create(parent: String, name: String, isDir: Boolean): (String, String) = {
+      val fullPath = path.join(parent, name)
+      if (isDir) fs.mkdirSync(fullPath)
+      else fs.writeFileSync(fullPath, s"file: $fullPath")
+      (fullPath, name)
+    }
+    
+    val (d1, d1Name) = create(tmpDir, "dir1", isDir = true)
+    val (f1, f1Name) = create(tmpDir, "file1.txt", isDir = false)
+    val (d2, _) = create(d1, "dir2", isDir = true)
+    val (f2, _) = create(d1, "file2.txt", isDir = false)
+    val (d3, _) = create(d2, "dir3", isDir = true)
+    val (f3, _) = create(d2, "file3.txt", isDir = false)
+    val items = List(
+      FileListItem(d1Name, isDir = true),
+      FileListItem(f1Name)
+    )
+
+    //when
+    val resultF = apiImp.delete(tmpDir, items)
+
+    //then
+    val resCheckF = resultF.map { _ =>
+      fs.existsSync(d1) shouldBe false
+      fs.existsSync(f1) shouldBe false
+      fs.existsSync(d2) shouldBe false
+      fs.existsSync(f2) shouldBe false
+      fs.existsSync(d3) shouldBe false
+      fs.existsSync(f3) shouldBe false
+    }
+    
+    //cleanup
+    resCheckF.onComplete { _ =>
+      def del(path: String, isDir: Boolean): Unit = {
+        if (fs.existsSync(path)) {
+          if (isDir) fs.rmdirSync(path)
+          else fs.unlinkSync(path)
+        }
+      }
+      
+      del(f3, isDir = false)
+      del(f2, isDir = false)
+      del(f1, isDir = false)
+      del(d3, isDir = true)
+      del(d2, isDir = true)
+      del(d1, isDir = true)
+      del(tmpDir, isDir = true)
+    }
+    resCheckF
+  }
+  
   it should "return file permissions" in {
     //given
     def flag(s: Char, c: Char, f: Int): Int = {
