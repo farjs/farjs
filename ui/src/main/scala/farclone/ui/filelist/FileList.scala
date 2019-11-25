@@ -2,7 +2,7 @@ package farclone.ui.filelist
 
 import farclone.api.filelist._
 import farclone.ui.filelist.FileListActions._
-import farclone.ui.filelist.popups.FileListPopupsActions
+import farclone.ui.filelist.popups.FileListPopupsActions._
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.react._
 import scommons.react.hooks._
@@ -146,9 +146,9 @@ object FileList extends FunctionComponent[FileListProps] {
               dir = dir.name
             ))
           }
-        case "f1" => props.dispatch(FileListPopupsActions.FileListHelpAction(show = true))
-        case "f8" => props.dispatch(FileListPopupsActions.FileListDeleteAction(show = true))
-        case "f10" => props.dispatch(FileListPopupsActions.FileListExitAction(show = true))
+        case "f1" => props.dispatch(FileListPopupHelpAction(show = true))
+        case "f8" => props.dispatch(FileListPopupDeleteAction(show = true))
+        case "f10" => props.dispatch(FileListPopupExitAction(show = true))
         case _ =>
       }
     ))()

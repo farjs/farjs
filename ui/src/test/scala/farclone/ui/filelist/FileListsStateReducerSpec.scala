@@ -146,4 +146,75 @@ class FileListsStateReducerSpec extends TestSpec {
       ))
     }
   }
+
+  it should "update FileListState when FileListItemsDeletedAction(currItem)" in {
+    //given
+    val currDir = FileListDir("/", isRoot = true, items = List(
+      FileListItem("file 1"),
+      FileListItem("file 2")
+    ))
+    val state = {
+      val state = FileListsState()
+      state.copy(
+        left = state.left.copy(currDir = currDir),
+        right = state.right.copy(index = 1, currDir = currDir)
+      )
+    }
+
+    //when & then
+    reduce(Some(state), FileListItemsDeletedAction(isRight = false)) shouldBe {
+      state.copy(left = FileListState(
+        currDir = currDir.copy(items = List(
+          FileListItem("file 2")
+        )),
+        isActive = true
+      ))
+    }
+    //when & then
+    reduce(Some(state), FileListItemsDeletedAction(isRight = true)) shouldBe {
+      state.copy(right = FileListState(
+        currDir = currDir.copy(items = List(
+          FileListItem("file 1")
+        )),
+        isRight = true
+      ))
+    }
+  }
+  
+  it should "update FileListState when FileListItemsDeletedAction(selectedItems)" in {
+    //given
+    val currDir = FileListDir("/", isRoot = true, items = List(
+      FileListItem("file 1"),
+      FileListItem("file 2"),
+      FileListItem("file 3")
+    ))
+    val state = {
+      val state = FileListsState()
+      state.copy(
+        left = state.left.copy(currDir = currDir, selectedNames = Set("file 1", "file 2")),
+        right = state.right.copy(index = 1, currDir = currDir, selectedNames = Set("file 2", "file 3"))
+      )
+    }
+
+    //when & then
+    reduce(Some(state), FileListItemsDeletedAction(isRight = false)) shouldBe {
+      state.copy(left = FileListState(
+        currDir = currDir.copy(items = List(
+          FileListItem("file 3")
+        )),
+        selectedNames = Set.empty,
+        isActive = true
+      ))
+    }
+    //when & then
+    reduce(Some(state), FileListItemsDeletedAction(isRight = true)) shouldBe {
+      state.copy(right = FileListState(
+        currDir = currDir.copy(items = List(
+          FileListItem("file 1")
+        )),
+        selectedNames = Set.empty,
+        isRight = true
+      ))
+    }
+  }
 }

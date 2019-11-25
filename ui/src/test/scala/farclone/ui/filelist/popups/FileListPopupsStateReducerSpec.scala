@@ -12,10 +12,10 @@ class FileListPopupsStateReducerSpec extends TestSpec {
     reduce(None, "") shouldBe FileListPopupsState()
   }
   
-  it should "set showHelpPopup when FileListHelpAction" in {
+  it should "set showHelpPopup when FileListPopupHelpAction" in {
     //given
     val state = FileListPopupsState()
-    val action = FileListHelpAction(show = true)
+    val action = FileListPopupHelpAction(show = true)
     
     //when & then
     reduce(Some(state), action) shouldBe {
@@ -23,10 +23,10 @@ class FileListPopupsStateReducerSpec extends TestSpec {
     }
   }
   
-  it should "set showExitPopup when FileListExitAction" in {
+  it should "set showExitPopup when FileListPopupExitAction" in {
     //given
     val state = FileListPopupsState()
-    val action = FileListExitAction(show = true)
+    val action = FileListPopupExitAction(show = true)
     
     //when & then
     reduce(Some(state), action) shouldBe {
@@ -34,10 +34,10 @@ class FileListPopupsStateReducerSpec extends TestSpec {
     }
   }
   
-  it should "set showDeletePopup when FileListDeleteAction" in {
+  it should "set showDeletePopup when FileListPopupDeleteAction" in {
     //given
     val state = FileListPopupsState()
-    val action = FileListDeleteAction(show = true)
+    val action = FileListPopupDeleteAction(show = true)
     
     //when & then
     reduce(Some(state), action) shouldBe {

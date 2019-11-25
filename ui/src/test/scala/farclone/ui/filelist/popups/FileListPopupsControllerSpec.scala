@@ -21,19 +21,17 @@ class FileListPopupsControllerSpec extends TestSpec {
     val props = mock[Props[Unit]]
     val controller = FileListPopupsController
     val dispatch = mock[Dispatch]
-    val popupsState = mock[FileListPopupsState]
     val fileListsState = mock[FileListsStateDef]
     val state = mock[FarcStateDef]
     (state.fileListsState _).expects().returning(fileListsState)
-    (fileListsState.popups _).expects().returning(popupsState)
 
     //when
     val result = controller.mapStateToProps(dispatch, state, props)
     
     //then
-    inside(result) { case FileListPopupsProps(disp, resPopupsState) =>
+    inside(result) { case FileListPopupsProps(disp, resState) =>
       disp shouldBe dispatch
-      resPopupsState shouldBe popupsState
+      resState shouldBe fileListsState
     }
   }
 }

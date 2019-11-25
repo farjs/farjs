@@ -34,6 +34,29 @@ class FileListActionsSpec extends AsyncTestSpec {
     msg shouldBe "Changing Dir"
     future.map(_ => Succeeded)
   }
+  
+  it should "dispatch FileListItemsDeletedAction when deleteItems" in {
+    //given
+    val api = mock[FileListApi]
+    val actions = new FileListActionsTest(api)
+    val dispatch = mockFunction[Any, Any]
+    val dir = "test dir"
+    val items = List(FileListItem("file 1"))
+    val isRight = true
+
+    (api.delete _).expects(dir, items).returning(Future.successful(()))
+    
+    //then
+    dispatch.expects(FileListItemsDeletedAction(isRight))
+    
+    //when
+    val FileListItemsDeleteAction(FutureTask(msg, future)) =
+      actions.deleteItems(dispatch, isRight, dir, items)
+    
+    //then
+    msg shouldBe "Deleting Items"
+    future.map(_ => Succeeded)
+  }
 }
 
 object FileListActionsSpec {

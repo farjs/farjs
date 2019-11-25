@@ -1,5 +1,6 @@
 package farclone.ui.filelist.popups
 
+import farclone.ui.filelist.FileListsState
 import farclone.ui.filelist.popups.FileListPopupsActions._
 import farclone.ui.popup._
 import scommons.nodejs._
@@ -15,7 +16,7 @@ class FileListPopupsSpec extends TestSpec with ShallowRendererUtils {
   it should "render empty component" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState())
+    val props = FileListPopupsProps(dispatch, FileListsState())
 
     //when
     val result = shallowRender(<(FileListPopups())(^.wrapped := props)())
@@ -24,13 +25,15 @@ class FileListPopupsSpec extends TestSpec with ShallowRendererUtils {
     assertNativeComponent(result, <.>()())
   }
   
-  "Help popup" should "dispatch FileListHelpAction when OK action" in {
+  "Help popup" should "dispatch FileListPopupHelpAction when OK action" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showHelpPopup = true))
+    val props = FileListPopupsProps(dispatch, FileListsState(
+      popups = FileListPopupsState(showHelpPopup = true)
+    ))
     val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
     val msgBox = findComponentProps(comp, MessageBox)
-    val action = FileListHelpAction(show = false)
+    val action = FileListPopupHelpAction(show = false)
 
     //then
     dispatch.expects(action)
@@ -42,7 +45,9 @@ class FileListPopupsSpec extends TestSpec with ShallowRendererUtils {
   it should "render component" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showHelpPopup = true))
+    val props = FileListPopupsProps(dispatch, FileListsState(
+      popups = FileListPopupsState(showHelpPopup = true)
+    ))
 
     //when
     val result = shallowRender(<(FileListPopups())(^.wrapped := props)())
@@ -61,13 +66,15 @@ class FileListPopupsSpec extends TestSpec with ShallowRendererUtils {
     })
   }
 
-  "Exit popup" should "dispatch FileListExitAction and emit Ctrl+C when YES action" in {
+  "Exit popup" should "dispatch FileListPopupExitAction and emit Ctrl+C when YES action" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showExitPopup = true))
+    val props = FileListPopupsProps(dispatch, FileListsState(
+      popups = FileListPopupsState(showExitPopup = true)
+    ))
     val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
     val msgBox = findComponentProps(comp, MessageBox)
-    val action = FileListExitAction(show = false)
+    val action = FileListPopupExitAction(show = false)
 
     val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
     val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
@@ -91,13 +98,15 @@ class FileListPopupsSpec extends TestSpec with ShallowRendererUtils {
     process.stdin.removeListener("keypress", listener)
   }
 
-  it should "dispatch FileListExitAction when NO action" in {
+  it should "dispatch FileListPopupExitAction when NO action" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showExitPopup = true))
+    val props = FileListPopupsProps(dispatch, FileListsState(
+      popups = FileListPopupsState(showExitPopup = true)
+    ))
     val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
     val msgBox = findComponentProps(comp, MessageBox)
-    val action = FileListExitAction(show = false)
+    val action = FileListPopupExitAction(show = false)
 
     //then
     dispatch.expects(action)
@@ -109,7 +118,9 @@ class FileListPopupsSpec extends TestSpec with ShallowRendererUtils {
   it should "render component" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showExitPopup = true))
+    val props = FileListPopupsProps(dispatch, FileListsState(
+      popups = FileListPopupsState(showExitPopup = true)
+    ))
 
     //when
     val result = shallowRender(<(FileListPopups())(^.wrapped := props)())
@@ -133,10 +144,12 @@ class FileListPopupsSpec extends TestSpec with ShallowRendererUtils {
   ignore should "dispatch FileListDeleteAction and call api when YES action" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showDeletePopup = true))
+    val props = FileListPopupsProps(dispatch, FileListsState(
+      popups = FileListPopupsState(showDeletePopup = true)
+    ))
     val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
     val msgBox = findComponentProps(comp, MessageBox)
-    val action = FileListDeleteAction(show = false)
+    val action = FileListPopupDeleteAction(show = false)
 
     //then
     dispatch.expects(action)
@@ -146,13 +159,15 @@ class FileListPopupsSpec extends TestSpec with ShallowRendererUtils {
     msgBox.actions.head.onAction()
   }
 
-  it should "dispatch FileListDeleteAction when NO action" in {
+  it should "dispatch FileListPopupDeleteAction when NO action" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showDeletePopup = true))
+    val props = FileListPopupsProps(dispatch, FileListsState(
+      popups = FileListPopupsState(showDeletePopup = true)
+    ))
     val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
     val msgBox = findComponentProps(comp, MessageBox)
-    val action = FileListDeleteAction(show = false)
+    val action = FileListPopupDeleteAction(show = false)
 
     //then
     dispatch.expects(action)
@@ -164,7 +179,9 @@ class FileListPopupsSpec extends TestSpec with ShallowRendererUtils {
   it should "render component" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showDeletePopup = true))
+    val props = FileListPopupsProps(dispatch, FileListsState(
+      popups = FileListPopupsState(showDeletePopup = true)
+    ))
 
     //when
     val result = shallowRender(<(FileListPopups())(^.wrapped := props)())

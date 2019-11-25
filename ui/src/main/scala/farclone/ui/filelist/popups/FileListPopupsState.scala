@@ -13,9 +13,9 @@ object FileListPopupsStateReducer {
   }
 
   private def reduce(state: FileListPopupsState, action: Any): FileListPopupsState = action match {
-    case FileListHelpAction(show) => state.copy(showHelpPopup = show)
-    case FileListExitAction(show) => state.copy(showExitPopup = show)
-    case FileListDeleteAction(show) => state.copy(showDeletePopup = show)
+    case FileListPopupHelpAction(show) => state.copy(showHelpPopup = show)
+    case FileListPopupExitAction(show) => state.copy(showExitPopup = show)
+    case FileListPopupDeleteAction(show) => state.copy(showDeletePopup = show)
     case _ => state
   }
 }

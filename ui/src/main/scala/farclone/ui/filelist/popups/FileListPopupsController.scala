@@ -11,6 +11,6 @@ object FileListPopupsController extends BaseStateController[FarcStateDef, FileLi
   lazy val uiComponent: UiComponent[FileListPopupsProps] = FileListPopups
 
   def mapStateToProps(dispatch: Dispatch, state: FarcStateDef, props: Props[Unit]): FileListPopupsProps = {
-    FileListPopupsProps(dispatch, state.fileListsState.popups)
+    FileListPopupsProps(dispatch, state.fileListsState)
   }
 }

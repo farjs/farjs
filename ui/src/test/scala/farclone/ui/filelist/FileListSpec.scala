@@ -17,7 +17,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
   with ShallowRendererUtils
   with TestRendererUtils {
 
-  it should "dispatch FileListHelpAction when F1" in {
+  it should "dispatch FileListPopupHelpAction when F1" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -28,14 +28,14 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     val comp = shallowRender(<(FileList())(^.wrapped := props)())
 
     //then
-    dispatch.expects(FileListPopupsActions.FileListHelpAction(show = true))
+    dispatch.expects(FileListPopupsActions.FileListPopupHelpAction(show = true))
     
     //when
     findComponentProps(comp, FileListView).onKeypress("f1")
     Succeeded
   }
   
-  it should "dispatch FileListDeleteAction when F8" in {
+  it should "dispatch FileListPopupDeleteAction when F8" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -46,14 +46,14 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     val comp = shallowRender(<(FileList())(^.wrapped := props)())
 
     //then
-    dispatch.expects(FileListPopupsActions.FileListDeleteAction(show = true))
+    dispatch.expects(FileListPopupsActions.FileListPopupDeleteAction(show = true))
     
     //when
     findComponentProps(comp, FileListView).onKeypress("f8")
     Succeeded
   }
   
-  it should "dispatch FileListExitAction when F10" in {
+  it should "dispatch FileListPopupExitAction when F10" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -64,7 +64,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     val comp = shallowRender(<(FileList())(^.wrapped := props)())
 
     //then
-    dispatch.expects(FileListPopupsActions.FileListExitAction(show = true))
+    dispatch.expects(FileListPopupsActions.FileListPopupExitAction(show = true))
     
     //when
     findComponentProps(comp, FileListView).onKeypress("f10")
