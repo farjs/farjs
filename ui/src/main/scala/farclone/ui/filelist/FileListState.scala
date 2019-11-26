@@ -87,21 +87,34 @@ object FileListsStateReducer {
         selectedNames = Set.empty
       )
     case FileListItemsDeletedAction(`isRight`) =>
-      val items = {
-        val selected = state.selectedNames
-        if (selected.nonEmpty) state.currDir.items.filterNot(i => selected.contains(i.name))
-        else {
-          val (start, _ :: end) = state.currDir.items.splitAt(state.index)
-          start ++: end
+      val selected =
+        if (state.selectedNames.nonEmpty) state.selectedNames
+        else state.currentItem.map(_.name).toSet
+      
+      val oldItems = state.currDir.items
+      val items = oldItems.filter(i => !selected.contains(i.name))
+      val (offset, index) = {
+        val oldIndex = state.offset + state.index
+        val newIndex = {
+          val index = oldItems.indexWhere(i => !selected.contains(i.name), oldIndex)
+          if (index < 0) {
+            oldItems.lastIndexWhere(i => !selected.contains(i.name), oldIndex)
+          }
+          else index
         }
-      }
-      val index = {
-        val count = items.size
-        if (state.index >= count) count - 1
-        else state.index
+        val index =
+          if (newIndex >= 0) {
+            val item = oldItems(newIndex)
+            math.max(items.indexWhere(_.name == item.name), 0)
+          }
+          else 0
+        
+        if (index >= state.offset) (state.offset, index - state.offset)
+        else (index, 0)
       }
       
       state.copy(
+        offset = offset,
         index = index,
         currDir = state.currDir.copy(items = items),
         selectedNames = Set.empty

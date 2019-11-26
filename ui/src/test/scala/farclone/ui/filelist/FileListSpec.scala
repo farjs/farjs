@@ -17,57 +17,45 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
   with ShallowRendererUtils
   with TestRendererUtils {
 
-  it should "dispatch FileListPopupHelpAction when F1" in {
+  it should "dispatch popups actions when F1-F10 keys" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val state = FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+        FileListItem.up,
+        FileListItem("file 1")
+      )) 
     )
     val props = FileListProps(dispatch, actions, state, (5, 5), columns = 2)
-    val comp = shallowRender(<(FileList())(^.wrapped := props)())
+    val renderer = createRenderer()
 
-    //then
-    dispatch.expects(FileListPopupsActions.FileListPopupHelpAction(show = true))
-    
-    //when
-    findComponentProps(comp, FileListView).onKeypress("f1")
-    Succeeded
-  }
-  
-  it should "dispatch FileListPopupDeleteAction when F8" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val state = FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
-    )
-    val props = FileListProps(dispatch, actions, state, (5, 5), columns = 2)
-    val comp = shallowRender(<(FileList())(^.wrapped := props)())
+    def check(fullKey: String,
+              action: Any,
+              index: Int = 0,
+              selectedNames: Set[String] = Set.empty,
+              never: Boolean = false): Unit = {
+      //given
+      renderer.render(<(FileList())(^.wrapped := props.copy(
+        state = props.state.copy(index = index, selectedNames = selectedNames)
+      ))())
+      
+      //then
+      if (never) dispatch.expects(action).never()
+      else dispatch.expects(action)
+      
+      //when
+      findComponentProps(renderer.getRenderOutput(), FileListView).onKeypress(fullKey)
+    }
 
-    //then
-    dispatch.expects(FileListPopupsActions.FileListPopupDeleteAction(show = true))
+    //when & then
+    check("f1", FileListPopupsActions.FileListPopupHelpAction(show = true))
+    check("f8", FileListPopupsActions.FileListPopupDeleteAction(show = true), never = true)
+    check("f8", FileListPopupsActions.FileListPopupDeleteAction(show = true), index = 1)
+    check("delete", FileListPopupsActions.FileListPopupDeleteAction(show = true), never = true)
+    check("delete", FileListPopupsActions.FileListPopupDeleteAction(show = true), selectedNames = Set("file 1"))
+    check("f10", FileListPopupsActions.FileListPopupExitAction(show = true))
     
-    //when
-    findComponentProps(comp, FileListView).onKeypress("f8")
-    Succeeded
-  }
-  
-  it should "dispatch FileListPopupExitAction when F10" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val state = FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
-    )
-    val props = FileListProps(dispatch, actions, state, (5, 5), columns = 2)
-    val comp = shallowRender(<(FileList())(^.wrapped := props)())
-
-    //then
-    dispatch.expects(FileListPopupsActions.FileListPopupExitAction(show = true))
-    
-    //when
-    findComponentProps(comp, FileListView).onKeypress("f10")
     Succeeded
   }
   

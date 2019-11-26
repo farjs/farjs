@@ -1,15 +1,17 @@
 package farclone.ui.filelist.popups
 
-import farclone.ui.filelist.FileListsStateDef
 import farclone.ui.filelist.popups.FileListPopupsActions._
+import farclone.ui.filelist.{FileListActions, FileListsStateDef}
 import farclone.ui.popup._
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.nodejs._
 import scommons.react._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 
 case class FileListPopupsProps(dispatch: Dispatch,
+                               actions: FileListActions,
                                data: FileListsStateDef)
 
 object FileListPopups extends FunctionComponent[FileListPopupsProps] {
@@ -56,13 +58,32 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
           message = "Do you really want to delete selected item(s)?",
           actions = List(
             MessageBoxAction.YES { () =>
-              //props.dispatch(FileListPopupDeleteAction(show = false))
-              //TODO: add api call
+              val state =
+                if (props.data.left.isActive) props.data.left
+                else props.data.right
+
+              val items =
+                if (state.selectedNames.nonEmpty) {
+                  state.currDir.items.filter(i => state.selectedNames.contains(i.name))
+                }
+                else state.currentItem.toList
+              
+              val action = props.actions.deleteItems(
+                dispatch = props.dispatch,
+                isRight = state.isRight,
+                dir = state.currDir.path,
+                items = items
+              )
+              action.task.future.foreach { _ =>
+                props.dispatch(FileListPopupDeleteAction(show = false))
+              }
+              props.dispatch(action)
             },
             MessageBoxAction.NO { () =>
               props.dispatch(FileListPopupDeleteAction(show = false))
             }
-          )
+          ),
+          style = Popup.Styles.error
         ))()
       ) else None
     )

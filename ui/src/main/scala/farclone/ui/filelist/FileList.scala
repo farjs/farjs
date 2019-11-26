@@ -147,7 +147,11 @@ object FileList extends FunctionComponent[FileListProps] {
             ))
           }
         case "f1" => props.dispatch(FileListPopupHelpAction(show = true))
-        case "f8" => props.dispatch(FileListPopupDeleteAction(show = true))
+        case k if k == "f8" || k == "delete" =>
+          if (props.state.selectedNames.nonEmpty
+            || props.state.currentItem.exists(_ != FileListItem.up)) {
+            props.dispatch(FileListPopupDeleteAction(show = true))
+          }
         case "f10" => props.dispatch(FileListPopupExitAction(show = true))
         case _ =>
       }

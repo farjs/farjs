@@ -35,12 +35,14 @@ object FarcApp {
     val actions = FarcActions
     val leftPanelController = new FileListController(actions, isRight = false)
     val rightPanelController = new FileListController(actions, isRight = true)
+    val fileListPopupsController = new FileListPopupsController(actions)
     
     ReactBlessed.render(
       <.Provider(^.store := store)(
         <(FarcAppRoot())(^.wrapped := FarcAppRootProps(
           leftPanelController,
-          rightPanelController
+          rightPanelController,
+          fileListPopupsController
         ))()
       ),
       screen
@@ -49,7 +51,8 @@ object FarcApp {
   }
 
   case class FarcAppRootProps(leftPanelController: FileListController,
-                              rightPanelController: FileListController)
+                              rightPanelController: FileListController,
+                              fileListPopupsController: FileListPopupsController)
   
   object FarcAppMain extends FunctionComponent[FarcAppRootProps] {
 
@@ -94,7 +97,7 @@ object FarcApp {
               Portal.create(
                 <(FarcAppMain())(^.wrapped := props)()
               ),
-              <(FileListPopupsController()).empty,
+              <(props.fileListPopupsController()).empty,
               <(FarcTaskController()).empty
             )
           )

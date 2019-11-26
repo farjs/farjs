@@ -12,11 +12,14 @@ class LogPanelSpec extends TestSpec with TestRendererUtils {
   it should "render component and redirect log output" in {
     //given
     val oldLog = g.console.log
+    val oldError = g.console.error
     
     //when & then
     val renderer = createTestRenderer(<(LogPanel())()())
 
     g.console.log should not be oldLog
+    g.console.error should not be oldError
+    
     assertNativeComponent(renderer.root.children(0),
       <.log(
         ^.rbAutoFocus := false,
@@ -32,7 +35,7 @@ class LogPanelSpec extends TestSpec with TestRendererUtils {
     //when & then
     TestRenderer.act { () =>
       println("test message 1")
-      println("test message 2")
+      Console.err.println("test message 2")
     }
     assertNativeComponent(renderer.root.children(0),
       <.log(
@@ -50,5 +53,6 @@ class LogPanelSpec extends TestSpec with TestRendererUtils {
       renderer.unmount()
     }
     g.console.log shouldBe oldLog
+    g.console.error shouldBe oldError
   }
 }
