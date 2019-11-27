@@ -5,5 +5,3 @@ resolvers += "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositor
 addSbtPlugin(("org.scommons.patched" % "sbt-scalajs-bundler" % "0.14.0-SNAPSHOT").force())
 
 addSbtPlugin(("org.scommons.sbt" % "sbt-scommons-plugin" % "1.0.0-SNAPSHOT").changing())
-
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.29")
