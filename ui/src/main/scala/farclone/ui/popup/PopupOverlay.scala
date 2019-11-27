@@ -29,10 +29,11 @@ object PopupOverlay extends FunctionComponent[PopupProps] {
     useLayoutEffect({ () =>
       val form = formRef.current.asInstanceOf[js.Dynamic]
       val listener: js.Function3[BlessedElement, js.Object, KeyboardKey, Unit] = { (_, _, key) =>
-        if (key.full == "escape") {
-          if (props.closable) {
-            props.onClose()
-          }
+        key.full match {
+          case "escape" if props.closable => props.onClose()
+          case "tab" | "down" | "right" => form.focusNext()
+          case "S-tab" | "up" | "left" => form.focusPrevious()
+          case _ =>
         }
       }
       

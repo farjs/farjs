@@ -132,7 +132,7 @@ class PopupOverlaySpec extends TestSpec
     renderer.update(<(PopupOverlay())(^.wrapped := props.copy(onClose = () => ()))())
   }
 
-  it should "call onClose if closable when escape" in {
+  it should "listen to element keys and perform actions" in {
     //given
     val onClose = mockFunction[Unit]
     val props = PopupProps(onClose = onClose, focusable = false)
@@ -142,19 +142,32 @@ class PopupOverlaySpec extends TestSpec
     (formMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
     (screenMock.focused _).expects().returning(null)
     
-    //then
-    onClose.expects()
-
+    var keyListener: js.Function3[BlessedElement, js.Object, KeyboardKey, Unit] = null
     (formMock.on _).expects("element keypress", *).onCall { (_, listener) =>
-      //when
-      listener(null, null, js.Dynamic.literal("full" -> "escape").asInstanceOf[KeyboardKey])
+      keyListener = listener
     }
-
-    //when
     createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
       else fail(s"Need mock for: ${el.`type`}")
     })
+
+    def check(keys: String*): Unit = keys.foreach { key =>
+      //then
+      key match {
+        case "escape" => onClose.expects()
+        case "tab" | "down" | "right" => (formMock.focusNext _).expects()
+        case "S-tab" | "up" | "left" => (formMock.focusPrevious _).expects()
+        case _ =>
+      }
+      //when
+      keyListener(null, null, js.Dynamic.literal("full" -> key).asInstanceOf[KeyboardKey])
+    }
+
+    //when & then
+    check("escape")
+    check("tab", "down", "right")
+    check("S-tab", "up", "left")
+    check("unknown")
   }
 
   it should "not call onClose if non-closable when escape" in {
@@ -258,6 +271,9 @@ object PopupOverlaySpec {
     def screen: BlessedScreen
 
     def focusFirst(): Unit
+    def focusNext(): Unit
+    def focusPrevious(): Unit
+    
     def on(event: String, listener: js.Function3[BlessedElement, js.Object, KeyboardKey, Unit]): Unit
     def off(event: String, listener: js.Function3[BlessedElement, js.Object, KeyboardKey, Unit]): Unit
   }
