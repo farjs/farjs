@@ -50,6 +50,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
 
     //when & then
     check("f1", FileListPopupsActions.FileListPopupHelpAction(show = true))
+    check("f7", FileListPopupsActions.FileListPopupMkFolderAction(show = true))
     check("f8", FileListPopupsActions.FileListPopupDeleteAction(show = true), never = true)
     check("f8", FileListPopupsActions.FileListPopupDeleteAction(show = true), index = 1)
     check("delete", FileListPopupsActions.FileListPopupDeleteAction(show = true), never = true)

@@ -44,4 +44,15 @@ class FileListPopupsStateReducerSpec extends TestSpec {
       state.copy(showDeletePopup = true)
     }
   }
+  
+  it should "set showMkFolderPopup when FileListPopupMkFolderAction" in {
+    //given
+    val state = FileListPopupsState()
+    val action = FileListPopupMkFolderAction(show = true)
+    
+    //when & then
+    reduce(Some(state), action) shouldBe {
+      state.copy(showMkFolderPopup = true)
+    }
+  }
 }

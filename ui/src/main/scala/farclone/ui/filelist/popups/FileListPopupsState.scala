@@ -4,7 +4,8 @@ import farclone.ui.filelist.popups.FileListPopupsActions._
 
 case class FileListPopupsState(showHelpPopup: Boolean = false,
                                showExitPopup: Boolean = false,
-                               showDeletePopup: Boolean = false)
+                               showDeletePopup: Boolean = false,
+                               showMkFolderPopup: Boolean = false)
 
 object FileListPopupsStateReducer {
 
@@ -16,6 +17,7 @@ object FileListPopupsStateReducer {
     case FileListPopupHelpAction(show) => state.copy(showHelpPopup = show)
     case FileListPopupExitAction(show) => state.copy(showExitPopup = show)
     case FileListPopupDeleteAction(show) => state.copy(showDeletePopup = show)
+    case FileListPopupMkFolderAction(show) => state.copy(showMkFolderPopup = show)
     case _ => state
   }
 }

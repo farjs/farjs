@@ -85,6 +85,20 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
           ),
           style = Popup.Styles.error
         ))()
+      ) else None,
+      
+      if (popups.showMkFolderPopup) Some(
+        <(MakeFolderPopup())(^.wrapped := MakeFolderPopupProps(
+          folderName = "",
+          multiple = false,
+          onOk = { (_, _) =>
+            //TODO: add api call
+            //props.dispatch(FileListPopupMkFolderAction(show = false))
+          },
+          onCancel = { () =>
+            props.dispatch(FileListPopupMkFolderAction(show = false))
+          }
+        ))()
       ) else None
     )
   }

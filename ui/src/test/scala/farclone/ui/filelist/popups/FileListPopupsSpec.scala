@@ -67,8 +67,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val result = shallowRender(<(FileListPopups())(^.wrapped := props)())
 
     //then
-    assertNativeComponent(result, <.>()(), { case List(helpPopup) =>
-      assertComponent(helpPopup, MessageBox) {
+    assertNativeComponent(result, <.>()(), { case List(popup) =>
+      assertComponent(popup, MessageBox) {
         case MessageBoxProps(title, message, resActions, style) =>
           title shouldBe "Help"
           message shouldBe "//TODO: show help/about info"
@@ -147,8 +147,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val result = shallowRender(<(FileListPopups())(^.wrapped := props)())
 
     //then
-    assertNativeComponent(result, <.>()(), { case List(helpPopup) =>
-      assertComponent(helpPopup, MessageBox) {
+    assertNativeComponent(result, <.>()(), { case List(popup) =>
+      assertComponent(popup, MessageBox) {
         case MessageBoxProps(title, message, resActions, style) =>
           title shouldBe "Exit"
           message shouldBe "Do you really want to exit FARc?"
@@ -261,8 +261,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val result = shallowRender(<(FileListPopups())(^.wrapped := props)())
 
     //then
-    assertNativeComponent(result, <.>()(), { case List(helpPopup) =>
-      assertComponent(helpPopup, MessageBox) {
+    assertNativeComponent(result, <.>()(), { case List(popup) =>
+      assertComponent(popup, MessageBox) {
         case MessageBoxProps(title, message, resActions, style) =>
           title shouldBe "Delete"
           message shouldBe "Do you really want to delete selected item(s)?"
@@ -270,6 +270,59 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
             case List(MessageBoxAction("YES", _, false), MessageBoxAction("NO", _, true)) =>
           }
           style shouldBe Popup.Styles.error
+      }
+    })
+  }
+  
+  behavior of "MkFolder popup"
+  
+  ignore should "call api and create single folder when OK action" in {
+    //TODO: add test case
+    Succeeded
+  }
+
+  ignore should "call api and create multiple folders when OK action" in {
+    //TODO: add test case
+    Succeeded
+  }
+
+  it should "dispatch FileListPopupMkFolderAction when Cancel action" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val props = FileListPopupsProps(dispatch, actions, FileListsState(
+      popups = FileListPopupsState(showMkFolderPopup = true)
+    ))
+    val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
+    val popup = findComponentProps(comp, MakeFolderPopup)
+    val action = FileListPopupMkFolderAction(show = false)
+
+    //then
+    dispatch.expects(action)
+
+    //when
+    popup.onCancel()
+
+    Succeeded
+  }
+
+  it should "render component" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val props = FileListPopupsProps(dispatch, actions, FileListsState(
+      popups = FileListPopupsState(showMkFolderPopup = true)
+    ))
+
+    //when
+    val result = shallowRender(<(FileListPopups())(^.wrapped := props)())
+
+    //then
+    assertNativeComponent(result, <.>()(), { case List(popup) =>
+      assertComponent(popup, MakeFolderPopup) {
+        case MakeFolderPopupProps(folderName, multiple, _, _) =>
+          folderName shouldBe ""
+          multiple shouldBe false
       }
     })
   }
