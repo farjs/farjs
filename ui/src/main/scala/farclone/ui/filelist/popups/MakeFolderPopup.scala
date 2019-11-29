@@ -4,6 +4,7 @@ import farclone.ui._
 import farclone.ui.border._
 import farclone.ui.popup._
 import scommons.react._
+import scommons.react.hooks._
 import scommons.react.blessed._
 
 case class MakeFolderPopupProps(folderName: String,
@@ -15,6 +16,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
+    val (multiple, setMultiple) = useState(props.multiple)
     val (width, height) = (75, 10)
     val style = Popup.Styles.normal
 
@@ -85,12 +87,14 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           endCh = Some(DoubleBorder.rightSingleCh)
         ))(),
 
-        <(TextLine())(^.wrapped := TextLineProps(
-          align = TextLine.Left,
-          pos = (4, 5),
-          width = width - 8,
-          text = "[ ] Process multiple names",
-          style = style
+        <(CheckBox())(^.wrapped := CheckBoxProps(
+          pos = (5, 5),
+          value = multiple,
+          label = "Process multiple names",
+          style = style,
+          onChange = { () =>
+            setMultiple(!multiple)
+          }
         ))(),
         <(HorizontalLine())(^.wrapped := HorizontalLineProps(
           pos = (3, 6),

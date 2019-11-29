@@ -27,6 +27,21 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
     popup.onClose()
   }
   
+  it should "set multiple flag when onChange in checkbox" in {
+    //given
+    val props = MakeFolderPopupProps("", multiple = false, (_, _) => (), () => ())
+    val renderer = createRenderer()
+    renderer.render(<(MakeFolderPopup())(^.wrapped := props)())
+    val checkbox = findComponentProps(renderer.getRenderOutput(), CheckBox)
+    checkbox.value shouldBe false
+
+    //when
+    checkbox.onChange()
+
+    //then
+    findComponentProps(renderer.getRenderOutput(), CheckBox).value shouldBe true
+  }
+  
   ignore should "call onOk when press OK button" in {
     //given
     val onOk = mockFunction[String, Boolean, Unit]
@@ -122,15 +137,12 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
           endCh shouldBe Some(DoubleBorder.rightSingleCh)
       }
       
-      assertComponent(multi, TextLine) {
-        case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
-          align shouldBe TextLine.Left
-          pos shouldBe 4 -> 5
-          resWidth shouldBe (width - 8)
-          text shouldBe "[ ] Process multiple names"
+      assertComponent(multi, CheckBox) {
+        case CheckBoxProps(pos, resValue, resLabel, resStyle, _) =>
+          pos shouldBe 5 -> 5
+          resValue shouldBe false
+          resLabel shouldBe "Process multiple names"
           resStyle shouldBe style
-          focused shouldBe false
-          padding shouldBe 1
       }
       assertComponent(sep2, HorizontalLine) {
         case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
