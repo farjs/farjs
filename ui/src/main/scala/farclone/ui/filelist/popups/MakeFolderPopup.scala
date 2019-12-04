@@ -70,14 +70,14 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           text = "Create the folder",
           style = style
         ))(),
-        <.input(
-          ^.rbMouse := true,
-          ^.rbWidth := width - 10,
-          ^.rbHeight := 1,
-          ^.rbLeft := 5,
-          ^.rbTop := 3,
-          ^.rbStyle := style.focus
-        )(),
+        <(TextBox())(^.wrapped := TextBoxProps(
+          pos = (5, 3),
+          width = width - 10,
+          value = "initial folder name",
+          style = style.focus.getOrElse(null),
+          onChange = { _ =>
+          }
+        ))(),
         <(HorizontalLine())(^.wrapped := HorizontalLineProps(
           pos = (3, 4),
           length = width - 6,
