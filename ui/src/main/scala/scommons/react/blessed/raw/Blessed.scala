@@ -13,7 +13,19 @@ object Blessed extends js.Object {
 }
 
 @js.native
+trait BlessedProgram extends js.Object {
+  
+  def showCursor(): Unit = js.native
+  def hideCursor(): Unit = js.native
+  
+  def omove(x: Int, y: Int): Unit = js.native //optimized cursor move
+}
+
+@js.native
 trait BlessedScreen extends js.Object {
+  
+  val program: BlessedProgram = js.native
+  val cursor: BlessedCursor = js.native
   
   val focused: BlessedElement = js.native
   
@@ -22,7 +34,15 @@ trait BlessedScreen extends js.Object {
   
   def key(keys: js.Array[String], onKey: js.Function2[js.Object, KeyboardKey, Unit]): Unit = js.native
   
+  def cursorShape(shape: String, blink: Boolean): Boolean = js.native
   def destroy(): Unit = js.native
+}
+
+@js.native
+trait BlessedCursor extends js.Object {
+
+  val shape: String = js.native //block, underline, or line
+  val blink: Boolean = js.native
 }
 
 @js.native

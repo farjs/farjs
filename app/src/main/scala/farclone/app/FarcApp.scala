@@ -25,6 +25,7 @@ object FarcApp {
       override val autoPadding = true
       override val smartCSR = true
       override val title = "FARc"
+      override val cursorShape = "underline"
     })
 
     screen.key(js.Array("C-c"), { (_, _) =>
