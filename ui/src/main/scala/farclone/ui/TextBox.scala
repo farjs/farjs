@@ -59,7 +59,9 @@ object TextBox extends FunctionComponent[TextBoxProps] {
         elementRef.current.screen.program.hideCursor()
       },
       ^.rbOnKeypress := { (ch, key) =>
-        println(s"ch: $ch, key: $key")
+        if (key.full == "right" || key.full == "left") {
+          key.defaultPrevented = true
+        }
       }
     )()
   }

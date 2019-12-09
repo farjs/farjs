@@ -107,6 +107,31 @@ class TextBoxSpec extends TestSpec
     root.children(0).props.onBlur()
   }
 
+  it should "prevent default if left or right key when onKeypress" in {
+    //given
+    val props = getTextBoxProps()
+    val inputMock = mock[BlessedElementMock]
+    val root = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
+      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
+      else null
+    }).root
+    
+    def check(defaultPrevented: Boolean, keys: String*): Unit = keys.foreach { fullKey =>
+      //given
+      val key = js.Dynamic.literal("full" -> fullKey).asInstanceOf[KeyboardKey]
+      
+      //when
+      root.children(0).props.onKeypress(null, key)
+      
+      //then
+      key.defaultPrevented.getOrElse(false) shouldBe defaultPrevented
+    }
+
+    //when & then
+    check(defaultPrevented = true, "left", "right")
+    check(defaultPrevented = false, "up", "down")
+  }
+
   it should "render component" in {
     //given
     val props = getTextBoxProps()

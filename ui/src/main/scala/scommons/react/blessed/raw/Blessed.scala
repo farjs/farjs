@@ -80,4 +80,6 @@ trait KeyboardKey extends js.Object {
   val shift: js.UndefOr[Boolean] = js.native
   val ctrl: js.UndefOr[Boolean] = js.native
   val meta: js.UndefOr[Boolean] = js.native
+  
+  var defaultPrevented: js.UndefOr[Boolean] = js.native
 }

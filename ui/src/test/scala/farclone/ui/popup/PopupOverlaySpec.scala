@@ -151,23 +151,30 @@ class PopupOverlaySpec extends TestSpec
       else fail(s"Need mock for: ${el.`type`}")
     })
 
-    def check(keys: String*): Unit = keys.foreach { key =>
+    def check(defaultPrevented: Boolean, keys: String*): Unit = keys.foreach { key =>
       //then
-      key match {
+      if (!defaultPrevented) key match {
         case "escape" => onClose.expects()
         case "tab" | "down" | "right" => (formMock.focusNext _).expects()
         case "S-tab" | "up" | "left" => (formMock.focusPrevious _).expects()
         case _ =>
       }
       //when
-      keyListener(null, null, js.Dynamic.literal("full" -> key).asInstanceOf[KeyboardKey])
+      keyListener(null, null, js.Dynamic.literal(
+        "full" -> key,
+        "defaultPrevented" -> defaultPrevented
+      ).asInstanceOf[KeyboardKey])
     }
 
     //when & then
-    check("escape")
-    check("tab", "down", "right")
-    check("S-tab", "up", "left")
-    check("unknown")
+    check(defaultPrevented = false, "escape")
+    check(defaultPrevented = true, "escape")
+    check(defaultPrevented = false, "tab", "down", "right")
+    check(defaultPrevented = true, "tab", "down", "right")
+    check(defaultPrevented = false, "S-tab", "up", "left")
+    check(defaultPrevented = true, "S-tab", "up", "left")
+    check(defaultPrevented = false, "unknown")
+    check(defaultPrevented = true, "unknown")
   }
 
   it should "not call onClose if non-closable when escape" in {
