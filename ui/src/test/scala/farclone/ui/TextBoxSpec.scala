@@ -28,17 +28,18 @@ class TextBoxSpec extends TestSpec
     //then
     (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
     (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-    (programMock.omove _).expects(1, 2)
+    (inputMock.aleft _).expects().returning(1)
+    (programMock.omove _).expects(2, 3)
     (screenMock.focused _).expects().returning(null)
     (inputMock.focus _).expects()
 
     //when
-    root.children(0).props.onClick(js.Dynamic.literal(x = 1, y = 2))
+    root.children(0).props.onClick(js.Dynamic.literal(x = 2, y = 3))
   }
 
   it should "keep cursor position when onResize" in {
     //given
-    val props = getTextBoxProps()
+    val props = getTextBoxProps(value = "test")
     val programMock = mock[BlessedProgramMock]
     val screenMock = mock[BlessedScreenMock]
     val inputMock = mock[BlessedElementMock]
@@ -53,7 +54,7 @@ class TextBoxSpec extends TestSpec
     (screenMock.focused _).expects().returning(inputMock.asInstanceOf[BlessedElement])
     (inputMock.aleft _).expects().returning(1)
     (inputMock.atop _).expects().returning(2)
-    (programMock.omove _).expects(1, 2)
+    (programMock.omove _).expects(5, 2)
 
     //when
     root.children(0).props.onResize()
@@ -61,7 +62,7 @@ class TextBoxSpec extends TestSpec
 
   it should "show cursor when onFocus" in {
     //given
-    val props = getTextBoxProps()
+    val props = getTextBoxProps(value = "test")
     val programMock = mock[BlessedProgramMock]
     val screenMock = mock[BlessedScreenMock]
     val cursorMock = mock[BlessedCursorMock]
@@ -80,7 +81,7 @@ class TextBoxSpec extends TestSpec
     (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
     (inputMock.aleft _).expects().returning(1)
     (inputMock.atop _).expects().returning(2)
-    (programMock.omove _).expects(1, 2)
+    (programMock.omove _).expects(5, 2)
     (programMock.showCursor _).expects()
 
     //when

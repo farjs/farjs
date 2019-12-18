@@ -13,9 +13,9 @@ case class TextBoxProps(pos: (Int, Int),
 object TextBox extends FunctionComponent[TextBoxProps] {
   
   protected def render(compProps: Props): ReactElement = {
-    val elementRef = useRef[BlessedElement](null)
-    
     val props = compProps.wrapped
+    val elementRef = useRef[BlessedElement](null)
+    val (cursorX, setCursorX) = useState(props.value.length)
     val (left, top) = props.pos
 
     <.input(
@@ -32,7 +32,12 @@ object TextBox extends FunctionComponent[TextBoxProps] {
       ^.rbOnClick := { data =>
         val el = elementRef.current
         val screen = el.screen
-        screen.program.omove(data.x, data.y)
+        val aleft = el.aleft
+        val newPos = math.min(math.max(data.x - aleft, 0), props.value.length)
+        if (newPos != cursorX) {
+          screen.program.omove(aleft + newPos, data.y)
+          setCursorX(newPos)
+        }
         if (screen.focused != el) {
           el.focus()
         }
@@ -41,7 +46,7 @@ object TextBox extends FunctionComponent[TextBoxProps] {
         val el = elementRef.current
         val screen = el.screen
         if (screen.focused == el) {
-          screen.program.omove(el.aleft, el.atop)
+          screen.program.omove(el.aleft + cursorX, el.atop)
         }
       },
       ^.rbOnFocus := { () =>
@@ -52,7 +57,7 @@ object TextBox extends FunctionComponent[TextBoxProps] {
           screen.cursorShape("underline", blink = true)
         }
         val program = screen.program
-        program.omove(el.aleft, el.atop)
+        program.omove(el.aleft + cursorX, el.atop)
         program.showCursor()
       },
       ^.rbOnBlur := { () =>
