@@ -28,7 +28,7 @@ object PopupOverlay extends FunctionComponent[PopupProps] {
     
     useLayoutEffect({ () =>
       val form = formRef.current.asInstanceOf[js.Dynamic]
-      val listener: js.Function3[BlessedElement, js.Object, KeyboardKey, Unit] = { (_, _, key) =>
+      val keyListener: js.Function3[BlessedElement, js.Object, KeyboardKey, Unit] = { (_, _, key) =>
         if (!key.defaultPrevented.getOrElse(false)) key.full match {
           case "escape" if props.closable => props.onClose()
           case "tab" | "down" | "right" => form.focusNext()
@@ -36,10 +36,15 @@ object PopupOverlay extends FunctionComponent[PopupProps] {
           case _ =>
         }
       }
+      val focusListener: js.Function1[BlessedElement, Unit] = { el =>
+        form._selected = el
+      }
       
-      form.on("element keypress", listener)
+      form.on("element keypress", keyListener)
+      form.on("element focus", focusListener)
       () => {
-        form.off("element keypress", listener)
+        form.off("element keypress", keyListener)
+        form.off("element focus", focusListener)
       }
     }, List(props.closable, props.onClose.asInstanceOf[js.Any]))
     
