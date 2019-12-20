@@ -108,18 +108,33 @@ class TextBoxSpec extends TestSpec
     root.children(0).props.onBlur()
   }
 
-  it should "prevent default if left or right key when onKeypress" in {
+  it should "process key and prevent default when onKeypress" in {
     //given
     val props = getTextBoxProps()
+    val programMock = mock[BlessedProgramMock]
+    val screenMock = mock[BlessedScreenMock]
     val inputMock = mock[BlessedElementMock]
     val root = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
       else null
     }).root
+    val aleft = 1
+    val atop = 2
+    var cursorX = props.value.length
     
-    def check(defaultPrevented: Boolean, keys: String*): Unit = keys.foreach { fullKey =>
+    def check(defaultPrevented: Boolean, fullKey: String, posX: Int): Unit = {
       //given
       val key = js.Dynamic.literal("full" -> fullKey).asInstanceOf[KeyboardKey]
+      
+      (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
+      (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
+      (inputMock.aleft _).expects().returning(aleft)
+      (inputMock.atop _).expects().returning(atop)
+      
+      if (cursorX != posX) {
+        cursorX = posX
+        (programMock.omove _).expects(aleft + cursorX, atop)
+      }
       
       //when
       root.children(0).props.onKeypress(null, key)
@@ -129,8 +144,18 @@ class TextBoxSpec extends TestSpec
     }
 
     //when & then
-    check(defaultPrevented = true, "left", "right")
-    check(defaultPrevented = false, "up", "down")
+    check(defaultPrevented = true, "right", cursorX)
+    check(defaultPrevented = true, "left", cursorX - 1)
+    check(defaultPrevented = true, "left", cursorX - 1)
+    check(defaultPrevented = true, "home", 0)
+    check(defaultPrevented = true, "left", 0)
+    check(defaultPrevented = true, "right", 1)
+    check(defaultPrevented = true, "right", 2)
+    check(defaultPrevented = true, "end", props.value.length)
+    
+    //when & then
+    check(defaultPrevented = false, "up", cursorX)
+    check(defaultPrevented = false, "down", cursorX)
   }
 
   it should "render component" in {

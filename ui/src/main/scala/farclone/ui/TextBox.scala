@@ -2,6 +2,7 @@ package farclone.ui
 
 import scommons.react._
 import scommons.react.blessed._
+import scommons.react.blessed.raw.BlessedProgram
 import scommons.react.hooks._
 
 case class TextBoxProps(pos: (Int, Int),
@@ -18,6 +19,14 @@ object TextBox extends FunctionComponent[TextBoxProps] {
     val (cursorX, setCursorX) = useState(props.value.length)
     val (left, top) = props.pos
 
+    def moveCursor(program: BlessedProgram, aleft: Int, atop: Int, posX: Int): Unit = {
+      val newPos = math.min(math.max(posX, 0), props.value.length)
+      if (newPos != cursorX) {
+        program.omove(aleft + newPos, atop)
+        setCursorX(newPos)
+      }
+    }
+
     <.input(
       ^.reactRef := elementRef,
       ^.rbAutoFocus := false,
@@ -33,11 +42,7 @@ object TextBox extends FunctionComponent[TextBoxProps] {
         val el = elementRef.current
         val screen = el.screen
         val aleft = el.aleft
-        val newPos = math.min(math.max(data.x - aleft, 0), props.value.length)
-        if (newPos != cursorX) {
-          screen.program.omove(aleft + newPos, data.y)
-          setCursorX(newPos)
-        }
+        moveCursor(screen.program, aleft, data.y, data.x - aleft)
         if (screen.focused != el) {
           el.focus()
         }
@@ -64,9 +69,21 @@ object TextBox extends FunctionComponent[TextBoxProps] {
         elementRef.current.screen.program.hideCursor()
       },
       ^.rbOnKeypress := { (ch, key) =>
-        if (key.full == "right" || key.full == "left") {
-          key.defaultPrevented = true
+        val el = elementRef.current
+        val program = el.screen.program
+        val aleft = el.aleft
+        val atop = el.atop
+        
+        var processed = true
+        key.full match {
+          case "right" => moveCursor(program, aleft, atop, cursorX + 1)
+          case "left" => moveCursor(program, aleft, atop, cursorX - 1)
+          case "home" => moveCursor(program, aleft, atop, 0)
+          case "end" => moveCursor(program, aleft, atop, props.value.length)
+          case _ =>
+            processed = false
         }
+        key.defaultPrevented = processed
       }
     )()
   }
