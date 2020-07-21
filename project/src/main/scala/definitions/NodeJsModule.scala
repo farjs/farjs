@@ -10,7 +10,7 @@ import scommons.sbtplugin.project.CommonModule.ideExcludedDirectories
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
 
-trait NodeJsModule extends FarcModule {
+trait NodeJsModule extends FarjsModule {
 
   override def definition: Project = {
     super.definition

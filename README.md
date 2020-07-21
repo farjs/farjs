@@ -1,11 +1,12 @@
 
-[![Build Status](https://travis-ci.org/scommons/farclone.svg?branch=master)](https://travis-ci.org/scommons/farclone)
-[![Coverage Status](https://coveralls.io/repos/github/scommons/farclone/badge.svg?branch=master)](https://coveralls.io/github/scommons/farclone?branch=master)
+[![Build Status](https://travis-ci.org/scommons/far-js.svg?branch=master)](https://travis-ci.org/scommons/far-js)
+[![Coverage Status](https://coveralls.io/repos/github/scommons/far-js/badge.svg?branch=master)](https://coveralls.io/github/scommons/far-js?branch=master)
 [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.17.svg)](https://www.scala-js.org)
 
-## FARc
-Clone of the old good Windows File and Archive Manager app
-[FAR](https://farmanager.com/index.php?l=en), built with:
+## FAR.js
+
+Good old Windows File and Archive Manager app
+[FAR](https://farmanager.com/index.php?l=en) built with:
   - [Scala.js](https://www.scala-js.org/)
   - [React.js](https://reactjs.org/)
   - [react-blessed](https://github.com/Yomguithereal/react-blessed)
@@ -24,7 +25,7 @@ sbt test
 
 To run the app use the following commands:
 ```bash
-sbt "project farclone-app" fastOptJS::webpack
+sbt "project farjs-app" fastOptJS::webpack
 
 node ./app/target/scala-2.12/scalajs-bundler/main/reload.index.js
 ```
@@ -36,7 +37,7 @@ To exit the application press `F10` on the keyboard.
 ```bash
 #console 1:
 sbt
->project farclone-app
+>project farjs-app
 >~fastOptJS
 
 #console 2:

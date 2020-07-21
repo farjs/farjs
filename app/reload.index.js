@@ -1,6 +1,6 @@
-const {FarcApp} = require("./farclone-app-fastopt")
+const {FarjsApp} = require("./farjs-app-fastopt")
 
-var screen = FarcApp.start()
+var screen = FarjsApp.start()
 
 if (module.hot) {
   // remove webpack Hot Module Replacement (HMR) logging
@@ -11,11 +11,11 @@ if (module.hot) {
     }
   }
   
-  module.hot.accept("./farclone-app-fastopt", function () {
+  module.hot.accept("./farjs-app-fastopt", function () {
     const oldScreen = screen
     oldScreen.destroy()
     
-    const {FarcApp} = require("./farclone-app-fastopt")
-    screen = FarcApp.start()
+    const {FarjsApp} = require("./farjs-app-fastopt")
+    screen = FarjsApp.start()
   })
 }

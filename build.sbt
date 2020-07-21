@@ -2,9 +2,9 @@ import definitions._
 import scommons.sbtplugin.project.CommonModule
 import scommons.sbtplugin.project.CommonModule.ideExcludedDirectories
 
-lazy val `farclone` = (project in file("."))
+lazy val `farjs` = (project in file("."))
   .settings(CommonModule.settings: _*)
-  .settings(FarcModule.settings: _*)
+  .settings(FarjsModule.settings: _*)
   .settings(
     skip in publish := true,
     publish := ((): Unit),
@@ -15,11 +15,11 @@ lazy val `farclone` = (project in file("."))
     ideExcludedDirectories += baseDirectory.value / "docs" / "_site"
   )
   .aggregate(
-    `farclone-api`,
-    `farclone-ui`,
-    `farclone-app`
+    `farjs-api`,
+    `farjs-ui`,
+    `farjs-app`
   )
 
-lazy val `farclone-api` = FarcApi.definition
-lazy val `farclone-ui` = FarcUi.definition
-lazy val `farclone-app` = FarcApp.definition
+lazy val `farjs-api` = FarjsApi.definition
+lazy val `farjs-ui` = FarjsUi.definition
+lazy val `farjs-app` = FarjsApp.definition
