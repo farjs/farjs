@@ -30,12 +30,22 @@ object FarjsApp extends ScalaJsModule {
       webpackBundlingMode := BundlingMode.LibraryOnly(),
       version in webpack := "4.29.0",
 
+      webpackResources := {
+        baseDirectory.value / ".." / "LICENSE.txt"
+      },
+      
       //dev
-      webpackConfigFile in fastOptJS := Some(baseDirectory.value / "dev.webpack.config.js"),
+      webpackConfigFile in fastOptJS := Some(
+        baseDirectory.value / "src" / "main" / "resources" / "dev.webpack.config.js"
+      ),
       //prod
-      webpackConfigFile in fullOptJS := Some(baseDirectory.value / "dev.webpack.config.js"),
-      //reload workflow and tests
-      //webpackConfigFile in Test := Some(baseDirectory.value / "test.webpack.config.js"),
+      webpackConfigFile in fullOptJS := Some(
+        baseDirectory.value / "src" / "main" / "resources" / "dev.webpack.config.js"
+      ),
+      //tests
+      //webpackConfigFile in Test := Some(
+      //  baseDirectory.value / "src" / "test" / "resources" / "test.webpack.config.js"
+      //),
 
       //useYarn := true,
       //yarnExtraArgs := Seq("--frozen-lockfile"),
@@ -96,8 +106,13 @@ object FarjsApp extends ScalaJsModule {
             str("filemanagement"),
             str("cli")
           ),
+          "bin" -> obj(
+            "farjs" -> str("bin/farjs.js")
+          ),
           "files" -> arr(
-            str("dist/far.js")
+            str("bin/farjs.js"),
+            str("build/far.js"),
+            str("LICENSE.txt")
           )
         )
       }

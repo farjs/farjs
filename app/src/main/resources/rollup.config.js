@@ -6,10 +6,10 @@ import resolve from 'rollup-plugin-node-resolve'
 import pkg from './package.json'
 
 export default {
-  input: './index.js',
+  input: './farjs-app-opt.js',
   output: [
     {
-      file: './dist/far.js',
+      file: './build/far.js',
       format: 'cjs',
       sourcemap: false
     }
