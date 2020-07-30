@@ -31,7 +31,8 @@ object FarjsApp extends ScalaJsModule {
       version in webpack := "4.29.0",
 
       webpackResources := {
-        baseDirectory.value / ".." / "LICENSE.txt"
+        baseDirectory.value / ".." / "LICENSE.txt" +++
+          baseDirectory.value / ".." / "README.md"
       },
       
       //dev
@@ -72,7 +73,7 @@ object FarjsApp extends ScalaJsModule {
       additionalNpmConfig in Compile := {
         import scalajsbundler.util.JSON._
         Map(
-          "name" -> str("far.js"),
+          "name" -> str("farjs-app"),
           "version" -> str(version.value),
           "description" -> str("File and Archive Manager (FAR) app built with Scala.js/React.js and runs on Node.js"),
           "scripts" -> obj(
@@ -112,7 +113,8 @@ object FarjsApp extends ScalaJsModule {
           "files" -> arr(
             str("bin/farjs.js"),
             str("build/far.js"),
-            str("LICENSE.txt")
+            str("LICENSE.txt"),
+            str("README.md")
           )
         )
       }

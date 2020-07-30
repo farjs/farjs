@@ -1,18 +1,33 @@
 
 [![Build Status](https://travis-ci.org/scommons/far-js.svg?branch=master)](https://travis-ci.org/scommons/far-js)
 [![Coverage Status](https://coveralls.io/repos/github/scommons/far-js/badge.svg?branch=master)](https://coveralls.io/github/scommons/far-js?branch=master)
+[![npm version](https://badge.fury.io/js/farjs-app.svg)](https://www.npmjs.com/package/farjs-app)
 [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.17.svg)](https://www.scala-js.org)
 
 ## FAR.js
 
-Good old Windows File and Archive Manager app
-[FAR](https://farmanager.com/index.php?l=en) built with:
-  - [Scala.js](https://www.scala-js.org/)
-  - [React.js](https://reactjs.org/)
-  - [react-blessed](https://github.com/Yomguithereal/react-blessed)
-  - [blessed](https://github.com/chjj/blessed)
+Good old Windows File and Archive Manager
+([FAR](https://farmanager.com/index.php?l=en)) app built with:
+  [Scala.js](https://www.scala-js.org/)
+  [React.js](https://reactjs.org/)
+  [react-blessed](https://github.com/Yomguithereal/react-blessed)
+  [blessed](https://github.com/chjj/blessed)
 
-![Screenshots](docs/images/screenshots.png)
+### Install
+
+To install (or upgrade) it on your machine use the following command:
+
+``` bash
+$ npm i -g farjs-app
+```
+
+then you can run the application from your favorite terminal:
+
+``` bash
+$ farjs
+```
+
+![Screenshots](https://raw.githubusercontent.com/scommons/far-js/master/docs/images/screenshots.png)
 
 ### How to Build
 
