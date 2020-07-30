@@ -27,7 +27,7 @@ script:
       npm run build;
       npm pack;
     else
-      VERSION="$(echo "${TRAVIS_TAG}" | cut -d'v' -f 2)"
+      VERSION="$(echo "${TRAVIS_TAG}" | cut -d'v' -f 2)";
       echo "Publish a release version=$VERSION for tag $TRAVIS_TAG";
       version=$VERSION sbt clean "project farjs-app" fullOptJS::webpack;
       cd app/target/scala-2.12/scalajs-bundler/main;
