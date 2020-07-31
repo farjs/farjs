@@ -33,6 +33,7 @@ script:
       cd app/target/scala-2.12/scalajs-bundler/main;
       npm run build;
       npm pack;
+      echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc;
       npm publish farjs-app-${VERSION}.tgz;
     fi
   else
