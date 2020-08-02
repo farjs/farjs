@@ -4,7 +4,7 @@ import farjs.ui.TextBoxSpec._
 import scommons.react.blessed._
 import scommons.react.blessed.raw._
 import scommons.react.test.TestSpec
-import scommons.react.test.raw.ShallowInstance
+import scommons.react.test.raw.{ShallowInstance, TestRenderer}
 import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
 
 import scala.scalajs.js
@@ -110,19 +110,21 @@ class TextBoxSpec extends TestSpec
 
   it should "process key and prevent default when onKeypress" in {
     //given
-    val props = getTextBoxProps()
+    val onChange = mockFunction[String, Unit]
+    var value = "initial name"
+    val props = getTextBoxProps(value, onChange)
     val programMock = mock[BlessedProgramMock]
     val screenMock = mock[BlessedScreenMock]
     val inputMock = mock[BlessedElementMock]
-    val root = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
       else null
-    }).root
+    })
     val aleft = 1
     val atop = 2
-    var cursorX = props.value.length
+    var cursorX = value.length
     
-    def check(defaultPrevented: Boolean, fullKey: String, posX: Int): Unit = {
+    def check(defaultPrevented: Boolean, fullKey: String, posX: Int, newVal: String, ch: String = null): Unit = {
       //given
       val key = js.Dynamic.literal("full" -> fullKey).asInstanceOf[KeyboardKey]
       
@@ -135,27 +137,64 @@ class TextBoxSpec extends TestSpec
         cursorX = posX
         (programMock.omove _).expects(aleft + cursorX, atop)
       }
+
+      if (value != newVal) {
+        onChange.expects(newVal)
+      }
       
       //when
-      root.children(0).props.onKeypress(null, key)
+      renderer.root.children(0).props.onKeypress(ch, key)
       
       //then
       key.defaultPrevented.getOrElse(false) shouldBe defaultPrevented
+
+      if (value != newVal) {
+        value = newVal
+
+        TestRenderer.act { () =>
+          renderer.update(<(TextBox())(^.wrapped := props.copy(value = newVal))())
+        }
+      }
     }
 
     //when & then
-    check(defaultPrevented = true, "right", cursorX)
-    check(defaultPrevented = true, "left", cursorX - 1)
-    check(defaultPrevented = true, "left", cursorX - 1)
-    check(defaultPrevented = true, "home", 0)
-    check(defaultPrevented = true, "left", 0)
-    check(defaultPrevented = true, "right", 1)
-    check(defaultPrevented = true, "right", 2)
-    check(defaultPrevented = true, "end", props.value.length)
+    check(defaultPrevented = false, "escape", cursorX, value)
+    check(defaultPrevented = false, "return", cursorX, value)
+    check(defaultPrevented = false, "enter", cursorX, value)
+    check(defaultPrevented = false, "tab", cursorX, value)
     
     //when & then
-    check(defaultPrevented = false, "up", cursorX)
-    check(defaultPrevented = false, "down", cursorX)
+    check(defaultPrevented = true, "right", cursorX, value)
+    check(defaultPrevented = true, "left", cursorX - 1, value)
+    check(defaultPrevented = true, "left", cursorX - 1, value)
+    check(defaultPrevented = true, "home", 0, value)
+    check(defaultPrevented = true, "left", 0, value)
+    check(defaultPrevented = true, "right", 1, value)
+    check(defaultPrevented = true, "right", 2, value)
+    check(defaultPrevented = true, "end", value.length, value)
+    
+    //when & then
+    check(defaultPrevented = true, "delete", cursorX, value)
+    check(defaultPrevented = true, "backspace", cursorX - 1, "initial nam")
+    check(defaultPrevented = true, "", cursorX + 1, "initial nam1", "1")
+    check(defaultPrevented = true, "", cursorX + 1, "initial nam12", "2")
+    check(defaultPrevented = true, "left", cursorX - 1, value)
+    check(defaultPrevented = true, "left", cursorX - 1, value)
+    check(defaultPrevented = true, "left", cursorX - 1, value)
+    check(defaultPrevented = true, "", cursorX + 1, "initial na3m12", "3")
+    check(defaultPrevented = true, "", cursorX + 1, "initial na34m12", "4")
+    check(defaultPrevented = true, "backspace", cursorX - 1, "initial na3m12")
+    check(defaultPrevented = true, "backspace", cursorX - 1, "initial nam12")
+    check(defaultPrevented = true, "delete", cursorX, "initial na12")
+    check(defaultPrevented = true, "delete", cursorX, "initial na2")
+    check(defaultPrevented = true, "home", 0, value)
+    check(defaultPrevented = true, "backspace", 0, value)
+    check(defaultPrevented = true, "delete", 0, "nitial na2")
+    check(defaultPrevented = true, "delete", 0, "itial na2")
+    
+    //when & then
+    check(defaultPrevented = false, "up", cursorX, value)
+    check(defaultPrevented = false, "down", cursorX, value)
   }
 
   it should "render component" in {

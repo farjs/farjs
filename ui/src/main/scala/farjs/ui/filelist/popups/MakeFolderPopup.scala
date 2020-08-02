@@ -16,6 +16,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
+    val (folderName, setFolderName) = useState(props.folderName)
     val (multiple, setMultiple) = useState(props.multiple)
     val (width, height) = (75, 10)
     val style = Popup.Styles.normal
@@ -73,9 +74,10 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
         <(TextBox())(^.wrapped := TextBoxProps(
           pos = (5, 3),
           width = width - 10,
-          value = "initial folder name",
+          value = folderName,
           style = style.focus.getOrElse(null),
-          onChange = { _ =>
+          onChange = { value =>
+            setFolderName(value)
           }
         ))(),
         <(HorizontalLine())(^.wrapped := HorizontalLineProps(

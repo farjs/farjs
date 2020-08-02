@@ -27,7 +27,24 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
     popup.onClose()
   }
   
-  it should "set multiple flag when onChange in checkbox" in {
+  it should "set folderName when onChange in TextBox" in {
+    //given
+    val folderName = "initial folder name"
+    val props = MakeFolderPopupProps(folderName, multiple = false, (_, _) => (), () => ())
+    val renderer = createRenderer()
+    renderer.render(<(MakeFolderPopup())(^.wrapped := props)())
+    val textBox = findComponentProps(renderer.getRenderOutput(), TextBox)
+    textBox.value shouldBe folderName
+    val newFolderName = "new folder name"
+
+    //when
+    textBox.onChange(newFolderName)
+
+    //then
+    findComponentProps(renderer.getRenderOutput(), TextBox).value shouldBe newFolderName
+  }
+  
+  it should "set multiple flag when onChange in CheckBox" in {
     //given
     val props = MakeFolderPopupProps("", multiple = false, (_, _) => (), () => ())
     val renderer = createRenderer()
@@ -76,7 +93,7 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
   
   it should "render component" in {
     //given
-    val props = MakeFolderPopupProps("", multiple = false, (_, _) => (), () => ())
+    val props = MakeFolderPopupProps("test folder", multiple = false, (_, _) => (), () => ())
 
     //when
     val result = shallowRender(<(MakeFolderPopup())(^.wrapped := props)())
@@ -121,7 +138,7 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
         case TextBoxProps(pos, resWidth, resValue, resStyle, _) =>
           pos shouldBe 5 -> 3
           resWidth shouldBe (width - 10)
-          resValue shouldBe "initial folder name"
+          resValue shouldBe props.folderName
           resStyle shouldBe style.focus
       }
       assertComponent(sep1, HorizontalLine) {

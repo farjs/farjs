@@ -5,6 +5,8 @@ import scommons.react.blessed._
 import scommons.react.blessed.raw.BlessedProgram
 import scommons.react.hooks._
 
+import scala.scalajs.js
+
 case class TextBoxProps(pos: (Int, Int),
                         width: Int,
                         value: String,
@@ -19,8 +21,8 @@ object TextBox extends FunctionComponent[TextBoxProps] {
     val (cursorX, setCursorX) = useState(props.value.length)
     val (left, top) = props.pos
 
-    def moveCursor(program: BlessedProgram, aleft: Int, atop: Int, posX: Int): Unit = {
-      val newPos = math.min(math.max(posX, 0), props.value.length)
+    def moveCursor(program: BlessedProgram, aleft: Int, atop: Int, posX: Int, value: String): Unit = {
+      val newPos = math.min(math.max(posX, 0), value.length)
       if (newPos != cursorX) {
         program.omove(aleft + newPos, atop)
         setCursorX(newPos)
@@ -42,7 +44,7 @@ object TextBox extends FunctionComponent[TextBoxProps] {
         val el = elementRef.current
         val screen = el.screen
         val aleft = el.aleft
-        moveCursor(screen.program, aleft, data.y, data.x - aleft)
+        moveCursor(screen.program, aleft, data.y, data.x - aleft, props.value)
         if (screen.focused != el) {
           el.focus()
         }
@@ -76,12 +78,33 @@ object TextBox extends FunctionComponent[TextBoxProps] {
         
         var processed = true
         key.full match {
-          case "right" => moveCursor(program, aleft, atop, cursorX + 1)
-          case "left" => moveCursor(program, aleft, atop, cursorX - 1)
-          case "home" => moveCursor(program, aleft, atop, 0)
-          case "end" => moveCursor(program, aleft, atop, props.value.length)
-          case _ =>
+          case "escape" | "return" | "enter" | "tab" =>
             processed = false
+          case "right" => moveCursor(program, aleft, atop, cursorX + 1, props.value)
+          case "left" => moveCursor(program, aleft, atop, cursorX - 1, props.value)
+          case "home" => moveCursor(program, aleft, atop, 0, props.value)
+          case "end" => moveCursor(program, aleft, atop, props.value.length, props.value)
+          case "delete" =>
+            val value = props.value
+            val newVal = value.slice(0, cursorX) + value.slice(cursorX + 1, value.length)
+            if (value != newVal) {
+              props.onChange(newVal)
+            }
+          case "backspace" =>
+            val value = props.value
+            val newVal = value.slice(0, cursorX - 1) + value.slice(cursorX, value.length)
+            if (value != newVal) {
+              props.onChange(newVal)
+              moveCursor(program, aleft, atop, cursorX - 1, newVal)
+            }
+          case _ =>
+            if (ch != null && !js.isUndefined(ch)) {
+              val value = props.value
+              val newVal = value.slice(0, cursorX) + ch + value.slice(cursorX, value.length)
+              props.onChange(newVal)
+              moveCursor(program, aleft, atop, cursorX + 1, newVal)
+            }
+            else processed = false
         }
         key.defaultPrevented = processed
       }
