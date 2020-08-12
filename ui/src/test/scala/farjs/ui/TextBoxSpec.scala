@@ -20,6 +20,14 @@ class TextBoxSpec extends TestSpec
     val programMock = mock[BlessedProgramMock]
     val screenMock = mock[BlessedScreenMock]
     val inputMock = mock[BlessedElementMock]
+    
+    (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
+    (inputMock.width _).expects().twice().returning(10)
+    (inputMock.aleft _).expects().returning(1)
+    (inputMock.atop _).expects().returning(3)
+    (programMock.omove _).expects(10, 3)
+
     val root = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
       else null
@@ -28,7 +36,9 @@ class TextBoxSpec extends TestSpec
     //then
     (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
     (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-    (inputMock.aleft _).expects().returning(1)
+    (inputMock.width _).expects().returning(10)
+    (inputMock.aleft _).expects().twice().returning(1)
+    (inputMock.atop _).expects().returning(3)
     (programMock.omove _).expects(2, 3)
     (screenMock.focused _).expects().returning(null)
     (inputMock.focus _).expects()
@@ -43,6 +53,14 @@ class TextBoxSpec extends TestSpec
     val programMock = mock[BlessedProgramMock]
     val screenMock = mock[BlessedScreenMock]
     val inputMock = mock[BlessedElementMock]
+
+    (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
+    (inputMock.width _).expects().twice().returning(10)
+    (inputMock.aleft _).expects().returning(1)
+    (inputMock.atop _).expects().returning(2)
+    (programMock.omove _).expects(5, 2)
+    
     val root = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
       else null
@@ -51,10 +69,10 @@ class TextBoxSpec extends TestSpec
     //then
     (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
     (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-    (screenMock.focused _).expects().returning(inputMock.asInstanceOf[BlessedElement])
     (inputMock.aleft _).expects().returning(1)
     (inputMock.atop _).expects().returning(2)
     (programMock.omove _).expects(5, 2)
+    (screenMock.focused _).expects().returning(inputMock.asInstanceOf[BlessedElement])
 
     //when
     root.children(0).props.onResize()
@@ -67,6 +85,14 @@ class TextBoxSpec extends TestSpec
     val screenMock = mock[BlessedScreenMock]
     val cursorMock = mock[BlessedCursorMock]
     val inputMock = mock[BlessedElementMock]
+
+    (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
+    (inputMock.width _).expects().twice().returning(10)
+    (inputMock.aleft _).expects().returning(1)
+    (inputMock.atop _).expects().returning(2)
+    (programMock.omove _).expects(5, 2)
+    
     val root = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
       else null
@@ -74,14 +100,11 @@ class TextBoxSpec extends TestSpec
 
     //then
     (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
     (screenMock.cursor _).expects().returning(cursorMock.asInstanceOf[BlessedCursor])
     (cursorMock.shape _).expects().returning("underline")
     (cursorMock.blink _).expects().returning(false)
     (screenMock.cursorShape _).expects("underline", true)
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-    (inputMock.aleft _).expects().returning(1)
-    (inputMock.atop _).expects().returning(2)
-    (programMock.omove _).expects(5, 2)
     (programMock.showCursor _).expects()
 
     //when
@@ -94,6 +117,14 @@ class TextBoxSpec extends TestSpec
     val programMock = mock[BlessedProgramMock]
     val screenMock = mock[BlessedScreenMock]
     val inputMock = mock[BlessedElementMock]
+
+    (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
+    (inputMock.width _).expects().twice().returning(10)
+    (inputMock.aleft _).expects().returning(1)
+    (inputMock.atop _).expects().returning(2)
+    (programMock.omove _).expects(10, 2)
+
     val root = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
       else null
@@ -116,23 +147,33 @@ class TextBoxSpec extends TestSpec
     val programMock = mock[BlessedProgramMock]
     val screenMock = mock[BlessedScreenMock]
     val inputMock = mock[BlessedElementMock]
+    val width = 10
+    val aleft = 1
+    val atop = 2
+    
+    def maxOffset = value.length - width + 1
+    def maxCursorX = width - 1
+
+    var offset = maxOffset
+    var cursorX = maxCursorX
+
+    (inputMock.screen _).expects().anyNumberOfTimes().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.program _).expects().anyNumberOfTimes().returning(programMock.asInstanceOf[BlessedProgram])
+    (inputMock.width _).expects().anyNumberOfTimes().returning(width)
+    (inputMock.aleft _).expects().anyNumberOfTimes().returning(aleft)
+    (inputMock.atop _).expects().anyNumberOfTimes().returning(atop)
+    (programMock.omove _).expects(aleft + cursorX, atop)
+
     val renderer = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
       else null
     })
-    val aleft = 1
-    val atop = 2
-    var cursorX = value.length
     
-    def check(defaultPrevented: Boolean, fullKey: String, posX: Int, newVal: String, ch: String = null): Unit = {
+    def check(defaultPrevented: Boolean, fullKey: String, posX: Int, newVal: String, idx: Int, ch: String = null): Unit = {
       //given
       val key = js.Dynamic.literal("full" -> fullKey).asInstanceOf[KeyboardKey]
       
-      (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-      (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-      (inputMock.aleft _).expects().returning(aleft)
-      (inputMock.atop _).expects().returning(atop)
-      
+      offset = idx
       if (cursorX != posX) {
         cursorX = posX
         (programMock.omove _).expects(aleft + cursorX, atop)
@@ -141,9 +182,10 @@ class TextBoxSpec extends TestSpec
       if (value != newVal) {
         onChange.expects(newVal)
       }
+      val inputEl = renderer.root.children(0)
       
       //when
-      renderer.root.children(0).props.onKeypress(ch, key)
+      inputEl.props.onKeypress(ch, key)
       
       //then
       key.defaultPrevented.getOrElse(false) shouldBe defaultPrevented
@@ -155,46 +197,49 @@ class TextBoxSpec extends TestSpec
           renderer.update(<(TextBox())(^.wrapped := props.copy(value = newVal))())
         }
       }
+      
+      inputEl.props.content shouldBe newVal.substring(offset)
     }
 
     //when & then
-    check(defaultPrevented = false, "escape", cursorX, value)
-    check(defaultPrevented = false, "return", cursorX, value)
-    check(defaultPrevented = false, "enter", cursorX, value)
-    check(defaultPrevented = false, "tab", cursorX, value)
+    check(defaultPrevented = false, "escape", cursorX, value, offset)
+    check(defaultPrevented = false, "return", cursorX, value, offset)
+    check(defaultPrevented = false, "enter", cursorX, value, offset)
+    check(defaultPrevented = false, "tab", cursorX, value, offset)
     
     //when & then
-    check(defaultPrevented = true, "right", cursorX, value)
-    check(defaultPrevented = true, "left", cursorX - 1, value)
-    check(defaultPrevented = true, "left", cursorX - 1, value)
-    check(defaultPrevented = true, "home", 0, value)
-    check(defaultPrevented = true, "left", 0, value)
-    check(defaultPrevented = true, "right", 1, value)
-    check(defaultPrevented = true, "right", 2, value)
-    check(defaultPrevented = true, "end", value.length, value)
+    check(defaultPrevented = true, "right", cursorX - 1, value, offset + 1)
+    check(defaultPrevented = true, "end", cursorX + 1, value, maxOffset)
+    check(defaultPrevented = true, "left", cursorX - 1, value, offset)
+    check(defaultPrevented = true, "left", cursorX - 1, value, offset)
+    check(defaultPrevented = true, "home", 0, value, 0)
+    check(defaultPrevented = true, "left", 0, value, offset)
+    check(defaultPrevented = true, "right", 1, value, offset)
+    check(defaultPrevented = true, "right", 2, value, offset)
+    check(defaultPrevented = true, "end", maxCursorX, value, maxOffset)
     
     //when & then
-    check(defaultPrevented = true, "delete", cursorX, value)
-    check(defaultPrevented = true, "backspace", cursorX - 1, "initial nam")
-    check(defaultPrevented = true, "", cursorX + 1, "initial nam1", "1")
-    check(defaultPrevented = true, "", cursorX + 1, "initial nam12", "2")
-    check(defaultPrevented = true, "left", cursorX - 1, value)
-    check(defaultPrevented = true, "left", cursorX - 1, value)
-    check(defaultPrevented = true, "left", cursorX - 1, value)
-    check(defaultPrevented = true, "", cursorX + 1, "initial na3m12", "3")
-    check(defaultPrevented = true, "", cursorX + 1, "initial na34m12", "4")
-    check(defaultPrevented = true, "backspace", cursorX - 1, "initial na3m12")
-    check(defaultPrevented = true, "backspace", cursorX - 1, "initial nam12")
-    check(defaultPrevented = true, "delete", cursorX, "initial na12")
-    check(defaultPrevented = true, "delete", cursorX, "initial na2")
-    check(defaultPrevented = true, "home", 0, value)
-    check(defaultPrevented = true, "backspace", 0, value)
-    check(defaultPrevented = true, "delete", 0, "nitial na2")
-    check(defaultPrevented = true, "delete", 0, "itial na2")
+    check(defaultPrevented = true, "delete", cursorX, value, offset)
+    check(defaultPrevented = true, "backspace", cursorX - 1, "initial nam", offset)
+    check(defaultPrevented = true, "", cursorX + 1, "initial nam1", offset, "1")
+    check(defaultPrevented = true, "", cursorX, "initial nam12", offset + 1, "2")
+    check(defaultPrevented = true, "left", cursorX - 1, value, offset)
+    check(defaultPrevented = true, "left", cursorX - 1, value, offset)
+    check(defaultPrevented = true, "left", cursorX - 1, value, offset)
+    check(defaultPrevented = true, "", cursorX + 1, "initial na3m12", offset, "3")
+    check(defaultPrevented = true, "", cursorX + 1, "initial na34m12", offset, "4")
+    check(defaultPrevented = true, "backspace", cursorX - 1, "initial na3m12", offset)
+    check(defaultPrevented = true, "backspace", cursorX - 1, "initial nam12", offset)
+    check(defaultPrevented = true, "delete", cursorX, "initial na12", offset)
+    check(defaultPrevented = true, "delete", cursorX, "initial na2", offset)
+    check(defaultPrevented = true, "home", 0, value, 0)
+    check(defaultPrevented = true, "backspace", cursorX, value, offset)
+    check(defaultPrevented = true, "delete", cursorX, "nitial na2", offset)
+    check(defaultPrevented = true, "delete", cursorX, "itial na2", offset)
     
     //when & then
-    check(defaultPrevented = false, "up", cursorX, value)
-    check(defaultPrevented = false, "down", cursorX, value)
+    check(defaultPrevented = false, "up", cursorX, value, offset)
+    check(defaultPrevented = false, "down", cursorX, value, offset)
   }
 
   it should "render component" in {
@@ -272,6 +317,8 @@ object TextBoxSpec {
   @JSExportAll
   trait BlessedElementMock {
 
+    def width: Int
+    
     def aleft: Int
     def atop: Int
 
