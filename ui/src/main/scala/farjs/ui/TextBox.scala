@@ -2,7 +2,6 @@ package farjs.ui
 
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.blessed.raw.BlessedProgram
 import scommons.react.hooks._
 
 import scala.scalajs.js
@@ -22,7 +21,19 @@ object TextBox extends FunctionComponent[TextBoxProps] {
     val (cursorX, setCursorX) = useState(-1)
     val (left, top) = props.pos
 
-    def moveCursor(program: BlessedProgram, el: BlessedElement, posX: Int, value: String, idx: Int): Unit = {
+    useLayoutEffect({ () =>
+      move(elementRef.current, props.value, CursorMove.End)
+    }, Nil)
+
+    def move(el: BlessedElement, value: String, cm: CursorMove): Unit = {
+      val (posX, idx) = cm match {
+        case CursorMove.At(pos) => (pos, offset)
+        case CursorMove.Home => (0, 0)
+        case CursorMove.End => (value.length, value.length - el.width + 1)
+        case CursorMove.Left => (cursorX - 1, if (cursorX == 0) offset - 1 else offset)
+        case CursorMove.Right => (cursorX + 1, if (cursorX == el.width - 1) offset + 1 else offset)
+      }
+
       val newOffset = math.min(
         math.max(idx, 0),
         value.length
@@ -37,15 +48,88 @@ object TextBox extends FunctionComponent[TextBoxProps] {
         )
       )
       if (newPos != cursorX) {
-        program.omove(el.aleft + newPos, el.atop)
+        el.screen.program.omove(el.aleft + newPos, el.atop)
         setCursorX(newPos)
       }
     }
     
-    useLayoutEffect({ () =>
+    def onClick(data: MouseData): Unit = {
       val el = elementRef.current
-      moveCursor(el.screen.program, el, props.value.length, props.value, props.value.length - el.width + 1)
-    }, Nil)
+      val screen = el.screen
+      move(el, props.value, CursorMove.At(data.x - el.aleft))
+      if (screen.focused != el) {
+        el.focus()
+      }
+    }
+    
+    val onResize: js.Function0[Unit] = { () =>
+      val el = elementRef.current
+      val screen = el.screen
+      if (screen.focused == el) {
+        screen.program.omove(el.aleft + cursorX, el.atop)
+      }
+    }
+    
+    val onFocus: js.Function0[Unit] = { () =>
+      val el = elementRef.current
+      val screen = el.screen
+      val cursor = screen.cursor
+      if (cursor.shape != "underline" || !cursor.blink) {
+        screen.cursorShape("underline", blink = true)
+      }
+      
+      screen.program.showCursor()
+    }
+    
+    val onBlur: js.Function0[Unit] = { () =>
+      val el = elementRef.current
+      el.screen.program.hideCursor()
+    }
+    
+    def onKeypress(ch: js.Dynamic, key: KeyboardKey): Unit = {
+      val el = elementRef.current
+
+      var processed = true
+      key.full match {
+        case "escape" | "return" | "enter" | "tab" =>
+          processed = false
+        case "right" => move(el, props.value, CursorMove.Right)
+        case "left" => move(el, props.value, CursorMove.Left)
+        case "home" => move(el, props.value, CursorMove.Home)
+        case "end" => move(el, props.value, CursorMove.End)
+        case "delete" =>
+          edit(props.value, TextEdit.Delete)
+        case "backspace" =>
+          val newVal = edit(props.value, TextEdit.Backspace)
+          if (props.value != newVal) {
+            move(el, newVal, CursorMove.Left)
+          }
+        case _ =>
+          if (ch != null && !js.isUndefined(ch)) {
+            val newVal = edit(props.value, TextEdit.Insert(ch.toString))
+            move(el, newVal, CursorMove.Right)
+          }
+          else processed = false
+      }
+      
+      key.defaultPrevented = processed
+    }
+    
+    def edit(value: String, te: TextEdit): String = {
+      val newVal = te match {
+        case TextEdit.Delete =>
+          value.slice(0, offset + cursorX) + value.slice(offset + cursorX + 1, value.length)
+        case TextEdit.Backspace =>
+          value.slice(0, offset + cursorX - 1) + value.slice(offset + cursorX, value.length)
+        case TextEdit.Insert(s) =>
+          value.slice(0, offset + cursorX) + s + value.slice(offset + cursorX, value.length)
+      }
+
+      if (value != newVal) {
+        props.onChange(newVal)
+      }
+      newVal
+    }
 
     <.input(
       ^.reactRef := elementRef,
@@ -58,69 +142,31 @@ object TextBox extends FunctionComponent[TextBoxProps] {
       ^.rbTop := top,
       ^.rbStyle := props.style,
       ^.content := props.value.substring(offset),
-      ^.rbOnClick := { data =>
-        val el = elementRef.current
-        val screen = el.screen
-        moveCursor(screen.program, el, data.x - el.aleft, props.value, offset)
-        if (screen.focused != el) {
-          el.focus()
-        }
-      },
-      ^.rbOnResize := { () =>
-        val el = elementRef.current
-        val screen = el.screen
-        if (screen.focused == el) {
-          screen.program.omove(el.aleft + cursorX, el.atop)
-        }
-      },
-      ^.rbOnFocus := { () =>
-        val el = elementRef.current
-        val screen = el.screen
-        val cursor = screen.cursor
-        if (cursor.shape != "underline" || !cursor.blink) {
-          screen.cursorShape("underline", blink = true)
-        }
-        screen.program.showCursor()
-      },
-      ^.rbOnBlur := { () =>
-        elementRef.current.screen.program.hideCursor()
-      },
-      ^.rbOnKeypress := { (ch, key) =>
-        val el = elementRef.current
-        val program = el.screen.program
-        
-        var processed = true
-        key.full match {
-          case "escape" | "return" | "enter" | "tab" =>
-            processed = false
-          case "right" => moveCursor(program, el, cursorX + 1, props.value, if (cursorX == el.width - 1) offset + 1 else offset)
-          case "left" => moveCursor(program, el, cursorX - 1, props.value, if (cursorX == 0) offset - 1 else offset)
-          case "home" => moveCursor(program, el, 0, props.value, 0)
-          case "end" => moveCursor(program, el, props.value.length, props.value, props.value.length - el.width + 1)
-          case "delete" =>
-            val value = props.value
-            val newVal = value.slice(0, offset + cursorX) + value.slice(offset + cursorX + 1, value.length)
-            if (value != newVal) {
-              props.onChange(newVal)
-            }
-          case "backspace" =>
-            val value = props.value
-            val newVal = value.slice(0, offset + cursorX - 1) + value.slice(offset + cursorX, value.length)
-            if (value != newVal) {
-              props.onChange(newVal)
-              moveCursor(program, el, cursorX - 1, newVal, if (cursorX == 0) offset - 1 else offset)
-            }
-          case _ =>
-            if (ch != null && !js.isUndefined(ch)) {
-              val value = props.value
-              val newVal = value.slice(0, offset + cursorX) + ch + value.slice(offset + cursorX, value.length)
-              props.onChange(newVal)
-              moveCursor(program, el, cursorX + 1, newVal, if (cursorX == el.width - 1) offset + 1 else offset)
-            }
-            else processed = false
-        }
-        key.defaultPrevented = processed
-      }
+      ^.rbOnClick := onClick,
+      ^.rbOnResize := onResize,
+      ^.rbOnFocus := onFocus,
+      ^.rbOnBlur := onBlur,
+      ^.rbOnKeypress := onKeypress
     )()
+  }
+  
+  private sealed trait CursorMove
+  
+  private object CursorMove {
+    
+    case class At(pos: Int) extends CursorMove
+    case object Home extends CursorMove
+    case object End extends CursorMove
+    case object Left extends CursorMove
+    case object Right extends CursorMove
+  }
+  
+  private sealed trait TextEdit
+  
+  private object TextEdit {
+    
+    case class Insert(str: String) extends TextEdit
+    case object Delete extends TextEdit
+    case object Backspace extends TextEdit
   }
 }

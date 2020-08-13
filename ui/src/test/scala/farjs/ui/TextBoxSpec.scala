@@ -34,7 +34,7 @@ class TextBoxSpec extends TestSpec
     }).root
 
     //then
-    (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
+    (inputMock.screen _).expects().twice().returning(screenMock.asInstanceOf[BlessedScreen])
     (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
     (inputMock.width _).expects().returning(10)
     (inputMock.aleft _).expects().twice().returning(1)
