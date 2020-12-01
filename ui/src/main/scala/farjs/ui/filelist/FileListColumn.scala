@@ -1,10 +1,9 @@
 package farjs.ui.filelist
 
 import farjs.api.filelist.FileListItem
-import farjs.ui.{TextLine, TextLineProps}
+import farjs.ui.{TextBox, TextLine, TextLineProps}
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.blessed.raw.Blessed
 
 case class FileListColumnProps(size: (Int, Int),
                                left: Int,
@@ -26,13 +25,13 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
     val (width, height) = props.size
     val styles = FileListView.styles
     
-    val borderEnd = renderText(
+    val borderEnd = TextBox.renderText(
       isBold = false,
       fgColor = styles.normalItem.fg.orNull,
       bgColor = styles.normalItem.bg.orNull,
       text = props.borderCh
     )
-    val overlapEnd = renderText(
+    val overlapEnd = TextBox.renderText(
       isBold = false,
       fgColor = styles.overlapColor,
       bgColor = styles.normalItem.bg.orNull,
@@ -55,13 +54,14 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
         }
 
         val text = name.trim
-        renderText(
+        val content = TextBox.renderText(
           isBold = style.bold.getOrElse(false),
           fgColor = style.fg.orNull,
           bgColor = style.bg.orNull,
-          text = text.take(width).padTo(width, ' '),
-          ending = if (text.length > width) overlapEnd else borderEnd
+          text = text.take(width).padTo(width, ' ')
         )
+        val ending = if (text.length > width) overlapEnd else borderEnd
+        s"$content$ending"
     }
 
     val itemsContent = renderItems().mkString("\n")
@@ -93,16 +93,5 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
 
       compProps.children // just for testing memo/re-render
     )
-  }
-
-  private def renderText(isBold: Boolean,
-                         fgColor: String,
-                         bgColor: String,
-                         text: String,
-                         ending: String = ""): String = {
-
-    val bold = if (isBold) "{bold}" else ""
-
-    s"$bold{$fgColor-fg}{$bgColor-bg}${Blessed.escape(text)}{/}$ending"
   }
 }

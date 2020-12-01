@@ -1,6 +1,8 @@
 package farjs.ui
 
+import farjs.ui.TextBox.styles
 import farjs.ui.TextBoxSpec._
+import org.scalactic.source.Position
 import scommons.react.blessed._
 import scommons.react.blessed.raw._
 import scommons.react.test.TestSpec
@@ -156,6 +158,10 @@ class TextBoxSpec extends TestSpec
 
     var offset = maxOffset
     var cursorX = maxCursorX
+    var selStart = 0
+    var selEnd = value.length
+    
+    def currIdx = offset + cursorX
 
     (inputMock.screen _).expects().anyNumberOfTimes().returning(screenMock.asInstanceOf[BlessedScreen])
     (screenMock.program _).expects().anyNumberOfTimes().returning(programMock.asInstanceOf[BlessedProgram])
@@ -169,11 +175,22 @@ class TextBoxSpec extends TestSpec
       else null
     })
     
-    def check(defaultPrevented: Boolean, fullKey: String, posX: Int, newVal: String, idx: Int, ch: String = null): Unit = {
+    def check(defaultPrevented: Boolean,
+              fullKey: String,
+              idx: Int,
+              posX: Int,
+              newVal: String,
+              startIdx: Int = -1,
+              endIdx: Int = -1,
+              ch: String = null
+             )(implicit pos: Position): Unit = {
+      
       //given
       val key = js.Dynamic.literal("full" -> fullKey).asInstanceOf[KeyboardKey]
       
       offset = idx
+      selStart = startIdx
+      selEnd = endIdx
       if (cursorX != posX) {
         cursorX = posX
         (programMock.omove _).expects(aleft + cursorX, atop)
@@ -198,48 +215,75 @@ class TextBoxSpec extends TestSpec
         }
       }
       
-      inputEl.props.content shouldBe newVal.substring(offset)
+      inputEl.props.content shouldBe {
+        if (selEnd - selStart > 0) {
+          val part1 = TextBox.renderText(styles.normal, newVal.slice(offset, selStart))
+          val part2 = TextBox.renderText(styles.selected, newVal.slice(math.max(selStart, offset), selEnd))
+          val part3 = TextBox.renderText(styles.normal, newVal.substring(math.min(selEnd, newVal.length)))
+          s"$part1$part2$part3"
+        } else TextBox.renderText(styles.normal, newVal.substring(math.min(offset, newVal.length)))
+      }
     }
 
     //when & then
-    check(defaultPrevented = false, "escape", cursorX, value, offset)
-    check(defaultPrevented = false, "return", cursorX, value, offset)
-    check(defaultPrevented = false, "enter", cursorX, value, offset)
-    check(defaultPrevented = false, "tab", cursorX, value, offset)
+    check(defaultPrevented = false, "escape", offset, cursorX, value, selStart, selEnd)
+    check(defaultPrevented = false, "return", offset, cursorX, value, selStart, selEnd)
+    check(defaultPrevented = false, "enter", offset, cursorX, value, selStart, selEnd)
+    check(defaultPrevented = false, "tab", offset, cursorX, value, selStart, selEnd)
     
     //when & then
-    check(defaultPrevented = true, "right", cursorX - 1, value, offset + 1)
-    check(defaultPrevented = true, "end", cursorX + 1, value, maxOffset)
-    check(defaultPrevented = true, "left", cursorX - 1, value, offset)
-    check(defaultPrevented = true, "left", cursorX - 1, value, offset)
-    check(defaultPrevented = true, "home", 0, value, 0)
-    check(defaultPrevented = true, "left", 0, value, offset)
-    check(defaultPrevented = true, "right", 1, value, offset)
-    check(defaultPrevented = true, "right", 2, value, offset)
-    check(defaultPrevented = true, "end", maxCursorX, value, maxOffset)
+    check(defaultPrevented = true, "right", offset + 1, cursorX - 1, value)
+    check(defaultPrevented = true, "S-home", 0, 0, value, 0, currIdx)
+    check(defaultPrevented = true, "right", offset, cursorX + 1, value)
+    check(defaultPrevented = true, "S-right", offset, cursorX + 1, value, currIdx, currIdx + 1)
+    check(defaultPrevented = true, "S-left", offset, cursorX - 1, value, currIdx - 1, selEnd)
+    check(defaultPrevented = true, "S-end", maxOffset, maxCursorX, value, selStart, value.length)
+    check(defaultPrevented = true, "C-a", maxOffset, maxCursorX, value, 0, value.length)
+    check(defaultPrevented = true, "end", maxOffset, maxCursorX, value)
+    check(defaultPrevented = true, "left", offset, cursorX - 1, value)
+    check(defaultPrevented = true, "left", offset, cursorX - 1, value)
+    check(defaultPrevented = true, "home", 0, 0, value)
+    check(defaultPrevented = true, "left", offset, 0, value)
+    check(defaultPrevented = true, "right", offset, 1, value)
+    check(defaultPrevented = true, "right", offset, 2, value)
+    check(defaultPrevented = true, "end", maxOffset, maxCursorX, value)
     
     //when & then
-    check(defaultPrevented = true, "delete", cursorX, value, offset)
-    check(defaultPrevented = true, "backspace", cursorX - 1, "initial nam", offset)
-    check(defaultPrevented = true, "", cursorX + 1, "initial nam1", offset, "1")
-    check(defaultPrevented = true, "", cursorX, "initial nam12", offset + 1, "2")
-    check(defaultPrevented = true, "left", cursorX - 1, value, offset)
-    check(defaultPrevented = true, "left", cursorX - 1, value, offset)
-    check(defaultPrevented = true, "left", cursorX - 1, value, offset)
-    check(defaultPrevented = true, "", cursorX + 1, "initial na3m12", offset, "3")
-    check(defaultPrevented = true, "", cursorX + 1, "initial na34m12", offset, "4")
-    check(defaultPrevented = true, "backspace", cursorX - 1, "initial na3m12", offset)
-    check(defaultPrevented = true, "backspace", cursorX - 1, "initial nam12", offset)
-    check(defaultPrevented = true, "delete", cursorX, "initial na12", offset)
-    check(defaultPrevented = true, "delete", cursorX, "initial na2", offset)
-    check(defaultPrevented = true, "home", 0, value, 0)
-    check(defaultPrevented = true, "backspace", cursorX, value, offset)
-    check(defaultPrevented = true, "delete", cursorX, "nitial na2", offset)
-    check(defaultPrevented = true, "delete", cursorX, "itial na2", offset)
+    check(defaultPrevented = true, "delete", offset, cursorX, value)
+    check(defaultPrevented = true, "S-left", offset, cursorX - 1, value, currIdx - 1, value.length)
+    check(defaultPrevented = true, "delete", offset, cursorX, "initial nam")
+    check(defaultPrevented = true, "S-left", offset, cursorX - 1, value, currIdx - 1, value.length)
+    check(defaultPrevented = true, "backspace", offset, cursorX, "initial na")
+    check(defaultPrevented = true, "left", offset, cursorX - 1, value)
+    check(defaultPrevented = true, "S-end", maxOffset, maxCursorX, value, currIdx, value.length)
+    check(defaultPrevented = true, "delete", offset, cursorX - 1, "initial n")
+    check(defaultPrevented = true, "", offset, cursorX + 1, "initial n1", ch = "1")
+    check(defaultPrevented = true, "", offset + 1, cursorX, "initial n12", ch = "2")
+    check(defaultPrevented = true, "S-left", offset, cursorX - 1, value, currIdx - 1, value.length)
+    check(defaultPrevented = true, "S-left", offset, cursorX - 1, value, currIdx - 1, value.length)
+    check(defaultPrevented = true, "", offset, cursorX + 1, "initial na", ch = "a")
+    check(defaultPrevented = true, "", offset, cursorX + 1, "initial nam", ch = "m")
+    check(defaultPrevented = true, "", offset + 1, cursorX, "initial name", ch = "e")
+    check(defaultPrevented = true, "backspace", offset, cursorX - 1, "initial nam")
+    check(defaultPrevented = true, "", offset, cursorX + 1, "initial nam1", ch = "1")
+    check(defaultPrevented = true, "", offset + 1, cursorX, "initial nam12", ch = "2")
+    check(defaultPrevented = true, "left", offset, cursorX - 1, value)
+    check(defaultPrevented = true, "left", offset, cursorX - 1, value)
+    check(defaultPrevented = true, "left", offset, cursorX - 1, value)
+    check(defaultPrevented = true, "", offset, cursorX + 1, "initial na3m12", ch = "3")
+    check(defaultPrevented = true, "", offset, cursorX + 1, "initial na34m12", ch = "4")
+    check(defaultPrevented = true, "backspace", offset, cursorX - 1, "initial na3m12")
+    check(defaultPrevented = true, "backspace", offset, cursorX - 1, "initial nam12")
+    check(defaultPrevented = true, "delete", offset, cursorX, "initial na12")
+    check(defaultPrevented = true, "delete", offset, cursorX, "initial na2")
+    check(defaultPrevented = true, "home", 0, 0, value)
+    check(defaultPrevented = true, "backspace", offset, cursorX, value)
+    check(defaultPrevented = true, "delete", offset, cursorX, "nitial na2")
+    check(defaultPrevented = true, "delete", offset, cursorX, "itial na2")
     
     //when & then
-    check(defaultPrevented = false, "up", cursorX, value, offset)
-    check(defaultPrevented = false, "down", cursorX, value, offset)
+    check(defaultPrevented = false, "up", offset, cursorX, value, selStart, selEnd)
+    check(defaultPrevented = false, "down", offset, cursorX, value, selStart, selEnd)
   }
 
   it should "render component" in {
@@ -279,7 +323,7 @@ class TextBoxSpec extends TestSpec
         ^.rbLeft := left,
         ^.rbTop := top,
         ^.rbStyle := props.style,
-        ^.content := props.value
+        ^.content := TextBox.renderText(styles.normal, props.value)
       )()
     )
   }
