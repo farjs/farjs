@@ -117,14 +117,7 @@ class FileListApiImplSpec extends AsyncTestSpec {
     }
     
     //cleanup
-    resCheckF.onComplete { _ =>
-      def del(path: String, isDir: Boolean): Unit = {
-        if (fs.existsSync(path)) {
-          if (isDir) fs.rmdirSync(path)
-          else fs.unlinkSync(path)
-        }
-      }
-      
+    resCheckF.map { _ =>
       del(f3, isDir = false)
       del(f2, isDir = false)
       del(f1, isDir = false)
@@ -132,8 +125,54 @@ class FileListApiImplSpec extends AsyncTestSpec {
       del(d2, isDir = true)
       del(d1, isDir = true)
       del(tmpDir, isDir = true)
+      Succeeded
     }
-    resCheckF
+  }
+  
+  it should "create multiple directories when mkDir" in {
+    //given
+    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
+    fs.existsSync(tmpDir) shouldBe true
+    val dir = s"test1${path.sep}test2${path.sep}${path.sep}test3${path.sep}"
+
+    //when
+    val resultF = apiImp.mkDir(tmpDir, dir, multiple = true)
+
+    //then
+    val resCheckF = resultF.map { _ =>
+      fs.existsSync(path.join(tmpDir, dir)) shouldBe true
+    }
+
+    //cleanup
+    resCheckF.map { _ =>
+      del(path.join(tmpDir, dir), isDir = true)
+      del(path.join(tmpDir, "test1", "test2"), isDir = true)
+      del(path.join(tmpDir, "test1"), isDir = true)
+      del(tmpDir, isDir = true)
+      Succeeded
+    }
+  }
+  
+  it should "create single directory when mkDir" in {
+    //given
+    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
+    fs.existsSync(tmpDir) shouldBe true
+    val dir = "test123"
+
+    //when
+    val resultF = apiImp.mkDir(tmpDir, dir, multiple = false)
+
+    //then
+    val resCheckF = resultF.map { _ =>
+      fs.existsSync(path.join(tmpDir, dir)) shouldBe true
+    }
+
+    //cleanup
+    resCheckF.map { _ =>
+      del(path.join(tmpDir, dir), isDir = true)
+      del(tmpDir, isDir = true)
+      Succeeded
+    }
   }
   
   it should "return file permissions" in {
@@ -170,5 +209,12 @@ class FileListApiImplSpec extends AsyncTestSpec {
     apiImp.getPermissions(of("drwxrwxrwx")) shouldBe "drwxrwxrwx"
     
     Succeeded
+  }
+
+  private def del(path: String, isDir: Boolean): Unit = {
+    if (fs.existsSync(path)) {
+      if (isDir) fs.rmdirSync(path)
+      else fs.unlinkSync(path)
+    }
   }
 }

@@ -7,4 +7,6 @@ trait FileListApi {
   def readDir(parent: Option[String], dir: String): Future[FileListDir]
   
   def delete(parent: String, items: Seq[FileListItem]): Future[Unit]
+
+  def mkDir(parent: String, dir: String, multiple: Boolean): Future[Unit]
 }

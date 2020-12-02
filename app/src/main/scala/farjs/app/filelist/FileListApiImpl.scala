@@ -65,6 +65,26 @@ class FileListApiImpl extends FileListApi {
 
     delDirItems(parent, items.map(i => (i.name, i.isDir)))
   }
+
+  def mkDir(parent: String, dir: String, multiple: Boolean): Future[Unit] = {
+
+    def mkDirs(parent: String, names: List[String]): Future[Unit] = names match {
+      case Nil => Future.unit
+      case name :: tail => Future.unit.flatMap { _ =>
+        val dir =
+          if (name.isEmpty) parent
+          else {
+            val dir = path.join(parent, name)
+            fs.mkdirSync(dir)
+            dir
+          }
+        
+        mkDirs(dir, tail)
+      }
+    }
+
+    mkDirs(parent, names = if (multiple) dir.split(path.sep).toList else List(dir))
+  }
   
   private[filelist] def getPermissions(mode: Int): String = {
     
