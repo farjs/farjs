@@ -141,6 +141,72 @@ class TextBoxSpec extends TestSpec
     root.children(0).props.onBlur()
   }
 
+  it should "call onEnter and prevent default if return key when onKeypress" in {
+    //given
+    val onEnter = mockFunction[Unit]
+    val props = getTextBoxProps(onEnter = onEnter)
+    val programMock = mock[BlessedProgramMock]
+    val screenMock = mock[BlessedScreenMock]
+    val inputMock = mock[BlessedElementMock]
+    val width = props.width
+    val (aleft, atop) = props.pos
+    val cursorX = width - 1
+    (inputMock.screen _).expects().anyNumberOfTimes().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.program _).expects().anyNumberOfTimes().returning(programMock.asInstanceOf[BlessedProgram])
+    (inputMock.width _).expects().anyNumberOfTimes().returning(width)
+    (inputMock.aleft _).expects().anyNumberOfTimes().returning(aleft)
+    (inputMock.atop _).expects().anyNumberOfTimes().returning(atop)
+    (programMock.omove _).expects(aleft + cursorX, atop)
+
+    val inputEl = testRender(<(TextBox())(^.wrapped := props)(), { el =>
+      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
+      else null
+    })
+    val key = js.Dynamic.literal("full" -> "return").asInstanceOf[KeyboardKey]
+
+    //then
+    onEnter.expects()
+
+    //when
+    inputEl.props.onKeypress(null, key)
+
+    //then
+    key.defaultPrevented.getOrElse(false) shouldBe true
+  }
+  
+  it should "call onEnter and prevent default if enter key when onKeypress" in {
+    //given
+    val onEnter = mockFunction[Unit]
+    val props = getTextBoxProps(onEnter = onEnter)
+    val programMock = mock[BlessedProgramMock]
+    val screenMock = mock[BlessedScreenMock]
+    val inputMock = mock[BlessedElementMock]
+    val width = props.width
+    val (aleft, atop) = props.pos
+    val cursorX = width - 1
+    (inputMock.screen _).expects().anyNumberOfTimes().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.program _).expects().anyNumberOfTimes().returning(programMock.asInstanceOf[BlessedProgram])
+    (inputMock.width _).expects().anyNumberOfTimes().returning(width)
+    (inputMock.aleft _).expects().anyNumberOfTimes().returning(aleft)
+    (inputMock.atop _).expects().anyNumberOfTimes().returning(atop)
+    (programMock.omove _).expects(aleft + cursorX, atop)
+
+    val inputEl = testRender(<(TextBox())(^.wrapped := props)(), { el =>
+      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
+      else null
+    })
+    val key = js.Dynamic.literal("full" -> "enter").asInstanceOf[KeyboardKey]
+
+    //then
+    onEnter.expects()
+
+    //when
+    inputEl.props.onKeypress(null, key)
+
+    //then
+    key.defaultPrevented.getOrElse(false) shouldBe true
+  }
+  
   it should "process key and prevent default when onKeypress" in {
     //given
     val onChange = mockFunction[String, Unit]
@@ -227,8 +293,6 @@ class TextBoxSpec extends TestSpec
 
     //when & then
     check(defaultPrevented = false, "escape", offset, cursorX, value, selStart, selEnd)
-    check(defaultPrevented = false, "return", offset, cursorX, value, selStart, selEnd)
-    check(defaultPrevented = false, "enter", offset, cursorX, value, selStart, selEnd)
     check(defaultPrevented = false, "tab", offset, cursorX, value, selStart, selEnd)
     
     //when & then
@@ -298,16 +362,14 @@ class TextBoxSpec extends TestSpec
   }
 
   private def getTextBoxProps(value: String = "initial name",
-                              onChange: String => Unit = _ => ()
+                              onChange: String => Unit = _ => (),
+                              onEnter: () => Unit = () => ()
                              ): TextBoxProps = TextBoxProps(
     pos = (1, 2),
     width = 10,
     value = value,
-    style = new BlessedStyle {
-      override val bg = "cyan"
-      override val fg = "black"
-    },
-    onChange = onChange
+    onChange = onChange,
+    onEnter = onEnter
   )
 
   private def assertTextBox(result: ShallowInstance, props: TextBoxProps): Unit = {
@@ -322,7 +384,7 @@ class TextBoxSpec extends TestSpec
         ^.rbHeight := 1,
         ^.rbLeft := left,
         ^.rbTop := top,
-        ^.rbStyle := props.style,
+        ^.rbStyle := styles.normal,
         ^.content := TextBox.renderText(styles.normal, props.value)
       )()
     )

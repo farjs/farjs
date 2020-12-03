@@ -75,7 +75,6 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           pos = (5, 3),
           width = width - 10,
           value = folderName,
-          style = style.focus.getOrElse(null),
           onChange = { value =>
             setFolderName(value)
           }

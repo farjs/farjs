@@ -135,11 +135,10 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
           padding shouldBe 1
       }
       assertComponent(input, TextBox) {
-        case TextBoxProps(pos, resWidth, resValue, resStyle, _) =>
+        case TextBoxProps(pos, resWidth, resValue, _, _) =>
           pos shouldBe 5 -> 3
           resWidth shouldBe (width - 10)
           resValue shouldBe props.folderName
-          resStyle shouldBe style.focus
       }
       assertComponent(sep1, HorizontalLine) {
         case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>

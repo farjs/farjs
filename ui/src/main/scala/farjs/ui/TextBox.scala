@@ -10,8 +10,8 @@ import scala.scalajs.js
 case class TextBoxProps(pos: (Int, Int),
                         width: Int,
                         value: String,
-                        style: BlessedStyle,
-                        onChange: String => Unit)
+                        onChange: String => Unit,
+                        onEnter: () => Unit = () => ())
 
 object TextBox extends FunctionComponent[TextBoxProps] {
 
@@ -123,8 +123,10 @@ object TextBox extends FunctionComponent[TextBoxProps] {
 
       var processed = true
       key.full match {
-        case "escape" | "return" | "enter" | "tab" =>
-          processed = false
+        case "return" | "enter" =>
+          props.onEnter()
+          processed = true
+        case "escape" | "tab" => processed = false
         case "right"   => move(el, props.value, CursorMove.Right, TextSelect.Reset)
         case "S-right" => move(el, props.value, CursorMove.Right, TextSelect.ToTheRight)
         case "left"    => move(el, props.value, CursorMove.Left, TextSelect.Reset)
@@ -192,7 +194,7 @@ object TextBox extends FunctionComponent[TextBoxProps] {
       ^.rbHeight := 1,
       ^.rbLeft := left,
       ^.rbTop := top,
-      ^.rbStyle := props.style,
+      ^.rbStyle := styles.normal,
       ^.rbTags := true,
       ^.content := {
         if (selEnd - selStart > 0) {
