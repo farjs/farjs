@@ -1,7 +1,7 @@
 package farjs.ui.filelist.popups
 
 import farjs.api.filelist.{FileListDir, FileListItem}
-import farjs.ui.filelist.FileListActions.FileListItemsDeleteAction
+import farjs.ui.filelist.FileListActions.{FileListDirCreateAction, FileListItemsDeleteAction}
 import farjs.ui.filelist.popups.FileListPopupsActions._
 import farjs.ui.filelist.{FileListActions, FileListsState}
 import farjs.ui.popup._
@@ -274,16 +274,42 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     })
   }
   
-  behavior of "MkFolder popup"
-  
-  ignore should "call api and create single folder when OK action" in {
-    //TODO: add test case
-    Succeeded
-  }
+  "MkFolder popup" should "call api and update state when OK action" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val currDir = FileListDir("/sub-dir", isRoot = false, items = Seq.empty)
+    val state = {
+      val state = FileListsState()
+      state.copy(
+        left = state.left.copy(isActive = true, currDir = currDir),
+        popups = FileListPopupsState(showMkFolderPopup = true)
+      )
+    }
+    val props = FileListPopupsProps(dispatch, actions, state)
+    val renderer = createRenderer()
+    renderer.render(<(FileListPopups())(^.wrapped := props)())
+    val popup = findComponentProps(renderer.getRenderOutput(), MakeFolderPopup)
+    val action = FileListDirCreateAction(
+      FutureTask("Creating...", Future.successful(()))
+    )
+    val dir = "test dir"
+    val multiple = true
 
-  ignore should "call api and create multiple folders when OK action" in {
-    //TODO: add test case
-    Succeeded
+    //then
+    (actions.createDir _).expects(dispatch, false, currDir.path, dir, multiple).returning(action)
+    dispatch.expects(action)
+    dispatch.expects(FileListPopupMkFolderAction(show = false))
+
+    //when
+    popup.onOk(dir, multiple)
+
+    action.task.future.map { _ =>
+      //then
+      val updated = findComponentProps(renderer.getRenderOutput(), MakeFolderPopup)
+      updated.folderName shouldBe dir
+      updated.multiple shouldBe multiple
+    }
   }
 
   it should "dispatch FileListPopupMkFolderAction when Cancel action" in {

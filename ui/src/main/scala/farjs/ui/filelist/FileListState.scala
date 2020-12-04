@@ -62,13 +62,7 @@ object FileListsStateReducer {
         selectedNames = selectedNames
       )
     case FileListDirChangedAction(`isRight`, dir, currDir) =>
-      val items = {
-        val sorted = currDir.items.sortBy(item => (!item.isDir, item.name))
-
-        if (currDir.isRoot) sorted
-        else FileListItem.up +: sorted
-      }
-
+      val processed = processDir(currDir)
       val index =
         if (dir == FileListItem.up.name) {
           val focusedDir = state.currDir.path
@@ -76,15 +70,21 @@ object FileListsStateReducer {
             .stripPrefix("/")
             .stripPrefix("\\")
 
-          math.max(items.indexWhere(_.name == focusedDir), 0)
+          math.max(processed.items.indexWhere(_.name == focusedDir), 0)
         }
         else 0
 
       state.copy(
         offset = 0,
         index = index,
-        currDir = currDir.copy(items = items),
+        currDir = processed,
         selectedNames = Set.empty
+      )
+    case FileListDirCreatedAction(`isRight`, dir, currDir) =>
+      val processed = processDir(currDir)
+      state.copy(
+        index = math.max(processed.items.indexWhere(_.name == dir), 0),
+        currDir = processed
       )
     case FileListItemsDeletedAction(`isRight`) =>
       val selected =
@@ -120,5 +120,16 @@ object FileListsStateReducer {
         selectedNames = Set.empty
       )
     case _ => state
+  }
+  
+  private def processDir(currDir: FileListDir): FileListDir = {
+    val items = {
+      val sorted = currDir.items.sortBy(item => (!item.isDir, item.name))
+
+      if (currDir.isRoot) sorted
+      else FileListItem.up +: sorted
+    }
+    
+    currDir.copy(items = items)
   }
 }

@@ -59,16 +59,48 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
     findComponentProps(renderer.getRenderOutput(), CheckBox).value shouldBe true
   }
   
-  ignore should "call onOk when press OK button" in {
+  it should "call onOk when onEnter in TextBox" in {
     //given
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
-    val props = MakeFolderPopupProps("", multiple = false, onOk = onOk, onCancel = onCancel)
+    val props = MakeFolderPopupProps("test", multiple = true, onOk, onCancel)
+    val comp = shallowRender(<(MakeFolderPopup())(^.wrapped := props)())
+    val textBox = findComponentProps(comp, TextBox)
+
+    //then
+    onOk.expects("test", true)
+    onCancel.expects().never()
+
+    //when
+    textBox.onEnter()
+  }
+  
+  it should "call onOk when press OK button" in {
+    //given
+    val onOk = mockFunction[String, Boolean, Unit]
+    val onCancel = mockFunction[Unit]
+    val props = MakeFolderPopupProps("test", multiple = true, onOk, onCancel)
     val comp = shallowRender(<(MakeFolderPopup())(^.wrapped := props)())
     val okButton = findComponents(comp, "button").head
 
     //then
-    onOk.expects("", false)
+    onOk.expects("test", true)
+    onCancel.expects().never()
+    
+    //when
+    okButton.props.onPress()
+  }
+  
+  it should "not call onOk if folderName is empty" in {
+    //given
+    val onOk = mockFunction[String, Boolean, Unit]
+    val onCancel = mockFunction[Unit]
+    val props = MakeFolderPopupProps("", multiple = true, onOk, onCancel)
+    val comp = shallowRender(<(MakeFolderPopup())(^.wrapped := props)())
+    val okButton = findComponents(comp, "button").head
+
+    //then
+    onOk.expects(*, *).never()
     onCancel.expects().never()
     
     //when

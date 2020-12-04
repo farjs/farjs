@@ -25,6 +25,23 @@ trait FileListActions {
     FileListDirChangeAction(FutureTask("Changing Dir", future))
   }
 
+  def createDir(dispatch: Dispatch,
+                isRight: Boolean,
+                parent: String,
+                dir: String,
+                multiple: Boolean): FileListDirCreateAction = {
+
+    val future = for {
+      created <- api.mkDir(parent, dir, multiple)
+      currDir <- api.readDir(parent)
+    } yield {
+      dispatch(FileListDirCreatedAction(isRight, created, currDir))
+      ()
+    }
+
+    FileListDirCreateAction(FutureTask("Creating Dir", future))
+  }
+
   def deleteItems(dispatch: Dispatch,
                   isRight: Boolean,
                   dir: String,
@@ -48,6 +65,9 @@ object FileListActions {
 
   case class FileListDirChangeAction(task: FutureTask[FileListDir]) extends TaskAction
   case class FileListDirChangedAction(isRight: Boolean, dir: String, currDir: FileListDir) extends Action
+  
+  case class FileListDirCreateAction(task: FutureTask[Unit]) extends TaskAction
+  case class FileListDirCreatedAction(isRight: Boolean, dir: String, currDir: FileListDir) extends Action
   
   case class FileListItemsDeleteAction(task: FutureTask[Unit]) extends TaskAction
   case class FileListItemsDeletedAction(isRight: Boolean) extends Action

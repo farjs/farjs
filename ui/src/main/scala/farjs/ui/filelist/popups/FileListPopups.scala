@@ -6,6 +6,7 @@ import farjs.ui.popup._
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.nodejs._
 import scommons.react._
+import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
@@ -17,6 +18,8 @@ case class FileListPopupsProps(dispatch: Dispatch,
 object FileListPopups extends FunctionComponent[FileListPopupsProps] {
 
   protected def render(compProps: Props): ReactElement = {
+    val (folderName, setFolderName) = useState("")
+    val (multiple, setMultiple) = useState(false)
     val props = compProps.wrapped
     val popups = props.data.popups
 
@@ -89,11 +92,26 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
       
       if (popups.showMkFolderPopup) Some(
         <(MakeFolderPopup())(^.wrapped := MakeFolderPopupProps(
-          folderName = "",
-          multiple = false,
-          onOk = { (_, _) =>
-            //TODO: add api call
-            //props.dispatch(FileListPopupMkFolderAction(show = false))
+          folderName = folderName,
+          multiple = multiple,
+          onOk = { (dir, multiple) =>
+            val state =
+              if (props.data.left.isActive) props.data.left
+              else props.data.right
+
+            val action = props.actions.createDir(
+              dispatch = props.dispatch,
+              isRight = state.isRight,
+              parent = state.currDir.path,
+              dir = dir,
+              multiple = multiple
+            )
+            action.task.future.foreach { _ =>
+              setFolderName(dir)
+              setMultiple(multiple)
+              props.dispatch(FileListPopupMkFolderAction(show = false))
+            }
+            props.dispatch(action)
           },
           onCancel = { () =>
             props.dispatch(FileListPopupMkFolderAction(show = false))

@@ -106,8 +106,8 @@ class FileListsStateReducerSpec extends TestSpec {
     //given
     val stateDir = FileListDir("/root/sub-dir/dir 2", isRoot = false, items = Seq.empty)
     val state = FileListsState(
-      left = FileListState(currDir = stateDir),
-      right = FileListState(currDir = stateDir, isRight = true)
+      left = FileListState(currDir = stateDir, selectedNames = Set("test")),
+      right = FileListState(currDir = stateDir, selectedNames = Set("test"), isRight = true)
     )
     val currDir = FileListDir("/root/sub-dir", isRoot = false, items = List(
       FileListItem("file 2"),
@@ -142,6 +142,52 @@ class FileListsStateReducerSpec extends TestSpec {
           FileListItem("file 2")
         )),
         selectedNames = Set.empty,
+        isRight = true
+      ))
+    }
+  }
+
+  it should "update FileListState when FileListDirCreatedAction" in {
+    //given
+    val stateDir = FileListDir("/", isRoot = true, items = Seq.empty)
+    val state = FileListsState(
+      left = FileListState(offset = 1, currDir = stateDir, selectedNames = Set("test1")),
+      right = FileListState(offset = 2, currDir = stateDir, selectedNames = Set("test2"), isRight = true)
+    )
+    val dir = "dir 2"
+    val currDir = stateDir.copy(items = List(
+      FileListItem("file 2"),
+      FileListItem("file 1"),
+      FileListItem(dir, isDir = true),
+      FileListItem("dir 1", isDir = true)
+    ))
+
+    //when & then
+    reduce(Some(state), FileListDirCreatedAction(isRight = false, dir, currDir)) shouldBe {
+      state.copy(left = FileListState(
+        offset = 1,
+        index = 1,
+        currDir = currDir.copy(items = List(
+          FileListItem("dir 1", isDir = true),
+          FileListItem("dir 2", isDir = true),
+          FileListItem("file 1"),
+          FileListItem("file 2")
+        )),
+        selectedNames = Set("test1")
+      ))
+    }
+    //when & then
+    reduce(Some(state), FileListDirCreatedAction(isRight = true, dir, currDir)) shouldBe {
+      state.copy(right = FileListState(
+        offset = 2,
+        index = 1,
+        currDir = currDir.copy(items = List(
+          FileListItem("dir 1", isDir = true),
+          FileListItem("dir 2", isDir = true),
+          FileListItem("file 1"),
+          FileListItem("file 2")
+        )),
+        selectedNames = Set("test2"),
         isRight = true
       ))
     }

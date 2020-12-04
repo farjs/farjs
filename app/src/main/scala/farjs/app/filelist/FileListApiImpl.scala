@@ -10,8 +10,10 @@ import scala.concurrent.Future
 class FileListApiImpl extends FileListApi {
 
   def readDir(parent: Option[String], dir: String): Future[FileListDir] = {
-    val targetDir = path.resolve(parent.toList :+ dir: _*)
-    
+    readDir(path.resolve(parent.toList :+ dir: _*))
+  }
+  
+  def readDir(targetDir: String): Future[FileListDir] = {
     fs.readdir(targetDir).map { files =>
       val items = files.map { name =>
         val stats = fs.lstatSync(path.join(targetDir, name))
@@ -66,7 +68,7 @@ class FileListApiImpl extends FileListApi {
     delDirItems(parent, items.map(i => (i.name, i.isDir)))
   }
 
-  def mkDir(parent: String, dir: String, multiple: Boolean): Future[Unit] = {
+  def mkDir(parent: String, dir: String, multiple: Boolean): Future[String] = {
 
     def mkDirs(parent: String, names: List[String]): Future[Unit] = names match {
       case Nil => Future.unit
@@ -75,7 +77,9 @@ class FileListApiImpl extends FileListApi {
           if (name.isEmpty) parent
           else {
             val dir = path.join(parent, name)
-            fs.mkdirSync(dir)
+            if (!fs.existsSync(dir)) {
+              fs.mkdirSync(dir)
+            }
             dir
           }
         
@@ -83,7 +87,8 @@ class FileListApiImpl extends FileListApi {
       }
     }
 
-    mkDirs(parent, names = if (multiple) dir.split(path.sep).toList else List(dir))
+    val names = if (multiple) dir.split(path.sep).toList else List(dir)
+    mkDirs(parent, names).map(_ => names.head)
   }
   
   private[filelist] def getPermissions(mode: Int): String = {

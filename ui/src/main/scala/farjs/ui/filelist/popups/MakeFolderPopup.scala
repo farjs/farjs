@@ -21,10 +21,14 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
     val (width, height) = (75, 10)
     val style = Popup.Styles.normal
 
+    val onOk = { () =>
+      if (folderName.nonEmpty) {
+        props.onOk(folderName, multiple)
+      }
+    }
+    
     val buttons = List(
-      "[ OK ]" -> { () =>
-        //TODO: handle OK action
-      },
+      "[ OK ]" -> onOk,
       "[ Cancel ]" -> props.onCancel
     ).foldLeft(List.empty[(String, () => Unit, Int)]) {
       case (result, (label, action)) =>
@@ -77,7 +81,8 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           value = folderName,
           onChange = { value =>
             setFolderName(value)
-          }
+          },
+          onEnter = onOk
         ))(),
         <(HorizontalLine())(^.wrapped := HorizontalLineProps(
           pos = (3, 4),

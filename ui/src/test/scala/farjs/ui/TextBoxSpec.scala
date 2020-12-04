@@ -174,39 +174,6 @@ class TextBoxSpec extends TestSpec
     key.defaultPrevented.getOrElse(false) shouldBe true
   }
   
-  it should "call onEnter and prevent default if enter key when onKeypress" in {
-    //given
-    val onEnter = mockFunction[Unit]
-    val props = getTextBoxProps(onEnter = onEnter)
-    val programMock = mock[BlessedProgramMock]
-    val screenMock = mock[BlessedScreenMock]
-    val inputMock = mock[BlessedElementMock]
-    val width = props.width
-    val (aleft, atop) = props.pos
-    val cursorX = width - 1
-    (inputMock.screen _).expects().anyNumberOfTimes().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.program _).expects().anyNumberOfTimes().returning(programMock.asInstanceOf[BlessedProgram])
-    (inputMock.width _).expects().anyNumberOfTimes().returning(width)
-    (inputMock.aleft _).expects().anyNumberOfTimes().returning(aleft)
-    (inputMock.atop _).expects().anyNumberOfTimes().returning(atop)
-    (programMock.omove _).expects(aleft + cursorX, atop)
-
-    val inputEl = testRender(<(TextBox())(^.wrapped := props)(), { el =>
-      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
-      else null
-    })
-    val key = js.Dynamic.literal("full" -> "enter").asInstanceOf[KeyboardKey]
-
-    //then
-    onEnter.expects()
-
-    //when
-    inputEl.props.onKeypress(null, key)
-
-    //then
-    key.defaultPrevented.getOrElse(false) shouldBe true
-  }
-  
   it should "process key and prevent default when onKeypress" in {
     //given
     val onChange = mockFunction[String, Unit]
@@ -292,6 +259,7 @@ class TextBoxSpec extends TestSpec
     }
 
     //when & then
+    check(defaultPrevented = true, "enter", offset, cursorX, value, selStart, selEnd)
     check(defaultPrevented = false, "escape", offset, cursorX, value, selStart, selEnd)
     check(defaultPrevented = false, "tab", offset, cursorX, value, selStart, selEnd)
     

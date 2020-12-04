@@ -123,9 +123,10 @@ object TextBox extends FunctionComponent[TextBoxProps] {
 
       var processed = true
       key.full match {
-        case "return" | "enter" =>
+        case "return" =>
           props.onEnter()
           processed = true
+        case "enter" => processed = true // either enter or return is handled, not both!
         case "escape" | "tab" => processed = false
         case "right"   => move(el, props.value, CursorMove.Right, TextSelect.Reset)
         case "S-right" => move(el, props.value, CursorMove.Right, TextSelect.ToTheRight)
