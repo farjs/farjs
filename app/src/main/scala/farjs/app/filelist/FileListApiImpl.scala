@@ -6,8 +6,11 @@ import scommons.nodejs.raw.FSConstants._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
 
 class FileListApiImpl extends FileListApi {
+
+  private[filelist] def fs: FS = FS
 
   def readDir(parent: Option[String], dir: String): Future[FileListDir] = {
     readDir(path.resolve(parent.toList :+ dir: _*))
@@ -16,20 +19,22 @@ class FileListApiImpl extends FileListApi {
   def readDir(targetDir: String): Future[FileListDir] = {
     fs.readdir(targetDir).map { files =>
       val items = files.map { name =>
-        val stats = fs.lstatSync(path.join(targetDir, name))
-
-        val isDir = stats.isDirectory()
-        FileListItem(
-          name = name,
-          isDir = isDir,
-          isSymLink = stats.isSymbolicLink(),
-          size = if (isDir) 0.0 else stats.size,
-          atimeMs = stats.atimeMs,
-          mtimeMs = stats.mtimeMs,
-          ctimeMs = stats.ctimeMs,
-          birthtimeMs = stats.birthtimeMs,
-          permissions = getPermissions(stats.mode)
-        )
+        Try(fs.lstatSync(path.join(targetDir, name))) match {
+          case Failure(_) => FileListItem(name)
+          case Success(stats) =>
+            val isDir = stats.isDirectory()
+            FileListItem(
+              name = name,
+              isDir = isDir,
+              isSymLink = stats.isSymbolicLink(),
+              size = if (isDir) 0.0 else stats.size,
+              atimeMs = stats.atimeMs,
+              mtimeMs = stats.mtimeMs,
+              ctimeMs = stats.ctimeMs,
+              birthtimeMs = stats.birthtimeMs,
+              permissions = getPermissions(stats.mode)
+            )
+        }
       }
 
       val pathObj = path.parse(targetDir)

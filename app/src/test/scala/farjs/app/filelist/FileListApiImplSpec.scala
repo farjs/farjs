@@ -1,15 +1,42 @@
 package farjs.app.filelist
 
 import farjs.api.filelist._
+import farjs.app.filelist.FileListApiImplSpec.TestApiImpl
 import org.scalatest.Succeeded
 import scommons.nodejs._
 import scommons.nodejs.raw.FSConstants
 import scommons.nodejs.test.AsyncTestSpec
 
+import scala.concurrent.Future
+
 class FileListApiImplSpec extends AsyncTestSpec {
   
   private val apiImp = new FileListApiImpl
 
+  it should "not fail if fs.lstatSync fail when readDir" in {
+    //given
+    val fs = mock[FS]
+    val apiImp = new TestApiImpl(fs)
+    val targetDir = path.resolve(FileListDir.curr)
+
+    (fs.readdir _).expects(targetDir).returning(Future.successful(List("file1", "file2")))
+    (fs.lstatSync _).expects(path.join(targetDir, "file1")).throwing(new Exception("test error"))
+    (fs.lstatSync _).expects(path.join(targetDir, "file2")).throwing(new Exception("test error"))
+    
+    //when
+    apiImp.readDir(targetDir).map { dir =>
+      //then
+      inside(dir) { case FileListDir(dirPath, isRoot, items) =>
+        dirPath shouldBe process.cwd()
+        isRoot shouldBe false
+        items shouldBe List(
+          FileListItem("file1"),
+          FileListItem("file2")
+        )
+      }
+    }
+  }
+  
   it should "return current dir info and files when readDir(None, .)" in {
     //when
     apiImp.readDir(None, FileListDir.curr).map { dir =>
@@ -246,5 +273,13 @@ class FileListApiImplSpec extends AsyncTestSpec {
       if (isDir) fs.rmdirSync(path)
       else fs.unlinkSync(path)
     }
+  }
+}
+
+object FileListApiImplSpec {
+
+  class TestApiImpl(fsMock: FS) extends FileListApiImpl {
+    
+    override private[filelist] val fs = fsMock
   }
 }
