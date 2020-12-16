@@ -131,7 +131,7 @@ class BottomMenuViewSpec extends TestSpec
       (9, "      ", 64, 8),
       (10, " Exit ", 72, 8),
       (11, "      ", 80, 8),
-      (12, "      ", 88, 8)
+      (12, "DevToo", 88, 8)
     )
     val keyFg = styles.key.fg
     val keyBg = styles.key.bg

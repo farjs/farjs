@@ -17,7 +17,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 object FarjsApp {
 
   @JSExport("start")
-  def start(): BlessedScreen = {
+  def start(showDevTools: Boolean = false): BlessedScreen = {
     val screen = Blessed.screen(new BlessedScreenConfig {
       override val autoPadding = true
       override val smartCSR = true
@@ -38,7 +38,9 @@ object FarjsApp {
     ).apply()
     val root = new FarjsRoot(
       fileListComp = fileListComp,
-      fileListPopups = new FileListPopupsController(actions).apply()
+      fileListPopups = new FileListPopupsController(actions).apply(),
+      taskController = FarjsTaskController(),
+      showDevTools = showDevTools
     )
     
     ReactBlessed.render(

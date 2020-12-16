@@ -1,5 +1,7 @@
 package scommons.react.blessed.raw
 
+import scommons.nodejs.raw.EventEmitter
+
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport
 
@@ -13,7 +15,7 @@ object Blessed extends js.Object {
 }
 
 @js.native
-trait BlessedProgram extends js.Object {
+trait BlessedProgram extends EventEmitter {
   
   def showCursor(): Unit = js.native
   def hideCursor(): Unit = js.native
