@@ -1,8 +1,9 @@
 package farjs.app.filelist
 
 import farjs.api.filelist._
+import farjs.app.filelist.FileListApiImpl._
 import scommons.nodejs._
-import scommons.nodejs.raw.FSConstants._
+import scommons.nodejs.raw.FSConstants
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -100,15 +101,32 @@ class FileListApiImpl extends FileListApi {
     
     def flag(c: Char, f: Int): Char = if ((mode & f) != 0) c else '-'
     
-    s"${flag('d', S_IFDIR)}" +
-      s"${flag('r', S_IRUSR)}" +
-      s"${flag('w', S_IWUSR)}" +
-      s"${flag('x', S_IXUSR)}" +
-      s"${flag('r', S_IRGRP)}" +
-      s"${flag('w', S_IWGRP)}" +
-      s"${flag('x', S_IXGRP)}" +
-      s"${flag('r', S_IROTH)}" +
-      s"${flag('w', S_IWOTH)}" +
-      s"${flag('x', S_IXOTH)}"
+    val chars = new Array[Char](10)
+    chars(0) = flag('d', S_IFDIR)
+    chars(1) = flag('r', S_IRUSR)
+    chars(2) = flag('w', S_IWUSR)
+    chars(3) = flag('x', S_IXUSR)
+    chars(4) = flag('r', S_IRGRP)
+    chars(5) = flag('w', S_IWGRP)
+    chars(6) = flag('x', S_IXGRP)
+    chars(7) = flag('r', S_IROTH)
+    chars(8) = flag('w', S_IWOTH)
+    chars(9) = flag('x', S_IXOTH)
+    
+    new String(chars)
   }
+}
+
+object FileListApiImpl {
+
+  private val S_IFDIR: Int = FSConstants.S_IFDIR
+  private val S_IRUSR: Int = FSConstants.S_IRUSR.getOrElse(0)
+  private val S_IWUSR: Int = FSConstants.S_IWUSR.getOrElse(0)
+  private val S_IXUSR: Int = FSConstants.S_IXUSR.getOrElse(0)
+  private val S_IRGRP: Int = FSConstants.S_IRGRP.getOrElse(0)
+  private val S_IWGRP: Int = FSConstants.S_IWGRP.getOrElse(0)
+  private val S_IXGRP: Int = FSConstants.S_IXGRP.getOrElse(0)
+  private val S_IROTH: Int = FSConstants.S_IROTH.getOrElse(0)
+  private val S_IWOTH: Int = FSConstants.S_IWOTH.getOrElse(0)
+  private val S_IXOTH: Int = FSConstants.S_IXOTH.getOrElse(0)
 }
