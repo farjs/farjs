@@ -64,7 +64,10 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
         s"$content$ending"
     }
 
-    val itemsContent = renderItems().mkString("\n")
+    val itemsContent = renderItems().mkString(
+      """
+        |""".stripMargin
+    )
 
     <.box(
       ^.rbWidth := width,

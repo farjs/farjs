@@ -93,7 +93,7 @@ class FileListApiImpl extends FileListApi {
       }
     }
 
-    val names = if (multiple) dir.split(path.sep).toList else List(dir)
+    val names = if (multiple) dir.split(path.sep.head).toList else List(dir)
     mkDirs(parent, names).map(_ => names.head)
   }
   
