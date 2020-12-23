@@ -1,7 +1,7 @@
 package farjs.app
 
 import farjs.app.FarjsRootSpec._
-import farjs.ui.LogPanel
+import farjs.ui._
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.blessed.portal._
@@ -62,6 +62,11 @@ class FarjsRootSpec extends TestSpec
 
     //then
     findComponents(renderer.root.children(0), "box").head.props.width shouldBe "70%"
+    
+    //cleanup
+    TestRenderer.act { () =>
+      renderer.unmount()
+    }
   }
 
   it should "render component without DevTools" in {
@@ -72,8 +77,10 @@ class FarjsRootSpec extends TestSpec
     val result = shallowRender(<(root())()())
 
     //then
-    assertNativeComponent(result,
-      <.>()(
+    assertNativeComponent(result, <.>()(), { children: List[ShallowInstance] =>
+      val List(main, log) = children
+      
+      assertNativeComponent(main,
         <.box(
           ^.rbWidth := "100%"
         )(
@@ -88,10 +95,17 @@ class FarjsRootSpec extends TestSpec
           )
         )
       )
-    )
+
+      assertComponent(log, LogController) { case LogControllerProps(render) =>
+        val content = "test log content"
+        assertNativeComponent(wrapRender(render(content)),
+          <.>()()
+        )
+      }
+    })
   }
   
-  it should "render component with DevTools" in {
+  it should "render component with LogPanel" in {
     //given
     val root = new FarjsRoot(fileListComp, fileListPopups, taskController, showDevTools = true)
 
@@ -99,8 +113,10 @@ class FarjsRootSpec extends TestSpec
     val result = shallowRender(<(root())()())
 
     //then
-    assertNativeComponent(result,
-      <.>()(
+    assertNativeComponent(result, <.>()(), { children: List[ShallowInstance] =>
+      val List(main, log) = children
+
+      assertNativeComponent(main,
         <.box(
           ^.rbWidth := "70%"
         )(
@@ -113,17 +129,41 @@ class FarjsRootSpec extends TestSpec
               <(taskController).empty
             )
           )
-        ),
-        <.box(
-          ^.rbWidth := "30%",
-          ^.rbHeight := "100%",
-          ^.rbLeft := "70%"
-        )(
-          <(LogPanel())()()
-          //<(ColorPanel())()()
         )
       )
-    )
+      
+      assertComponent(log, LogController) { case LogControllerProps(render) =>
+        val content = "test log content"
+        val renderResult = wrapRender(render(content))
+        
+        assertNativeComponent(renderResult, <.>()(), { children: List[ShallowInstance] =>
+          val List(box) = children
+          assertNativeComponent(box,
+            <.box(
+              ^.rbWidth := "30%",
+              ^.rbHeight := "100%",
+              ^.rbLeft := "70%"
+            )(),
+            { children: List[ShallowInstance] =>
+              val List(logPanel) = children
+              assertComponent(logPanel, LogPanel) { case LogPanelProps(resContent) =>
+                resContent shouldBe content
+              }
+            }
+          )
+        })
+      }
+    })
+  }
+  
+  private def wrapRender(comp: ReactElement): ShallowInstance = {
+    val wrapper = new FunctionComponent[Unit] {
+      protected def render(props: Props): ReactElement = {
+        comp
+      }
+    }
+    
+    shallowRender(<(wrapper()).empty)
   }
 }
 

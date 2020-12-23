@@ -1,6 +1,6 @@
 package farjs.app
 
-import farjs.ui.LogPanel
+import farjs.ui._
 import scommons.react._
 import scommons.react.hooks._
 import scommons.react.blessed._
@@ -47,17 +47,21 @@ class FarjsRoot(fileListComp: ReactClass,
           )
         )
       ),
-      if (devTools) Some(
-        <.box(
-          ^.rbWidth := "30%",
-          ^.rbHeight := "100%",
-          ^.rbLeft := "70%"
-        )(
-          <(LogPanel())()()
-          //<(ColorPanel())()()
+      <(LogController())(^.wrapped := LogControllerProps { content =>
+        <.>()(
+          if (devTools) Some(
+            <.box(
+              ^.rbWidth := "30%",
+              ^.rbHeight := "100%",
+              ^.rbLeft := "70%"
+            )(
+              <(LogPanel())(^.wrapped := LogPanelProps(content))()
+              //<(ColorPanel())()()
+            )
+          )
+          else None
         )
-      )
-      else None
+      })()
     )
   }
 }
