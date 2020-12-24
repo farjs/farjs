@@ -1,5 +1,6 @@
 package farjs.app.filelist
 
+import farjs.app.filelist.FileListBrowser._
 import farjs.ui.menu.BottomMenu
 import scommons.react._
 import scommons.react.blessed._
@@ -25,8 +26,13 @@ class FileListBrowser(leftPanelComp: ReactClass,
       ),
 
       <.box(^.rbTop := "100%-1")(
-        <(BottomMenu())()()
+        <(bottomMenuComp())()()
       )
     )
   }
+}
+
+object FileListBrowser {
+
+  private[filelist] var bottomMenuComp: UiComponent[Unit] = BottomMenu
 }

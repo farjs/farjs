@@ -13,6 +13,7 @@ import scala.util.{Failure, Try}
 object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
 
   private[app] var logger: String => Unit = println
+  private[app] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
   
   val errorHandler: PartialFunction[Try[_], (Option[String], Option[String])] = {
     case Failure(ex@JavaScriptException(error)) =>
@@ -30,16 +31,14 @@ object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
     val showError = props.error.isDefined
     val errorMessage = props.error.getOrElse("")
 
-    <.>()(
-      if (showError) Some(
-        <(MessageBox())(^.wrapped := MessageBoxProps(
-          title = "Error",
-          message = errorMessage,
-          //message = s"$errorMessage${props.errorDetails.map(d => s"\n\n$d").getOrElse("")}",
-          actions = List(MessageBoxAction.OK(props.onCloseErrorPopup)),
-          style = Popup.Styles.error
-        ))()
-      ) else None
-    )
+    if (showError) {
+      <(messageBoxComp())(^.wrapped := MessageBoxProps(
+        title = "Error",
+        message = errorMessage,
+        //message = s"$errorMessage${props.errorDetails.map(d => s"\n\n$d").getOrElse("")}",
+        actions = List(MessageBoxAction.OK(props.onCloseErrorPopup)),
+        style = Popup.Styles.error
+      ))()
+    } else null
   }
 }

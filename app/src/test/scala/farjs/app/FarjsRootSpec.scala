@@ -1,5 +1,6 @@
 package farjs.app
 
+import farjs.app.FarjsRoot._
 import farjs.app.FarjsRootSpec._
 import farjs.ui._
 import scommons.react._
@@ -11,27 +12,16 @@ import scommons.react.test._
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportAll
 
-class FarjsRootSpec extends TestSpec
-  with TestRendererUtils
-  with ShallowRendererUtils {
+class FarjsRootSpec extends TestSpec with TestRendererUtils {
 
-  private val fileListComp = new FunctionComponent[Unit] {
-    protected def render(props: Props): ReactElement = {
-      <.>()("FileList Comp")
-    }
-  }.apply()
+  private val fileListComp = "FileListBrowser".asInstanceOf[ReactClass]
+  private val fileListPopups = "FileListPopups".asInstanceOf[ReactClass]
+  private val taskController = "TaskController".asInstanceOf[ReactClass]
 
-  private val fileListPopups = new FunctionComponent[Unit] {
-    protected def render(props: Props): ReactElement = {
-      <.>()("FileListPopups Comp")
-    }
-  }.apply()
-
-  private val taskController = new FunctionComponent[Unit] {
-    protected def render(props: Props): ReactElement = {
-      <.>()("TaskController Comp")
-    }
-  }.apply()
+  FarjsRoot.withPortalsComp = () => "WithPortals".asInstanceOf[ReactClass]
+  FarjsRoot.portalComp = () => "Portal".asInstanceOf[ReactClass]
+  FarjsRoot.logControllerComp = () => "LogController".asInstanceOf[ReactClass]
+  FarjsRoot.logPanelComp = () => "LogPanel".asInstanceOf[ReactClass]
 
   it should "emit resize event when on F12" in {
     //given
@@ -50,10 +40,10 @@ class FarjsRootSpec extends TestSpec
     (programMock.emit _).expects("resize")
     
     val renderer = createTestRenderer(<(root())()(), { el =>
-      if (el.`type` == "box".asInstanceOf[js.Any]) boxMock.asInstanceOf[js.Any]
+      if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock.asInstanceOf[js.Any]
       else null
     })
-    findComponents(renderer.root.children(0), "box").head.props.width shouldBe "100%"
+    findComponents(renderer.root.children(0), <.box.name).head.props.width shouldBe "100%"
     
     //when
     TestRenderer.act { () =>
@@ -61,7 +51,7 @@ class FarjsRootSpec extends TestSpec
     }
 
     //then
-    findComponents(renderer.root.children(0), "box").head.props.width shouldBe "70%"
+    findComponents(renderer.root.children(0), <.box.name).head.props.width shouldBe "70%"
     
     //cleanup
     TestRenderer.act { () =>
@@ -72,98 +62,80 @@ class FarjsRootSpec extends TestSpec
   it should "render component without DevTools" in {
     //given
     val root = new FarjsRoot(fileListComp, fileListPopups, taskController, showDevTools = false)
+    val screenMock = mock[BlessedScreenMock]
+    val boxMock = mock[BlessedElementMock]
+
+    (boxMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.key _).expects(*, *)
 
     //when
-    val result = shallowRender(<(root())()())
+    val result = createTestRenderer(<(root())()(), { el =>
+      if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock.asInstanceOf[js.Any]
+      else null
+    }).root
 
     //then
-    assertNativeComponent(result, <.>()(), { children: List[ShallowInstance] =>
-      val List(main, log) = children
-      
-      assertNativeComponent(main,
-        <.box(
-          ^.rbWidth := "100%"
-        )(
-          <(WithPortals())()(
-            <.>()(
-              Portal.create(
-                <(fileListComp).empty
-              ),
-              <(fileListPopups).empty,
-              <(taskController).empty
-            )
-          )
-        )
-      )
+    inside(result.children.toList) { case List(main, log) =>
+      assertNativeComponent(main, <.box(^.rbWidth := "100%")(), { case List(withPortals) =>
+        assertNativeComponent(withPortals, <(withPortalsComp())()(), { case List(portal, fileList, task) =>
+          assertTestComponent(portal, portalComp) { case PortalProps(content) =>
+            assertNativeComponent(createTestRenderer(content).root, <(fileListComp).empty)
+          }
+          assertNativeComponent(fileList, <(fileListPopups).empty)
+          assertNativeComponent(task, <(taskController).empty)
+        })
+      })
 
-      assertComponent(log, LogController) { case LogControllerProps(render) =>
-        val content = "test log content"
-        assertNativeComponent(wrapRender(render(content)),
-          <.>()()
-        )
+      assertTestComponent(log, logControllerComp) { case LogControllerProps(render) =>
+        render("test log content") shouldBe null
       }
-    })
+    }
   }
   
   it should "render component with LogPanel" in {
     //given
     val root = new FarjsRoot(fileListComp, fileListPopups, taskController, showDevTools = true)
+    val screenMock = mock[BlessedScreenMock]
+    val boxMock = mock[BlessedElementMock]
+
+    (boxMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.key _).expects(*, *)
 
     //when
-    val result = shallowRender(<(root())()())
+    val result = createTestRenderer(<(root())()(), { el =>
+      if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock.asInstanceOf[js.Any]
+      else null
+    }).root
 
     //then
-    assertNativeComponent(result, <.>()(), { children: List[ShallowInstance] =>
-      val List(main, log) = children
-
-      assertNativeComponent(main,
-        <.box(
-          ^.rbWidth := "70%"
-        )(
-          <(WithPortals())()(
-            <.>()(
-              Portal.create(
-                <(fileListComp).empty
-              ),
-              <(fileListPopups).empty,
-              <(taskController).empty
-            )
-          )
-        )
-      )
-      
-      assertComponent(log, LogController) { case LogControllerProps(render) =>
-        val content = "test log content"
-        val renderResult = wrapRender(render(content))
-        
-        assertNativeComponent(renderResult, <.>()(), { children: List[ShallowInstance] =>
-          val List(box) = children
-          assertNativeComponent(box,
-            <.box(
-              ^.rbWidth := "30%",
-              ^.rbHeight := "100%",
-              ^.rbLeft := "70%"
-            )(),
-            { children: List[ShallowInstance] =>
-              val List(logPanel) = children
-              assertComponent(logPanel, LogPanel) { case LogPanelProps(resContent) =>
-                resContent shouldBe content
-              }
-            }
-          )
+    inside(result.children.toList) { case List(main, log) =>
+      assertNativeComponent(main, <.box(^.rbWidth := "70%")(), { case List(withPortals) =>
+        assertNativeComponent(withPortals, <(withPortalsComp())()(), { case List(portal, fileList, task) =>
+          assertTestComponent(portal, portalComp) { case PortalProps(content) =>
+            assertNativeComponent(createTestRenderer(content).root, <(fileListComp).empty)
+          }
+          assertNativeComponent(fileList, <(fileListPopups).empty)
+          assertNativeComponent(task, <(taskController).empty)
         })
-      }
-    })
-  }
-  
-  private def wrapRender(comp: ReactElement): ShallowInstance = {
-    val wrapper = new FunctionComponent[Unit] {
-      protected def render(props: Props): ReactElement = {
-        comp
+      })
+
+      assertTestComponent(log, logControllerComp) { case LogControllerProps(render) =>
+        val content = "test log content"
+        val box = createTestRenderer(render(content)).root
+        
+        assertNativeComponent(box,
+          <.box(
+            ^.rbWidth := "30%",
+            ^.rbHeight := "100%",
+            ^.rbLeft := "70%"
+          )(), { case List(logPanel) =>
+            assertTestComponent(logPanel, logPanelComp) { case LogPanelProps(resContent) =>
+              resContent shouldBe content
+            }
+          }
+        )
       }
     }
-    
-    shallowRender(<(wrapper()).empty)
   }
 }
 

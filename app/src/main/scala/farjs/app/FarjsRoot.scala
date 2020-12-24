@@ -1,5 +1,6 @@
 package farjs.app
 
+import farjs.app.FarjsRoot._
 import farjs.ui._
 import scommons.react._
 import scommons.react.hooks._
@@ -37,31 +38,36 @@ class FarjsRoot(fileListComp: ReactClass,
           ^.rbWidth := "100%"
         )
       )(
-        <(WithPortals())()(
-          <.>()(
-            Portal.create(
-              <(fileListComp).empty
-            ),
-            <(fileListPopups).empty,
-            <(taskController).empty
-          )
+        <(withPortalsComp())()(
+          <(portalComp())(^.wrapped := PortalProps(
+            <(fileListComp).empty
+          ))(),
+          <(fileListPopups).empty,
+          <(taskController).empty
         )
       ),
-      <(LogController())(^.wrapped := LogControllerProps { content =>
-        <.>()(
-          if (devTools) Some(
-            <.box(
-              ^.rbWidth := "30%",
-              ^.rbHeight := "100%",
-              ^.rbLeft := "70%"
-            )(
-              <(LogPanel())(^.wrapped := LogPanelProps(content))()
-              //<(ColorPanel())()()
-            )
+      
+      <(logControllerComp())(^.wrapped := LogControllerProps { content =>
+        if (devTools) {
+          <.box(
+            ^.rbWidth := "30%",
+            ^.rbHeight := "100%",
+            ^.rbLeft := "70%"
+          )(
+            <(logPanelComp())(^.wrapped := LogPanelProps(content))()
+            //<(ColorPanel())()()
           )
-          else None
-        )
+        }
+        else null
       })()
     )
   }
+}
+
+object FarjsRoot {
+
+  private[app] var withPortalsComp: UiComponent[Unit] = WithPortals
+  private[app] var portalComp: UiComponent[PortalProps] = Portal
+  private[app] var logControllerComp: UiComponent[LogControllerProps] = LogController
+  private[app] var logPanelComp: UiComponent[LogPanelProps] = LogPanel
 }

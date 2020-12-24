@@ -1,50 +1,49 @@
 package farjs.app.filelist
 
-import farjs.ui.menu.BottomMenu
+import farjs.app.filelist.FileListBrowser._
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
 
-class FileListBrowserSpec extends TestSpec with ShallowRendererUtils {
+class FileListBrowserSpec extends TestSpec with TestRendererUtils {
+  
+  private val leftPanelComp = "Left".asInstanceOf[ReactClass]
+  private val rightPanelComp = "Right".asInstanceOf[ReactClass]
+
+  FileListBrowser.bottomMenuComp = () => "BottomMenu".asInstanceOf[ReactClass]
 
   it should "render component" in {
     //given
-    val leftPanelComp = new FunctionComponent[Unit] {
-      override protected def render(props: Props): ReactElement = {
-        <.>()("Left")
-      }
-    }.apply()
-    val rightPanelComp = new FunctionComponent[Unit] {
-      override protected def render(props: Props): ReactElement = {
-        <.>()("Right")
-      }
-    }.apply()
     val fileListBrowser = new FileListBrowser(leftPanelComp, rightPanelComp)
 
     //when
-    val result = shallowRender(<(fileListBrowser())()())
+    val result = createTestRenderer(<(fileListBrowser())()()).root
 
     //then
-    assertNativeComponent(result,
-      <.>()(
+    inside(result.children.toList) { case List(left, right, menu) =>
+      assertNativeComponent(left,
         <.box(
           ^.rbWidth := "50%",
           ^.rbHeight := "100%-1"
         )(
           <(leftPanelComp).empty
-        ),
+        )
+      )
+      assertNativeComponent(right,
         <.box(
           ^.rbWidth := "50%",
           ^.rbHeight := "100%-1",
           ^.rbLeft := "50%"
         )(
           <(rightPanelComp).empty
-        ),
-
-        <.box(^.rbTop := "100%-1")(
-          <(BottomMenu())()()
         )
       )
-    )
+
+      assertNativeComponent(menu,
+        <.box(^.rbTop := "100%-1")(
+          <(bottomMenuComp())()()
+        )
+      )
+    }
   }
 }

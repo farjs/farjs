@@ -1,17 +1,17 @@
 package farjs.app
 
+import farjs.app.FarjsTaskManagerUi._
 import farjs.ui.popup._
-import org.scalatest.Succeeded
 import scommons.react._
-import scommons.react.redux.task.{TaskManager, TaskManagerUiProps}
-import scommons.react.test.TestSpec
-import scommons.react.test.raw.ShallowInstance
-import scommons.react.test.util.ShallowRendererUtils
+import scommons.react.redux.task._
+import scommons.react.test._
 
 import scala.scalajs.js.JavaScriptException
 import scala.util.Failure
 
-class FarjsTaskManagerUiSpec extends TestSpec with ShallowRendererUtils {
+class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
+
+  FarjsTaskManagerUi.messageBoxComp = () => "MessageBox".asInstanceOf[ReactClass]
 
   it should "return error if JavaScriptException in errorHandler" in {
     //given
@@ -66,8 +66,8 @@ class FarjsTaskManagerUiSpec extends TestSpec with ShallowRendererUtils {
       error = Some("Some error"),
       onCloseErrorPopup = onCloseErrorPopup
     )
-    val comp = shallowRender(<(FarjsTaskManagerUi())(^.wrapped := props)())
-    val msgBox = findComponentProps(comp, MessageBox)
+    val comp = testRender(<(FarjsTaskManagerUi())(^.wrapped := props)())
+    val msgBox = findComponentProps(comp, messageBoxComp)
 
     //then
     onCloseErrorPopup.expects()
@@ -76,7 +76,7 @@ class FarjsTaskManagerUiSpec extends TestSpec with ShallowRendererUtils {
     msgBox.actions.head.onAction()
   }
 
-  it should "render error" in {
+  it should "render MessageBox if error" in {
     //given
     val props = getTaskManagerUiProps(
       error = Some("Some error"),
@@ -85,10 +85,29 @@ class FarjsTaskManagerUiSpec extends TestSpec with ShallowRendererUtils {
     val component = <(FarjsTaskManagerUi())(^.wrapped := props)()
 
     //when
-    val result = shallowRender(component)
+    val result = testRender(component)
 
     //then
-    assertRenderingResult(result, props)
+    assertTestComponent(result, messageBoxComp) {
+      case MessageBoxProps(title, message, actions, style) =>
+        title shouldBe "Error"
+        message shouldBe props.error.getOrElse("")
+        //details shouldBe props.errorDetails
+        actions shouldBe List(MessageBoxAction.OK(props.onCloseErrorPopup))
+        style shouldBe Popup.Styles.error
+    }
+  }
+
+  it should "render null if no error" in {
+    //given
+    val props = getTaskManagerUiProps(error = None)
+    val component = <(FarjsTaskManagerUi())(^.wrapped := props)()
+
+    //when
+    val result = createTestRenderer(component).root
+
+    //then
+    result.children.toList should be (empty)
   }
 
   private def getTaskManagerUiProps(showLoading: Boolean = false,
@@ -106,29 +125,5 @@ class FarjsTaskManagerUiSpec extends TestSpec with ShallowRendererUtils {
       errorDetails,
       onCloseErrorPopup
     )
-  }
-  
-  private def assertRenderingResult(result: ShallowInstance, props: TaskManagerUiProps): Unit = {
-    val showError = props.error.isDefined
-    
-    assertNativeComponent(result, <.>()(), { children =>
-      val errorPopup = children match {
-        case List(ep) if showError => Some(ep)
-      }
-
-      if (showError) {
-        errorPopup should not be None
-        assertComponent(errorPopup.get, MessageBox) {
-          case MessageBoxProps(title, message, actions, style) =>
-            title shouldBe "Error"
-            message shouldBe props.error.getOrElse("")
-            //details shouldBe props.errorDetails
-            actions shouldBe List(MessageBoxAction.OK(props.onCloseErrorPopup))
-            style shouldBe Popup.Styles.error
-        }
-      }
-      
-      Succeeded
-    })
   }
 }

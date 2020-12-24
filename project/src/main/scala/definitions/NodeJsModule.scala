@@ -43,6 +43,7 @@ object NodeJsModule {
     requireJsDomEnv in Test := false,
     version in webpack := "3.5.5",
     emitSourceMaps := false,
+    parallelExecution in Test := false,
 
     ideExcludedDirectories ++= {
       val base = baseDirectory.value
