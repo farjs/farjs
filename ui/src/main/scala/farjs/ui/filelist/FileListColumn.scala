@@ -1,7 +1,7 @@
 package farjs.ui.filelist
 
 import farjs.api.filelist.FileListItem
-import farjs.ui.{TextBox, TextLine, TextLineProps}
+import farjs.ui._
 import scommons.react._
 import scommons.react.blessed._
 
@@ -64,10 +64,7 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
         s"$content$ending"
     }
 
-    val itemsContent = renderItems().mkString(
-      """
-        |""".stripMargin
-    )
+    val itemsContent = renderItems().mkString(UI.newLine)
 
     <.box(
       ^.rbWidth := width,

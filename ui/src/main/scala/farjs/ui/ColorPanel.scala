@@ -7,40 +7,39 @@ object ColorPanel extends FunctionComponent[Unit] {
   
   protected def render(props: Props): ReactElement = {
     
-    def renderRow(pos: Int, bgColor: String, bgName: String, isBold: Boolean): ReactElement = {
-      val colorsLine = colors.map { case (color, name, _) =>
-        s"{$color-fg}{$bgColor-bg}$name{/}"
-      }.mkString
+    val levels = List(0x0, 0x5, 0x8, 0xa, 0xc, 0xe)
+    val mainColors = levels.map { group =>
+      levels.map { row =>
+        levels.map { level =>
+          val fg =
+            if (group > 0xa) "black"
+            else if (row > 0xa) "black"
+            else if (level > 0xa) "black"
+            else "white"
 
-      <.text(
-        ^.key := s"$pos",
-        ^.rbTop := pos,
-        ^.rbTags := true,
-        ^.rbStyle := new BlessedStyle {
-          override val bold = isBold
-        },
-        ^.content := s"$bgName$colorsLine"
-      )()
-    }
-    
-    <.>()(
-      colors.map { case (id, name, index) =>
-        renderRow(index, id, name, isBold = false)
-      },
-      colors.map { case (id, name, index) =>
-        renderRow(colors.size + index, id, name, isBold = true)
-      }
-    )
+          val color = f"#$group%x$row%x$level%x"
+          s"{$fg-fg}{$color-bg}$color{/}"
+        }.mkString("")
+      }.mkString(UI.newLine)
+    }.mkString(UI.newLine)
+
+    val grayScale = List(0x0, 0x3, 0x5, 0x8, 0xa, 0xc, 0xf).map { level =>
+      val fg =
+        if (level > 0xa) "black"
+        else "white"
+      
+      val color = f"#$level%x$level%x$level%x"
+      s"{$fg-fg}{$color-bg}$color{/}"
+    }.mkString("")
+
+    <.log(
+      ^.rbAutoFocus := false,
+      ^.rbMouse := true,
+      ^.rbTags := true,
+      ^.rbScrollbar := true,
+      ^.rbScrollable := true,
+      ^.rbAlwaysScroll := true,
+      ^.content := s"$mainColors${UI.newLine}${UI.newLine}$grayScale"
+    )()
   }
-
-  private lazy val colors = List(
-    " black ",
-    " red   ",
-    " green ",
-    " yellow",
-    " blue  ",
-    "magenta",
-    " cyan  ",
-    " white "
-  ).zipWithIndex.map { case (name, index) => (name.trim, name, index) }
 }
