@@ -249,7 +249,7 @@ object TextBox extends FunctionComponent[TextBoxProps] {
 
     val normal: BlessedStyle = new BlessedStyle {
       override val bold = false
-      override val bg = "cyan"
+      override val bg = "#088"
       override val fg = "black"
     }
     val selected: BlessedStyle = new BlessedStyle {

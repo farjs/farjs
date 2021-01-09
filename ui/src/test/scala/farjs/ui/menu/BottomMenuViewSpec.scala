@@ -150,7 +150,7 @@ class BottomMenuViewSpec extends TestSpec
               ^.rbTags := true,
               ^.rbMouse := true,
               ^.rbLeft := pos,
-              ^.content := f"{$keyFg-fg}{$keyBg-bg}$num%2d{/}{$itemFg-fg}{$itemBg-bg}$item{/}"
+              ^.content := f"{$keyFg-fg}{$keyBg-bg}{bold}$num%2d{/}{$itemFg-fg}{$itemBg-bg}$item{/}"
             )()
           )
       }

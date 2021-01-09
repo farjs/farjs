@@ -29,7 +29,7 @@ object Popup extends FunctionComponent[PopupProps] {
       override val fg = "black"
       override val focus = new BlessedStyle {
         override val bold = false
-        override val bg = "cyan"
+        override val bg = "#088"
         override val fg = "black"
       }
     }

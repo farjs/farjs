@@ -6,8 +6,6 @@ import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
 
-import scala.scalajs.js
-
 case class FileListViewProps(size: (Int, Int),
                              columns: Int,
                              items: Seq[FileListItem],
@@ -129,56 +127,53 @@ object FileListView extends FunctionComponent[FileListViewProps] {
     )
   }
   
-  private[filelist] lazy val styles = Styles
-  
-  private[filelist] object Styles extends js.Object {
+  private[filelist] lazy val styles = new Styles
+  private[filelist] class Styles {
     
     val normalItem: BlessedStyle = new BlessedStyle {
-      override val bold = false
-      override val bg = "blue"
-      override val fg = "white"
+      override val bold = true
+      override val bg = "#008"
+      override val fg = "#5ce"
       override val focus = new BlessedStyle {
         override val bold = false
-        override val bg = "cyan"
+        override val bg = "#088"
         override val fg = "black"
       }
     }
     val dirItem: BlessedStyle = new BlessedStyle {
       override val bold = true
-      override val bg = "blue"
-      override val fg = "white"
+      override val bg = "#008"
+      override val fg = "#fff"
       override val focus = new BlessedStyle {
         override val bold = true
-        override val bg = "cyan"
-        override val fg = "white"
+        override val bg = "#088"
+        override val fg = "#fff"
       }
     }
     val hiddenItem: BlessedStyle = new BlessedStyle {
       override val bold = true
-      override val bg = "blue"
-      override val fg = "black"
+      override val bg = "#008"
+      override val fg = "#055"
       override val focus = new BlessedStyle {
         override val bold = true
-        override val bg = "cyan"
-        override val fg = "black"
+        override val bg = "#088"
+        override val fg = "#055"
       }
     }
     val selectedItem: BlessedStyle = new BlessedStyle {
       override val bold = true
-      override val bg = "blue"
+      override val bg = "#008"
       override val fg = "yellow"
       override val focus = new BlessedStyle {
         override val bold = true
-        override val bg = "cyan"
+        override val bg = "#088"
         override val fg = "yellow"
       }
     }
     
-    val overlapColor = "red"
-
     val headerStyle: BlessedStyle = new BlessedStyle {
       override val bold = true
-      override val bg = "blue"
+      override val bg = "#008"
       override val fg = "yellow"
     }
   }

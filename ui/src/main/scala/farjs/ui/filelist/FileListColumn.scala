@@ -25,18 +25,8 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
     val (width, height) = props.size
     val styles = FileListView.styles
     
-    val borderEnd = TextBox.renderText(
-      isBold = false,
-      fgColor = styles.normalItem.fg.orNull,
-      bgColor = styles.normalItem.bg.orNull,
-      text = props.borderCh
-    )
-    val overlapEnd = TextBox.renderText(
-      isBold = false,
-      fgColor = styles.overlapColor,
-      bgColor = styles.normalItem.bg.orNull,
-      text = "}"
-    )
+    val borderEnd = TextBox.renderText(styles.normalItem, props.borderCh)
+    val overlapEnd = TextBox.renderText(styles.normalItem, "}")
 
     def renderItems(): Seq[String] = props.items.zipWithIndex.map {
       case (item, index) =>

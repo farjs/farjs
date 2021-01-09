@@ -108,13 +108,13 @@ class FileListColumnSpec extends TestSpec
 
     //then
     assertFileListColumn(result, props, Some(
-      """{white-fg}{blue-bg}..            {/}{white-fg}{blue-bg}│{/}
-        |{bold}{white-fg}{blue-bg}dir 1 {open}bold{close}  {/}{white-fg}{blue-bg}│{/}
-        |{bold}{yellow-fg}{cyan-bg}.dir 2 loooooo{/}{red-fg}{blue-bg}{close}{/}
-        |{bold}{yellow-fg}{blue-bg}file 3        {/}{white-fg}{blue-bg}│{/}
-        |{bold}{black-fg}{blue-bg}.dir 4        {/}{white-fg}{blue-bg}│{/}
-        |{bold}{black-fg}{blue-bg}.file 5       {/}{white-fg}{blue-bg}│{/}
-        |{white-fg}{blue-bg}file 6        {/}{white-fg}{blue-bg}│{/}""".stripMargin
+      """{bold}{#5ce-fg}{#008-bg}..            {/}{bold}{#5ce-fg}{#008-bg}│{/}
+        |{bold}{#fff-fg}{#008-bg}dir 1 {open}bold{close}  {/}{bold}{#5ce-fg}{#008-bg}│{/}
+        |{bold}{yellow-fg}{#088-bg}.dir 2 loooooo{/}{bold}{#5ce-fg}{#008-bg}{close}{/}
+        |{bold}{yellow-fg}{#008-bg}file 3        {/}{bold}{#5ce-fg}{#008-bg}│{/}
+        |{bold}{#055-fg}{#008-bg}.dir 4        {/}{bold}{#5ce-fg}{#008-bg}│{/}
+        |{bold}{#055-fg}{#008-bg}.file 5       {/}{bold}{#5ce-fg}{#008-bg}│{/}
+        |{bold}{#5ce-fg}{#008-bg}file 6        {/}{bold}{#5ce-fg}{#008-bg}│{/}""".stripMargin
     ))
   }
   

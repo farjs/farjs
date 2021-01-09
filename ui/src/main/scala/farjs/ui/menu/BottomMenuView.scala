@@ -45,8 +45,11 @@ object BottomMenuView extends FunctionComponent[BottomMenuViewProps] {
       (index + 1, text, leftPos, itemWidth)
     }
     
+    val keyBold = if (styles.key.bold.getOrElse(false)) "{bold}" else ""
     val keyFg = styles.key.fg
     val keyBg = styles.key.bg
+    
+    val itemBold = if (styles.item.bold.getOrElse(false)) "{bold}" else ""
     val itemFg = styles.item.fg
     val itemBg = styles.item.bg
     
@@ -68,7 +71,7 @@ object BottomMenuView extends FunctionComponent[BottomMenuViewProps] {
               shift = false
             ))
           },
-          ^.content := f"{$keyFg-fg}{$keyBg-bg}$key%2d{/}{$itemFg-fg}{$itemBg-bg}$item{/}"
+          ^.content := f"{$keyFg-fg}{$keyBg-bg}$keyBold$key%2d{/}{$itemFg-fg}{$itemBg-bg}$itemBold$item{/}"
         )()
       },
 
@@ -76,16 +79,17 @@ object BottomMenuView extends FunctionComponent[BottomMenuViewProps] {
     )
   }
 
-  private[menu] lazy val styles = Styles
+  private[menu] lazy val styles = new Styles
+  private[menu] class Styles {
 
-  private[menu] object Styles {
-
-    val key = new BlessedStyle {
+    val key: BlessedStyle = new BlessedStyle {
+      override val bold = true
       override val bg = "black"
-      override val fg = "white"
+      override val fg = "#aaa"
     }
-    val item = new BlessedStyle {
-      override val bg = "cyan"
+    val item: BlessedStyle = new BlessedStyle {
+      override val bold = false
+      override val bg = "#088"
       override val fg = "black"
     }
   }
