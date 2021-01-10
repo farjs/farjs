@@ -135,9 +135,9 @@ object FileListView extends FunctionComponent[FileListViewProps] {
       override val bg = "#008"
       override val fg = "#5ce"
       override val focus = new BlessedStyle {
-        override val bold = false
+        override val bold = true
         override val bg = "#088"
-        override val fg = "black"
+        override val fg = "#111"
       }
     }
     val dirItem: BlessedStyle = new BlessedStyle {

@@ -8,7 +8,7 @@ import io.github.shogowada.scalajs.reactjs.redux.Redux
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.blessed.raw.{Blessed, ReactBlessed}
+import scommons.react.blessed.raw.{Blessed, BlessedOverrides, ReactBlessed}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -18,6 +18,8 @@ object FarjsApp {
 
   @JSExport("start")
   def start(showDevTools: Boolean = false): BlessedScreen = {
+    BlessedOverrides.apply()
+    
     val screen = Blessed.screen(new BlessedScreenConfig {
       override val autoPadding = true
       override val smartCSR = true

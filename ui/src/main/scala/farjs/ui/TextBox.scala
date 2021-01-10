@@ -248,12 +248,12 @@ object TextBox extends FunctionComponent[TextBoxProps] {
   private[ui] object styles {
 
     val normal: BlessedStyle = new BlessedStyle {
-      override val bold = false
+      override val bold = true
       override val bg = "#088"
-      override val fg = "black"
+      override val fg = "#111"
     }
     val selected: BlessedStyle = new BlessedStyle {
-      override val bold = false
+      override val bold = true
       override val bg = "blue"
       override val fg = "white"
     }

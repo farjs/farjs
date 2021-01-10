@@ -88,9 +88,9 @@ object BottomMenuView extends FunctionComponent[BottomMenuViewProps] {
       override val fg = "#aaa"
     }
     val item: BlessedStyle = new BlessedStyle {
-      override val bold = false
+      override val bold = true
       override val bg = "#088"
-      override val fg = "black"
+      override val fg = "#111"
     }
   }
 }

@@ -24,13 +24,13 @@ object Popup extends FunctionComponent[PopupProps] {
   object Styles {
 
     val normal: BlessedStyle = new BlessedStyle {
-      override val bold = false
+      override val bold = true
       override val bg = "white"
-      override val fg = "black"
+      override val fg = "#111"
       override val focus = new BlessedStyle {
-        override val bold = false
+        override val bold = true
         override val bg = "#088"
-        override val fg = "black"
+        override val fg = "#111"
       }
     }
     
@@ -39,9 +39,9 @@ object Popup extends FunctionComponent[PopupProps] {
       override val bg = "red"
       override val fg = "white"
       override val focus = new BlessedStyle {
-        override val bold = false
+        override val bold = true
         override val bg = "white"
-        override val fg = "black"
+        override val fg = "#111"
       }
     }
   }
