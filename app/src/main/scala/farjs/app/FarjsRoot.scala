@@ -9,7 +9,8 @@ import scommons.react.blessed.portal._
 
 import scala.scalajs.js
 
-class FarjsRoot(fileListComp: ReactClass,
+class FarjsRoot(withPortalsComp: UiComponent[Unit],
+                fileListComp: ReactClass,
                 fileListPopups: ReactClass,
                 taskController: ReactClass,
                 showDevTools: Boolean
@@ -66,7 +67,6 @@ class FarjsRoot(fileListComp: ReactClass,
 
 object FarjsRoot {
 
-  private[app] var withPortalsComp: UiComponent[Unit] = WithPortals
   private[app] var portalComp: UiComponent[PortalProps] = Portal
   private[app] var logControllerComp: UiComponent[LogControllerProps] = LogController
   private[app] var logPanelComp: UiComponent[LogPanelProps] = LogPanel

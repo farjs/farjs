@@ -13,17 +13,11 @@ object PopupOverlay extends FunctionComponent[PopupProps] {
     val props = compProps.wrapped
 
     useLayoutEffect({ () =>
-      val focused = formRef.current.screen.focused
       if (props.focusable) {
         formRef.current.asInstanceOf[js.Dynamic].focusFirst()
       }
-      props.onOpen()
       
-      () => {
-        if (!js.isUndefined(focused) && focused != null) {
-          focused.focus()
-        }
-      }
+      props.onOpen()
     }, Nil)
     
     useLayoutEffect({ () =>

@@ -14,18 +14,18 @@ import scala.scalajs.js.annotation.JSExportAll
 
 class FarjsRootSpec extends TestSpec with TestRendererUtils {
 
+  private val withPortalsComp: UiComponent[Unit] = () => "WithPortals".asInstanceOf[ReactClass]
   private val fileListComp = "FileListBrowser".asInstanceOf[ReactClass]
   private val fileListPopups = "FileListPopups".asInstanceOf[ReactClass]
   private val taskController = "TaskController".asInstanceOf[ReactClass]
-
-  FarjsRoot.withPortalsComp = () => "WithPortals".asInstanceOf[ReactClass]
+  
   FarjsRoot.portalComp = () => "Portal".asInstanceOf[ReactClass]
   FarjsRoot.logControllerComp = () => "LogController".asInstanceOf[ReactClass]
   FarjsRoot.logPanelComp = () => "LogPanel".asInstanceOf[ReactClass]
 
   it should "emit resize event when on F12" in {
     //given
-    val root = new FarjsRoot(fileListComp, fileListPopups, taskController, showDevTools = false)
+    val root = new FarjsRoot(withPortalsComp, fileListComp, fileListPopups, taskController, showDevTools = false)
     val programMock = mock[BlessedProgramMock]
     val screenMock = mock[BlessedScreenMock]
     val boxMock = mock[BlessedElementMock]
@@ -61,7 +61,7 @@ class FarjsRootSpec extends TestSpec with TestRendererUtils {
 
   it should "render component without DevTools" in {
     //given
-    val root = new FarjsRoot(fileListComp, fileListPopups, taskController, showDevTools = false)
+    val root = new FarjsRoot(withPortalsComp, fileListComp, fileListPopups, taskController, showDevTools = false)
     val screenMock = mock[BlessedScreenMock]
     val boxMock = mock[BlessedElementMock]
 
@@ -94,7 +94,7 @@ class FarjsRootSpec extends TestSpec with TestRendererUtils {
   
   it should "render component with LogPanel" in {
     //given
-    val root = new FarjsRoot(fileListComp, fileListPopups, taskController, showDevTools = true)
+    val root = new FarjsRoot(withPortalsComp, fileListComp, fileListPopups, taskController, showDevTools = true)
     val screenMock = mock[BlessedScreenMock]
     val boxMock = mock[BlessedElementMock]
 

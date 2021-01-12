@@ -2,15 +2,16 @@ package scommons.react.blessed.portal
 
 import java.util.concurrent.atomic.AtomicReference
 
+import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
+import scommons.react.blessed._
+import scommons.react.blessed.portal.WithPortalsSpec._
 import scommons.react.hooks._
-import scommons.react.test.TestSpec
-import scommons.react.test.raw.ShallowInstance
-import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
+import scommons.react.test._
 
-class WithPortalsSpec extends TestSpec
-  with TestRendererUtils
-  with ShallowRendererUtils {
+import scala.scalajs.js.annotation.JSExportAll
+
+class WithPortalsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   private def getPortalsCtxHook: (AtomicReference[WithPortalsContext], ReactClass) = {
     val ref = new AtomicReference[WithPortalsContext](null)
@@ -39,11 +40,16 @@ class WithPortalsSpec extends TestSpec
     val (portalsCtx, portalsComp) = getPortalsCtxHook
     val (portalCtx1, portalComp1) = getPortalCtxHook("portal content 1")
     val (portalCtx2, portalComp2) = getPortalCtxHook("portal content 2")
-    val root = createTestRenderer(<(WithPortals())()(
+    val screenMock = mock[BlessedScreenMock]
+    val withPortals = new WithPortals(screenMock.asInstanceOf[BlessedScreen])
+    val root = createTestRenderer(<(withPortals())()(
       <(portalsComp).empty,
       <.>()("some other content")
     )).root
 
+    val focused1 = mock[BlessedElementMock]
+    (screenMock.focused _).expects().returning(focused1.asInstanceOf[BlessedElement])
+    
     //when & then
     portalsCtx.get.onRender(1, <(portalComp1).empty)
     portalCtx1.get.isActive shouldBe true
@@ -52,6 +58,9 @@ class WithPortalsSpec extends TestSpec
       otherContent shouldBe "some other content"
       portal1.`type` shouldBe portalComp1
     }
+    
+    val focused2 = mock[BlessedElementMock]
+    (screenMock.focused _).expects().returning(focused2.asInstanceOf[BlessedElement])
     
     //when & then
     portalsCtx.get.onRender(2, <(portalComp2).empty)
@@ -70,7 +79,11 @@ class WithPortalsSpec extends TestSpec
     val (portalsCtx, portalsComp) = getPortalsCtxHook
     val (portalCtx1, portalComp1) = getPortalCtxHook("portal content 1")
     val (portalCtx2, portalComp2) = getPortalCtxHook("portal content 2")
-    val root = createTestRenderer(<(WithPortals())()(
+    val screenMock = mock[BlessedScreenMock]
+    (screenMock.focused _).expects().returning(null).twice()
+    
+    val withPortals = new WithPortals(screenMock.asInstanceOf[BlessedScreen])
+    val root = createTestRenderer(<(withPortals())()(
       <(portalsComp).empty,
       <.>()("some other content")
     )).root
@@ -107,16 +120,39 @@ class WithPortalsSpec extends TestSpec
   it should "remove portals when onRemove" in {
     //given
     val (portalsCtx, portalsComp) = getPortalsCtxHook
+    val (portalCtx0, portalComp0) = getPortalCtxHook("portal content 0")
     val (portalCtx1, portalComp1) = getPortalCtxHook("portal content 1")
     val (portalCtx2, portalComp2) = getPortalCtxHook("portal content 2")
     val (portalCtx3, portalComp3) = getPortalCtxHook("portal content 3")
-    val root = createTestRenderer(<(WithPortals())()(
+    val screenMock = mock[BlessedScreenMock]
+    val focused1 = mock[BlessedElementMock]
+    val focused2 = mock[BlessedElementMock]
+    val focused3 = mock[BlessedElementMock]
+    (screenMock.focused _).expects().returning(null)
+    (screenMock.focused _).expects().returning(focused1.asInstanceOf[BlessedElement])
+    (screenMock.focused _).expects().returning(focused2.asInstanceOf[BlessedElement])
+    (screenMock.focused _).expects().returning(focused3.asInstanceOf[BlessedElement])
+    
+    var renderNum = 0
+    (screenMock.render _).expects().onCall { () =>
+      renderNum += 1
+    }.repeated(4)
+
+    //then
+    (focused3.focus _).expects()
+    (focused1.focus _).expects()
+    (focused2.focus _).expects().never()
+    
+    val withPortals = new WithPortals(screenMock.asInstanceOf[BlessedScreen])
+    val root = createTestRenderer(<(withPortals())()(
       <(portalsComp).empty,
       <.>()("some other content")
     )).root
+    portalsCtx.get.onRender(0, <(portalComp0).empty)
     portalsCtx.get.onRender(1, <(portalComp1).empty)
     portalsCtx.get.onRender(2, <(portalComp2).empty)
     portalsCtx.get.onRender(3, <(portalComp3).empty)
+    portalCtx0.get.isActive shouldBe false
     portalCtx1.get.isActive shouldBe false
     portalCtx2.get.isActive shouldBe false
     portalCtx3.get.isActive shouldBe true
@@ -125,9 +161,10 @@ class WithPortalsSpec extends TestSpec
     portalsCtx.get.onRemove(3)
     portalCtx1.get.isActive shouldBe false
     portalCtx2.get.isActive shouldBe true
-    inside(root.children.toList) { case List(resCtxHook, otherContent, portal1, portal2) =>
+    inside(root.children.toList) { case List(resCtxHook, otherContent, portal0, portal1, portal2) =>
       resCtxHook.`type` shouldBe portalsComp
       otherContent shouldBe "some other content"
+      portal0.`type` shouldBe portalComp0
       portal1.`type` shouldBe portalComp1
       portal2.`type` shouldBe portalComp2
     }
@@ -135,51 +172,67 @@ class WithPortalsSpec extends TestSpec
     //when & then
     portalsCtx.get.onRemove(1)
     portalCtx2.get.isActive shouldBe true
-    inside(root.children.toList) { case List(resCtxHook, otherContent, portal2) =>
+    inside(root.children.toList) { case List(resCtxHook, otherContent, portal0, portal2) =>
       resCtxHook.`type` shouldBe portalsComp
       otherContent shouldBe "some other content"
+      portal0.`type` shouldBe portalComp0
       portal2.`type` shouldBe portalComp2
     }
     
     //when & then
     portalsCtx.get.onRemove(2)
+    portalCtx0.get.isActive shouldBe true
+    inside(root.children.toList) { case List(resCtxHook, otherContent, portal0) =>
+      resCtxHook.`type` shouldBe portalsComp
+      otherContent shouldBe "some other content"
+      portal0.`type` shouldBe portalComp0
+    }
+    
+    //when & then
+    portalsCtx.get.onRemove(0)
+    inside(root.children.toList) { case List(resCtxHook, otherContent) =>
+      resCtxHook.`type` shouldBe portalsComp
+      otherContent shouldBe "some other content"
+    }
+    
+    eventually {
+      renderNum shouldBe 4
+    }
+  }
+  
+  it should "do nothing if portal not found when onRemove" in {
+    //given
+    val (portalsCtx, portalsComp) = getPortalsCtxHook
+    val screenMock = mock[BlessedScreenMock]
+    (screenMock.render _).expects().never()
+
+    val withPortals = new WithPortals(screenMock.asInstanceOf[BlessedScreen])
+    val root = createTestRenderer(<(withPortals())()(
+      <(portalsComp).empty,
+      <.>()("some other content")
+    )).root
+
+    //when & then
+    portalsCtx.get.onRemove(123)
     inside(root.children.toList) { case List(resCtxHook, otherContent) =>
       resCtxHook.`type` shouldBe portalsComp
       otherContent shouldBe "some other content"
     }
   }
-  
-  it should "set key and Portal.Context when renderPortal" in {
-    //given
-    val id = 123
-    val isActive = true
-    val content = <.>()("some portal content")
+}
 
-    //when
-    val result = WithPortals.renderPortal(id, content, isActive)
+object WithPortalsSpec {
 
-    //then
-    assertPortal(result, id, content, isActive)
+  @JSExportAll
+  trait BlessedScreenMock {
+
+    def focused: BlessedElement
+    def render(): Unit
   }
   
-  private def assertPortal(result: ReactElement, id: Int, content: ReactElement, isActive: Boolean): Unit = {
-    val wrapper = new FunctionComponent[Unit] {
-      protected def render(props: Props): ReactElement = {
-        result
-      }
-    }
-    
-    val resInstance = shallowRender(<(wrapper()).empty)
-    assertNativeComponent(resInstance, <.>(^.key := s"$id")(), { children: List[ShallowInstance] =>
-      val List(provider) = children
-      
-      val ctx = provider.props.selectDynamic("value").asInstanceOf[PortalContext]
-      ctx shouldBe PortalContext(isActive)
-      
-      assertNativeComponent(provider, <(Portal.Context.Provider)()(), { children: List[ShallowInstance] =>
-        val List(resContent) = children
-        resContent shouldBe content
-      })
-    })
+  @JSExportAll
+  trait BlessedElementMock {
+
+    def focus(): Unit
   }
 }

@@ -8,6 +8,7 @@ import io.github.shogowada.scalajs.reactjs.redux.Redux
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
+import scommons.react.blessed.portal.WithPortals
 import scommons.react.blessed.raw.{Blessed, BlessedOverrides, ReactBlessed}
 
 import scala.scalajs.js
@@ -39,6 +40,7 @@ object FarjsApp {
       rightPanelComp = new FileListController(actions, isRight = true).apply()
     ).apply()
     val root = new FarjsRoot(
+      withPortalsComp = new WithPortals(screen),
       fileListComp = fileListComp,
       fileListPopups = new FileListPopupsController(actions).apply(),
       taskController = FarjsTaskController(),

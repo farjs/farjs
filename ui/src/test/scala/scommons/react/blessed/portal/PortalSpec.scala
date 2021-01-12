@@ -1,30 +1,29 @@
 package scommons.react.blessed.portal
 
 import scommons.react._
-import scommons.react.test.TestSpec
-import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
+import scommons.react.blessed.portal.PortalSpec._
+import scommons.react.test._
 
 import scala.scalajs.js
-import scala.scalajs.js.JavaScriptException
 
-class PortalSpec extends TestSpec
-  with TestRendererUtils
-  with ShallowRendererUtils {
+class PortalSpec extends TestSpec with TestRendererUtils {
 
   it should "fail if no WithPortals.Context when render" in {
     //given
     val portal = Portal.create(<.>()())
     
     //when
-    val JavaScriptException(error) = the[JavaScriptException] thrownBy {
-      shallowRender(portal)
-    }
+    val result = testRender(<(TestErrorBoundary())()(
+      portal
+    ))
     
     //then
-    s"$error" shouldBe {
-      "Error: WithPortals.Context is not found." +
-        "\nPlease, make sure you use WithPortals and not creating nested portals."
-    }
+    assertNativeComponent(result,
+      <.div()(
+        "Error: WithPortals.Context is not found." +
+          "\nPlease, make sure you use WithPortals and not creating nested portals."
+      )
+    )
   }
   
   it should "call onRender/onRemove when mount/un-mount" in {
@@ -109,5 +108,31 @@ class PortalSpec extends TestSpec
     //cleanup
     onRemove.expects(portalId)
     renderer.unmount()
+  }
+}
+
+object PortalSpec {
+
+  private case class TestErrorBoundaryState(error: Option[js.Object] = None)
+
+  private object TestErrorBoundary extends ClassComponent[Unit] {
+    
+    protected def create(): ReactClass = createClass[TestErrorBoundaryState](
+      getInitialState = { _ =>
+        TestErrorBoundaryState()
+      },
+      componentDidCatch = { (self, error, _) =>
+        self.setState(TestErrorBoundaryState(Option(error)))
+      },
+      render = { self =>
+        self.state.error match {
+          case None => self.props.children
+          case Some(error) =>
+            <.div()(
+              s"$error"
+            )
+        }
+      }
+    )
   }
 }
