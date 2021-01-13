@@ -15,10 +15,6 @@ object Portal extends FunctionComponent[PortalProps] {
     defaultValue = PortalContext(isActive = false)
   )
   
-  def create(content: ReactElement): ReactElement = {
-    <(Portal())(^.wrapped := PortalProps(content))()
-  }
-  
   protected def render(compProps: Props): ReactElement = {
     val (portalId, _) = useState(() => getNextPortalId)
     

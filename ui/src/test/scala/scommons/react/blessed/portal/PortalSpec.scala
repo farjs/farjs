@@ -10,7 +10,7 @@ class PortalSpec extends TestSpec with TestRendererUtils {
 
   it should "fail if no WithPortals.Context when render" in {
     //given
-    val portal = Portal.create(<.>()())
+    val portal = <(Portal())(^.wrapped := PortalProps(<.>()()))()
     
     //when
     val result = testRender(<(TestErrorBoundary())()(
@@ -40,7 +40,7 @@ class PortalSpec extends TestSpec with TestRendererUtils {
     //when
     val renderer = createTestRenderer {
       <(WithPortals.Context.Provider)(^.contextValue := WithPortalsContext(onRender, onRemove))(
-        Portal.create(content)
+        <(Portal())(^.wrapped := PortalProps(content))()
       )
     }
     
@@ -61,7 +61,7 @@ class PortalSpec extends TestSpec with TestRendererUtils {
     onRender.expects(portalId, content1)
     val renderer = createTestRenderer {
       <(WithPortals.Context.Provider)(^.contextValue := WithPortalsContext(onRenderJs, onRemoveJs))(
-        Portal.create(content1)
+        <(Portal())(^.wrapped := PortalProps(content1))()
       )
     }
 
@@ -71,7 +71,7 @@ class PortalSpec extends TestSpec with TestRendererUtils {
     //when
     renderer.update {
       <(WithPortals.Context.Provider)(^.contextValue := WithPortalsContext(onRenderJs, onRemoveJs))(
-        Portal.create(content2)
+        <(Portal())(^.wrapped := PortalProps(content2))()
       )
     }
     
@@ -94,14 +94,14 @@ class PortalSpec extends TestSpec with TestRendererUtils {
     
     val renderer = createTestRenderer {
       <(WithPortals.Context.Provider)(^.contextValue := WithPortalsContext(onRenderJs, onRemoveJs))(
-        Portal.create(content)
+        <(Portal())(^.wrapped := PortalProps(content))()
       )
     }
 
     //when
     renderer.update {
       <(WithPortals.Context.Provider)(^.contextValue := WithPortalsContext(onRenderJs, onRemoveJs))(
-        Portal.create(content)
+        <(Portal())(^.wrapped := PortalProps(content))()
       )
     }
     

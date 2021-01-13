@@ -1,13 +1,15 @@
 package farjs.ui.popup
 
+import farjs.ui.popup.Popup._
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.blessed.portal.{Portal, PortalProps}
-import scommons.react.test.TestSpec
-import scommons.react.test.raw.ShallowInstance
-import scommons.react.test.util.ShallowRendererUtils
+import scommons.react.blessed.portal.PortalProps
+import scommons.react.test._
 
-class PopupSpec extends TestSpec with ShallowRendererUtils {
+class PopupSpec extends TestSpec with TestRendererUtils {
+
+  Popup.portalComp = () => "Portal".asInstanceOf[ReactClass]
+  Popup.popupOverlayComp = () => "PopupOverlay".asInstanceOf[ReactClass]
 
   it should "render component" in {
     //given
@@ -15,31 +17,21 @@ class PopupSpec extends TestSpec with ShallowRendererUtils {
     val props = PopupProps(onClose = () => ())
 
     //when
-    val result = shallowRender(<(Popup())(^.wrapped := props)(children))
+    val result = testRender(<(Popup())(^.wrapped := props)(children))
 
     //then
     assertPopup(result, props, children)
   }
 
-  private def renderPortalContent(content: ReactElement): ShallowInstance = {
-    val wrapper = new FunctionComponent[Unit] {
-      protected def render(props: Props): ReactElement = {
-        content
-      }
-    }
-
-    shallowRender(<(wrapper())()())
-  }
-
-  private def assertPopup(result: ShallowInstance,
+  private def assertPopup(result: TestInstance,
                           props: PopupProps,
                           children: ReactElement): Unit = {
     
-    assertComponent(result, Portal) { case PortalProps(content) =>
-      assertComponent(renderPortalContent(content), PopupOverlay)({ resProps =>
-        resProps shouldBe props
+    assertTestComponent(result, portalComp) { case PortalProps(content) =>
+      assertTestComponent(createTestRenderer(content).root, popupOverlayComp)({ resProps =>
+        resProps should be theSameInstanceAs props
       }, {
-        case List(child) => child shouldBe children
+        case List(child) => assertNativeComponent(child, children)
       })
     }
   }

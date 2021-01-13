@@ -2,7 +2,7 @@ package farjs.ui.popup
 
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.blessed.portal.Portal
+import scommons.react.blessed.portal._
 
 case class PopupProps(onClose: () => Unit,
                       closable: Boolean = true,
@@ -11,14 +11,17 @@ case class PopupProps(onClose: () => Unit,
 
 object Popup extends FunctionComponent[PopupProps] {
   
+  private[popup] var portalComp: UiComponent[PortalProps] = Portal
+  private[popup] var popupOverlayComp: UiComponent[PopupProps] = PopupOverlay
+  
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
 
-    Portal.create(
-      <(PopupOverlay())(^.wrapped := props)(
+    <(portalComp())(^.wrapped := PortalProps(
+      <(popupOverlayComp())(^.wrapped := props)(
         compProps.children
       )
-    )
+    ))()
   }
   
   object Styles {
