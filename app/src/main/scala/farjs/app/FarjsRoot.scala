@@ -40,9 +40,9 @@ class FarjsRoot(withPortalsComp: UiComponent[Unit],
         )
       )(
         <(withPortalsComp())()(
-          <(portalComp())(^.wrapped := PortalProps(
+          <(portalComp())()(
             <(fileListComp).empty
-          ))(),
+          ),
           <(fileListPopups).empty,
           <(taskController).empty
         )
@@ -67,7 +67,7 @@ class FarjsRoot(withPortalsComp: UiComponent[Unit],
 
 object FarjsRoot {
 
-  private[app] var portalComp: UiComponent[PortalProps] = Portal
+  private[app] var portalComp: UiComponent[Unit] = Portal
   private[app] var logControllerComp: UiComponent[LogControllerProps] = LogController
   private[app] var logPanelComp: UiComponent[LogPanelProps] = LogPanel
 }

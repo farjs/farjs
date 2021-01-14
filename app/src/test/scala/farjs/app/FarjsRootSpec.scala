@@ -5,7 +5,6 @@ import farjs.app.FarjsRootSpec._
 import farjs.ui._
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.blessed.portal._
 import scommons.react.blessed.raw.BlessedProgram
 import scommons.react.test._
 
@@ -76,15 +75,15 @@ class FarjsRootSpec extends TestSpec with TestRendererUtils {
 
     //then
     inside(result.children.toList) { case List(main, log) =>
-      assertNativeComponent(main, <.box(^.rbWidth := "100%")(), { case List(withPortals) =>
-        assertNativeComponent(withPortals, <(withPortalsComp())()(), { case List(portal, fileList, task) =>
-          assertTestComponent(portal, portalComp) { case PortalProps(content) =>
-            assertNativeComponent(createTestRenderer(content).root, <(fileListComp).empty)
-          }
-          assertNativeComponent(fileList, <(fileListPopups).empty)
-          assertNativeComponent(task, <(taskController).empty)
-        })
-      })
+      assertNativeComponent(main, <.box(^.rbWidth := "100%")(
+        <(withPortalsComp())()(
+          <(portalComp())()(
+            <(fileListComp).empty
+          ),
+          <(fileListPopups).empty,
+          <(taskController).empty
+        )
+      ))
 
       assertTestComponent(log, logControllerComp) { case LogControllerProps(render) =>
         render("test log content") shouldBe null
@@ -109,15 +108,15 @@ class FarjsRootSpec extends TestSpec with TestRendererUtils {
 
     //then
     inside(result.children.toList) { case List(main, log) =>
-      assertNativeComponent(main, <.box(^.rbWidth := "70%")(), { case List(withPortals) =>
-        assertNativeComponent(withPortals, <(withPortalsComp())()(), { case List(portal, fileList, task) =>
-          assertTestComponent(portal, portalComp) { case PortalProps(content) =>
-            assertNativeComponent(createTestRenderer(content).root, <(fileListComp).empty)
-          }
-          assertNativeComponent(fileList, <(fileListPopups).empty)
-          assertNativeComponent(task, <(taskController).empty)
-        })
-      })
+      assertNativeComponent(main, <.box(^.rbWidth := "70%")(
+        <(withPortalsComp())()(
+          <(portalComp())()(
+            <(fileListComp).empty
+          ),
+          <(fileListPopups).empty,
+          <(taskController).empty
+        )
+      ))
 
       assertTestComponent(log, logControllerComp) { case LogControllerProps(render) =>
         val content = "test log content"

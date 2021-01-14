@@ -3,7 +3,6 @@ package farjs.ui.popup
 import farjs.ui.popup.Popup._
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.blessed.portal.PortalProps
 import scommons.react.test._
 
 class PopupSpec extends TestSpec with TestRendererUtils {
@@ -27,12 +26,12 @@ class PopupSpec extends TestSpec with TestRendererUtils {
                           props: PopupProps,
                           children: ReactElement): Unit = {
     
-    assertTestComponent(result, portalComp) { case PortalProps(content) =>
-      assertTestComponent(createTestRenderer(content).root, popupOverlayComp)({ resProps =>
+    assertNativeComponent(result, <(portalComp()).empty, { case List(content) =>
+      assertTestComponent(content, popupOverlayComp)({ resProps =>
         resProps should be theSameInstanceAs props
       }, {
         case List(child) => assertNativeComponent(child, children)
       })
-    }
+    })
   }
 }

@@ -5,11 +5,9 @@ import scommons.react.hooks._
 
 import scala.scalajs.js.{Error, JavaScriptException}
 
-case class PortalProps(content: ReactElement)
-
 case class PortalContext(isActive: Boolean)
 
-object Portal extends FunctionComponent[PortalProps] {
+object Portal extends FunctionComponent[Unit] {
 
   val Context: ReactContext[PortalContext] = ReactContext(
     defaultValue = PortalContext(isActive = false)
@@ -26,8 +24,6 @@ object Portal extends FunctionComponent[PortalProps] {
       ))
     }
     
-    val props = compProps.wrapped
-    
     useLayoutEffect({ () =>
       val cleanup = () => {
         ctx.onRemove(portalId)
@@ -36,8 +32,8 @@ object Portal extends FunctionComponent[PortalProps] {
     }, Nil)
 
     useLayoutEffect({ () =>
-      ctx.onRender(portalId, props.content)
-    }, List(props.content))
+      ctx.onRender(portalId, compProps.children)
+    }, List(compProps.children))
 
     <.>()()
   }
