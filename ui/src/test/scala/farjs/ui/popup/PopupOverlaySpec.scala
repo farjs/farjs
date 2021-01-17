@@ -1,6 +1,8 @@
 package farjs.ui.popup
 
 import farjs.ui.popup.PopupOverlaySpec._
+import org.scalatest._
+import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
@@ -8,7 +10,7 @@ import scommons.react.test._
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportAll
 
-class PopupOverlaySpec extends TestSpec with TestRendererUtils {
+class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   it should "call onOpen and focus first element if focusable when mount" in {
     //given
@@ -19,8 +21,10 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
     (formMock.on _).expects("element keypress", *)
     (formMock.on _).expects("element focus", *)
     
-    //then
-    (formMock.focusFirst _).expects()
+    var focused = false
+    (formMock.focusFirst _).expects().onCall { () =>
+      focused = true
+    }
     onOpen.expects()
 
     //when
@@ -28,6 +32,11 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
       else null
     })
+
+    //then
+    eventually {
+      focused shouldBe true
+    }
   }
 
   it should "call onOpen and not focus first element if not focusable when mount" in {
@@ -48,6 +57,8 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
       else null
     })
+    
+    Succeeded
   }
 
   it should "remove listeners when unmount" in {
@@ -69,6 +80,8 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
 
     //when
     renderer.unmount()
+    
+    Succeeded
   }
 
   it should "re-subscribe element listeners when update" in {
@@ -92,6 +105,8 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
 
     //when
     renderer.update(<(PopupOverlay())(^.wrapped := props.copy(onClose = () => ()))())
+
+    Succeeded
   }
 
   it should "listen to element keys and perform actions" in {
@@ -134,6 +149,8 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
     check(defaultPrevented = true, "S-tab", "up", "left")
     check(defaultPrevented = false, "unknown")
     check(defaultPrevented = true, "unknown")
+
+    Succeeded
   }
 
   it should "not call onClose if non-closable when escape" in {
@@ -157,6 +174,8 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
       else null
     })
+
+    Succeeded
   }
 
   it should "set form._selected element when child element is focused" in {
@@ -180,6 +199,8 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
       else null
     })
+
+    Succeeded
   }
 
   it should "call onClose if closable when onClick" in {
@@ -202,6 +223,8 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
     
     //when
     form.props.onClick()
+
+    Succeeded
   }
   
   it should "not call onClose if non-closable when onClick" in {
@@ -224,6 +247,8 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
     
     //when
     form.props.onClick()
+
+    Succeeded
   }
   
   it should "render component" in {
@@ -248,7 +273,7 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
 
   private def assertPopupOverlay(result: TestInstance,
                                  props: PopupProps,
-                                 children: ReactElement): Unit = {
+                                 children: ReactElement): Assertion = {
     
     assertNativeComponent(result,
       <.form(

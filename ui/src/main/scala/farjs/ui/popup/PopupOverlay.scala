@@ -4,6 +4,8 @@ import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.scalajs.js
 
 object PopupOverlay extends FunctionComponent[PopupProps] {
@@ -13,7 +15,7 @@ object PopupOverlay extends FunctionComponent[PopupProps] {
     val props = compProps.wrapped
 
     useLayoutEffect({ () =>
-      if (props.focusable) {
+      if (props.focusable) Future { //focus on the next tick
         formRef.current.asInstanceOf[js.Dynamic].focusFirst()
       }
       

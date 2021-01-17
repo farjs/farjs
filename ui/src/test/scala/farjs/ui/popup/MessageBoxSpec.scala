@@ -2,7 +2,6 @@ package farjs.ui.popup
 
 import farjs.ui._
 import farjs.ui.border._
-import farjs.ui.popup.MessageBox.splitText
 import org.scalatest.{Assertion, Succeeded}
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
@@ -10,16 +9,6 @@ import scommons.react.test.raw.ShallowInstance
 import scommons.react.test.util.ShallowRendererUtils
 
 class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
-
-  it should "split text when splitText" in {
-    //when & then
-    splitText("", 2) shouldBe List("")
-    splitText("test", 2) shouldBe List("test")
-    splitText("test1, test2", 11) shouldBe List("test1,", "test2")
-    splitText("test1, test2", 12) shouldBe List("test1, test2")
-    splitText("test1, test2, test3", 12) shouldBe List("test1,", "test2, test3")
-    splitText("test1, test2, test3", 13) shouldBe List("test1, test2,", "test3")
-  }
 
   "OK popup" should "call OK action when onClose popup" in {
     //given
@@ -178,7 +167,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
                                closable: Boolean = true): Unit = {
     val width = 60
     val textWidth = width - 8
-    val textLines = splitText(props.message, textWidth - 2) //exclude padding
+    val textLines = UI.splitText(props.message, textWidth - 2) //exclude padding
     val height = 5 + textLines.size
     
     def assertComponents(border: ShallowInstance,

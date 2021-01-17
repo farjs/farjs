@@ -1,6 +1,6 @@
-package farjs.app
+package farjs.app.task
 
-import farjs.app.FarjsTaskManagerUi._
+import farjs.app.task.FarjsTaskManagerUi._
 import farjs.ui.popup._
 import scommons.react._
 import scommons.react.redux.task._
@@ -11,6 +11,7 @@ import scala.util.Failure
 
 class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
 
+  FarjsTaskManagerUi.statusPopupComp = () => "TaskStatusPopup".asInstanceOf[ReactClass]
   FarjsTaskManagerUi.messageBoxComp = () => "MessageBox".asInstanceOf[ReactClass]
 
   it should "return error if JavaScriptException in errorHandler" in {
@@ -76,6 +77,24 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
     msgBox.actions.head.onAction()
   }
 
+  it should "render status popup if loading" in {
+    //given
+    val props = getTaskManagerUiProps(
+      showLoading = true,
+      status = Some("Some status message")
+    )
+    val component = <(FarjsTaskManagerUi())(^.wrapped := props)()
+
+    //when
+    val result = testRender(component)
+
+    //then
+    assertTestComponent(result, statusPopupComp) {
+      case TaskStatusPopupProps(message) =>
+        message shouldBe props.status.getOrElse("")
+    }
+  }
+
   it should "render MessageBox if error" in {
     //given
     val props = getTaskManagerUiProps(
@@ -98,9 +117,9 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
     }
   }
 
-  it should "render null if no error" in {
+  it should "render nothing if no loading and no error" in {
     //given
-    val props = getTaskManagerUiProps(error = None)
+    val props = getTaskManagerUiProps()
     val component = <(FarjsTaskManagerUi())(^.wrapped := props)()
 
     //when
@@ -112,15 +131,14 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
 
   private def getTaskManagerUiProps(showLoading: Boolean = false,
                                     status: Option[String] = None,
-                                    onHideStatus: () => Unit = () => (),
-                                    error: Option[String],
+                                    error: Option[String] = None,
                                     errorDetails: Option[String] = None,
                                     onCloseErrorPopup: () => Unit = () => ()
                                    ): TaskManagerUiProps = {
     TaskManagerUiProps(
       showLoading,
       status,
-      onHideStatus,
+      onHideStatus = () => (),
       error,
       errorDetails,
       onCloseErrorPopup

@@ -1,4 +1,4 @@
-package farjs.app
+package farjs.app.task
 
 import farjs.ui.popup._
 import scommons.react._
@@ -12,8 +12,9 @@ import scala.util.{Failure, Try}
   */
 object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
 
-  private[app] var logger: String => Unit = println
-  private[app] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
+  private[task] var logger: String => Unit = println
+  private[task] var statusPopupComp: UiComponent[TaskStatusPopupProps] = TaskStatusPopup
+  private[task] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
   
   val errorHandler: PartialFunction[Try[_], (Option[String], Option[String])] = {
     case Failure(ex@JavaScriptException(error)) =>
@@ -31,14 +32,20 @@ object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
     val showError = props.error.isDefined
     val errorMessage = props.error.getOrElse("")
 
-    if (showError) {
-      <(messageBoxComp())(^.wrapped := MessageBoxProps(
-        title = "Error",
-        message = errorMessage,
-        //message = s"$errorMessage${props.errorDetails.map(d => s"\n\n$d").getOrElse("")}",
-        actions = List(MessageBoxAction.OK(props.onCloseErrorPopup)),
-        style = Popup.Styles.error
-      ))()
-    } else null
+    <.>()(
+      props.status.filter(_ => props.showLoading).map { msg =>
+        <(statusPopupComp())(^.wrapped := TaskStatusPopupProps(msg))()
+      },
+      
+      if (showError) Some(
+        <(messageBoxComp())(^.wrapped := MessageBoxProps(
+          title = "Error",
+          message = errorMessage,
+          //message = s"$errorMessage${props.errorDetails.map(d => s"\n\n$d").getOrElse("")}",
+          actions = List(MessageBoxAction.OK(props.onCloseErrorPopup)),
+          style = Popup.Styles.error
+        ))()
+      ) else None
+    )
   }
 }

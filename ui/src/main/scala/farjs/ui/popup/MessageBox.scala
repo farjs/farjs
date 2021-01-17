@@ -16,7 +16,7 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
     val props = compProps.wrapped
     val width = 60
     val textWidth = width - 8
-    val textLines = splitText(props.message, textWidth - 2) //exclude padding
+    val textLines = UI.splitText(props.message, textWidth - 2) //exclude padding
     val height = 5 + textLines.size
     val onClose = props.actions.find(_.triggeredOnClose).map(_.onAction)
 
@@ -81,19 +81,5 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
         )
       )
     )
-  }
-  
-  private[popup] def splitText(text: String, maxLen: Int): List[String] = {
-    val parts = text.split(" ")
-    
-    parts.foldLeft(List.empty[String]) {
-      case (Nil, item) => List(item)
-      case (head::tail, item) =>
-        if ((head.length + item.length + 1) > maxLen) {
-          item :: head :: tail
-        } else {
-          s"$head $item" :: tail
-        }
-    }.reverse
   }
 }

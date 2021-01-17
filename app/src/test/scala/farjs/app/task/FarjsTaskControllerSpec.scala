@@ -1,4 +1,4 @@
-package farjs.app
+package farjs.app.task
 
 import farjs.ui.FarjsStateDef
 import io.github.shogowada.scalajs.reactjs.React.Props
