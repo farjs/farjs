@@ -8,10 +8,13 @@
 
 Good old Windows File and Archive Manager
 ([FAR](https://farmanager.com/index.php?l=en)) app built with:
-  [Scala.js](https://www.scala-js.org/)
-  [React.js](https://reactjs.org/)
-  [react-blessed](https://github.com/Yomguithereal/react-blessed)
+  [Scala.js](https://www.scala-js.org/),
+  [React.js](https://reactjs.org/),
+  [react-blessed](https://github.com/Yomguithereal/react-blessed),
   [blessed](https://github.com/chjj/blessed)
+
+Cross-platform: Mac OS, Linux, Windows. Runs everywhere,
+where [Node.js](https://nodejs.org/) can run.
 
 ### Install
 

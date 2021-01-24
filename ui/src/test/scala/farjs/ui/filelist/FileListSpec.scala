@@ -90,7 +90,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     action.task.future.map(_ => Succeeded)
   }
 
-  it should "dispatch action when onKeypress(enter)" in {
+  it should "dispatch action when onKeypress(enter | C-pageup | C-pagedown)" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -179,12 +179,18 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     Future.sequence(List(
       //when & then
       check("unknown", "/",    "123",         List("dir 1", "dir 2", "dir 3", "dir 4"), 0, 0, changed = false),
+
+      check("C-pageup", "/",   "..",          List("dir 1", "dir 2", "dir 3", "dir 4"), 0, 0),
+      check("C-pagedown", "/", "dir 1",       List("..", "dir 1", "dir 2", "dir 3"), 0, 0),
+      check("C-pageup", "/dir 1", "..",       List("dir 1", "dir 2", "dir 3", "dir 4"), 0, 0),
       
       check("enter", "/",      "dir 1",       List("..", "dir 1", "dir 2", "dir 3"), 0, 0),
       check("enter", "/dir 1", "..",          List("dir 1", "dir 2", "dir 3", "dir 4"), 0, 0),
       
       prepare(3, 3, "/", props.state.currDir.items),
       check("enter", "/",      "file 7",      List("dir 5", "dir 6", "file 7"), 4, 2, changed = false),
+      check("C-pagedown", "/", "file 7",      List("dir 5", "dir 6", "file 7"), 4, 2, changed = false),
+      check("C-pageup", "/",   "..",          List("dir 1", "dir 2", "dir 3", "dir 4"), 0, 0),
       
       prepare(3, 2, "/", props.state.currDir.items),
       check("enter", "/",      "dir 6",       List("..", "dir 1", "dir 2", "dir 3"), 0, 0),

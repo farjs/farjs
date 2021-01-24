@@ -137,8 +137,12 @@ object FileList extends FunctionComponent[FileListProps] {
         case k if k == "pagedown" || k == "S-pagedown" => focusDx(viewSize - 1, k == "S-pagedown")
         case k if k == "home" || k == "S-home" => focusItem(0, 0, k == "S-home")
         case k if k == "end" || k == "S-end" => focusItem(maxOffset, maxIndex, k == "S-end")
-        case "enter" =>
-          props.state.currentItem.filter(_.isDir).foreach { dir =>
+        case k@("enter" | "C-pageup" | "C-pagedown") =>
+          val targetDir = k match {
+            case "C-pageup" => Some(FileListItem.up)
+            case _ => props.state.currentItem.filter(_.isDir)
+          }
+          targetDir.foreach { dir =>
             props.dispatch(props.actions.changeDir(
               dispatch = props.dispatch,
               isRight = props.state.isRight,
