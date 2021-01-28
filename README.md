@@ -13,10 +13,11 @@ Good old Windows File and Archive Manager
   [react-blessed](https://github.com/Yomguithereal/react-blessed),
   [blessed](https://github.com/chjj/blessed)
 
-Cross-platform: Mac OS, Linux, Windows. Runs everywhere,
-where [Node.js](https://nodejs.org/) can run.
+Cross-platform: `Mac OS`, `Linux`, `Windows`.
 
-### Install
+Runs everywhere, where [Node.js](https://nodejs.org/) can run.
+
+## Install
 
 To install (or upgrade) it on your machine use the following command:
 
@@ -32,40 +33,65 @@ $ farjs
 
 ![Screenshots](https://raw.githubusercontent.com/scommons/far-js/master/docs/images/screenshots.png)
 
-### How to Build
-
-To build and run all the tests use the following command:
-```bash
-sbt test
-```
-
-### How to Run
-
-To run the app use the following commands:
-```bash
-sbt "project farjs-app" fastOptJS::webpack
-
-node ./app/target/scala-2.12/scalajs-bundler/main/reload.index.js
-```
-
 To exit the application press `F10` on the keyboard.
-
-### How to Run with Reload Workflow
-
-```bash
-#console 1:
-sbt
->project farjs-app
->~fastOptJS
-
-#console 2:
-cd ./app/target/scala-2.12/scalajs-bundler/main/
-./node_modules/webpack/bin/webpack.js --watch --config ./reload.webpack.config.js
-
-#console 3:
-node ./app/target/scala-2.12/scalajs-bundler/main/dist/bundle.js
-```
 
 ## Documentation
 
-You can find more documentation [here](https://scommons.org/)
+### Modules
+
+- [File Browser](#file-browser)
+- [Dev Tools](#dev-tools)
+  - [Logs](#logs)
+  - [Colors](#colors)
+
+### Other
+
+- Developing
+  - See [develop.md](https://github.com/scommons/far-js/blob/master/develop.md)
+- [FAQ](#faq)
+  - [Key Bindings](#key-bindings)
+
+## File Browser
+
+Supported operations:
+
+* Navigation within panels:
+  * Items selection - `Shift + Up/Down/Left/Right/PageUp/PageDown/Home/End`
+  * Back to the parent folder - `Ctrl + PageUp`
+  * Go into a folder - `Ctrl + PageDown`
+  * Open item in default application - `Alt + PageDown`
+  (see [Key Bindings](#key-bindings) for how to re-map to `Shift + Return`)
+
+* Create Folder (with intermediate sub-folders) - `F7`
+* Delete Item(s) - `F8`
+
+## Dev Tools
+
+Use `F12` to show/hide DEV tools components on the right side.
+Press `F12` again to switch between the components.
+
+### Logs
+
+Shows all the intercepted `console.log` and `console.error` messages,
+since the app itself is rendered to the console.
+
+### Colors
+
+Shows possible colors with their `hex` codes for current terminal.
+
+## FAQ
+
+### Key Bindings
+
+* Why supported key combination doesn't work or trigger another
+action in my terminal?
+  - You may re-map the keys to send supported **escape sequences**.
+  For example you can re-map:
+    - | Key | Supported Key | Escape Sequence ^[ ... |
+      | --- | --- | --- |
+      | `Shift + Return` | `Alt + PageDown` | `[6;3~` |
+      | `CMD + PageDown` | `Ctrl + PageDown` | `[6^` |
+      | `CMD + PageUp` | `Ctrl + PageUp` | `[5^` |
+  - In [iTerm2](https://iterm2.com/) it looks like this:
+    - ![Keys Re Mapping](https://raw.githubusercontent.com/scommons/far-js/master/docs/images/keys_re_mapping.png)
+  
