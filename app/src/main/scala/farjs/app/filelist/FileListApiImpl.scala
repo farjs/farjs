@@ -11,7 +11,7 @@ import scala.util.{Failure, Success, Try}
 
 class FileListApiImpl extends FileListApi {
 
-  private[filelist] def fs: FS = FS
+  private[filelist] def fs: FS = scommons.nodejs.fs
 
   def readDir(parent: Option[String], dir: String): Future[FileListDir] = {
     readDir(path.resolve(parent.toList :+ dir: _*))

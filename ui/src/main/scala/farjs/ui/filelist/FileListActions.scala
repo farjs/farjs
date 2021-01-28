@@ -4,15 +4,41 @@ import farjs.api.filelist._
 import farjs.ui.filelist.FileListActions._
 import io.github.shogowada.scalajs.reactjs.redux.Action
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
+import scommons.nodejs.Process.Platform
+import scommons.nodejs._
 import scommons.react.redux.task.{FutureTask, TaskAction}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.scalajs.js
 import scala.util.Success
 
 trait FileListActions {
 
   protected def api: FileListApi
 
+  private[filelist] var platform: Platform = process.platform
+  private[filelist] var childProcess: ChildProcess = child_process
+
+  def openInDefaultApp(parent: String, item: String): FileListOpenInDefaultAppAction = {
+    val name =
+      if (item == FileListItem.up.name) FileListDir.curr
+      else item
+    
+    val (_, future) = childProcess.exec(
+      command = {
+        if (platform == Platform.darwin) s"""open "$name""""
+        else if (platform == Platform.win32) s"""start "" "$name""""
+        else s"""xdg-open "$name""""
+      },
+      options = Some(new raw.ChildProcessOptions {
+        override val cwd = parent
+        override val windowsHide = true
+      })
+    )
+
+    FileListOpenInDefaultAppAction(FutureTask("Opening default app", future))
+  }
+  
   def changeDir(dispatch: Dispatch,
                 isRight: Boolean,
                 parent: Option[String],
@@ -63,6 +89,8 @@ object FileListActions {
                                          index: Int,
                                          selectedNames: Set[String]) extends Action
 
+  case class FileListOpenInDefaultAppAction(task: FutureTask[(js.Object, js.Object)]) extends TaskAction
+  
   case class FileListDirChangeAction(task: FutureTask[FileListDir]) extends TaskAction
   case class FileListDirChangedAction(isRight: Boolean, dir: String, currDir: FileListDir) extends Action
   

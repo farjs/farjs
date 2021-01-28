@@ -12,6 +12,7 @@ import scommons.react.test.raw.ShallowInstance
 import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
 
 import scala.concurrent.Future
+import scala.scalajs.js
 
 class FileListSpec extends AsyncTestSpec with BaseTestSpec
   with ShallowRendererUtils
@@ -88,6 +89,35 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     renderer.unmount()
 
     action.task.future.map(_ => Succeeded)
+  }
+
+  it should "dispatch action when onKeypress(M-pagedown)" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val props = FileListProps(dispatch, actions, FileListState(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
+    ), (7, 2), columns = 2)
+    val dirAction = FileListDirChangeAction(
+      FutureTask("Changing dir", Future.successful(props.state.currDir))
+    )
+    val openAction = FileListOpenInDefaultAppAction(
+      FutureTask("Opening item", Future.successful((new js.Object, new js.Object)))
+    )
+    
+    //then
+    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
+    (actions.openInDefaultApp _).expects("/sub-dir", "item 1").returning(openAction)
+    dispatch.expects(dirAction)
+    dispatch.expects(openAction)
+    
+    val result = testRender(<(FileList())(^.wrapped := props)())
+    val List(viewProps) = findProps(result, FileListView)
+    
+    //when
+    viewProps.onKeypress("M-pagedown")
+    
+    dirAction.task.future.flatMap(_ => openAction.task.future).map(_ => Succeeded)
   }
 
   it should "dispatch action when onKeypress(enter | C-pageup | C-pagedown)" in {
