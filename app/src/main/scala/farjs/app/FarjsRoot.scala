@@ -1,30 +1,37 @@
 package farjs.app
 
 import farjs.app.FarjsRoot._
-import farjs.ui._
+import farjs.app.util._
 import scommons.react._
-import scommons.react.hooks._
 import scommons.react.blessed._
 import scommons.react.blessed.portal._
+import scommons.react.hooks._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.scalajs.js
 
 class FarjsRoot(withPortalsComp: UiComponent[Unit],
                 fileListComp: ReactClass,
                 fileListPopups: ReactClass,
                 taskController: ReactClass,
-                showDevTools: Boolean
+                initialDevTool: DevTool
                ) extends FunctionComponent[Unit] {
 
   protected def render(compProps: Props): ReactElement = {
     val elementRef = useRef[BlessedElement](null)
-    val (devTools, setDevTools) = useStateUpdater(showDevTools)
+    val (devTool, setDevTool) = useStateUpdater(initialDevTool)
 
     useLayoutEffect({ () =>
       val screen = elementRef.current.screen
       screen.key(js.Array("f12"), { (_, _) =>
-        setDevTools(v => !v)
-        screen.program.emit("resize")
+        setDevTool { from =>
+          val to = from.getNext
+          if (DevTool.shouldResize(from, to)) Future[Unit] { //exec on the next tick
+            screen.program.emit("resize")
+          }
+          to
+        }
       })
       ()
     }, Nil)
@@ -32,12 +39,10 @@ class FarjsRoot(withPortalsComp: UiComponent[Unit],
     <.>()(
       <.box(
         ^.reactRef := elementRef,
-        if (devTools) Some(
-          ^.rbWidth := "70%"
-        )
-        else Some(
-          ^.rbWidth := "100%"
-        )
+        ^.rbWidth := {
+          if (devTool == DevTool.Hidden) "100%"
+          else "70%"
+        }
       )(
         <(withPortalsComp())()(
           <(portalComp())()(
@@ -49,15 +54,18 @@ class FarjsRoot(withPortalsComp: UiComponent[Unit],
       ),
       
       <(logControllerComp())(^.wrapped := LogControllerProps { content =>
-        if (devTools) {
+        val comp = devTool match {
+          case DevTool.Hidden => <.>()()
+          case DevTool.Logs => <(logPanelComp())(^.wrapped := LogPanelProps(content))()
+          case DevTool.Colors => <(colorPanelComp())()()
+        }
+        
+        if (devTool != DevTool.Hidden) {
           <.box(
             ^.rbWidth := "30%",
             ^.rbHeight := "100%",
             ^.rbLeft := "70%"
-          )(
-            <(logPanelComp())(^.wrapped := LogPanelProps(content))()
-            //<(ColorPanel())()()
-          )
+          )(comp)
         }
         else null
       })()
@@ -70,4 +78,5 @@ object FarjsRoot {
   private[app] var portalComp: UiComponent[Unit] = Portal
   private[app] var logControllerComp: UiComponent[LogControllerProps] = LogController
   private[app] var logPanelComp: UiComponent[LogPanelProps] = LogPanel
+  private[app] var colorPanelComp: UiComponent[Unit] = ColorPanel
 }

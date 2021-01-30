@@ -1,4 +1,4 @@
-package farjs.ui
+package farjs.app.util
 
 import scommons.react._
 import scommons.react.hooks._

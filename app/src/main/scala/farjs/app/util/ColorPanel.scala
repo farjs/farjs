@@ -1,5 +1,6 @@
-package farjs.ui
+package farjs.app.util
 
+import farjs.ui.UI
 import scommons.react._
 import scommons.react.blessed._
 

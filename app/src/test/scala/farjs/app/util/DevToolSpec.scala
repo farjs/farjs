@@ -1,0 +1,33 @@
+package farjs.app.util
+
+import farjs.app.util.DevTool._
+import scommons.nodejs.test.TestSpec
+
+class DevToolSpec extends TestSpec {
+
+  it should "return correct value when shouldResize" in {
+    //when & then
+    shouldResize(Hidden, Hidden) shouldBe true
+    shouldResize(Hidden, Logs) shouldBe true
+    shouldResize(Logs, Hidden) shouldBe true
+    shouldResize(Logs, Logs) shouldBe false
+    shouldResize(Logs, Colors) shouldBe false
+  }
+  
+  it should "transition state from Hidden to Hidden when getNext" in {
+    //given
+    var state: DevTool = Hidden.getNext
+    state should not be Hidden
+    
+    //when
+    var count = 0
+    while (state != Hidden && count < 10) {
+      count += 1
+      state = state.getNext
+    }
+
+    //then
+    state shouldBe Hidden
+    count should be > 0
+  }
+}

@@ -1,4 +1,4 @@
-package farjs.ui
+package farjs.app.util
 
 import scommons.react._
 import scommons.react.blessed._
@@ -23,8 +23,8 @@ object LogPanel extends FunctionComponent[LogPanelProps] {
     )()
   }
   
-  private[ui] lazy val styles = new Styles
-  private[ui] class Styles extends js.Object {
+  private[util] lazy val styles = new Styles
+  private[util] class Styles extends js.Object {
     
     val container: BlessedStyle = new BlessedStyle {
       override val scrollbar = new BlessedScrollBarStyle {

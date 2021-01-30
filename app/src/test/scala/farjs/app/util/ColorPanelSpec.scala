@@ -1,4 +1,4 @@
-package farjs.ui
+package farjs.app.util
 
 import scommons.react.blessed._
 import scommons.react.test._

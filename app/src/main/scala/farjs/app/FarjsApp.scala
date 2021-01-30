@@ -2,6 +2,7 @@ package farjs.app
 
 import farjs.app.filelist.FileListBrowser
 import farjs.app.task.FarjsTaskController
+import farjs.app.util.DevTool
 import farjs.ui.filelist.FileListController
 import farjs.ui.filelist.popups.FileListPopupsController
 import io.github.shogowada.scalajs.reactjs.redux.ReactRedux._
@@ -45,7 +46,7 @@ object FarjsApp {
       fileListComp = fileListComp,
       fileListPopups = new FileListPopupsController(actions).apply(),
       taskController = FarjsTaskController(),
-      showDevTools = showDevTools
+      initialDevTool = if (showDevTools) DevTool.Logs else DevTool.Hidden
     )
     
     ReactBlessed.render(
