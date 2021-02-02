@@ -187,16 +187,23 @@ class FileListViewSpec extends TestSpec
 
   it should "call onKeypress when onKeypress(...)" in {
     //given
-    val onKeypress = mockFunction[String, Unit]
+    val onKeypress = mockFunction[BlessedScreen, String, Unit]
     val props = FileListViewProps((7, 3), columns = 2, items = List(
       FileListItem("item 1"),
       FileListItem("item 2")
     ), onKeypress = onKeypress)
-    val comp = shallowRender(<(FileListView())(^.wrapped := props)())
+    val screenMock = mock[BlessedScreenMock]
+    val buttonMock = mock[BlessedElementMock]
+    val comp = testRender(<(FileListView())(^.wrapped := props)(), { el =>
+      if (el.`type` == "button".asInstanceOf[js.Any]) buttonMock.asInstanceOf[js.Any]
+      else null
+    })
     val keyFull = "some-key"
+
+    (buttonMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
     
     //then
-    onKeypress.expects(keyFull)
+    onKeypress.expects(screenMock.asInstanceOf[BlessedScreen], keyFull)
     
     //when
     comp.props.onKeypress(null, literal(full = keyFull))

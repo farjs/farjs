@@ -3,6 +3,7 @@ const blessed = require("blessed")
 const colors = blessed.colors
 const unicode = blessed.unicode
 const Element = blessed.widget.Element
+const Program = blessed.Program
 
 const apply = function () {
 
@@ -520,6 +521,16 @@ const apply = function () {
   };
   
   Element.prototype._render = Element.prototype.render;
+  
+  Program.prototype.copyToClipboard = function(text) {
+    if (this.isiTerm2) {
+      //this._twrite('\x1b]1337;CopyToClipboard=\x07' + text + '\x1b]1337;EndCopy\x07');
+      var base64 = new Buffer(text).toString('base64')
+      this._twrite('\x1b]1337;Copy=:' + base64 + '\x07');
+      return true;
+    }
+    return false;
+  };
   
   //console.log("Blessed overrides!");
 }

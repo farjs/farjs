@@ -4,6 +4,7 @@ import farjs.api.filelist._
 import farjs.ui.filelist.FileListActions._
 import farjs.ui.filelist.popups.FileListPopupsActions._
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
+import scommons.nodejs.path
 import scommons.react._
 import scommons.react.hooks._
 
@@ -129,19 +130,26 @@ object FileList extends FunctionComponent[FileListProps] {
         focusItem(viewOffset, index)
       },
       onKeypress = {
-        case k if k == "up" || k == "S-up" => focusDx(- 1, k == "S-up")
-        case k if k == "down" || k == "S-down" => focusDx(1, k == "S-down")
-        case k if k == "left" || k == "S-left" => focusDx(-columnSize, k == "S-left")
-        case k if k == "right" || k == "S-right" => focusDx(columnSize, k == "S-right")
-        case k if k == "pageup" || k == "S-pageup" => focusDx(-viewSize + 1, k == "S-pageup")
-        case k if k == "pagedown" || k == "S-pagedown" => focusDx(viewSize - 1, k == "S-pagedown")
-        case k if k == "home" || k == "S-home" => focusItem(0, 0, k == "S-home")
-        case k if k == "end" || k == "S-end" => focusItem(maxOffset, maxIndex, k == "S-end")
-        case "M-pagedown" =>
+        case (_, k) if k == "up" || k == "S-up" => focusDx(- 1, k == "S-up")
+        case (_, k) if k == "down" || k == "S-down" => focusDx(1, k == "S-down")
+        case (_, k) if k == "left" || k == "S-left" => focusDx(-columnSize, k == "S-left")
+        case (_, k) if k == "right" || k == "S-right" => focusDx(columnSize, k == "S-right")
+        case (_, k) if k == "pageup" || k == "S-pageup" => focusDx(-viewSize + 1, k == "S-pageup")
+        case (_, k) if k == "pagedown" || k == "S-pagedown" => focusDx(viewSize - 1, k == "S-pagedown")
+        case (_, k) if k == "home" || k == "S-home" => focusItem(0, 0, k == "S-home")
+        case (_, k) if k == "end" || k == "S-end" => focusItem(maxOffset, maxIndex, k == "S-end")
+        case (screen, "C-c") =>
+          props.state.currentItem.foreach { item =>
+            val text =
+              if (item.name == FileListItem.up.name) props.state.currDir.path
+              else path.join(props.state.currDir.path, item.name)
+            screen.copyToClipboard(text)
+          }
+        case (_, "M-pagedown") =>
           props.state.currentItem.foreach { item =>
             props.dispatch(props.actions.openInDefaultApp(props.state.currDir.path, item.name))
           }
-        case k@("enter" | "C-pageup" | "C-pagedown") =>
+        case (_, k@("enter" | "C-pageup" | "C-pagedown")) =>
           val targetDir = k match {
             case "C-pageup" => Some(FileListItem.up)
             case _ => props.state.currentItem.filter(_.isDir)
@@ -154,14 +162,14 @@ object FileList extends FunctionComponent[FileListProps] {
               dir = dir.name
             ))
           }
-        case "f1" => props.dispatch(FileListPopupHelpAction(show = true))
-        case "f7" => props.dispatch(FileListPopupMkFolderAction(show = true))
-        case k if k == "f8" || k == "delete" =>
+        case (_, "f1") => props.dispatch(FileListPopupHelpAction(show = true))
+        case (_, "f7") => props.dispatch(FileListPopupMkFolderAction(show = true))
+        case (_, k) if k == "f8" || k == "delete" =>
           if (props.state.selectedNames.nonEmpty
             || props.state.currentItem.exists(_ != FileListItem.up)) {
             props.dispatch(FileListPopupDeleteAction(show = true))
           }
-        case "f10" => props.dispatch(FileListPopupExitAction(show = true))
+        case (_, "f10") => props.dispatch(FileListPopupExitAction(show = true))
         case _ =>
       }
     ))()

@@ -80,7 +80,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     })
   }
 
-  "Exit popup" should "dispatch FileListPopupExitAction and emit Ctrl+C when YES action" in {
+  "Exit popup" should "dispatch FileListPopupExitAction and emit Ctrl+Q when YES action" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -104,7 +104,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
 
     //then
     dispatch.expects(action)
-    onKey.expects("c", true, false, false)
+    onKey.expects("q", true, false, false)
 
     //when
     msgBox.actions.head.onAction()

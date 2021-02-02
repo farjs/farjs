@@ -14,7 +14,7 @@ case class FileListViewProps(size: (Int, Int),
                              onActivate: () => Unit = () => (),
                              onWheel: Boolean => Unit = _ => (),
                              onClick: Int => Unit = _ => (),
-                             onKeypress: String => Unit = _ => ())
+                             onKeypress: (BlessedScreen, String) => Unit = (_, _) => ())
 
 object FileListView extends FunctionComponent[FileListViewProps] {
   
@@ -80,7 +80,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
         if (keyFull == "tab") elementRef.current.screen.focusNext()
         else if (keyFull == "S-tab") elementRef.current.screen.focusPrevious()
         else {
-          props.onKeypress(keyFull)
+          props.onKeypress(elementRef.current.screen, keyFull)
         }
       }
     )(

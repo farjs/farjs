@@ -30,7 +30,7 @@ object FarjsApp {
       override val cursorShape = "underline"
     })
 
-    screen.key(js.Array("C-c"), { (_, _) =>
+    screen.key(js.Array("C-q"), { (_, _) =>
       process.exit(0)
     })
 

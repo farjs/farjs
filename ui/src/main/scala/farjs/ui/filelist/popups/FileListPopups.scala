@@ -42,7 +42,7 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
             MessageBoxAction.YES { () =>
               props.dispatch(FileListPopupExitAction(show = false))
               process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
-                name = "c",
+                name = "q",
                 ctrl = true,
                 meta = false,
                 shift = false

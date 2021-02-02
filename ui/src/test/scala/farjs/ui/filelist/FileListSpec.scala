@@ -2,10 +2,13 @@ package farjs.ui.filelist
 
 import farjs.api.filelist._
 import farjs.ui.filelist.FileListActions._
+import farjs.ui.filelist.FileListSpec._
 import farjs.ui.filelist.popups.FileListPopupsActions
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
+import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.blessed.BlessedScreen
 import scommons.react.redux.task.FutureTask
 import scommons.react.test.BaseTestSpec
 import scommons.react.test.raw.ShallowInstance
@@ -13,6 +16,7 @@ import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
 
 import scala.concurrent.Future
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSExportAll
 
 class FileListSpec extends AsyncTestSpec with BaseTestSpec
   with ShallowRendererUtils
@@ -46,7 +50,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       else dispatch.expects(action)
       
       //when
-      findComponentProps(renderer.getRenderOutput(), FileListView).onKeypress(fullKey)
+      findComponentProps(renderer.getRenderOutput(), FileListView).onKeypress(null, fullKey)
     }
 
     //when & then
@@ -91,6 +95,60 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     action.task.future.map(_ => Succeeded)
   }
 
+  it should "copy parent path into clipboard when onKeypress(C-c)" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val props = FileListProps(dispatch, actions, FileListState(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("..")))
+    ), (7, 2), columns = 2)
+    val dirAction = FileListDirChangeAction(
+      FutureTask("Changing dir", Future.successful(props.state.currDir))
+    )
+    val screenMock = mock[BlessedScreenMock]    
+    
+    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
+    dispatch.expects(dirAction)
+    
+    //then
+    (screenMock.copyToClipboard _).expects("/sub-dir")
+    
+    val result = testRender(<(FileList())(^.wrapped := props)())
+    val List(viewProps) = findProps(result, FileListView)
+    
+    //when
+    viewProps.onKeypress(screenMock.asInstanceOf[BlessedScreen], "C-c")
+    
+    dirAction.task.future.map(_ => Succeeded)
+  }
+
+  it should "copy item path into clipboard when onKeypress(C-c)" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val props = FileListProps(dispatch, actions, FileListState(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
+    ), (7, 2), columns = 2)
+    val dirAction = FileListDirChangeAction(
+      FutureTask("Changing dir", Future.successful(props.state.currDir))
+    )
+    val screenMock = mock[BlessedScreenMock]    
+    
+    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
+    dispatch.expects(dirAction)
+    
+    //then
+    (screenMock.copyToClipboard _).expects(path.join("/sub-dir", "item 1"))
+    
+    val result = testRender(<(FileList())(^.wrapped := props)())
+    val List(viewProps) = findProps(result, FileListView)
+    
+    //when
+    viewProps.onKeypress(screenMock.asInstanceOf[BlessedScreen], "C-c")
+    
+    dirAction.task.future.map(_ => Succeeded)
+  }
+
   it should "dispatch action when onKeypress(M-pagedown)" in {
     //given
     val dispatch = mockFunction[Any, Any]
@@ -115,7 +173,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
     val List(viewProps) = findProps(result, FileListView)
     
     //when
-    viewProps.onKeypress("M-pagedown")
+    viewProps.onKeypress(null, "M-pagedown")
     
     dirAction.task.future.flatMap(_ => openAction.task.future).map(_ => Succeeded)
   }
@@ -193,7 +251,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
 
       Future {
         //when
-        findComponentProps(renderer.getRenderOutput(), FileListView).onKeypress(keyFull)
+        findComponentProps(renderer.getRenderOutput(), FileListView).onKeypress(null, keyFull)
         renderer.render(<(FileList())(^.wrapped := props.copy(state = state))())
 
         //then
@@ -426,7 +484,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
       }
       
       //when
-      findComponentProps(renderer.getRenderOutput(), FileListView).onKeypress(keyFull)
+      findComponentProps(renderer.getRenderOutput(), FileListView).onKeypress(null, keyFull)
       renderer.render(<(FileList())(^.wrapped := props.copy(state = state))())
 
       //then
@@ -565,5 +623,14 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec
         resFocusedIndex shouldBe focusedIndex
         resSelectedNames shouldBe selectedNames
     }
+  }
+}
+
+object FileListSpec {
+
+  @JSExportAll
+  trait BlessedScreenMock {
+
+    def copyToClipboard(text: String): Boolean
   }
 }

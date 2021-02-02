@@ -39,6 +39,8 @@ trait BlessedScreen extends js.Object {
   def cursorShape(shape: String, blink: Boolean): Boolean = js.native
   def destroy(): Unit = js.native
   def render(): Unit = js.native
+  
+  def copyToClipboard(text: String): Boolean = js.native
 }
 
 @js.native

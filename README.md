@@ -53,15 +53,19 @@ To exit the application press `F10` on the keyboard.
 
 ## File Browser
 
-Supported operations:
+Main application window that consists of two similar panels.
+Each panel displays list of files and directories. You can perform
+different operations:
 
 * Navigation within panels:
   * Items selection - `Shift + Up/Down/Left/Right/PageUp/PageDown/Home/End`
   * Back to the parent folder - `Ctrl + PageUp`
-  * Go into a folder - `Ctrl + PageDown`
-  * Open item in default application - `Alt + PageDown`
-  (see [Key Bindings](#key-bindings) for how to re-map to `Shift + Return`)
+  * Go into a folder - `Ctrl + PageDown` / `Return`
 
+* Open item in **default application** - `Alt + PageDown`
+  (see [Key Bindings](#key-bindings) for how to re-map it to `Shift + Return`)
+* Copy current item's path into **Clipboard** - `Ctrl + C`
+  (in iTerm2 only)
 * Create Folder (with intermediate sub-folders) - `F7`
 * Delete Item(s) - `F8`
 
