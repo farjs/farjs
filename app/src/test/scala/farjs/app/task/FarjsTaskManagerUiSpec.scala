@@ -98,7 +98,7 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
   it should "render MessageBox if error" in {
     //given
     val props = getTaskManagerUiProps(
-      error = Some("Some error"),
+      error = Some("Error: \nSome error "),
       errorDetails = Some("Some error details")
     )
     val component = <(FarjsTaskManagerUi())(^.wrapped := props)()
@@ -110,7 +110,7 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
     assertTestComponent(result, messageBoxComp) {
       case MessageBoxProps(title, message, actions, style) =>
         title shouldBe "Error"
-        message shouldBe props.error.getOrElse("")
+        message shouldBe "Some error"
         //details shouldBe props.errorDetails
         actions shouldBe List(MessageBoxAction.OK(props.onCloseErrorPopup))
         style shouldBe Popup.Styles.error

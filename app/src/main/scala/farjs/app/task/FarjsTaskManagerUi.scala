@@ -30,7 +30,7 @@ object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val showError = props.error.isDefined
-    val errorMessage = props.error.getOrElse("")
+    val errorMessage = props.error.getOrElse("").trim
 
     <.>()(
       props.status.filter(_ => props.showLoading).map { msg =>
@@ -40,7 +40,7 @@ object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
       if (showError) Some(
         <(messageBoxComp())(^.wrapped := MessageBoxProps(
           title = "Error",
-          message = errorMessage,
+          message = errorMessage.stripPrefix("Error:").trim,
           //message = s"$errorMessage${props.errorDetails.map(d => s"\n\n$d").getOrElse("")}",
           actions = List(MessageBoxAction.OK(props.onCloseErrorPopup)),
           style = Popup.Styles.error

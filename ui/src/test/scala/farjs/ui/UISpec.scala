@@ -13,5 +13,6 @@ class UISpec extends TestSpec {
     splitText("test1, test2", 12) shouldBe List("test1, test2")
     splitText("test1, test2, test3", 12) shouldBe List("test1,", "test2, test3")
     splitText("test1, test2, test3", 13) shouldBe List("test1, test2,", "test3")
+    splitText("test1, \n\n test2, test3", 13) shouldBe List("test1,", "", "test2, test3")
   }
 }
