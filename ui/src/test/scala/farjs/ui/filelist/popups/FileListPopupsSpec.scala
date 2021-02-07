@@ -5,6 +5,7 @@ import farjs.ui.filelist.FileListActions.{FileListDirCreateAction, FileListItems
 import farjs.ui.filelist.popups.FileListPopupsActions._
 import farjs.ui.filelist.{FileListActions, FileListsState}
 import farjs.ui.popup._
+import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
 import scommons.nodejs._
 import scommons.nodejs.test.AsyncTestSpec
@@ -75,7 +76,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
           inside(resActions) {
             case List(MessageBoxAction("OK", _, true)) =>
           }
-          style shouldBe Popup.Styles.normal
+          style shouldBe Theme.current.popup.regular
       }
     })
   }
@@ -155,7 +156,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
           inside(resActions) {
             case List(MessageBoxAction("YES", _, false), MessageBoxAction("NO", _, true)) =>
           }
-          style shouldBe Popup.Styles.normal
+          style shouldBe Theme.current.popup.regular
       }
     })
   }
@@ -269,7 +270,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
           inside(resActions) {
             case List(MessageBoxAction("YES", _, false), MessageBoxAction("NO", _, true)) =>
           }
-          style shouldBe Popup.Styles.error
+          style shouldBe Theme.current.popup.error
       }
     })
   }

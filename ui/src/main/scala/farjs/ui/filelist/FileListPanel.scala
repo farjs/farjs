@@ -3,6 +3,7 @@ package farjs.ui.filelist
 import farjs.api.filelist.FileListItem
 import farjs.ui._
 import farjs.ui.border._
+import farjs.ui.theme.Theme
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.react._
 import scommons.react.blessed._
@@ -17,8 +18,8 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
+    val theme = Theme.current.fileList
     
-    val styles = FileListView.styles
     val currItem = props.state.currentItem
     val selectedItems =
       if (props.state.selectedNames.nonEmpty) {
@@ -27,13 +28,13 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
       else Nil
 
     <(WithSize())(^.wrapped := WithSizeProps({ (width, height) =>
-      <.box(^.rbStyle := styles.normalItem)(
-        <(DoubleBorder())(^.wrapped := DoubleBorderProps((width, height), styles.normalItem))(),
+      <.box(^.rbStyle := theme.regularItem)(
+        <(DoubleBorder())(^.wrapped := DoubleBorderProps((width, height), theme.regularItem))(),
         <(HorizontalLine())(^.wrapped := HorizontalLineProps(
           pos = (0, height - 4),
           length = width,
           lineCh = SingleBorder.horizontalCh,
-          style = styles.normalItem,
+          style = theme.regularItem,
           startCh = Some(DoubleBorder.leftSingleCh),
           endCh = Some(DoubleBorder.rightSingleCh)
         ))(),
@@ -49,7 +50,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           pos = (1, 0),
           width = width - 2,
           text = props.state.currDir.path,
-          style = styles.normalItem,
+          style = theme.regularItem,
           focused = props.state.isActive
         ))(),
 
@@ -62,7 +63,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
               val selectedSize = selectedItems.foldLeft(0.0)((res, f) => res + f.size)
               f"$selectedSize%,.0f in ${selectedItems.size}%d file(s)"
             },
-            style = styles.selectedItem
+            style = theme.selectedItem
           ))()
         )
         else None,
@@ -72,7 +73,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           pos = (1, height - 3),
           width = width - 2 - 12,
           text = currItem.map(_.name).getOrElse(""),
-          style = styles.normalItem,
+          style = theme.regularItem,
           padding = 0
         ))(),
         <(TextLine())(^.wrapped := TextLineProps(
@@ -82,7 +83,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           text = currItem.filter(i => i.size > 0.0 || !i.isDir).map { i =>
             f"${i.size}%,.0f"
           }.getOrElse(""),
-          style = styles.normalItem,
+          style = theme.regularItem,
           padding = 0
         ))(),
 
@@ -91,7 +92,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           pos = (1, height - 2),
           width = 10,
           text = currItem.map(_.permissions).getOrElse(""),
-          style = styles.normalItem,
+          style = theme.regularItem,
           padding = 0
         ))(),
         <(TextLine())(^.wrapped := TextLineProps(
@@ -102,7 +103,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
             val date = new js.Date(i.mtimeMs)
             s"${date.toLocaleDateString()} ${date.toLocaleTimeString()}"
           }.getOrElse(""),
-          style = styles.normalItem,
+          style = theme.regularItem,
           padding = 0
         ))(),
 
@@ -115,7 +116,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
             val filesSize = files.foldLeft(0.0)((res, f) => res + f.size)
             f"$filesSize%,.0f (${files.size}%d)"
           },
-          style = styles.normalItem
+          style = theme.regularItem
         ))()
       )
     }))()

@@ -4,16 +4,25 @@ import farjs.app.task.TaskStatusPopup._
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.PopupProps
+import farjs.ui.theme.Theme
 import org.scalatest._
+import scommons.nodejs.test.TestSpec
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
 
-class TaskStatusPopupSpec extends TestSpec with TestRendererUtils {
+class TaskStatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils {
 
   TaskStatusPopup.popupComp = () => "Popup".asInstanceOf[ReactClass]
   TaskStatusPopup.doubleBorderComp = () => "DoubleBorder".asInstanceOf[ReactClass]
   TaskStatusPopup.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
+
+  private val theme = Theme.current.popup.regular
+  private val style = new BlessedStyle {
+    override val bold = theme.bold
+    override val bg = theme.bg
+    override val fg = theme.fg
+  }
   
   it should "render component" in {
     //given
@@ -50,12 +59,12 @@ class TaskStatusPopupSpec extends TestSpec with TestRendererUtils {
           ^.rbTop := "center",
           ^.rbLeft := "center",
           ^.rbShadow := true,
-          ^.rbStyle := styles.text
+          ^.rbStyle := style
         )(), { case List(border, btn) =>
           assertTestComponent(border, doubleBorderComp) {
-            case DoubleBorderProps(resSize, style, pos, title) =>
+            case DoubleBorderProps(resSize, resStyle, pos, title) =>
               resSize shouldBe (width - 6) -> (height - 2)
-              style shouldBe styles.text
+              assertObject(resStyle, style)
               pos shouldBe 3 -> 1
               title shouldBe Some("Status")
           }
@@ -66,17 +75,17 @@ class TaskStatusPopupSpec extends TestSpec with TestRendererUtils {
               ^.rbHeight := textLines.size,
               ^.rbLeft := 4,
               ^.rbTop := 2,
-              ^.rbStyle := styles.text
+              ^.rbStyle := style
             )(), { msgs =>
               msgs.size shouldBe textLines.size
               msgs.zip(textLines).zipWithIndex.foreach { case ((msg, textLine), index) =>
                 assertTestComponent(msg, textLineComp) {
-                  case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
+                  case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
                     align shouldBe TextLine.Center
                     pos shouldBe 0 -> index
                     resWidth shouldBe textWidth
                     text shouldBe textLine
-                    style shouldBe styles.text
+                    assertObject(resStyle, style)
                     focused shouldBe false
                     padding shouldBe 1
                 }

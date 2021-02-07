@@ -1,7 +1,7 @@
 package farjs.ui
 
-import farjs.ui.TextBox.styles
 import farjs.ui.TextBoxSpec._
+import farjs.ui.theme.Theme
 import org.scalactic.source.Position
 import scommons.react.blessed._
 import scommons.react.blessed.raw._
@@ -248,13 +248,14 @@ class TextBoxSpec extends TestSpec
         }
       }
       
+      val theme = Theme.current.textBox
       inputEl.props.content shouldBe {
         if (selEnd - selStart > 0) {
-          val part1 = TextBox.renderText(styles.normal, newVal.slice(offset, selStart))
-          val part2 = TextBox.renderText(styles.selected, newVal.slice(math.max(selStart, offset), selEnd))
-          val part3 = TextBox.renderText(styles.normal, newVal.substring(math.min(selEnd, newVal.length)))
+          val part1 = TextBox.renderText(theme.regular, newVal.slice(offset, selStart))
+          val part2 = TextBox.renderText(theme.selected, newVal.slice(math.max(selStart, offset), selEnd))
+          val part3 = TextBox.renderText(theme.regular, newVal.substring(math.min(selEnd, newVal.length)))
           s"$part1$part2$part3"
-        } else TextBox.renderText(styles.normal, newVal.substring(math.min(offset, newVal.length)))
+        } else TextBox.renderText(theme.regular, newVal.substring(math.min(offset, newVal.length)))
       }
     }
 
@@ -341,6 +342,7 @@ class TextBoxSpec extends TestSpec
   )
 
   private def assertTextBox(result: ShallowInstance, props: TextBoxProps): Unit = {
+    val theme = Theme.current.textBox
     val (left, top) = props.pos
     
     assertNativeComponent(result,
@@ -352,8 +354,8 @@ class TextBoxSpec extends TestSpec
         ^.rbHeight := 1,
         ^.rbLeft := left,
         ^.rbTop := top,
-        ^.rbStyle := styles.normal,
-        ^.content := TextBox.renderText(styles.normal, props.value)
+        ^.rbStyle := theme.regular,
+        ^.content := TextBox.renderText(theme.regular, props.value)
       )()
     )
   }

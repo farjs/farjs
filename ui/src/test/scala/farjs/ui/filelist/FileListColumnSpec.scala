@@ -3,6 +3,7 @@ package farjs.ui.filelist
 import farjs.api.filelist.FileListItem
 import farjs.ui._
 import farjs.ui.border._
+import farjs.ui.theme.Theme
 import org.scalatest.Assertion
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
@@ -141,6 +142,8 @@ class FileListColumnSpec extends TestSpec
                                    props: FileListColumnProps,
                                    expectedContent: Option[String]): Unit = {
     
+    val theme = Theme.current.fileList
+    
     def assertElements(header: ShallowInstance, itemsText: Option[ShallowInstance]): Assertion = {
       assertComponent(header, TextLine) {
         case TextLineProps(align, pos, width, text, style, focused, padding) =>
@@ -148,7 +151,7 @@ class FileListColumnSpec extends TestSpec
           pos shouldBe 0 -> 0
           width shouldBe props.size._1
           text shouldBe "Name"
-          style shouldBe FileListView.styles.headerStyle
+          style shouldBe theme.header
           focused shouldBe false
           padding shouldBe 0
       }
@@ -170,7 +173,7 @@ class FileListColumnSpec extends TestSpec
       ^.rbWidth := props.size._1,
       ^.rbHeight := props.size._2,
       ^.rbLeft := props.left,
-      ^.rbStyle := FileListView.styles.normalItem
+      ^.rbStyle := theme.regularItem
     )(), { children: List[ShallowInstance] =>
       children match {
         case List(header, itemsText, _) => assertElements(header, Some(itemsText))

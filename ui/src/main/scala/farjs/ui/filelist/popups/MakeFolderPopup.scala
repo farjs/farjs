@@ -3,6 +3,7 @@ package farjs.ui.filelist.popups
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup._
+import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
@@ -19,7 +20,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
     val (folderName, setFolderName) = useState(props.folderName)
     val (multiple, setMultiple) = useState(props.multiple)
     val (width, height) = (75, 10)
-    val style = Popup.Styles.normal
+    val theme = Theme.current.popup.regular
 
     val onOk = { () =>
       if (folderName.nonEmpty) {
@@ -44,7 +45,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
         ^.rbWidth := content.length,
         ^.rbHeight := 1,
         ^.rbLeft := pos,
-        ^.rbStyle := style,
+        ^.rbStyle := theme,
         ^.rbOnPress := onAction,
         ^.content := content
       )())
@@ -59,11 +60,11 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
         ^.rbTop := "center",
         ^.rbLeft := "center",
         ^.rbShadow := true,
-        ^.rbStyle := style
+        ^.rbStyle := theme
       )(
         <(DoubleBorder())(^.wrapped := DoubleBorderProps(
           size = (width - 6, height - 2),
-          style = style,
+          style = theme,
           pos = (3, 1),
           title = Some("Make Folder")
         ))(),
@@ -73,7 +74,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           pos = (4, 2),
           width = width - 8,
           text = "Create the folder",
-          style = style
+          style = theme
         ))(),
         <(TextBox())(^.wrapped := TextBoxProps(
           pos = (5, 3),
@@ -88,7 +89,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           pos = (3, 4),
           length = width - 6,
           lineCh = SingleBorder.horizontalCh,
-          style = style,
+          style = theme,
           startCh = Some(DoubleBorder.leftSingleCh),
           endCh = Some(DoubleBorder.rightSingleCh)
         ))(),
@@ -97,7 +98,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           pos = (5, 5),
           value = multiple,
           label = "Process multiple names",
-          style = style,
+          style = theme,
           onChange = { () =>
             setMultiple(!multiple)
           }
@@ -106,7 +107,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           pos = (3, 6),
           length = width - 6,
           lineCh = SingleBorder.horizontalCh,
-          style = style,
+          style = theme,
           startCh = Some(DoubleBorder.leftSingleCh),
           endCh = Some(DoubleBorder.rightSingleCh)
         ))(),
@@ -116,7 +117,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           ^.rbHeight := 1,
           ^.rbTop := height - 3,
           ^.rbLeft := "center",
-          ^.rbStyle := style
+          ^.rbStyle := theme
         )(
           buttons.map(_._2)
         )

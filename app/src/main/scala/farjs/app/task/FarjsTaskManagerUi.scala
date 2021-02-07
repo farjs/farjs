@@ -1,6 +1,7 @@
 package farjs.app.task
 
 import farjs.ui.popup._
+import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.redux.task.{TaskManager, TaskManagerUiProps}
 
@@ -31,6 +32,7 @@ object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
     val props = compProps.wrapped
     val showError = props.error.isDefined
     val errorMessage = props.error.getOrElse("").trim
+    val theme = Theme.current.popup
 
     <.>()(
       props.status.filter(_ => props.showLoading).map { msg =>
@@ -43,7 +45,7 @@ object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
           message = errorMessage.stripPrefix("Error:").trim,
           //message = s"$errorMessage${props.errorDetails.map(d => s"\n\n$d").getOrElse("")}",
           actions = List(MessageBoxAction.OK(props.onCloseErrorPopup)),
-          style = Popup.Styles.error
+          style = theme.error
         ))()
       ) else None
     )

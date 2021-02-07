@@ -3,6 +3,7 @@ package farjs.ui.filelist.popups
 import farjs.ui.filelist.popups.FileListPopupsActions._
 import farjs.ui.filelist.{FileListActions, FileListsStateDef}
 import farjs.ui.popup._
+import farjs.ui.theme.Theme
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.nodejs._
 import scommons.react._
@@ -22,6 +23,7 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
     val (multiple, setMultiple) = useState(false)
     val props = compProps.wrapped
     val popups = props.data.popups
+    val theme = Theme.current.popup
 
     <.>()(
       if (popups.showHelpPopup) Some(
@@ -30,7 +32,8 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
           message = "//TODO: show help/about info",
           actions = List(MessageBoxAction.OK { () =>
             props.dispatch(FileListPopupHelpAction(show = false))
-          })
+          }),
+          style = theme.regular
         ))()
       ) else None,
       
@@ -51,7 +54,8 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
             MessageBoxAction.NO { () =>
               props.dispatch(FileListPopupExitAction(show = false))
             }
-          )
+          ),
+          style = theme.regular
         ))()
       ) else None,
       
@@ -86,7 +90,7 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
               props.dispatch(FileListPopupDeleteAction(show = false))
             }
           ),
-          style = Popup.Styles.error
+          style = theme.error
         ))()
       ) else None,
       

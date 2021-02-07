@@ -2,6 +2,7 @@ package farjs.ui.filelist
 
 import farjs.api.filelist.FileListItem
 import farjs.ui.border._
+import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
@@ -95,7 +96,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
                   pos = (colLeft + colWidth, -1),
                   length = height + 2,
                   lineCh = SingleBorder.verticalCh,
-                  style = styles.normalItem,
+                  style = Theme.current.fileList.regularItem,
                   startCh = Some(DoubleBorder.topSingleCh),
                   endCh = Some(SingleBorder.bottomCh)
                 ))()
@@ -125,56 +126,5 @@ object FileListView extends FunctionComponent[FileListViewProps] {
       }
       else Nil
     )
-  }
-  
-  private[filelist] lazy val styles = new Styles
-  private[filelist] class Styles {
-    
-    val normalItem: BlessedStyle = new BlessedStyle {
-      override val bold = true
-      override val bg = "#008"
-      override val fg = "#5ce"
-      override val focus = new BlessedStyle {
-        override val bold = true
-        override val bg = "#088"
-        override val fg = "#111"
-      }
-    }
-    val dirItem: BlessedStyle = new BlessedStyle {
-      override val bold = true
-      override val bg = "#008"
-      override val fg = "#fff"
-      override val focus = new BlessedStyle {
-        override val bold = true
-        override val bg = "#088"
-        override val fg = "#fff"
-      }
-    }
-    val hiddenItem: BlessedStyle = new BlessedStyle {
-      override val bold = true
-      override val bg = "#008"
-      override val fg = "#055"
-      override val focus = new BlessedStyle {
-        override val bold = true
-        override val bg = "#088"
-        override val fg = "#055"
-      }
-    }
-    val selectedItem: BlessedStyle = new BlessedStyle {
-      override val bold = true
-      override val bg = "#008"
-      override val fg = "yellow"
-      override val focus = new BlessedStyle {
-        override val bold = true
-        override val bg = "#088"
-        override val fg = "yellow"
-      }
-    }
-    
-    val headerStyle: BlessedStyle = new BlessedStyle {
-      override val bold = true
-      override val bg = "#008"
-      override val fg = "yellow"
-    }
   }
 }

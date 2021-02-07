@@ -2,6 +2,7 @@ package farjs.ui.filelist
 
 import farjs.api.filelist.FileListItem
 import farjs.ui._
+import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 
@@ -23,20 +24,20 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val (width, height) = props.size
-    val styles = FileListView.styles
+    val theme = Theme.current.fileList
     
-    val borderEnd = TextBox.renderText(styles.normalItem, props.borderCh)
-    val overlapEnd = TextBox.renderText(styles.normalItem, "}")
+    val borderEnd = TextBox.renderText(theme.regularItem, props.borderCh)
+    val overlapEnd = TextBox.renderText(theme.regularItem, "}")
 
     def renderItems(): Seq[String] = props.items.zipWithIndex.map {
       case (item, index) =>
         val name = item.name
         val style = {
           val style =
-            if (props.selectedNames.contains(name)) styles.selectedItem
-            else if (name.startsWith(".") && name != FileListItem.up.name) styles.hiddenItem
-            else if (item.isDir && name != FileListItem.up.name) styles.dirItem
-            else styles.normalItem
+            if (props.selectedNames.contains(name)) theme.selectedItem
+            else if (name.startsWith(".") && name != FileListItem.up.name) theme.hiddenItem
+            else if (item.isDir && name != FileListItem.up.name) theme.dirItem
+            else theme.regularItem
           
           val focused = props.focusedIndex == index
           if (focused) style.focus.getOrElse(null)
@@ -60,14 +61,14 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
       ^.rbWidth := width,
       ^.rbHeight := height,
       ^.rbLeft := props.left,
-      ^.rbStyle := styles.normalItem
+      ^.rbStyle := theme.regularItem
     )(
       <(TextLine())(^.wrapped := TextLineProps(
         align = TextLine.Center,
         pos = (0, 0),
         width = width,
         text = "Name",
-        style = styles.headerStyle,
+        style = theme.header,
         padding = 0
       ))(),
       

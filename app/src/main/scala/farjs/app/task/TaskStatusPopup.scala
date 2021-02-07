@@ -3,6 +3,7 @@ package farjs.app.task
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup._
+import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 
@@ -20,7 +21,12 @@ object TaskStatusPopup extends FunctionComponent[TaskStatusPopupProps] {
     val textWidth = width - 8
     val textLines = UI.splitText(props.text, textWidth - 2) //exclude padding
     val height = 4 + textLines.size
-    val style = styles.text
+    val theme = Theme.current.popup.regular
+    val style = new BlessedStyle {
+      override val bold = theme.bold
+      override val bg = theme.bg
+      override val fg = theme.fg
+    }
 
     <(popupComp())(^.wrapped := PopupProps(
       onClose = () => (),
@@ -62,15 +68,5 @@ object TaskStatusPopup extends FunctionComponent[TaskStatusPopupProps] {
         )
       )
     )
-  }
-  
-  private[task] lazy val styles = new Styles
-  private[task] class Styles {
-
-    val text: BlessedStyle = new BlessedStyle {
-      override val bold = Popup.Styles.normal.bold
-      override val bg = Popup.Styles.normal.bg
-      override val fg = Popup.Styles.normal.fg
-    }
   }
 }

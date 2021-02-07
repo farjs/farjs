@@ -3,6 +3,7 @@ package farjs.ui.filelist
 import farjs.api.filelist.{FileListDir, FileListItem}
 import farjs.ui._
 import farjs.ui.border._
+import farjs.ui.theme.Theme
 import org.scalatest.Assertion
 import scommons.react._
 import scommons.react.blessed._
@@ -127,7 +128,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
                                   dirSize: String = "0 (0)"): Unit = {
     
     val (width, height) = (25, 15)
-    val styles = FileListView.styles
+    val theme = Theme.current.fileList
     
     def assertComponents(border: ShallowInstance,
                          line: ShallowInstance,
@@ -143,7 +144,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
       assertComponent(border, DoubleBorder) {
         case DoubleBorderProps(resSize, style, pos, title) =>
           resSize shouldBe width -> height
-          style shouldBe styles.normalItem
+          style shouldBe theme.regularItem
           pos shouldBe 0 -> 0
           title shouldBe None
       }
@@ -152,7 +153,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
           pos shouldBe 0 -> (height - 4)
           len shouldBe width
           lineCh shouldBe SingleBorder.horizontalCh
-          style shouldBe styles.normalItem
+          style shouldBe theme.regularItem
           startCh shouldBe Some(DoubleBorder.leftSingleCh)
           endCh shouldBe Some(DoubleBorder.rightSingleCh)
       }
@@ -170,7 +171,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
           pos shouldBe 1 -> 0
           resWidth shouldBe (width - 2)
           text shouldBe state.currDir.path
-          style shouldBe styles.normalItem
+          style shouldBe theme.regularItem
           focused shouldBe props.state.isActive
           padding shouldBe 1
       }
@@ -183,7 +184,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
             pos shouldBe 1 -> (height - 4)
             resWidth shouldBe (width - 2)
             text shouldBe selected.get
-            style shouldBe styles.selectedItem
+            style shouldBe theme.selectedItem
             focused shouldBe false
             padding shouldBe 1
         }
@@ -195,7 +196,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
           pos shouldBe 1 -> (height - 3)
           resWidth shouldBe (width - 2 - 12)
           text shouldBe expectedFile
-          style shouldBe styles.normalItem
+          style shouldBe theme.regularItem
           focused shouldBe false
           padding shouldBe 0
       }
@@ -205,7 +206,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
           pos shouldBe (1 + width - 2 - 12) -> (height - 3)
           resWidth shouldBe 12
           text shouldBe expectedFileSize
-          style shouldBe styles.normalItem
+          style shouldBe theme.regularItem
           focused shouldBe false
           padding shouldBe 0
       }
@@ -216,7 +217,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
           pos shouldBe 1 -> (height - 2)
           resWidth shouldBe 10
           text shouldBe permissions
-          style shouldBe styles.normalItem
+          style shouldBe theme.regularItem
           focused shouldBe false
           padding shouldBe 0
       }
@@ -227,7 +228,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
           resWidth shouldBe 25
           if (showDate) text should not be empty
           else text should be (empty)
-          style shouldBe styles.normalItem
+          style shouldBe theme.regularItem
           focused shouldBe false
           padding shouldBe 0
       }
@@ -238,7 +239,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
           pos shouldBe 1 -> (height - 1)
           resWidth shouldBe (width - 2)
           text shouldBe dirSize
-          style shouldBe styles.normalItem
+          style shouldBe theme.regularItem
           focused shouldBe false
           padding shouldBe 1
       }
@@ -255,7 +256,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
     assertComponent(result, WithSize) { case WithSizeProps(render) =>
       val result = renderContent(render(width, height))
       
-      assertNativeComponent(result, <.box(^.rbStyle := styles.normalItem)(), {
+      assertNativeComponent(result, <.box(^.rbStyle := theme.regularItem)(), {
         case List(border, line, list, currFolder, currFile, fileSize, filePerm, fileDate, folderSize) =>
           assertComponents(border, line, list, currFolder, None, currFile, fileSize, filePerm, fileDate, folderSize)
         case List(border, line, list, currFolder, selection, currFile, fileSize, filePerm, fileDate, folderSize) =>

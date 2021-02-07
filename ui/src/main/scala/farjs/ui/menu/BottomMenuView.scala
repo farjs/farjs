@@ -1,5 +1,6 @@
 package farjs.ui.menu
 
+import farjs.ui.theme.Theme
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
@@ -18,6 +19,7 @@ object BottomMenuView extends FunctionComponent[BottomMenuViewProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
+    val theme = Theme.current.menu
     val width = props.width
     val items = props.items
 
@@ -45,13 +47,13 @@ object BottomMenuView extends FunctionComponent[BottomMenuViewProps] {
       (index + 1, text, leftPos, itemWidth)
     }
     
-    val keyBold = if (styles.key.bold.getOrElse(false)) "{bold}" else ""
-    val keyFg = styles.key.fg
-    val keyBg = styles.key.bg
+    val keyBold = if (theme.key.bold.getOrElse(false)) "{bold}" else ""
+    val keyFg = theme.key.fg
+    val keyBg = theme.key.bg
     
-    val itemBold = if (styles.item.bold.getOrElse(false)) "{bold}" else ""
-    val itemFg = styles.item.fg
-    val itemBg = styles.item.bg
+    val itemBold = if (theme.item.bold.getOrElse(false)) "{bold}" else ""
+    val itemFg = theme.item.fg
+    val itemBg = theme.item.bg
     
     <.>()(
       itemsWithPos.map { case (key, item, pos, textWidth) =>
@@ -77,20 +79,5 @@ object BottomMenuView extends FunctionComponent[BottomMenuViewProps] {
 
       compProps.children // just for testing memo/re-render
     )
-  }
-
-  private[menu] lazy val styles = new Styles
-  private[menu] class Styles {
-
-    val key: BlessedStyle = new BlessedStyle {
-      override val bold = true
-      override val bg = "black"
-      override val fg = "#aaa"
-    }
-    val item: BlessedStyle = new BlessedStyle {
-      override val bold = true
-      override val bg = "#088"
-      override val fg = "#111"
-    }
   }
 }

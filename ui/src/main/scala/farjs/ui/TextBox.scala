@@ -1,5 +1,6 @@
 package farjs.ui
 
+import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.blessed.raw.Blessed
@@ -34,6 +35,7 @@ object TextBox extends FunctionComponent[TextBoxProps] {
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
+    val theme = Theme.current.textBox
     val elementRef = useRef[BlessedElement](null)
     val ((offset, cursorX), setOffsetAndPos) = useState(() => (0, -1))
     val ((selStart, selEnd), setSelStartAndEnd) = useState(() => (-1, -1))
@@ -195,15 +197,15 @@ object TextBox extends FunctionComponent[TextBoxProps] {
       ^.rbHeight := 1,
       ^.rbLeft := left,
       ^.rbTop := top,
-      ^.rbStyle := styles.normal,
+      ^.rbStyle := theme.regular,
       ^.rbTags := true,
       ^.content := {
         if (selEnd - selStart > 0) {
-          val part1 = renderText(styles.normal, props.value.slice(offset, selStart))
-          val part2 = renderText(styles.selected, props.value.slice(math.max(selStart, offset), selEnd))
-          val part3 = renderText(styles.normal, props.value.substring(math.min(selEnd, props.value.length)))
+          val part1 = renderText(theme.regular, props.value.slice(offset, selStart))
+          val part2 = renderText(theme.selected, props.value.slice(math.max(selStart, offset), selEnd))
+          val part3 = renderText(theme.regular, props.value.substring(math.min(selEnd, props.value.length)))
           s"$part1$part2$part3"
-        } else renderText(styles.normal, props.value.substring(math.min(offset, props.value.length)))
+        } else renderText(theme.regular, props.value.substring(math.min(offset, props.value.length)))
       },
       ^.rbOnClick := onClick,
       ^.rbOnResize := onResize,
@@ -243,19 +245,5 @@ object TextBox extends FunctionComponent[TextBoxProps] {
     case object TillTheEnd extends TextSelect
     case object ToTheLeft extends TextSelect
     case object ToTheRight extends TextSelect
-  }
-
-  private[ui] object styles {
-
-    val normal: BlessedStyle = new BlessedStyle {
-      override val bold = true
-      override val bg = "#088"
-      override val fg = "#111"
-    }
-    val selected: BlessedStyle = new BlessedStyle {
-      override val bold = true
-      override val bg = "blue"
-      override val fg = "white"
-    }
   }
 }

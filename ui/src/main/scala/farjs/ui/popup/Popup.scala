@@ -1,7 +1,6 @@
 package farjs.ui.popup
 
 import scommons.react._
-import scommons.react.blessed._
 import scommons.react.blessed.portal._
 
 case class PopupProps(onClose: () => Unit,
@@ -22,30 +21,5 @@ object Popup extends FunctionComponent[PopupProps] {
         compProps.children
       )
     )
-  }
-  
-  object Styles {
-
-    val normal: BlessedStyle = new BlessedStyle {
-      override val bold = true
-      override val bg = "white"
-      override val fg = "#111"
-      override val focus = new BlessedStyle {
-        override val bold = true
-        override val bg = "#088"
-        override val fg = "#111"
-      }
-    }
-    
-    val error: BlessedStyle = new BlessedStyle {
-      override val bold = true
-      override val bg = "red"
-      override val fg = "white"
-      override val focus = new BlessedStyle {
-        override val bold = true
-        override val bg = "white"
-        override val fg = "#111"
-      }
-    }
   }
 }

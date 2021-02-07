@@ -3,6 +3,7 @@ package farjs.ui.filelist.popups
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.{Popup, PopupProps}
+import farjs.ui.theme.Theme
 import org.scalatest.{Assertion, Succeeded}
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
@@ -138,7 +139,7 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
                                     props: MakeFolderPopupProps,
                                     actions: List[(String, Int)]): Unit = {
     val (width, height) = (75, 10)
-    val style = Popup.Styles.normal
+    val style = Theme.current.popup.regular
     
     def assertComponents(border: ShallowInstance,
                          label: ShallowInstance,

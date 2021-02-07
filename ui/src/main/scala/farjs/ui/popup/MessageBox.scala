@@ -8,7 +8,7 @@ import scommons.react.blessed._
 case class MessageBoxProps(title: String,
                            message: String,
                            actions: List[MessageBoxAction],
-                           style: BlessedStyle = Popup.Styles.normal)
+                           style: BlessedStyle)
 
 object MessageBox extends FunctionComponent[MessageBoxProps] {
 

@@ -3,6 +3,7 @@ package farjs.ui.filelist
 import farjs.api.filelist.FileListItem
 import farjs.ui.border._
 import farjs.ui.filelist.FileListViewSpec._
+import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
@@ -286,7 +287,7 @@ class FileListViewSpec extends TestSpec
             pos shouldBe 2 -> -1
             resLength shouldBe 4
             ch shouldBe SingleBorder.verticalCh
-            style shouldBe FileListView.styles.normalItem
+            style shouldBe Theme.current.fileList.regularItem
             start shouldBe Some(DoubleBorder.topSingleCh)
             end shouldBe Some(SingleBorder.bottomCh)
         }

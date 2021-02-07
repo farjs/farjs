@@ -2,6 +2,7 @@ package farjs.ui.popup
 
 import farjs.ui._
 import farjs.ui.border._
+import farjs.ui.theme.Theme
 import org.scalatest.{Assertion, Succeeded}
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
@@ -15,7 +16,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
     val onAction = mockFunction[Unit]
     val props = MessageBoxProps("test title", "test message", List(
       MessageBoxAction.OK(onAction)
-    ))
+    ), Theme.current.popup.regular)
     val comp = shallowRender(<(MessageBox())(^.wrapped := props)())
     val popup = findComponentProps(comp, Popup)
 
@@ -31,7 +32,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
     val onAction = mockFunction[Unit]
     val props = MessageBoxProps("test title", "test message", List(
       MessageBoxAction.OK(onAction)
-    ))
+    ), Theme.current.popup.regular)
     val comp = shallowRender(<(MessageBox())(^.wrapped := props)())
     val okButton = findComponents(comp, "button").head
 
@@ -47,7 +48,8 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
     val props = MessageBoxProps(
       title = "test title",
       message = "Toooooooooooooooooooooooooooooo looooooooooooooooooooooooong test message",
-      actions = List(MessageBoxAction.OK(() => ()))
+      actions = List(MessageBoxAction.OK(() => ())),
+      style = Theme.current.popup.regular
     )
 
     //when
@@ -64,7 +66,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
     val props = MessageBoxProps("test title", "test message", List(
       MessageBoxAction.YES(onYesAction),
       MessageBoxAction.NO(onNoAction)
-    ))
+    ), Theme.current.popup.regular)
     val comp = shallowRender(<(MessageBox())(^.wrapped := props)())
     val popup = findComponentProps(comp, Popup)
 
@@ -83,7 +85,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
     val props = MessageBoxProps("test title", "test message", List(
       MessageBoxAction.YES(onYesAction),
       MessageBoxAction.NO(onNoAction)
-    ))
+    ), Theme.current.popup.regular)
     val comp = shallowRender(<(MessageBox())(^.wrapped := props)())
     val yesButton = findComponents(comp, "button").head
 
@@ -102,7 +104,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
     val props = MessageBoxProps("test title", "test message", List(
       MessageBoxAction.YES(onYesAction),
       MessageBoxAction.NO(onNoAction)
-    ))
+    ), Theme.current.popup.regular)
     val comp = shallowRender(<(MessageBox())(^.wrapped := props)())
     val noButton = findComponents(comp, "button")(1)
 
@@ -119,7 +121,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
     val props = MessageBoxProps("test title", "test message", List(
       MessageBoxAction.YES(() => ()),
       MessageBoxAction.NO(() => ())
-    ))
+    ), Theme.current.popup.regular)
 
     //when
     val result = shallowRender(<(MessageBox())(^.wrapped := props)())
@@ -135,7 +137,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
     val props = MessageBoxProps("test title", "test message", List(
       MessageBoxAction.YES(onYesAction),
       MessageBoxAction.NO(onNoAction).copy(triggeredOnClose = false)
-    ))
+    ), Theme.current.popup.regular)
     val comp = shallowRender(<(MessageBox())(^.wrapped := props)())
     val popup = findComponentProps(comp, Popup)
 
@@ -152,7 +154,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
     val props = MessageBoxProps("test title", "test message", List(
       MessageBoxAction.YES(() => ()),
       MessageBoxAction.NO(() => ()).copy(triggeredOnClose = false)
-    ))
+    ), Theme.current.popup.regular)
 
     //when
     val result = shallowRender(<(MessageBox())(^.wrapped := props)())

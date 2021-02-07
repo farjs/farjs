@@ -2,6 +2,7 @@ package farjs.app.task
 
 import farjs.app.task.FarjsTaskManagerUi._
 import farjs.ui.popup._
+import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.redux.task._
 import scommons.react.test._
@@ -113,7 +114,7 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
         message shouldBe "Some error"
         //details shouldBe props.errorDetails
         actions shouldBe List(MessageBoxAction.OK(props.onCloseErrorPopup))
-        style shouldBe Popup.Styles.error
+        style shouldBe Theme.current.popup.error
     }
   }
 
