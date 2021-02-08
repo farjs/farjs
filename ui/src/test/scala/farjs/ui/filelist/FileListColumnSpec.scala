@@ -3,7 +3,7 @@ package farjs.ui.filelist
 import farjs.api.filelist.FileListItem
 import farjs.ui._
 import farjs.ui.border._
-import farjs.ui.theme.Theme
+import farjs.ui.theme.{Theme, XTerm256Theme}
 import org.scalatest.Assertion
 import scommons.react.blessed._
 import scommons.react.test.TestSpec
@@ -86,6 +86,8 @@ class FileListColumnSpec extends TestSpec
   
   it should "render non-empty component" in {
     //given
+    val savedTheme = Theme.current
+    Theme.current = XTerm256Theme
     val props = FileListColumnProps(
       size = (14, 3),
       left = 2,
@@ -117,6 +119,9 @@ class FileListColumnSpec extends TestSpec
         |{bold}{#055-fg}{#008-bg}.file 5       {/}{bold}{#5ce-fg}{#008-bg}│{/}
         |{bold}{#5ce-fg}{#008-bg}file 6        {/}{bold}{#5ce-fg}{#008-bg}│{/}""".stripMargin
     ))
+    
+    //cleanup
+    Theme.current = savedTheme
   }
   
   it should "render empty component" in {

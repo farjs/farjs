@@ -5,6 +5,7 @@ import farjs.app.task.FarjsTaskController
 import farjs.app.util.DevTool
 import farjs.ui.filelist.FileListController
 import farjs.ui.filelist.popups.FileListPopupsController
+import farjs.ui.theme.{Theme, XTerm256Theme}
 import io.github.shogowada.scalajs.reactjs.redux.ReactRedux._
 import io.github.shogowada.scalajs.reactjs.redux.Redux
 import scommons.nodejs._
@@ -30,6 +31,10 @@ object FarjsApp {
       override val cursorShape = "underline"
     })
 
+    if (screen.terminal == TerminalName.`xterm-256color`) {
+      Theme.current = XTerm256Theme
+    }
+    
     screen.key(js.Array("C-q"), { (_, _) =>
       process.exit(0)
     })

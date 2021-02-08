@@ -1,6 +1,6 @@
 package farjs.ui.menu
 
-import farjs.ui.theme.Theme
+import farjs.ui.theme.{Theme, XTerm256Theme}
 import org.scalatest.Succeeded
 import scommons.nodejs._
 import scommons.react._
@@ -15,8 +15,6 @@ class BottomMenuViewSpec extends TestSpec
   with ShallowRendererUtils
   with TestRendererUtils {
 
-  private val theme = Theme.current.menu
-  
   it should "emit keypress event when onClick" in {
     //given
     val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
@@ -115,6 +113,9 @@ class BottomMenuViewSpec extends TestSpec
   
   it should "render component" in {
     //given
+    val savedTheme = Theme.current
+    Theme.current = XTerm256Theme
+    val theme = Theme.current.menu
     val props = BottomMenuViewProps(width = 98, items = BottomMenu.items)
 
     //when
@@ -159,5 +160,8 @@ class BottomMenuViewSpec extends TestSpec
       
       Succeeded
     })
+
+    //cleanup
+    Theme.current = savedTheme
   }
 }

@@ -1,6 +1,7 @@
 package scommons.react.blessed.raw
 
 import scommons.nodejs.raw.EventEmitter
+import scommons.react.blessed.TerminalName
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport
@@ -27,6 +28,7 @@ trait BlessedProgram extends EventEmitter {
 trait BlessedScreen extends js.Object {
   
   val program: BlessedProgram = js.native
+  val terminal: TerminalName = js.native
   val cursor: BlessedCursor = js.native
   
   val focused: BlessedElement = js.native
