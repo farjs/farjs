@@ -1,19 +1,13 @@
 package farjs.ui.menu
 
 import farjs.ui.theme.{Theme, XTerm256Theme}
-import org.scalatest.Succeeded
 import scommons.nodejs._
-import scommons.react._
 import scommons.react.blessed._
-import scommons.react.test.TestSpec
-import scommons.react.test.raw.ShallowInstance
-import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
+import scommons.react.test._
 
 import scala.scalajs.js
 
-class BottomMenuViewSpec extends TestSpec
-  with ShallowRendererUtils
-  with TestRendererUtils {
+class BottomMenuViewSpec extends TestSpec with TestRendererUtils {
 
   it should "emit keypress event when onClick" in {
     //given
@@ -119,7 +113,7 @@ class BottomMenuViewSpec extends TestSpec
     val props = BottomMenuViewProps(width = 98, items = BottomMenu.items)
 
     //when
-    val result = shallowRender(<(BottomMenuView())(^.wrapped := props)())
+    val result = testRender(<(BottomMenuView())(^.wrapped := props)())
 
     //then
     val itemsWithPos = List(
@@ -141,25 +135,21 @@ class BottomMenuViewSpec extends TestSpec
     val itemFg = theme.item.fg
     val itemBg = theme.item.bg
 
-    assertNativeComponent(result, <.>()(), { children: List[ShallowInstance] =>
-      children.zip(itemsWithPos).foreach {
-        case (text, (num, item, pos, textWidth)) =>
-          assertNativeComponent(text,
-            <.text(
-              ^.key := s"$num",
-              ^.rbWidth := textWidth,
-              ^.rbAutoFocus := false,
-              ^.rbClickable := true,
-              ^.rbTags := true,
-              ^.rbMouse := true,
-              ^.rbLeft := pos,
-              ^.content := f"{$keyFg-fg}{$keyBg-bg}{bold}$num%2d{/}{$itemFg-fg}{$itemBg-bg}{bold}$item{/}"
-            )()
-          )
-      }
-      
-      Succeeded
-    })
+    result.children.zip(itemsWithPos).foreach {
+      case (text, (num, item, pos, textWidth)) =>
+        assertNativeComponent(text,
+          <.text(
+            ^.key := s"$num",
+            ^.rbWidth := textWidth,
+            ^.rbAutoFocus := false,
+            ^.rbClickable := true,
+            ^.rbTags := true,
+            ^.rbMouse := true,
+            ^.rbLeft := pos,
+            ^.content := f"{$keyFg-fg}{$keyBg-bg}{bold}$num%2d{/}{$itemFg-fg}{$itemBg-bg}{bold}$item{/}"
+          )()
+        )
+    }
 
     //cleanup
     Theme.current = savedTheme

@@ -5,16 +5,12 @@ import farjs.ui.theme.Theme
 import org.scalactic.source.Position
 import scommons.react.blessed._
 import scommons.react.blessed.raw._
-import scommons.react.test.TestSpec
-import scommons.react.test.raw.{ShallowInstance, TestRenderer}
-import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
+import scommons.react.test._
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportAll
 
-class TextBoxSpec extends TestSpec
-  with ShallowRendererUtils
-  with TestRendererUtils {
+class TextBoxSpec extends TestSpec with TestRendererUtils {
 
   it should "move cursor and grab focus when onClick" in {
     //given
@@ -319,12 +315,25 @@ class TextBoxSpec extends TestSpec
     check(defaultPrevented = false, "down", offset, cursorX, value, selStart, selEnd)
   }
 
-  it should "render component" in {
+  it should "render initial component" in {
     //given
     val props = getTextBoxProps()
+    val programMock = mock[BlessedProgramMock]
+    val screenMock = mock[BlessedScreenMock]
+    val inputMock = mock[BlessedElementMock]
+
+    (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
+    (inputMock.width _).expects().twice().returning(10)
+    (inputMock.aleft _).expects().returning(1)
+    (inputMock.atop _).expects().returning(3)
+    (programMock.omove _).expects(10, 3)
 
     //when
-    val result = shallowRender(<(TextBox())(^.wrapped := props)())
+    val result = testRender(<(TextBox())(^.wrapped := props)(), { el =>
+      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
+      else null
+    })
 
     //then
     assertTextBox(result, props)
@@ -341,9 +350,10 @@ class TextBoxSpec extends TestSpec
     onEnter = onEnter
   )
 
-  private def assertTextBox(result: ShallowInstance, props: TextBoxProps): Unit = {
+  private def assertTextBox(result: TestInstance, props: TextBoxProps): Unit = {
     val theme = Theme.current.textBox
     val (left, top) = props.pos
+    val selectedText = props.value.drop(props.value.length - props.width + 1)
     
     assertNativeComponent(result,
       <.input(
@@ -355,7 +365,7 @@ class TextBoxSpec extends TestSpec
         ^.rbLeft := left,
         ^.rbTop := top,
         ^.rbStyle := theme.regular,
-        ^.content := TextBox.renderText(theme.regular, props.value)
+        ^.content := TextBox.renderText(theme.selected, selectedText)
       )()
     )
   }

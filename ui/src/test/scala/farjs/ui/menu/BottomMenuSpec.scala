@@ -1,36 +1,30 @@
 package farjs.ui.menu
 
 import farjs.ui._
+import farjs.ui.menu.BottomMenu._
 import scommons.react._
-import scommons.react.test.TestSpec
-import scommons.react.test.raw.ShallowInstance
-import scommons.react.test.util.ShallowRendererUtils
+import scommons.react.test._
 
-class BottomMenuSpec extends TestSpec with ShallowRendererUtils {
+class BottomMenuSpec extends TestSpec with TestRendererUtils {
+
+  BottomMenu.withSizeComp = () => "WithSize".asInstanceOf[ReactClass]
+  BottomMenu.bottomMenuViewComp = () => "BottomMenuView".asInstanceOf[ReactClass]
 
   it should "render component" in {
     //when
-    val result = shallowRender(<(BottomMenu())()())
+    val result = testRender(<(BottomMenu())()())
 
     //then
     assertBottomMenu(result)
   }
   
-  private def assertBottomMenu(result: ShallowInstance): Unit = {
+  private def assertBottomMenu(result: TestInstance): Unit = {
     val (width, height) = (80, 25)
 
-    def renderContent(content: ReactElement): ShallowInstance = {
-      val wrapper = new ClassComponent[Unit] {
-        protected def create(): ReactClass = createClass[Unit](_ => content)
-      }
+    assertTestComponent(result, withSizeComp) { case WithSizeProps(render) =>
+      val result = createTestRenderer(render(width, height)).root
 
-      shallowRender(<(wrapper()).empty)
-    }
-
-    assertComponent(result, WithSize) { case WithSizeProps(render) =>
-      val result = renderContent(render(width, height))
-
-      assertComponent(result, BottomMenuView) { case BottomMenuViewProps(resWidth, resItems) =>
+      assertTestComponent(result, bottomMenuViewComp) { case BottomMenuViewProps(resWidth, resItems) =>
         resWidth shouldBe width
         resItems shouldBe BottomMenu.items
       }

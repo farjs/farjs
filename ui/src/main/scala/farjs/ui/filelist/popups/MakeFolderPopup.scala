@@ -15,6 +15,13 @@ case class MakeFolderPopupProps(folderName: String,
 
 object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
 
+  private[popups] var popupComp: UiComponent[PopupProps] = Popup
+  private[popups] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
+  private[popups] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[popups] var textBoxComp: UiComponent[TextBoxProps] = TextBox
+  private[popups] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[popups] var checkBoxComp: UiComponent[CheckBoxProps] = CheckBox
+
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val (folderName, setFolderName) = useState(props.folderName)
@@ -51,7 +58,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
       )())
     }
 
-    <(Popup())(^.wrapped := PopupProps(onClose = props.onCancel))(
+    <(popupComp())(^.wrapped := PopupProps(onClose = props.onCancel))(
       <.box(
         ^.rbClickable := true,
         ^.rbAutoFocus := false,
@@ -62,21 +69,21 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
         ^.rbShadow := true,
         ^.rbStyle := theme
       )(
-        <(DoubleBorder())(^.wrapped := DoubleBorderProps(
+        <(doubleBorderComp())(^.wrapped := DoubleBorderProps(
           size = (width - 6, height - 2),
           style = theme,
           pos = (3, 1),
           title = Some("Make Folder")
         ))(),
         
-        <(TextLine())(^.wrapped := TextLineProps(
+        <(textLineComp())(^.wrapped := TextLineProps(
           align = TextLine.Left,
           pos = (4, 2),
           width = width - 8,
           text = "Create the folder",
           style = theme
         ))(),
-        <(TextBox())(^.wrapped := TextBoxProps(
+        <(textBoxComp())(^.wrapped := TextBoxProps(
           pos = (5, 3),
           width = width - 10,
           value = folderName,
@@ -85,7 +92,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           },
           onEnter = onOk
         ))(),
-        <(HorizontalLine())(^.wrapped := HorizontalLineProps(
+        <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
           pos = (3, 4),
           length = width - 6,
           lineCh = SingleBorder.horizontalCh,
@@ -94,7 +101,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           endCh = Some(DoubleBorder.rightSingleCh)
         ))(),
 
-        <(CheckBox())(^.wrapped := CheckBoxProps(
+        <(checkBoxComp())(^.wrapped := CheckBoxProps(
           pos = (5, 5),
           value = multiple,
           label = "Process multiple names",
@@ -103,7 +110,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
             setMultiple(!multiple)
           }
         ))(),
-        <(HorizontalLine())(^.wrapped := HorizontalLineProps(
+        <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
           pos = (3, 6),
           length = width - 6,
           lineCh = SingleBorder.horizontalCh,

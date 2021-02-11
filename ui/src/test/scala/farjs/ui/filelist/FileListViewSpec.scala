@@ -2,21 +2,21 @@ package farjs.ui.filelist
 
 import farjs.api.filelist.FileListItem
 import farjs.ui.border._
+import farjs.ui.filelist.FileListView._
 import farjs.ui.filelist.FileListViewSpec._
 import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.test.TestSpec
-import scommons.react.test.raw.{ShallowInstance, TestRenderer}
-import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
+import scommons.react.test._
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
 import scala.scalajs.js.annotation.JSExportAll
 
-class FileListViewSpec extends TestSpec
-  with ShallowRendererUtils
-  with TestRendererUtils {
+class FileListViewSpec extends TestSpec with TestRendererUtils {
+
+  FileListView.verticalLineComp = () => "VerticalLine".asInstanceOf[ReactClass]
+  FileListView.fileListColumnComp = () => "FileListColumn".asInstanceOf[ReactClass]
 
   it should "set focus if focused when mount but not when update" in {
     //given
@@ -69,7 +69,7 @@ class FileListViewSpec extends TestSpec
       FileListItem("item 1"),
       FileListItem("item 2")
     ), onActivate = onActivate)
-    val comp = shallowRender(<(FileListView())(^.wrapped := props)())
+    val comp = testRender(<(FileListView())(^.wrapped := props)())
 
     //then
     onActivate.expects()
@@ -217,7 +217,7 @@ class FileListViewSpec extends TestSpec
     )
 
     //when
-    val result = shallowRender(<(FileListView())(^.wrapped := props)())
+    val result = testRender(<(FileListView())(^.wrapped := props)())
 
     //then
     assertNativeComponent(result, <.button(^.rbMouse := true)())
@@ -228,7 +228,7 @@ class FileListViewSpec extends TestSpec
     val props = FileListViewProps((1, 2), columns = 0, items = Nil)
 
     //when
-    val result = shallowRender(<(FileListView())(^.wrapped := props)())
+    val result = testRender(<(FileListView())(^.wrapped := props)())
 
     //then
     assertNativeComponent(result, <.button(^.rbMouse := true)())
@@ -240,7 +240,7 @@ class FileListViewSpec extends TestSpec
     val comp = <(FileListView())(^.wrapped := props)()
 
     //when
-    val result = shallowRender(comp)
+    val result = testRender(comp)
 
     //then
     assertFileListView(result, props, List(
@@ -256,10 +256,16 @@ class FileListViewSpec extends TestSpec
       focusedIndex = 1,
       selectedNames = Set("item 2")
     )
-    val comp = <(FileListView())(^.wrapped := props)()
+    val buttonMock = mock[BlessedElementMock]
+
+    //then
+    (buttonMock.focus _).expects()
 
     //when
-    val result = shallowRender(comp)
+    val result = testRender(<(FileListView())(^.wrapped := props)(), { el =>
+      if (el.`type` == "button".asInstanceOf[js.Any]) buttonMock.asInstanceOf[js.Any]
+      else null
+    })
 
     //then
     assertFileListView(result, props, List(
@@ -268,7 +274,7 @@ class FileListViewSpec extends TestSpec
     ))
   }
   
-  private def assertFileListView(result: ShallowInstance,
+  private def assertFileListView(result: TestInstance,
                                  props: FileListViewProps,
                                  expectedData: List[(List[FileListItem], Int, Set[String])]): Unit = {
     
@@ -278,37 +284,30 @@ class FileListViewSpec extends TestSpec
       ^.rbLeft := 1,
       ^.rbTop := 1,
       ^.rbMouse := true
-    )(), { children: List[ShallowInstance] =>
-      val List(colWrap1, colWrap2) = children
-      assertNativeComponent(colWrap1, <.>(^.key := "0")(), { children: List[ShallowInstance] =>
-        val List(sep, col1) = children
-        assertComponent(sep, VerticalLine) {
-          case VerticalLineProps(pos, resLength, ch, style, start, end) =>
-            pos shouldBe 2 -> -1
-            resLength shouldBe 4
-            ch shouldBe SingleBorder.verticalCh
-            style shouldBe Theme.current.fileList.regularItem
-            start shouldBe Some(DoubleBorder.topSingleCh)
-            end shouldBe Some(SingleBorder.bottomCh)
-        }
-        assertComponent(col1, FileListColumn) {
-          case FileListColumnProps(resSize, left, borderCh, items, focusedPos, selectedNames) =>
-            resSize shouldBe 2 -> 2
-            left shouldBe 0
-            borderCh shouldBe SingleBorder.verticalCh
-            (items, focusedPos, selectedNames) shouldBe expectedData.head
-        }
-      })
-      assertNativeComponent(colWrap2, <.>(^.key := "1")(), { children: List[ShallowInstance] =>
-        val List(col2) = children
-        assertComponent(col2, FileListColumn) {
-          case FileListColumnProps(resSize, left, borderCh, items, focusedPos, selectedNames) =>
-            resSize shouldBe 4 -> 2
-            left shouldBe 3
-            borderCh shouldBe DoubleBorder.verticalCh
-            (items, focusedPos, selectedNames) shouldBe expectedData(1)
-        }
-      })
+    )(), { case List(sep, col1, col2) =>
+      assertTestComponent(sep, verticalLineComp) {
+        case VerticalLineProps(pos, resLength, ch, style, start, end) =>
+          pos shouldBe 2 -> -1
+          resLength shouldBe 4
+          ch shouldBe SingleBorder.verticalCh
+          style shouldBe Theme.current.fileList.regularItem
+          start shouldBe Some(DoubleBorder.topSingleCh)
+          end shouldBe Some(SingleBorder.bottomCh)
+      }
+      assertTestComponent(col1, fileListColumnComp) {
+        case FileListColumnProps(resSize, left, borderCh, items, focusedPos, selectedNames) =>
+          resSize shouldBe 2 -> 2
+          left shouldBe 0
+          borderCh shouldBe SingleBorder.verticalCh
+          (items, focusedPos, selectedNames) shouldBe expectedData.head
+      }
+      assertTestComponent(col2, fileListColumnComp) {
+        case FileListColumnProps(resSize, left, borderCh, items, focusedPos, selectedNames) =>
+          resSize shouldBe 4 -> 2
+          left shouldBe 3
+          borderCh shouldBe DoubleBorder.verticalCh
+          (items, focusedPos, selectedNames) shouldBe expectedData(1)
+      }
     })
   }
 }

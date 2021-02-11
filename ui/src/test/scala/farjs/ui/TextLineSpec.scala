@@ -1,12 +1,9 @@
 package farjs.ui
 
-import scommons.react._
 import scommons.react.blessed._
-import scommons.react.test.TestSpec
-import scommons.react.test.raw.ShallowInstance
-import scommons.react.test.util.ShallowRendererUtils
+import scommons.react.test._
 
-class TextLineSpec extends TestSpec with ShallowRendererUtils {
+class TextLineSpec extends TestSpec with TestRendererUtils {
 
   it should "render Left aligned text" in {
     //given
@@ -19,7 +16,7 @@ class TextLineSpec extends TestSpec with ShallowRendererUtils {
     )
 
     //when
-    val result = shallowRender(<(TextLine())(^.wrapped := props)())
+    val result = createTestRenderer(<(TextLine())(^.wrapped := props)()).root
 
     //then
     assertTextLine(result, props, left, " test item ")
@@ -36,7 +33,7 @@ class TextLineSpec extends TestSpec with ShallowRendererUtils {
     )
 
     //when
-    val result = shallowRender(<(TextLine())(^.wrapped := props)())
+    val result = createTestRenderer(<(TextLine())(^.wrapped := props)()).root
 
     //then
     assertTextLine(result, props, left + 2, " test item ")
@@ -53,7 +50,7 @@ class TextLineSpec extends TestSpec with ShallowRendererUtils {
     )
 
     //when
-    inside(shallowRender(<(TextLine())(^.wrapped := props)())) { case result =>
+    inside(createTestRenderer(<(TextLine())(^.wrapped := props)()).root) { case result =>
       //then
       //       10|  15|
       //     test item 
@@ -61,7 +58,7 @@ class TextLineSpec extends TestSpec with ShallowRendererUtils {
     }
 
     //when empty
-    inside(shallowRender(<(TextLine())(^.wrapped := props.copy(text = ""))())) { case result =>
+    inside(createTestRenderer(<(TextLine())(^.wrapped := props.copy(text = ""))()).root) { case result =>
       //then
       //       10|  15|
       //               
@@ -69,7 +66,7 @@ class TextLineSpec extends TestSpec with ShallowRendererUtils {
     }
 
     //when without padding
-    inside(shallowRender(<(TextLine())(^.wrapped := props.copy(padding = 0))())) { case result =>
+    inside(createTestRenderer(<(TextLine())(^.wrapped := props.copy(padding = 0))()).root) { case result =>
       //then
       //       10|  15|
       //      test item
@@ -77,7 +74,7 @@ class TextLineSpec extends TestSpec with ShallowRendererUtils {
     }
     
     //when empty text without padding
-    inside(shallowRender(<(TextLine())(^.wrapped := props.copy(text = "", padding = 0))())) { case result =>
+    inside(createTestRenderer(<(TextLine())(^.wrapped := props.copy(text = "", padding = 0))()).root) { case result =>
       //then
       assertTextLine(result, props, 0, "")
     }
@@ -94,7 +91,7 @@ class TextLineSpec extends TestSpec with ShallowRendererUtils {
     )
 
     //when
-    val result = shallowRender(<(TextLine())(^.wrapped := props)())
+    val result = createTestRenderer(<(TextLine())(^.wrapped := props)()).root
 
     //then
     assertTextLine(result, props, left, " test item ")
@@ -112,7 +109,7 @@ class TextLineSpec extends TestSpec with ShallowRendererUtils {
     )
 
     //when
-    val result = shallowRender(<(TextLine())(^.wrapped := props)())
+    val result = createTestRenderer(<(TextLine())(^.wrapped := props)()).root
 
     //then
     assertTextLine(result, props, left, "test item")
@@ -128,7 +125,7 @@ class TextLineSpec extends TestSpec with ShallowRendererUtils {
     )
 
     //when
-    val result = shallowRender(<(TextLine())(^.wrapped := props)())
+    val result = createTestRenderer(<(TextLine())(^.wrapped := props)()).root
 
     //then
     assertTextLine(result, props, left, " tes...item ")
@@ -146,14 +143,16 @@ class TextLineSpec extends TestSpec with ShallowRendererUtils {
     }
   )
 
-  private def assertTextLine(result: ShallowInstance,
+  private def assertTextLine(result: TestInstance,
                              props: TextLineProps,
                              left: Int,
                              text: String): Unit = {
     val (_, top) = props.pos
     
-    assertNativeComponent(result, <.>()(
-      if (text.nonEmpty) Some(
+    val children = result.children.toList
+    if (text.nonEmpty) {
+      val List(textEl) = children
+      assertNativeComponent(textEl,
         <.text(
           ^.rbWidth := text.length,
           ^.rbHeight := 1,
@@ -166,7 +165,9 @@ class TextLineSpec extends TestSpec with ShallowRendererUtils {
           ^.content := text
         )()
       )
-      else None
-    ))
+    }
+    else {
+      children shouldBe Nil
+    }
   }
 }

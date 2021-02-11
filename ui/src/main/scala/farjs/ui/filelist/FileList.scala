@@ -15,6 +15,8 @@ case class FileListProps(dispatch: Dispatch,
                          columns: Int)
 
 object FileList extends FunctionComponent[FileListProps] {
+
+  private[filelist] var fileListViewComp: UiComponent[FileListViewProps] = FileListView
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -103,7 +105,7 @@ object FileList extends FunctionComponent[FileListProps] {
       }
     }
     
-    <(FileListView())(^.wrapped := FileListViewProps(
+    <(fileListViewComp())(^.wrapped := FileListViewProps(
       size = props.size,
       columns = props.columns,
       items = viewItems,

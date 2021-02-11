@@ -7,13 +7,16 @@ case class SingleBorderProps(size: (Int, Int),
                              style: BlessedStyle)
 
 object SingleBorder extends FunctionComponent[SingleBorderProps] {
+
+  private[border] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[border] var verticalLineComp: UiComponent[VerticalLineProps] = VerticalLine
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val (width, height) = props.size
 
     <.>()(
-      <(HorizontalLine())(^.key := "0", ^.wrapped := HorizontalLineProps(
+      <(horizontalLineComp())(^.key := "0", ^.wrapped := HorizontalLineProps(
         pos = (0, 0),
         length = width,
         lineCh = horizontalCh,
@@ -22,21 +25,21 @@ object SingleBorder extends FunctionComponent[SingleBorderProps] {
         endCh = Some(topRightCh)
       ))(),
       
-      <(VerticalLine())(^.key := "1", ^.wrapped := VerticalLineProps(
+      <(verticalLineComp())(^.key := "1", ^.wrapped := VerticalLineProps(
         pos = (0, 1),
         length = height - 2,
         lineCh = verticalCh,
         style = props.style
       ))(),
       
-      <(VerticalLine())(^.key := "2", ^.wrapped := VerticalLineProps(
+      <(verticalLineComp())(^.key := "2", ^.wrapped := VerticalLineProps(
         pos = (width - 1, 1),
         length = height - 2,
         lineCh = verticalCh,
         style = props.style
       ))(),
 
-      <(HorizontalLine())(^.key := "3", ^.wrapped := HorizontalLineProps(
+      <(horizontalLineComp())(^.key := "3", ^.wrapped := HorizontalLineProps(
         pos = (0, height - 1),
         length = width,
         lineCh = horizontalCh,

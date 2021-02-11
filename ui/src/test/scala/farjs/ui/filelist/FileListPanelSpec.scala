@@ -3,15 +3,20 @@ package farjs.ui.filelist
 import farjs.api.filelist.{FileListDir, FileListItem}
 import farjs.ui._
 import farjs.ui.border._
+import farjs.ui.filelist.FileListPanel._
 import farjs.ui.theme.Theme
 import org.scalatest.Assertion
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.test.TestSpec
-import scommons.react.test.raw.ShallowInstance
-import scommons.react.test.util.ShallowRendererUtils
+import scommons.react.test._
 
-class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
+class FileListPanelSpec extends TestSpec with TestRendererUtils {
+
+  FileListPanel.withSizeComp = () => "WithSize".asInstanceOf[ReactClass]
+  FileListPanel.doubleBorderComp = () => "DoubleBorder".asInstanceOf[ReactClass]
+  FileListPanel.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
+  FileListPanel.fileListComp = () => "FileList".asInstanceOf[ReactClass]
+  FileListPanel.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
 
   it should "render empty component" in {
     //given
@@ -20,7 +25,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
     val props = FileListPanelProps(dispatch, actions, FileListState())
 
     //when
-    val result = shallowRender(<(FileListPanel())(^.wrapped := props)())
+    val result = testRender(<(FileListPanel())(^.wrapped := props)())
 
     //then
     assertFileListPanel(result, props, FileListState())
@@ -38,7 +43,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
     val props = FileListPanelProps(dispatch, actions, state)
 
     //when
-    val result = shallowRender(<(FileListPanel())(^.wrapped := props)())
+    val result = testRender(<(FileListPanel())(^.wrapped := props)())
 
     //then
     assertFileListPanel(result, props, state, "file", "3", showDate = true,
@@ -57,7 +62,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
     val props = FileListPanelProps(dispatch, actions, state)
 
     //when
-    val result = shallowRender(<(FileListPanel())(^.wrapped := props)())
+    val result = testRender(<(FileListPanel())(^.wrapped := props)())
 
     //then
     assertFileListPanel(result, props, state, "file 2", "2", permissions = "drwxr-xr-x", showDate = true, dirSize = "6 (3)")
@@ -75,7 +80,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
     val props = FileListPanelProps(dispatch, actions, state)
 
     //when
-    val result = shallowRender(<(FileListPanel())(^.wrapped := props)())
+    val result = testRender(<(FileListPanel())(^.wrapped := props)())
 
     //then
     assertFileListPanel(result, props, state, "file 2", "2", permissions = "drwxr-xr-x", showDate = true, dirSize = "6 (3)")
@@ -93,7 +98,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
     val props = FileListPanelProps(dispatch, actions, state)
 
     //when
-    val result = shallowRender(<(FileListPanel())(^.wrapped := props)())
+    val result = testRender(<(FileListPanel())(^.wrapped := props)())
 
     //then
     assertFileListPanel(result, props, state, "dir", "1", permissions = "dr--r--r--", showDate = true, dirSize = "2 (1)")
@@ -111,13 +116,13 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
     val props = FileListPanelProps(dispatch, actions, state)
 
     //when
-    val result = shallowRender(<(FileListPanel())(^.wrapped := props)())
+    val result = testRender(<(FileListPanel())(^.wrapped := props)())
 
     //then
     assertFileListPanel(result, props, state, "..", dirSize = "2 (1)")
   }
   
-  private def assertFileListPanel(result: ShallowInstance,
+  private def assertFileListPanel(result: TestInstance,
                                   props: FileListPanelProps,
                                   state: FileListState,
                                   expectedFile: String = "",
@@ -130,25 +135,25 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
     val (width, height) = (25, 15)
     val theme = Theme.current.fileList
     
-    def assertComponents(border: ShallowInstance,
-                         line: ShallowInstance,
-                         list: ShallowInstance,
-                         currFolder: ShallowInstance,
-                         selection: Option[ShallowInstance],
-                         currFile: ShallowInstance,
-                         fileSize: ShallowInstance,
-                         filePerm: ShallowInstance,
-                         fileDate: ShallowInstance,
-                         folderSize: ShallowInstance): Assertion = {
+    def assertComponents(border: TestInstance,
+                         line: TestInstance,
+                         list: TestInstance,
+                         currFolder: TestInstance,
+                         selection: Option[TestInstance],
+                         currFile: TestInstance,
+                         fileSize: TestInstance,
+                         filePerm: TestInstance,
+                         fileDate: TestInstance,
+                         folderSize: TestInstance): Assertion = {
 
-      assertComponent(border, DoubleBorder) {
+      assertTestComponent(border, doubleBorderComp) {
         case DoubleBorderProps(resSize, style, pos, title) =>
           resSize shouldBe width -> height
           style shouldBe theme.regularItem
           pos shouldBe 0 -> 0
           title shouldBe None
       }
-      assertComponent(line, HorizontalLine) {
+      assertTestComponent(line, horizontalLineComp) {
         case HorizontalLineProps(pos, len, lineCh, style, startCh, endCh) =>
           pos shouldBe 0 -> (height - 4)
           len shouldBe width
@@ -157,7 +162,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
           startCh shouldBe Some(DoubleBorder.leftSingleCh)
           endCh shouldBe Some(DoubleBorder.rightSingleCh)
       }
-      assertComponent(list, FileList) {
+      assertTestComponent(list, fileListComp) {
         case FileListProps(dispatch, actions, resState, resSize, columns) =>
           dispatch shouldBe props.dispatch
           actions shouldBe props.actions
@@ -165,7 +170,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
           resSize shouldBe (width - 2) -> (height - 5)
           columns shouldBe 2
       }
-      assertComponent(currFolder, TextLine) {
+      assertTestComponent(currFolder, textLineComp) {
         case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
           align shouldBe TextLine.Center
           pos shouldBe 1 -> 0
@@ -178,7 +183,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
       
       selection.size shouldBe selected.size
       selection.foreach { selectedText =>
-        assertComponent(selectedText, TextLine) {
+        assertTestComponent(selectedText, textLineComp) {
           case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
             align shouldBe TextLine.Center
             pos shouldBe 1 -> (height - 4)
@@ -190,7 +195,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
         }
       }
       
-      assertComponent(currFile, TextLine) {
+      assertTestComponent(currFile, textLineComp) {
         case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
           align shouldBe TextLine.Left
           pos shouldBe 1 -> (height - 3)
@@ -200,7 +205,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
           focused shouldBe false
           padding shouldBe 0
       }
-      assertComponent(fileSize, TextLine) {
+      assertTestComponent(fileSize, textLineComp) {
         case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
           align shouldBe TextLine.Right
           pos shouldBe (1 + width - 2 - 12) -> (height - 3)
@@ -211,7 +216,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
           padding shouldBe 0
       }
       
-      assertComponent(filePerm, TextLine) {
+      assertTestComponent(filePerm, textLineComp) {
         case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
           align shouldBe TextLine.Left
           pos shouldBe 1 -> (height - 2)
@@ -221,7 +226,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
           focused shouldBe false
           padding shouldBe 0
       }
-      assertComponent(fileDate, TextLine) {
+      assertTestComponent(fileDate, textLineComp) {
         case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
           align shouldBe TextLine.Right
           pos shouldBe (1 + width - 2 - 25) -> (height - 2)
@@ -233,7 +238,7 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
           padding shouldBe 0
       }
       
-      assertComponent(folderSize, TextLine) {
+      assertTestComponent(folderSize, textLineComp) {
         case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
           align shouldBe TextLine.Center
           pos shouldBe 1 -> (height - 1)
@@ -245,16 +250,8 @@ class FileListPanelSpec extends TestSpec with ShallowRendererUtils {
       }
     }
     
-    def renderContent(content: ReactElement): ShallowInstance = {
-      val wrapper = new ClassComponent[Unit] {
-        protected def create(): ReactClass = createClass[Unit](_ => content)
-      }
-      
-      shallowRender(<(wrapper()).empty)
-    }
-
-    assertComponent(result, WithSize) { case WithSizeProps(render) =>
-      val result = renderContent(render(width, height))
+    assertTestComponent(result, withSizeComp) { case WithSizeProps(render) =>
+      val result = createTestRenderer(render(width, height)).root
       
       assertNativeComponent(result, <.box(^.rbStyle := theme.regularItem)(), {
         case List(border, line, list, currFolder, currFile, fileSize, filePerm, fileDate, folderSize) =>

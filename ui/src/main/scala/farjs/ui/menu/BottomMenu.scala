@@ -4,12 +4,15 @@ import farjs.ui._
 import scommons.react._
 
 object BottomMenu extends FunctionComponent[Unit] {
+
+  private[menu] var withSizeComp: UiComponent[WithSizeProps] = WithSize
+  private[menu] var bottomMenuViewComp: UiComponent[BottomMenuViewProps] = BottomMenuView
   
   protected def render(compProps: Props): ReactElement = {
 
-    <(WithSize())(^.wrapped := WithSizeProps({ (width, _) =>
+    <(withSizeComp())(^.wrapped := WithSizeProps({ (width, _) =>
       
-      <(BottomMenuView())(^.wrapped := BottomMenuViewProps(
+      <(bottomMenuViewComp())(^.wrapped := BottomMenuViewProps(
         width = width,
         items = items
       ))()

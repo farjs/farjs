@@ -16,6 +16,12 @@ case class FileListPanelProps(dispatch: Dispatch,
 
 object FileListPanel extends FunctionComponent[FileListPanelProps] {
 
+  private[filelist] var withSizeComp: UiComponent[WithSizeProps] = WithSize
+  private[filelist] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
+  private[filelist] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[filelist] var fileListComp: UiComponent[FileListProps] = FileList
+  private[filelist] var textLineComp: UiComponent[TextLineProps] = TextLine
+
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val theme = Theme.current.fileList
@@ -27,10 +33,10 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
       }
       else Nil
 
-    <(WithSize())(^.wrapped := WithSizeProps({ (width, height) =>
+    <(withSizeComp())(^.wrapped := WithSizeProps({ (width, height) =>
       <.box(^.rbStyle := theme.regularItem)(
-        <(DoubleBorder())(^.wrapped := DoubleBorderProps((width, height), theme.regularItem))(),
-        <(HorizontalLine())(^.wrapped := HorizontalLineProps(
+        <(doubleBorderComp())(^.wrapped := DoubleBorderProps((width, height), theme.regularItem))(),
+        <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
           pos = (0, height - 4),
           length = width,
           lineCh = SingleBorder.horizontalCh,
@@ -38,14 +44,14 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           startCh = Some(DoubleBorder.leftSingleCh),
           endCh = Some(DoubleBorder.rightSingleCh)
         ))(),
-        <(FileList())(^.wrapped := FileListProps(
+        <(fileListComp())(^.wrapped := FileListProps(
           dispatch = props.dispatch,
           actions = props.actions,
           state = props.state,
           size = (width - 2, height - 5),
           columns = 2
         ))(),
-        <(TextLine())(^.wrapped := TextLineProps(
+        <(textLineComp())(^.wrapped := TextLineProps(
           align = TextLine.Center,
           pos = (1, 0),
           width = width - 2,
@@ -55,7 +61,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
         ))(),
 
         if (selectedItems.nonEmpty) Some(
-          <(TextLine())(^.wrapped := TextLineProps(
+          <(textLineComp())(^.wrapped := TextLineProps(
             align = TextLine.Center,
             pos = (1, height - 4),
             width = width - 2,
@@ -68,7 +74,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
         )
         else None,
 
-        <(TextLine())(^.wrapped := TextLineProps(
+        <(textLineComp())(^.wrapped := TextLineProps(
           align = TextLine.Left,
           pos = (1, height - 3),
           width = width - 2 - 12,
@@ -76,7 +82,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           style = theme.regularItem,
           padding = 0
         ))(),
-        <(TextLine())(^.wrapped := TextLineProps(
+        <(textLineComp())(^.wrapped := TextLineProps(
           align = TextLine.Right,
           pos = (1 + width - 2 - 12, height - 3),
           width = 12,
@@ -87,7 +93,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           padding = 0
         ))(),
 
-        <(TextLine())(^.wrapped := TextLineProps(
+        <(textLineComp())(^.wrapped := TextLineProps(
           align = TextLine.Left,
           pos = (1, height - 2),
           width = 10,
@@ -95,7 +101,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           style = theme.regularItem,
           padding = 0
         ))(),
-        <(TextLine())(^.wrapped := TextLineProps(
+        <(textLineComp())(^.wrapped := TextLineProps(
           align = TextLine.Right,
           pos = (1 + width - 2 - 25, height - 2),
           width = 25,
@@ -107,7 +113,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           padding = 0
         ))(),
 
-        <(TextLine())(^.wrapped := TextLineProps(
+        <(textLineComp())(^.wrapped := TextLineProps(
           align = TextLine.Center,
           pos = (1, height - 1),
           width = width - 2,

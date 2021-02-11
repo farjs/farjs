@@ -1,18 +1,15 @@
 package farjs.ui
 
-import scommons.react._
 import scommons.react.blessed._
-import scommons.react.test.TestSpec
-import scommons.react.test.raw.ShallowInstance
-import scommons.react.test.util.ShallowRendererUtils
+import scommons.react.test._
 
-class CheckBoxSpec extends TestSpec with ShallowRendererUtils {
+class CheckBoxSpec extends TestSpec with TestRendererUtils {
 
   it should "call onChange when press button" in {
     //given
     val onChange = mockFunction[Unit]
     val props = getCheckBoxProps(onChange = onChange)
-    val comp = shallowRender(<(CheckBox())(^.wrapped := props)())
+    val comp = testRender(<(CheckBox())(^.wrapped := props)())
     val button = findComponents(comp, "button").head
 
     //then
@@ -27,7 +24,7 @@ class CheckBoxSpec extends TestSpec with ShallowRendererUtils {
     val props = getCheckBoxProps(value = true)
 
     //when
-    val result = shallowRender(<(CheckBox())(^.wrapped := props)())
+    val result = createTestRenderer(<(CheckBox())(^.wrapped := props)()).root
 
     //then
     assertCheckBox(result, props)
@@ -38,7 +35,7 @@ class CheckBoxSpec extends TestSpec with ShallowRendererUtils {
     val props = getCheckBoxProps()
 
     //when
-    val result = shallowRender(<(CheckBox())(^.wrapped := props)())
+    val result = createTestRenderer(<(CheckBox())(^.wrapped := props)()).root
 
     //then
     assertCheckBox(result, props)
@@ -57,10 +54,11 @@ class CheckBoxSpec extends TestSpec with ShallowRendererUtils {
     onChange = onChange
   )
 
-  private def assertCheckBox(result: ShallowInstance, props: CheckBoxProps): Unit = {
+  private def assertCheckBox(result: TestInstance, props: CheckBoxProps): Unit = {
     val (left, top) = props.pos
     
-    assertNativeComponent(result, <.>()(
+    val List(button, text) = result.children.toList
+    assertNativeComponent(button,
       <.button(
         ^.rbMouse := true,
         ^.rbWidth := 3,
@@ -72,8 +70,9 @@ class CheckBoxSpec extends TestSpec with ShallowRendererUtils {
           if (props.value) "[x]"
           else "[ ]"
         }
-      )(),
-
+      )()
+    )
+    assertNativeComponent(text,
       <.text(
         ^.rbHeight := 1,
         ^.rbLeft := left + 4,
@@ -81,6 +80,6 @@ class CheckBoxSpec extends TestSpec with ShallowRendererUtils {
         ^.rbStyle := props.style,
         ^.content := props.label
       )()
-    ))
+    )
   }
 }

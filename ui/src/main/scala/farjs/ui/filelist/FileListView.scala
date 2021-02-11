@@ -18,6 +18,9 @@ case class FileListViewProps(size: (Int, Int),
                              onKeypress: (BlessedScreen, String) => Unit = (_, _) => ())
 
 object FileListView extends FunctionComponent[FileListViewProps] {
+
+  private[filelist] var verticalLineComp: UiComponent[VerticalLineProps] = VerticalLine
+  private[filelist] var fileListColumnComp: UiComponent[FileListColumnProps] = FileListColumn
   
   protected def render(compProps: Props): ReactElement = {
     val elementRef = useRef[BlessedElement](null)
@@ -92,7 +95,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
           case (colItems, (colLeft, colWidth, colIndex)) =>
             <.>(^.key := s"$colIndex")(
               if (colIndex != columns - 1) Some(
-                <(VerticalLine())(^.wrapped := VerticalLineProps(
+                <(verticalLineComp())(^.wrapped := VerticalLineProps(
                   pos = (colLeft + colWidth, -1),
                   length = height + 2,
                   lineCh = SingleBorder.verticalCh,
@@ -103,7 +106,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
               )
               else None,
 
-              <(FileListColumn())(^.wrapped := FileListColumnProps(
+              <(fileListColumnComp())(^.wrapped := FileListColumnProps(
                 size = (colWidth, height),
                 left = colLeft,
                 borderCh =

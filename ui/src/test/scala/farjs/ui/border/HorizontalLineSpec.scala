@@ -1,11 +1,9 @@
 package farjs.ui.border
 
 import scommons.react.blessed._
-import scommons.react.test.TestSpec
-import scommons.react.test.raw.ShallowInstance
-import scommons.react.test.util.ShallowRendererUtils
+import scommons.react.test._
 
-class HorizontalLineSpec extends TestSpec with ShallowRendererUtils {
+class HorizontalLineSpec extends TestSpec with TestRendererUtils {
 
   it should "render line without start and end chars" in {
     //given
@@ -16,7 +14,7 @@ class HorizontalLineSpec extends TestSpec with ShallowRendererUtils {
     val comp = <(HorizontalLine())(^.wrapped := props)()
 
     //when
-    val result = shallowRender(comp)
+    val result = testRender(comp)
 
     //then
     assertHorizontalLine(result, props)
@@ -31,7 +29,7 @@ class HorizontalLineSpec extends TestSpec with ShallowRendererUtils {
     val comp = <(HorizontalLine())(^.wrapped := props)()
 
     //when
-    val result = shallowRender(comp)
+    val result = testRender(comp)
 
     //then
     assertHorizontalLine(result, props)
@@ -46,7 +44,7 @@ class HorizontalLineSpec extends TestSpec with ShallowRendererUtils {
     val comp = <(HorizontalLine())(^.wrapped := props)()
 
     //when
-    val result = shallowRender(comp)
+    val result = testRender(comp)
 
     //then
     assertHorizontalLine(result, props)
@@ -61,7 +59,7 @@ class HorizontalLineSpec extends TestSpec with ShallowRendererUtils {
     val comp = <(HorizontalLine())(^.wrapped := props)()
 
     //when
-    val result = shallowRender(comp)
+    val result = testRender(comp)
 
     //then
     assertHorizontalLine(result, props)
@@ -79,7 +77,7 @@ class HorizontalLineSpec extends TestSpec with ShallowRendererUtils {
     endCh = None
   )
 
-  private def assertHorizontalLine(result: ShallowInstance, props: HorizontalLineProps): Unit = {
+  private def assertHorizontalLine(result: TestInstance, props: HorizontalLineProps): Unit = {
     val (left, top) = props.pos
     
     assertNativeComponent(result,

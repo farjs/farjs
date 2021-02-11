@@ -1,14 +1,17 @@
 package farjs.ui.border
 
 import farjs.ui._
+import farjs.ui.border.DoubleBorder._
 import org.scalatest.Assertion
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.test.TestSpec
-import scommons.react.test.raw.ShallowInstance
-import scommons.react.test.util.ShallowRendererUtils
+import scommons.react.test._
 
-class DoubleBorderSpec extends TestSpec with ShallowRendererUtils {
+class DoubleBorderSpec extends TestSpec with TestRendererUtils {
+
+  DoubleBorder.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
+  DoubleBorder.verticalLineComp = () => "VerticalLine".asInstanceOf[ReactClass]
+  DoubleBorder.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
 
   it should "render component" in {
     //given
@@ -19,7 +22,7 @@ class DoubleBorderSpec extends TestSpec with ShallowRendererUtils {
     val comp = <(DoubleBorder())(^.wrapped := props)()
 
     //when
-    val result = shallowRender(comp)
+    val result = createTestRenderer(comp).root
 
     //then
     assertDoubleBorder(result, props)
@@ -34,23 +37,23 @@ class DoubleBorderSpec extends TestSpec with ShallowRendererUtils {
     val comp = <(DoubleBorder())(^.wrapped := props)()
 
     //when
-    val result = shallowRender(comp)
+    val result = createTestRenderer(comp).root
 
     //then
     assertDoubleBorder(result, props)
   }
   
-  private def assertDoubleBorder(result: ShallowInstance, props: DoubleBorderProps): Unit = {
+  private def assertDoubleBorder(result: TestInstance, props: DoubleBorderProps): Unit = {
     val (width, height) = props.size
     val (left, top) = props.pos
 
-    def assertComponents(line1: ShallowInstance,
-                         title: Option[ShallowInstance],
-                         line2: ShallowInstance,
-                         line3: ShallowInstance,
-                         line4: ShallowInstance): Assertion = {
+    def assertComponents(line1: TestInstance,
+                         title: Option[TestInstance],
+                         line2: TestInstance,
+                         line3: TestInstance,
+                         line4: TestInstance): Assertion = {
 
-      assertComponent(line1, HorizontalLine) {
+      assertTestComponent(line1, horizontalLineComp) {
         case HorizontalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
           pos shouldBe props.pos
           resLength shouldBe width
@@ -62,7 +65,7 @@ class DoubleBorderSpec extends TestSpec with ShallowRendererUtils {
 
       title.isDefined shouldBe props.title.isDefined
       title.foreach { t =>
-        assertComponent(t, TextLine) {
+        assertTestComponent(t, textLineComp) {
           case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
             align shouldBe TextLine.Center
             pos shouldBe props.pos
@@ -74,7 +77,7 @@ class DoubleBorderSpec extends TestSpec with ShallowRendererUtils {
         }
       }
 
-      assertComponent(line2, VerticalLine) {
+      assertTestComponent(line2, verticalLineComp) {
         case VerticalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
           pos shouldBe left -> (top + 1)
           resLength shouldBe (height - 2)
@@ -83,7 +86,7 @@ class DoubleBorderSpec extends TestSpec with ShallowRendererUtils {
           startCh shouldBe None
           endCh shouldBe None
       }
-      assertComponent(line3, VerticalLine) {
+      assertTestComponent(line3, verticalLineComp) {
         case VerticalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
           pos shouldBe (left + width - 1) -> (top + 1)
           resLength shouldBe (height - 2)
@@ -92,7 +95,7 @@ class DoubleBorderSpec extends TestSpec with ShallowRendererUtils {
           startCh shouldBe None
           endCh shouldBe None
       }
-      assertComponent(line4, HorizontalLine) {
+      assertTestComponent(line4, horizontalLineComp) {
         case HorizontalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
           pos shouldBe left -> (top + height - 1)
           resLength shouldBe width
@@ -103,11 +106,11 @@ class DoubleBorderSpec extends TestSpec with ShallowRendererUtils {
       }
     }
 
-    assertNativeComponent(result, <.>()(), {
+    result.children.toList match {
       case List(line1, line2, line3, line4) =>
         assertComponents(line1, None, line2, line3, line4)
       case List(line1, title, line2, line3, line4) =>
         assertComponents(line1, Some(title), line2, line3, line4)
-    })
+    }
   }
 }

@@ -12,6 +12,10 @@ case class MessageBoxProps(title: String,
 
 object MessageBox extends FunctionComponent[MessageBoxProps] {
 
+  private[popup] var popupComp: UiComponent[PopupProps] = Popup
+  private[popup] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
+  private[popup] var textLineComp: UiComponent[TextLineProps] = TextLine
+
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val width = 60
@@ -39,7 +43,7 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
       )())
     }
 
-    <(Popup())(^.wrapped := PopupProps(
+    <(popupComp())(^.wrapped := PopupProps(
       onClose = onClose.getOrElse(() => ()),
       closable = onClose.isDefined
     ))(
@@ -53,7 +57,7 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
         ^.rbShadow := true,
         ^.rbStyle := props.style
       )(
-        <(DoubleBorder())(^.wrapped := DoubleBorderProps(
+        <(doubleBorderComp())(^.wrapped := DoubleBorderProps(
           size = (width - 6, height - 2),
           style = props.style,
           pos = (3, 1),
@@ -61,7 +65,7 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
         ))(),
         
         textLines.zipWithIndex.map { case (text, index) =>
-          <(TextLine())(^.key := s"$index", ^.wrapped := TextLineProps(
+          <(textLineComp())(^.key := s"$index", ^.wrapped := TextLineProps(
             align = TextLine.Center,
             pos = (4, 2 + index),
             width = textWidth,

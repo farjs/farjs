@@ -2,23 +2,30 @@ package farjs.ui.filelist.popups
 
 import farjs.ui._
 import farjs.ui.border._
-import farjs.ui.popup.{Popup, PopupProps}
+import farjs.ui.filelist.popups.MakeFolderPopup._
+import farjs.ui.popup.PopupProps
 import farjs.ui.theme.Theme
 import org.scalatest.{Assertion, Succeeded}
+import scommons.react.ReactClass
 import scommons.react.blessed._
-import scommons.react.test.TestSpec
-import scommons.react.test.raw.ShallowInstance
-import scommons.react.test.util.ShallowRendererUtils
+import scommons.react.test._
 
-class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
+class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
+
+  MakeFolderPopup.popupComp = () => "Popup".asInstanceOf[ReactClass]
+  MakeFolderPopup.doubleBorderComp = () => "DoubleBorder".asInstanceOf[ReactClass]
+  MakeFolderPopup.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
+  MakeFolderPopup.textBoxComp = () => "TextBox".asInstanceOf[ReactClass]
+  MakeFolderPopup.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
+  MakeFolderPopup.checkBoxComp = () => "CheckBox".asInstanceOf[ReactClass]
 
   it should "call onCancel when close popup" in {
     //given
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
     val props = MakeFolderPopupProps("", multiple = false, onOk = onOk, onCancel = onCancel)
-    val comp = shallowRender(<(MakeFolderPopup())(^.wrapped := props)())
-    val popup = findComponentProps(comp, Popup)
+    val comp = testRender(<(MakeFolderPopup())(^.wrapped := props)())
+    val popup = findComponentProps(comp, popupComp)
 
     //then
     onOk.expects(*, *).never()
@@ -32,9 +39,8 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
     //given
     val folderName = "initial folder name"
     val props = MakeFolderPopupProps(folderName, multiple = false, (_, _) => (), () => ())
-    val renderer = createRenderer()
-    renderer.render(<(MakeFolderPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(renderer.getRenderOutput(), TextBox)
+    val renderer = createTestRenderer(<(MakeFolderPopup())(^.wrapped := props)())
+    val textBox = findComponentProps(renderer.root, textBoxComp)
     textBox.value shouldBe folderName
     val newFolderName = "new folder name"
 
@@ -42,22 +48,21 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
     textBox.onChange(newFolderName)
 
     //then
-    findComponentProps(renderer.getRenderOutput(), TextBox).value shouldBe newFolderName
+    findComponentProps(renderer.root, textBoxComp).value shouldBe newFolderName
   }
   
   it should "set multiple flag when onChange in CheckBox" in {
     //given
     val props = MakeFolderPopupProps("", multiple = false, (_, _) => (), () => ())
-    val renderer = createRenderer()
-    renderer.render(<(MakeFolderPopup())(^.wrapped := props)())
-    val checkbox = findComponentProps(renderer.getRenderOutput(), CheckBox)
+    val renderer = createTestRenderer(<(MakeFolderPopup())(^.wrapped := props)())
+    val checkbox = findComponentProps(renderer.root, checkBoxComp)
     checkbox.value shouldBe false
 
     //when
     checkbox.onChange()
 
     //then
-    findComponentProps(renderer.getRenderOutput(), CheckBox).value shouldBe true
+    findComponentProps(renderer.root, checkBoxComp).value shouldBe true
   }
   
   it should "call onOk when onEnter in TextBox" in {
@@ -65,8 +70,8 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
     val props = MakeFolderPopupProps("test", multiple = true, onOk, onCancel)
-    val comp = shallowRender(<(MakeFolderPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(comp, TextBox)
+    val comp = testRender(<(MakeFolderPopup())(^.wrapped := props)())
+    val textBox = findComponentProps(comp, textBoxComp)
 
     //then
     onOk.expects("test", true)
@@ -81,7 +86,7 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
     val props = MakeFolderPopupProps("test", multiple = true, onOk, onCancel)
-    val comp = shallowRender(<(MakeFolderPopup())(^.wrapped := props)())
+    val comp = testRender(<(MakeFolderPopup())(^.wrapped := props)())
     val okButton = findComponents(comp, "button").head
 
     //then
@@ -97,7 +102,7 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
     val props = MakeFolderPopupProps("", multiple = true, onOk, onCancel)
-    val comp = shallowRender(<(MakeFolderPopup())(^.wrapped := props)())
+    val comp = testRender(<(MakeFolderPopup())(^.wrapped := props)())
     val okButton = findComponents(comp, "button").head
 
     //then
@@ -113,7 +118,7 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
     val props = MakeFolderPopupProps("", multiple = false, onOk = onOk, onCancel = onCancel)
-    val comp = shallowRender(<(MakeFolderPopup())(^.wrapped := props)())
+    val comp = testRender(<(MakeFolderPopup())(^.wrapped := props)())
     val cancelButton = findComponents(comp, "button")(1)
 
     //then
@@ -129,27 +134,27 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
     val props = MakeFolderPopupProps("test folder", multiple = false, (_, _) => (), () => ())
 
     //when
-    val result = shallowRender(<(MakeFolderPopup())(^.wrapped := props)())
+    val result = testRender(<(MakeFolderPopup())(^.wrapped := props)())
 
     //then
     assertMakeFolderPopup(result, props, List("[ OK ]" -> 0, "[ Cancel ]" -> 8))
   }
 
-  private def assertMakeFolderPopup(result: ShallowInstance,
+  private def assertMakeFolderPopup(result: TestInstance,
                                     props: MakeFolderPopupProps,
                                     actions: List[(String, Int)]): Unit = {
     val (width, height) = (75, 10)
     val style = Theme.current.popup.regular
     
-    def assertComponents(border: ShallowInstance,
-                         label: ShallowInstance,
-                         input: ShallowInstance,
-                         sep1: ShallowInstance,
-                         multi: ShallowInstance,
-                         sep2: ShallowInstance,
-                         actionsBox: ShallowInstance): Assertion = {
+    def assertComponents(border: TestInstance,
+                         label: TestInstance,
+                         input: TestInstance,
+                         sep1: TestInstance,
+                         multi: TestInstance,
+                         sep2: TestInstance,
+                         actionsBox: TestInstance): Assertion = {
 
-      assertComponent(border, DoubleBorder) {
+      assertTestComponent(border, doubleBorderComp) {
         case DoubleBorderProps(resSize, resStyle, pos, title) =>
           resSize shouldBe (width - 6) -> (height - 2)
           resStyle shouldBe style
@@ -157,7 +162,7 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
           title shouldBe Some("Make Folder")
       }
       
-      assertComponent(label, TextLine) {
+      assertTestComponent(label, textLineComp) {
         case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
           align shouldBe TextLine.Left
           pos shouldBe 4 -> 2
@@ -167,13 +172,13 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
           focused shouldBe false
           padding shouldBe 1
       }
-      assertComponent(input, TextBox) {
+      assertTestComponent(input, textBoxComp) {
         case TextBoxProps(pos, resWidth, resValue, _, _) =>
           pos shouldBe 5 -> 3
           resWidth shouldBe (width - 10)
           resValue shouldBe props.folderName
       }
-      assertComponent(sep1, HorizontalLine) {
+      assertTestComponent(sep1, horizontalLineComp) {
         case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
           pos shouldBe 3 -> 4
           resLength shouldBe (width - 6)
@@ -183,14 +188,14 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
           endCh shouldBe Some(DoubleBorder.rightSingleCh)
       }
       
-      assertComponent(multi, CheckBox) {
+      assertTestComponent(multi, checkBoxComp) {
         case CheckBoxProps(pos, resValue, resLabel, resStyle, _) =>
           pos shouldBe 5 -> 5
           resValue shouldBe false
           resLabel shouldBe "Process multiple names"
           resStyle shouldBe style
       }
-      assertComponent(sep2, HorizontalLine) {
+      assertTestComponent(sep2, horizontalLineComp) {
         case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
           pos shouldBe 3 -> 6
           resLength shouldBe (width - 6)
@@ -208,7 +213,7 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
           ^.rbTop := height - 3,
           ^.rbLeft := "center",
           ^.rbStyle := style
-        )(), { buttons: List[ShallowInstance] =>
+        )(), { buttons: List[TestInstance] =>
           buttons.size shouldBe actions.size
           buttons.zip(actions).foreach { case (btn, (action, pos)) =>
             assertNativeComponent(btn,
@@ -227,7 +232,7 @@ class MakeFolderPopupSpec extends TestSpec with ShallowRendererUtils {
       )
     }
     
-    assertComponent(result, Popup)({ case PopupProps(_, resClosable, focusable, _) =>
+    assertTestComponent(result, popupComp)({ case PopupProps(_, resClosable, focusable, _) =>
       resClosable shouldBe true
       focusable shouldBe true
     }, inside(_) { case List(box) =>

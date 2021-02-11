@@ -3,16 +3,16 @@ package farjs.ui.filelist
 import farjs.api.filelist.FileListItem
 import farjs.ui._
 import farjs.ui.border._
+import farjs.ui.filelist.FileListColumn._
 import farjs.ui.theme.{Theme, XTerm256Theme}
 import org.scalatest.Assertion
+import scommons.react.ReactClass
 import scommons.react.blessed._
-import scommons.react.test.TestSpec
-import scommons.react.test.raw.ShallowInstance
-import scommons.react.test.util.{ShallowRendererUtils, TestRendererUtils}
+import scommons.react.test._
 
-class FileListColumnSpec extends TestSpec
-  with ShallowRendererUtils
-  with TestRendererUtils {
+class FileListColumnSpec extends TestSpec with TestRendererUtils {
+
+  FileListColumn.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
 
   it should "not re-render component if the same props" in {
     //given
@@ -104,10 +104,9 @@ class FileListColumnSpec extends TestSpec
       focusedIndex = 2,
       selectedNames = Set(".dir 2 looooooong", "file 3")
     )
-    val comp = <(FileListColumn())(^.wrapped := props)()
 
     //when
-    val result = shallowRender(comp)
+    val result = testRender(<(FileListColumn())(^.wrapped := props)())
 
     //then
     assertFileListColumn(result, props, Some(
@@ -134,23 +133,22 @@ class FileListColumnSpec extends TestSpec
       focusedIndex = -1,
       selectedNames = Set.empty
     )
-    val comp = <(FileListColumn())(^.wrapped := props)()
 
     //when
-    val result = shallowRender(comp)
+    val result = testRender(<(FileListColumn())(^.wrapped := props)())
 
     //then
     assertFileListColumn(result, props, None)
   }
   
-  private def assertFileListColumn(result: ShallowInstance,
+  private def assertFileListColumn(result: TestInstance,
                                    props: FileListColumnProps,
                                    expectedContent: Option[String]): Unit = {
     
     val theme = Theme.current.fileList
     
-    def assertElements(header: ShallowInstance, itemsText: Option[ShallowInstance]): Assertion = {
-      assertComponent(header, TextLine) {
+    def assertElements(header: TestInstance, itemsText: Option[TestInstance]): Assertion = {
+      assertTestComponent(header, textLineComp) {
         case TextLineProps(align, pos, width, text, style, focused, padding) =>
           align shouldBe TextLine.Center
           pos shouldBe 0 -> 0
@@ -174,15 +172,15 @@ class FileListColumnSpec extends TestSpec
       expectedContent.size shouldBe itemsText.size
     }
     
-    assertNativeComponent(result, <.box(
+    assertNativeComponent(result.children.head, <.box(
       ^.rbWidth := props.size._1,
       ^.rbHeight := props.size._2,
       ^.rbLeft := props.left,
       ^.rbStyle := theme.regularItem
-    )(), { children: List[ShallowInstance] =>
+    )(), { children: List[TestInstance] =>
       children match {
-        case List(header, itemsText, _) => assertElements(header, Some(itemsText))
-        case List(header, _) => assertElements(header, None)
+        case List(header, itemsText) => assertElements(header, Some(itemsText))
+        case List(header) => assertElements(header, None)
       }
     })
   }

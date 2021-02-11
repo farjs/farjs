@@ -10,14 +10,18 @@ case class DoubleBorderProps(size: (Int, Int),
                              title: Option[String] = None)
 
 object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
-  
+
+  private[border] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[border] var verticalLineComp: UiComponent[VerticalLineProps] = VerticalLine
+  private[border] var textLineComp: UiComponent[TextLineProps] = TextLine
+
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val (width, height) = props.size
     val (left, top) = props.pos
 
     <.>()(
-      <(HorizontalLine())(^.wrapped := HorizontalLineProps(
+      <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
         pos = props.pos,
         length = width,
         lineCh = horizontalCh,
@@ -27,7 +31,7 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
       ))(),
       
       props.title.map { title =>
-        <(TextLine())(^.wrapped := TextLineProps(
+        <(textLineComp())(^.wrapped := TextLineProps(
           align = TextLine.Center,
           pos = props.pos,
           width = width,
@@ -36,21 +40,21 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
         ))()
       },
 
-      <(VerticalLine())(^.wrapped := VerticalLineProps(
+      <(verticalLineComp())(^.wrapped := VerticalLineProps(
         pos = (left, top + 1),
         length = height - 2,
         lineCh = verticalCh,
         style = props.style
       ))(),
       
-      <(VerticalLine())(^.wrapped := VerticalLineProps(
+      <(verticalLineComp())(^.wrapped := VerticalLineProps(
         pos = (left + width - 1, top + 1),
         length = height - 2,
         lineCh = verticalCh,
         style = props.style
       ))(),
 
-      <(HorizontalLine())(^.wrapped := HorizontalLineProps(
+      <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
         pos = (left, top + height - 1),
         length = width,
         lineCh = horizontalCh,

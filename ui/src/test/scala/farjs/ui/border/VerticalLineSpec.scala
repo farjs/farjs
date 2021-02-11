@@ -1,11 +1,9 @@
 package farjs.ui.border
 
 import scommons.react.blessed._
-import scommons.react.test.TestSpec
-import scommons.react.test.raw.ShallowInstance
-import scommons.react.test.util.ShallowRendererUtils
+import scommons.react.test._
 
-class VerticalLineSpec extends TestSpec with ShallowRendererUtils {
+class VerticalLineSpec extends TestSpec with TestRendererUtils {
 
   it should "render line without start and end chars" in {
     //given
@@ -16,7 +14,7 @@ class VerticalLineSpec extends TestSpec with ShallowRendererUtils {
     val comp = <(VerticalLine())(^.wrapped := props)()
 
     //when
-    val result = shallowRender(comp)
+    val result = testRender(comp)
 
     //then
     assertVerticalLine(result, props)
@@ -31,7 +29,7 @@ class VerticalLineSpec extends TestSpec with ShallowRendererUtils {
     val comp = <(VerticalLine())(^.wrapped := props)()
 
     //when
-    val result = shallowRender(comp)
+    val result = testRender(comp)
 
     //then
     assertVerticalLine(result, props)
@@ -46,7 +44,7 @@ class VerticalLineSpec extends TestSpec with ShallowRendererUtils {
     val comp = <(VerticalLine())(^.wrapped := props)()
 
     //when
-    val result = shallowRender(comp)
+    val result = testRender(comp)
 
     //then
     assertVerticalLine(result, props)
@@ -61,7 +59,7 @@ class VerticalLineSpec extends TestSpec with ShallowRendererUtils {
     val comp = <(VerticalLine())(^.wrapped := props)()
 
     //when
-    val result = shallowRender(comp)
+    val result = testRender(comp)
 
     //then
     assertVerticalLine(result, props)
@@ -79,7 +77,7 @@ class VerticalLineSpec extends TestSpec with ShallowRendererUtils {
     endCh = None
   )
 
-  private def assertVerticalLine(result: ShallowInstance, props: VerticalLineProps): Unit = {
+  private def assertVerticalLine(result: TestInstance, props: VerticalLineProps): Unit = {
     val (left, top) = props.pos
     
     assertNativeComponent(result,

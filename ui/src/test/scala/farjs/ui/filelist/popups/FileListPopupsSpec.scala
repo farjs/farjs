@@ -1,7 +1,8 @@
 package farjs.ui.filelist.popups
 
 import farjs.api.filelist.{FileListDir, FileListItem}
-import farjs.ui.filelist.FileListActions.{FileListDirCreateAction, FileListItemsDeleteAction}
+import farjs.ui.filelist.FileListActions._
+import farjs.ui.filelist.popups.FileListPopups._
 import farjs.ui.filelist.popups.FileListPopupsActions._
 import farjs.ui.filelist.{FileListActions, FileListsState}
 import farjs.ui.popup._
@@ -12,14 +13,16 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.redux.task.FutureTask
-import scommons.react.test.BaseTestSpec
-import scommons.react.test.util.ShallowRendererUtils
+import scommons.react.test._
 
 import scala.concurrent.Future
 import scala.scalajs.js
 
 class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
-  with ShallowRendererUtils {
+  with TestRendererUtils {
+
+  FileListPopups.messageBoxComp = () => "MessageBox".asInstanceOf[ReactClass]
+  FileListPopups.makeFolderPopupComp = () => "MakeFolderPopup".asInstanceOf[ReactClass]
 
   it should "render empty component" in {
     //given
@@ -28,12 +31,10 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val props = FileListPopupsProps(dispatch, actions, FileListsState())
 
     //when
-    val result = shallowRender(<(FileListPopups())(^.wrapped := props)())
+    val result = createTestRenderer(<(FileListPopups())(^.wrapped := props)())
 
     //then
-    assertNativeComponent(result, <.>()())
-    
-    Succeeded
+    result.root.children.toList should be (empty)
   }
   
   "Help popup" should "dispatch FileListPopupHelpAction when OK action" in {
@@ -43,8 +44,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       popups = FileListPopupsState(showHelpPopup = true)
     ))
-    val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
-    val msgBox = findComponentProps(comp, MessageBox)
+    val comp = testRender(<(FileListPopups())(^.wrapped := props)())
+    val msgBox = findComponentProps(comp, messageBoxComp)
     val action = FileListPopupHelpAction(show = false)
 
     //then
@@ -65,20 +66,18 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     ))
 
     //when
-    val result = shallowRender(<(FileListPopups())(^.wrapped := props)())
+    val result = testRender(<(FileListPopups())(^.wrapped := props)())
 
     //then
-    assertNativeComponent(result, <.>()(), { case List(popup) =>
-      assertComponent(popup, MessageBox) {
-        case MessageBoxProps(title, message, resActions, style) =>
-          title shouldBe "Help"
-          message shouldBe "//TODO: show help/about info"
-          inside(resActions) {
-            case List(MessageBoxAction("OK", _, true)) =>
-          }
-          style shouldBe Theme.current.popup.regular
-      }
-    })
+    assertTestComponent(result, messageBoxComp) {
+      case MessageBoxProps(title, message, resActions, style) =>
+        title shouldBe "Help"
+        message shouldBe "//TODO: show help/about info"
+        inside(resActions) {
+          case List(MessageBoxAction("OK", _, true)) =>
+        }
+        style shouldBe Theme.current.popup.regular
+    }
   }
 
   "Exit popup" should "dispatch FileListPopupExitAction and emit Ctrl+Q when YES action" in {
@@ -88,8 +87,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       popups = FileListPopupsState(showExitPopup = true)
     ))
-    val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
-    val msgBox = findComponentProps(comp, MessageBox)
+    val comp = testRender(<(FileListPopups())(^.wrapped := props)())
+    val msgBox = findComponentProps(comp, messageBoxComp)
     val action = FileListPopupExitAction(show = false)
 
     val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
@@ -123,8 +122,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       popups = FileListPopupsState(showExitPopup = true)
     ))
-    val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
-    val msgBox = findComponentProps(comp, MessageBox)
+    val comp = testRender(<(FileListPopups())(^.wrapped := props)())
+    val msgBox = findComponentProps(comp, messageBoxComp)
     val action = FileListPopupExitAction(show = false)
 
     //then
@@ -145,20 +144,18 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     ))
 
     //when
-    val result = shallowRender(<(FileListPopups())(^.wrapped := props)())
+    val result = testRender(<(FileListPopups())(^.wrapped := props)())
 
     //then
-    assertNativeComponent(result, <.>()(), { case List(popup) =>
-      assertComponent(popup, MessageBox) {
-        case MessageBoxProps(title, message, resActions, style) =>
-          title shouldBe "Exit"
-          message shouldBe "Do you really want to exit FAR.js?"
-          inside(resActions) {
-            case List(MessageBoxAction("YES", _, false), MessageBoxAction("NO", _, true)) =>
-          }
-          style shouldBe Theme.current.popup.regular
-      }
-    })
+    assertTestComponent(result, messageBoxComp) {
+      case MessageBoxProps(title, message, resActions, style) =>
+        title shouldBe "Exit"
+        message shouldBe "Do you really want to exit FAR.js?"
+        inside(resActions) {
+          case List(MessageBoxAction("YES", _, false), MessageBoxAction("NO", _, true)) =>
+        }
+        style shouldBe Theme.current.popup.regular
+    }
   }
   
   "Delete popup" should "call api and delete currItem when YES action" in {
@@ -177,8 +174,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
       )
     }
     val props = FileListPopupsProps(dispatch, actions, state)
-    val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
-    val msgBox = findComponentProps(comp, MessageBox)
+    val comp = testRender(<(FileListPopups())(^.wrapped := props)())
+    val msgBox = findComponentProps(comp, messageBoxComp)
     val action = FileListItemsDeleteAction(
       FutureTask("Deleting Items", Future.successful(()))
     )
@@ -212,8 +209,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
       )
     }
     val props = FileListPopupsProps(dispatch, actions, state)
-    val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
-    val msgBox = findComponentProps(comp, MessageBox)
+    val comp = testRender(<(FileListPopups())(^.wrapped := props)())
+    val msgBox = findComponentProps(comp, messageBoxComp)
     val action = FileListItemsDeleteAction(
       FutureTask("Deleting Items", Future.successful(()))
     )
@@ -237,8 +234,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       popups = FileListPopupsState(showDeletePopup = true)
     ))
-    val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
-    val msgBox = findComponentProps(comp, MessageBox)
+    val comp = testRender(<(FileListPopups())(^.wrapped := props)())
+    val msgBox = findComponentProps(comp, messageBoxComp)
     val action = FileListPopupDeleteAction(show = false)
 
     //then
@@ -259,20 +256,18 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     ))
 
     //when
-    val result = shallowRender(<(FileListPopups())(^.wrapped := props)())
+    val result = testRender(<(FileListPopups())(^.wrapped := props)())
 
     //then
-    assertNativeComponent(result, <.>()(), { case List(popup) =>
-      assertComponent(popup, MessageBox) {
-        case MessageBoxProps(title, message, resActions, style) =>
-          title shouldBe "Delete"
-          message shouldBe "Do you really want to delete selected item(s)?"
-          inside(resActions) {
-            case List(MessageBoxAction("YES", _, false), MessageBoxAction("NO", _, true)) =>
-          }
-          style shouldBe Theme.current.popup.error
-      }
-    })
+    assertTestComponent(result, messageBoxComp) {
+      case MessageBoxProps(title, message, resActions, style) =>
+        title shouldBe "Delete"
+        message shouldBe "Do you really want to delete selected item(s)?"
+        inside(resActions) {
+          case List(MessageBoxAction("YES", _, false), MessageBoxAction("NO", _, true)) =>
+        }
+        style shouldBe Theme.current.popup.error
+    }
   }
   
   "MkFolder popup" should "call api and update state when OK action" in {
@@ -288,9 +283,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
       )
     }
     val props = FileListPopupsProps(dispatch, actions, state)
-    val renderer = createRenderer()
-    renderer.render(<(FileListPopups())(^.wrapped := props)())
-    val popup = findComponentProps(renderer.getRenderOutput(), MakeFolderPopup)
+    val renderer = createTestRenderer(<(FileListPopups())(^.wrapped := props)())
+    val popup = findComponentProps(renderer.root, makeFolderPopupComp)
     val action = FileListDirCreateAction(
       FutureTask("Creating...", Future.successful(()))
     )
@@ -307,7 +301,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
 
     action.task.future.map { _ =>
       //then
-      val updated = findComponentProps(renderer.getRenderOutput(), MakeFolderPopup)
+      val updated = findComponentProps(renderer.root, makeFolderPopupComp)
       updated.folderName shouldBe dir
       updated.multiple shouldBe multiple
     }
@@ -320,8 +314,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       popups = FileListPopupsState(showMkFolderPopup = true)
     ))
-    val comp = shallowRender(<(FileListPopups())(^.wrapped := props)())
-    val popup = findComponentProps(comp, MakeFolderPopup)
+    val comp = testRender(<(FileListPopups())(^.wrapped := props)())
+    val popup = findComponentProps(comp, makeFolderPopupComp)
     val action = FileListPopupMkFolderAction(show = false)
 
     //then
@@ -342,15 +336,13 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     ))
 
     //when
-    val result = shallowRender(<(FileListPopups())(^.wrapped := props)())
+    val result = testRender(<(FileListPopups())(^.wrapped := props)())
 
     //then
-    assertNativeComponent(result, <.>()(), { case List(popup) =>
-      assertComponent(popup, MakeFolderPopup) {
-        case MakeFolderPopupProps(folderName, multiple, _, _) =>
-          folderName shouldBe ""
-          multiple shouldBe false
-      }
-    })
+    assertTestComponent(result, makeFolderPopupComp) {
+      case MakeFolderPopupProps(folderName, multiple, _, _) =>
+        folderName shouldBe ""
+        multiple shouldBe false
+    }
   }
 }

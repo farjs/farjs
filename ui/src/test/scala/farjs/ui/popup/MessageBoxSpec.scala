@@ -2,14 +2,18 @@ package farjs.ui.popup
 
 import farjs.ui._
 import farjs.ui.border._
+import farjs.ui.popup.MessageBox._
 import farjs.ui.theme.Theme
 import org.scalatest.{Assertion, Succeeded}
+import scommons.react.ReactClass
 import scommons.react.blessed._
-import scommons.react.test.TestSpec
-import scommons.react.test.raw.ShallowInstance
-import scommons.react.test.util.ShallowRendererUtils
+import scommons.react.test._
 
-class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
+class MessageBoxSpec extends TestSpec with TestRendererUtils {
+
+  MessageBox.popupComp = () => "Popup".asInstanceOf[ReactClass]
+  MessageBox.doubleBorderComp = () => "DoubleBorder".asInstanceOf[ReactClass]
+  MessageBox.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
 
   "OK popup" should "call OK action when onClose popup" in {
     //given
@@ -17,8 +21,8 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
     val props = MessageBoxProps("test title", "test message", List(
       MessageBoxAction.OK(onAction)
     ), Theme.current.popup.regular)
-    val comp = shallowRender(<(MessageBox())(^.wrapped := props)())
-    val popup = findComponentProps(comp, Popup)
+    val comp = testRender(<(MessageBox())(^.wrapped := props)())
+    val popup = findComponentProps(comp, popupComp)
 
     //then
     onAction.expects()
@@ -33,7 +37,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
     val props = MessageBoxProps("test title", "test message", List(
       MessageBoxAction.OK(onAction)
     ), Theme.current.popup.regular)
-    val comp = shallowRender(<(MessageBox())(^.wrapped := props)())
+    val comp = testRender(<(MessageBox())(^.wrapped := props)())
     val okButton = findComponents(comp, "button").head
 
     //then
@@ -53,7 +57,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
     )
 
     //when
-    val result = shallowRender(<(MessageBox())(^.wrapped := props)())
+    val result = testRender(<(MessageBox())(^.wrapped := props)())
 
     //then
     assertMessageBox(result, props, List("OK" -> 0))
@@ -67,8 +71,8 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
       MessageBoxAction.YES(onYesAction),
       MessageBoxAction.NO(onNoAction)
     ), Theme.current.popup.regular)
-    val comp = shallowRender(<(MessageBox())(^.wrapped := props)())
-    val popup = findComponentProps(comp, Popup)
+    val comp = testRender(<(MessageBox())(^.wrapped := props)())
+    val popup = findComponentProps(comp, popupComp)
 
     //then
     onYesAction.expects().never()
@@ -86,7 +90,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
       MessageBoxAction.YES(onYesAction),
       MessageBoxAction.NO(onNoAction)
     ), Theme.current.popup.regular)
-    val comp = shallowRender(<(MessageBox())(^.wrapped := props)())
+    val comp = testRender(<(MessageBox())(^.wrapped := props)())
     val yesButton = findComponents(comp, "button").head
 
     //then
@@ -105,7 +109,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
       MessageBoxAction.YES(onYesAction),
       MessageBoxAction.NO(onNoAction)
     ), Theme.current.popup.regular)
-    val comp = shallowRender(<(MessageBox())(^.wrapped := props)())
+    val comp = testRender(<(MessageBox())(^.wrapped := props)())
     val noButton = findComponents(comp, "button")(1)
 
     //then
@@ -124,7 +128,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
     ), Theme.current.popup.regular)
 
     //when
-    val result = shallowRender(<(MessageBox())(^.wrapped := props)())
+    val result = testRender(<(MessageBox())(^.wrapped := props)())
 
     //then
     assertMessageBox(result, props, List("YES" -> 0, "NO" -> 5))
@@ -138,8 +142,8 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
       MessageBoxAction.YES(onYesAction),
       MessageBoxAction.NO(onNoAction).copy(triggeredOnClose = false)
     ), Theme.current.popup.regular)
-    val comp = shallowRender(<(MessageBox())(^.wrapped := props)())
-    val popup = findComponentProps(comp, Popup)
+    val comp = testRender(<(MessageBox())(^.wrapped := props)())
+    val popup = findComponentProps(comp, popupComp)
 
     //then
     onYesAction.expects().never()
@@ -157,13 +161,13 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
     ), Theme.current.popup.regular)
 
     //when
-    val result = shallowRender(<(MessageBox())(^.wrapped := props)())
+    val result = testRender(<(MessageBox())(^.wrapped := props)())
 
     //then
     assertMessageBox(result, props, List("YES" -> 0, "NO" -> 5), closable = false)
   }
 
-  private def assertMessageBox(result: ShallowInstance,
+  private def assertMessageBox(result: TestInstance,
                                props: MessageBoxProps,
                                actions: List[(String, Int)],
                                closable: Boolean = true): Unit = {
@@ -172,11 +176,11 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
     val textLines = UI.splitText(props.message, textWidth - 2) //exclude padding
     val height = 5 + textLines.size
     
-    def assertComponents(border: ShallowInstance,
-                         msgs: List[ShallowInstance],
-                         actionsBox: ShallowInstance): Assertion = {
+    def assertComponents(border: TestInstance,
+                         msgs: List[TestInstance],
+                         actionsBox: TestInstance): Assertion = {
 
-      assertComponent(border, DoubleBorder) {
+      assertTestComponent(border, doubleBorderComp) {
         case DoubleBorderProps(resSize, style, pos, title) =>
           resSize shouldBe (width - 6) -> (height - 2)
           style shouldBe props.style
@@ -186,8 +190,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
       
       msgs.size shouldBe textLines.size
       msgs.zip(textLines).zipWithIndex.foreach { case ((msg, textLine), index) =>
-        msg.key shouldBe s"$index"
-        assertComponent(msg, TextLine) {
+        assertTestComponent(msg, textLineComp) {
           case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
             align shouldBe TextLine.Center
             pos shouldBe 4 -> (2 + index)
@@ -207,7 +210,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
           ^.rbTop := height - 3,
           ^.rbLeft := "center",
           ^.rbStyle := props.style
-        )(), { buttons: List[ShallowInstance] =>
+        )(), { buttons: List[TestInstance] =>
           buttons.size shouldBe actions.size
           buttons.zip(actions).foreach { case (btn, (label, pos)) =>
             assertNativeComponent(btn,
@@ -226,7 +229,7 @@ class MessageBoxSpec extends TestSpec with ShallowRendererUtils {
       )
     }
     
-    assertComponent(result, Popup)({ case PopupProps(_, resClosable, focusable, _) =>
+    assertTestComponent(result, popupComp)({ case PopupProps(_, resClosable, focusable, _) =>
       resClosable shouldBe closable
       focusable shouldBe true
     }, inside(_) { case List(box) =>

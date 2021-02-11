@@ -18,6 +18,9 @@ case class FileListPopupsProps(dispatch: Dispatch,
 
 object FileListPopups extends FunctionComponent[FileListPopupsProps] {
 
+  private[popups] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
+  private[popups] var makeFolderPopupComp: UiComponent[MakeFolderPopupProps] = MakeFolderPopup
+
   protected def render(compProps: Props): ReactElement = {
     val (folderName, setFolderName) = useState("")
     val (multiple, setMultiple) = useState(false)
@@ -27,7 +30,7 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
 
     <.>()(
       if (popups.showHelpPopup) Some(
-        <(MessageBox())(^.wrapped := MessageBoxProps(
+        <(messageBoxComp())(^.wrapped := MessageBoxProps(
           title = "Help",
           message = "//TODO: show help/about info",
           actions = List(MessageBoxAction.OK { () =>
@@ -38,7 +41,7 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
       ) else None,
       
       if (popups.showExitPopup) Some(
-        <(MessageBox())(^.wrapped := MessageBoxProps(
+        <(messageBoxComp())(^.wrapped := MessageBoxProps(
           title = "Exit",
           message = "Do you really want to exit FAR.js?",
           actions = List(
@@ -60,7 +63,7 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
       ) else None,
       
       if (popups.showDeletePopup) Some(
-        <(MessageBox())(^.wrapped := MessageBoxProps(
+        <(messageBoxComp())(^.wrapped := MessageBoxProps(
           title = "Delete",
           message = "Do you really want to delete selected item(s)?",
           actions = List(
@@ -95,7 +98,7 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
       ) else None,
       
       if (popups.showMkFolderPopup) Some(
-        <(MakeFolderPopup())(^.wrapped := MakeFolderPopupProps(
+        <(makeFolderPopupComp())(^.wrapped := MakeFolderPopupProps(
           folderName = folderName,
           multiple = multiple,
           onOk = { (dir, multiple) =>

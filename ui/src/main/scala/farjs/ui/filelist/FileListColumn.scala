@@ -15,6 +15,8 @@ case class FileListColumnProps(size: (Int, Int),
 
 object FileListColumn extends FunctionComponent[FileListColumnProps] {
 
+  private[filelist] var textLineComp: UiComponent[TextLineProps] = TextLine
+
   override protected def create(): ReactClass = {
     ReactMemo[Props](super.create(), { (prevProps, nextProps) =>
       prevProps.wrapped == nextProps.wrapped
@@ -63,7 +65,7 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
       ^.rbLeft := props.left,
       ^.rbStyle := theme.regularItem
     )(
-      <(TextLine())(^.wrapped := TextLineProps(
+      <(textLineComp())(^.wrapped := TextLineProps(
         align = TextLine.Center,
         pos = (0, 0),
         width = width,
