@@ -1,7 +1,7 @@
 package farjs.app.filelist
 
-import farjs.api.filelist._
 import farjs.app.filelist.FileListApiImpl._
+import farjs.filelist.api.{FileListApi, FileListDir, FileListItem}
 import scommons.nodejs._
 import scommons.nodejs.raw.FSConstants
 

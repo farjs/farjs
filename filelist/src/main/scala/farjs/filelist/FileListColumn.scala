@@ -1,0 +1,90 @@
+package farjs.filelist
+
+import farjs.filelist.api.FileListItem
+import farjs.ui._
+import farjs.ui.theme.Theme
+import scommons.react._
+import scommons.react.blessed._
+
+case class FileListColumnProps(size: (Int, Int),
+                               left: Int,
+                               borderCh: String,
+                               items: Seq[FileListItem],
+                               focusedIndex: Int,
+                               selectedNames: Set[String])
+
+object FileListColumn extends FunctionComponent[FileListColumnProps] {
+
+  private[filelist] var textLineComp: UiComponent[TextLineProps] = TextLine
+
+  override protected def create(): ReactClass = {
+    ReactMemo[Props](super.create(), { (prevProps, nextProps) =>
+      prevProps.wrapped == nextProps.wrapped
+    })
+  }
+  
+  protected def render(compProps: Props): ReactElement = {
+    val props = compProps.wrapped
+    val (width, height) = props.size
+    val theme = Theme.current.fileList
+    
+    val borderEnd = TextBox.renderText(theme.regularItem, props.borderCh)
+    val overlapEnd = TextBox.renderText(theme.regularItem, "}")
+
+    def renderItems(): Seq[String] = props.items.zipWithIndex.map {
+      case (item, index) =>
+        val name = item.name
+        val style = {
+          val style =
+            if (props.selectedNames.contains(name)) theme.selectedItem
+            else if (name.startsWith(".") && name != FileListItem.up.name) theme.hiddenItem
+            else if (item.isDir && name != FileListItem.up.name) theme.dirItem
+            else theme.regularItem
+          
+          val focused = props.focusedIndex == index
+          if (focused) style.focus.getOrElse(null)
+          else style
+        }
+
+        val text = name.trim
+        val content = TextBox.renderText(
+          isBold = style.bold.getOrElse(false),
+          fgColor = style.fg.orNull,
+          bgColor = style.bg.orNull,
+          text = text.take(width).padTo(width, ' ')
+        )
+        val ending = if (text.length > width) overlapEnd else borderEnd
+        s"$content$ending"
+    }
+
+    val itemsContent = renderItems().mkString(UI.newLine)
+
+    <.box(
+      ^.rbWidth := width,
+      ^.rbHeight := height,
+      ^.rbLeft := props.left,
+      ^.rbStyle := theme.regularItem
+    )(
+      <(textLineComp())(^.wrapped := TextLineProps(
+        align = TextLine.Center,
+        pos = (0, 0),
+        width = width,
+        text = "Name",
+        style = theme.header,
+        padding = 0
+      ))(),
+      
+      if (itemsContent.nonEmpty) Some(
+        <.text(
+          ^.rbWidth := width + 1,
+          ^.rbTop := 1,
+          ^.rbTags := true,
+          ^.content := itemsContent
+        )()
+      )
+      else None,
+
+      compProps.children // just for testing memo/re-render
+    )
+  }
+}

@@ -1,7 +1,7 @@
 package farjs.app.filelist
 
-import farjs.api.filelist._
 import farjs.app.filelist.FileListApiImplSpec.TestApiImpl
+import farjs.filelist.api.{FileListDir, FileListItem}
 import org.scalatest.Succeeded
 import scommons.nodejs._
 import scommons.nodejs.raw.FSConstants

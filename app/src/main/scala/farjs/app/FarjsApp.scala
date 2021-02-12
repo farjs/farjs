@@ -1,10 +1,8 @@
 package farjs.app
 
-import farjs.app.filelist.FileListBrowser
+import farjs.app.filelist._
 import farjs.app.task.FarjsTaskController
 import farjs.app.util.DevTool
-import farjs.ui.filelist.FileListController
-import farjs.ui.filelist.popups.FileListPopupsController
 import farjs.ui.theme.{Theme, XTerm256Theme}
 import io.github.shogowada.scalajs.reactjs.redux.ReactRedux._
 import io.github.shogowada.scalajs.reactjs.redux.Redux

@@ -1,6 +1,6 @@
 package farjs.app.task
 
-import farjs.ui.FarjsStateDef
+import farjs.app.FarjsStateDef
 import io.github.shogowada.scalajs.reactjs.React.Props
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.react.redux.task.{FutureTask, TaskManager, TaskManagerProps}

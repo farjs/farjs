@@ -130,6 +130,6 @@ object FarjsApp extends ScalaJsModule {
     )
 
   override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Seq(
-    FarjsUi.definition
+    FarjsFileList.definition
   )
 }

@@ -1,7 +1,7 @@
 package farjs.app
 
 import farjs.app.filelist.FileListApiImpl
-import farjs.ui.filelist.FileListActions
+import farjs.filelist.FileListActions
 
 object FarjsActions extends FileListActions {
 

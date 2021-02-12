@@ -1,8 +1,13 @@
 package farjs.app
 
-import farjs.ui.FarjsStateDef
-import farjs.ui.filelist.{FileListsState, FileListsStateReducer}
+import farjs.filelist.{FileListsState, FileListsStateDef, FileListsStateReducer}
 import scommons.react.redux.task.{AbstractTask, TaskReducer}
+
+trait FarjsStateDef {
+
+  def currentTask: Option[AbstractTask]
+  def fileListsState: FileListsStateDef
+}
 
 case class FarjsState(currentTask: Option[AbstractTask],
                       fileListsState: FileListsState) extends FarjsStateDef

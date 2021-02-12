@@ -1,8 +1,8 @@
 package farjs.app
 
-import farjs.ui.filelist.FileListActions._
-import farjs.api.filelist.FileListDir
-import farjs.ui.filelist.FileListsState
+import farjs.filelist.FileListActions._
+import farjs.filelist.FileListsState
+import farjs.filelist.api.FileListDir
 import scommons.react.redux.task.{AbstractTask, FutureTask}
 import scommons.react.test.TestSpec
 

@@ -24,7 +24,5 @@ object FarjsUi extends ScalaJsModule {
       )
     )
 
-  override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Seq(
-    FarjsApi.definition
-  )
+  override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Nil
 }

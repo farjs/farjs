@@ -15,11 +15,11 @@ lazy val `farjs` = (project in file("."))
     ideExcludedDirectories += baseDirectory.value / "docs" / "_site"
   )
   .aggregate(
-    `farjs-api`,
     `farjs-ui`,
+    `farjs-filelist`,
     `farjs-app`
   )
 
-lazy val `farjs-api` = FarjsApi.definition
 lazy val `farjs-ui` = FarjsUi.definition
+lazy val `farjs-filelist` = FarjsFileList.definition
 lazy val `farjs-app` = FarjsApp.definition
