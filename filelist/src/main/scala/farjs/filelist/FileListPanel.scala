@@ -27,11 +27,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
     val theme = Theme.current.fileList
     
     val currItem = props.state.currentItem
-    val selectedItems =
-      if (props.state.selectedNames.nonEmpty) {
-        props.state.currDir.items.filter(i => props.state.selectedNames.contains(i.name))
-      }
-      else Nil
+    val selectedItems = props.state.selectedItems
 
     <(withSizeComp())(^.wrapped := WithSizeProps({ (width, height) =>
       <.box(^.rbStyle := theme.regularItem)(

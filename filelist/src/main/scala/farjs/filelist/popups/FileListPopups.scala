@@ -68,14 +68,9 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
           message = "Do you really want to delete selected item(s)?",
           actions = List(
             MessageBoxAction.YES { () =>
-              val state =
-                if (props.data.left.isActive) props.data.left
-                else props.data.right
-
+              val state = props.data.activeList
               val items =
-                if (state.selectedNames.nonEmpty) {
-                  state.currDir.items.filter(i => state.selectedNames.contains(i.name))
-                }
+                if (state.selectedItems.nonEmpty) state.selectedItems
                 else state.currentItem.toList
               
               val action = props.actions.deleteItems(
@@ -102,10 +97,7 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
           folderName = folderName,
           multiple = multiple,
           onOk = { (dir, multiple) =>
-            val state =
-              if (props.data.left.isActive) props.data.left
-              else props.data.right
-
+            val state = props.data.activeList
             val action = props.actions.createDir(
               dispatch = props.dispatch,
               isRight = state.isRight,

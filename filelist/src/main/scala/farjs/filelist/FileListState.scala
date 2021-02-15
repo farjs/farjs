@@ -11,12 +11,19 @@ case class FileListState(offset: Int = 0,
                          isRight: Boolean = false,
                          isActive: Boolean = false) {
 
-  def currentItem: Option[FileListItem] = {
+  lazy val currentItem: Option[FileListItem] = {
     val itemIndex = offset + index
     if (itemIndex >= 0 && itemIndex < currDir.items.size) {
       Some(currDir.items(itemIndex))
     }
     else None
+  }
+  
+  lazy val selectedItems: Seq[FileListItem] = {
+    if (selectedNames.nonEmpty) {
+      currDir.items.filter(i => selectedNames.contains(i.name))
+    }
+    else Nil
   }
 }
 
@@ -25,12 +32,19 @@ trait FileListsStateDef {
   def left: FileListState
   def right: FileListState
   def popups: FileListPopupsState
+  def activeList: FileListState
 }
 
 case class FileListsState(left: FileListState = FileListState(isActive = true),
                           right: FileListState = FileListState(isRight = true),
                           popups: FileListPopupsState = FileListPopupsState()
-                         ) extends FileListsStateDef
+                         ) extends FileListsStateDef {
+  
+  lazy val activeList: FileListState = {
+    if (left.isActive) left
+    else right
+  }
+}
 
 object FileListsStateReducer {
 
