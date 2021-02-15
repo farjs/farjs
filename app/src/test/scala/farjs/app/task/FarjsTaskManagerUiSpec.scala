@@ -91,8 +91,10 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
 
     //then
     assertTestComponent(result, statusPopupComp) {
-      case TaskStatusPopupProps(message) =>
+      case StatusPopupProps(message, title, closable, _) =>
         message shouldBe props.status.getOrElse("")
+        title shouldBe "Status"
+        closable shouldBe false
     }
   }
 

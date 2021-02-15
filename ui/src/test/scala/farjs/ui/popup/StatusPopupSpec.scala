@@ -1,9 +1,8 @@
-package farjs.app.task
+package farjs.ui.popup
 
-import farjs.app.task.TaskStatusPopup._
 import farjs.ui._
 import farjs.ui.border._
-import farjs.ui.popup.PopupProps
+import farjs.ui.popup.StatusPopup._
 import farjs.ui.theme.Theme
 import org.scalatest._
 import scommons.nodejs.test.TestSpec
@@ -11,11 +10,11 @@ import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
 
-class TaskStatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils {
+class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils {
 
-  TaskStatusPopup.popupComp = () => "Popup".asInstanceOf[ReactClass]
-  TaskStatusPopup.doubleBorderComp = () => "DoubleBorder".asInstanceOf[ReactClass]
-  TaskStatusPopup.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
+  StatusPopup.popupComp = () => "Popup".asInstanceOf[ReactClass]
+  StatusPopup.doubleBorderComp = () => "DoubleBorder".asInstanceOf[ReactClass]
+  StatusPopup.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
 
   private val theme = Theme.current.popup.regular
   private val style = new BlessedStyle {
@@ -26,19 +25,22 @@ class TaskStatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUt
   
   it should "render component" in {
     //given
-    val props = TaskStatusPopupProps(
-      "Toooooooooooooooooooooooooooooo looooooooooooooooooooooooong test message"
+    val props = StatusPopupProps(
+      text = "Toooooooooooooooooooooooooooooo looooooooooooooooooooooooong test message",
+      title = "Test Title",
+      closable = true,
+      onClose = () => ()
     )
 
     //when
-    val result = testRender(<(TaskStatusPopup())(^.wrapped := props)())
+    val result = testRender(<(StatusPopup())(^.wrapped := props)())
 
     //then
     assertTaskStatusPopup(result, props)
   }
 
   private def assertTaskStatusPopup(result: TestInstance,
-                                    props: TaskStatusPopupProps): Unit = {
+                                    props: StatusPopupProps): Unit = {
     
     val width = 35
     val textWidth = width - 8
@@ -46,8 +48,8 @@ class TaskStatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUt
     val height = 4 + textLines.size
 
     assertTestComponent(result, popupComp)({ case PopupProps(onClose, resClosable, focusable, _) =>
-      onClose()
-      resClosable shouldBe false
+      onClose should be theSameInstanceAs props.onClose
+      resClosable shouldBe props.closable
       focusable shouldBe true
     }, { case List(box) =>
       assertNativeComponent(box,
@@ -66,7 +68,7 @@ class TaskStatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUt
               resSize shouldBe (width - 6) -> (height - 2)
               assertObject(resStyle, style)
               pos shouldBe 3 -> 1
-              title shouldBe Some("Status")
+              title shouldBe Some(props.title)
           }
           
           assertNativeComponent(btn,

@@ -1,19 +1,21 @@
-package farjs.app.task
+package farjs.ui.popup
 
 import farjs.ui._
 import farjs.ui.border._
-import farjs.ui.popup._
 import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 
-case class TaskStatusPopupProps(text: String)
+case class StatusPopupProps(text: String,
+                            title: String = "Status",
+                            closable: Boolean = false,
+                            onClose: () => Unit = () => ())
 
-object TaskStatusPopup extends FunctionComponent[TaskStatusPopupProps] {
+object StatusPopup extends FunctionComponent[StatusPopupProps] {
 
-  private[task] var popupComp: UiComponent[PopupProps] = Popup
-  private[task] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
-  private[task] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[popup] var popupComp: UiComponent[PopupProps] = Popup
+  private[popup] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
+  private[popup] var textLineComp: UiComponent[TextLineProps] = TextLine
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -29,8 +31,8 @@ object TaskStatusPopup extends FunctionComponent[TaskStatusPopupProps] {
     }
 
     <(popupComp())(^.wrapped := PopupProps(
-      onClose = () => (),
-      closable = false
+      onClose = props.onClose,
+      closable = props.closable
     ))(
       <.box(
         ^.rbClickable := true,
@@ -46,7 +48,7 @@ object TaskStatusPopup extends FunctionComponent[TaskStatusPopupProps] {
           size = (width - 6, height - 2),
           style = style,
           pos = (3, 1),
-          title = Some("Status")
+          title = Some(props.title)
         ))(),
 
         <.button(
