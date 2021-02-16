@@ -133,6 +133,16 @@ object FileListsStateReducer {
         currDir = state.currDir.copy(items = items),
         selectedNames = Set.empty
       )
+    case FileListItemsViewedAction(`isRight`, sizes) =>
+      val updatedItems = state.currDir.items.map { item =>
+        sizes.get(item.name) match {
+          case Some(size) => item.copy(size = size)
+          case None => item
+        }
+      }
+      state.copy(
+        currDir = state.currDir.copy(items = updatedItems)
+      )
     case _ => state
   }
   

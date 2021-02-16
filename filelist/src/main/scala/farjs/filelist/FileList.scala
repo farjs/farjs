@@ -165,10 +165,15 @@ object FileList extends FunctionComponent[FileListProps] {
             ))
           }
         case (_, "f1") => props.dispatch(FileListPopupHelpAction(show = true))
+        case (_, "f3") =>
+          val currItem = props.state.currentItem.filter(_ != FileListItem.up)
+          if (props.state.selectedNames.nonEmpty || currItem.exists(_.isDir)) {
+            props.dispatch(FileListPopupViewItemsAction(show = true))
+          }
         case (_, "f7") => props.dispatch(FileListPopupMkFolderAction(show = true))
         case (_, k) if k == "f8" || k == "delete" =>
-          if (props.state.selectedNames.nonEmpty
-            || props.state.currentItem.exists(_ != FileListItem.up)) {
+          val currItem = props.state.currentItem.filter(_ != FileListItem.up)
+          if (props.state.selectedNames.nonEmpty || currItem.isDefined) {
             props.dispatch(FileListPopupDeleteAction(show = true))
           }
         case (_, "f10") => props.dispatch(FileListPopupExitAction(show = true))

@@ -119,7 +119,7 @@ class BottomMenuViewSpec extends TestSpec with TestRendererUtils {
     val itemsWithPos = List(
       (1, "      ", 0, 8),
       (2, "      ", 8, 8),
-      (3, "      ", 16, 8),
+      (3, " View ", 16, 8),
       (4, "      ", 24, 8),
       (5, "      ", 32, 8),
       (6, "      ", 40, 8),

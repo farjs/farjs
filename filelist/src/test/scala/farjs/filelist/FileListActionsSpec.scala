@@ -187,6 +187,65 @@ class FileListActionsSpec extends AsyncTestSpec {
     msg shouldBe "Deleting Items"
     future.map(_ => Succeeded)
   }
+  
+  it should "process sub-dirs and return true when scanDirs" in {
+    //given
+    val api = mock[FileListApi]
+    val onNextDir = mockFunction[String, Seq[FileListItem], Boolean]
+    val actions = new FileListActionsTest(api)
+    val parent = "parent-dir"
+    val items = List(
+      FileListItem("dir 1", isDir = true),
+      FileListItem("file 2")
+    )
+    val res = FileListDir("dir1", isRoot = false, List(
+      FileListItem("dir 3", isDir = true),
+      FileListItem("file 4")
+    ))
+
+    (api.readDir(_: Option[String], _: String)).expects(Some(parent), "dir 1")
+      .returning(Future.successful(res))
+    (api.readDir(_: Option[String], _: String)).expects(Some(res.path), "dir 3")
+      .returning(Future.successful(FileListDir("dir3", isRoot = false, Nil)))
+    onNextDir.expects(res.path, res.items).returning(true)
+    onNextDir.expects("dir3", Nil).returning(true)
+    
+    //when
+    val resultF = actions.scanDirs(parent, items, onNextDir)
+    
+    //then
+    resultF.map { res =>
+      res shouldBe true
+    }
+  }
+  
+  it should "process sub-dirs and return false when scanDirs" in {
+    //given
+    val api = mock[FileListApi]
+    val onNextDir = mockFunction[String, Seq[FileListItem], Boolean]
+    val actions = new FileListActionsTest(api)
+    val parent = "parent-dir"
+    val items = List(
+      FileListItem("dir 1", isDir = true),
+      FileListItem("file 2")
+    )
+    val res = FileListDir("dir1", isRoot = false, List(
+      FileListItem("dir 3", isDir = true),
+      FileListItem("file 4")
+    ))
+
+    (api.readDir(_: Option[String], _: String)).expects(Some(parent), "dir 1")
+      .returning(Future.successful(res))
+    onNextDir.expects(res.path, res.items).returning(false)
+    
+    //when
+    val resultF = actions.scanDirs(parent, items, onNextDir)
+    
+    //then
+    resultF.map { res =>
+      res shouldBe false
+    }
+  }
 }
 
 object FileListActionsSpec {

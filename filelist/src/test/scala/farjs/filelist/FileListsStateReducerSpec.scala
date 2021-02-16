@@ -271,4 +271,36 @@ class FileListsStateReducerSpec extends TestSpec {
       ))
     }
   }
+  
+  it should "update state when FileListItemsViewedAction" in {
+    //given
+    val currDir = FileListDir("/", isRoot = true, items = List(
+      FileListItem("dir 0"),
+      FileListItem("dir 1"),
+      FileListItem("file 3", size = 3)
+    ))
+    val state = {
+      val state = FileListsState()
+      state.copy(
+        left = state.left.copy(index = 1, currDir = currDir)
+      )
+    }
+
+    //when & then
+    reduce(Some(state), FileListItemsViewedAction(isRight = false, Map(
+      "dir 1" -> 123,
+      "file 1" -> 10
+    ))) shouldBe {
+      state.copy(left = FileListState(
+        currDir = currDir.copy(items = List(
+          FileListItem("dir 0"),
+          FileListItem("dir 1", size = 123),
+          FileListItem("file 3", size = 3)
+        )),
+        index = 1,
+        selectedNames = Set.empty,
+        isActive = true
+      ))
+    }
+  }
 }

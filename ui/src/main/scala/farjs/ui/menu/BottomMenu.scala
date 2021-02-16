@@ -22,7 +22,7 @@ object BottomMenu extends FunctionComponent[Unit] {
   private[ui] val items = List(
     /*  F1 */ "",
     /*  F2 */ "",
-    /*  F3 */ "",
+    /*  F3 */ "View",
     /*  F4 */ "",
     /*  F5 */ "",
     /*  F6 */ "",

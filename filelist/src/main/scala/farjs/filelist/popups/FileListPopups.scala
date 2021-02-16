@@ -20,6 +20,7 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
 
   private[popups] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
   private[popups] var makeFolderPopupComp: UiComponent[MakeFolderPopupProps] = MakeFolderPopup
+  private[popups] var viewItemsPopupComp: UiComponent[FileListPopupsProps] = ViewItemsPopup
 
   protected def render(compProps: Props): ReactElement = {
     val (folderName, setFolderName) = useState("")
@@ -116,7 +117,9 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
             props.dispatch(FileListPopupMkFolderAction(show = false))
           }
         ))()
-      ) else None
+      ) else None,
+
+      <(viewItemsPopupComp())(^.wrapped := props)()
     )
   }
 }

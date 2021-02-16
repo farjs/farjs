@@ -29,7 +29,8 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val state = FileListState(
       currDir = FileListDir("/sub-dir", isRoot = false, items = List(
         FileListItem.up,
-        FileListItem("file 1")
+        FileListItem("file 1"),
+        FileListItem("dir 1", isDir = true)
       )) 
     )
     val props = FileListProps(dispatch, actions, state, (5, 5), columns = 2)
@@ -62,6 +63,10 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     dirAction.task.future.map { _ =>
       //when & then
       check("f1", FileListPopupsActions.FileListPopupHelpAction(show = true))
+      check("f3", FileListPopupsActions.FileListPopupViewItemsAction(show = true), never = true)
+      check("f3", FileListPopupsActions.FileListPopupViewItemsAction(show = true), index = 1, never = true)
+      check("f3", FileListPopupsActions.FileListPopupViewItemsAction(show = true), index = 1, selectedNames = Set("file 1"))
+      check("f3", FileListPopupsActions.FileListPopupViewItemsAction(show = true), index = 2)
       check("f7", FileListPopupsActions.FileListPopupMkFolderAction(show = true))
       check("f8", FileListPopupsActions.FileListPopupDeleteAction(show = true), never = true)
       check("f8", FileListPopupsActions.FileListPopupDeleteAction(show = true), index = 1)

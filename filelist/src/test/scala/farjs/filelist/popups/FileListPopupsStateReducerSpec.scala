@@ -1,5 +1,6 @@
 package farjs.filelist.popups
 
+import farjs.filelist.FileListActions.FileListItemsViewedAction
 import farjs.filelist.popups.FileListPopupsActions._
 import scommons.react.test.TestSpec
 
@@ -53,6 +54,28 @@ class FileListPopupsStateReducerSpec extends TestSpec {
     //when & then
     reduce(Some(state), action) shouldBe {
       state.copy(showMkFolderPopup = true)
+    }
+  }
+  
+  it should "set showViewItemsPopup when FileListPopupViewItemsAction" in {
+    //given
+    val state = FileListPopupsState()
+    val action = FileListPopupViewItemsAction(show = true)
+    
+    //when & then
+    reduce(Some(state), action) shouldBe {
+      state.copy(showViewItemsPopup = true)
+    }
+  }
+  
+  it should "reset showViewItemsPopup when FileListItemsViewedAction" in {
+    //given
+    val state = FileListPopupsState(showViewItemsPopup = true)
+    val action = FileListItemsViewedAction(isRight = false, sizes = Map("file 1" -> 123))
+    
+    //when & then
+    reduce(Some(state), action) shouldBe {
+      state.copy(showViewItemsPopup = false)
     }
   }
 }

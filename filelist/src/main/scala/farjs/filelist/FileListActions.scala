@@ -9,6 +9,7 @@ import scommons.nodejs._
 import scommons.react.redux.task.{FutureTask, TaskAction}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.scalajs.js
 import scala.util.Success
 
@@ -79,6 +80,22 @@ trait FileListActions {
 
     FileListItemsDeleteAction(FutureTask("Deleting Items", future))
   }
+
+  def scanDirs(parent: String,
+               items: Seq[FileListItem],
+               onNextDir: (String, Seq[FileListItem]) => Boolean): Future[Boolean] = {
+
+    items.foldLeft(Future.successful(true)) { case (resF, item) =>
+      resF.flatMap {
+        case true if item.isDir =>
+          api.readDir(Some(parent), item.name).flatMap { ls =>
+            if (onNextDir(ls.path, ls.items)) scanDirs(ls.path, ls.items, onNextDir)
+            else Future.successful(false)
+          }
+        case res => Future.successful(res)
+      }
+    }
+  }
 }
 
 object FileListActions {
@@ -99,4 +116,7 @@ object FileListActions {
   
   case class FileListItemsDeleteAction(task: FutureTask[Unit]) extends TaskAction
   case class FileListItemsDeletedAction(isRight: Boolean) extends Action
+  
+  case class FileListItemsViewAction(task: FutureTask[Boolean]) extends TaskAction
+  case class FileListItemsViewedAction(isRight: Boolean, sizes: Map[String, Double]) extends Action
 }

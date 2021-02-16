@@ -23,18 +23,22 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
 
   FileListPopups.messageBoxComp = () => "MessageBox".asInstanceOf[ReactClass]
   FileListPopups.makeFolderPopupComp = () => "MakeFolderPopup".asInstanceOf[ReactClass]
+  FileListPopups.viewItemsPopupComp = () => "ViewItemsPopup".asInstanceOf[ReactClass]
 
-  it should "render empty component" in {
+  it should "render initial component" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val props = FileListPopupsProps(dispatch, actions, FileListsState())
 
     //when
-    val result = createTestRenderer(<(FileListPopups())(^.wrapped := props)())
+    val result = createTestRenderer(<(FileListPopups())(^.wrapped := props)()).root
 
     //then
-    result.root.children.toList should be (empty)
+    val List(viewItemsPopup) = result.children.toList
+    assertTestComponent(viewItemsPopup, viewItemsPopupComp) { popupProps =>
+      popupProps should be theSameInstanceAs props
+    }
   }
   
   "Help popup" should "dispatch FileListPopupHelpAction when OK action" in {
