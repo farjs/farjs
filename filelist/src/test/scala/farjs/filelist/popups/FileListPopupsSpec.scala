@@ -108,7 +108,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
 
     //then
     dispatch.expects(action)
-    onKey.expects("q", true, false, false)
+    onKey.expects("e", true, false, false)
 
     //when
     msgBox.actions.head.onAction()

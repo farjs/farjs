@@ -33,7 +33,7 @@ object FarjsApp {
       Theme.current = XTerm256Theme
     }
     
-    screen.key(js.Array("C-q"), { (_, _) =>
+    screen.key(js.Array("C-e"), { (_, _) =>
       process.exit(0)
     })
 
