@@ -31,7 +31,26 @@ class FileListPanelSpec extends TestSpec with TestRendererUtils {
     assertFileListPanel(result, props, FileListState())
   }
   
-  it should "render component with selected files" in {
+  it should "render component with selected one file" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val state = FileListState(index = 2, currDir = FileListDir("/", isRoot = true, items = List(
+      FileListItem("dir 1", isDir = true, size = 1),
+      FileListItem("dir 2", isDir = true, size = 2),
+      FileListItem("file", size = 3)
+    )), selectedNames = Set("dir 2"))
+    val props = FileListPanelProps(dispatch, actions, state)
+
+    //when
+    val result = testRender(<(FileListPanel())(^.wrapped := props)())
+
+    //then
+    assertFileListPanel(result, props, state, "file", "3", showDate = true,
+      selected = Some("2 in 1 file"), dirSize = "3 (1)")
+  }
+  
+  it should "render component with selected more than one file" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -47,7 +66,7 @@ class FileListPanelSpec extends TestSpec with TestRendererUtils {
 
     //then
     assertFileListPanel(result, props, state, "file", "3", showDate = true,
-      selected = Some("5 in 2 file(s)"), dirSize = "3 (1)")
+      selected = Some("5 in 2 files"), dirSize = "3 (1)")
   }
   
   it should "render active component with root dir and focused file" in {

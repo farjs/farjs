@@ -63,7 +63,9 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
             width = width - 2,
             text = {
               val selectedSize = selectedItems.foldLeft(0.0)((res, f) => res + f.size)
-              f"$selectedSize%,.0f in ${selectedItems.size}%d file(s)"
+              val count = selectedItems.size
+              val files = if (count == 1) "file" else "files"
+              f"$selectedSize%,.0f in $count%d $files"
             },
             style = theme.selectedItem
           ))()
