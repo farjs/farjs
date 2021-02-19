@@ -87,13 +87,13 @@ class FileListPanelSpec extends TestSpec with TestRendererUtils {
     assertFileListPanel(result, props, state, "file 2", "2", permissions = "drwxr-xr-x", showDate = true, dirSize = "6 (3)")
   }
   
-  it should "render component with root dir and focused file" in {
+  it should "render component with root dir and focused dir" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = List(
       FileListItem("file 1", size = 1),
-      FileListItem("file 2", size = 2, permissions = "drwxr-xr-x"),
+      FileListItem("dir 2", size = 999999999, isDir = true, permissions = "drwxr-xr-x"),
       FileListItem("file 3", size = 3)
     )))
     val props = FileListPanelProps(dispatch, actions, state)
@@ -102,7 +102,25 @@ class FileListPanelSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(FileListPanel())(^.wrapped := props)())
 
     //then
-    assertFileListPanel(result, props, state, "file 2", "2", permissions = "drwxr-xr-x", showDate = true, dirSize = "6 (3)")
+    assertFileListPanel(result, props, state, "dir 2", "999,999,999", permissions = "drwxr-xr-x", showDate = true, dirSize = "4 (2)")
+  }
+  
+  it should "render component with root dir and focused file of big size" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = List(
+      FileListItem("file 1", size = 1),
+      FileListItem("file 2", size = 1123456789, permissions = "drwxr-xr-x"),
+      FileListItem("file 3", size = 3)
+    )))
+    val props = FileListPanelProps(dispatch, actions, state)
+
+    //when
+    val result = testRender(<(FileListPanel())(^.wrapped := props)())
+
+    //then
+    assertFileListPanel(result, props, state, "file 2", "~1 G", permissions = "drwxr-xr-x", showDate = true, dirSize = "1,123,456,793 (3)")
   }
   
   it should "render component with sub-dir and focused dir" in {

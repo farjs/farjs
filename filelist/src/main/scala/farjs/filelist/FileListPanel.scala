@@ -85,7 +85,9 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           pos = (1 + width - 2 - 12, height - 3),
           width = 12,
           text = currItem.filter(i => i.size > 0.0 || !i.isDir).map { i =>
-            f"${i.size}%,.0f"
+            if (i.size >= 1000000000) {
+              f"~${i.size/1000000000}%,.0f G"
+            } else f"${i.size}%,.0f"
           }.getOrElse(""),
           style = theme.regularItem,
           padding = 0
