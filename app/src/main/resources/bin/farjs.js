@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
-const { FarjsApp } = require('../build/far.js')
+const versionChecker = require('../dist/versionChecker.js')
+versionChecker.check(() => {
 
-FarjsApp.start()
+  const { FarjsApp } = require('../dist/far.js')
+
+  FarjsApp.start()
+})

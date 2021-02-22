@@ -121,7 +121,8 @@ object FarjsApp extends ScalaJsModule {
           ),
           "files" -> arr(
             str("bin/farjs.js"),
-            str("build/far.js"),
+            str("dist/far.js"),
+            str("dist/versionChecker.js"),
             str("LICENSE.txt"),
             str("README.md")
           )

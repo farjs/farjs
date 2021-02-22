@@ -9,7 +9,7 @@ export default {
   input: './farjs-app-opt.js',
   output: [
     {
-      file: './build/far.js',
+      file: './dist/far.js',
       format: 'cjs',
       sourcemap: false
     }
