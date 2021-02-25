@@ -5,11 +5,12 @@ import farjs.ui.border._
 import farjs.ui.popup.MessageBox._
 import farjs.ui.theme.Theme
 import org.scalatest.{Assertion, Succeeded}
+import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
-class MessageBoxSpec extends TestSpec with TestRendererUtils {
+class MessageBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   MessageBox.popupComp = () => "Popup".asInstanceOf[ReactClass]
   MessageBox.doubleBorderComp = () => "DoubleBorder".asInstanceOf[ReactClass]
@@ -29,6 +30,8 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     
     //when
     popup.onClose()
+    
+    Succeeded
   }
   
   it should "call OK action when onPress OK button" in {
@@ -41,10 +44,18 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     val okButton = findComponents(comp, "button").head
 
     //then
-    onAction.expects()
+    var onActionCalled = false
+    onAction.expects().onCall { () =>
+      onActionCalled = true
+    }
     
     //when
     okButton.props.onPress()
+    
+    //then
+    eventually {
+      onActionCalled shouldBe true
+    }
   }
   
   it should "render component" in {
@@ -80,6 +91,8 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     
     //when
     popup.onClose()
+
+    Succeeded
   }
   
   it should "call YES action when onPress YES button" in {
@@ -94,11 +107,19 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     val yesButton = findComponents(comp, "button").head
 
     //then
-    onYesAction.expects()
+    var onYesActionCalled = false
+    onYesAction.expects().onCall { () =>
+      onYesActionCalled = true
+    }
     onNoAction.expects().never()
     
     //when
     yesButton.props.onPress()
+
+    //then
+    eventually {
+      onYesActionCalled shouldBe true
+    }
   }
   
   it should "call NO action when onPress NO button" in {
@@ -113,11 +134,19 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     val noButton = findComponents(comp, "button")(1)
 
     //then
+    var onNoActionCalled = false
+    onNoAction.expects().onCall { () =>
+      onNoActionCalled = true
+    }
     onYesAction.expects().never()
-    onNoAction.expects()
     
     //when
     noButton.props.onPress()
+
+    //then
+    eventually {
+      onNoActionCalled shouldBe true
+    }
   }
   
   it should "render component" in {
@@ -151,6 +180,8 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
 
     //when
     popup.onClose()
+
+    Succeeded
   }
 
   it should "render component" in {
@@ -170,7 +201,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
   private def assertMessageBox(result: TestInstance,
                                props: MessageBoxProps,
                                actions: List[(String, Int)],
-                               closable: Boolean = true): Unit = {
+                               closable: Boolean = true): Assertion = {
     val width = 60
     val textWidth = width - 8
     val textLines = UI.splitText(props.message, textWidth - 2) //exclude padding

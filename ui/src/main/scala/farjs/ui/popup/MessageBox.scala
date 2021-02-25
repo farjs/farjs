@@ -5,6 +5,9 @@ import farjs.ui.border._
 import scommons.react._
 import scommons.react.blessed._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
 case class MessageBoxProps(title: String,
                            message: String,
                            actions: List[MessageBoxAction],
@@ -38,7 +41,9 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
         ^.rbHeight := 1,
         ^.rbLeft := pos,
         ^.rbStyle := props.style,
-        ^.rbOnPress := onAction,
+        ^.rbOnPress := { () =>
+          Future(onAction()) //execute on the next tick
+        },
         ^.content := content
       )())
     }
