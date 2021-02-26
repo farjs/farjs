@@ -44,7 +44,12 @@ module.exports = {
   There is a new version of ${packageJson.name} available (${npmVersion}).
   You are currently using ${packageJson.name} ${packageJson.version}
   Install FAR.js globally using the package manager of your choice;
-  for example: 'npm install -g ${packageJson.name}' to get the latest version
+  for example:
+
+    npm install -g ${packageJson.name}
+
+  to get the latest version. See the changelog here:
+    https://github.com/scommons/far-js/releases
 `
         ))
       }
