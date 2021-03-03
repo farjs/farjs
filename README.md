@@ -66,6 +66,7 @@ different operations:
   (see [Key Bindings](#key-bindings) for how to re-map it to `Shift + Return`)
 * Copy current item's path into **Clipboard** - `Ctrl + C`
   (in iTerm2 only)
+* Swap the panels - `Ctrl + U`
 * View Item(s) - `F3`
   * Scans selected folder(s)/file(s) and calculates size(s)
 * Create Folder (with intermediate sub-folders) - `F7`

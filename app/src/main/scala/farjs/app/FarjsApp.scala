@@ -40,13 +40,9 @@ object FarjsApp {
     val store = Redux.createStore(FarjsStateReducer.reduce)
     val actions = FarjsActions
     
-    val fileListComp = new FileListBrowser(
-      leftPanelComp = new FileListController(actions, isRight = false).apply(),
-      rightPanelComp = new FileListController(actions, isRight = true).apply()
-    ).apply()
     val root = new FarjsRoot(
       withPortalsComp = new WithPortals(screen),
-      fileListComp = fileListComp,
+      fileListComp = new FileListController(actions).apply(),
       fileListPopups = new FileListPopupsController(actions).apply(),
       taskController = FarjsTaskController(),
       initialDevTool = if (showDevTools) DevTool.Logs else DevTool.Hidden

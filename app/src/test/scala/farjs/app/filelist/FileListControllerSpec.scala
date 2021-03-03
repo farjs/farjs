@@ -11,55 +11,30 @@ class FileListControllerSpec extends TestSpec {
   it should "return component" in {
     //given
     val actions = mock[FileListActions]
-    val controller = new FileListController(actions, isRight = false)
+    val controller = new FileListController(actions)
     
     //when & then
-    controller.uiComponent shouldBe FileListPanel
+    controller.uiComponent shouldBe FileListBrowser
   }
   
-  it should "map state(left) to props" in {
+  it should "map state to props" in {
     //given
     val actions = mock[FileListActions]
     val props = mock[Props[Unit]]
-    val controller = new FileListController(actions, isRight = false)
+    val controller = new FileListController(actions)
     val dispatch = mock[Dispatch]
-    val fileListState = mock[FileListState]
     val fileListsState = mock[FileListsStateDef]
     val state = mock[FarjsStateDef]
     (state.fileListsState _).expects().returning(fileListsState)
-    (fileListsState.left _).expects().returning(fileListState)
 
     //when
     val result = controller.mapStateToProps(dispatch, state, props)
     
     //then
-    inside(result) { case FileListPanelProps(disp, resActions, resFileListState) =>
+    inside(result) { case FileListBrowserProps(disp, resActions, data) =>
       disp shouldBe dispatch
       resActions shouldBe resActions
-      resFileListState shouldBe fileListState
-    }
-  }
-  
-  it should "map state(right) to props" in {
-    //given
-    val actions = mock[FileListActions]
-    val props = mock[Props[Unit]]
-    val controller = new FileListController(actions, isRight = true)
-    val dispatch = mock[Dispatch]
-    val fileListState = mock[FileListState]
-    val fileListsState = mock[FileListsStateDef]
-    val state = mock[FarjsStateDef]
-    (state.fileListsState _).expects().returning(fileListsState)
-    (fileListsState.right _).expects().returning(fileListState)
-
-    //when
-    val result = controller.mapStateToProps(dispatch, state, props)
-    
-    //then
-    inside(result) { case FileListPanelProps(disp, resActions, resFileListState) =>
-      disp shouldBe dispatch
-      resActions shouldBe resActions
-      resFileListState shouldBe fileListState
+      data shouldBe fileListsState
     }
   }
 }

@@ -7,15 +7,16 @@ import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.react.UiComponent
 import scommons.react.redux.BaseStateController
 
-class FileListController(actions: FileListActions, isRight: Boolean)
-  extends BaseStateController[FarjsStateDef, FileListPanelProps] {
+class FileListController(actions: FileListActions)
+  extends BaseStateController[FarjsStateDef, FileListBrowserProps] {
 
-  lazy val uiComponent: UiComponent[FileListPanelProps] = FileListPanel
+  lazy val uiComponent: UiComponent[FileListBrowserProps] = FileListBrowser
 
-  def mapStateToProps(dispatch: Dispatch, state: FarjsStateDef, props: Props[Unit]): FileListPanelProps = {
-    FileListPanelProps(dispatch, actions,
-      if (isRight) state.fileListsState.right
-      else state.fileListsState.left
+  def mapStateToProps(dispatch: Dispatch, state: FarjsStateDef, props: Props[Unit]): FileListBrowserProps = {
+    FileListBrowserProps(
+      dispatch = dispatch,
+      actions = actions,
+      data = state.fileListsState
     )
   }
 }
