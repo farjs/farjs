@@ -2,12 +2,9 @@ package farjs.filelist
 
 import farjs.filelist.FileList._
 import farjs.filelist.FileListActions._
-import farjs.filelist.FileListSpec._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.popups.FileListPopupsActions
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
-import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 import scommons.react.blessed.BlessedScreen
@@ -16,68 +13,11 @@ import scommons.react.test._
 
 import scala.concurrent.Future
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExportAll
 
 class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   FileList.fileListViewComp = () => "FileListView".asInstanceOf[ReactClass]
 
-  it should "dispatch popups actions when F1-F10 keys" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val state = FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
-        FileListItem.up,
-        FileListItem("file 1"),
-        FileListItem("dir 1", isDir = true)
-      )) 
-    )
-    val props = FileListProps(dispatch, actions, state, (5, 5), columns = 2)
-    val dirAction = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(props.state.currDir))
-    )
-    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
-    dispatch.expects(dirAction)
-
-    val renderer = createTestRenderer(<(FileList())(^.wrapped := props)())
-
-    def check(fullKey: String,
-              action: Any,
-              index: Int = 0,
-              selectedNames: Set[String] = Set.empty,
-              never: Boolean = false): Unit = {
-      //given
-      renderer.update(<(FileList())(^.wrapped := props.copy(
-        state = props.state.copy(index = index, selectedNames = selectedNames)
-      ))())
-      
-      //then
-      if (never) dispatch.expects(action).never()
-      else dispatch.expects(action)
-      
-      //when
-      findComponentProps(renderer.root, fileListViewComp).onKeypress(null, fullKey)
-    }
-
-    dirAction.task.future.map { _ =>
-      //when & then
-      check("f1", FileListPopupsActions.FileListPopupHelpAction(show = true))
-      check("f3", FileListPopupsActions.FileListPopupViewItemsAction(show = true), never = true)
-      check("f3", FileListPopupsActions.FileListPopupViewItemsAction(show = true), index = 1, never = true)
-      check("f3", FileListPopupsActions.FileListPopupViewItemsAction(show = true), index = 1, selectedNames = Set("file 1"))
-      check("f3", FileListPopupsActions.FileListPopupViewItemsAction(show = true), index = 2)
-      check("f7", FileListPopupsActions.FileListPopupMkFolderAction(show = true))
-      check("f8", FileListPopupsActions.FileListPopupDeleteAction(show = true), never = true)
-      check("f8", FileListPopupsActions.FileListPopupDeleteAction(show = true), index = 1)
-      check("delete", FileListPopupsActions.FileListPopupDeleteAction(show = true), never = true)
-      check("delete", FileListPopupsActions.FileListPopupDeleteAction(show = true), selectedNames = Set("file 1"))
-      check("f10", FileListPopupsActions.FileListPopupExitAction(show = true))
-      
-      Succeeded
-    }
-  }
-  
   it should "dispatch action only once when mount but not when update" in {
     //given
     val dispatch = mockFunction[Any, Any]
@@ -106,263 +46,6 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     renderer.unmount()
 
     action.task.future.map(_ => Succeeded)
-  }
-
-  it should "focus next element when onKeypress(tab)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("..")))
-    ), (7, 2), columns = 2)
-    val dirAction = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(props.state.currDir))
-    )
-    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
-    dispatch.expects(dirAction)
-    
-    val comp = testRender(<(FileList())(^.wrapped := props)())
-    val List(viewProps) = findProps(comp, fileListViewComp)
-    val screenMock = mock[BlessedScreenMock]    
-    
-    //then
-    (screenMock.focusNext _).expects()
-    
-    //when
-    viewProps.onKeypress(screenMock.asInstanceOf[BlessedScreen], "tab")
-    
-    dirAction.task.future.map(_ => Succeeded)
-  }
-
-  it should "focus previous element when onKeypress(S-tab)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("..")))
-    ), (7, 2), columns = 2)
-    val dirAction = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(props.state.currDir))
-    )
-    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
-    dispatch.expects(dirAction)
-    
-    val comp = testRender(<(FileList())(^.wrapped := props)())
-    val List(viewProps) = findProps(comp, fileListViewComp)
-    val screenMock = mock[BlessedScreenMock]    
-    
-    //then
-    (screenMock.focusPrevious _).expects()
-    
-    //when
-    viewProps.onKeypress(screenMock.asInstanceOf[BlessedScreen], "S-tab")
-    
-    dirAction.task.future.map(_ => Succeeded)
-  }
-
-  it should "copy parent path into clipboard when onKeypress(C-c)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("..")))
-    ), (7, 2), columns = 2)
-    val dirAction = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(props.state.currDir))
-    )
-    val screenMock = mock[BlessedScreenMock]    
-    
-    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
-    dispatch.expects(dirAction)
-    
-    //then
-    (screenMock.copyToClipboard _).expects("/sub-dir")
-    
-    val result = testRender(<(FileList())(^.wrapped := props)())
-    val List(viewProps) = findProps(result, fileListViewComp)
-    
-    //when
-    viewProps.onKeypress(screenMock.asInstanceOf[BlessedScreen], "C-c")
-    
-    dirAction.task.future.map(_ => Succeeded)
-  }
-
-  it should "copy item path into clipboard when onKeypress(C-c)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
-    ), (7, 2), columns = 2)
-    val dirAction = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(props.state.currDir))
-    )
-    val screenMock = mock[BlessedScreenMock]    
-    
-    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
-    dispatch.expects(dirAction)
-    
-    //then
-    (screenMock.copyToClipboard _).expects(path.join("/sub-dir", "item 1"))
-    
-    val result = testRender(<(FileList())(^.wrapped := props)())
-    val List(viewProps) = findProps(result, fileListViewComp)
-    
-    //when
-    viewProps.onKeypress(screenMock.asInstanceOf[BlessedScreen], "C-c")
-    
-    dirAction.task.future.map(_ => Succeeded)
-  }
-
-  it should "dispatch action when onKeypress(M-pagedown)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
-    ), (7, 2), columns = 2)
-    val dirAction = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(props.state.currDir))
-    )
-    val openAction = FileListOpenInDefaultAppAction(
-      FutureTask("Opening item", Future.successful((new js.Object, new js.Object)))
-    )
-    
-    //then
-    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
-    (actions.openInDefaultApp _).expects("/sub-dir", "item 1").returning(openAction)
-    dispatch.expects(dirAction)
-    dispatch.expects(openAction)
-    
-    val result = testRender(<(FileList())(^.wrapped := props)())
-    val List(viewProps) = findProps(result, fileListViewComp)
-    
-    //when
-    viewProps.onKeypress(null, "M-pagedown")
-    
-    dirAction.task.future.flatMap(_ => openAction.task.future).map(_ => Succeeded)
-  }
-
-  it should "dispatch action when onKeypress(enter | C-pageup | C-pagedown)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/", isRoot = true, items = List(
-        FileListItem("dir 1", isDir = true),
-        FileListItem("dir 2", isDir = true),
-        FileListItem("dir 3", isDir = true),
-        FileListItem("dir 4", isDir = true),
-        FileListItem("dir 5", isDir = true),
-        FileListItem("dir 6", isDir = true),
-        FileListItem("file 7")
-      )),
-      isActive = true
-    ), (7, 3), columns = 2)
-    val dirAction = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(props.state.currDir))
-    )
-    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
-    dispatch.expects(dirAction)
-
-    val renderer = createTestRenderer(<(FileList())(^.wrapped := props)())
-    findComponentProps(renderer.root, fileListViewComp).focusedIndex shouldBe 0
-
-    def prepare(offset: Int, index: Int, currDir: String, items: Seq[FileListItem]): Future[Assertion] = Future {
-      renderer.update(<(FileList())(^.wrapped := props.copy(state = props.state.copy(
-        offset = offset,
-        index = index,
-        currDir = FileListDir(currDir, currDir == "/", items = items)
-      )))())
-
-      Succeeded
-    }
-
-    def check(keyFull: String,
-              parent: String,
-              pressItem: String,
-              items: List[String],
-              offset: Int,
-              index: Int,
-              changed: Boolean = true
-             )(implicit pos: Position): Future[Assertion] = {
-
-      val currDirPath =
-        if (changed) {
-          if (pressItem == FileListItem.up.name) {
-            val index = parent.lastIndexOf('/')
-            parent.take(if (index > 0) index else 1)
-          }
-          else if (parent == "/") s"$parent$pressItem"
-          else s"$parent/$pressItem"
-        }
-        else parent
-      
-      val isRoot = currDirPath == "/"
-      val currDir = FileListDir(currDirPath, isRoot, items =
-        if (isRoot) props.state.currDir.items
-        else FileListItem.up +: props.state.currDir.items
-      )
-      val state = props.state.copy(offset = 0, index = offset + index, currDir = currDir)
-      val checkF =
-        if (changed) {
-          val action = FileListDirChangeAction(
-            FutureTask("Changing dir", Future.successful(currDir))
-          )
-
-          //then
-          (actions.changeDir _).expects(dispatch, state.isRight, Some(parent), pressItem).returning(action)
-          dispatch.expects(action)
-
-          action.task.future.map(_ => Succeeded)
-        }
-        else Future.successful(Succeeded)
-
-      Future {
-        //when
-        findComponentProps(renderer.root, fileListViewComp).onKeypress(null, keyFull)
-        renderer.update(<(FileList())(^.wrapped := props.copy(state = state))())
-
-        //then
-        val res = findComponentProps(renderer.root, fileListViewComp)
-        val viewItems = items.map(name => FileListItem(
-          name = name,
-          isDir = name == FileListItem.up.name || name.startsWith("dir")
-        ))
-        (res.items.toList, res.focusedIndex) shouldBe ((viewItems, index))
-      }.flatMap(_ => checkF)
-    }
-
-    val resF = Future.sequence(List(
-      //when & then
-      check("unknown", "/",    "123",         List("dir 1", "dir 2", "dir 3", "dir 4"), 0, 0, changed = false),
-
-      check("C-pageup", "/",   "..",          List("dir 1", "dir 2", "dir 3", "dir 4"), 0, 0),
-      check("C-pagedown", "/", "dir 1",       List("..", "dir 1", "dir 2", "dir 3"), 0, 0),
-      check("C-pageup", "/dir 1", "..",       List("dir 1", "dir 2", "dir 3", "dir 4"), 0, 0),
-      
-      check("enter", "/",      "dir 1",       List("..", "dir 1", "dir 2", "dir 3"), 0, 0),
-      check("enter", "/dir 1", "..",          List("dir 1", "dir 2", "dir 3", "dir 4"), 0, 0),
-      
-      prepare(3, 3, "/", props.state.currDir.items),
-      check("enter", "/",      "file 7",      List("dir 5", "dir 6", "file 7"), 4, 2, changed = false),
-      check("C-pagedown", "/", "file 7",      List("dir 5", "dir 6", "file 7"), 4, 2, changed = false),
-      check("C-pageup", "/",   "..",          List("dir 1", "dir 2", "dir 3", "dir 4"), 0, 0),
-      
-      prepare(3, 2, "/", props.state.currDir.items),
-      check("enter", "/",      "dir 6",       List("..", "dir 1", "dir 2", "dir 3"), 0, 0),
-      
-      prepare(3, 1, "/dir 6", FileListItem.up +: props.state.currDir.items),
-      check("enter", "/dir 6",       "dir 4", List("..", "dir 1", "dir 2", "dir 3"), 0, 0),
-      check("enter", "/dir 6/dir 4", "..",    List("dir 4", "dir 5", "dir 6", "file 7"), 4, 0),
-      
-      prepare(0, 0, "/dir 6", FileListItem.up +: props.state.currDir.items),
-      check("enter", "/dir 6",       "..",    List("dir 5", "dir 6", "file 7"), 4, 1)
-      
-    ))
-    dirAction.task.future.flatMap { _ =>
-      resF.map(_ => Succeeded)
-    }
   }
 
   it should "dispatch action when onActivate" in {
@@ -672,6 +355,34 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     }
   }
 
+  it should "call onKeypress when onKeypress(...)" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val onKeypress = mockFunction[BlessedScreen, String, Unit]
+    val props = FileListProps(dispatch, actions, FileListState(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("..")))
+    ), (7, 2), columns = 2, onKeypress)
+    val dirAction = FileListDirChangeAction(
+      FutureTask("Changing dir", Future.successful(props.state.currDir))
+    )
+    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
+    dispatch.expects(dirAction)
+
+    val comp = testRender(<(FileList())(^.wrapped := props)())
+    val List(viewProps) = findProps(comp, fileListViewComp)
+    val screen = js.Dynamic.literal().asInstanceOf[BlessedScreen]
+    val key = "some-key"
+
+    //then
+    onKeypress.expects(screen, key)
+
+    //when
+    viewProps.onKeypress(screen, key)
+
+    dirAction.task.future.map(_ => Succeeded)
+  }
+
   it should "render empty component" in {
     //given
     val dispatch = mockFunction[Any, Any]
@@ -741,17 +452,5 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         resFocusedIndex shouldBe focusedIndex
         resSelectedNames shouldBe selectedNames
     }
-  }
-}
-
-object FileListSpec {
-
-  @JSExportAll
-  trait BlessedScreenMock {
-
-    def focusPrevious(): Unit
-    def focusNext(): Unit
-    
-    def copyToClipboard(text: String): Boolean
   }
 }

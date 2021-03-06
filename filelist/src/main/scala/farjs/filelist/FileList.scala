@@ -2,17 +2,17 @@ package farjs.filelist
 
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.popups.FileListPopupsActions._
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
-import scommons.nodejs.path
 import scommons.react._
+import scommons.react.blessed.BlessedScreen
 import scommons.react.hooks._
 
 case class FileListProps(dispatch: Dispatch,
                          actions: FileListActions,
                          state: FileListState,
                          size: (Int, Int),
-                         columns: Int)
+                         columns: Int,
+                         onKeypress: (BlessedScreen, String) => Unit = (_, _) => ())
 
 object FileList extends FunctionComponent[FileListProps] {
 
@@ -131,55 +131,20 @@ object FileList extends FunctionComponent[FileListProps] {
       onClick = { index =>
         focusItem(viewOffset, index)
       },
-      onKeypress = {
-        case (_, k) if k == "up" || k == "S-up" => focusDx(- 1, k == "S-up")
-        case (_, k) if k == "down" || k == "S-down" => focusDx(1, k == "S-down")
-        case (_, k) if k == "left" || k == "S-left" => focusDx(-columnSize, k == "S-left")
-        case (_, k) if k == "right" || k == "S-right" => focusDx(columnSize, k == "S-right")
-        case (_, k) if k == "pageup" || k == "S-pageup" => focusDx(-viewSize + 1, k == "S-pageup")
-        case (_, k) if k == "pagedown" || k == "S-pagedown" => focusDx(viewSize - 1, k == "S-pagedown")
-        case (_, k) if k == "home" || k == "S-home" => focusItem(0, 0, k == "S-home")
-        case (_, k) if k == "end" || k == "S-end" => focusItem(maxOffset, maxIndex, k == "S-end")
-        case (screen, "tab") => screen.focusNext()
-        case (screen, "S-tab") => screen.focusPrevious()
-        case (screen, "C-c") =>
-          props.state.currentItem.foreach { item =>
-            val text =
-              if (item.name == FileListItem.up.name) props.state.currDir.path
-              else path.join(props.state.currDir.path, item.name)
-            screen.copyToClipboard(text)
-          }
-        case (_, "M-pagedown") =>
-          props.state.currentItem.foreach { item =>
-            props.dispatch(props.actions.openInDefaultApp(props.state.currDir.path, item.name))
-          }
-        case (_, k@("enter" | "C-pageup" | "C-pagedown")) =>
-          val targetDir = k match {
-            case "C-pageup" => Some(FileListItem.up)
-            case _ => props.state.currentItem.filter(_.isDir)
-          }
-          targetDir.foreach { dir =>
-            props.dispatch(props.actions.changeDir(
-              dispatch = props.dispatch,
-              isRight = props.state.isRight,
-              parent = Some(props.state.currDir.path),
-              dir = dir.name
-            ))
-          }
-        case (_, "f1") => props.dispatch(FileListPopupHelpAction(show = true))
-        case (_, "f3") =>
-          val currItem = props.state.currentItem.filter(_ != FileListItem.up)
-          if (props.state.selectedNames.nonEmpty || currItem.exists(_.isDir)) {
-            props.dispatch(FileListPopupViewItemsAction(show = true))
-          }
-        case (_, "f7") => props.dispatch(FileListPopupMkFolderAction(show = true))
-        case (_, k) if k == "f8" || k == "delete" =>
-          val currItem = props.state.currentItem.filter(_ != FileListItem.up)
-          if (props.state.selectedNames.nonEmpty || currItem.isDefined) {
-            props.dispatch(FileListPopupDeleteAction(show = true))
-          }
-        case (_, "f10") => props.dispatch(FileListPopupExitAction(show = true))
-        case _ =>
+      onKeypress = { (screen, key) =>
+        key match {
+          case k@("up" | "S-up") => focusDx(-1, k == "S-up")
+          case k@("down" | "S-down") => focusDx(1, k == "S-down")
+          case k@("left" | "S-left") => focusDx(-columnSize, k == "S-left")
+          case k@("right" | "S-right") => focusDx(columnSize, k == "S-right")
+          case k@("pageup" | "S-pageup") => focusDx(-viewSize + 1, k == "S-pageup")
+          case k@("pagedown" | "S-pagedown") => focusDx(viewSize - 1, k == "S-pagedown")
+          case k@("home" | "S-home") => focusItem(0, 0, k == "S-home")
+          case k@("end" | "S-end") => focusItem(maxOffset, maxIndex, k == "S-end")
+          case _ =>
+        }
+        
+        props.onKeypress(screen, key)
       }
     ))()
   }

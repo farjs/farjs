@@ -14,7 +14,8 @@ case class FileListPanelViewProps(dispatch: Dispatch,
                                   actions: FileListActions,
                                   state: FileListState,
                                   width: Int,
-                                  height: Int)
+                                  height: Int,
+                                  onKeypress: (BlessedScreen, String) => Unit = (_, _) => ())
 
 object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
 
@@ -47,7 +48,8 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         actions = props.actions,
         state = props.state,
         size = (width - 2, height - 5),
-        columns = 2
+        columns = 2,
+        onKeypress = props.onKeypress
       ))(),
       <(textLineComp())(^.wrapped := TextLineProps(
         align = TextLine.Center,
