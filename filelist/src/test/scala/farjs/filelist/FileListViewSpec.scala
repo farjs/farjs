@@ -144,48 +144,6 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     check(x = 8, y = 5, index = 3) // last item in col 2
   }
 
-  it should "focus next element when onKeypress(tab)" in {
-    //given
-    val props = FileListViewProps((7, 3), columns = 2, items = List(
-      FileListItem("item 1"),
-      FileListItem("item 2")
-    ))
-    val screenMock = mock[BlessedScreenMock]
-    val buttonMock = mock[BlessedElementMock]
-    val comp = testRender(<(FileListView())(^.wrapped := props)(), { el =>
-      if (el.`type` == "button".asInstanceOf[js.Any]) buttonMock.asInstanceOf[js.Any]
-      else null
-    })
-
-    //then
-    (buttonMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.focusNext _).expects()
-
-    //when
-    comp.props.onKeypress(null, literal(full = "tab"))
-  }
-
-  it should "focus previous element when onKeypress(S-tab)" in {
-    //given
-    val props = FileListViewProps((7, 3), columns = 2, items = List(
-      FileListItem("item 1"),
-      FileListItem("item 2")
-    ))
-    val screenMock = mock[BlessedScreenMock]
-    val buttonMock = mock[BlessedElementMock]
-    val comp = testRender(<(FileListView())(^.wrapped := props)(), { el =>
-      if (el.`type` == "button".asInstanceOf[js.Any]) buttonMock.asInstanceOf[js.Any]
-      else null
-    })
-
-    //then
-    (buttonMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.focusPrevious _).expects()
-
-    //when
-    comp.props.onKeypress(null, literal(full = "S-tab"))
-  }
-
   it should "call onKeypress when onKeypress(...)" in {
     //given
     val onKeypress = mockFunction[BlessedScreen, String, Unit]
@@ -193,7 +151,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
       FileListItem("item 1"),
       FileListItem("item 2")
     ), onKeypress = onKeypress)
-    val screenMock = mock[BlessedScreenMock]
+    val screen = js.Dynamic.literal().asInstanceOf[BlessedScreen]
     val buttonMock = mock[BlessedElementMock]
     val comp = testRender(<(FileListView())(^.wrapped := props)(), { el =>
       if (el.`type` == "button".asInstanceOf[js.Any]) buttonMock.asInstanceOf[js.Any]
@@ -201,10 +159,10 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     })
     val keyFull = "some-key"
 
-    (buttonMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
+    (buttonMock.screen _).expects().returning(screen)
     
     //then
-    onKeypress.expects(screenMock.asInstanceOf[BlessedScreen], keyFull)
+    onKeypress.expects(screen, keyFull)
     
     //when
     comp.props.onKeypress(null, literal(full = keyFull))
@@ -314,13 +272,6 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
 
 object FileListViewSpec {
 
-  @JSExportAll
-  trait BlessedScreenMock {
-
-    def focusPrevious(): Unit
-    def focusNext(): Unit
-  }
-  
   @JSExportAll
   trait BlessedElementMock {
 

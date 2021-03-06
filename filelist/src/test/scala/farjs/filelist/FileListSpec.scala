@@ -108,6 +108,58 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     action.task.future.map(_ => Succeeded)
   }
 
+  it should "focus next element when onKeypress(tab)" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val props = FileListProps(dispatch, actions, FileListState(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("..")))
+    ), (7, 2), columns = 2)
+    val dirAction = FileListDirChangeAction(
+      FutureTask("Changing dir", Future.successful(props.state.currDir))
+    )
+    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
+    dispatch.expects(dirAction)
+    
+    val comp = testRender(<(FileList())(^.wrapped := props)())
+    val List(viewProps) = findProps(comp, fileListViewComp)
+    val screenMock = mock[BlessedScreenMock]    
+    
+    //then
+    (screenMock.focusNext _).expects()
+    
+    //when
+    viewProps.onKeypress(screenMock.asInstanceOf[BlessedScreen], "tab")
+    
+    dirAction.task.future.map(_ => Succeeded)
+  }
+
+  it should "focus previous element when onKeypress(S-tab)" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val props = FileListProps(dispatch, actions, FileListState(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("..")))
+    ), (7, 2), columns = 2)
+    val dirAction = FileListDirChangeAction(
+      FutureTask("Changing dir", Future.successful(props.state.currDir))
+    )
+    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
+    dispatch.expects(dirAction)
+    
+    val comp = testRender(<(FileList())(^.wrapped := props)())
+    val List(viewProps) = findProps(comp, fileListViewComp)
+    val screenMock = mock[BlessedScreenMock]    
+    
+    //then
+    (screenMock.focusPrevious _).expects()
+    
+    //when
+    viewProps.onKeypress(screenMock.asInstanceOf[BlessedScreen], "S-tab")
+    
+    dirAction.task.future.map(_ => Succeeded)
+  }
+
   it should "copy parent path into clipboard when onKeypress(C-c)" in {
     //given
     val dispatch = mockFunction[Any, Any]
@@ -697,6 +749,9 @@ object FileListSpec {
   @JSExportAll
   trait BlessedScreenMock {
 
+    def focusPrevious(): Unit
+    def focusNext(): Unit
+    
     def copyToClipboard(text: String): Boolean
   }
 }

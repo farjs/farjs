@@ -140,6 +140,8 @@ object FileList extends FunctionComponent[FileListProps] {
         case (_, k) if k == "pagedown" || k == "S-pagedown" => focusDx(viewSize - 1, k == "S-pagedown")
         case (_, k) if k == "home" || k == "S-home" => focusItem(0, 0, k == "S-home")
         case (_, k) if k == "end" || k == "S-end" => focusItem(maxOffset, maxIndex, k == "S-end")
+        case (screen, "tab") => screen.focusNext()
+        case (screen, "S-tab") => screen.focusPrevious()
         case (screen, "C-c") =>
           props.state.currentItem.foreach { item =>
             val text =
