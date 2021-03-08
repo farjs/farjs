@@ -1,11 +1,13 @@
 package farjs.filelist
 
+import farjs.filelist.FileListActions.FileListParamsChangedAction
 import farjs.filelist.api.FileListItem
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.ui._
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.nodejs.path
 import scommons.react._
+import scommons.react.hooks._
 import scommons.react.blessed.BlessedScreen
 
 case class FileListPanelProps(dispatch: Dispatch,
@@ -16,9 +18,25 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
 
   private[filelist] var withSizeComp: UiComponent[WithSizeProps] = WithSize
   private[filelist] var fileListPanelView: UiComponent[FileListPanelViewProps] = FileListPanelView
+  private[filelist] var fileListQuickSearch: UiComponent[FileListQuickSearchProps] = FileListQuickSearch
 
   protected def render(compProps: Props): ReactElement = {
+    val (maybeQuickSearch, setMaybeQuickSearch) = useState(Option.empty[String])
     val props = compProps.wrapped
+
+    def quickSearch(text: String): Unit = {
+      val index = props.state.currDir.items.indexWhere(_.name.startsWith(text))
+      if (index >= 0) {
+        props.dispatch(FileListParamsChangedAction(
+          isRight = props.state.isRight,
+          offset = 0,
+          index = index,
+          selectedNames = props.state.selectedNames
+        ))
+        
+        setMaybeQuickSearch(Some(text))
+      }
+    }
 
     def onKeypress(screen: BlessedScreen, key: String): Unit = {
       key match {
@@ -61,19 +79,44 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
               dir = dir.name
             ))
           }
+        case "C-s" => setMaybeQuickSearch(Some(""))
         case _ =>
       }
+
+      maybeQuickSearch.foreach { text =>
+        if (key.length == 1) quickSearch(s"$text$key")
+        else if (key.startsWith("S-") && key.length == 3) quickSearch(s"""$text${key.drop(2).toUpperCase}""")
+        else if (key == "backspace") setMaybeQuickSearch(Some(text.take(text.length - 1)))
+        else if (key != "C-s" && key.length > 1) setMaybeQuickSearch(None)
+      }
     }
+    
+    useLayoutEffect({ () =>
+      if (!props.state.isActive) {
+        setMaybeQuickSearch(None)
+      }
+    }, List(props.state.isActive))
   
     <(withSizeComp())(^.wrapped := WithSizeProps({ (width, height) =>
-      <(fileListPanelView())(^.wrapped := FileListPanelViewProps(
-        dispatch = props.dispatch,
-        actions = props.actions,
-        state = props.state,
-        width = width,
-        height = height,
-        onKeypress = onKeypress
-      ))()
+      <.>()(
+        <(fileListPanelView())(^.wrapped := FileListPanelViewProps(
+          dispatch = props.dispatch,
+          actions = props.actions,
+          state = props.state,
+          width = width,
+          height = height,
+          onKeypress = onKeypress
+        ))(),
+  
+        maybeQuickSearch.map { text =>
+          <(fileListQuickSearch())(^.wrapped := FileListQuickSearchProps(
+            text = text,
+            onClose = { () =>
+              setMaybeQuickSearch(None)
+            }
+          ))()
+        }
+      )
     }))()
   }
 }

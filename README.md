@@ -67,6 +67,7 @@ different operations:
 * Copy current item's path into **Clipboard** - `Ctrl + C`
   (in iTerm2 only)
 * Swap the panels - `Ctrl + U`
+* Show Quick Search box - `Ctrl + S`
 * View Item(s) - `F3`
   * Scans selected folder(s)/file(s) and calculates size(s)
 * Create Folder (with intermediate sub-folders) - `F7`
