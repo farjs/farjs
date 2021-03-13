@@ -16,7 +16,13 @@ object Blessed extends js.Object {
 }
 
 @js.native
-trait BlessedProgram extends EventEmitter {
+trait BlessedEventEmitter extends EventEmitter {
+
+  def off(eventName: String, listener: js.Function): BlessedEventEmitter = js.native
+}
+
+@js.native
+trait BlessedProgram extends BlessedEventEmitter {
   
   def showCursor(): Unit = js.native
   def hideCursor(): Unit = js.native
@@ -25,7 +31,7 @@ trait BlessedProgram extends EventEmitter {
 }
 
 @js.native
-trait BlessedScreen extends js.Object {
+trait BlessedScreen extends BlessedEventEmitter {
   
   val program: BlessedProgram = js.native
   val terminal: TerminalName = js.native
@@ -53,7 +59,7 @@ trait BlessedCursor extends js.Object {
 }
 
 @js.native
-trait BlessedElement extends js.Object {
+trait BlessedElement extends BlessedEventEmitter {
   
   val width: Int = js.native  //Calculated width
   val height: Int = js.native //Calculated height

@@ -7,6 +7,7 @@ import scala.scalajs.js
 
 package object blessed {
 
+  type BlessedEventEmitter = blessed.raw.BlessedEventEmitter
   type BlessedScreenConfig = blessed.raw.BlessedScreenConfig
   type BlessedScreen = blessed.raw.BlessedScreen
   type BlessedElement = blessed.raw.BlessedElement

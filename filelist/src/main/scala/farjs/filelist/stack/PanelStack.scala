@@ -39,7 +39,7 @@ object PanelStack extends FunctionComponent[PanelStackProps] {
   
   type StackItem = (ReactClass, js.Any)
 
-  private[stack] val Context = ReactContext[PanelStackProps](defaultValue = null)
+  val Context: ReactContext[PanelStackProps] = ReactContext[PanelStackProps](defaultValue = null)
 
   def usePanelStack: PanelStackProps = {
     val ctx = useContext(Context)

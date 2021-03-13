@@ -1,11 +1,13 @@
 package farjs.app.filelist
 
 import farjs.filelist._
+import farjs.filelist.stack.PanelStack.StackItem
+import farjs.filelist.stack._
 import farjs.ui.menu.BottomMenu
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.react._
-import scommons.react.hooks._
 import scommons.react.blessed._
+import scommons.react.hooks._
 
 import scala.scalajs.js
 
@@ -19,12 +21,26 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
   private[filelist] var bottomMenuComp: UiComponent[Unit] = BottomMenu
 
   protected def render(compProps: Props): ReactElement = {
-    val elementRef = useRef[BlessedElement](null)
+    val leftButtonRef = useRef[BlessedElement](null)
+    val rightButtonRef = useRef[BlessedElement](null)
+    val leftStackRef = useRef[PanelStack](null)
+    val rightStackRef = useRef[PanelStack](null)
+    val propsRef = useRef[FileListBrowserProps](null)
     val (isRight, setIsRight) = useStateUpdater(false)
-    val props = compProps.wrapped
+    
+    val (leftStackData, setLeftStackData) = useStateUpdater(List.empty[StackItem])
+    val (rightStackData, setRightStackData) = useStateUpdater(List.empty[StackItem])
+    leftStackRef.current = new PanelStack(leftStackData.headOption, setLeftStackData)
+    rightStackRef.current = new PanelStack(rightStackData.headOption, setRightStackData)
 
     useLayoutEffect({ () =>
-      val screen = elementRef.current.screen
+      val element = 
+        if (propsRef.current.data.activeList.isRight) rightButtonRef.current
+        else leftButtonRef.current
+      
+      element.focus()
+      
+      val screen = element.screen
       screen.key(js.Array("C-u"), { (_, _) =>
         setIsRight(!_)
         screen.focusNext()
@@ -32,31 +48,41 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       ()
     }, Nil)
 
-    <.>()(
-      <.box(
+    val props = compProps.wrapped
+    propsRef.current = props
+    
+    <(WithPanelStacks())(^.wrapped := WithPanelStacksProps(leftStackRef.current, rightStackRef.current))(
+      <.button(
+        ^("isRight") := false,
+        ^.reactRef := leftButtonRef,
+        ^.rbMouse := true,
         ^.rbWidth := "50%",
         ^.rbHeight := "100%-1"
       )(
-        <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions,
-          if (isRight) props.data.right
-          else props.data.left
-        ))()
+        <(PanelStack())(^.wrapped := PanelStackProps(isRight, leftButtonRef.current))(
+          <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions,
+            if (isRight) props.data.right
+            else props.data.left
+          ))()
+        )
       ),
-      <.box(
+      <.button(
+        ^("isRight") := true,
+        ^.reactRef := rightButtonRef,
+        ^.rbMouse := true,
         ^.rbWidth := "50%",
         ^.rbHeight := "100%-1",
         ^.rbLeft := "50%"
       )(
-        <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions,
-          if (!isRight) props.data.right
-          else props.data.left
-        ))()
+        <(PanelStack())(^.wrapped := PanelStackProps(!isRight, rightButtonRef.current))(
+          <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions,
+            if (!isRight) props.data.right
+            else props.data.left
+          ))()
+        )
       ),
 
-      <.box(
-        ^.reactRef := elementRef,
-        ^.rbTop := "100%-1"
-      )(
+      <.box(^.rbTop := "100%-1")(
         <(bottomMenuComp())()()
       )
     )
