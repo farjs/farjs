@@ -111,11 +111,6 @@ object FileList extends FunctionComponent[FileListProps] {
       items = viewItems,
       focusedIndex = if (props.state.isActive) focusedIndex else -1,
       selectedNames = props.state.selectedNames,
-      onActivate = { () =>
-        if (!props.state.isActive) {
-          props.dispatch(FileListActivateAction(props.state.isRight))
-        }
-      },
       onWheel = { up =>
         if (props.state.isActive) {
           if (up) {

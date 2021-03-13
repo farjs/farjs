@@ -1,5 +1,6 @@
 package farjs.app.filelist
 
+import farjs.filelist.FileListActions.FileListActivateAction
 import farjs.filelist._
 import farjs.filelist.stack.PanelStack.StackItem
 import farjs.filelist.stack._
@@ -51,19 +52,37 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     val props = compProps.wrapped
     propsRef.current = props
     
+    def getState(isRight: Boolean): FileListState = {
+      if (isRight) props.data.right
+      else props.data.left
+    }
+    
+    def onActivate(isRight: Boolean): js.Function0[Unit] = { () =>
+      val state = getState(isRight)
+      if (!state.isActive) {
+        props.dispatch(FileListActivateAction(state.isRight))
+      }
+    }
+    
+    val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (_, key) =>
+      val keyFull = key.full
+      if (keyFull == "tab" || keyFull == "S-tab") {
+        leftButtonRef.current.screen.focusNext()
+      }
+    }
+    
     <(WithPanelStacks())(^.wrapped := WithPanelStacksProps(leftStackRef.current, rightStackRef.current))(
       <.button(
         ^("isRight") := false,
         ^.reactRef := leftButtonRef,
         ^.rbMouse := true,
         ^.rbWidth := "50%",
-        ^.rbHeight := "100%-1"
+        ^.rbHeight := "100%-1",
+        ^.rbOnFocus := onActivate(isRight),
+        ^.rbOnKeypress := onKeypress
       )(
         <(PanelStack())(^.wrapped := PanelStackProps(isRight, leftButtonRef.current))(
-          <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions,
-            if (isRight) props.data.right
-            else props.data.left
-          ))()
+          <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions, getState(isRight)))()
         )
       ),
       <.button(
@@ -72,13 +91,12 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         ^.rbMouse := true,
         ^.rbWidth := "50%",
         ^.rbHeight := "100%-1",
-        ^.rbLeft := "50%"
+        ^.rbLeft := "50%",
+        ^.rbOnFocus := onActivate(!isRight),
+        ^.rbOnKeypress := onKeypress
       )(
         <(PanelStack())(^.wrapped := PanelStackProps(!isRight, rightButtonRef.current))(
-          <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions,
-            if (!isRight) props.data.right
-            else props.data.left
-          ))()
+          <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions, getState(!isRight)))()
         )
       ),
 

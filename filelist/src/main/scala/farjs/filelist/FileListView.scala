@@ -15,7 +15,6 @@ case class FileListViewProps(size: (Int, Int),
                              items: Seq[FileListItem],
                              focusedIndex: Int = -1,
                              selectedNames: Set[String] = Set.empty,
-                             onActivate: () => Unit = () => (),
                              onWheel: Boolean => Unit = _ => (),
                              onClick: Int => Unit = _ => (),
                              onKeypress: (BlessedScreen, String) => Unit = (_, _) => ())
@@ -56,9 +55,6 @@ object FileListView extends FunctionComponent[FileListViewProps] {
         val keyListener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
           propsRef.current.onKeypress(inputEl.screen, key.full)
         }
-        val focusListener: js.Function0[Unit] = { () =>
-          propsRef.current.onActivate()
-        }
         val wheelupListener: js.Function1[MouseData, Unit] = { data =>
           if (!data.shift) {
             propsRef.current.onWheel(true)
@@ -83,14 +79,12 @@ object FileListView extends FunctionComponent[FileListViewProps] {
         }
 
         inputEl.on("keypress", keyListener)
-        inputEl.on("focus", focusListener)
         inputEl.on("wheelup", wheelupListener)
         inputEl.on("wheeldown", wheeldownListener)
         inputEl.on("click", clickListener)
 
         val cleanup: js.Function0[Unit] = { () =>
           inputEl.off("keypress", keyListener)
-          inputEl.off("focus", focusListener)
           inputEl.off("wheelup", wheelupListener)
           inputEl.off("wheeldown", wheeldownListener)
           inputEl.off("click", clickListener)

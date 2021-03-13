@@ -48,55 +48,6 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     action.task.future.map(_ => Succeeded)
   }
 
-  it should "dispatch action when onActivate" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/", isRoot = true, items = List(
-        FileListItem("item 1"),
-        FileListItem("item 2")
-      ))
-    ), (7, 3), columns = 2)
-    val dirAction = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(props.state.currDir))
-    )
-    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
-    dispatch.expects(dirAction)
-
-    val renderer = createTestRenderer(<(FileList())(^.wrapped := props)())
-    findComponentProps(renderer.root, fileListViewComp).focusedIndex shouldBe -1
-
-    def check(active: Boolean, changed: Boolean = true)(implicit pos: Position): Assertion = {
-      val state = props.state.copy(isActive = active)
-      if (changed) {
-        //then
-        dispatch.expects(FileListActivateAction(isRight = state.isRight))
-      }
-      
-      //when
-      findComponentProps(renderer.root, fileListViewComp).onActivate()
-      renderer.update(<(FileList())(^.wrapped := props.copy(state = state))())
-
-      //then
-      val res = findComponentProps(renderer.root, fileListViewComp)
-      res.focusedIndex shouldBe {
-        if (active) 0
-        else -1
-      }
-    }
-
-    dirAction.task.future.map { _ =>
-      //when & then
-      check(active = true)
-      check(active = true, changed = false)
-
-      //when & then
-      check(active = false)
-      check(active = false, changed = false)
-    }
-  }
-
   it should "focus item when onWheel and active" in {
     //given
     val dispatch = mockFunction[Any, Any]
@@ -445,7 +396,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
                              selectedNames: Set[Int]): Assertion = {
     
     assertTestComponent(result, fileListViewComp) {
-      case FileListViewProps(resSize, columns, items, resFocusedIndex, resSelectedNames, _, _, _, _) =>
+      case FileListViewProps(resSize, columns, items, resFocusedIndex, resSelectedNames, _, _, _) =>
         resSize shouldBe props.size
         columns shouldBe props.columns
         items shouldBe viewItems

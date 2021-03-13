@@ -76,42 +76,6 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     Succeeded
   }
 
-  it should "focus next element when onKeypress(tab)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListPanelProps(dispatch, actions, FileListState())
-    val comp = testRender(<(FileListPanel())(^.wrapped := props)())
-    val viewProps = getRenderedComp(comp, fileListPanelView)
-    val screenMock = mock[BlessedScreenMock]
-
-    //then
-    (screenMock.focusNext _).expects()
-
-    //when
-    viewProps.onKeypress(screenMock.asInstanceOf[BlessedScreen], "tab")
-
-    Succeeded
-  }
-
-  it should "focus previous element when onKeypress(S-tab)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListPanelProps(dispatch, actions, FileListState())
-    val comp = testRender(<(FileListPanel())(^.wrapped := props)())
-    val viewProps = getRenderedComp(comp, fileListPanelView)
-    val screenMock = mock[BlessedScreenMock]
-
-    //then
-    (screenMock.focusPrevious _).expects()
-
-    //when
-    viewProps.onKeypress(screenMock.asInstanceOf[BlessedScreen], "S-tab")
-
-    Succeeded
-  }
-
   it should "copy parent path into clipboard when onKeypress(C-c)" in {
     //given
     val dispatch = mockFunction[Any, Any]
@@ -441,9 +405,6 @@ object FileListPanelSpec {
 
   @JSExportAll
   trait BlessedScreenMock {
-
-    def focusPrevious(): Unit
-    def focusNext(): Unit
 
     def copyToClipboard(text: String): Boolean
   }

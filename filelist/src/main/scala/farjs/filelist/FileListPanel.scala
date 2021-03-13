@@ -53,8 +53,6 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
             props.dispatch(FileListPopupDeleteAction(show = true))
           }
         case "f10" => props.dispatch(FileListPopupExitAction(show = true))
-        case "tab" => screen.focusNext()
-        case "S-tab" => screen.focusPrevious()
         case "C-c" =>
           props.state.currentItem.foreach { item =>
             val text =

@@ -19,43 +19,6 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
   FileListView.verticalLineComp = () => "VerticalLine".asInstanceOf[ReactClass]
   FileListView.fileListColumnComp = () => "FileListColumn".asInstanceOf[ReactClass]
 
-  it should "call onActivate when onFocus" in {
-    //given
-    val onActivate = mockFunction[Unit]
-    val props = FileListViewProps((7, 7), columns = 2, items = List(
-      FileListItem("item 1"),
-      FileListItem("item 2")
-    ), onActivate = onActivate)
-    val inputMock = mock[BlessedElementMock]
-    val input = inputMock.asInstanceOf[BlessedElement]
-
-    var focusListener: js.Function0[Unit] = null
-    (inputMock.on _).expects("focus", *).onCall { (_: String, listener: js.Function) =>
-      focusListener = listener.asInstanceOf[js.Function0[Unit]]
-      input
-    }
-    (inputMock.on _).expects("keypress", *)
-    (inputMock.on _).expects("click", *)
-    (inputMock.on _).expects("wheelup", *)
-    (inputMock.on _).expects("wheeldown", *)
-    
-    val renderer = createTestRenderer(withContext(<(FileListView())(^.wrapped := props)(), input))
-    
-    //then
-    onActivate.expects()
-    
-    //when
-    focusListener()
-
-    //cleanup
-    (inputMock.off _).expects("click", *)
-    (inputMock.off _).expects("keypress", *)
-    (inputMock.off _).expects("focus", focusListener)
-    (inputMock.off _).expects("wheelup", *)
-    (inputMock.off _).expects("wheeldown", *)
-    renderer.unmount()
-  }
-
   it should "call onWheel when onWheelup/onWheeldown" in {
     //given
     val onWheel = mockFunction[Boolean, Unit]
@@ -77,7 +40,6 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
       input
     }
     (inputMock.on _).expects("keypress", *)
-    (inputMock.on _).expects("focus", *)
     (inputMock.on _).expects("click", *)
     
     val renderer = createTestRenderer(withContext(<(FileListView())(^.wrapped := props)(), input), { el =>
@@ -107,7 +69,6 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     //cleanup
     (inputMock.off _).expects("click", *)
     (inputMock.off _).expects("keypress", *)
-    (inputMock.off _).expects("focus", *)
     (inputMock.off _).expects("wheelup", wheelupListener)
     (inputMock.off _).expects("wheeldown", wheeldownListener)
     renderer.unmount()
@@ -130,7 +91,6 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
       input
     }
     (inputMock.on _).expects("keypress", *)
-    (inputMock.on _).expects("focus", *)
     (inputMock.on _).expects("wheelup", *)
     (inputMock.on _).expects("wheeldown", *)
     
@@ -162,7 +122,6 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     //cleanup
     (inputMock.off _).expects("click", clickListener)
     (inputMock.off _).expects("keypress", *)
-    (inputMock.off _).expects("focus", *)
     (inputMock.off _).expects("wheelup", *)
     (inputMock.off _).expects("wheeldown", *)
     renderer.unmount()
@@ -185,7 +144,6 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
       keyListener = listener.asInstanceOf[js.Function2[js.Object, KeyboardKey, Unit]]
       input
     }
-    (inputMock.on _).expects("focus", *)
     (inputMock.on _).expects("wheelup", *)
     (inputMock.on _).expects("wheeldown", *)
     (inputMock.on _).expects("click", *)
@@ -201,7 +159,6 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
 
     //cleanup
     (inputMock.off _).expects("keypress", keyListener)
-    (inputMock.off _).expects("focus", *)
     (inputMock.off _).expects("wheelup", *)
     (inputMock.off _).expects("wheeldown", *)
     (inputMock.off _).expects("click", *)
