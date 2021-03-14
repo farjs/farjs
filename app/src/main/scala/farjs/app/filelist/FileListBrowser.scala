@@ -18,6 +18,7 @@ case class FileListBrowserProps(dispatch: Dispatch,
 
 object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
 
+  private[filelist] var panelStackComp: UiComponent[PanelStackProps] = PanelStack
   private[filelist] var fileListPanelComp: UiComponent[FileListPanelProps] = FileListPanel
   private[filelist] var bottomMenuComp: UiComponent[Unit] = BottomMenu
 
@@ -81,7 +82,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         ^.rbOnFocus := onActivate(isRight),
         ^.rbOnKeypress := onKeypress
       )(
-        <(PanelStack())(^.wrapped := PanelStackProps(isRight, leftButtonRef.current))(
+        <(panelStackComp())(^.wrapped := PanelStackProps(isRight, leftButtonRef.current))(
           <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions, getState(isRight)))()
         )
       ),
@@ -95,7 +96,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         ^.rbOnFocus := onActivate(!isRight),
         ^.rbOnKeypress := onKeypress
       )(
-        <(PanelStack())(^.wrapped := PanelStackProps(!isRight, rightButtonRef.current))(
+        <(panelStackComp())(^.wrapped := PanelStackProps(!isRight, rightButtonRef.current))(
           <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions, getState(!isRight)))()
         )
       ),

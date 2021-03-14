@@ -3,7 +3,6 @@ package farjs.filelist
 import farjs.filelist.FileListActions.FileListParamsChangedAction
 import farjs.filelist.api.FileListItem
 import farjs.filelist.popups.FileListPopupsActions._
-import farjs.ui._
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.nodejs.path
 import scommons.react._
@@ -16,7 +15,6 @@ case class FileListPanelProps(dispatch: Dispatch,
 
 object FileListPanel extends FunctionComponent[FileListPanelProps] {
 
-  private[filelist] var withSizeComp: UiComponent[WithSizeProps] = WithSize
   private[filelist] var fileListPanelView: UiComponent[FileListPanelViewProps] = FileListPanelView
   private[filelist] var fileListQuickSearch: UiComponent[FileListQuickSearchProps] = FileListQuickSearch
 
@@ -95,26 +93,22 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
       }
     }, List(props.state.isActive))
   
-    <(withSizeComp())(^.wrapped := WithSizeProps({ (width, height) =>
-      <.>()(
-        <(fileListPanelView())(^.wrapped := FileListPanelViewProps(
-          dispatch = props.dispatch,
-          actions = props.actions,
-          state = props.state,
-          width = width,
-          height = height,
-          onKeypress = onKeypress
-        ))(),
-  
-        maybeQuickSearch.map { text =>
-          <(fileListQuickSearch())(^.wrapped := FileListQuickSearchProps(
-            text = text,
-            onClose = { () =>
-              setMaybeQuickSearch(None)
-            }
-          ))()
-        }
-      )
-    }))()
+    <.>()(
+      <(fileListPanelView())(^.wrapped := FileListPanelViewProps(
+        dispatch = props.dispatch,
+        actions = props.actions,
+        state = props.state,
+        onKeypress = onKeypress
+      ))(),
+
+      maybeQuickSearch.map { text =>
+        <(fileListQuickSearch())(^.wrapped := FileListQuickSearchProps(
+          text = text,
+          onClose = { () =>
+            setMaybeQuickSearch(None)
+          }
+        ))()
+      }
+    )
   }
 }

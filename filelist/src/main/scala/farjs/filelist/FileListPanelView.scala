@@ -1,6 +1,7 @@
 package farjs.filelist
 
 import farjs.filelist.api.FileListItem
+import farjs.filelist.stack.PanelStack
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.theme.Theme
@@ -13,8 +14,6 @@ import scala.scalajs.js
 case class FileListPanelViewProps(dispatch: Dispatch,
                                   actions: FileListActions,
                                   state: FileListState,
-                                  width: Int,
-                                  height: Int,
                                   onKeypress: (BlessedScreen, String) => Unit = (_, _) => ())
 
 object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
@@ -26,8 +25,9 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val width = props.width
-    val height = props.height
+    val panelStack = PanelStack.usePanelStack
+    val width = panelStack.width
+    val height = panelStack.height
     val theme = Theme.current.fileList
     
     val currItem = props.state.currentItem

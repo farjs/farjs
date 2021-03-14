@@ -2,7 +2,7 @@ package farjs.filelist.stack
 
 import java.util.concurrent.atomic.AtomicReference
 
-import farjs.filelist.stack.PanelStack.StackItem
+import farjs.filelist.stack.PanelStack._
 import farjs.filelist.stack.PanelStackSpec.TestParams
 import farjs.filelist.stack.WithPanelStacksSpec.TestErrorBoundary
 import scommons.react._
@@ -12,6 +12,10 @@ import scommons.react.test._
 import scala.scalajs.js
 
 class PanelStackSpec extends TestSpec with TestRendererUtils {
+
+  PanelStack.withSizeComp = () => "WithSize".asInstanceOf[ReactClass]
+
+  private val (width, height) = (25, 15)
 
   it should "push new component when push" in {
     //given
@@ -150,18 +154,16 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     val rightStack = new PanelStack(Some(("TestComp".asInstanceOf[ReactClass], null)), null)
 
     //when
-    val result = createTestRenderer(
+    val result = renderWithSize(
       <(WithPanelStacks.Context.Provider)(^.contextValue := WithPanelStacksProps(leftStack, rightStack))(
         <(PanelStack())(^.wrapped := props)(
           <.>()("some other content")
         )
       )
-    ).root
+    )
 
     //then
-    inside(result.children.toList) { case List(top) =>
-      top.`type` shouldBe "TestComp"
-    }
+    result.`type` shouldBe "TestComp"
   }
 
   it should "render children if empty stack" in {
@@ -172,17 +174,17 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     val rightStack = new PanelStack(Some(("test comp".asInstanceOf[ReactClass], null)), null)
 
     //when
-    val result = createTestRenderer(
+    val result = renderWithSize(
       <(WithPanelStacks.Context.Provider)(^.contextValue := WithPanelStacksProps(leftStack, rightStack))(
         <(PanelStack())(^.wrapped := props)(
           <(stackComp).empty,
           <.>()("some other content")
         )
       )
-    ).root
+    )
 
     //then
-    stackCtx.get() shouldBe props
+    stackCtx.get() shouldBe props.copy(width = width, height = height)
 
     inside(result.children.toList) { case List(resCtxHook, otherContent) =>
       resCtxHook.`type` shouldBe stackComp
@@ -190,6 +192,11 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     }
   }
 
+  private def renderWithSize(element: ReactElement): TestInstance = {
+    val withSizeProps = findComponentProps(testRender(element), withSizeComp)
+    createTestRenderer(withSizeProps.render(width, height)).root
+  }
+  
   private def getStackCtxHook: (AtomicReference[PanelStackProps], ReactClass) = {
     val ref = new AtomicReference[PanelStackProps](null)
     (ref, new FunctionComponent[Unit] {

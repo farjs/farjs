@@ -15,6 +15,7 @@ import scala.scalajs.js.annotation.JSExportAll
 
 class FileListBrowserSpec extends TestSpec with TestRendererUtils {
   
+  FileListBrowser.panelStackComp = () => "PanelStack".asInstanceOf[ReactClass]
   FileListBrowser.fileListPanelComp = () => "FileListPanel".asInstanceOf[ReactClass]
   FileListBrowser.bottomMenuComp = () => "BottomMenu".asInstanceOf[ReactClass]
 
@@ -197,7 +198,7 @@ class FileListBrowserSpec extends TestSpec with TestRendererUtils {
         ^.rbWidth := "50%",
         ^.rbHeight := "100%-1"
       )(), { case List(stack) =>
-        assertTestComponent(stack, PanelStack)({ case PanelStackProps(isRight, _) =>
+        assertTestComponent(stack, panelStackComp)({ case PanelStackProps(isRight, _, _, _) =>
           isRight shouldBe false
         }, { case List(panel) =>
           assertTestComponent(panel, fileListPanelComp) {
@@ -214,7 +215,7 @@ class FileListBrowserSpec extends TestSpec with TestRendererUtils {
         ^.rbHeight := "100%-1",
         ^.rbLeft := "50%"
       )(), { case List(stack) =>
-        assertTestComponent(stack, PanelStack)({ case PanelStackProps(isRight, _) =>
+        assertTestComponent(stack, panelStackComp)({ case PanelStackProps(isRight, _, _, _) =>
           isRight shouldBe true
         }, { case List(panel) =>
           assertTestComponent(panel, fileListPanelComp) {
