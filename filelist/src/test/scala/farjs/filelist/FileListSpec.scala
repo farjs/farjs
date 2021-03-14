@@ -22,13 +22,9 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val state1 = FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
-    )
+    val state1 = FileListState()
     val props1 = FileListProps(dispatch, actions, state1, (7, 2), columns = 2)
-    val state2 = state1.copy(
-      currDir = FileListDir("/changed", isRoot = false, items = List(FileListItem("item 2")))
-    )
+    val state2 = state1.copy(isActive = true)
     val props2 = props1.copy(state = state2)
     val action = FileListDirChangeAction(
       FutureTask("Changing dir", Future.successful(state1.currDir))
@@ -62,11 +58,6 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       )),
       isActive = true
     ), (7, 3), columns = 2)
-    val dirAction = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(props.state.currDir))
-    )
-    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
-    dispatch.expects(dirAction)
 
     val renderer = createTestRenderer(<(FileList())(^.wrapped := props)())
     findComponentProps(renderer.root, fileListViewComp).focusedIndex shouldBe 0
@@ -87,21 +78,19 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       res.focusedIndex shouldBe index
     }
 
-    dirAction.task.future.map { _ =>
-      //when & then
-      check(up = false, offset = 1, index = 0)
-      check(up = false, offset = 1, index = 1)
-      check(up = false, offset = 1, index = 2)
-      check(up = false, offset = 1, index = 3)
-      check(up = false, offset = 1, index = 3, changed = false)
+    //when & then
+    check(up = false, offset = 1, index = 0)
+    check(up = false, offset = 1, index = 1)
+    check(up = false, offset = 1, index = 2)
+    check(up = false, offset = 1, index = 3)
+    check(up = false, offset = 1, index = 3, changed = false)
 
-      //when & then
-      check(up = true, offset = 0, index = 3)
-      check(up = true, offset = 0, index = 2)
-      check(up = true, offset = 0, index = 1)
-      check(up = true, offset = 0, index = 0)
-      check(up = true, offset = 0, index = 0, changed = false)
-    }
+    //when & then
+    check(up = true, offset = 0, index = 3)
+    check(up = true, offset = 0, index = 2)
+    check(up = true, offset = 0, index = 1)
+    check(up = true, offset = 0, index = 0)
+    check(up = true, offset = 0, index = 0, changed = false)
   }
 
   it should "not focus item when onWheel and not active" in {
@@ -114,11 +103,6 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         FileListItem("item 2")
       ))
     ), (7, 3), columns = 2)
-    val dirAction = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(props.state.currDir))
-    )
-    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
-    dispatch.expects(dirAction)
 
     val comp = testRender(<(FileList())(^.wrapped := props)())
     val viewProps = findComponentProps(comp, fileListViewComp)
@@ -131,7 +115,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     viewProps.onWheel(false)
     viewProps.onWheel(true)
     
-    dirAction.task.future.map(_ => Succeeded)
+    Succeeded
   }
 
   it should "focus item when onClick" in {
@@ -146,11 +130,6 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       )),
       isActive = true
     ), (7, 3), columns = 2)
-    val dirAction = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(props.state.currDir))
-    )
-    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
-    dispatch.expects(dirAction)
 
     val renderer = createTestRenderer(<(FileList())(^.wrapped := props)())
     findComponentProps(renderer.root, fileListViewComp).focusedIndex shouldBe 0
@@ -171,17 +150,16 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       res.focusedIndex shouldBe index
     }
 
-    dirAction.task.future.map { _ =>
-      //when & then
-      check(clickIndex = 0, index = 0, changed = false) // first item in col 1
-      check(clickIndex = 1, index = 1) // second item in col 1
-      check(clickIndex = 2, index = 2) // first item in col 2
-      check(clickIndex = 3, index = 2, changed = false) // last item in col 2
-    }
+    //when & then
+    check(clickIndex = 0, index = 0, changed = false) // first item in col 1
+    check(clickIndex = 1, index = 1) // second item in col 1
+    check(clickIndex = 2, index = 2) // first item in col 2
+    check(clickIndex = 3, index = 2, changed = false) // last item in col 2
   }
 
   it should "focus and select item when onKeypress" in {
     //given
+    val onKeypress = mockFunction[BlessedScreen, String, Unit]
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val items = List(
@@ -196,12 +174,8 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val rootProps = FileListProps(dispatch, actions, FileListState(
       currDir = FileListDir("/", isRoot = true, items = items),
       isActive = true
-    ), (7, 3), columns = 2)
-    val dirAction = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(rootProps.state.currDir))
-    )
-    (actions.changeDir _).expects(dispatch, rootProps.state.isRight, None, FileListDir.curr).returning(dirAction)
-    dispatch.expects(dirAction)
+    ), (7, 3), columns = 2, onKeypress = onKeypress)
+    val screen = js.Dynamic.literal().asInstanceOf[BlessedScreen]
 
     val renderer = createTestRenderer(<(FileList())(^.wrapped := rootProps)())
     findComponentProps(renderer.root, fileListViewComp).focusedIndex shouldBe 0
@@ -221,8 +195,11 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         dispatch.expects(FileListParamsChangedAction(state.isRight, offset, index, selected))
       }
       
+      //then
+      onKeypress.expects(screen, keyFull)
+
       //when
-      findComponentProps(renderer.root, fileListViewComp).onKeypress(null, keyFull)
+      findComponentProps(renderer.root, fileListViewComp).onKeypress(screen, keyFull)
       renderer.update(<(FileList())(^.wrapped := props.copy(state = state))())
 
       //then
@@ -231,107 +208,77 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       (res.items, res.focusedIndex, res.selectedNames) shouldBe ((viewItems, index, selected))
     }
 
-    dirAction.task.future.map { _ =>
-      //when & then
-      check("unknown", List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
-      
-      //when & then
-      check("S-down",  List("item 1", "item 2", "item 3", "item 4"), 0, 1, Set("item 1"))
-      check("S-down",  List("item 1", "item 2", "item 3", "item 4"), 0, 2, Set("item 1", "item 2"))
-      check("down",    List("item 1", "item 2", "item 3", "item 4"), 0, 3, Set("item 1", "item 2"))
-      check("down",    List("item 2", "item 3", "item 4", "item 5"), 1, 3, Set("item 1", "item 2"))
-      check("S-down",  List("item 3", "item 4", "item 5", "item 6"), 2, 3, Set("item 1", "item 2", "item 5"))
-      check("S-down",  List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6", "item 7"))
-      check("down",    List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6", "item 7"), changed = false)
-  
-      //when & then
-      check("S-up",    List("item 4", "item 5", "item 6", "item 7"), 3, 2, Set("item 1", "item 2", "item 5", "item 6"))
-      check("S-up",    List("item 4", "item 5", "item 6", "item 7"), 3, 1, Set("item 1", "item 2", "item 5"))
-      check("S-up",    List("item 4", "item 5", "item 6", "item 7"), 3, 0, Set("item 1", "item 2"))
-      check("up",      List("item 3", "item 4", "item 5", "item 6"), 2, 0, Set("item 1", "item 2"))
-      check("up",      List("item 2", "item 3", "item 4", "item 5"), 1, 0, Set("item 1", "item 2"))
-      check("S-up",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
-      check("up",      List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
-  
-      //when & then
-      check("S-right", List("item 1", "item 2", "item 3", "item 4"), 0, 2, Set("item 1", "item 2"))
-      check("right",   List("item 3", "item 4", "item 5", "item 6"), 2, 2, Set("item 1", "item 2"))
-      check("S-right", List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6", "item 7"))
-      check("right",   List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6", "item 7"), changed = false)
-  
-      //when & then
-      check("S-left",  List("item 4", "item 5", "item 6", "item 7"), 3, 1, Set("item 1", "item 2", "item 5"))
-      check("left",    List("item 2", "item 3", "item 4", "item 5"), 1, 1, Set("item 1", "item 2", "item 5"))
-      check("S-left",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set("item 1", "item 2", "item 3", "item 5"))
-      check("left",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set("item 1", "item 2", "item 3", "item 5"), changed = false)
-  
-      //when & then
-      check("S-pagedown", List("item 1", "item 2", "item 3", "item 4"), 0, 3, Set("item 5"))
-      check("S-pagedown", List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 4", "item 5", "item 6", "item 7"))
-      check("pagedown",   List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 4", "item 5", "item 6", "item 7"), changed = false)
-  
-      //when & then
-      check("S-pageup",List("item 4", "item 5", "item 6", "item 7"), 3, 0, Set("item 4"))
-      check("S-pageup",List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
-      check("pageup",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
-  
-      //when & then
-      check("end",     List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set.empty)
-      check("end",     List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set.empty, changed = false)
-  
-      //when & then
-      check("home",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
-      check("home",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
-      
-      //when & then
-      check("S-end",   List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 3", "item 4", "item 5", "item 6", "item 7"))
-      check("S-end",   List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 3", "item 4", "item 5", "item 6", "item 7"), changed = false)
-  
-      //when & then
-      check("S-home",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
-      check("S-home",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
-  
-      //given
-      val nonRootProps = rootProps.copy(state = rootProps.state.copy(
-        currDir = rootProps.state.currDir.copy(items = FileListItem.up +: items)
-      ))
-      renderer.update(<(FileList())(^.wrapped := nonRootProps)())
-      findComponentProps(renderer.root, fileListViewComp).focusedIndex shouldBe 0
-  
-      //when & then
-      check("S-down",  List("..", "item 1", "item 2", "item 3"), 0, 1, Set.empty, props = nonRootProps)
-      check("S-down",  List("..", "item 1", "item 2", "item 3"), 0, 2, Set("item 1"), props = nonRootProps)
-      check("up",      List("..", "item 1", "item 2", "item 3"), 0, 1, Set("item 1"), props = nonRootProps)
-      check("S-up",    List("..", "item 1", "item 2", "item 3"), 0, 0, Set.empty, props = nonRootProps)
-    }
-  }
+    //when & then
+    check("unknown", List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
+    
+    //when & then
+    check("S-down",  List("item 1", "item 2", "item 3", "item 4"), 0, 1, Set("item 1"))
+    check("S-down",  List("item 1", "item 2", "item 3", "item 4"), 0, 2, Set("item 1", "item 2"))
+    check("down",    List("item 1", "item 2", "item 3", "item 4"), 0, 3, Set("item 1", "item 2"))
+    check("down",    List("item 2", "item 3", "item 4", "item 5"), 1, 3, Set("item 1", "item 2"))
+    check("S-down",  List("item 3", "item 4", "item 5", "item 6"), 2, 3, Set("item 1", "item 2", "item 5"))
+    check("S-down",  List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6", "item 7"))
+    check("down",    List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6", "item 7"), changed = false)
 
-  it should "call onKeypress when onKeypress(...)" in {
+    //when & then
+    check("S-up",    List("item 4", "item 5", "item 6", "item 7"), 3, 2, Set("item 1", "item 2", "item 5", "item 6"))
+    check("S-up",    List("item 4", "item 5", "item 6", "item 7"), 3, 1, Set("item 1", "item 2", "item 5"))
+    check("S-up",    List("item 4", "item 5", "item 6", "item 7"), 3, 0, Set("item 1", "item 2"))
+    check("up",      List("item 3", "item 4", "item 5", "item 6"), 2, 0, Set("item 1", "item 2"))
+    check("up",      List("item 2", "item 3", "item 4", "item 5"), 1, 0, Set("item 1", "item 2"))
+    check("S-up",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
+    check("up",      List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
+
+    //when & then
+    check("S-right", List("item 1", "item 2", "item 3", "item 4"), 0, 2, Set("item 1", "item 2"))
+    check("right",   List("item 3", "item 4", "item 5", "item 6"), 2, 2, Set("item 1", "item 2"))
+    check("S-right", List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6", "item 7"))
+    check("right",   List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6", "item 7"), changed = false)
+
+    //when & then
+    check("S-left",  List("item 4", "item 5", "item 6", "item 7"), 3, 1, Set("item 1", "item 2", "item 5"))
+    check("left",    List("item 2", "item 3", "item 4", "item 5"), 1, 1, Set("item 1", "item 2", "item 5"))
+    check("S-left",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set("item 1", "item 2", "item 3", "item 5"))
+    check("left",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set("item 1", "item 2", "item 3", "item 5"), changed = false)
+
+    //when & then
+    check("S-pagedown", List("item 1", "item 2", "item 3", "item 4"), 0, 3, Set("item 5"))
+    check("S-pagedown", List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 4", "item 5", "item 6", "item 7"))
+    check("pagedown",   List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 4", "item 5", "item 6", "item 7"), changed = false)
+
+    //when & then
+    check("S-pageup",List("item 4", "item 5", "item 6", "item 7"), 3, 0, Set("item 4"))
+    check("S-pageup",List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
+    check("pageup",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
+
+    //when & then
+    check("end",     List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set.empty)
+    check("end",     List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set.empty, changed = false)
+
+    //when & then
+    check("home",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
+    check("home",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
+    
+    //when & then
+    check("S-end",   List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 3", "item 4", "item 5", "item 6", "item 7"))
+    check("S-end",   List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 3", "item 4", "item 5", "item 6", "item 7"), changed = false)
+
+    //when & then
+    check("S-home",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
+    check("S-home",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
+
     //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val onKeypress = mockFunction[BlessedScreen, String, Unit]
-    val props = FileListProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("..")))
-    ), (7, 2), columns = 2, onKeypress)
-    val dirAction = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(props.state.currDir))
-    )
-    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
-    dispatch.expects(dirAction)
+    val nonRootProps = rootProps.copy(state = rootProps.state.copy(
+      currDir = rootProps.state.currDir.copy(items = FileListItem.up +: items)
+    ))
+    renderer.update(<(FileList())(^.wrapped := nonRootProps)())
+    findComponentProps(renderer.root, fileListViewComp).focusedIndex shouldBe 0
 
-    val comp = testRender(<(FileList())(^.wrapped := props)())
-    val List(viewProps) = findProps(comp, fileListViewComp)
-    val screen = js.Dynamic.literal().asInstanceOf[BlessedScreen]
-    val key = "some-key"
-
-    //then
-    onKeypress.expects(screen, key)
-
-    //when
-    viewProps.onKeypress(screen, key)
-
-    dirAction.task.future.map(_ => Succeeded)
+    //when & then
+    check("S-down",  List("..", "item 1", "item 2", "item 3"), 0, 1, Set.empty, props = nonRootProps)
+    check("S-down",  List("..", "item 1", "item 2", "item 3"), 0, 2, Set("item 1"), props = nonRootProps)
+    check("up",      List("..", "item 1", "item 2", "item 3"), 0, 1, Set("item 1"), props = nonRootProps)
+    check("S-up",    List("..", "item 1", "item 2", "item 3"), 0, 0, Set.empty, props = nonRootProps)
   }
 
   it should "render empty component" in {
@@ -370,23 +317,16 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       )),
       isActive = true
     ), (7, 2), columns = 2)
-    val dirAction = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(props.state.currDir))
-    )
-    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
-    dispatch.expects(dirAction)
 
     //when
     val result = testRender(<(FileList())(^.wrapped := props)())
 
     //then
-    dirAction.task.future.map { _ =>
-      assertFileList(result, props,
-        viewItems = List(FileListItem("item 1"), FileListItem("item 2")),
-        focusedIndex = 0,
-        selectedNames = Set.empty
-      )
-    }
+    assertFileList(result, props,
+      viewItems = List(FileListItem("item 1"), FileListItem("item 2")),
+      focusedIndex = 0,
+      selectedNames = Set.empty
+    )
   }
   
   private def assertFileList(result: TestInstance,

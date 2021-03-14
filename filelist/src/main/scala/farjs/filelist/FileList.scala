@@ -42,12 +42,15 @@ object FileList extends FunctionComponent[FileListProps] {
     val maxIndex = math.max(viewItems.size - 1, 0)
 
     useLayoutEffect({ () =>
-      props.dispatch(props.actions.changeDir(
-        dispatch = props.dispatch,
-        isRight = props.state.isRight,
-        parent = None,
-        dir = FileListDir.curr
-      )): Unit
+      if (props.state.currDir.isEmpty) {
+        props.dispatch(props.actions.changeDir(
+          dispatch = props.dispatch,
+          isRight = props.state.isRight,
+          parent = None,
+          dir = FileListDir.curr
+        ))
+      }
+      ()
     }, Nil)
     
     def focusDx(dx: Int, select: Boolean): Unit = {
