@@ -11,12 +11,15 @@ class FileListController(actions: FileListActions)
   extends BaseStateController[FarjsStateDef, FileListBrowserProps] {
 
   lazy val uiComponent: UiComponent[FileListBrowserProps] = FileListBrowser
+  
+  private lazy val plugins: Seq[FileListPlugin] = Nil
 
   def mapStateToProps(dispatch: Dispatch, state: FarjsStateDef, props: Props[Unit]): FileListBrowserProps = {
     FileListBrowserProps(
       dispatch = dispatch,
       actions = actions,
-      data = state.fileListsState
+      data = state.fileListsState,
+      plugins = plugins
     )
   }
 }

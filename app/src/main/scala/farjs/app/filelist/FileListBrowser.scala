@@ -14,7 +14,8 @@ import scala.scalajs.js
 
 case class FileListBrowserProps(dispatch: Dispatch,
                                 actions: FileListActions,
-                                data: FileListsStateDef)
+                                data: FileListsStateDef,
+                                plugins: Seq[FileListPlugin] = Nil)
 
 object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
 
@@ -25,33 +26,21 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
   protected def render(compProps: Props): ReactElement = {
     val leftButtonRef = useRef[BlessedElement](null)
     val rightButtonRef = useRef[BlessedElement](null)
-    val leftStackRef = useRef[PanelStack](null)
-    val rightStackRef = useRef[PanelStack](null)
-    val propsRef = useRef[FileListBrowserProps](null)
     val (isRight, setIsRight) = useStateUpdater(false)
+    val props = compProps.wrapped
     
     val (leftStackData, setLeftStackData) = useStateUpdater(List.empty[StackItem])
     val (rightStackData, setRightStackData) = useStateUpdater(List.empty[StackItem])
-    leftStackRef.current = new PanelStack(leftStackData.headOption, setLeftStackData)
-    rightStackRef.current = new PanelStack(rightStackData.headOption, setRightStackData)
+    val leftStack = new PanelStack(leftStackData.headOption, setLeftStackData)
+    val rightStack = new PanelStack(rightStackData.headOption, setRightStackData)
 
     useLayoutEffect({ () =>
       val element = 
-        if (propsRef.current.data.activeList.isRight) rightButtonRef.current
+        if (props.data.activeList.isRight) rightButtonRef.current
         else leftButtonRef.current
       
       element.focus()
-      
-      val screen = element.screen
-      screen.key(js.Array("C-u"), { (_, _) =>
-        setIsRight(!_)
-        screen.focusNext()
-      })
-      ()
     }, Nil)
-
-    val props = compProps.wrapped
-    propsRef.current = props
     
     def getState(isRight: Boolean): FileListState = {
       if (isRight) props.data.right
@@ -66,13 +55,23 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     }
     
     val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (_, key) =>
+      val screen = leftButtonRef.current.screen
       val keyFull = key.full
       if (keyFull == "tab" || keyFull == "S-tab") {
-        leftButtonRef.current.screen.focusNext()
+        screen.focusNext()
+      }
+      else if (keyFull == "C-u") {
+        setIsRight(!_)
+        screen.focusNext()
+      }
+      else {
+        props.plugins.find(_.triggerKey == keyFull).foreach { plugin =>
+          plugin.onTrigger(props.data.activeList.isRight, leftStack, rightStack)
+        }
       }
     }
     
-    <(WithPanelStacks())(^.wrapped := WithPanelStacksProps(leftStackRef.current, rightStackRef.current))(
+    <(WithPanelStacks())(^.wrapped := WithPanelStacksProps(leftStack, rightStack))(
       <.button(
         ^("isRight") := false,
         ^.reactRef := leftButtonRef,
