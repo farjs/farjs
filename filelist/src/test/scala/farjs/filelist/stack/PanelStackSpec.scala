@@ -22,7 +22,7 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     val updater = mockFunction[js.Function1[List[StackItem], List[StackItem]], Unit]
     val stack = new PanelStack(None, updater)
     val comp = "new comp".asInstanceOf[ReactClass]
-    val params = js.Dynamic.literal()
+    val params = TestParams("test name")
     val data = List[StackItem](("existing comp".asInstanceOf[ReactClass], null))
     
     var result: List[StackItem] = null
@@ -42,7 +42,7 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     //given
     val updater = mockFunction[js.Function1[List[StackItem], List[StackItem]], Unit]
     val stack = new PanelStack(None, updater)
-    val params = js.Dynamic.literal()
+    val params = TestParams("test name")
     val data = List.empty[StackItem]
     
     var result: List[StackItem] = null
@@ -58,11 +58,11 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     result should be theSameInstanceAs data
   }
   
-  it should "update top component when update" in {
+  it should "update top component params when update" in {
     //given
     val updater = mockFunction[js.Function1[List[StackItem], List[StackItem]], Unit]
     val stack = new PanelStack(None, updater)
-    val params = js.Dynamic.literal()
+    val params = TestParams("test name")
     val top = "top comp".asInstanceOf[ReactClass]
     val other: StackItem = ("other comp".asInstanceOf[ReactClass], null)
     val data = List((top, null), other)
@@ -98,6 +98,19 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     
     //then
     result shouldBe List(other)
+  }
+  
+  it should "return top when peek" in {
+    //given
+    val params = TestParams(name = "test")
+    val top: StackItem = ("top comp".asInstanceOf[ReactClass], params.asInstanceOf[js.Any])
+    val stack = new PanelStack(Some(top), null)
+    
+    //when
+    val result = stack.peek
+    
+    //then
+    result shouldBe Some(top)
   }
   
   it should "return params if Some(top) when params" in {
@@ -184,7 +197,7 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     )
 
     //then
-    stackCtx.get() shouldBe props.copy(width = width, height = height)
+    stackCtx.get() shouldBe props.copy(stack = leftStack, width = width, height = height)
 
     inside(result.children.toList) { case List(resCtxHook, otherContent) =>
       resCtxHook.`type` shouldBe stackComp

@@ -8,20 +8,20 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-class PanelStack(val top: Option[StackItem],
+class PanelStack(top: Option[StackItem],
                  updater: js.Function1[js.Function1[List[StackItem], List[StackItem]], Unit]) {
 
-  def push(comp: ReactClass, params: js.Any): Unit = {
+  def push[T](comp: ReactClass, params: T): Unit = {
     updater { stack =>
-      (comp, params) :: stack
+      (comp, params.asInstanceOf[js.Any]) :: stack
     }
   }
 
-  def update(params: js.Any): Unit = {
+  def update[T](params: T): Unit = {
     updater { stack =>
       if (stack.nonEmpty) {
         val (comp, _) = stack.head
-        (comp, params) :: stack.tail
+        (comp, params.asInstanceOf[js.Any]) :: stack.tail
       }
       else stack
     }
@@ -31,10 +31,16 @@ class PanelStack(val top: Option[StackItem],
     updater(_.tail)
   }
 
+  def peek: Option[StackItem] = top
+  
   def params[T]: T = top.map(_._2).orNull.asInstanceOf[T]
 }
 
-case class PanelStackProps(isRight: Boolean, panelInput: BlessedElement, width: Int = 0, height: Int = 0)
+case class PanelStackProps(isRight: Boolean,
+                           panelInput: BlessedElement,
+                           stack: PanelStack = null,
+                           width: Int = 0,
+                           height: Int = 0)
 
 object PanelStack extends FunctionComponent[PanelStackProps] {
   
@@ -58,13 +64,14 @@ object PanelStack extends FunctionComponent[PanelStackProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val stacks = WithPanelStacks.usePanelStacks
+    val stack =
+      if (props.isRight) stacks.rightStack
+      else stacks.leftStack
 
-    val maybeTop =
-      if (props.isRight) stacks.rightStack.top
-      else stacks.leftStack.top
+    val maybeTop = stack.peek
 
     <(withSizeComp())(^.wrapped := WithSizeProps({ (width, height) =>
-      <(PanelStack.Context.Provider)(^.contextValue := props.copy(width = width, height = height))(
+      <(PanelStack.Context.Provider)(^.contextValue := props.copy(stack = stack, width = width, height = height))(
         maybeTop match {
           case None => compProps.children
           case Some((comp, _)) => <(comp)()()

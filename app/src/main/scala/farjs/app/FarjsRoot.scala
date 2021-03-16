@@ -4,7 +4,6 @@ import farjs.app.FarjsRoot._
 import farjs.app.util._
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.blessed.portal._
 import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -45,9 +44,7 @@ class FarjsRoot(withPortalsComp: UiComponent[Unit],
         }
       )(
         <(withPortalsComp())()(
-          <(portalComp())()(
-            <(fileListComp).empty
-          ),
+          <(fileListComp).empty,
           <(fileListPopups).empty,
           <(taskController).empty
         )
@@ -75,7 +72,6 @@ class FarjsRoot(withPortalsComp: UiComponent[Unit],
 
 object FarjsRoot {
 
-  private[app] var portalComp: UiComponent[Unit] = Portal
   private[app] var logControllerComp: UiComponent[LogControllerProps] = LogController
   private[app] var logPanelComp: UiComponent[LogPanelProps] = LogPanel
   private[app] var colorPanelComp: UiComponent[Unit] = ColorPanel

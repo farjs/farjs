@@ -20,7 +20,6 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   private val fileListPopups = "FileListPopups".asInstanceOf[ReactClass]
   private val taskController = "TaskController".asInstanceOf[ReactClass]
   
-  FarjsRoot.portalComp = () => "Portal".asInstanceOf[ReactClass]
   FarjsRoot.logControllerComp = () => "LogController".asInstanceOf[ReactClass]
   FarjsRoot.logPanelComp = () => "LogPanel".asInstanceOf[ReactClass]
   FarjsRoot.colorPanelComp = () => "ColorPanel".asInstanceOf[ReactClass]
@@ -87,9 +86,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     inside(result.children.toList) { case List(main, log) =>
       assertNativeComponent(main, <.box(^.rbWidth := "100%")(
         <(withPortalsComp())()(
-          <(portalComp())()(
-            <(fileListComp).empty
-          ),
+          <(fileListComp).empty,
           <(fileListPopups).empty,
           <(taskController).empty
         )
@@ -119,9 +116,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     inside(result.children.toList) { case List(main, log) =>
       assertNativeComponent(main, <.box(^.rbWidth := "70%")(
         <(withPortalsComp())()(
-          <(portalComp())()(
-            <(fileListComp).empty
-          ),
+          <(fileListComp).empty,
           <(fileListPopups).empty,
           <(taskController).empty
         )
@@ -163,9 +158,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     inside(result.children.toList) { case List(main, log) =>
       assertNativeComponent(main, <.box(^.rbWidth := "70%")(
         <(withPortalsComp())()(
-          <(portalComp())()(
-            <(fileListComp).empty
-          ),
+          <(fileListComp).empty,
           <(fileListPopups).empty,
           <(taskController).empty
         )

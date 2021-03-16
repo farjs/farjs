@@ -206,7 +206,7 @@ class FileListBrowserSpec extends TestSpec with TestRendererUtils {
         ^.rbWidth := "50%",
         ^.rbHeight := "100%-1"
       )(), { case List(stack) =>
-        assertTestComponent(stack, panelStackComp)({ case PanelStackProps(isRight, _, _, _) =>
+        assertTestComponent(stack, panelStackComp)({ case PanelStackProps(isRight, _, _, _, _) =>
           isRight shouldBe false
         }, { case List(panel) =>
           assertTestComponent(panel, fileListPanelComp) {
@@ -223,7 +223,7 @@ class FileListBrowserSpec extends TestSpec with TestRendererUtils {
         ^.rbHeight := "100%-1",
         ^.rbLeft := "50%"
       )(), { case List(stack) =>
-        assertTestComponent(stack, panelStackComp)({ case PanelStackProps(isRight, _, _, _) =>
+        assertTestComponent(stack, panelStackComp)({ case PanelStackProps(isRight, _, _, _, _) =>
           isRight shouldBe true
         }, { case List(panel) =>
           assertTestComponent(panel, fileListPanelComp) {
