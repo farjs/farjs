@@ -13,4 +13,5 @@ case class FileListItem(name: String,
 object FileListItem {
 
   val up = FileListItem("..", isDir = true)
+  val currDir = FileListItem(FileListDir.curr, isDir = true)
 }

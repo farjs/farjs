@@ -1,6 +1,6 @@
 package farjs.filelist.popups
 
-import farjs.filelist.FileListActions.{FileListItemsViewAction, FileListItemsViewedAction}
+import farjs.filelist.FileListActions.{FileListScanDirsAction, FileListItemsViewedAction}
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupViewItemsAction
@@ -129,7 +129,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     //then
     dispatch.expects(action)
     dispatch.expects(*).onCall { action: Any =>
-      inside(action) { case action: FileListItemsViewAction =>
+      inside(action) { case action: FileListScanDirsAction =>
         resultF = action.task.future
       }
     }

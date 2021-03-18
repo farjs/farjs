@@ -117,6 +117,6 @@ object FileListActions {
   case class FileListItemsDeleteAction(task: FutureTask[Unit]) extends TaskAction
   case class FileListItemsDeletedAction(isRight: Boolean) extends Action
   
-  case class FileListItemsViewAction(task: FutureTask[Boolean]) extends TaskAction
+  case class FileListScanDirsAction(task: FutureTask[Boolean]) extends TaskAction
   case class FileListItemsViewedAction(isRight: Boolean, sizes: Map[String, Double]) extends Action
 }

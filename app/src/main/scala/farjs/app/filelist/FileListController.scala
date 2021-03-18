@@ -2,6 +2,7 @@ package farjs.app.filelist
 
 import farjs.app.FarjsStateDef
 import farjs.filelist._
+import farjs.filelist.quickview.QuickViewPlugin
 import io.github.shogowada.scalajs.reactjs.React.Props
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.react.UiComponent
@@ -12,7 +13,9 @@ class FileListController(actions: FileListActions)
 
   lazy val uiComponent: UiComponent[FileListBrowserProps] = FileListBrowser
   
-  private lazy val plugins: Seq[FileListPlugin] = Nil
+  private lazy val plugins: Seq[FileListPlugin] = List(
+    new QuickViewPlugin(actions)
+  )
 
   def mapStateToProps(dispatch: Dispatch, state: FarjsStateDef, props: Props[Unit]): FileListBrowserProps = {
     FileListBrowserProps(

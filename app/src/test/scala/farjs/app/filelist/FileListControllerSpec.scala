@@ -35,7 +35,7 @@ class FileListControllerSpec extends TestSpec {
       disp shouldBe dispatch
       resActions shouldBe resActions
       data shouldBe fileListsState
-      plugins shouldBe Nil
+      plugins should not be Nil
     }
   }
 }
