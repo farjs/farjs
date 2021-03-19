@@ -2,6 +2,7 @@ package farjs.app.filelist
 
 import farjs.filelist.FileListActions.FileListActivateAction
 import farjs.filelist._
+import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
 import farjs.filelist.stack.PanelStack.StackItem
 import farjs.filelist.stack._
 import farjs.ui.menu.BottomMenu
@@ -56,18 +57,16 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     
     val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (_, key) =>
       val screen = leftButtonRef.current.screen
-      val keyFull = key.full
-      if (keyFull == "tab" || keyFull == "S-tab") {
-        screen.focusNext()
-      }
-      else if (keyFull == "C-u") {
-        setIsRight(!_)
-        screen.focusNext()
-      }
-      else {
-        props.plugins.find(_.triggerKey == keyFull).foreach { plugin =>
-          plugin.onTrigger(props.data.activeList.isRight, leftStack, rightStack)
-        }
+      key.full match {
+        case "f10" => props.dispatch(FileListPopupExitAction(show = true))
+        case "tab" | "S-tab" => screen.focusNext()
+        case "C-u" =>
+          setIsRight(!_)
+          screen.focusNext()
+        case keyFull =>
+          props.plugins.find(_.triggerKey == keyFull).foreach { plugin =>
+            plugin.onTrigger(props.data.activeList.isRight, leftStack, rightStack)
+          }
       }
     }
     

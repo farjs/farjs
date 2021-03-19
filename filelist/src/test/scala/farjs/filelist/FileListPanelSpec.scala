@@ -23,7 +23,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
   FileListPanel.fileListPanelView = () => "FileListPanelView".asInstanceOf[ReactClass]
   FileListPanel.fileListQuickSearch = () => "FileListQuickSearch".asInstanceOf[ReactClass]
 
-  it should "dispatch popups actions when F1-F10 keys" in {
+  it should "dispatch popups actions when F-keys" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -67,7 +67,6 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     check("f8", FileListPopupDeleteAction(show = true), index = 1)
     check("delete", FileListPopupDeleteAction(show = true), never = true)
     check("delete", FileListPopupDeleteAction(show = true), selectedNames = Set("file 1"))
-    check("f10", FileListPopupExitAction(show = true))
 
     Succeeded
   }

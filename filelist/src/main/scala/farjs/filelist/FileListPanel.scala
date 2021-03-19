@@ -50,7 +50,6 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           if (props.state.selectedNames.nonEmpty || currItem.isDefined) {
             props.dispatch(FileListPopupDeleteAction(show = true))
           }
-        case "f10" => props.dispatch(FileListPopupExitAction(show = true))
         case "C-c" =>
           props.state.currentItem.foreach { item =>
             val text =

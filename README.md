@@ -13,9 +13,10 @@ Good old Windows File and Archive Manager
   [react-blessed](https://github.com/Yomguithereal/react-blessed),
   [blessed](https://github.com/chjj/blessed)
 
-Cross-platform: `Mac OS`, `Linux`, `Windows`.
-
-Runs everywhere, where [Node.js](https://nodejs.org/) can run.
+Runs on [Node.js](https://nodejs.org/), thus cross-platform:
+* `Mac OS` (primary support in [iTerm2](https://iterm2.com/) terminal)
+* `Linux`
+* `Windows`
 
 ## Install
 

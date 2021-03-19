@@ -4,6 +4,7 @@ import farjs.app.filelist.FileListBrowser._
 import farjs.app.filelist.FileListBrowserSpec._
 import farjs.filelist.FileListActions.FileListActivateAction
 import farjs.filelist._
+import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
 import farjs.filelist.stack._
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.react._
@@ -72,6 +73,31 @@ class FileListBrowserSpec extends TestSpec with TestRendererUtils {
 
     //when
     rightButton.props.onFocus()
+  }
+
+  it should "dispatch FileListPopupExitAction when onKeypress(F10)" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val props = FileListBrowserProps(dispatch, actions, FileListsState())
+    val screenMock = mock[BlessedScreenMock]
+    val screen = screenMock.asInstanceOf[BlessedScreen]
+    val buttonMock = mock[BlessedElementMock]
+    (buttonMock.focus _).expects()
+
+    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
+      if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock.asInstanceOf[js.Any]
+      else null
+    })
+    val List(button, _) = findComponents(comp, <.button.name)
+    val keyFull = "f10"
+    
+    //then
+    (buttonMock.screen _).expects().returning(screen)
+    dispatch.expects(FileListPopupExitAction(show = true))
+
+    //when
+    button.props.onKeypress(null, js.Dynamic.literal(full = keyFull).asInstanceOf[KeyboardKey])
   }
 
   it should "focus next panel when onKeypress(tab|S-tab)" in {
