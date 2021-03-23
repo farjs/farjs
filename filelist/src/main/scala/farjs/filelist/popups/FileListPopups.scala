@@ -1,5 +1,6 @@
 package farjs.filelist.popups
 
+import farjs.filelist.copy.CopyItems
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.{FileListActions, FileListsStateDef}
 import farjs.ui.popup._
@@ -21,6 +22,7 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
   private[popups] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
   private[popups] var makeFolderPopupComp: UiComponent[MakeFolderPopupProps] = MakeFolderPopup
   private[popups] var viewItemsPopupComp: UiComponent[FileListPopupsProps] = ViewItemsPopup
+  private[popups] var copyItemsComp: UiComponent[FileListPopupsProps] = CopyItems
 
   protected def render(compProps: Props): ReactElement = {
     val (folderName, setFolderName) = useState("")
@@ -119,7 +121,8 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
         ))()
       ) else None,
 
-      <(viewItemsPopupComp())(^.wrapped := props)()
+      <(viewItemsPopupComp())(^.wrapped := props)(),
+      <(copyItemsComp())(^.wrapped := props)()
     )
   }
 }

@@ -9,4 +9,5 @@ object FileListPopupsActions {
   case class FileListPopupDeleteAction(show: Boolean) extends Action
   case class FileListPopupMkFolderAction(show: Boolean) extends Action
   case class FileListPopupViewItemsAction(show: Boolean) extends Action
+  case class FileListPopupCopyItemsAction(show: Boolean) extends Action
 }

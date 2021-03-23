@@ -24,6 +24,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
   FileListPopups.messageBoxComp = () => "MessageBox".asInstanceOf[ReactClass]
   FileListPopups.makeFolderPopupComp = () => "MakeFolderPopup".asInstanceOf[ReactClass]
   FileListPopups.viewItemsPopupComp = () => "ViewItemsPopup".asInstanceOf[ReactClass]
+  FileListPopups.copyItemsComp = () => "CopyItems".asInstanceOf[ReactClass]
 
   it should "render initial component" in {
     //given
@@ -35,9 +36,13 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val result = createTestRenderer(<(FileListPopups())(^.wrapped := props)()).root
 
     //then
-    val List(viewItemsPopup) = result.children.toList
-    assertTestComponent(viewItemsPopup, viewItemsPopupComp) { popupProps =>
-      popupProps should be theSameInstanceAs props
+    inside(result.children.toList) { case List(viewItems, copyItems) =>
+      assertTestComponent(viewItems, viewItemsPopupComp) { popupProps =>
+        popupProps should be theSameInstanceAs props
+      }
+      assertTestComponent(copyItems, copyItemsComp) { popupProps =>
+        popupProps should be theSameInstanceAs props
+      }
     }
   }
   
