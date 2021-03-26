@@ -23,6 +23,7 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
   private[copy] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
   private[copy] var textLineComp: UiComponent[TextLineProps] = TextLine
   private[copy] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[copy] var progressBarComp: UiComponent[ProgressBarProps] = ProgressBar
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -74,6 +75,12 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
           padding = 0
         ))(),
 
+        <(progressBarComp())(^.wrapped := ProgressBarProps(
+          percent = props.itemPercent,
+          pos = (5, 6),
+          length = width - 10,
+          style = theme
+        ))(),
         <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
           pos = (5, 7),
           length = width - 10,
@@ -85,6 +92,12 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
           pos = (5, 7),
           width = width - 10,
           text = f"Total: ${props.total}%,.0f",
+          style = theme
+        ))(),
+        <(progressBarComp())(^.wrapped := ProgressBarProps(
+          percent = props.totalPercent,
+          pos = (5, 8),
+          length = width - 10,
           style = theme
         ))(),
 

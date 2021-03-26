@@ -95,8 +95,10 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
                          label: TestInstance,
                          item: TestInstance,
                          to: TestInstance,
+                         itemPercent: TestInstance,
                          sep1: TestInstance,
                          total: TestInstance,
+                         totalPercent: TestInstance,
                          sep2: TestInstance,
                          time: TestInstance,
                          speed: TestInstance,
@@ -143,6 +145,13 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           padding shouldBe 0
       }
 
+      assertTestComponent(itemPercent, progressBarComp) {
+        case ProgressBarProps(percent, pos, resLength, resStyle) =>
+          percent shouldBe props.itemPercent
+          pos shouldBe 5 -> 6
+          resLength shouldBe (width - 10)
+          resStyle shouldBe theme
+      }
       assertTestComponent(sep1, horizontalLineComp) {
         case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
           pos shouldBe 5 -> 7
@@ -161,6 +170,13 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           resStyle shouldBe theme
           focused shouldBe false
           padding shouldBe 1
+      }
+      assertTestComponent(totalPercent, progressBarComp) {
+        case ProgressBarProps(percent, pos, resLength, resStyle) =>
+          percent shouldBe props.totalPercent
+          pos shouldBe 5 -> 8
+          resLength shouldBe (width - 10)
+          resStyle shouldBe theme
       }
 
       assertTestComponent(sep2, horizontalLineComp) {
@@ -212,8 +228,8 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           ^.rbShadow := true,
           ^.rbStyle := theme
         )(), inside(_) {
-          case List(border, label, item, to, sep1, total, sep2, time, speed, button) =>
-            assertComponents(border, label, item, to, sep1, total, sep2, time, speed, button)
+          case List(border, label, item, to, itemPercent, sep1, total, totalPercent, sep2, time, speed, button) =>
+            assertComponents(border, label, item, to, itemPercent, sep1, total, totalPercent, sep2, time, speed, button)
         }
       )
     })
