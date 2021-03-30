@@ -2,6 +2,7 @@ package farjs.ui
 
 import scommons.react._
 import scommons.react.blessed._
+import scommons.react.hooks._
 
 case class CheckBoxProps(pos: (Int, Int),
                          value: Boolean,
@@ -12,30 +13,40 @@ case class CheckBoxProps(pos: (Int, Int),
 object CheckBox extends FunctionComponent[CheckBoxProps] {
   
   protected def render(compProps: Props): ReactElement = {
+    val (focused, setFocused) = useState(false)
     val props = compProps.wrapped
     val (left, top) = props.pos
     
     <.>()(
       <.button(
         ^.rbMouse := true,
-        ^.rbWidth := 3,
+        ^.rbTags := true,
+        ^.rbWidth := 4,
         ^.rbHeight := 1,
         ^.rbLeft := left,
         ^.rbTop := top,
-        ^.rbStyle := props.style,
         ^.rbOnPress := props.onChange,
+        ^.rbOnFocus := { () =>
+          setFocused(true)
+        },
+        ^.rbOnBlur := { () =>
+          setFocused(false)
+        },
         ^.content := {
-          if (props.value) "[x]"
-          else "[ ]"
+          val style =
+            if (focused) props.style.focus.orNull
+            else props.style
+          
+          TextBox.renderText(style, if (props.value) "[x]" else "[ ]")
         }
       )(),
       
       <.text(
         ^.rbHeight := 1,
-        ^.rbLeft := left + 4,
+        ^.rbLeft := left + 3,
         ^.rbTop := top,
         ^.rbStyle := props.style,
-        ^.content := props.label
+        ^.content := s" ${props.label}"
       )()
     )
   }
