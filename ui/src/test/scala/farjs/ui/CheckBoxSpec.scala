@@ -10,7 +10,7 @@ class CheckBoxSpec extends TestSpec with TestRendererUtils {
     val onChange = mockFunction[Unit]
     val props = getCheckBoxProps(onChange = onChange)
     val comp = testRender(<(CheckBox())(^.wrapped := props)())
-    val button = findComponents(comp, "button").head
+    val button = findComponents(comp, <.button.name).head
 
     //then
     onChange.expects()
@@ -24,7 +24,7 @@ class CheckBoxSpec extends TestSpec with TestRendererUtils {
     val onChange = mockFunction[Unit]
     val props = getCheckBoxProps(onChange = onChange)
     val renderer = createTestRenderer(<(CheckBox())(^.wrapped := props)())
-    val button = findComponents(renderer.root, "button").head
+    val button = findComponents(renderer.root, <.button.name).head
     assertCheckBox(renderer.root, props, focused = false)
 
     //then
