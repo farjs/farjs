@@ -5,9 +5,6 @@ import farjs.ui.border._
 import scommons.react._
 import scommons.react.blessed._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
 case class MessageBoxProps(title: String,
                            message: String,
                            actions: List[MessageBoxAction],
@@ -18,6 +15,7 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
   private[popup] var popupComp: UiComponent[PopupProps] = Popup
   private[popup] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
   private[popup] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[popup] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -27,25 +25,8 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
     val height = 5 + textLines.size
     val onClose = props.actions.find(_.triggeredOnClose).map(_.onAction)
 
-    val buttons = props.actions.foldLeft(List.empty[(String, () => Unit, Int)]) {
-      case (result, action) =>
-        val nextPos = result match {
-          case Nil => 0
-          case (content, _, pos) :: _ => pos + content.length
-        }
-        (s" ${action.label} ", action.onAction, nextPos) :: result
-    }.reverse.map {
-      case (content, onAction, pos) => (content.length, <.button(
-        ^.key := s"$pos",
-        ^.rbMouse := true,
-        ^.rbHeight := 1,
-        ^.rbLeft := pos,
-        ^.rbStyle := props.style,
-        ^.rbOnPress := { () =>
-          Future(onAction()) //execute on the next tick
-        },
-        ^.content := content
-      )())
+    val actions = props.actions.map { action =>
+      (action.label, action.onAction)
     }
 
     <(popupComp())(^.wrapped := PopupProps(
@@ -79,15 +60,12 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
           ))()
         },
         
-        <.box(
-          ^.rbWidth := buttons.map(_._1).sum,
-          ^.rbHeight := 1,
-          ^.rbTop := height - 3,
-          ^.rbLeft := "center",
-          ^.rbStyle := props.style
-        )(
-          buttons.map(_._2)
-        )
+        <(buttonsPanelComp())(^.wrapped := ButtonsPanelProps(
+          top = height - 3,
+          actions = actions,
+          style = props.style,
+          padding = 1
+        ))()
       )
     )
   }

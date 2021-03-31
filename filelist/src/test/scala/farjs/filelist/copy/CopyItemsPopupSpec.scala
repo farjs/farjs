@@ -6,7 +6,7 @@ import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.PopupProps
 import farjs.ui.theme.Theme
-import org.scalatest.{Assertion, Succeeded}
+import org.scalatest.Assertion
 import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
@@ -18,6 +18,7 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
   CopyItemsPopup.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
   CopyItemsPopup.textBoxComp = () => "TextBox".asInstanceOf[ReactClass]
   CopyItemsPopup.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
+  CopyItemsPopup.buttonsPanelComp = () => "ButtonsPanel".asInstanceOf[ReactClass]
 
   it should "call onCancel when close popup" in {
     //given
@@ -73,14 +74,14 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = CopyItemsPopupProps("test", Seq(FileListItem("file 1")), onCopy, onCancel)
     val comp = testRender(<(CopyItemsPopup())(^.wrapped := props)())
-    val okButton = findComponents(comp, "button").head
+    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.head
 
     //then
     onCopy.expects("test")
     onCancel.expects().never()
     
     //when
-    okButton.props.onPress()
+    onPress()
   }
   
   it should "not call onCopy if path is empty" in {
@@ -89,14 +90,14 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = CopyItemsPopupProps("", Seq(FileListItem("file 1")), onCopy, onCancel)
     val comp = testRender(<(CopyItemsPopup())(^.wrapped := props)())
-    val okButton = findComponents(comp, "button").head
+    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.head
 
     //then
     onCopy.expects(*).never()
     onCancel.expects().never()
     
     //when
-    okButton.props.onPress()
+    onPress()
   }
   
   it should "call onCancel when press Cancel button" in {
@@ -105,14 +106,14 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = CopyItemsPopupProps("", Seq(FileListItem("file 1")), onCopy, onCancel)
     val comp = testRender(<(CopyItemsPopup())(^.wrapped := props)())
-    val cancelButton = findComponents(comp, "button")(1)
+    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions(1)
 
     //then
     onCopy.expects(*).never()
     onCancel.expects()
     
     //when
-    cancelButton.props.onPress()
+    onPress()
   }
   
   it should "render component" in {
@@ -123,12 +124,12 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(CopyItemsPopup())(^.wrapped := props)())
 
     //then
-    assertCopyItemsPopup(result, props, List("[ Copy ]" -> 0, "[ Cancel ]" -> 10))
+    assertCopyItemsPopup(result, props, List("[ Copy ]", "[ Cancel ]"))
   }
 
   private def assertCopyItemsPopup(result: TestInstance,
                                    props: CopyItemsPopupProps,
-                                   actions: List[(String, Int)]): Unit = {
+                                   actions: List[String]): Unit = {
     val (width, height) = (75, 8)
     val style = Theme.current.popup.regular
     val count = props.items.size
@@ -176,31 +177,14 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
           endCh shouldBe Some(DoubleBorder.rightSingleCh)
       }
       
-      val buttonsWidth = actions.map(_._1.length).sum + 2
-      assertNativeComponent(actionsBox,
-        <.box(
-          ^.rbWidth := buttonsWidth,
-          ^.rbHeight := 1,
-          ^.rbTop := height - 3,
-          ^.rbLeft := "center",
-          ^.rbStyle := style
-        )(), { buttons: List[TestInstance] =>
-          buttons.size shouldBe actions.size
-          buttons.zip(actions).foreach { case (btn, (action, pos)) =>
-            assertNativeComponent(btn,
-              <.button(
-                ^.key := s"$pos",
-                ^.rbMouse := true,
-                ^.rbHeight := 1,
-                ^.rbLeft := pos,
-                ^.rbStyle := style,
-                ^.content := action
-              )()
-            )
-          }
-          Succeeded
-        }
-      )
+      assertTestComponent(actionsBox, buttonsPanelComp) {
+        case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
+          top shouldBe (height - 3)
+          resActions.map(_._1) shouldBe actions
+          resStyle shouldBe style
+          padding shouldBe 0
+          margin shouldBe 2
+      }
     }
     
     assertTestComponent(result, popupComp)({ case PopupProps(_, resClosable, focusable, _) =>

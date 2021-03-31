@@ -21,6 +21,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
   private[copy] var textLineComp: UiComponent[TextLineProps] = TextLine
   private[copy] var textBoxComp: UiComponent[TextBoxProps] = TextBox
   private[copy] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[copy] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -39,28 +40,10 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
       }
     }
     
-    val buttons = List(
+    val actions = List(
       "[ Copy ]" -> onCopy,
       "[ Cancel ]" -> props.onCancel
-    ).foldLeft(List.empty[(String, () => Unit, Int)]) {
-      case (result, (label, action)) =>
-        val nextPos = result match {
-          case Nil => 0
-          case (content, _, pos) :: _ => pos + content.length + 2
-        }
-        (label, action, nextPos) :: result
-    }.reverse.map {
-      case (content, onAction, pos) => (content.length, <.button(
-        ^.key := s"$pos",
-        ^.rbMouse := true,
-        ^.rbWidth := content.length,
-        ^.rbHeight := 1,
-        ^.rbLeft := pos,
-        ^.rbStyle := theme,
-        ^.rbOnPress := onAction,
-        ^.content := content
-      )())
-    }
+    )
 
     <(popupComp())(^.wrapped := PopupProps(onClose = props.onCancel))(
       <.box(
@@ -105,15 +88,12 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
           endCh = Some(DoubleBorder.rightSingleCh)
         ))(),
 
-        <.box(
-          ^.rbWidth := buttons.map(_._1).sum + 2,
-          ^.rbHeight := 1,
-          ^.rbTop := height - 3,
-          ^.rbLeft := "center",
-          ^.rbStyle := theme
-        )(
-          buttons.map(_._2)
-        )
+        <(buttonsPanelComp())(^.wrapped := ButtonsPanelProps(
+          top = height - 3,
+          actions = actions,
+          style = theme,
+          margin = 2
+        ))()
       )
     )
   }

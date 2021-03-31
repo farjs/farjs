@@ -6,7 +6,7 @@ import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.PopupProps
 import farjs.ui.theme.Theme
-import org.scalatest.{Assertion, Succeeded}
+import org.scalatest.Assertion
 import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
@@ -17,6 +17,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
   FileExistsPopup.doubleBorderComp = () => "DoubleBorder".asInstanceOf[ReactClass]
   FileExistsPopup.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
   FileExistsPopup.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
+  FileExistsPopup.buttonsPanelComp = () => "ButtonsPanel".asInstanceOf[ReactClass]
 
   it should "call onAction(Overwrite) when press Overwrite button" in {
     //given
@@ -24,14 +25,14 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
     val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
-    val button = findComponents(comp, "button").head
+    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.head
 
     //then
     onAction.expects(FileExistsAction.Overwrite)
     onCancel.expects().never()
     
     //when
-    button.props.onPress()
+    onPress()
   }
   
   it should "call onAction(All) when press All button" in {
@@ -40,14 +41,14 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
     val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
-    val button = findComponents(comp, "button")(1)
+    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions(1)
 
     //then
     onAction.expects(FileExistsAction.All)
     onCancel.expects().never()
     
     //when
-    button.props.onPress()
+    onPress()
   }
   
   it should "call onAction(Skip) when press Skip button" in {
@@ -56,14 +57,14 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
     val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
-    val button = findComponents(comp, "button")(2)
+    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions(2)
 
     //then
     onAction.expects(FileExistsAction.Skip)
     onCancel.expects().never()
     
     //when
-    button.props.onPress()
+    onPress()
   }
   
   it should "call onAction(SkipAll) when press Skip all button" in {
@@ -72,14 +73,14 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
     val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
-    val button = findComponents(comp, "button")(3)
+    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions(3)
 
     //then
     onAction.expects(FileExistsAction.SkipAll)
     onCancel.expects().never()
     
     //when
-    button.props.onPress()
+    onPress()
   }
   
   it should "call onAction(Append) when press Append button" in {
@@ -88,14 +89,14 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
     val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
-    val button = findComponents(comp, "button")(4)
+    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions(4)
 
     //then
     onAction.expects(FileExistsAction.Append)
     onCancel.expects().never()
     
     //when
-    button.props.onPress()
+    onPress()
   }
   
   it should "call onCancel when close popup" in {
@@ -120,14 +121,14 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
     val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
-    val cancelButton = findComponents(comp, "button").last
+    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.last
 
     //then
     onAction.expects(*).never()
     onCancel.expects()
     
     //when
-    cancelButton.props.onPress()
+    onPress()
   }
   
   it should "render component" in {
@@ -144,18 +145,18 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
 
     //then
     assertFileExistsPopup(result, props, List(
-      " Overwrite " -> 0,
-      " All " -> 11,
-      " Skip " -> 16,
-      " Skip all " -> 22,
-      " Append " -> 32,
-      " Cancel " -> 40
+      "Overwrite",
+      "All",
+      "Skip",
+      "Skip all",
+      "Append",
+      "Cancel"
     ))
   }
 
   private def assertFileExistsPopup(result: TestInstance,
                                     props: FileExistsPopupProps,
-                                    actions: List[(String, Int)]): Unit = {
+                                    actions: List[String]): Unit = {
     val (width, height) = (58, 11)
     val theme = Theme.current.popup.error
     
@@ -246,31 +247,14 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
           endCh shouldBe Some(DoubleBorder.rightSingleCh)
       }
 
-      val buttonsWidth = actions.map(_._1.length).sum
-      assertNativeComponent(actionsBox,
-        <.box(
-          ^.rbWidth := buttonsWidth,
-          ^.rbHeight := 1,
-          ^.rbLeft := 5,
-          ^.rbTop := height - 3,
-          ^.rbStyle := theme
-        )(), { buttons: List[TestInstance] =>
-          buttons.size shouldBe actions.size
-          buttons.zip(actions).foreach { case (btn, (action, pos)) =>
-            assertNativeComponent(btn,
-              <.button(
-                ^.key := s"$pos",
-                ^.rbMouse := true,
-                ^.rbHeight := 1,
-                ^.rbLeft := pos,
-                ^.rbStyle := theme,
-                ^.content := action
-              )()
-            )
-          }
-          Succeeded
-        }
-      )
+      assertTestComponent(actionsBox, buttonsPanelComp) {
+        case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
+          top shouldBe (height - 3)
+          resActions.map(_._1) shouldBe actions
+          resStyle shouldBe theme
+          padding shouldBe 1
+          margin shouldBe 0
+      }
     }
     
     assertTestComponent(result, popupComp)({ case PopupProps(_, resClosable, focusable, _) =>

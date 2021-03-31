@@ -21,6 +21,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
   private[popups] var textBoxComp: UiComponent[TextBoxProps] = TextBox
   private[popups] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
   private[popups] var checkBoxComp: UiComponent[CheckBoxProps] = CheckBox
+  private[popups] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -35,28 +36,10 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
       }
     }
     
-    val buttons = List(
+    val actions = List(
       "[ OK ]" -> onOk,
       "[ Cancel ]" -> props.onCancel
-    ).foldLeft(List.empty[(String, () => Unit, Int)]) {
-      case (result, (label, action)) =>
-        val nextPos = result match {
-          case Nil => 0
-          case (content, _, pos) :: _ => pos + content.length + 2
-        }
-        (label, action, nextPos) :: result
-    }.reverse.map {
-      case (content, onAction, pos) => (content.length, <.button(
-        ^.key := s"$pos",
-        ^.rbMouse := true,
-        ^.rbWidth := content.length,
-        ^.rbHeight := 1,
-        ^.rbLeft := pos,
-        ^.rbStyle := theme,
-        ^.rbOnPress := onAction,
-        ^.content := content
-      )())
-    }
+    )
 
     <(popupComp())(^.wrapped := PopupProps(onClose = props.onCancel))(
       <.box(
@@ -119,15 +102,12 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           endCh = Some(DoubleBorder.rightSingleCh)
         ))(),
 
-        <.box(
-          ^.rbWidth := buttons.map(_._1).sum + 2,
-          ^.rbHeight := 1,
-          ^.rbTop := height - 3,
-          ^.rbLeft := "center",
-          ^.rbStyle := theme
-        )(
-          buttons.map(_._2)
-        )
+        <(buttonsPanelComp())(^.wrapped := ButtonsPanelProps(
+          top = height - 3,
+          actions = actions,
+          style = theme,
+          margin = 2
+        ))()
       )
     )
   }

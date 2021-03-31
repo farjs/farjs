@@ -21,6 +21,7 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
   private[copy] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
   private[copy] var textLineComp: UiComponent[TextLineProps] = TextLine
   private[copy] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[copy] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -31,32 +32,14 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
       props.onAction(action)
     }
 
-    val buttons = List(
-      " Overwrite " -> onButton(FileExistsAction.Overwrite),
-      " All " -> onButton(FileExistsAction.All),
-      " Skip " -> onButton(FileExistsAction.Skip),
-      " Skip all " -> onButton(FileExistsAction.SkipAll),
-      " Append " -> onButton(FileExistsAction.Append),
-      " Cancel " -> props.onCancel
-    ).foldLeft(List.empty[(String, () => Unit, Int)]) {
-      case (result, (label, action)) =>
-        val nextPos = result match {
-          case Nil => 0
-          case (content, _, pos) :: _ => pos + content.length
-        }
-        (label, action, nextPos) :: result
-    }.reverse.map {
-      case (content, onAction, pos) => (content.length, <.button(
-        ^.key := s"$pos",
-        ^.rbMouse := true,
-        ^.rbWidth := content.length,
-        ^.rbHeight := 1,
-        ^.rbLeft := pos,
-        ^.rbStyle := theme,
-        ^.rbOnPress := onAction,
-        ^.content := content
-      )())
-    }
+    val actions = List(
+      "Overwrite" -> onButton(FileExistsAction.Overwrite),
+      "All" -> onButton(FileExistsAction.All),
+      "Skip" -> onButton(FileExistsAction.Skip),
+      "Skip all" -> onButton(FileExistsAction.SkipAll),
+      "Append" -> onButton(FileExistsAction.Append),
+      "Cancel" -> props.onCancel
+    )
 
     <(popupComp())(^.wrapped := PopupProps(onClose = props.onCancel))(
       <.box(
@@ -139,15 +122,12 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
           endCh = Some(DoubleBorder.rightSingleCh)
         ))(),
 
-        <.box(
-          ^.rbWidth := buttons.map(_._1).sum,
-          ^.rbHeight := 1,
-          ^.rbLeft := 5,
-          ^.rbTop := height - 3,
-          ^.rbStyle := theme
-        )(
-          buttons.map(_._2)
-        )
+        <(buttonsPanelComp())(^.wrapped := ButtonsPanelProps(
+          top = height - 3,
+          actions = actions,
+          style = theme,
+          padding = 1
+        ))()
       )
     )
   }
