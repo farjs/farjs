@@ -19,6 +19,7 @@ object Button extends FunctionComponent[ButtonProps] {
     <.button(
       ^.rbMouse := true,
       ^.rbTags := true,
+      ^.rbWrap := false,
       ^.rbWidth := props.label.length,
       ^.rbHeight := 1,
       ^.rbLeft := left,

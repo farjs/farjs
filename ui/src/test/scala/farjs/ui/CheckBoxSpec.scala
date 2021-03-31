@@ -1,42 +1,26 @@
 package farjs.ui
 
+import farjs.ui.CheckBox._
+import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
 
 class CheckBoxSpec extends TestSpec with TestRendererUtils {
+
+  CheckBox.buttonComp = () => "Button".asInstanceOf[ReactClass]
 
   it should "call onChange when press button" in {
     //given
     val onChange = mockFunction[Unit]
     val props = getCheckBoxProps(onChange = onChange)
     val comp = testRender(<(CheckBox())(^.wrapped := props)())
-    val button = findComponents(comp, <.button.name).head
+    val button = findComponentProps(comp, buttonComp)
 
     //then
     onChange.expects()
 
     //when
-    button.props.onPress()
-  }
-
-  it should "change focused state when onFocus/onBlur" in {
-    //given
-    val onChange = mockFunction[Unit]
-    val props = getCheckBoxProps(onChange = onChange)
-    val renderer = createTestRenderer(<(CheckBox())(^.wrapped := props)())
-    val button = findComponents(renderer.root, <.button.name).head
-    assertCheckBox(renderer.root, props, focused = false)
-
-    //then
-    onChange.expects().never()
-
-    //when & then
-    button.props.onFocus()
-    assertCheckBox(renderer.root, props, focused = true)
-
-    //when & then
-    button.props.onBlur()
-    assertCheckBox(renderer.root, props, focused = false)
+    button.onPress()
   }
 
   it should "render checked component" in {
@@ -47,7 +31,7 @@ class CheckBoxSpec extends TestSpec with TestRendererUtils {
     val result = createTestRenderer(<(CheckBox())(^.wrapped := props)()).root
 
     //then
-    assertCheckBox(result, props, focused = false)
+    assertCheckBox(result, props)
   }
   
   it should "render un-checked component" in {
@@ -58,7 +42,7 @@ class CheckBoxSpec extends TestSpec with TestRendererUtils {
     val result = createTestRenderer(<(CheckBox())(^.wrapped := props)()).root
 
     //then
-    assertCheckBox(result, props, focused = false)
+    assertCheckBox(result, props)
   }
 
   private def getCheckBoxProps(value: Boolean = false,
@@ -78,35 +62,26 @@ class CheckBoxSpec extends TestSpec with TestRendererUtils {
     onChange = onChange
   )
 
-  private def assertCheckBox(result: TestInstance, props: CheckBoxProps, focused: Boolean): Unit = {
+  private def assertCheckBox(result: TestInstance, props: CheckBoxProps): Unit = {
     val (left, top) = props.pos
     
-    val List(button, text) = result.children.toList
-    assertNativeComponent(button,
-      <.button(
-        ^.rbMouse := true,
-        ^.rbTags := true,
-        ^.rbWidth := 4,
-        ^.rbHeight := 1,
-        ^.rbLeft := left,
-        ^.rbTop := top,
-        ^.content := {
-          val style =
-            if (focused) props.style.focus.orNull
-            else props.style
+    inside(result.children.toList) { case List(button, text) =>
+      assertTestComponent(button, buttonComp) {
+        case ButtonProps(resPos, label, resStyle, _) =>
+          resPos shouldBe props.pos
+          label shouldBe (if (props.value) "[x]" else "[ ]")
+          resStyle shouldBe props.style
+      }
 
-          TextBox.renderText(style, if (props.value) "[x]" else "[ ]")
-        }
-      )()
-    )
-    assertNativeComponent(text,
-      <.text(
-        ^.rbHeight := 1,
-        ^.rbLeft := left + 3,
-        ^.rbTop := top,
-        ^.rbStyle := props.style,
-        ^.content := s" ${props.label}"
-      )()
-    )
+      assertNativeComponent(text,
+        <.text(
+          ^.rbHeight := 1,
+          ^.rbLeft := left + 4,
+          ^.rbTop := top,
+          ^.rbStyle := props.style,
+          ^.content := props.label
+        )()
+      )
+    }
   }
 }

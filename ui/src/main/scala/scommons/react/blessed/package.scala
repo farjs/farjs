@@ -76,6 +76,7 @@ package object blessed {
     lazy val rbLeft = BlessedPositionAttributeSpec("left")
     lazy val rbMouse = BlessedBooleanAttributeSpec("mouse")
     lazy val rbTags = BlessedBooleanAttributeSpec("tags")
+    lazy val rbWrap = BlessedBooleanAttributeSpec("wrap")
     lazy val rbClickable = BlessedBooleanAttributeSpec("clickable")
     lazy val rbKeyable = BlessedBooleanAttributeSpec("keyable")
     lazy val rbAutoFocus = BlessedBooleanAttributeSpec("autoFocus")

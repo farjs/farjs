@@ -72,6 +72,7 @@ class ButtonSpec extends TestSpec with TestRendererUtils {
         <.button(
           ^.rbMouse := true,
           ^.rbTags := true,
+          ^.rbWrap := false,
           ^.rbWidth := props.label.length,
           ^.rbHeight := 1,
           ^.rbLeft := left,
