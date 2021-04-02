@@ -7,10 +7,12 @@ import scommons.react.hooks._
 
 object CopyItems extends FunctionComponent[FileListPopupsProps] {
 
+  private[copy] var copyItemsStats: UiComponent[CopyItemsStatsProps] = CopyItemsStats
   private[copy] var copyItemsPopup: UiComponent[CopyItemsPopupProps] = CopyItemsPopup
   private[copy] var copyProgressPopup: UiComponent[CopyProgressPopupProps] = CopyProgressPopup
 
   protected def render(compProps: Props): ReactElement = {
+    val (maybeTotal, setTotal) = useState[Option[Double]](None)
     val (toPath, setToPath) = useState[Option[String]](None)
     val props = compProps.wrapped
     
@@ -23,34 +25,55 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
       if (fromState.selectedItems.nonEmpty) fromState.selectedItems
       else fromState.currentItem.toList
 
+    def onCancel(dispatchAction: Boolean): () => Unit = { () =>
+      if (dispatchAction) {
+        props.dispatch(FileListPopupCopyItemsAction(show = false))
+      }
+      setTotal(None)
+      setToPath(None)
+    }
+    
     <.>()(
-      if (showPopup) Some(
-        <(copyItemsPopup())(^.wrapped := CopyItemsPopupProps(
-          path = toState.currDir.path,
-          items = items,
-          onCopy = { path =>
-            setToPath(Some(path))
-          },
-          onCancel = { () =>
-            props.dispatch(FileListPopupCopyItemsAction(show = false))
-          }
-        ))()
-      )
+      if (showPopup) Some {
+        if (maybeTotal.isEmpty) {
+          <(copyItemsStats())(^.wrapped := CopyItemsStatsProps(
+            dispatch = props.dispatch,
+            actions = props.actions,
+            state = fromState,
+            onDone = { total =>
+              setTotal(Some(total))
+            },
+            onCancel = onCancel(dispatchAction = true)
+          ))()
+        }
+        else {
+          <(copyItemsPopup())(^.wrapped := CopyItemsPopupProps(
+            path = toState.currDir.path,
+            items = items,
+            onCopy = { path =>
+              props.dispatch(FileListPopupCopyItemsAction(show = false))
+              setToPath(Some(path))
+            },
+            onCancel = onCancel(dispatchAction = true)
+          ))()
+        }
+      }
       else None,
 
-      toPath.map { to =>
+      for {
+        to <- toPath
+        total <- maybeTotal
+      } yield {
         <(copyProgressPopup())(^.wrapped := CopyProgressPopupProps(
           item = "test.file",
           to = to,
           itemPercent = 25,
-          total = 1234567890,
+          total = total,
           totalPercent = 50,
           timeSeconds = 5,
           leftSeconds = 7,
           bytesPerSecond = 345123,
-          onCancel = { () =>
-            setToPath(None)
-          }
+          onCancel = onCancel(dispatchAction = false)
         ))()
       }
     )
