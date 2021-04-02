@@ -3,33 +3,19 @@ package farjs.filelist.copy
 import farjs.filelist.copy.CopyProgressPopup._
 import farjs.ui._
 import farjs.ui.border._
-import farjs.ui.popup.PopupProps
+import farjs.ui.popup.ModalContent._
+import farjs.ui.popup.ModalProps
 import farjs.ui.theme.Theme
 import org.scalatest.Assertion
-import scommons.react.ReactClass
+import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
 
 class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
 
-  CopyProgressPopup.popupComp = () => "Popup".asInstanceOf[ReactClass]
-  CopyProgressPopup.doubleBorderComp = () => "DoubleBorder".asInstanceOf[ReactClass]
+  CopyProgressPopup.modalComp = () => "Modal".asInstanceOf[ReactClass]
   CopyProgressPopup.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
   CopyProgressPopup.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
-
-  it should "call onCancel when close popup" in {
-    //given
-    val onCancel = mockFunction[Unit]
-    val props = getCopyProgressPopupProps(onCancel = onCancel)
-    val comp = testRender(<(CopyProgressPopup())(^.wrapped := props)())
-    val popup = findComponentProps(comp, popupComp)
-
-    //then
-    onCancel.expects()
-
-    //when
-    popup.onClose()
-  }
 
   it should "render component" in {
     //given
@@ -39,7 +25,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(CopyProgressPopup())(^.wrapped := props)())
 
     //then
-    assertCopyProgressPopup(result, props, List("[ Copy ]" -> 0, "[ Cancel ]" -> 10))
+    assertCopyProgressPopup(result, props)
   }
 
   it should "convert seconds to time when toTime" in {
@@ -85,14 +71,13 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
     )
   }
 
-  private def assertCopyProgressPopup(result: TestInstance,
-                                      props: CopyProgressPopupProps,
-                                      actions: List[(String, Int)]): Unit = {
+  private def assertCopyProgressPopup(result: TestInstance, props: CopyProgressPopupProps): Unit = {
     val (width, height) = (50, 13)
+    val contentWidth = width - (paddingHorizontal + 2) * 2
+    val contentLeft = 2
     val theme = Theme.current.popup.regular
 
-    def assertComponents(border: TestInstance,
-                         label: TestInstance,
+    def assertComponents(label: TestInstance,
                          item: TestInstance,
                          to: TestInstance,
                          itemPercent: TestInstance,
@@ -104,18 +89,10 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
                          speed: TestInstance,
                          button: TestInstance): Assertion = {
 
-      assertTestComponent(border, doubleBorderComp) {
-        case DoubleBorderProps(resSize, resStyle, pos, title) =>
-          resSize shouldBe (width - 6) -> (height - 2)
-          resStyle shouldBe theme
-          pos shouldBe 3 -> 1
-          title shouldBe Some("Copy")
-      }
-
       assertNativeComponent(label,
         <.text(
-          ^.rbLeft := 5,
-          ^.rbTop := 2,
+          ^.rbLeft := contentLeft,
+          ^.rbTop := 1,
           ^.rbStyle := theme,
           ^.content :=
             """Copying the file
@@ -127,8 +104,8 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
       assertTestComponent(item, textLineComp) {
         case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
           align shouldBe TextLine.Left
-          pos shouldBe 5 -> 3
-          resWidth shouldBe (width - 10)
+          pos shouldBe contentLeft -> 2
+          resWidth shouldBe contentWidth
           text shouldBe props.item
           resStyle shouldBe theme
           focused shouldBe false
@@ -137,8 +114,8 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
       assertTestComponent(to, textLineComp) {
         case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
           align shouldBe TextLine.Left
-          pos shouldBe 5 -> 5
-          resWidth shouldBe (width - 10)
+          pos shouldBe contentLeft -> 4
+          resWidth shouldBe contentWidth
           text shouldBe props.to
           resStyle shouldBe theme
           focused shouldBe false
@@ -148,14 +125,14 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
       assertTestComponent(itemPercent, progressBarComp) {
         case ProgressBarProps(percent, pos, resLength, resStyle) =>
           percent shouldBe props.itemPercent
-          pos shouldBe 5 -> 6
-          resLength shouldBe (width - 10)
+          pos shouldBe contentLeft -> 5
+          resLength shouldBe contentWidth
           resStyle shouldBe theme
       }
       assertTestComponent(sep1, horizontalLineComp) {
         case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
-          pos shouldBe 5 -> 7
-          resLength shouldBe (width - 10)
+          pos shouldBe contentLeft -> 6
+          resLength shouldBe contentWidth
           lineCh shouldBe SingleBorder.horizontalCh
           resStyle shouldBe theme
           startCh shouldBe None
@@ -164,8 +141,8 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
       assertTestComponent(total, textLineComp) {
         case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
           align shouldBe TextLine.Center
-          pos shouldBe 5 -> 7
-          resWidth shouldBe (width - 10)
+          pos shouldBe contentLeft -> 6
+          resWidth shouldBe contentWidth
           text shouldBe f"Total: ${props.total}%,.0f"
           resStyle shouldBe theme
           focused shouldBe false
@@ -174,15 +151,15 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
       assertTestComponent(totalPercent, progressBarComp) {
         case ProgressBarProps(percent, pos, resLength, resStyle) =>
           percent shouldBe props.totalPercent
-          pos shouldBe 5 -> 8
-          resLength shouldBe (width - 10)
+          pos shouldBe contentLeft -> 7
+          resLength shouldBe contentWidth
           resStyle shouldBe theme
       }
 
       assertTestComponent(sep2, horizontalLineComp) {
         case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
-          pos shouldBe 5 -> 9
-          resLength shouldBe (width - 10)
+          pos shouldBe contentLeft -> 8
+          resLength shouldBe contentWidth
           lineCh shouldBe SingleBorder.horizontalCh
           resStyle shouldBe theme
           startCh shouldBe None
@@ -191,8 +168,8 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
 
       assertNativeComponent(time,
         <.text(
-          ^.rbLeft := 5,
-          ^.rbTop := 10,
+          ^.rbLeft := contentLeft,
+          ^.rbTop := 9,
           ^.rbStyle := theme,
           ^.content := s"Time: ${toTime(props.timeSeconds)} Left: ${toTime(props.leftSeconds)}"
         )()
@@ -200,8 +177,8 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
       assertTestComponent(speed, textLineComp) {
         case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
           align shouldBe TextLine.Right
-          pos shouldBe 35 -> 10
-          resWidth shouldBe (width - 40)
+          pos shouldBe (contentLeft + 30) -> 9
+          resWidth shouldBe (contentWidth - 30)
           text shouldBe s"${toSpeed(props.bytesPerSecond * 8)}/s"
           resStyle shouldBe theme
           focused shouldBe false
@@ -213,25 +190,14 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
       )
     }
 
-    assertTestComponent(result, popupComp)({ case PopupProps(_, resClosable, focusable, _) =>
-      resClosable shouldBe true
-      focusable shouldBe true
-    }, inside(_) { case List(box) =>
-      assertNativeComponent(box,
-        <.box(
-          ^.rbClickable := true,
-          ^.rbAutoFocus := false,
-          ^.rbWidth := width,
-          ^.rbHeight := height,
-          ^.rbTop := "center",
-          ^.rbLeft := "center",
-          ^.rbShadow := true,
-          ^.rbStyle := theme
-        )(), inside(_) {
-          case List(border, label, item, to, itemPercent, sep1, total, totalPercent, sep2, time, speed, button) =>
-            assertComponents(border, label, item, to, itemPercent, sep1, total, totalPercent, sep2, time, speed, button)
-        }
-      )
+    assertTestComponent(result, modalComp)({ case ModalProps(title, size, resStyle, onCancel) =>
+      title shouldBe "Copy"
+      size shouldBe width -> height
+      resStyle shouldBe theme
+      onCancel should be theSameInstanceAs props.onCancel
+    }, inside(_) {
+      case List(label, item, to, itemPercent, sep1, total, totalPercent, sep2, time, speed, button) =>
+        assertComponents(label, item, to, itemPercent, sep1, total, totalPercent, sep2, time, speed, button)
     })
   }
 }

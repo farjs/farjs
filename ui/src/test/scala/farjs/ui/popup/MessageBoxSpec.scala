@@ -1,18 +1,17 @@
 package farjs.ui.popup
 
 import farjs.ui._
-import farjs.ui.border._
 import farjs.ui.popup.MessageBox._
+import farjs.ui.popup.ModalContent._
 import farjs.ui.theme.Theme
 import org.scalatest.{Assertion, Succeeded}
-import scommons.react.ReactClass
-import scommons.react.blessed._
+import scommons.react._
 import scommons.react.test._
 
 class MessageBoxSpec extends TestSpec with TestRendererUtils {
 
   MessageBox.popupComp = () => "Popup".asInstanceOf[ReactClass]
-  MessageBox.doubleBorderComp = () => "DoubleBorder".asInstanceOf[ReactClass]
+  MessageBox.modalContentComp = () => "ModalContent".asInstanceOf[ReactClass]
   MessageBox.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
   MessageBox.buttonsPanelComp = () => "ButtonsPanel".asInstanceOf[ReactClass]
 
@@ -177,39 +176,30 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
                                actions: List[String],
                                closable: Boolean = true): Assertion = {
     val width = 60
-    val textWidth = width - 8
-    val textLines = UI.splitText(props.message, textWidth - 2) //exclude padding
-    val height = 5 + textLines.size
+    val textWidth = width - (paddingHorizontal + 2) * 2
+    val textLines = UI.splitText(props.message, textWidth)
+    val height = (paddingVertical + 1) * 2 + textLines.size + 1
     
-    def assertComponents(border: TestInstance,
-                         msgs: List[TestInstance],
+    def assertComponents(msgs: List[TestInstance],
                          actionsBox: TestInstance): Assertion = {
 
-      assertTestComponent(border, doubleBorderComp) {
-        case DoubleBorderProps(resSize, style, pos, title) =>
-          resSize shouldBe (width - 6) -> (height - 2)
-          style shouldBe props.style
-          pos shouldBe 3 -> 1
-          title shouldBe Some(props.title)
-      }
-      
       msgs.size shouldBe textLines.size
       msgs.zip(textLines).zipWithIndex.foreach { case ((msg, textLine), index) =>
         assertTestComponent(msg, textLineComp) {
           case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
             align shouldBe TextLine.Center
-            pos shouldBe 4 -> (2 + index)
-            resWidth shouldBe (width - 8)
+            pos shouldBe 2 -> (1 + index)
+            resWidth shouldBe (width - 10)
             text shouldBe textLine
             style shouldBe props.style
             focused shouldBe false
-            padding shouldBe 1
+            padding shouldBe 0
         }
       }
       
       assertTestComponent(actionsBox, buttonsPanelComp) {
         case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
-          top shouldBe (height - 3)
+          top shouldBe (1 + textLines.size)
           resActions.map(_._1) shouldBe actions
           resStyle shouldBe props.style
           padding shouldBe 1
@@ -220,22 +210,17 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     assertTestComponent(result, popupComp)({ case PopupProps(_, resClosable, focusable, _) =>
       resClosable shouldBe closable
       focusable shouldBe true
-    }, inside(_) { case List(box) =>
-      assertNativeComponent(box,
-        <.box(
-          ^.rbClickable := true,
-          ^.rbAutoFocus := false,
-          ^.rbWidth := width,
-          ^.rbHeight := height,
-          ^.rbTop := "center",
-          ^.rbLeft := "center",
-          ^.rbShadow := true,
-          ^.rbStyle := props.style
-        )(), inside(_) {
-          case List(border, msg, actionsBox) if textLines.size == 1 =>
-            assertComponents(border, List(msg), actionsBox)
-          case List(border, msg1, msg2, actionsBox) if textLines.size == 2 =>
-            assertComponents(border, List(msg1, msg2), actionsBox)
+    }, inside(_) { case List(content) =>
+      assertTestComponent(content, modalContentComp)({
+        case ModalContentProps(title, size, style) =>
+          title shouldBe props.title
+          size shouldBe width -> height
+          style shouldBe props.style
+      }, inside(_) {
+          case List(msg, actionsBox) if textLines.size == 1 =>
+            assertComponents(List(msg), actionsBox)
+          case List(msg1, msg2, actionsBox) if textLines.size == 2 =>
+            assertComponents(List(msg1, msg2), actionsBox)
         }
       )
     })

@@ -1,7 +1,7 @@
 package farjs.ui.popup
 
 import farjs.ui._
-import farjs.ui.border._
+import farjs.ui.popup.ModalContent._
 import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
@@ -14,15 +14,15 @@ case class StatusPopupProps(text: String,
 object StatusPopup extends FunctionComponent[StatusPopupProps] {
 
   private[popup] var popupComp: UiComponent[PopupProps] = Popup
-  private[popup] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
+  private[popup] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
   private[popup] var textLineComp: UiComponent[TextLineProps] = TextLine
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val width = 35
-    val textWidth = width - 8
-    val textLines = UI.splitText(props.text, textWidth - 2) //exclude padding
-    val height = 4 + textLines.size
+    val textWidth = width - (paddingHorizontal + 2) * 2
+    val textLines = UI.splitText(props.text, textWidth)
+    val height = (paddingVertical + 1) * 2 + textLines.size
     val theme = Theme.current.popup.regular
     val style = new BlessedStyle {
       override val bold = theme.bold
@@ -34,28 +34,16 @@ object StatusPopup extends FunctionComponent[StatusPopupProps] {
       onClose = props.onClose,
       closable = props.closable
     ))(
-      <.box(
-        ^.rbClickable := true,
-        ^.rbAutoFocus := false,
-        ^.rbWidth := width,
-        ^.rbHeight := height,
-        ^.rbTop := "center",
-        ^.rbLeft := "center",
-        ^.rbShadow := true,
-        ^.rbStyle := style
-      )(
-        <(doubleBorderComp())(^.wrapped := DoubleBorderProps(
-          size = (width - 6, height - 2),
-          style = style,
-          pos = (3, 1),
-          title = Some(props.title)
-        ))(),
-
+      <(modalContentComp())(^.wrapped := ModalContentProps(
+        title = props.title,
+        size = (width, height),
+        style = style
+      ))(
         <.button(
           ^.rbWidth := textWidth,
           ^.rbHeight := textLines.size,
-          ^.rbLeft := 4,
-          ^.rbTop := 2,
+          ^.rbLeft := 2,
+          ^.rbTop := 1,
           ^.rbStyle := style
         )(
           textLines.zipWithIndex.map { case (text, index) =>
@@ -64,7 +52,8 @@ object StatusPopup extends FunctionComponent[StatusPopupProps] {
               pos = (0, index),
               width = textWidth,
               text = text,
-              style = style
+              style = style,
+              padding = 0
             ))()
           }
         )

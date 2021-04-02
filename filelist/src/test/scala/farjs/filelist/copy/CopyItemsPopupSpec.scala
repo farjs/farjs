@@ -4,38 +4,21 @@ import farjs.filelist.api.FileListItem
 import farjs.filelist.copy.CopyItemsPopup._
 import farjs.ui._
 import farjs.ui.border._
-import farjs.ui.popup.PopupProps
+import farjs.ui.popup.ModalContent._
+import farjs.ui.popup.ModalProps
 import farjs.ui.theme.Theme
 import org.scalatest.Assertion
-import scommons.react.ReactClass
-import scommons.react.blessed._
+import scommons.react._
 import scommons.react.test._
 
 class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
 
-  CopyItemsPopup.popupComp = () => "Popup".asInstanceOf[ReactClass]
-  CopyItemsPopup.doubleBorderComp = () => "DoubleBorder".asInstanceOf[ReactClass]
+  CopyItemsPopup.modalComp = () => "Modal".asInstanceOf[ReactClass]
   CopyItemsPopup.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
   CopyItemsPopup.textBoxComp = () => "TextBox".asInstanceOf[ReactClass]
   CopyItemsPopup.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
   CopyItemsPopup.buttonsPanelComp = () => "ButtonsPanel".asInstanceOf[ReactClass]
 
-  it should "call onCancel when close popup" in {
-    //given
-    val onCopy = mockFunction[String, Unit]
-    val onCancel = mockFunction[Unit]
-    val props = CopyItemsPopupProps("", Seq(FileListItem("file 1")), onCopy, onCancel)
-    val comp = testRender(<(CopyItemsPopup())(^.wrapped := props)())
-    val popup = findComponentProps(comp, popupComp)
-
-    //then
-    onCopy.expects(*).never()
-    onCancel.expects()
-    
-    //when
-    popup.onClose()
-  }
-  
   it should "set path when onChange in TextBox" in {
     //given
     val path = "initial path"
@@ -137,49 +120,40 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
       if (count > 1) s"$count items"
       else s"${props.items.headOption.map(i => s""""${i.name}"""").getOrElse("")}"
     
-    def assertComponents(border: TestInstance,
-                         label: TestInstance,
+    def assertComponents(label: TestInstance,
                          input: TestInstance,
                          sep: TestInstance,
                          actionsBox: TestInstance): Assertion = {
 
-      assertTestComponent(border, doubleBorderComp) {
-        case DoubleBorderProps(resSize, resStyle, pos, title) =>
-          resSize shouldBe (width - 6) -> (height - 2)
-          resStyle shouldBe style
-          pos shouldBe 3 -> 1
-          title shouldBe Some("Copy")
-      }
-      
       assertTestComponent(label, textLineComp) {
         case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
           align shouldBe TextLine.Left
-          pos shouldBe 4 -> 2
-          resWidth shouldBe (width - 8)
+          pos shouldBe 2 -> 1
+          resWidth shouldBe (width - (paddingHorizontal + 2) * 2)
           text shouldBe s"Copy $itemsText to:"
           resStyle shouldBe style
           focused shouldBe false
-          padding shouldBe 1
+          padding shouldBe 0
       }
       assertTestComponent(input, textBoxComp) {
         case TextBoxProps(pos, resWidth, resValue, _, _) =>
-          pos shouldBe 5 -> 3
-          resWidth shouldBe (width - 10)
+          pos shouldBe 2 -> 2
+          resWidth shouldBe (width - (paddingHorizontal + 2) * 2)
           resValue shouldBe props.path
       }
+
       assertTestComponent(sep, horizontalLineComp) {
         case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
-          pos shouldBe 3 -> 4
-          resLength shouldBe (width - 6)
+          pos shouldBe 0 -> 3
+          resLength shouldBe (width - paddingHorizontal * 2)
           lineCh shouldBe SingleBorder.horizontalCh
           resStyle shouldBe style
           startCh shouldBe Some(DoubleBorder.leftSingleCh)
           endCh shouldBe Some(DoubleBorder.rightSingleCh)
       }
-      
       assertTestComponent(actionsBox, buttonsPanelComp) {
         case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
-          top shouldBe (height - 3)
+          top shouldBe 4
           resActions.map(_._1) shouldBe actions
           resStyle shouldBe style
           padding shouldBe 0
@@ -187,25 +161,13 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
       }
     }
     
-    assertTestComponent(result, popupComp)({ case PopupProps(_, resClosable, focusable, _) =>
-      resClosable shouldBe true
-      focusable shouldBe true
-    }, inside(_) { case List(box) =>
-      assertNativeComponent(box,
-        <.box(
-          ^.rbClickable := true,
-          ^.rbAutoFocus := false,
-          ^.rbWidth := width,
-          ^.rbHeight := height,
-          ^.rbTop := "center",
-          ^.rbLeft := "center",
-          ^.rbShadow := true,
-          ^.rbStyle := style
-        )(), inside(_) {
-          case List(border, label, input, sep, actionsBox) =>
-            assertComponents(border, label, input, sep, actionsBox)
-        }
-      )
+    assertTestComponent(result, modalComp)({ case ModalProps(title, size, resStyle, onCancel) =>
+      title shouldBe "Copy"
+      size shouldBe width -> height
+      resStyle shouldBe style
+      onCancel should be theSameInstanceAs props.onCancel
+    }, inside(_) { case List(label, input, sep, actionsBox) =>
+      assertComponents(label, input, sep, actionsBox)
     })
   }
 }

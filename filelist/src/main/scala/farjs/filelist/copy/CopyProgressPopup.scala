@@ -2,6 +2,7 @@ package farjs.filelist.copy
 
 import farjs.ui._
 import farjs.ui.border._
+import farjs.ui.popup.ModalContent._
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
 import scommons.react._
@@ -19,113 +20,96 @@ case class CopyProgressPopupProps(item: String,
 
 object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
 
-  private[copy] var popupComp: UiComponent[PopupProps] = Popup
-  private[copy] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
+  private[copy] var modalComp: UiComponent[ModalProps] = Modal
   private[copy] var textLineComp: UiComponent[TextLineProps] = TextLine
   private[copy] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
   private[copy] var progressBarComp: UiComponent[ProgressBarProps] = ProgressBar
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val (width, height) = (50, 13)
+    val size@(width, _) = (50, 13)
+    val contentWidth = width - (paddingHorizontal + 2) * 2
+    val contentLeft = 2
     val theme = Theme.current.popup.regular
     
-    <(popupComp())(^.wrapped := PopupProps(onClose = props.onCancel))(
-      <.box(
-        ^.rbClickable := true,
-        ^.rbAutoFocus := false,
-        ^.rbWidth := width,
-        ^.rbHeight := height,
-        ^.rbTop := "center",
-        ^.rbLeft := "center",
-        ^.rbShadow := true,
-        ^.rbStyle := theme
-      )(
-        <(doubleBorderComp())(^.wrapped := DoubleBorderProps(
-          size = (width - 6, height - 2),
-          style = theme,
-          pos = (3, 1),
-          title = Some("Copy")
-        ))(),
+    <(modalComp())(^.wrapped := ModalProps("Copy", size, theme, props.onCancel))(
+      <.text(
+        ^.rbLeft := contentLeft,
+        ^.rbTop := 1,
+        ^.rbStyle := theme,
+        ^.content :=
+          """Copying the file
+            |
+            |to
+            |""".stripMargin
+      )(),
+      <(textLineComp())(^.wrapped := TextLineProps(
+        align = TextLine.Left,
+        pos = (contentLeft, 2),
+        width = contentWidth,
+        text = props.item,
+        style = theme,
+        padding = 0
+      ))(),
+      <(textLineComp())(^.wrapped := TextLineProps(
+        align = TextLine.Left,
+        pos = (contentLeft, 4),
+        width = contentWidth,
+        text = props.to,
+        style = theme,
+        padding = 0
+      ))(),
 
-        <.text(
-          ^.rbLeft := 5,
-          ^.rbTop := 2,
-          ^.rbStyle := theme,
-          ^.content :=
-            """Copying the file
-              |
-              |to
-              |""".stripMargin
-        )(),
-        <(textLineComp())(^.wrapped := TextLineProps(
-          align = TextLine.Left,
-          pos = (5, 3),
-          width = width - 10,
-          text = props.item,
-          style = theme,
-          padding = 0
-        ))(),
-        <(textLineComp())(^.wrapped := TextLineProps(
-          align = TextLine.Left,
-          pos = (5, 5),
-          width = width - 10,
-          text = props.to,
-          style = theme,
-          padding = 0
-        ))(),
+      <(progressBarComp())(^.wrapped := ProgressBarProps(
+        percent = props.itemPercent,
+        pos = (contentLeft, 5),
+        length = contentWidth,
+        style = theme
+      ))(),
+      <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
+        pos = (contentLeft, 6),
+        length = contentWidth,
+        lineCh = SingleBorder.horizontalCh,
+        style = theme
+      ))(),
+      <(textLineComp())(^.wrapped := TextLineProps(
+        align = TextLine.Center,
+        pos = (contentLeft, 6),
+        width = contentWidth,
+        text = f"Total: ${props.total}%,.0f",
+        style = theme
+      ))(),
+      <(progressBarComp())(^.wrapped := ProgressBarProps(
+        percent = props.totalPercent,
+        pos = (contentLeft, 7),
+        length = contentWidth,
+        style = theme
+      ))(),
 
-        <(progressBarComp())(^.wrapped := ProgressBarProps(
-          percent = props.itemPercent,
-          pos = (5, 6),
-          length = width - 10,
-          style = theme
-        ))(),
-        <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
-          pos = (5, 7),
-          length = width - 10,
-          lineCh = SingleBorder.horizontalCh,
-          style = theme
-        ))(),
-        <(textLineComp())(^.wrapped := TextLineProps(
-          align = TextLine.Center,
-          pos = (5, 7),
-          width = width - 10,
-          text = f"Total: ${props.total}%,.0f",
-          style = theme
-        ))(),
-        <(progressBarComp())(^.wrapped := ProgressBarProps(
-          percent = props.totalPercent,
-          pos = (5, 8),
-          length = width - 10,
-          style = theme
-        ))(),
+      <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
+        pos = (contentLeft, 8),
+        length = contentWidth,
+        lineCh = SingleBorder.horizontalCh,
+        style = theme
+      ))(),
 
-        <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
-          pos = (5, 9),
-          length = width - 10,
-          lineCh = SingleBorder.horizontalCh,
-          style = theme
-        ))(),
+      <.text(
+        ^.rbLeft := contentLeft,
+        ^.rbTop := 9,
+        ^.rbStyle := theme,
+        ^.content := s"Time: ${toTime(props.timeSeconds)} Left: ${toTime(props.leftSeconds)}"
+      )(),
+      <(textLineComp())(^.wrapped := TextLineProps(
+        align = TextLine.Right,
+        pos = (contentLeft + 30, 9),
+        width = contentWidth - 30,
+        text = s"${toSpeed(props.bytesPerSecond * 8)}/s",
+        style = theme,
+        padding = 0
+      ))(),
 
-        <.text(
-          ^.rbLeft := 5,
-          ^.rbTop := 10,
-          ^.rbStyle := theme,
-          ^.content := s"Time: ${toTime(props.timeSeconds)} Left: ${toTime(props.leftSeconds)}"
-        )(),
-        <(textLineComp())(^.wrapped := TextLineProps(
-          align = TextLine.Right,
-          pos = (35, 10),
-          width = width - 40,
-          text = s"${toSpeed(props.bytesPerSecond * 8)}/s",
-          style = theme,
-          padding = 0
-        ))(),
-
-        //for capturing inputs
-        <.button(^.rbWidth := 0, ^.rbHeight := 0)()
-      )
+      //for capturing inputs
+      <.button(^.rbWidth := 0, ^.rbHeight := 0)()
     )
   }
   

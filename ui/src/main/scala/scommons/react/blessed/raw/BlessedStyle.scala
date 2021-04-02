@@ -35,3 +35,11 @@ trait BlessedBorder extends js.Object {
   val `type`: js.UndefOr[String] = js.undefined // Type of border (line or bg). bg by default
   val ch: js.UndefOr[String] = js.undefined     // Character to use if bg type, default is space
 }
+
+trait BlessedPadding extends js.Object {
+
+  val left: Int
+  val right: Int
+  val top: Int
+  val bottom: Int
+}

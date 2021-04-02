@@ -16,6 +16,7 @@ package object blessed {
 
   type BlessedStyle = blessed.raw.BlessedStyle
   type BlessedBorder = blessed.raw.BlessedBorder
+  type BlessedPadding = blessed.raw.BlessedPadding
   type BlessedBorderStyle = blessed.raw.BlessedBorderStyle
   type BlessedScrollBarStyle = blessed.raw.BlessedScrollBarStyle
   
@@ -37,6 +38,10 @@ package object blessed {
 
     case class BlessedBorderAttributeSpec(name: String) extends AttributeSpec {
       def :=(value: BlessedBorder): Attribute[BlessedBorder] = Attribute(name, value, AS_IS)
+    }
+
+    case class BlessedPaddingAttributeSpec(name: String) extends AttributeSpec {
+      def :=(value: BlessedPadding): Attribute[BlessedPadding] = Attribute(name, value, AS_IS)
     }
 
     case class BlessedPositionAttributeSpec(name: String) extends AttributeSpec {
@@ -74,6 +79,7 @@ package object blessed {
     lazy val rbWidth = BlessedPositionAttributeSpec("width")
     lazy val rbTop = BlessedPositionAttributeSpec("top")
     lazy val rbLeft = BlessedPositionAttributeSpec("left")
+    lazy val rbPadding = BlessedPaddingAttributeSpec("padding")
     lazy val rbMouse = BlessedBooleanAttributeSpec("mouse")
     lazy val rbTags = BlessedBooleanAttributeSpec("tags")
     lazy val rbWrap = BlessedBooleanAttributeSpec("wrap")

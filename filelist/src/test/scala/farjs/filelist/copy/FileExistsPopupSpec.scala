@@ -4,17 +4,16 @@ import farjs.filelist.api.FileListItem
 import farjs.filelist.copy.FileExistsPopup._
 import farjs.ui._
 import farjs.ui.border._
-import farjs.ui.popup.PopupProps
+import farjs.ui.popup.ModalProps
 import farjs.ui.theme.Theme
 import org.scalatest.Assertion
-import scommons.react.ReactClass
+import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
 
 class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
 
-  FileExistsPopup.popupComp = () => "Popup".asInstanceOf[ReactClass]
-  FileExistsPopup.doubleBorderComp = () => "DoubleBorder".asInstanceOf[ReactClass]
+  FileExistsPopup.modalComp = () => "Modal".asInstanceOf[ReactClass]
   FileExistsPopup.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
   FileExistsPopup.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
   FileExistsPopup.buttonsPanelComp = () => "ButtonsPanel".asInstanceOf[ReactClass]
@@ -99,22 +98,6 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     onPress()
   }
   
-  it should "call onCancel when close popup" in {
-    //given
-    val onAction = mockFunction[FileExistsAction, Unit]
-    val onCancel = mockFunction[Unit]
-    val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
-    val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
-    val popup = findComponentProps(comp, popupComp)
-
-    //then
-    onAction.expects(*).never()
-    onCancel.expects()
-    
-    //when
-    popup.onClose()
-  }
-  
   it should "call onCancel when press Cancel button" in {
     //given
     val onAction = mockFunction[FileExistsAction, Unit]
@@ -160,8 +143,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val (width, height) = (58, 11)
     val theme = Theme.current.popup.error
     
-    def assertComponents(border: TestInstance,
-                         label1: TestInstance,
+    def assertComponents(label1: TestInstance,
                          item : TestInstance,
                          sep1: TestInstance,
                          label2: TestInstance,
@@ -170,18 +152,10 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
                          sep2: TestInstance,
                          actionsBox: TestInstance): Assertion = {
 
-      assertTestComponent(border, doubleBorderComp) {
-        case DoubleBorderProps(resSize, resStyle, pos, title) =>
-          resSize shouldBe (width - 6) -> (height - 2)
-          resStyle shouldBe theme
-          pos shouldBe 3 -> 1
-          title shouldBe Some("Warning")
-      }
-
       assertNativeComponent(label1,
         <.text(
           ^.rbLeft := "center",
-          ^.rbTop := 2,
+          ^.rbTop := 1,
           ^.rbStyle := theme,
           ^.content := "File already exists"
         )()
@@ -189,27 +163,27 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
       assertTestComponent(item, textLineComp) {
         case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
           align shouldBe TextLine.Center
-          pos shouldBe 5 -> 3
+          pos shouldBe 2 -> 2
           resWidth shouldBe (width - 10)
           text shouldBe props.newItem.name
           resStyle shouldBe theme
           focused shouldBe false
           padding shouldBe 0
       }
-
       assertTestComponent(sep1, horizontalLineComp) {
         case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
-          pos shouldBe 3 -> 4
+          pos shouldBe 0 -> 3
           resLength shouldBe (width - 6)
           lineCh shouldBe SingleBorder.horizontalCh
           resStyle shouldBe theme
           startCh shouldBe Some(DoubleBorder.leftSingleCh)
           endCh shouldBe Some(DoubleBorder.rightSingleCh)
       }
+      
       assertNativeComponent(label2,
         <.text(
-          ^.rbLeft := 5,
-          ^.rbTop := 5,
+          ^.rbLeft := 2,
+          ^.rbTop := 4,
           ^.rbStyle := theme,
           ^.content :=
             """New
@@ -219,7 +193,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
       assertTestComponent(newItem, textLineComp) {
         case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
           align shouldBe TextLine.Right
-          pos shouldBe 5 -> 5
+          pos shouldBe 2 -> 4
           resWidth shouldBe (width - 10)
           text should startWith (props.newItem.size.toString)
           resStyle shouldBe theme
@@ -229,7 +203,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
       assertTestComponent(existing, textLineComp) {
         case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
           align shouldBe TextLine.Right
-          pos shouldBe 5 -> 6
+          pos shouldBe 2 -> 5
           resWidth shouldBe (width - 10)
           text should startWith (props.existing.size.toString)
           resStyle shouldBe theme
@@ -239,17 +213,16 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
 
       assertTestComponent(sep2, horizontalLineComp) {
         case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
-          pos shouldBe 3 -> 7
+          pos shouldBe 0 -> 6
           resLength shouldBe (width - 6)
           lineCh shouldBe SingleBorder.horizontalCh
           resStyle shouldBe theme
           startCh shouldBe Some(DoubleBorder.leftSingleCh)
           endCh shouldBe Some(DoubleBorder.rightSingleCh)
       }
-
       assertTestComponent(actionsBox, buttonsPanelComp) {
         case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
-          top shouldBe (height - 3)
+          top shouldBe 7
           resActions.map(_._1) shouldBe actions
           resStyle shouldBe theme
           padding shouldBe 1
@@ -257,25 +230,14 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
       }
     }
     
-    assertTestComponent(result, popupComp)({ case PopupProps(_, resClosable, focusable, _) =>
-      resClosable shouldBe true
-      focusable shouldBe true
-    }, inside(_) { case List(box) =>
-      assertNativeComponent(box,
-        <.box(
-          ^.rbClickable := true,
-          ^.rbAutoFocus := false,
-          ^.rbWidth := width,
-          ^.rbHeight := height,
-          ^.rbTop := "center",
-          ^.rbLeft := "center",
-          ^.rbShadow := true,
-          ^.rbStyle := theme
-        )(), inside(_) {
-          case List(border, label1, item, sep1, label2, newItem, existing, sep2, actionsBox) =>
-            assertComponents(border, label1, item, sep1, label2, newItem, existing, sep2, actionsBox)
-        }
-      )
+    assertTestComponent(result, modalComp)({ case ModalProps(title, size, resStyle, onCancel) =>
+      title shouldBe "Warning"
+      size shouldBe width -> height
+      resStyle shouldBe theme
+      onCancel should be theSameInstanceAs props.onCancel
+    }, inside(_) {
+      case List(label1, item, sep1, label2, newItem, existing, sep2, actionsBox) =>
+        assertComponents(label1, item, sep1, label2, newItem, existing, sep2, actionsBox)
     })
   }
 }
