@@ -86,6 +86,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
       maybeQuickSearch.foreach { text =>
         if (key.length == 1) quickSearch(s"$text$key")
         else if (key.startsWith("S-") && key.length == 3) quickSearch(s"""$text${key.drop(2).toUpperCase}""")
+        else if (key == "space") quickSearch(s"$text ")
         else if (key == "backspace") setMaybeQuickSearch(Some(text.take(text.length - 1)))
         else if (key != "C-s" && key.length > 1) setMaybeQuickSearch(None)
       }

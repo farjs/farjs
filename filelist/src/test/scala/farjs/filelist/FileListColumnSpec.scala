@@ -98,8 +98,8 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
         FileListItem(".dir 2 looooooong", isDir = true),
         FileListItem("file 3"),
         FileListItem(".dir 4", isDir = true),
-        FileListItem(".file 5\n"),
-        FileListItem("file 6")
+        FileListItem(".file 5"),
+        FileListItem(" file 6")
       ),
       focusedIndex = 2,
       selectedNames = Set(".dir 2 looooooong", "file 3")
@@ -116,7 +116,7 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
         |{bold}{yellow-fg}{#008-bg}file 3        {/}{bold}{#5ce-fg}{#008-bg}│{/}
         |{bold}{#055-fg}{#008-bg}.dir 4        {/}{bold}{#5ce-fg}{#008-bg}│{/}
         |{bold}{#055-fg}{#008-bg}.file 5       {/}{bold}{#5ce-fg}{#008-bg}│{/}
-        |{bold}{#5ce-fg}{#008-bg}file 6        {/}{bold}{#5ce-fg}{#008-bg}│{/}""".stripMargin
+        |{bold}{#5ce-fg}{#008-bg} file 6       {/}{bold}{#5ce-fg}{#008-bg}│{/}""".stripMargin
     ))
     
     //cleanup

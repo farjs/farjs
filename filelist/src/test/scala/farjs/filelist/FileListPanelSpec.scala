@@ -316,7 +316,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         FileListItem.up,
         FileListItem("aB 1"),
         FileListItem("aBc1"),
-        FileListItem("aBc2")
+        FileListItem("aBc 2")
       ))
     )
     val props = FileListPanelProps(dispatch, actions, state)
@@ -351,7 +351,8 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     check("backspace", index = 2, text = "aB", dispatchAction = false)
     check("d", index = 2, text = "aB", dispatchAction = false)
     check("c", index = 2, text = "aBc", dispatchAction = true)
-    check("2", index = 3, text = "aBc2", dispatchAction = true)
+    check("space", index = 3, text = "aBc ", dispatchAction = true)
+    check("2", index = 3, text = "aBc 2", dispatchAction = true)
 
     Succeeded
   }
