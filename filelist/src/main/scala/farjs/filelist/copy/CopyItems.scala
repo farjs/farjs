@@ -9,7 +9,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
 
   private[copy] var copyItemsStats: UiComponent[CopyItemsStatsProps] = CopyItemsStats
   private[copy] var copyItemsPopup: UiComponent[CopyItemsPopupProps] = CopyItemsPopup
-  private[copy] var copyProgressPopup: UiComponent[CopyProgressPopupProps] = CopyProgressPopup
+  private[copy] var copyProcessComp: UiComponent[CopyProcessProps] = CopyProcess
 
   protected def render(compProps: Props): ReactElement = {
     val (maybeTotal, setTotal) = useState[Option[Double]](None)
@@ -64,16 +64,13 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
         to <- toPath
         total <- maybeTotal
       } yield {
-        <(copyProgressPopup())(^.wrapped := CopyProgressPopupProps(
-          item = "test.file",
-          to = to,
-          itemPercent = 25,
+        <(copyProcessComp())(^.wrapped := CopyProcessProps(
+          dispatch = props.dispatch,
+          actions = props.actions,
+          items = items,
+          toPath = to,
           total = total,
-          totalPercent = 50,
-          timeSeconds = 5,
-          leftSeconds = 7,
-          bytesPerSecond = 345123,
-          onCancel = onCancel(dispatchAction = false)
+          onDone = onCancel(dispatchAction = false)
         ))()
       }
     )

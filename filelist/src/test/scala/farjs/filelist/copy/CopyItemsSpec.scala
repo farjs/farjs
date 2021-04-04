@@ -12,7 +12,7 @@ class CopyItemsSpec extends TestSpec with TestRendererUtils {
 
   CopyItems.copyItemsStats = () => "CopyItemsStats".asInstanceOf[ReactClass]
   CopyItems.copyItemsPopup = () => "CopyItemsPopup".asInstanceOf[ReactClass]
-  CopyItems.copyProgressPopup = () => "CopyProgressPopup".asInstanceOf[ReactClass]
+  CopyItems.copyProcessComp = () => "CopyProcess".asInstanceOf[ReactClass]
   
   it should "show CopyItemsStats when showCopyItemsPopup=true" in {
     //given
@@ -101,12 +101,14 @@ class CopyItemsSpec extends TestSpec with TestRendererUtils {
     renderer.root.children.toList should be (empty)
   }
 
-  it should "show CopyProgressPopup when onCopy" in {
+  it should "render CopyProcess when onCopy" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
+    val item = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, List(
-      FileListItem("dir 1", isDir = true)
+      item,
+      FileListItem("file 1")
     ))
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       left = FileListState(currDir = currDir, isActive = true),
@@ -129,24 +131,24 @@ class CopyItemsSpec extends TestSpec with TestRendererUtils {
     //then
     TestRenderer.act { () =>
       renderer.update(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(popups = FileListPopupsState())
+        data = FileListsState(
+          left = props.data.left,
+          popups = FileListPopupsState()
+        )
       ))())
     }
 
-    assertTestComponent(renderer.root.children.head, copyProgressPopup) {
-      case CopyProgressPopupProps(item, to, itemPercent, resTotal, totalPercent, timeSeconds, leftSeconds, bytesPerSecond, _) =>
-        item shouldBe "test.file"
-        to shouldBe toPath
-        itemPercent shouldBe 25
+    assertTestComponent(renderer.root.children.head, copyProcessComp) {
+      case CopyProcessProps(resDispatch, resActions, items, resToPath, resTotal, _) =>
+        resDispatch shouldBe dispatch
+        resActions shouldBe actions
+        items shouldBe List(item)
+        resToPath shouldBe toPath
         resTotal shouldBe total
-        totalPercent shouldBe 50
-        timeSeconds shouldBe 5
-        leftSeconds shouldBe 7
-        bytesPerSecond shouldBe 345123
     }
   }
 
-  it should "hide CopyProgressPopup when onCancel" in {
+  it should "hide CopyProcess when onDone" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -166,10 +168,10 @@ class CopyItemsSpec extends TestSpec with TestRendererUtils {
     dispatch.expects(FileListPopupCopyItemsAction(show = false))
 
     copyPopup.onCopy("test to path")
-    val progressPopup = findComponentProps(renderer.root, copyProgressPopup)
+    val progressPopup = findComponentProps(renderer.root, copyProcessComp)
 
     //when
-    progressPopup.onCancel()
+    progressPopup.onDone()
     
     //then
     TestRenderer.act { () =>
@@ -178,7 +180,7 @@ class CopyItemsSpec extends TestSpec with TestRendererUtils {
       ))())
     }
 
-    findProps(renderer.root, copyProgressPopup) should be (empty)
+    findProps(renderer.root, copyProcessComp) should be (empty)
   }
 
   it should "render empty component when showCopyItemsPopup=false" in {
