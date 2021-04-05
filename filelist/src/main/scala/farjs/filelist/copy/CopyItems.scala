@@ -67,6 +67,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
         <(copyProcessComp())(^.wrapped := CopyProcessProps(
           dispatch = props.dispatch,
           actions = props.actions,
+          fromPath = fromState.currDir.path,
           items = items,
           toPath = to,
           total = total,

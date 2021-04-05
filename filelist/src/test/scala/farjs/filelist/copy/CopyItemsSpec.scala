@@ -139,9 +139,10 @@ class CopyItemsSpec extends TestSpec with TestRendererUtils {
     }
 
     assertTestComponent(renderer.root.children.head, copyProcessComp) {
-      case CopyProcessProps(resDispatch, resActions, items, resToPath, resTotal, _) =>
+      case CopyProcessProps(resDispatch, resActions, fromPath, items, resToPath, resTotal, _) =>
         resDispatch shouldBe dispatch
         resActions shouldBe actions
+        fromPath shouldBe currDir.path
         items shouldBe List(item)
         resToPath shouldBe toPath
         resTotal shouldBe total

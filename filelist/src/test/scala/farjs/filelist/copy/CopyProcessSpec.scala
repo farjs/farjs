@@ -3,22 +3,112 @@ package farjs.filelist.copy
 import farjs.filelist._
 import farjs.filelist.api.FileListItem
 import farjs.filelist.copy.CopyProcess._
+import farjs.filelist.copy.CopyProcessSpec._
 import farjs.ui.popup.MessageBoxProps
 import farjs.ui.theme.Theme
+import scommons.nodejs._
+import scommons.nodejs.raw.Timers
 import scommons.react._
 import scommons.react.test._
+
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSExportAll
 
 class CopyProcessSpec extends TestSpec with TestRendererUtils {
 
   CopyProcess.copyProgressPopup = () => "CopyProgressPopup".asInstanceOf[ReactClass]
   CopyProcess.messageBoxComp = () => "MessageBox".asInstanceOf[ReactClass]
   
+  CopyProcess.timers = new TimersMock {
+
+    def setInterval(callback: js.Function0[Any], delay: Double): Timeout = {
+      js.Dynamic.literal().asInstanceOf[Timeout]
+    }
+
+    def clearInterval(timeout: Timeout): Unit = {
+    }
+  }.asInstanceOf[Timers]
+  
+  it should "increment timeSeconds every second" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val timers = mock[TimersMock]
+    val savedTimers = CopyProcess.timers
+    CopyProcess.timers = timers.asInstanceOf[Timers]
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(
+      FileListItem("dir 1", isDir = true)
+    ), "/to/path", 12345, () => ())
+    val timerId = js.Dynamic.literal().asInstanceOf[Timeout]
+
+    //then
+    var onTimer: js.Function0[Any] = null
+    (timers.setInterval _).expects(*, 1000).onCall { (callback: js.Function0[Any], _) =>
+      onTimer = callback
+      timerId
+    }
+    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    
+    //when & then
+    onTimer()
+    findComponentProps(renderer.root, copyProgressPopup).timeSeconds shouldBe 1
+    
+    //when & then
+    onTimer()
+    findComponentProps(renderer.root, copyProgressPopup).timeSeconds shouldBe 2
+    
+    //then
+    (timers.clearInterval _).expects(timerId)
+    
+    //when
+    TestRenderer.act { () =>
+      renderer.unmount()
+    }
+    
+    //cleanup
+    CopyProcess.timers = savedTimers
+  }
+
+  it should "not increment timeSeconds when cancel" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val timers = mock[TimersMock]
+    val savedTimers = CopyProcess.timers
+    CopyProcess.timers = timers.asInstanceOf[Timers]
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(
+      FileListItem("dir 1", isDir = true)
+    ), "/to/path", 12345, () => ())
+    val timerId = js.Dynamic.literal().asInstanceOf[Timeout]
+
+    //then
+    var onTimer: js.Function0[Any] = null
+    (timers.setInterval _).expects(*, 1000).onCall { (callback: js.Function0[Any], _) =>
+      onTimer = callback
+      timerId
+    }
+    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val progressProps = findComponentProps(renderer.root, copyProgressPopup)
+    progressProps.onCancel()
+
+    //when & then
+    onTimer()
+    findComponentProps(renderer.root, copyProgressPopup).timeSeconds shouldBe 0
+    
+    //cleanup
+    (timers.clearInterval _).expects(timerId)
+    TestRenderer.act { () =>
+      renderer.unmount()
+    }
+    CopyProcess.timers = savedTimers
+  }
+
   it should "call onDone when YES action in cancel popup" in {
     //given
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val props = CopyProcessProps(dispatch, actions, List(
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(
       FileListItem("dir 1", isDir = true)
     ), "/to/path", 12345, onDone)
     val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
@@ -37,7 +127,7 @@ class CopyProcessSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val props = CopyProcessProps(dispatch, actions, List(
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(
       FileListItem("dir 1", isDir = true)
     ), "/to/path", 12345, () => ())
     val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
@@ -56,7 +146,7 @@ class CopyProcessSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val props = CopyProcessProps(dispatch, actions, List(
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(
       FileListItem("dir 1", isDir = true)
     ), "/to/path", 12345, () => ())
     val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
@@ -84,7 +174,7 @@ class CopyProcessSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val props = CopyProcessProps(dispatch, actions, List(
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(
       FileListItem("dir 1", isDir = true)
     ), "/to/path", 12345, () => ())
 
@@ -99,9 +189,20 @@ class CopyProcessSpec extends TestSpec with TestRendererUtils {
         itemPercent shouldBe 25
         resTotal shouldBe props.total
         totalPercent shouldBe 50
-        timeSeconds shouldBe 5
+        timeSeconds shouldBe 0
         leftSeconds shouldBe 7
         bytesPerSecond shouldBe 345123
     }
+  }
+}
+
+object CopyProcessSpec {
+
+  @JSExportAll
+  trait TimersMock {
+
+    def setInterval(callback: js.Function0[Any], delay: Double): Timeout
+
+    def clearInterval(timeout: Timeout): Unit
   }
 }
