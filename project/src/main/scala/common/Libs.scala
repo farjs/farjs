@@ -6,7 +6,7 @@ import scommons.sbtplugin.project.CommonLibs
 
 object Libs extends CommonLibs {
 
-  val scommonsNodejsVersion = "0.3.0"
+  val scommonsNodejsVersion = "1.0.0-SNAPSHOT"
   val scommonsReactVersion = "0.3.0"
 
   lazy val scommonsNodejsCore = Def.setting("org.scommons.nodejs" %%% "scommons-nodejs-core" % scommonsNodejsVersion)

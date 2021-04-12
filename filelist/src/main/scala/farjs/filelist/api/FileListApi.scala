@@ -11,4 +11,10 @@ trait FileListApi {
   def delete(parent: String, items: Seq[FileListItem]): Future[Unit]
 
   def mkDir(parent: String, dir: String, multiple: Boolean): Future[String]
+
+  def readFile(parentDirs: List[String], file: FileListItem, position: Double): Future[FileSource]
+
+  def writeFile(parentDirs: List[String],
+                fileName: String,
+                onExists: FileListItem => Future[Option[Boolean]]): Future[Option[FileTarget]]
 }

@@ -1,13 +1,15 @@
 package farjs.app.filelist
 
 import farjs.app.filelist.FileListApiImplSpec.TestApiImpl
-import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.filelist.api.{FileListDir, FileListItem, FileSource, FileTarget}
 import org.scalatest.Succeeded
 import scommons.nodejs._
-import scommons.nodejs.raw.FSConstants
+import scommons.nodejs.raw.{FSConstants, FileOptions}
 import scommons.nodejs.test.AsyncTestSpec
 
 import scala.concurrent.Future
+import scala.scalajs.js
+import scala.scalajs.js.typedarray.Uint8Array
 
 class FileListApiImplSpec extends AsyncTestSpec {
   
@@ -232,6 +234,199 @@ class FileListApiImplSpec extends AsyncTestSpec {
     }
   }
   
+  it should "copy new file when readFile/writeFile" in {
+    //given
+    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
+    fs.existsSync(tmpDir) shouldBe true
+
+    val file1 = path.join(tmpDir, "example.txt")
+    val file2 = path.join(tmpDir, "example2.txt")
+    fs.writeFileSync(file1, "hello, World!!!")
+    fs.existsSync(file1) shouldBe true
+
+    val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
+    val stats1 = fs.lstatSync(file1)
+    val buff = new Uint8Array(5)
+
+    def loop(source: FileSource, target: FileTarget): Future[Unit] = {
+      source.readNextBytes(buff).flatMap { bytesRead =>
+        if (bytesRead == 0) target.setModTime(getFileListItem("example.txt", stats1))
+        else target.writeNextBytes(buff, bytesRead).flatMap(_ => loop(source, target))
+      }
+    }
+    
+    //then
+    onExists.expects(*).never()
+    
+    //when
+    val resultF = for {
+      source <- apiImp.readFile(List(tmpDir), FileListItem("example.txt"), 0.0)
+      _ = source.file shouldBe file1
+      maybeTarget <- apiImp.writeFile(List(tmpDir), "example2.txt", onExists)
+      _ <- maybeTarget.map(loop(source, _)).getOrElse(Future.unit)
+      _ <- maybeTarget.map(_.close()).getOrElse(Future.unit)
+      _ <- source.close()
+    } yield ()
+
+    resultF.map { _ =>
+      //then
+      val stats2 = fs.lstatSync(file2)
+      stats2.size shouldBe stats1.size
+      toDateTimeStr(stats2.atimeMs) shouldBe toDateTimeStr(stats1.atimeMs)
+      toDateTimeStr(stats2.mtimeMs) shouldBe toDateTimeStr(stats1.mtimeMs)
+
+      fs.readFileSync(file2, new FileOptions {
+        override val encoding = "utf8"
+      }) shouldBe "hello, World!!!"
+
+      //cleanup
+      fs.unlinkSync(file1)
+      fs.unlinkSync(file2)
+      fs.rmdirSync(tmpDir)
+      Succeeded
+    }
+  }
+
+  it should "overwrite existing file when readFile/writeFile" in {
+    //given
+    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
+    fs.existsSync(tmpDir) shouldBe true
+
+    val file1 = path.join(tmpDir, "example.txt")
+    val file2 = path.join(tmpDir, "example2.txt")
+    fs.writeFileSync(file1, "hello, World!!!")
+    fs.writeFileSync(file2, "hello, World")
+    fs.existsSync(file1) shouldBe true
+    fs.existsSync(file2) shouldBe true
+
+    val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
+    val srcItem = getFileListItem("example.txt", fs.lstatSync(file1))
+    val existing = getFileListItem("example2.txt", fs.lstatSync(file2))
+    val buff = new Uint8Array(5)
+
+    def loop(source: FileSource, target: FileTarget): Future[Unit] = {
+      source.readNextBytes(buff).flatMap { bytesRead =>
+        if (bytesRead == 0) target.setModTime(srcItem)
+        else target.writeNextBytes(buff, bytesRead).flatMap(_ => loop(source, target))
+      }
+    }
+    
+    //then
+    onExists.expects(existing).returning(Future.successful(Some(true)))
+    
+    //when
+    val resultF = for {
+      source <- apiImp.readFile(List(tmpDir), FileListItem("example.txt"), 0.0)
+      maybeTarget <- apiImp.writeFile(List(tmpDir), "example2.txt", onExists)
+      _ <- maybeTarget.map(loop(source, _)).getOrElse(Future.unit)
+      _ <- maybeTarget.map(_.close()).getOrElse(Future.unit)
+      _ <- source.close()
+    } yield ()
+
+    resultF.map { _ =>
+      //then
+      val stats2 = fs.lstatSync(file2)
+      stats2.size shouldBe srcItem.size
+      toDateTimeStr(stats2.atimeMs) shouldBe toDateTimeStr(srcItem.atimeMs)
+      toDateTimeStr(stats2.mtimeMs) shouldBe toDateTimeStr(srcItem.mtimeMs)
+
+      fs.readFileSync(file2, new FileOptions {
+        override val encoding = "utf8"
+      }) shouldBe "hello, World!!!"
+
+      //cleanup
+      fs.unlinkSync(file1)
+      fs.unlinkSync(file2)
+      fs.rmdirSync(tmpDir)
+      Succeeded
+    }
+  }
+
+  it should "append to existing file when readFile/writeFile" in {
+    //given
+    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
+    fs.existsSync(tmpDir) shouldBe true
+
+    val file1 = path.join(tmpDir, "example.txt")
+    val file2 = path.join(tmpDir, "example2.txt")
+    fs.writeFileSync(file1, "hello, World!!!")
+    fs.writeFileSync(file2, "hello")
+    fs.existsSync(file1) shouldBe true
+    fs.existsSync(file2) shouldBe true
+
+    val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
+    val srcItem = getFileListItem("example.txt", fs.lstatSync(file1))
+    val existing = getFileListItem("example2.txt", fs.lstatSync(file2))
+    val buff = new Uint8Array(5)
+
+    def loop(source: FileSource, target: FileTarget): Future[Unit] = {
+      source.readNextBytes(buff).flatMap { bytesRead =>
+        if (bytesRead == 0) target.setModTime(srcItem)
+        else target.writeNextBytes(buff, bytesRead).flatMap(_ => loop(source, target))
+      }
+    }
+    
+    //then
+    onExists.expects(existing).returning(Future.successful(Some(false)))
+    
+    //when
+    val resultF = for {
+      source <- apiImp.readFile(List(tmpDir), FileListItem("example.txt"), existing.size)
+      maybeTarget <- apiImp.writeFile(List(tmpDir), "example2.txt", onExists)
+      _ <- maybeTarget.map(loop(source, _)).getOrElse(Future.unit)
+      _ <- maybeTarget.map(_.close()).getOrElse(Future.unit)
+      _ <- source.close()
+    } yield maybeTarget
+
+    resultF.flatMap { maybeTarget =>
+      //then
+      val stats2 = fs.lstatSync(file2)
+      stats2.size shouldBe srcItem.size
+      toDateTimeStr(stats2.atimeMs) shouldBe toDateTimeStr(srcItem.atimeMs)
+      toDateTimeStr(stats2.mtimeMs) shouldBe toDateTimeStr(srcItem.mtimeMs)
+
+      fs.readFileSync(file2, new FileOptions {
+        override val encoding = "utf8"
+      }) shouldBe "hello, World!!!"
+
+      //cleanup
+      fs.unlinkSync(file1)
+      maybeTarget.map(_.delete()).getOrElse(Future.unit).map { _ =>
+        fs.rmdirSync(tmpDir)
+        Succeeded
+      }
+    }
+  }
+
+  it should "return None if skip existing file when writeFile" in {
+    //given
+    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
+    fs.existsSync(tmpDir) shouldBe true
+
+    val file = path.join(tmpDir, "example2.txt")
+    fs.writeFileSync(file, "hello")
+    fs.existsSync(file) shouldBe true
+
+    val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
+    val existing = getFileListItem("example2.txt", fs.lstatSync(file))
+
+    //then
+    onExists.expects(existing).returning(Future.successful(None))
+    
+    //when
+    val resultF = apiImp.writeFile(List(tmpDir), "example2.txt", onExists)
+
+    resultF.flatMap { maybeTarget =>
+      //then
+      maybeTarget shouldBe None
+
+      //cleanup
+      fs.unlinkSync(file)
+      fs.rmdirSync(tmpDir)
+      Succeeded
+    }
+  }
+
   it should "return file permissions" in {
     //given
     def flag(s: Char, c: Char, f: Int): Int = {
@@ -266,6 +461,26 @@ class FileListApiImplSpec extends AsyncTestSpec {
     apiImp.getPermissions(of("drwxrwxrwx")) shouldBe "drwxrwxrwx"
     
     Succeeded
+  }
+
+  private def getFileListItem(name: String, stats: Stats) = {
+    val isDir = stats.isDirectory()
+    FileListItem(
+      name = name,
+      isDir = isDir,
+      isSymLink = stats.isSymbolicLink(),
+      size = if (isDir) 0.0 else stats.size,
+      atimeMs = stats.atimeMs,
+      mtimeMs = stats.mtimeMs,
+      ctimeMs = stats.ctimeMs,
+      birthtimeMs = stats.birthtimeMs,
+      permissions = apiImp.getPermissions(stats.mode)
+    )
+  }
+
+  private def toDateTimeStr(dtimeMs: Double): String = {
+    val date = new js.Date(dtimeMs)
+    s"${date.toLocaleDateString()} ${date.toLocaleTimeString()}"
   }
 
   private def del(path: String, isDir: Boolean): Unit = {
