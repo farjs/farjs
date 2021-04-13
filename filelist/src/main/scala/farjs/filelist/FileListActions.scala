@@ -11,7 +11,9 @@ import scommons.react.redux.task.{FutureTask, TaskAction}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
+import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.Success
+import scala.util.control.NonFatal
 
 trait FileListActions {
 
@@ -96,9 +98,59 @@ trait FileListActions {
       }
     }
   }
+
+  def copyFile(srcDirs: List[String],
+               file: FileListItem,
+               dstDirs: List[String],
+               onExists: FileListItem => Future[Option[Boolean]],
+               onProgress: (String, String, Double) => Future[Boolean]): Future[Boolean] = {
+
+    var srcPosition: Double = 0.0
+    
+    api.writeFile(dstDirs, file.name, { existing =>
+      onExists(existing).andThen {
+        case Success(Some(overwrite)) if !overwrite => srcPosition = existing.size
+      }
+    }).flatMap {
+      case None => Future.successful(true)
+      case Some(target) =>
+        api.readFile(srcDirs, file, srcPosition).flatMap { source =>
+          val buff = new Uint8Array(copyBufferBytes)
+
+          def loop(): Future[Boolean] = {
+            source.readNextBytes(buff).flatMap { bytesRead =>
+              if (bytesRead == 0) target.setModTime(file).map(_ => true)
+              else {
+                target.writeNextBytes(buff, bytesRead).flatMap { position =>
+                  onProgress(source.file, target.file, position).flatMap {
+                    case true => loop()
+                    case false => Future.successful(false)
+                  }
+                }
+              }
+            }
+          }
+
+          loop().transformWith { res =>
+            source.close().recover {
+              case NonFatal(ex) => println(s"Failed to close srcFile: ${source.file}, error: $ex")
+            }.flatMap(_ => Future.fromTry(res))
+          }
+        }.transformWith { res =>
+          target.close().recover {
+            case NonFatal(ex) => println(s"Failed to close dstFile: ${target.file}, error: $ex")
+          }.flatMap(_ => Future.fromTry(res))
+        }.flatMap { res =>
+          if (!res) target.delete().map(_ => res)
+          else Future.successful(res)
+        }
+    }
+  }
 }
 
 object FileListActions {
+  
+  private val copyBufferBytes: Int = 64 * 1024
 
   case class FileListActivateAction(isRight: Boolean) extends Action
   case class FileListParamsChangedAction(isRight: Boolean,

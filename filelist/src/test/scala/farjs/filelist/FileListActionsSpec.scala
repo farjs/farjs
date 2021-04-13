@@ -2,7 +2,7 @@ package farjs.filelist
 
 import farjs.filelist.FileListActions._
 import farjs.filelist.FileListActionsSpec._
-import farjs.filelist.api.{FileListApi, FileListDir, FileListItem}
+import farjs.filelist.api._
 import org.scalatest.Succeeded
 import scommons.nodejs.ChildProcess
 import scommons.nodejs.ChildProcess._
@@ -12,6 +12,7 @@ import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.Future
 import scala.scalajs.js
+import scala.scalajs.js.typedarray.Uint8Array
 
 class FileListActionsSpec extends AsyncTestSpec {
 
@@ -240,6 +241,241 @@ class FileListActionsSpec extends AsyncTestSpec {
     
     //when
     val resultF = actions.scanDirs(parent, items, onNextDir)
+    
+    //then
+    resultF.map { res =>
+      res shouldBe false
+    }
+  }
+
+  it should "copy new file when copyFile" in {
+    //given
+    val api = mock[FileListApi]
+    val actions = new FileListActionsTest(api)
+    val srcDirs = List("parent-dir")
+    val file = FileListItem("test_file")
+    val dstDirs = List("target-dir")
+    val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
+    val onProgress = mockFunction[String, String, Double, Future[Boolean]]
+    val srcFile = "source_file"
+    val dstFile = "target_file"
+    val position = 1234.0
+    
+    val source = mock[FileSource]
+    (source.file _).expects().returning(srcFile)
+    (source.readNextBytes _).expects(*).onCall { buff: Uint8Array =>
+      buff.length shouldBe (64 * 1024)
+      Future.successful(123)
+    }
+    (source.readNextBytes _).expects(*).onCall { _: Uint8Array =>
+      Future.successful(0)
+    }
+    (source.close _).expects().returning(Future.unit)
+    
+    val target = mock[FileTarget]
+    (target.file _).expects().returning(dstFile)
+    (target.writeNextBytes _).expects(*, *).onCall { (buff: Uint8Array, length: Int) =>
+      buff.length shouldBe (64 * 1024)
+      length shouldBe 123
+      Future.successful(position)
+    }
+    (target.setModTime _).expects(file).returning(Future.unit)
+    (target.close _).expects().returning(Future.unit)
+
+    //then
+    (api.writeFile _).expects(dstDirs, file.name, *).returning(Future.successful(Some(target)))
+    (api.readFile _).expects(srcDirs, file, 0.0).returning(Future.successful(source))
+    onExists.expects(*).never()
+    onProgress.expects(srcFile, dstFile, position).returning(Future.successful(true))
+    
+    //when
+    val resultF = actions.copyFile(srcDirs, file, dstDirs, onExists, onProgress)
+    
+    //then
+    resultF.map { res =>
+      res shouldBe true
+    }
+  }
+
+  it should "overwrite existing file when copyFile" in {
+    //given
+    val api = mock[FileListApi]
+    val actions = new FileListActionsTest(api)
+    val srcDirs = List("parent-dir")
+    val file = FileListItem("test_file")
+    val existing = FileListItem("existing_file", size = 12)
+    val dstDirs = List("target-dir")
+    val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
+    val onProgress = mockFunction[String, String, Double, Future[Boolean]]
+    val srcFile = "source_file"
+    val dstFile = "target_file"
+    val position = 1234.0
+    
+    val source = mock[FileSource]
+    (source.file _).expects().returning(srcFile)
+    (source.readNextBytes _).expects(*).onCall { buff: Uint8Array =>
+      buff.length shouldBe (64 * 1024)
+      Future.successful(123)
+    }
+    (source.readNextBytes _).expects(*).onCall { _: Uint8Array =>
+      Future.successful(0)
+    }
+    (source.close _).expects().returning(Future.unit)
+    
+    val target = mock[FileTarget]
+    (target.file _).expects().returning(dstFile)
+    (target.writeNextBytes _).expects(*, *).onCall { (buff: Uint8Array, length: Int) =>
+      buff.length shouldBe (64 * 1024)
+      length shouldBe 123
+      Future.successful(position)
+    }
+    (target.setModTime _).expects(file).returning(Future.unit)
+    (target.close _).expects().returning(Future.unit)
+
+    //then
+    onExists.expects(existing).returning(Future.successful(Some(true)))
+    (api.writeFile _).expects(dstDirs, file.name, *).onCall { (_, _, onExists) =>
+      onExists(existing).map { res =>
+        res shouldBe Some(true)
+        Some(target)
+      }
+    }
+    (api.readFile _).expects(srcDirs, file, 0.0).returning(Future.successful(source))
+    onProgress.expects(srcFile, dstFile, position).returning(Future.successful(true))
+    
+    //when
+    val resultF = actions.copyFile(srcDirs, file, dstDirs, onExists, onProgress)
+    
+    //then
+    resultF.map { res =>
+      res shouldBe true
+    }
+  }
+
+  it should "append to existing file when copyFile" in {
+    //given
+    val api = mock[FileListApi]
+    val actions = new FileListActionsTest(api)
+    val srcDirs = List("parent-dir")
+    val file = FileListItem("test_file")
+    val existing = FileListItem("existing_file", size = 12)
+    val dstDirs = List("target-dir")
+    val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
+    val onProgress = mockFunction[String, String, Double, Future[Boolean]]
+    val srcFile = "source_file"
+    val dstFile = "target_file"
+    val position = 1234.0
+    
+    val source = mock[FileSource]
+    (source.file _).expects().returning(srcFile)
+    (source.readNextBytes _).expects(*).onCall { buff: Uint8Array =>
+      buff.length shouldBe (64 * 1024)
+      Future.successful(123)
+    }
+    (source.readNextBytes _).expects(*).onCall { _: Uint8Array =>
+      Future.successful(0)
+    }
+    (source.close _).expects().returning(Future.unit)
+    
+    val target = mock[FileTarget]
+    (target.file _).expects().returning(dstFile)
+    (target.writeNextBytes _).expects(*, *).onCall { (buff: Uint8Array, length: Int) =>
+      buff.length shouldBe (64 * 1024)
+      length shouldBe 123
+      Future.successful(position)
+    }
+    (target.setModTime _).expects(file).returning(Future.unit)
+    (target.close _).expects().returning(Future.unit)
+
+    //then
+    onExists.expects(existing).returning(Future.successful(Some(false)))
+    (api.writeFile _).expects(dstDirs, file.name, *).onCall { (_, _, onExists) =>
+      onExists(existing).map { res =>
+        res shouldBe Some(false)
+        Some(target)
+      }
+    }
+    (api.readFile _).expects(srcDirs, file, existing.size).returning(Future.successful(source))
+    onProgress.expects(srcFile, dstFile, position).returning(Future.successful(true))
+    
+    //when
+    val resultF = actions.copyFile(srcDirs, file, dstDirs, onExists, onProgress)
+    
+    //then
+    resultF.map { res =>
+      res shouldBe true
+    }
+  }
+
+  it should "return true if skip existing file when copyFile" in {
+    //given
+    val api = mock[FileListApi]
+    val actions = new FileListActionsTest(api)
+    val srcDirs = List("parent-dir")
+    val file = FileListItem("test_file")
+    val existing = FileListItem("existing_file", size = 12)
+    val dstDirs = List("target-dir")
+    val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
+    val onProgress = mockFunction[String, String, Double, Future[Boolean]]
+    
+    //then
+    onExists.expects(existing).returning(Future.successful(None))
+    (api.writeFile _).expects(dstDirs, file.name, *).onCall { (_, _, onExists) =>
+      onExists(existing).map { res =>
+        res shouldBe None
+        None
+      }
+    }
+    onProgress.expects(*, *, *).never()
+    
+    //when
+    val resultF = actions.copyFile(srcDirs, file, dstDirs, onExists, onProgress)
+    
+    //then
+    resultF.map { res =>
+      res shouldBe true
+    }
+  }
+
+  it should "return false and delete target file if cancelled when copyFile" in {
+    //given
+    val api = mock[FileListApi]
+    val actions = new FileListActionsTest(api)
+    val srcDirs = List("parent-dir")
+    val file = FileListItem("test_file")
+    val dstDirs = List("target-dir")
+    val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
+    val onProgress = mockFunction[String, String, Double, Future[Boolean]]
+    val srcFile = "source_file"
+    val dstFile = "target_file"
+    val position = 1234.0
+    
+    val source = mock[FileSource]
+    (source.file _).expects().returning(srcFile)
+    (source.readNextBytes _).expects(*).onCall { buff: Uint8Array =>
+      buff.length shouldBe (64 * 1024)
+      Future.successful(123)
+    }
+    (source.close _).expects().returning(Future.unit)
+    
+    val target = mock[FileTarget]
+    (target.file _).expects().returning(dstFile)
+    (target.writeNextBytes _).expects(*, *).onCall { (buff: Uint8Array, length: Int) =>
+      buff.length shouldBe (64 * 1024)
+      length shouldBe 123
+      Future.successful(position)
+    }
+    (target.close _).expects().returning(Future.unit)
+    (target.delete _).expects().returning(Future.unit)
+
+    //then
+    (api.writeFile _).expects(dstDirs, file.name, *).returning(Future.successful(Some(target)))
+    (api.readFile _).expects(srcDirs, file, 0.0).returning(Future.successful(source))
+    onExists.expects(*).never()
+    onProgress.expects(srcFile, dstFile, position).returning(Future.successful(false))
+    
+    //when
+    val resultF = actions.copyFile(srcDirs, file, dstDirs, onExists, onProgress)
     
     //then
     resultF.map { res =>
