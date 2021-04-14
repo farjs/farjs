@@ -60,16 +60,22 @@ trait FileListActions {
                 dir: String,
                 multiple: Boolean): FileListDirCreateAction = {
 
+    val names =
+      if (multiple) dir.split(path.sep.head).toList
+      else List(dir)
+    
     val future = for {
-      created <- api.mkDir(parent, dir, multiple)
+      _ <- mkDirs(parent :: names)
       currDir <- api.readDir(parent)
     } yield {
-      dispatch(FileListDirCreatedAction(isRight, created, currDir))
+      dispatch(FileListDirCreatedAction(isRight, names.head, currDir))
       ()
     }
 
     FileListDirCreateAction(FutureTask("Creating Dir", future))
   }
+
+  def mkDirs(dirs: List[String]): Future[Unit] = api.mkDirs(dirs)
 
   def deleteItems(dispatch: Dispatch,
                   isRight: Boolean,

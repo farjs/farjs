@@ -61,27 +61,29 @@ class FileListApiImpl extends FileListApi {
     delDirItems(parent, items.map(i => (i.name, i.isDir)))
   }
 
-  def mkDir(parent: String, dir: String, multiple: Boolean): Future[String] = {
+  def mkDirs(dirs: List[String]): Future[Unit] = {
 
-    def mkDirs(parent: String, names: List[String]): Future[Unit] = names match {
+    def loop(parent: String, names: List[String]): Future[Unit] = names match {
       case Nil => Future.unit
       case name :: tail => Future.unit.flatMap { _ =>
         val dir =
           if (name.isEmpty) parent
           else {
             val dir = path.join(parent, name)
-            if (!fs.existsSync(dir)) {
+            try {
               fs.mkdirSync(dir)
+            }
+            catch {
+              case JavaScriptException(error: raw.Error) if error.code == "EEXIST" => //skip
             }
             dir
           }
         
-        mkDirs(dir, tail)
+        loop(dir, tail)
       }
     }
 
-    val names = if (multiple) dir.split(path.sep.head).toList else List(dir)
-    mkDirs(parent, names).map(_ => names.head)
+    loop("", dirs)
   }
   
   def readFile(parentDirs: List[String], file: FileListItem, position: Double): Future[FileSource] = Future {

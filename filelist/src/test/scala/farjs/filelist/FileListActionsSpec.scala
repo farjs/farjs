@@ -140,18 +140,44 @@ class FileListActionsSpec extends AsyncTestSpec {
     future.map(_ => Succeeded)
   }
   
-  it should "dispatch FileListDirChangedAction when createDir" in {
+  it should "dispatch FileListDirChangedAction when createDir(multiple=false)" in {
     //given
     val api = mock[FileListApi]
     val actions = new FileListActionsTest(api)
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
     val isRight = true
-    val parent = "/"
+    val parent = "/parent"
+    val dir = "test/dir"
+    val multiple = false
+
+    (api.mkDirs _).expects(List(parent, dir)).returning(Future.unit)
+    (api.readDir(_: String)).expects(parent).returning(Future.successful(currDir))
+    
+    //then
+    dispatch.expects(FileListDirCreatedAction(isRight, dir, currDir))
+    
+    //when
+    val FileListDirCreateAction(FutureTask(msg, future)) =
+      actions.createDir(dispatch, isRight, parent, dir, multiple)
+    
+    //then
+    msg shouldBe "Creating Dir"
+    future.map(_ => Succeeded)
+  }
+  
+  it should "dispatch FileListDirChangedAction when createDir(multiple=true)" in {
+    //given
+    val api = mock[FileListApi]
+    val actions = new FileListActionsTest(api)
+    val dispatch = mockFunction[Any, Any]
+    val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
+    val isRight = true
+    val parent = "/parent"
     val dir = "test/dir"
     val multiple = true
 
-    (api.mkDir _).expects(parent, dir, multiple).returning(Future.successful("test"))
+    (api.mkDirs _).expects(List(parent, "test", "dir")).returning(Future.unit)
     (api.readDir(_: String)).expects(parent).returning(Future.successful(currDir))
     
     //then

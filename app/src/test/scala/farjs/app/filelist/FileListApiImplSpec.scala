@@ -158,24 +158,23 @@ class FileListApiImplSpec extends AsyncTestSpec {
     }
   }
   
-  it should "create multiple directories when mkDir" in {
+  it should "create multiple directories when mkDirs" in {
     //given
     val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
     fs.existsSync(tmpDir) shouldBe true
-    val dir = s"test1${path.sep}test2${path.sep}${path.sep}test3${path.sep}"
+    val dirs = List("test1", "test2", "", "test3", "")
 
     //when
-    val resultF = apiImp.mkDir(tmpDir, dir, multiple = true)
+    val resultF = apiImp.mkDirs(tmpDir :: dirs)
 
     //then
-    val resCheckF = resultF.map { res =>
-      res shouldBe "test1"
-      fs.existsSync(path.join(tmpDir, dir)) shouldBe true
+    val resCheckF = resultF.map { _ =>
+      fs.existsSync(path.join(tmpDir :: dirs: _*)) shouldBe true
     }
 
     //cleanup
     resCheckF.map { _ =>
-      del(path.join(tmpDir, dir), isDir = true)
+      del(path.join(tmpDir :: dirs: _*), isDir = true)
       del(path.join(tmpDir, "test1", "test2"), isDir = true)
       del(path.join(tmpDir, "test1"), isDir = true)
       del(tmpDir, isDir = true)
@@ -183,27 +182,26 @@ class FileListApiImplSpec extends AsyncTestSpec {
     }
   }
   
-  it should "not fail if dirs already exists when mkDir" in {
+  it should "not fail if dirs already exists when mkDirs" in {
     //given
     val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
     fs.existsSync(tmpDir) shouldBe true
     val topDir = "test1"
-    val dir = s"$topDir${path.sep}test2${path.sep}${path.sep}test3${path.sep}"
+    val dirs = List(topDir, "test2", "", "test3", "")
     fs.mkdirSync(path.join(tmpDir, topDir))
     fs.existsSync(path.join(tmpDir, topDir)) shouldBe true
 
     //when
-    val resultF = apiImp.mkDir(tmpDir, dir, multiple = true)
+    val resultF = apiImp.mkDirs(tmpDir :: dirs)
 
     //then
-    val resCheckF = resultF.map { res =>
-      res shouldBe topDir
-      fs.existsSync(path.join(tmpDir, dir)) shouldBe true
+    val resCheckF = resultF.map { _ =>
+      fs.existsSync(path.join(tmpDir :: dirs: _*)) shouldBe true
     }
 
     //cleanup
     resCheckF.map { _ =>
-      del(path.join(tmpDir, dir), isDir = true)
+      del(path.join(tmpDir :: dirs: _*), isDir = true)
       del(path.join(tmpDir, "test1", "test2"), isDir = true)
       del(path.join(tmpDir, "test1"), isDir = true)
       del(tmpDir, isDir = true)
@@ -211,18 +209,17 @@ class FileListApiImplSpec extends AsyncTestSpec {
     }
   }
   
-  it should "create single directory when mkDir" in {
+  it should "create single directory when mkDirs" in {
     //given
     val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
     fs.existsSync(tmpDir) shouldBe true
     val dir = "test123"
 
     //when
-    val resultF = apiImp.mkDir(tmpDir, dir, multiple = false)
+    val resultF = apiImp.mkDirs(List(path.join(tmpDir, dir)))
 
     //then
-    val resCheckF = resultF.map { res =>
-      res shouldBe dir
+    val resCheckF = resultF.map { _ =>
       fs.existsSync(path.join(tmpDir, dir)) shouldBe true
     }
 
