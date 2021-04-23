@@ -47,7 +47,7 @@ trait FileListActions {
                 parent: Option[String],
                 dir: String): FileListDirChangeAction = {
     
-    val future = api.readDir(parent, dir).andThen {
+    val future = readDir(parent, dir).andThen {
       case Success(currDir) => dispatch(FileListDirChangedAction(isRight, dir, currDir))
     }
 
@@ -77,6 +77,8 @@ trait FileListActions {
 
   def mkDirs(dirs: List[String]): Future[Unit] = api.mkDirs(dirs)
 
+  def readDir(parent: Option[String], dir: String): Future[FileListDir] = api.readDir(parent, dir)
+
   def deleteItems(dispatch: Dispatch,
                   isRight: Boolean,
                   dir: String,
@@ -96,7 +98,7 @@ trait FileListActions {
     items.foldLeft(Future.successful(true)) { case (resF, item) =>
       resF.flatMap {
         case true if item.isDir =>
-          api.readDir(Some(parent), item.name).flatMap { ls =>
+          readDir(Some(parent), item.name).flatMap { ls =>
             if (onNextDir(ls.path, ls.items)) scanDirs(ls.path, ls.items, onNextDir)
             else Future.successful(false)
           }
