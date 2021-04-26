@@ -23,6 +23,7 @@ import scala.scalajs.js.annotation.JSExportAll
 class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   CopyProcess.copyProgressPopup = () => "CopyProgressPopup".asInstanceOf[ReactClass]
+  CopyProcess.fileExistsPopup = () => "FileExistsPopup".asInstanceOf[ReactClass]
   CopyProcess.messageBoxComp = () => "MessageBox".asInstanceOf[ReactClass]
   
   CopyProcess.timers = new TimersMock {
@@ -177,6 +178,307 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     }
   }
 
+  it should "call onDone when onCancel in FileExistsPopup" in {
+    //given
+    val onDone = mockFunction[Unit]
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val item = FileListItem("file 1")
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onDone)
+    val p = Promise[Boolean]()
+
+    var onExistsFn: FileListItem => Future[Option[Boolean]] = null
+    (actions.copyFile _).expects(List("/from/path"), item, List("/to/path"), *, *).onCall { (_, _, _, onExists, _) =>
+      onExistsFn = onExists
+      p.future
+    }
+    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    
+    eventually(onExistsFn should not be null).flatMap { _ =>
+      val existsF = onExistsFn(FileListItem("existing.file"))
+      val existsProps = findComponentProps(renderer.root, fileExistsPopup)
+      
+      //then
+      onDone.expects()
+      
+      //when
+      existsProps.onCancel()
+      
+      //then
+      existsF.flatMap { res =>
+        res shouldBe None
+
+        //complete
+        p.success(false)
+        p.future.map(_ => Succeeded)
+      }
+    }
+  }
+
+  it should "skip existing file when skip action" in {
+    //given
+    val onDone = mockFunction[Unit]
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val item = FileListItem("file 1")
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onDone)
+    val p = Promise[Boolean]()
+
+    var onExistsFn: FileListItem => Future[Option[Boolean]] = null
+    (actions.copyFile _).expects(List("/from/path"), item, List("/to/path"), *, *).onCall { (_, _, _, onExists, _) =>
+      onExistsFn = onExists
+      p.future
+    }
+    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    
+    eventually(onExistsFn should not be null).flatMap { _ =>
+      val existsF = onExistsFn(FileListItem("existing.file"))
+      val existsProps = findComponentProps(renderer.root, fileExistsPopup)
+      
+      //when
+      TestRenderer.act { () =>
+        existsProps.onAction(FileExistsAction.Skip)
+      }
+
+      //then
+      findProps(renderer.root, fileExistsPopup) should be (empty)
+      existsF.flatMap { res =>
+        res shouldBe None
+
+        //complete
+        p.success(false)
+        p.future.map(_ => Succeeded)
+      }
+    }
+  }
+
+  it should "append to existing file when append action" in {
+    //given
+    val onDone = mockFunction[Unit]
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val item = FileListItem("file 1")
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onDone)
+    val p = Promise[Boolean]()
+
+    var onExistsFn: FileListItem => Future[Option[Boolean]] = null
+    (actions.copyFile _).expects(List("/from/path"), item, List("/to/path"), *, *).onCall { (_, _, _, onExists, _) =>
+      onExistsFn = onExists
+      p.future
+    }
+    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    
+    eventually(onExistsFn should not be null).flatMap { _ =>
+      val existsF = onExistsFn(FileListItem("existing.file"))
+      val existsProps = findComponentProps(renderer.root, fileExistsPopup)
+      
+      //when
+      TestRenderer.act { () =>
+        existsProps.onAction(FileExistsAction.Append)
+      }
+
+      //then
+      findProps(renderer.root, fileExistsPopup) should be (empty)
+      existsF.flatMap { res =>
+        res shouldBe Some(false)
+
+        //complete
+        p.success(false)
+        p.future.map(_ => Succeeded)
+      }
+    }
+  }
+
+  it should "pause copy process when asking for existing file action" in {
+    //given
+    val onDone = mockFunction[Unit]
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val item = FileListItem("file 1")
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onDone)
+    val p = Promise[Boolean]()
+
+    var onExistsFn: FileListItem => Future[Option[Boolean]] = null
+    (actions.copyFile _).expects(List("/from/path"), item, List("/to/path"), *, *).onCall { (_, _, _, onExists, _) =>
+      onExistsFn = onExists
+      p.future
+    }
+    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    
+    eventually {
+      onExistsFn should not be null
+    }.flatMap { _ =>
+      //when
+      val existsF = onExistsFn(FileListItem("existing.file"))
+      
+      //then
+      implicit val patienceConfig: PatienceConfig = PatienceConfig(
+        timeout = scaled(Span(1, Seconds)),
+        interval = scaled(Span(100, Millis))
+      )
+      val resultF = eventually(existsF.isCompleted shouldBe true)
+      resultF.failed.flatMap { _ =>
+        //when
+        val existsProps = findComponentProps(renderer.root, fileExistsPopup)
+        TestRenderer.act { () =>
+          existsProps.onAction(FileExistsAction.Overwrite)
+        }
+        findProps(renderer.root, fileExistsPopup) should be (empty)
+
+        //then
+        existsF.flatMap { res =>
+          res shouldBe Some(true)
+
+          //complete
+          p.success(false)
+          p.future.map(_ => Succeeded)
+        }
+      }
+    }
+  }
+
+  it should "do not ask for existing file action when canceled(unmount)" in {
+    //given
+    val onDone = mockFunction[Unit]
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val item = FileListItem("file 1")
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onDone)
+    val p = Promise[Boolean]()
+
+    var onExistsFn: FileListItem => Future[Option[Boolean]] = null
+    (actions.copyFile _).expects(List("/from/path"), item, List("/to/path"), *, *).onCall { (_, _, _, onExists, _) =>
+      onExistsFn = onExists
+      p.future
+    }
+    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    
+    eventually {
+      onExistsFn should not be null
+    }.flatMap { _ =>
+      //when
+      TestRenderer.act { () =>
+        renderer.unmount()
+      }
+      
+      //then
+      val existsF = onExistsFn(FileListItem("existing.file"))
+      existsF.flatMap { res =>
+        res shouldBe None
+        
+        //complete
+        p.success(false)
+        p.future.map(_ => Succeeded)
+      }
+    }
+  }
+
+  it should "do not ask for existing file action again if applied all action" in {
+    //given
+    val onDone = mockFunction[Unit]
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val item1 = FileListItem("file 1")
+    val item2 = FileListItem("file 2")
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item1, item2), "/to/path", 12345, onDone)
+
+    val p1 = Promise[Boolean]()
+    var onExistsFn1: FileListItem => Future[Option[Boolean]] = null
+    (actions.copyFile _).expects(List("/from/path"), item1, List("/to/path"), *, *).onCall { (_, _, _, onExists, _) =>
+      onExistsFn1 = onExists
+      p1.future
+    }
+    val p2 = Promise[Boolean]()
+    var onExistsFn2: FileListItem => Future[Option[Boolean]] = null
+    (actions.copyFile _).expects(List("/from/path"), item2, List("/to/path"), *, *).onCall { (_, _, _, onExists, _) =>
+      onExistsFn2 = onExists
+      p2.future
+    }
+    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+
+    eventually(onExistsFn1 should not be null).flatMap { _ =>
+      //given
+      val existsF1 = onExistsFn1(FileListItem("existing.file1"))
+      val existsProps = findComponentProps(renderer.root, fileExistsPopup)
+      TestRenderer.act { () =>
+        existsProps.onAction(FileExistsAction.All)
+      }
+      findProps(renderer.root, fileExistsPopup) should be (empty)
+      existsF1.flatMap { res =>
+        res shouldBe Some(true)
+        p1.success(true)
+
+        eventually(onExistsFn2 should not be null).flatMap { _ =>
+          //when
+          val existsF2 = onExistsFn2(FileListItem("existing.file2"))
+
+          //then
+          findProps(renderer.root, fileExistsPopup) should be (empty)
+          existsF2.flatMap { res =>
+            res shouldBe Some(true)
+            
+            //complete
+            p2.success(false)
+            p2.future.map(_ => Succeeded)
+          }
+        }
+      }
+    }
+  }
+
+  it should "do not ask for existing file action again if applied skip all action" in {
+    //given
+    val onDone = mockFunction[Unit]
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val item1 = FileListItem("file 1")
+    val item2 = FileListItem("file 2")
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item1, item2), "/to/path", 12345, onDone)
+
+    val p1 = Promise[Boolean]()
+    var onExistsFn1: FileListItem => Future[Option[Boolean]] = null
+    (actions.copyFile _).expects(List("/from/path"), item1, List("/to/path"), *, *).onCall { (_, _, _, onExists, _) =>
+      onExistsFn1 = onExists
+      p1.future
+    }
+    val p2 = Promise[Boolean]()
+    var onExistsFn2: FileListItem => Future[Option[Boolean]] = null
+    (actions.copyFile _).expects(List("/from/path"), item2, List("/to/path"), *, *).onCall { (_, _, _, onExists, _) =>
+      onExistsFn2 = onExists
+      p2.future
+    }
+    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+
+    eventually(onExistsFn1 should not be null).flatMap { _ =>
+      //given
+      val existsF1 = onExistsFn1(FileListItem("existing.file1"))
+      val existsProps = findComponentProps(renderer.root, fileExistsPopup)
+      TestRenderer.act { () =>
+        existsProps.onAction(FileExistsAction.SkipAll)
+      }
+      findProps(renderer.root, fileExistsPopup) should be (empty)
+      existsF1.flatMap { res =>
+        res shouldBe None
+        p1.success(true)
+
+        eventually(onExistsFn2 should not be null).flatMap { _ =>
+          //when
+          val existsF2 = onExistsFn2(FileListItem("existing.file2"))
+
+          //then
+          findProps(renderer.root, fileExistsPopup) should be (empty)
+          existsF2.flatMap { res =>
+            res shouldBe None
+            
+            //complete
+            p2.success(false)
+            p2.future.map(_ => Succeeded)
+          }
+        }
+      }
+    }
+  }
+
   it should "pause copy process when cancelling" in {
     //given
     val onDone = mockFunction[Unit]
@@ -227,7 +529,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     }
   }
 
-  it should "not call onDone when unmount (cancelled)" in {
+  it should "not call onDone if cancelled when unmount" in {
     //given
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]

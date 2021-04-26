@@ -28,23 +28,27 @@ case class CopyProcessProps(dispatch: Dispatch,
 object CopyProcess extends FunctionComponent[CopyProcessProps] {
 
   private[copy] var copyProgressPopup: UiComponent[CopyProgressPopupProps] = CopyProgressPopup
+  private[copy] var fileExistsPopup: UiComponent[FileExistsPopupProps] = FileExistsPopup
   private[copy] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
   
   private[copy] var timers: Timers = nodejs.global
   
   private case class CopyState(time100ms: Int = 0,
-                               cancel: Boolean = false)
+                               cancel: Boolean = false,
+                               existing: Option[FileListItem] = None)
 
-  private case class CopyData(item: String = "",
+  private case class CopyData(item: FileListItem = FileListItem(""),
                               to: String = "",
                               itemPercent: Int = 0,
                               itemBytes: Double = 0.0,
-                              total: Double = 0.0)
+                              total: Double = 0.0,
+                              askWhenExists: Boolean = true)
 
   protected def render(compProps: Props): ReactElement = {
     val (state, setState) = useStateUpdater(() => CopyState())
     val inProgress = useRef(false)
     val cancelPromise = useRef(Promise.successful(()))
+    val existsPromise = useRef(Promise.successful[Option[Boolean]](None))
     val data = useRef(CopyData())
     val props = compProps.wrapped
     
@@ -62,13 +66,17 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
               } yield res
             case true if !item.isDir && inProgress.current =>
               data.current = data.current.copy(
-                item = item.name,
+                item = item,
                 to = nodejs.path.join(targetDirs :+ item.name: _*),
                 itemPercent = 0,
                 itemBytes = 0.0
               )
-              props.actions.copyFile(List(parent), item, targetDirs, onExists = { _ =>
-                Future.successful(None)
+              props.actions.copyFile(List(parent), item, targetDirs, onExists = { existing =>
+                if (inProgress.current && data.current.askWhenExists) {
+                  setState(_.copy(existing = Some(existing)))
+                  existsPromise.current = Promise[Option[Boolean]]()
+                }
+                existsPromise.current.future
               }, onProgress = { (_, _, position) =>
                 data.current = data.current.copy(
                   itemPercent = (divide(position, item.size) * 100).toInt,
@@ -122,7 +130,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
     
     <.>()(
       <(copyProgressPopup())(^.wrapped := CopyProgressPopupProps(
-        item = d.item,
+        item = d.item.name,
         to = d.to,
         itemPercent = d.itemPercent,
         total = props.total,
@@ -136,18 +144,44 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
         }
       ))(),
 
+      state.existing.map { existing =>
+        <(fileExistsPopup())(^.wrapped := FileExistsPopupProps(
+          newItem = d.item,
+          existing = existing,
+          onAction = { action =>
+            setState(_.copy(existing = None))
+            
+            if (action == FileExistsAction.All || action == FileExistsAction.SkipAll) {
+              data.current = data.current.copy(askWhenExists = false)
+            }
+            action match {
+              case FileExistsAction.Overwrite | FileExistsAction.All =>
+                existsPromise.current.trySuccess(Some(true))
+              case FileExistsAction.Skip | FileExistsAction.SkipAll =>
+                existsPromise.current.trySuccess(None)
+              case FileExistsAction.Append =>
+                existsPromise.current.trySuccess(Some(false))
+            }
+          },
+          onCancel = { () =>
+            props.onDone()
+            existsPromise.current.trySuccess(None)
+          }
+        ))()
+      },
+
       if (state.cancel) Some {
         <(messageBoxComp())(^.wrapped := MessageBoxProps(
           title = "Operation has been interrupted",
           message = "Do you really want to cancel it?",
           actions = List(
             MessageBoxAction.YES { () =>
-              cancelPromise.current.trySuccess(())
               props.onDone()
+              cancelPromise.current.trySuccess(())
             },
             MessageBoxAction.NO { () =>
-              cancelPromise.current.trySuccess(())
               setState(_.copy(cancel = false))
+              cancelPromise.current.trySuccess(())
             }
           ),
           style = Theme.current.popup.error

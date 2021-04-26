@@ -73,6 +73,7 @@ different operations:
 * Show Quick Search box - `Ctrl + S`
 * View Item(s) - `F3`
   * Scans selected folder(s)/file(s) and calculates size(s)
+* Copy Item(s) - `F5`
 * Create Folder (with intermediate sub-folders) - `F7`
 * Delete Item(s) - `F8`
 
