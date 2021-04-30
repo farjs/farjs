@@ -29,6 +29,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     val rightButtonRef = useRef[BlessedElement](null)
     val (isRight, setIsRight) = useStateUpdater(false)
     val props = compProps.wrapped
+    val activeList = props.data.activeList
     
     val (leftStackData, setLeftStackData) = useStateUpdater(List.empty[StackItem])
     val (rightStackData, setRightStackData) = useStateUpdater(List.empty[StackItem])
@@ -37,7 +38,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
 
     useLayoutEffect({ () =>
       val element = 
-        if (props.data.activeList.isRight) rightButtonRef.current
+        if (activeList.isRight) rightButtonRef.current
         else leftButtonRef.current
       
       element.focus()
@@ -63,9 +64,11 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         case "C-u" =>
           setIsRight(!_)
           screen.focusNext()
+        case "C-r" =>
+          props.dispatch(props.actions.updateDir(props.dispatch, activeList.isRight, activeList.currDir.path))
         case keyFull =>
           props.plugins.find(_.triggerKey == keyFull).foreach { plugin =>
-            plugin.onTrigger(props.data.activeList.isRight, leftStack, rightStack)
+            plugin.onTrigger(activeList.isRight, leftStack, rightStack)
           }
       }
     }

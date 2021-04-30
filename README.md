@@ -35,7 +35,7 @@ $ farjs
 
 ![Screenshots](https://raw.githubusercontent.com/scommons/far-js/master/docs/images/screenshots.png)
 
-To exit the application press `F10` on the keyboard.
+To exit the application - press `F10` on the keyboard.
 
 ## Documentation
 
@@ -59,23 +59,24 @@ Main application window that consists of two similar panels.
 Each panel displays list of files and directories. You can perform
 different operations:
 
-* Navigation within panels:
-  * Items selection - `Shift + Up/Down/Left/Right/PageUp/PageDown/Home/End`
-  * Back to the parent folder - `Ctrl + PageUp`
-  * Go into a folder - `Ctrl + PageDown` / `Return`
+* **Navigation** within panels:
+  * Items **selection** - `Shift + Up/Down/Left/Right/PageUp/PageDown/Home/End`
+  * **Go back** to the parent folder - `Ctrl + PageUp`
+  * **Go into** a folder - `Ctrl + PageDown` / `Return`
 
-* Open item in **default application** - `Alt + PageDown`
+* **Open item** in default application - `Alt + PageDown`
   (see [Key Bindings](#key-bindings) for how to re-map it to `Shift + Return`)
-* Copy current item's path into **Clipboard** - `Ctrl + C`
+* **Copy Path** of current item into **Clipboard** - `Ctrl + C`
   (in iTerm2 only)
-* Swap the panels - `Ctrl + U`
-* Quick View of current item on in-active panel - `Ctrl + Q`
-* Show Quick Search box - `Ctrl + S`
-* View Item(s) - `F3`
+* **Swap** the panels - `Ctrl + U`
+* **Quick View** of current item on in-active panel - `Ctrl + Q`
+* Show **Quick Search** box - `Ctrl + S`
+* **Refresh** active panel - `Ctrl + R`
+* **View item**(s) - `F3`
   * Scans selected folder(s)/file(s) and calculates size(s)
-* Copy Item(s) - `F5`
-* Create Folder (with intermediate sub-folders) - `F7`
-* Delete Item(s) - `F8`
+* **Copy item**(s) - `F5`
+* **Create folder** (with intermediate sub-folders) - `F7`
+* **Delete item**(s) - `F8`
 
 ## Dev Tools
 
@@ -97,13 +98,15 @@ Shows possible colors with their `hex` codes for current terminal.
 
 * Why supported key combination doesn't work or trigger another
 action in my terminal?
-  - You may re-map the keys to send supported **escape sequences**.
+  - You may re-map the keys to **send** supported **escape sequences**
+  or **hex codes**.
   For example you can re-map:
-    - | Key | Supported Key | Escape Sequence ^[ ... |
-      | --- | --- | --- |
+    - | Key | Supported Key | Escape Sequence ^[ ... | Hex Codes |
+      | --- | --- | --- | --- |
       | `Shift + Return` | `Alt + PageDown` | `[6;3~` |
       | `CMD + PageDown` | `Ctrl + PageDown` | `[6^` |
       | `CMD + PageUp` | `Ctrl + PageUp` | `[5^` |
+      | `CMD + R` | `Ctrl + R` | | `0x12` |
   - In [iTerm2](https://iterm2.com/) it looks like this:
     - ![Keys Re Mapping](https://raw.githubusercontent.com/scommons/far-js/master/docs/images/keys_re_mapping.png)
   

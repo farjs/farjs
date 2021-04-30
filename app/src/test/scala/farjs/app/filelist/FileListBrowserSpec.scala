@@ -2,19 +2,24 @@ package farjs.app.filelist
 
 import farjs.app.filelist.FileListBrowser._
 import farjs.app.filelist.FileListBrowserSpec._
-import farjs.filelist.FileListActions.FileListActivateAction
+import farjs.filelist.FileListActions.{FileListActivateAction, FileListDirUpdateAction}
 import farjs.filelist._
+import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
 import farjs.filelist.stack._
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
+import org.scalatest.Succeeded
+import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
 import scommons.react.blessed._
+import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
+import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportAll
 
-class FileListBrowserSpec extends TestSpec with TestRendererUtils {
+class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
   
   FileListBrowser.panelStackComp = () => "PanelStack".asInstanceOf[ReactClass]
   FileListBrowser.fileListPanelComp = () => "FileListPanel".asInstanceOf[ReactClass]
@@ -49,6 +54,8 @@ class FileListBrowserSpec extends TestSpec with TestRendererUtils {
 
     //when
     leftButton.props.onFocus()
+    
+    Succeeded
   }
 
   it should "dispatch FileListActivateAction when onFocus in right panel" in {
@@ -73,6 +80,8 @@ class FileListBrowserSpec extends TestSpec with TestRendererUtils {
 
     //when
     rightButton.props.onFocus()
+    
+    Succeeded
   }
 
   it should "dispatch FileListPopupExitAction when onKeypress(F10)" in {
@@ -98,6 +107,8 @@ class FileListBrowserSpec extends TestSpec with TestRendererUtils {
 
     //when
     button.props.onKeypress(null, js.Dynamic.literal(full = keyFull).asInstanceOf[KeyboardKey])
+
+    Succeeded
   }
 
   it should "focus next panel when onKeypress(tab|S-tab)" in {
@@ -131,6 +142,8 @@ class FileListBrowserSpec extends TestSpec with TestRendererUtils {
     check(keyFull = "tab", focus = true)
     check(keyFull = "S-tab", focus = true)
     check(keyFull = "unknown", focus = false)
+
+    Succeeded
   }
 
   it should "swap the panels when onKeypress(Ctrl+U)" in {
@@ -161,6 +174,47 @@ class FileListBrowserSpec extends TestSpec with TestRendererUtils {
     val List(leftPanel, rightPanel) = findProps(comp, fileListPanelComp)
     leftPanel.state shouldBe props.data.right
     rightPanel.state shouldBe props.data.left
+  }
+
+  it should "update active panel when onKeypress(Ctrl+R)" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val leftDir = FileListDir("/left/dir", isRoot = false, List(
+      FileListItem("dir 1", isDir = true)
+    ))
+    val rightDir = FileListDir("/right/dir", isRoot = false, List(
+      FileListItem("dir 2", isDir = true)
+    ))
+    val props = FileListBrowserProps(dispatch, actions, FileListsState(
+      left = FileListState(currDir = leftDir, isActive = true),
+      right = FileListState(currDir = rightDir, isRight = true)
+    ))
+    val screenMock = mock[BlessedScreenMock]
+    val screen = screenMock.asInstanceOf[BlessedScreen]
+    val buttonMock = mock[BlessedElementMock]
+    (buttonMock.focus _).expects()
+
+    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
+      if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock.asInstanceOf[js.Any]
+      else null
+    })
+    val List(button, _) = findComponents(comp, <.button.name)
+    val keyFull = "C-r"
+    val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
+      FileListItem("file 1")
+    ))
+    val action = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
+    
+    //then
+    (buttonMock.screen _).expects().returning(screen)
+    (actions.updateDir _).expects(dispatch, false, leftDir.path).returning(action)
+    dispatch.expects(action)
+
+    //when
+    button.props.onKeypress(screen, js.Dynamic.literal(full = keyFull).asInstanceOf[KeyboardKey])
+
+    action.task.future.map(_ => Succeeded)
   }
 
   it should "trigger plugin when onKeypress(triggerKey)" in {
@@ -194,6 +248,8 @@ class FileListBrowserSpec extends TestSpec with TestRendererUtils {
 
     //when
     button.props.onKeypress(screen, js.Dynamic.literal(full = keyFull).asInstanceOf[KeyboardKey])
+
+    Succeeded
   }
 
   it should "render component and focus active panel" in {
