@@ -140,6 +140,29 @@ class FileListActionsSpec extends AsyncTestSpec {
     future.map(_ => Succeeded)
   }
   
+  it should "dispatch FileListDirUpdatedAction when updateDir" in {
+    //given
+    val api = mock[FileListApi]
+    val actions = new FileListActionsTest(api)
+    val dispatch = mockFunction[Any, Any]
+    val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
+    val isRight = true
+    val path = "/test/path"
+
+    (api.readDir(_: String)).expects(path).returning(Future.successful(currDir))
+    
+    //then
+    dispatch.expects(FileListDirUpdatedAction(isRight, currDir))
+    
+    //when
+    val FileListDirUpdateAction(FutureTask(msg, future)) =
+      actions.updateDir(dispatch, isRight, path)
+    
+    //then
+    msg shouldBe "Updating Dir"
+    future.map(_ => Succeeded)
+  }
+  
   it should "dispatch FileListDirChangedAction when createDir(multiple=false)" in {
     //given
     val api = mock[FileListApi]

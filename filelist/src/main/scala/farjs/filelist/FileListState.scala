@@ -94,6 +94,9 @@ object FileListsStateReducer {
         currDir = processed,
         selectedNames = Set.empty
       )
+    case FileListDirUpdatedAction(`isRight`, currDir) =>
+      val processed = processDir(currDir)
+      state.copy(currDir = processed)
     case FileListDirCreatedAction(`isRight`, dir, currDir) =>
       val processed = processDir(currDir)
       state.copy(

@@ -54,6 +54,17 @@ trait FileListActions {
     FileListDirChangeAction(FutureTask("Changing Dir", future))
   }
 
+  def updateDir(dispatch: Dispatch,
+                isRight: Boolean,
+                path: String): FileListDirUpdateAction = {
+
+    val future = api.readDir(path).andThen {
+      case Success(currDir) => dispatch(FileListDirUpdatedAction(isRight, currDir))
+    }
+
+    FileListDirUpdateAction(FutureTask("Updating Dir", future))
+  }
+
   def createDir(dispatch: Dispatch,
                 isRight: Boolean,
                 parent: String,
@@ -170,6 +181,9 @@ object FileListActions {
   
   case class FileListDirChangeAction(task: FutureTask[FileListDir]) extends TaskAction
   case class FileListDirChangedAction(isRight: Boolean, dir: String, currDir: FileListDir) extends Action
+  
+  case class FileListDirUpdateAction(task: FutureTask[FileListDir]) extends TaskAction
+  case class FileListDirUpdatedAction(isRight: Boolean, currDir: FileListDir) extends Action
   
   case class FileListDirCreateAction(task: FutureTask[Unit]) extends TaskAction
   case class FileListDirCreatedAction(isRight: Boolean, dir: String, currDir: FileListDir) extends Action

@@ -147,6 +147,36 @@ class FileListsStateReducerSpec extends TestSpec {
     }
   }
 
+  it should "update FileListState when FileListDirUpdatedAction" in {
+    //given
+    val state = FileListsState(
+      left = FileListState(
+        offset = 1,
+        index = 2,
+        currDir = FileListDir("/root/sub-dir/dir 2", isRoot = false, items = Seq.empty),
+        selectedNames = Set("test")
+      )
+    )
+    val currDir = FileListDir("/root/sub-dir", isRoot = false, items = List(
+      FileListItem("file 1"),
+      FileListItem("dir 1", isDir = true)
+    ))
+    
+    //when & then
+    reduce(Some(state), FileListDirUpdatedAction(isRight = false, currDir)) shouldBe {
+      state.copy(left = FileListState(
+        offset = 1,
+        index = 2,
+        currDir = currDir.copy(items = List(
+          FileListItem.up,
+          FileListItem("dir 1", isDir = true),
+          FileListItem("file 1")
+        )),
+        selectedNames = Set("test")
+      ))
+    }
+  }
+
   it should "update FileListState when FileListDirCreatedAction" in {
     //given
     val stateDir = FileListDir("/", isRoot = true, items = Seq.empty)

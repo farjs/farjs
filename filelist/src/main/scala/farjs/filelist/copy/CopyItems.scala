@@ -5,6 +5,9 @@ import farjs.filelist.popups.FileListPopupsProps
 import scommons.react._
 import scommons.react.hooks._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Success
+
 object CopyItems extends FunctionComponent[FileListPopupsProps] {
 
   private[copy] var copyItemsStats: UiComponent[CopyItemsStatsProps] = CopyItemsStats
@@ -31,6 +34,19 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
       }
       setTotal(None)
       setToPath(None)
+    }
+    
+    val onDone: () => Unit = { () =>
+      onCancel(dispatchAction = false)()
+
+      val leftAction = props.actions.updateDir(props.dispatch, isRight = false, props.data.left.currDir.path)
+      props.dispatch(leftAction)
+
+      leftAction.task.future.andThen {
+        case Success(_) =>
+          val rightAction = props.actions.updateDir(props.dispatch, isRight = true, props.data.right.currDir.path)
+          props.dispatch(rightAction)
+      }
     }
     
     <.>()(
@@ -71,7 +87,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
           items = items,
           toPath = to,
           total = total,
-          onDone = onCancel(dispatchAction = false)
+          onDone = onDone
         ))()
       }
     )
