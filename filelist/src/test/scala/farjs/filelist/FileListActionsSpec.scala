@@ -305,13 +305,10 @@ class FileListActionsSpec extends AsyncTestSpec {
     val file = FileListItem("test_file")
     val dstDirs = List("target-dir")
     val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
-    val onProgress = mockFunction[String, String, Double, Future[Boolean]]
-    val srcFile = "source_file"
-    val dstFile = "target_file"
+    val onProgress = mockFunction[Double, Future[Boolean]]
     val position = 1234.0
     
     val source = mock[FileSource]
-    (source.file _).expects().returning(srcFile)
     (source.readNextBytes _).expects(*).onCall { buff: Uint8Array =>
       buff.length shouldBe (64 * 1024)
       Future.successful(123)
@@ -322,7 +319,6 @@ class FileListActionsSpec extends AsyncTestSpec {
     (source.close _).expects().returning(Future.unit)
     
     val target = mock[FileTarget]
-    (target.file _).expects().returning(dstFile)
     (target.writeNextBytes _).expects(*, *).onCall { (buff: Uint8Array, length: Int) =>
       buff.length shouldBe (64 * 1024)
       length shouldBe 123
@@ -335,7 +331,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     (api.writeFile _).expects(dstDirs, file.name, *).returning(Future.successful(Some(target)))
     (api.readFile _).expects(srcDirs, file, 0.0).returning(Future.successful(source))
     onExists.expects(*).never()
-    onProgress.expects(srcFile, dstFile, position).returning(Future.successful(true))
+    onProgress.expects(position).returning(Future.successful(true))
     
     //when
     val resultF = actions.copyFile(srcDirs, file, dstDirs, onExists, onProgress)
@@ -355,13 +351,10 @@ class FileListActionsSpec extends AsyncTestSpec {
     val existing = FileListItem("existing_file", size = 12)
     val dstDirs = List("target-dir")
     val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
-    val onProgress = mockFunction[String, String, Double, Future[Boolean]]
-    val srcFile = "source_file"
-    val dstFile = "target_file"
+    val onProgress = mockFunction[Double, Future[Boolean]]
     val position = 1234.0
     
     val source = mock[FileSource]
-    (source.file _).expects().returning(srcFile)
     (source.readNextBytes _).expects(*).onCall { buff: Uint8Array =>
       buff.length shouldBe (64 * 1024)
       Future.successful(123)
@@ -372,7 +365,6 @@ class FileListActionsSpec extends AsyncTestSpec {
     (source.close _).expects().returning(Future.unit)
     
     val target = mock[FileTarget]
-    (target.file _).expects().returning(dstFile)
     (target.writeNextBytes _).expects(*, *).onCall { (buff: Uint8Array, length: Int) =>
       buff.length shouldBe (64 * 1024)
       length shouldBe 123
@@ -390,7 +382,7 @@ class FileListActionsSpec extends AsyncTestSpec {
       }
     }
     (api.readFile _).expects(srcDirs, file, 0.0).returning(Future.successful(source))
-    onProgress.expects(srcFile, dstFile, position).returning(Future.successful(true))
+    onProgress.expects(position).returning(Future.successful(true))
     
     //when
     val resultF = actions.copyFile(srcDirs, file, dstDirs, onExists, onProgress)
@@ -410,13 +402,10 @@ class FileListActionsSpec extends AsyncTestSpec {
     val existing = FileListItem("existing_file", size = 12)
     val dstDirs = List("target-dir")
     val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
-    val onProgress = mockFunction[String, String, Double, Future[Boolean]]
-    val srcFile = "source_file"
-    val dstFile = "target_file"
+    val onProgress = mockFunction[Double, Future[Boolean]]
     val position = 1234.0
     
     val source = mock[FileSource]
-    (source.file _).expects().returning(srcFile)
     (source.readNextBytes _).expects(*).onCall { buff: Uint8Array =>
       buff.length shouldBe (64 * 1024)
       Future.successful(123)
@@ -427,7 +416,6 @@ class FileListActionsSpec extends AsyncTestSpec {
     (source.close _).expects().returning(Future.unit)
     
     val target = mock[FileTarget]
-    (target.file _).expects().returning(dstFile)
     (target.writeNextBytes _).expects(*, *).onCall { (buff: Uint8Array, length: Int) =>
       buff.length shouldBe (64 * 1024)
       length shouldBe 123
@@ -445,7 +433,7 @@ class FileListActionsSpec extends AsyncTestSpec {
       }
     }
     (api.readFile _).expects(srcDirs, file, existing.size).returning(Future.successful(source))
-    onProgress.expects(srcFile, dstFile, position).returning(Future.successful(true))
+    onProgress.expects(position).returning(Future.successful(true))
     
     //when
     val resultF = actions.copyFile(srcDirs, file, dstDirs, onExists, onProgress)
@@ -456,16 +444,16 @@ class FileListActionsSpec extends AsyncTestSpec {
     }
   }
 
-  it should "return true if skip existing file when copyFile" in {
+  it should "call onProgress(file.size) if skip existing when copyFile" in {
     //given
     val api = mock[FileListApi]
     val actions = new FileListActionsTest(api)
     val srcDirs = List("parent-dir")
-    val file = FileListItem("test_file")
+    val file = FileListItem("test_file", size = 123)
     val existing = FileListItem("existing_file", size = 12)
     val dstDirs = List("target-dir")
     val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
-    val onProgress = mockFunction[String, String, Double, Future[Boolean]]
+    val onProgress = mockFunction[Double, Future[Boolean]]
     
     //then
     onExists.expects(existing).returning(Future.successful(None))
@@ -475,14 +463,14 @@ class FileListActionsSpec extends AsyncTestSpec {
         None
       }
     }
-    onProgress.expects(*, *, *).never()
+    onProgress.expects(file.size).returning(Future.successful(false))
     
     //when
     val resultF = actions.copyFile(srcDirs, file, dstDirs, onExists, onProgress)
     
     //then
     resultF.map { res =>
-      res shouldBe true
+      res shouldBe false
     }
   }
 
@@ -494,13 +482,10 @@ class FileListActionsSpec extends AsyncTestSpec {
     val file = FileListItem("test_file")
     val dstDirs = List("target-dir")
     val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
-    val onProgress = mockFunction[String, String, Double, Future[Boolean]]
-    val srcFile = "source_file"
-    val dstFile = "target_file"
+    val onProgress = mockFunction[Double, Future[Boolean]]
     val position = 1234.0
     
     val source = mock[FileSource]
-    (source.file _).expects().returning(srcFile)
     (source.readNextBytes _).expects(*).onCall { buff: Uint8Array =>
       buff.length shouldBe (64 * 1024)
       Future.successful(123)
@@ -508,7 +493,6 @@ class FileListActionsSpec extends AsyncTestSpec {
     (source.close _).expects().returning(Future.unit)
     
     val target = mock[FileTarget]
-    (target.file _).expects().returning(dstFile)
     (target.writeNextBytes _).expects(*, *).onCall { (buff: Uint8Array, length: Int) =>
       buff.length shouldBe (64 * 1024)
       length shouldBe 123
@@ -521,7 +505,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     (api.writeFile _).expects(dstDirs, file.name, *).returning(Future.successful(Some(target)))
     (api.readFile _).expects(srcDirs, file, 0.0).returning(Future.successful(source))
     onExists.expects(*).never()
-    onProgress.expects(srcFile, dstFile, position).returning(Future.successful(false))
+    onProgress.expects(position).returning(Future.successful(false))
     
     //when
     val resultF = actions.copyFile(srcDirs, file, dstDirs, onExists, onProgress)

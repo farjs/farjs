@@ -122,7 +122,7 @@ trait FileListActions {
                file: FileListItem,
                dstDirs: List[String],
                onExists: FileListItem => Future[Option[Boolean]],
-               onProgress: (String, String, Double) => Future[Boolean]): Future[Boolean] = {
+               onProgress: Double => Future[Boolean]): Future[Boolean] = {
 
     var srcPosition: Double = 0.0
     
@@ -131,7 +131,7 @@ trait FileListActions {
         case Success(Some(overwrite)) if !overwrite => srcPosition = existing.size
       }
     }).flatMap {
-      case None => Future.successful(true)
+      case None => onProgress(file.size)
       case Some(target) =>
         api.readFile(srcDirs, file, srcPosition).flatMap { source =>
           val buff = new Uint8Array(copyBufferBytes)
@@ -141,7 +141,7 @@ trait FileListActions {
               if (bytesRead == 0) target.setModTime(file).map(_ => true)
               else {
                 target.writeNextBytes(buff, bytesRead).flatMap { position =>
-                  onProgress(source.file, target.file, position).flatMap {
+                  onProgress(position).flatMap {
                     case true => loop()
                     case false => Future.successful(false)
                   }

@@ -43,7 +43,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val timers = mock[TimersMock]
     val savedTimers = CopyProcess.timers
     CopyProcess.timers = timers.asInstanceOf[Timers]
-    val props = CopyProcessProps(dispatch, actions, "/from/path", Nil, "/to/path", 12345, () => ())
+    val props = CopyProcessProps(dispatch, actions, "/from/path", Nil, "/to/path", 12345, _ => (), () => ())
     val timerId = js.Dynamic.literal().asInstanceOf[Timeout]
 
     //then
@@ -86,7 +86,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val timers = mock[TimersMock]
     val savedTimers = CopyProcess.timers
     CopyProcess.timers = timers.asInstanceOf[Timers]
-    val props = CopyProcessProps(dispatch, actions, "/from/path", Nil, "/to/path", 12345, () => ())
+    val props = CopyProcessProps(dispatch, actions, "/from/path", Nil, "/to/path", 12345, _ => (), () => ())
     val timerId = js.Dynamic.literal().asInstanceOf[Timeout]
 
     //then
@@ -114,32 +114,54 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "call onDone when YES action in cancel popup" in {
     //given
+    val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val item = FileListItem("file 1")
-    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onDone)
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(
+      item,
+      FileListItem("file 2")
+    ), "/to/path", 12345, onTopItem, onDone)
+    val p = Promise[Boolean]()
+
+    var onProgressFn: Double => Future[Boolean] = null
+    (actions.copyFile _).expects(List("/from/path"), item, List("/to/path"), *, *).onCall { (_, _, _, _, onProgress) =>
+      onProgressFn = onProgress
+      p.future
+    }
     val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
-    val progressProps = findComponentProps(renderer.root, copyProgressPopup)
-    progressProps.onCancel()
-    val cancelProps = findComponentProps(renderer.root, messageBoxComp)
-    val resultF = Future.successful(false)
+    eventually {
+      onProgressFn should not be null
+    }.flatMap { _ =>
+      val progressProps = findComponentProps(renderer.root, copyProgressPopup)
+      progressProps.onCancel()
+      val cancelProps = findComponentProps(renderer.root, messageBoxComp)
+      val resultF = onProgressFn(123)
+      
+      //then
+      onTopItem.expects(*).never()
+      onDone.expects()
 
-    //then
-    (actions.copyFile _).expects(List("/from/path"), item, List("/to/path"), *, *).returning(resultF)
-    onDone.expects()
-    
-    //when
-    cancelProps.actions.head.onAction()
+      //when
+      cancelProps.actions.head.onAction()
 
-    resultF.map(_ => Succeeded)
+      //then
+      resultF.flatMap { res =>
+        res shouldBe false
+
+        //complete
+        p.success(false)
+        p.future.map(_ => Succeeded)
+      }
+    }
   }
 
   it should "hide cancel popup when NO action" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val props = CopyProcessProps(dispatch, actions, "/from/path", Nil, "/to/path", 12345, () => ())
+    val props = CopyProcessProps(dispatch, actions, "/from/path", Nil, "/to/path", 12345, _ => (), () => ())
     val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
     val progressProps = findComponentProps(renderer.root, copyProgressPopup)
     progressProps.onCancel()
@@ -156,7 +178,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val props = CopyProcessProps(dispatch, actions, "/from/path", Nil, "/to/path", 12345, () => ())
+    val props = CopyProcessProps(dispatch, actions, "/from/path", Nil, "/to/path", 12345, _ => (), () => ())
     val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
     val progressProps = findComponentProps(renderer.root, copyProgressPopup)
 
@@ -180,11 +202,12 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "call onDone when onCancel in FileExistsPopup" in {
     //given
+    val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val item = FileListItem("file 1")
-    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onDone)
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onTopItem, onDone)
     val p = Promise[Boolean]()
 
     var onExistsFn: FileListItem => Future[Option[Boolean]] = null
@@ -199,6 +222,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       val existsProps = findComponentProps(renderer.root, fileExistsPopup)
       
       //then
+      onTopItem.expects(*).never()
       onDone.expects()
       
       //when
@@ -217,11 +241,12 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "skip existing file when skip action" in {
     //given
+    val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val item = FileListItem("file 1")
-    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onDone)
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onTopItem, onDone)
     val p = Promise[Boolean]()
 
     var onExistsFn: FileListItem => Future[Option[Boolean]] = null
@@ -245,8 +270,12 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       existsF.flatMap { res =>
         res shouldBe None
 
+        //then
+        onTopItem.expects(*).never()
+        onDone.expects()
+        
         //complete
-        p.success(false)
+        p.success(true)
         p.future.map(_ => Succeeded)
       }
     }
@@ -258,7 +287,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val item = FileListItem("file 1")
-    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onDone)
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, _ => (), onDone)
     val p = Promise[Boolean]()
 
     var onExistsFn: FileListItem => Future[Option[Boolean]] = null
@@ -295,7 +324,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val item = FileListItem("file 1")
-    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onDone)
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, _ => (), onDone)
     val p = Promise[Boolean]()
 
     var onExistsFn: FileListItem => Future[Option[Boolean]] = null
@@ -343,7 +372,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val item = FileListItem("file 1")
-    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onDone)
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, _ => (), onDone)
     val p = Promise[Boolean]()
 
     var onExistsFn: FileListItem => Future[Option[Boolean]] = null
@@ -380,7 +409,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val actions = mock[FileListActions]
     val item1 = FileListItem("file 1")
     val item2 = FileListItem("file 2")
-    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item1, item2), "/to/path", 12345, onDone)
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item1, item2), "/to/path", 12345, _ => (), onDone)
 
     val p1 = Promise[Boolean]()
     var onExistsFn1: FileListItem => Future[Option[Boolean]] = null
@@ -433,7 +462,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val actions = mock[FileListActions]
     val item1 = FileListItem("file 1")
     val item2 = FileListItem("file 2")
-    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item1, item2), "/to/path", 12345, onDone)
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item1, item2), "/to/path", 12345, _ => (), onDone)
 
     val p1 = Promise[Boolean]()
     var onExistsFn1: FileListItem => Future[Option[Boolean]] = null
@@ -481,14 +510,15 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "pause copy process when cancelling" in {
     //given
+    val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val item = FileListItem("file 1")
-    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onDone)
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onTopItem, onDone)
     val p = Promise[Boolean]()
 
-    var onProgressFn: (String, String, Double) => Future[Boolean] = null
+    var onProgressFn: Double => Future[Boolean] = null
     (actions.copyFile _).expects(List("/from/path"), item, List("/to/path"), *, *).onCall { (_, _, _, _, onProgress) =>
       onProgressFn = onProgress
       p.future
@@ -503,7 +533,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       progressProps.onCancel()
       
       //then
-      val progressF = onProgressFn("/srcFile", "/dstFile", 123)
+      val progressF = onProgressFn(123)
       implicit val patienceConfig: PatienceConfig = PatienceConfig(
         timeout = scaled(Span(1, Seconds)),
         interval = scaled(Span(100, Millis))
@@ -519,6 +549,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
           res shouldBe true
 
           //then
+          onTopItem.expects(item)
           onDone.expects()
 
           //when & then
@@ -529,8 +560,9 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     }
   }
 
-  it should "not call onDone if cancelled when unmount" in {
+  it should "not call onTopItem/onDone if cancelled when unmount" in {
     //given
+    val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -538,10 +570,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val props = CopyProcessProps(dispatch, actions, "/from/path", List(
       item,
       FileListItem("file 2")
-    ), "/to/path", 12345, onDone)
+    ), "/to/path", 12345, onTopItem, onDone)
     val p = Promise[Boolean]()
 
-    var onProgressFn: (String, String, Double) => Future[Boolean] = null
+    var onProgressFn: Double => Future[Boolean] = null
     (actions.copyFile _).expects(List("/from/path"), item, List("/to/path"), *, *).onCall { (_, _, _, _, onProgress) =>
       onProgressFn = onProgress
       p.future
@@ -554,11 +586,12 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       TestRenderer.act { () =>
         renderer.unmount()
       }
-      onProgressFn("/srcFile", "/dstFile", 123).flatMap { res =>
+      onProgressFn(123).flatMap { res =>
         //then
         res shouldBe false
 
         //then
+        onTopItem.expects(*).never()
         onDone.expects().never()
 
         //when & then
@@ -570,17 +603,19 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "dispatch actions when failure" in {
     //given
+    val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val item = FileListItem("file 1")
-    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onDone)
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item), "/to/path", 12345, onTopItem, onDone)
 
     val p = Promise[Boolean]()
     (actions.copyFile _).expects(List("/from/path"), item, List("/to/path"), *, *).returning(p.future)
     testRender(<(CopyProcess())(^.wrapped := props)())
 
     //then
+    onTopItem.expects(*).never()
     onDone.expects()
     var resultF: Future[Boolean] = null
     dispatch.expects(*).onCall { action: Any =>
@@ -603,20 +638,20 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "make target dir, copy file, update progress and call onDone" in {
     //given
+    val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val item = FileListItem("file 1", size = 246)
-    val props = CopyProcessProps(dispatch, actions, "/from/path", List(
-      FileListItem("dir 1", isDir = true)
-    ), "/to/path", 492, onDone)
+    val dir = FileListItem("dir 1", isDir = true)
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(dir), "/to/path", 492, onTopItem, onDone)
     val dirList = FileListDir("/from/path/dir 1", isRoot = false, List(item))
     val p = Promise[Boolean]()
 
     (actions.readDir _).expects(Some("/from/path"), "dir 1").returning(Future.successful(dirList))
     (actions.mkDirs _).expects(List("/to/path", "dir 1")).returning(Future.unit)
     
-    var onProgressFn: (String, String, Double) => Future[Boolean] = null
+    var onProgressFn: Double => Future[Boolean] = null
     (actions.copyFile _).expects(List("/from/path/dir 1"), item, List("/to/path", "dir 1"), *, *).onCall { (_, _, _, _, onProgress) =>
       onProgressFn = onProgress
       p.future
@@ -626,17 +661,21 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       onProgressFn should not be null
     }.flatMap { _ =>
       //when
-      onProgressFn("/srcFile", "/dstFile", 123).flatMap { res =>
+      onProgressFn(123).flatMap { res =>
         //then
         res shouldBe true
         assertCopyProgressPopup(renderer, props, "/dir 1", "file 1", itemPercent = 50, totalPercent = 25)
   
         //then
-        onDone.expects()
+        onTopItem.expects(dir)
+        var onDoneCalled = false
+        onDone.expects().onCall { () =>
+          onDoneCalled = true
+        }
 
         //when & then
         p.success(res)
-        p.future.map { _ =>
+        p.future.flatMap(_ => eventually(onDoneCalled shouldBe true)).map { _ =>
           assertCopyProgressPopup(renderer, props, "/dir 1", "file 1", itemPercent = 50, totalPercent = 25)
         }
       }
@@ -645,21 +684,22 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "copy two files and update progress" in {
     //given
+    val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val item1 = FileListItem("file 1", size = 246)
     val item2 = FileListItem("file 2", size = 123)
-    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item1, item2), "/to/path", 492, onDone)
+    val props = CopyProcessProps(dispatch, actions, "/from/path", List(item1, item2), "/to/path", 492, onTopItem, onDone)
     
     val p1 = Promise[Boolean]()
-    var onProgressFn1: (String, String, Double) => Future[Boolean] = null
+    var onProgressFn1: Double => Future[Boolean] = null
     (actions.copyFile _).expects(List("/from/path"), item1, List("/to/path"), *, *).onCall { (_, _, _, _, onProgress) =>
       onProgressFn1 = onProgress
       p1.future
     }
     val p2 = Promise[Boolean]()
-    var onProgressFn2: (String, String, Double) => Future[Boolean] = null
+    var onProgressFn2: Double => Future[Boolean] = null
     (actions.copyFile _).expects(List("/from/path"), item2, List("/to/path"), *, *).onCall { (_, _, _, _, onProgress) =>
       onProgressFn2 = onProgress
       p2.future
@@ -668,8 +708,11 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     eventually {
       onProgressFn1 should not be null
     }.flatMap { _ =>
+      //then
+      onTopItem.expects(item1)
+      
       //when
-      onProgressFn1("/srcFile", "/dstFile", 123).flatMap { res =>
+      onProgressFn1(123).flatMap { res =>
         //then
         res shouldBe true
         assertCopyProgressPopup(renderer, props, "", "file 1", itemPercent = 50, totalPercent = 25)
@@ -678,8 +721,11 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         p1.future.flatMap(_ => eventually {
           onProgressFn2 should not be null
         }).flatMap { _ =>
+          //then
+          onTopItem.expects(item2)
+
           //when
-          onProgressFn2("/srcFile", "/dstFile", 123).flatMap { res =>
+          onProgressFn2(123).flatMap { res =>
             //then
             res shouldBe true
             assertCopyProgressPopup(renderer, props, "", "file 2", itemPercent = 100, totalPercent = 50)

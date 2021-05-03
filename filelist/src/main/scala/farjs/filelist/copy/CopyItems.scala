@@ -1,5 +1,6 @@
 package farjs.filelist.copy
 
+import farjs.filelist.FileListActions.FileListParamsChangedAction
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupCopyItemsAction
 import farjs.filelist.popups.FileListPopupsProps
 import scommons.react._
@@ -17,6 +18,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
   protected def render(compProps: Props): ReactElement = {
     val (maybeTotal, setTotal) = useState[Option[Double]](None)
     val (toPath, setToPath) = useState[Option[String]](None)
+    val copied = useRef(Set.empty[String])
     val props = compProps.wrapped
     
     val showPopup = props.data.popups.showCopyItemsPopup
@@ -34,9 +36,20 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
       }
       setTotal(None)
       setToPath(None)
+      copied.current = Set.empty[String]
     }
     
     val onDone: () => Unit = { () =>
+      val updatedSelection = fromState.selectedNames -- copied.current
+      if (updatedSelection != fromState.selectedNames) {
+        props.dispatch(FileListParamsChangedAction(
+          isRight = fromState.isRight,
+          offset = fromState.offset,
+          index = fromState.index,
+          selectedNames = updatedSelection
+        ))
+      }
+      
       onCancel(dispatchAction = false)()
 
       val leftAction = props.actions.updateDir(props.dispatch, isRight = false, props.data.left.currDir.path)
@@ -87,6 +100,9 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
           items = items,
           toPath = to,
           total = total,
+          onTopItem = { item =>
+            copied.current += item.name
+          },
           onDone = onDone
         ))()
       }

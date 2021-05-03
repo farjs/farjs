@@ -23,6 +23,7 @@ case class CopyProcessProps(dispatch: Dispatch,
                             items: Seq[FileListItem],
                             toPath: String,
                             total: Double,
+                            onTopItem: FileListItem => Unit,
                             onDone: () => Unit)
 
 object CopyProcess extends FunctionComponent[CopyProcessProps] {
@@ -54,30 +55,36 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
     
     def doCopy(): Unit = {
 
-      def loop(parent: String, targetDirs: List[String], items: Seq[FileListItem]): Future[Boolean] = {
-        items.foldLeft(Future.successful(true)) { (resF, item) =>
+      def loop(copied: Boolean, parent: String, targetDirs: List[String], items: Seq[FileListItem]): Future[(Boolean, Boolean)] = {
+        items.foldLeft(Future.successful((copied, inProgress.current))) { (resF, item) =>
           resF.flatMap {
-            case true if item.isDir && inProgress.current =>
+            case (prevCopied, true) if item.isDir && inProgress.current =>
               for {
                 dirList <- props.actions.readDir(Some(parent), item.name)
                 dstDirs = targetDirs :+ item.name
                 _ <- props.actions.mkDirs(dstDirs)
-                res <- loop(dirList.path, dstDirs, dirList.items)
+                res <- loop(prevCopied, dirList.path, dstDirs, dirList.items)
               } yield res
-            case true if !item.isDir && inProgress.current =>
+            case (prevCopied, true) if !item.isDir && inProgress.current =>
               data.current = data.current.copy(
                 item = item,
                 to = nodejs.path.join(targetDirs :+ item.name: _*),
                 itemPercent = 0,
                 itemBytes = 0.0
               )
+              var isCopied = true
               props.actions.copyFile(List(parent), item, targetDirs, onExists = { existing =>
                 if (inProgress.current && data.current.askWhenExists) {
                   setState(_.copy(existing = Some(existing)))
                   existsPromise.current = Promise[Option[Boolean]]()
                 }
-                existsPromise.current.future
-              }, onProgress = { (_, _, position) =>
+                existsPromise.current.future.map { maybeOverwrite =>
+                  if (maybeOverwrite.isEmpty) {
+                    isCopied = false
+                  }
+                  maybeOverwrite
+                }
+              }, onProgress = { position =>
                 data.current = data.current.copy(
                   itemPercent = (divide(position, item.size) * 100).toInt,
                   itemBytes = position
@@ -90,13 +97,26 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
                     itemBytes = 0.0,
                     total = d.total + d.itemBytes
                   )
+              }.map { res =>
+                (prevCopied && isCopied, res)
               }
             case res => Future.successful(res)
           }
         }
       }
 
-      val resultF = loop(props.fromPath, List(props.toPath), props.items)
+      val resultF = props.items.foldLeft(Future.successful(true)) { (resF, topItem) =>
+        resF.flatMap {
+          case true if inProgress.current =>
+            loop(copied = true, props.fromPath, List(props.toPath), Seq(topItem)).map { case (isCopied, res) =>
+              if (isCopied && res) {
+                props.onTopItem(topItem)
+              }
+              res
+            }
+          case res => Future.successful(res)
+        }
+      }
       resultF.onComplete {
         case Success(false) => // already cancelled
         case Success(true) => props.onDone()
@@ -164,8 +184,9 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
             }
           },
           onCancel = { () =>
-            props.onDone()
+            inProgress.current = false
             existsPromise.current.trySuccess(None)
+            props.onDone()
           }
         ))()
       },
@@ -176,8 +197,9 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
           message = "Do you really want to cancel it?",
           actions = List(
             MessageBoxAction.YES { () =>
-              props.onDone()
+              inProgress.current = false
               cancelPromise.current.trySuccess(())
+              props.onDone()
             },
             MessageBoxAction.NO { () =>
               setState(_.copy(cancel = false))
