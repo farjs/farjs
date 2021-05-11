@@ -1,6 +1,6 @@
 package farjs.filelist.copy
 
-import farjs.filelist.FileListActions.{FileListDirUpdateAction, FileListParamsChangedAction}
+import farjs.filelist.FileListActions.{FileListDirUpdateAction, FileListParamsChangedAction, FileListTaskAction}
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.copy.CopyItems._
@@ -12,7 +12,7 @@ import scommons.react._
 import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
 
 class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -126,13 +126,15 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val total = 123456789
     statsPopup.onDone(total)
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
-    val toPath = "test to path"
+    val toDir = FileListDir("/to/path/dir 1", isRoot = false, Nil)
+    val to = "test to path"
 
     //then
+    (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
     dispatch.expects(FileListPopupCopyItemsAction(show = false))
 
     //when
-    copyPopup.onCopy(toPath)
+    copyPopup.onCopy(to)
 
     //then
     TestRenderer.act { () =>
@@ -144,14 +146,58 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       ))())
     }
 
-    assertTestComponent(renderer.root.children.head, copyProcessComp) {
-      case CopyProcessProps(resDispatch, resActions, fromPath, items, resToPath, resTotal, _, _) =>
-        resDispatch shouldBe dispatch
-        resActions shouldBe actions
-        fromPath shouldBe currDir.path
-        items shouldBe List(item)
-        resToPath shouldBe toPath
-        resTotal shouldBe total
+    eventually {
+      assertTestComponent(renderer.root.children.head, copyProcessComp) {
+        case CopyProcessProps(resDispatch, resActions, fromPath, items, resToPath, resTotal, _, _) =>
+          resDispatch shouldBe dispatch
+          resActions shouldBe actions
+          fromPath shouldBe currDir.path
+          items shouldBe List(item)
+          resToPath shouldBe toDir.path
+          resTotal shouldBe total
+      }
+    }
+  }
+
+  it should "dispatch FileListTaskAction if failure when onCopy" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val item = FileListItem("dir 1", isDir = true)
+    val currDir = FileListDir("/folder", isRoot = false, List(item))
+    val props = FileListPopupsProps(dispatch, actions, FileListsState(
+      left = FileListState(currDir = currDir, isActive = true),
+      popups = FileListPopupsState(showCopyItemsPopup = true)
+    ))
+
+    val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
+    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
+    val total = 123456789
+    statsPopup.onDone(total)
+    
+    val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
+    val p = Promise[FileListDir]()
+    val to = "test to path"
+    (actions.readDir _).expects(Some(currDir.path), to).returning(p.future)
+    copyPopup.onCopy(to)
+
+    //then
+    var resultF: Future[_] = null
+    dispatch.expects(*).onCall { action: Any =>
+      inside(action) { case action: FileListTaskAction =>
+        action.task.message shouldBe "Resolving target dir"
+        resultF = action.task.future
+      }
+    }
+
+    //when
+    p.failure(new Exception("test error"))
+
+    //then
+    eventually {
+      resultF should not be null
+    }.flatMap(_ => resultF.failed).map { _ =>
+      Succeeded
     }
   }
 
@@ -177,40 +223,47 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     statsPopup.onDone(123)
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
 
+    val toDir = FileListDir("/to/path/dir 1", isRoot = false, Nil)
+    val to = "test to path"
+    (actions.readDir _).expects(Some(leftDir.path), to).returning(Future.successful(toDir))
     dispatch.expects(FileListPopupCopyItemsAction(show = false))
-
-    copyPopup.onCopy("test to path")
-    val progressPopup = findComponentProps(renderer.root, copyProcessComp)
-    progressPopup.onTopItem(dir)
-
-    val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
-      FileListItem("file 1")
-    ))
-    val leftAction = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
-    val rightAction = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
-
-    //then
-    dispatch.expects(FileListParamsChangedAction(
-      isRight = false,
-      offset = 0,
-      index = 1,
-      selectedNames = Set("file 1")
-    ))
-    (actions.updateDir _).expects(dispatch, false, leftDir.path).returning(leftAction)
-    (actions.updateDir _).expects(dispatch, true, rightDir.path).returning(rightAction)
-    dispatch.expects(leftAction)
-    dispatch.expects(rightAction)
-
-    //when
-    progressPopup.onDone()
+    copyPopup.onCopy(to)
     
-    //then
-    findProps(renderer.root, copyProcessComp) should be (empty)
-    
-    for {
-      _ <- leftAction.task.future
-      _ <- rightAction.task.future
-    } yield Succeeded
+    eventually {
+      findProps(renderer.root, copyProcessComp) should not be empty
+    }.flatMap { _ =>
+      val progressPopup = findComponentProps(renderer.root, copyProcessComp)
+      progressPopup.onTopItem(dir)
+
+      val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
+        FileListItem("file 1")
+      ))
+      val leftAction = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
+      val rightAction = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
+
+      //then
+      dispatch.expects(FileListParamsChangedAction(
+        isRight = false,
+        offset = 0,
+        index = 1,
+        selectedNames = Set("file 1")
+      ))
+      (actions.updateDir _).expects(dispatch, false, leftDir.path).returning(leftAction)
+      (actions.updateDir _).expects(dispatch, true, rightDir.path).returning(rightAction)
+      dispatch.expects(leftAction)
+      dispatch.expects(rightAction)
+
+      //when
+      progressPopup.onDone()
+
+      //then
+      findProps(renderer.root, copyProcessComp) should be(empty)
+
+      for {
+        _ <- leftAction.task.future
+        _ <- rightAction.task.future
+      } yield Succeeded
+    }
   }
 
   it should "not dispatch FileListParamsChangedAction if not selected when onDone" in {
@@ -235,40 +288,47 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     statsPopup.onDone(123)
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
 
+    val toDir = FileListDir("/to/path/dir 1", isRoot = false, Nil)
+    val to = "test to path"
+    (actions.readDir _).expects(Some(leftDir.path), to).returning(Future.successful(toDir))
     dispatch.expects(FileListPopupCopyItemsAction(show = false))
-
     copyPopup.onCopy("test to path")
-    val progressPopup = findComponentProps(renderer.root, copyProcessComp)
-    progressPopup.onTopItem(dir)
 
-    val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
-      FileListItem("file 1")
-    ))
-    val leftAction = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
-    val rightAction = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
+    eventually {
+      findProps(renderer.root, copyProcessComp) should not be empty
+    }.flatMap { _ =>
+      val progressPopup = findComponentProps(renderer.root, copyProcessComp)
+      progressPopup.onTopItem(dir)
 
-    //then
-    dispatch.expects(FileListParamsChangedAction(
-      isRight = false,
-      offset = 0,
-      index = 1,
-      selectedNames = Set("file 1")
-    )).never()
-    (actions.updateDir _).expects(dispatch, false, leftDir.path).returning(leftAction)
-    (actions.updateDir _).expects(dispatch, true, rightDir.path).returning(rightAction)
-    dispatch.expects(leftAction)
-    dispatch.expects(rightAction)
+      val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
+        FileListItem("file 1")
+      ))
+      val leftAction = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
+      val rightAction = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
 
-    //when
-    progressPopup.onDone()
+      //then
+      dispatch.expects(FileListParamsChangedAction(
+        isRight = false,
+        offset = 0,
+        index = 1,
+        selectedNames = Set("file 1")
+      )).never()
+      (actions.updateDir _).expects(dispatch, false, leftDir.path).returning(leftAction)
+      (actions.updateDir _).expects(dispatch, true, rightDir.path).returning(rightAction)
+      dispatch.expects(leftAction)
+      dispatch.expects(rightAction)
 
-    //then
-    findProps(renderer.root, copyProcessComp) should be (empty)
+      //when
+      progressPopup.onDone()
 
-    for {
-      _ <- leftAction.task.future
-      _ <- rightAction.task.future
-    } yield Succeeded
+      //then
+      findProps(renderer.root, copyProcessComp) should be(empty)
+
+      for {
+        _ <- leftAction.task.future
+        _ <- rightAction.task.future
+      } yield Succeeded
+    }
   }
 
   it should "render empty component when showCopyItemsPopup=false" in {

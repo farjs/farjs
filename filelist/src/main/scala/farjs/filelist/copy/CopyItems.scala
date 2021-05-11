@@ -1,13 +1,14 @@
 package farjs.filelist.copy
 
-import farjs.filelist.FileListActions.FileListParamsChangedAction
+import farjs.filelist.FileListActions.{FileListParamsChangedAction, FileListTaskAction}
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupCopyItemsAction
 import farjs.filelist.popups.FileListPopupsProps
 import scommons.react._
 import scommons.react.hooks._
+import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Success
+import scala.util.{Failure, Success}
 
 object CopyItems extends FunctionComponent[FileListPopupsProps] {
 
@@ -80,8 +81,14 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
             path = toState.currDir.path,
             items = items,
             onCopy = { path =>
-              props.dispatch(FileListPopupCopyItemsAction(show = false))
-              setToPath(Some(path))
+              val dirF = props.actions.readDir(Some(fromState.currDir.path), path)
+              dirF.onComplete {
+                case Success(dir) =>
+                  props.dispatch(FileListPopupCopyItemsAction(show = false))
+                  setToPath(Some(dir.path))
+                case Failure(_) =>
+                  props.dispatch(FileListTaskAction(FutureTask("Resolving target dir", dirF)))
+              }
             },
             onCancel = onCancel(dispatchAction = true)
           ))()
