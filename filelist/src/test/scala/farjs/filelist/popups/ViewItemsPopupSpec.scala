@@ -1,6 +1,6 @@
 package farjs.filelist.popups
 
-import farjs.filelist.FileListActions.{FileListScanDirsAction, FileListItemsViewedAction}
+import farjs.filelist.FileListActions.{FileListTaskAction, FileListItemsViewedAction}
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupViewItemsAction
@@ -124,12 +124,12 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val renderer = createTestRenderer(<(ViewItemsPopup())(^.wrapped := props)())
     findComponentProps(renderer.root, statusPopupComp)
     val action = FileListPopupViewItemsAction(show = false)
-    var resultF: Future[Boolean] = null
+    var resultF: Future[_] = null
 
     //then
     dispatch.expects(action)
     dispatch.expects(*).onCall { action: Any =>
-      inside(action) { case action: FileListScanDirsAction =>
+      inside(action) { case action: FileListTaskAction =>
         resultF = action.task.future
       }
     }

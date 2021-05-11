@@ -1,6 +1,6 @@
 package farjs.filelist.popups
 
-import farjs.filelist.FileListActions.{FileListScanDirsAction, FileListItemsViewedAction}
+import farjs.filelist.FileListActions.{FileListTaskAction, FileListItemsViewedAction}
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupViewItemsAction
 import farjs.ui.popup._
 import scommons.react._
@@ -55,7 +55,7 @@ object ViewItemsPopup extends FunctionComponent[FileListPopupsProps] {
         case Success(true) => props.dispatch(FileListItemsViewedAction(state.isRight, sizes))
         case Failure(_) =>
           props.dispatch(FileListPopupViewItemsAction(show = false))
-          props.dispatch(FileListScanDirsAction(FutureTask("Viewing Items", resultF)))
+          props.dispatch(FileListTaskAction(FutureTask("Viewing Items", resultF)))
       }
     }
 

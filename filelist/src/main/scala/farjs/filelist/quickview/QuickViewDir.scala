@@ -1,6 +1,6 @@
 package farjs.filelist.quickview
 
-import farjs.filelist.FileListActions.FileListScanDirsAction
+import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.api.FileListItem
 import farjs.filelist.stack.PanelStack
 import farjs.filelist.{FileListActions, FileListState}
@@ -64,7 +64,7 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
           stack.update(params.copy(folders = folders, files = files, filesSize = filesSize))
         case Failure(_) =>
           setShowPopup(false)
-          props.dispatch(FileListScanDirsAction(FutureTask("Quick view dir scan", resultF)))
+          props.dispatch(FileListTaskAction(FutureTask("Quick view dir scan", resultF)))
       }
     }
 

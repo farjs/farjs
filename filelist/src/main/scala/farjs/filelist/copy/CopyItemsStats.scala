@@ -1,6 +1,6 @@
 package farjs.filelist.copy
 
-import farjs.filelist.FileListActions.FileListScanDirsAction
+import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.{FileListActions, FileListState}
 import farjs.ui.popup.{StatusPopup, StatusPopupProps}
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
@@ -57,7 +57,7 @@ object CopyItemsStats extends FunctionComponent[CopyItemsStatsProps] {
           props.onDone(filesSize)
         case Failure(_) =>
           props.onCancel()
-          props.dispatch(FileListScanDirsAction(FutureTask("Copy dir scan", resultF)))
+          props.dispatch(FileListTaskAction(FutureTask("Copy dir scan", resultF)))
       }
     }
 

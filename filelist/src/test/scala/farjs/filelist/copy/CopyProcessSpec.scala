@@ -1,6 +1,6 @@
 package farjs.filelist.copy
 
-import farjs.filelist.FileListActions.FileListScanDirsAction
+import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.copy.CopyProcess._
@@ -617,9 +617,9 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //then
     onTopItem.expects(*).never()
     onDone.expects()
-    var resultF: Future[Boolean] = null
+    var resultF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      inside(action) { case action: FileListScanDirsAction =>
+      inside(action) { case action: FileListTaskAction =>
         action.task.message shouldBe "Copying Items"
         resultF = action.task.future
       }

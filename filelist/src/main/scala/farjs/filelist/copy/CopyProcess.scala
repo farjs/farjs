@@ -1,7 +1,7 @@
 package farjs.filelist.copy
 
 import farjs.filelist.FileListActions
-import farjs.filelist.FileListActions.FileListScanDirsAction
+import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.api.FileListItem
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
@@ -122,7 +122,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
         case Success(true) => props.onDone()
         case Failure(_) =>
           props.onDone()
-          props.dispatch(FileListScanDirsAction(FutureTask("Copying Items", resultF)))
+          props.dispatch(FileListTaskAction(FutureTask("Copying Items", resultF)))
       }
     }
 

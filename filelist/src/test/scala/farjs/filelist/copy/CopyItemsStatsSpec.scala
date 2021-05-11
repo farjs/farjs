@@ -1,6 +1,6 @@
 package farjs.filelist.copy
 
-import farjs.filelist.FileListActions.FileListScanDirsAction
+import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.copy.CopyItemsStats._
@@ -123,12 +123,12 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     
     val renderer = createTestRenderer(<(CopyItemsStats())(^.wrapped := props)())
     findProps(renderer.root, statusPopupComp) should not be empty
-    var resultF: Future[Boolean] = null
+    var resultF: Future[_] = null
 
     //then
     onCancel.expects()
     dispatch.expects(*).onCall { action: Any =>
-      inside(action) { case action: FileListScanDirsAction =>
+      inside(action) { case action: FileListTaskAction =>
         resultF = action.task.future
       }
     }

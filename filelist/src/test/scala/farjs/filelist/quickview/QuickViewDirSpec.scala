@@ -1,6 +1,6 @@
 package farjs.filelist.quickview
 
-import farjs.filelist.FileListActions.FileListScanDirsAction
+import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.quickview.QuickViewDir._
@@ -137,9 +137,9 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     findProps(renderer.root, statusPopupComp) should not be empty
 
     //then
-    var resultF: Future[Boolean] = null
+    var resultF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      inside(action) { case action: FileListScanDirsAction =>
+      inside(action) { case action: FileListTaskAction =>
         resultF = action.task.future
       }
     }
