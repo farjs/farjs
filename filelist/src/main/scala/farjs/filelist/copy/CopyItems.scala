@@ -3,6 +3,8 @@ package farjs.filelist.copy
 import farjs.filelist.FileListActions.{FileListParamsChangedAction, FileListTaskAction}
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupCopyItemsAction
 import farjs.filelist.popups.FileListPopupsProps
+import farjs.ui.popup._
+import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.hooks._
 import scommons.react.redux.task.FutureTask
@@ -15,6 +17,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
   private[copy] var copyItemsStats: UiComponent[CopyItemsStatsProps] = CopyItemsStats
   private[copy] var copyItemsPopup: UiComponent[CopyItemsPopupProps] = CopyItemsPopup
   private[copy] var copyProcessComp: UiComponent[CopyProcessProps] = CopyProcess
+  private[copy] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
 
   protected def render(compProps: Props): ReactElement = {
     val (maybeTotal, setTotal) = useState[Option[Double]](None)
@@ -100,18 +103,28 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
         to <- toPath
         total <- maybeTotal
       } yield {
-        <(copyProcessComp())(^.wrapped := CopyProcessProps(
-          dispatch = props.dispatch,
-          actions = props.actions,
-          fromPath = fromState.currDir.path,
-          items = items,
-          toPath = to,
-          total = total,
-          onTopItem = { item =>
-            copied.current += item.name
-          },
-          onDone = onDone
-        ))()
+        if (fromState.currDir.path == to) {
+          <(messageBoxComp())(^.wrapped := MessageBoxProps(
+            title = "Error",
+            message = s"Cannot copy the item\n${items.head.name}\nonto itself",
+            actions = List(MessageBoxAction.OK(onCancel(dispatchAction = false))),
+            style = Theme.current.popup.error
+          ))()
+        }
+        else {
+          <(copyProcessComp())(^.wrapped := CopyProcessProps(
+            dispatch = props.dispatch,
+            actions = props.actions,
+            fromPath = fromState.currDir.path,
+            items = items,
+            toPath = to,
+            total = total,
+            onTopItem = { item =>
+              copied.current += item.name
+            },
+            onDone = onDone
+          ))()
+        }
       }
     )
   }

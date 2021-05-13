@@ -6,6 +6,8 @@ import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.copy.CopyItems._
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupCopyItemsAction
 import farjs.filelist.popups.{FileListPopupsProps, FileListPopupsState}
+import farjs.ui.popup.MessageBoxProps
+import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
@@ -19,6 +21,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   CopyItems.copyItemsStats = () => "CopyItemsStats".asInstanceOf[ReactClass]
   CopyItems.copyItemsPopup = () => "CopyItemsPopup".asInstanceOf[ReactClass]
   CopyItems.copyProcessComp = () => "CopyProcess".asInstanceOf[ReactClass]
+  CopyItems.messageBoxComp = () => "MessageBox".asInstanceOf[ReactClass]
   
   it should "show CopyItemsStats when showCopyItemsPopup=true" in {
     //given
@@ -107,6 +110,140 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     renderer.root.children.toList should be (empty)
   }
 
+  it should "dispatch FileListTaskAction if failure when onCopy" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val item = FileListItem("dir 1", isDir = true)
+    val currDir = FileListDir("/folder", isRoot = false, List(item))
+    val props = FileListPopupsProps(dispatch, actions, FileListsState(
+      left = FileListState(currDir = currDir, isActive = true),
+      popups = FileListPopupsState(showCopyItemsPopup = true)
+    ))
+
+    val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
+    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
+    val total = 123456789
+    statsPopup.onDone(total)
+    
+    val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
+    val p = Promise[FileListDir]()
+    val to = "test to path"
+    (actions.readDir _).expects(Some(currDir.path), to).returning(p.future)
+    copyPopup.onCopy(to)
+
+    //then
+    var resultF: Future[_] = null
+    dispatch.expects(*).onCall { action: Any =>
+      inside(action) { case action: FileListTaskAction =>
+        action.task.message shouldBe "Resolving target dir"
+        resultF = action.task.future
+      }
+    }
+
+    //when
+    p.failure(new Exception("test error"))
+
+    //then
+    eventually {
+      resultF should not be null
+    }.flatMap(_ => resultF.failed).map { _ =>
+      Succeeded
+    }
+  }
+
+  it should "render error popup if same path when onCopy" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val item = FileListItem("dir 1", isDir = true)
+    val currDir = FileListDir("/folder", isRoot = false, List(item))
+    val props = FileListPopupsProps(dispatch, actions, FileListsState(
+      left = FileListState(currDir = currDir, isActive = true),
+      popups = FileListPopupsState(showCopyItemsPopup = true)
+    ))
+
+    val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
+    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
+    val total = 123456789
+    statsPopup.onDone(total)
+    val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
+    val toDir = FileListDir("/folder", isRoot = false, Nil)
+    val to = "test to path"
+
+    //then
+    (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
+    dispatch.expects(FileListPopupCopyItemsAction(show = false))
+
+    //when
+    copyPopup.onCopy(to)
+
+    //then
+    TestRenderer.act { () =>
+      renderer.update(<(CopyItems())(^.wrapped := props.copy(
+        data = FileListsState(
+          left = props.data.left,
+          popups = FileListPopupsState()
+        )
+      ))())
+    }
+
+    eventually {
+      assertTestComponent(renderer.root.children.head, messageBoxComp) {
+        case MessageBoxProps(title, message, resActions, style) =>
+          title shouldBe "Error"
+          message shouldBe s"Cannot copy the item\n${item.name}\nonto itself"
+          inside(resActions) { case List(ok) =>
+            ok.label shouldBe "OK"
+          }
+          style shouldBe Theme.current.popup.error
+      }
+    }
+  }
+
+  it should "hide error popup when OK action" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val item = FileListItem("dir 1", isDir = true)
+    val currDir = FileListDir("/folder", isRoot = false, List(item))
+    val props = FileListPopupsProps(dispatch, actions, FileListsState(
+      left = FileListState(currDir = currDir, isActive = true),
+      popups = FileListPopupsState(showCopyItemsPopup = true)
+    ))
+
+    val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
+    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
+    val total = 123456789
+    statsPopup.onDone(total)
+    val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
+    val toDir = FileListDir("/folder", isRoot = false, Nil)
+    val to = "test to path"
+    
+    (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
+    dispatch.expects(FileListPopupCopyItemsAction(show = false))
+    copyPopup.onCopy(to)
+
+    TestRenderer.act { () =>
+      renderer.update(<(CopyItems())(^.wrapped := props.copy(
+        data = FileListsState(
+          left = props.data.left,
+          popups = FileListPopupsState()
+        )
+      ))())
+    }
+
+    eventually(findProps(renderer.root, messageBoxComp) should not be empty).map { _ =>
+      val errorProps = findComponentProps(renderer.root, messageBoxComp)
+      
+      //when
+      errorProps.actions.head.onAction()
+      
+      //then
+      renderer.root.children.toList should be (empty)
+    }
+  }
+
   it should "render CopyProcess when onCopy" in {
     //given
     val dispatch = mockFunction[Any, Any]
@@ -156,48 +293,6 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
           resToPath shouldBe toDir.path
           resTotal shouldBe total
       }
-    }
-  }
-
-  it should "dispatch FileListTaskAction if failure when onCopy" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val item = FileListItem("dir 1", isDir = true)
-    val currDir = FileListDir("/folder", isRoot = false, List(item))
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
-      left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyItemsPopup = true)
-    ))
-
-    val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
-    val total = 123456789
-    statsPopup.onDone(total)
-    
-    val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
-    val p = Promise[FileListDir]()
-    val to = "test to path"
-    (actions.readDir _).expects(Some(currDir.path), to).returning(p.future)
-    copyPopup.onCopy(to)
-
-    //then
-    var resultF: Future[_] = null
-    dispatch.expects(*).onCall { action: Any =>
-      inside(action) { case action: FileListTaskAction =>
-        action.task.message shouldBe "Resolving target dir"
-        resultF = action.task.future
-      }
-    }
-
-    //when
-    p.failure(new Exception("test error"))
-
-    //then
-    eventually {
-      resultF should not be null
-    }.flatMap(_ => resultF.failed).map { _ =>
-      Succeeded
     }
   }
 
