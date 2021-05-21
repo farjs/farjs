@@ -12,12 +12,20 @@ class PortalSpec extends TestSpec with TestRendererUtils {
     //given
     val portal = <(Portal())()(<.>()())
     
+    // suppress intended error
+    // see: https://github.com/facebook/react/issues/11098#issuecomment-412682721
+    val savedConsoleError = js.Dynamic.global.console.error
+    js.Dynamic.global.console.error = { _: js.Any =>
+    }
+
     //when
     val result = testRender(<(TestErrorBoundary())()(
       portal
     ))
     
     //then
+    js.Dynamic.global.console.error = savedConsoleError
+    
     assertNativeComponent(result,
       <.div()(
         "Error: WithPortals.Context is not found." +
