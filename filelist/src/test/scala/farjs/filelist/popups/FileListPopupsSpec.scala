@@ -185,20 +185,29 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val props = FileListPopupsProps(dispatch, actions, state)
     val comp = testRender(<(FileListPopups())(^.wrapped := props)())
     val msgBox = findComponentProps(comp, messageBoxComp)
-    val action = FileListItemsDeleteAction(
+    val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
+      FileListItem("file 1")
+    ))
+    val updateAction = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
+    val deleteAction = FileListItemsDeleteAction(
       FutureTask("Deleting Items", Future.successful(()))
     )
     val items = List(FileListItem("file 1"))
 
     //then
-    (actions.deleteItems _).expects(dispatch, false, currDir.path, items).returning(action)
-    dispatch.expects(action)
+    (actions.deleteItems _).expects(dispatch, false, currDir.path, items).returning(deleteAction)
+    (actions.updateDir _).expects(dispatch, false, currDir.path).returning(updateAction)
+    dispatch.expects(deleteAction)
+    dispatch.expects(updateAction)
     dispatch.expects(FileListPopupDeleteAction(show = false))
 
     //when
     msgBox.actions.head.onAction()
 
-    action.task.future.map(_ => Succeeded)
+    for {
+      _ <- deleteAction.task.future
+      _ <- updateAction.task.future
+    } yield Succeeded
   }
 
   it should "call api and delete selectedItems when YES action" in {
@@ -220,20 +229,29 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val props = FileListPopupsProps(dispatch, actions, state)
     val comp = testRender(<(FileListPopups())(^.wrapped := props)())
     val msgBox = findComponentProps(comp, messageBoxComp)
-    val action = FileListItemsDeleteAction(
+    val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
+      FileListItem("file 1")
+    ))
+    val updateAction = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
+    val deleteAction = FileListItemsDeleteAction(
       FutureTask("Deleting Items", Future.successful(()))
     )
     val items = List(FileListItem("file 2"))
 
     //then
-    (actions.deleteItems _).expects(dispatch, true, currDir.path, items).returning(action)
-    dispatch.expects(action)
+    (actions.deleteItems _).expects(dispatch, true, currDir.path, items).returning(deleteAction)
+    (actions.updateDir _).expects(dispatch, true, currDir.path).returning(updateAction)
+    dispatch.expects(deleteAction)
+    dispatch.expects(updateAction)
     dispatch.expects(FileListPopupDeleteAction(show = false))
 
     //when
     msgBox.actions.head.onAction()
 
-    action.task.future.map(_ => Succeeded)
+    for {
+      _ <- deleteAction.task.future
+      _ <- updateAction.task.future
+    } yield Succeeded
   }
 
   it should "dispatch FileListPopupDeleteAction when NO action" in {
