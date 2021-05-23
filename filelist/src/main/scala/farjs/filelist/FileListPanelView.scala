@@ -32,6 +32,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
     
     val currItem = props.state.currentItem
     val selectedItems = props.state.selectedItems
+    val freeSizeBytes = props.state.currDir.freeBytes
 
     <.box(^.rbStyle := theme.regularItem)(
       <(doubleBorderComp())(^.wrapped := DoubleBorderProps((width, height), theme.regularItem))(),
@@ -120,14 +121,23 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
       <(textLineComp())(^.wrapped := TextLineProps(
         align = TextLine.Center,
         pos = (1, height - 1),
-        width = width - 2,
+        width = if (freeSizeBytes.isEmpty) width - 2 else (width - 2) / 2,
         text = {
           val files = props.state.currDir.items.filter(!_.isDir)
           val filesSize = files.foldLeft(0.0)((res, f) => res + f.size)
           f"$filesSize%,.0f (${files.size}%d)"
         },
         style = theme.regularItem
-      ))()
+      ))(),
+      freeSizeBytes.map { freeSize =>
+        <(textLineComp())(^.wrapped := TextLineProps(
+          align = TextLine.Center,
+          pos = ((width - 2) / 2 + 1, height - 1),
+          width = (width - 2) / 2,
+          text = f"$freeSize%,.0f",
+          style = theme.regularItem
+        ))()
+      }
     )
   }
 }

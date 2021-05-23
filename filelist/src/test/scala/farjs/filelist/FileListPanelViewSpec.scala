@@ -6,7 +6,7 @@ import farjs.filelist.stack.{PanelStack, PanelStackProps}
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.theme.Theme
-import org.scalatest.Assertion
+import org.scalatest.{Assertion, Succeeded}
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
@@ -33,7 +33,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     assertFileListPanelView(result, props, FileListState())
   }
   
-  it should "render component with selected one file" in {
+  it should "render component with selected one file and with free size" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -41,7 +41,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
       FileListItem("dir 1", isDir = true, size = 1),
       FileListItem("dir 2", isDir = true, size = 2),
       FileListItem("file", size = 3)
-    )), selectedNames = Set("dir 2"))
+    ), freeBytes = Some(12345)), selectedNames = Set("dir 2"))
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
@@ -49,7 +49,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
 
     //then
     assertFileListPanelView(result, props, state, "file", "3", showDate = true,
-      selected = Some("2 in 1 file"), dirSize = "3 (1)")
+      selected = Some("2 in 1 file"), dirSize = "3 (1)", freeSize = Some("12,345"))
   }
   
   it should "render component with selected more than one file" in {
@@ -180,7 +180,8 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
                                       permissions: String = "",
                                       showDate: Boolean = false,
                                       selected: Option[String] = None,
-                                      dirSize: String = "0 (0)"): Unit = {
+                                      dirSize: String = "0 (0)",
+                                      freeSize: Option[String] = None): Unit = {
     
     val theme = Theme.current.fileList
     
@@ -193,7 +194,8 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
                          fileSize: TestInstance,
                          filePerm: TestInstance,
                          fileDate: TestInstance,
-                         folderSize: TestInstance): Assertion = {
+                         folderSize: TestInstance,
+                         free: Option[TestInstance]): Assertion = {
 
       assertTestComponent(border, doubleBorderComp) {
         case DoubleBorderProps(resSize, style, pos, title) =>
@@ -292,19 +294,36 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
         case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
           align shouldBe TextLine.Center
           pos shouldBe 1 -> (height - 1)
-          resWidth shouldBe (width - 2)
+          resWidth shouldBe (if (freeSize.isEmpty) width - 2 else (width - 2) / 2)
           text shouldBe dirSize
           style shouldBe theme.regularItem
           focused shouldBe false
           padding shouldBe 1
       }
+      free.size shouldBe freeSize.size
+      free.foreach { freeText =>
+        assertTestComponent(freeText, textLineComp) {
+          case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
+            align shouldBe TextLine.Center
+            pos shouldBe ((width - 2) / 2 + 1) -> (height - 1)
+            resWidth shouldBe (width - 2) / 2
+            text shouldBe freeSize.get
+            style shouldBe theme.regularItem
+            focused shouldBe false
+            padding shouldBe 1
+        }
+      }
+      
+      Succeeded
     }
     
     assertNativeComponent(result, <.box(^.rbStyle := theme.regularItem)(), {
       case List(border, line, list, currFolder, currFile, fileSize, filePerm, fileDate, folderSize) =>
-        assertComponents(border, line, list, currFolder, None, currFile, fileSize, filePerm, fileDate, folderSize)
+        assertComponents(border, line, list, currFolder, None, currFile, fileSize, filePerm, fileDate, folderSize, None)
       case List(border, line, list, currFolder, selection, currFile, fileSize, filePerm, fileDate, folderSize) =>
-        assertComponents(border, line, list, currFolder, Some(selection), currFile, fileSize, filePerm, fileDate, folderSize)
+        assertComponents(border, line, list, currFolder, Some(selection), currFile, fileSize, filePerm, fileDate, folderSize, None)
+      case List(border, line, list, currFolder, selection, currFile, fileSize, filePerm, fileDate, folderSize, free) =>
+        assertComponents(border, line, list, currFolder, Some(selection), currFile, fileSize, filePerm, fileDate, folderSize, Some(free))
     })
   }
 }
