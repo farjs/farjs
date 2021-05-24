@@ -3,116 +3,34 @@ package farjs.filelist
 import farjs.filelist.FileListActions._
 import farjs.filelist.FileListActionsSpec._
 import farjs.filelist.api._
+import farjs.filelist.fs.FSService
 import org.scalatest.Succeeded
-import scommons.nodejs.ChildProcess
-import scommons.nodejs.ChildProcess._
-import scommons.nodejs.Process.Platform
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.Future
-import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 
 class FileListActionsSpec extends AsyncTestSpec {
 
-  it should "dispatch FileListOpenInDefaultAppAction on Mac OS" in {
+  it should "dispatch FileListTaskAction when openInDefaultApp" in {
     //given
-    val childProcess = mock[ChildProcess]
+    val fsService = mock[FSService]
     val actions = new FileListActionsTest(mock[FileListApi])
-    actions.platform = Platform.darwin
-    actions.childProcess = childProcess
+    actions.fsService = fsService
     val parent = "test dir"
-    val item = ".."
-    val result = (new js.Object, new js.Object)
+    val item = "test item"
     
     //then
-    (childProcess.exec _).expects(*, *)
-      .onCall { (command, options) =>
-      command shouldBe """open ".""""
-      assertObject(options.get, new ChildProcessOptions {
-        override val cwd = parent
-        override val windowsHide = true
-      })
-
-      (null, Future.successful(result))
-    }
+    (fsService.openItem _).expects(parent, item).returning(Future.unit)
     
     //when
-    val FileListOpenInDefaultAppAction(FutureTask(msg, future)) =
+    val FileListTaskAction(FutureTask(msg, future)) =
       actions.openInDefaultApp(parent, item)
     
     //then
     msg shouldBe "Opening default app"
-    future.map { res =>
-      res should be theSameInstanceAs result
-    }
-  }
-  
-  it should "dispatch FileListOpenInDefaultAppAction on Windows" in {
-    //given
-    val childProcess = mock[ChildProcess]
-    val actions = new FileListActionsTest(mock[FileListApi])
-    actions.platform = Platform.win32
-    actions.childProcess = childProcess
-    val parent = "test dir"
-    val item = "file 1"
-    val result = (new js.Object, new js.Object)
-    
-    //then
-    (childProcess.exec _).expects(*, *)
-      .onCall { (command, options) =>
-      command shouldBe s"""start "" "$item""""
-      assertObject(options.get, new ChildProcessOptions {
-        override val cwd = parent
-        override val windowsHide = true
-      })
-
-      (null, Future.successful(result))
-    }
-    
-    //when
-    val FileListOpenInDefaultAppAction(FutureTask(msg, future)) =
-      actions.openInDefaultApp(parent, item)
-    
-    //then
-    msg shouldBe "Opening default app"
-    future.map { res =>
-      res should be theSameInstanceAs result
-    }
-  }
-  
-  it should "dispatch FileListOpenInDefaultAppAction on Linux" in {
-    //given
-    val childProcess = mock[ChildProcess]
-    val actions = new FileListActionsTest(mock[FileListApi])
-    actions.platform = Platform.linux
-    actions.childProcess = childProcess
-    val parent = "test dir"
-    val item = "file 1"
-    val result = (new js.Object, new js.Object)
-    
-    //then
-    (childProcess.exec _).expects(*, *)
-      .onCall { (command, options) =>
-      command shouldBe s"""xdg-open "$item""""
-      assertObject(options.get, new ChildProcessOptions {
-        override val cwd = parent
-        override val windowsHide = true
-      })
-
-      (null, Future.successful(result))
-    }
-    
-    //when
-    val FileListOpenInDefaultAppAction(FutureTask(msg, future)) =
-      actions.openInDefaultApp(parent, item)
-    
-    //then
-    msg shouldBe "Opening default app"
-    future.map { res =>
-      res should be theSameInstanceAs result
-    }
+    future.map(_ => Succeeded)
   }
   
   it should "dispatch FileListDirChangedAction when changeDir" in {

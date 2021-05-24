@@ -1,10 +1,10 @@
-package farjs.filelist
+package farjs.filelist.fs
 
 import scala.util.matching.Regex
 
-case class FileListDisk(root: String, size: Double, free: Double, name: String)
+case class FSDisk(root: String, size: Double, free: Double, name: String)
 
-object FileListDisk {
+object FSDisk {
   
   private lazy val dfRegex =
     """(Filesystem\s+|1024-blocks|\s+Used|\s+Available|\s+Capacity|\s+Mounted on\s*)""".r
@@ -12,9 +12,9 @@ object FileListDisk {
   private lazy val wmicLogicalDiskRegex =
     """(Caption\s*|FreeSpace\s*|Size\s*|VolumeName\s*)""".r
   
-  def fromDfCommand(output: String): List[FileListDisk] = {
+  def fromDfCommand(output: String): List[FSDisk] = {
     parseOutput(dfRegex, output).map { data =>
-      FileListDisk(
+      FSDisk(
         root = data.getOrElse("Mounted on", ""),
         size = toDouble(data.getOrElse("1024-blocks", "")) * 1024,
         free = toDouble(data.getOrElse("Available", "")) * 1024,
@@ -23,9 +23,9 @@ object FileListDisk {
     }
   }
 
-  def fromWmicLogicalDisk(output: String): List[FileListDisk] = {
+  def fromWmicLogicalDisk(output: String): List[FSDisk] = {
     parseOutput(wmicLogicalDiskRegex, output).map { data =>
-      FileListDisk(
+      FSDisk(
         root = data.getOrElse("Caption", ""),
         size = toDouble(data.getOrElse("Size", "")),
         free = toDouble(data.getOrElse("FreeSpace", "")),

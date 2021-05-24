@@ -15,7 +15,6 @@ import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
 import scala.concurrent.Future
-import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportAll
 
 class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
@@ -132,9 +131,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     ))
     val comp = testRender(<(FileListPanel())(^.wrapped := props)())
     val viewProps = findComponentProps(comp, fileListPanelView)
-    val action = FileListOpenInDefaultAppAction(
-      FutureTask("Opening item", Future.successful((new js.Object, new js.Object)))
-    )
+    val action = FileListTaskAction(FutureTask("Opening item", Future.unit))
 
     //then
     (actions.openInDefaultApp _).expects("/sub-dir", "item 1").returning(action)
