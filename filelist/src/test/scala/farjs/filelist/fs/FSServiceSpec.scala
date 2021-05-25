@@ -1,10 +1,10 @@
 package farjs.filelist.fs
 
 import org.scalatest.Succeeded
-import scommons.nodejs.ChildProcess
 import scommons.nodejs.ChildProcess._
 import scommons.nodejs.Process.Platform
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.nodejs.{ChildProcess, path => nodePath, _}
 
 import scala.concurrent.Future
 import scala.scalajs.js
@@ -87,5 +87,74 @@ class FSServiceSpec extends AsyncTestSpec {
 
     //then
     resultF.map(_ => Succeeded)
+  }
+
+  it should "read disk info on Windows" in {
+    //given
+    val childProcess = mock[ChildProcess]
+    val service = new FSService(Platform.win32, childProcess)
+    val path = os.homedir()
+    val output =
+      """Caption  FreeSpace     Size          VolumeName
+        |C:       81697124352   156595318784  SYSTEM
+        |""".stripMargin
+    val result: (js.Object, js.Object) = (output.asInstanceOf[js.Object], new js.Object)
+
+    //then
+    (childProcess.exec _).expects(*, *).onCall { (command, options) =>
+      val root = nodePath.parse(path).root.map(_.stripSuffix("\\"))
+      command shouldBe {
+        s"""wmic logicaldisk where "Caption='$root'" get Caption,VolumeName,FreeSpace,Size"""
+      }
+      assertObject(options.get, new ChildProcessOptions {
+        override val cwd = path
+        override val windowsHide = true
+      })
+
+      (null, Future.successful(result))
+    }
+
+    //when
+    val resultF = service.readDisk(path)
+
+    //then
+    resultF.map { res =>
+      res shouldBe Some(
+        FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM")
+      )
+    }
+  }
+
+  it should "read disk info on Mac OS/Linux" in {
+    //given
+    val childProcess = mock[ChildProcess]
+    val service = new FSService(Platform.darwin, childProcess)
+    val path = os.homedir()
+    val output =
+      """Filesystem   1024-blocks      Used Available Capacity  Mounted on
+        |/dev/disk1s1   244912536 202577024  40612004    84%    /
+        |""".stripMargin
+    val result: (js.Object, js.Object) = (output.asInstanceOf[js.Object], new js.Object)
+
+    //then
+    (childProcess.exec _).expects(*, *).onCall { (command, options) =>
+      command shouldBe s"""df -kPl "$path""""
+      assertObject(options.get, new ChildProcessOptions {
+        override val cwd = path
+        override val windowsHide = true
+      })
+
+      (null, Future.successful(result))
+    }
+
+    //when
+    val resultF = service.readDisk(path)
+
+    //then
+    resultF.map { res =>
+      res shouldBe Some(
+        FSDisk("/", size = 250790436864.0, free = 41586692096.0, "/")
+      )
+    }
   }
 }

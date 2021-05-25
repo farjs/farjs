@@ -2,10 +2,11 @@ package farjs.filelist.fs
 
 import farjs.filelist.api.{FileListDir, FileListItem}
 import scommons.nodejs.Process.Platform
-import scommons.nodejs._
+import scommons.nodejs.{path => nodePath, _}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.control.NonFatal
 
 class FSService(platform: Platform, childProcess: ChildProcess) {
 
@@ -30,6 +31,29 @@ class FSService(platform: Platform, childProcess: ChildProcess) {
   }
 
   def readDisk(path: String): Future[Option[FSDisk]] = {
-    ???
+    val (_, future) = childProcess.exec(
+      command = {
+        if (platform == Platform.win32) {
+          val root = nodePath.parse(path).root.map(_.stripSuffix("\\"))
+          s"""wmic logicaldisk where "Caption='$root'" get Caption,VolumeName,FreeSpace,Size"""
+        }
+        else s"""df -kPl "$path""""
+      },
+      options = Some(new raw.ChildProcessOptions {
+        override val cwd = path
+        override val windowsHide = true
+      })
+    )
+
+    future.map { case (stdout, _) =>
+      val output = stdout.asInstanceOf[String]
+      val disks =
+        if (platform == Platform.win32) FSDisk.fromWmicLogicalDisk(output)
+        else FSDisk.fromDfCommand(output)
+
+      disks.headOption
+    }.recover {
+      case NonFatal(_) => None
+    }
   }
 }
