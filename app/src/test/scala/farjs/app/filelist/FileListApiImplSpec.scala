@@ -28,7 +28,7 @@ class FileListApiImplSpec extends AsyncTestSpec {
     //when
     apiImp.readDir(targetDir).map { dir =>
       //then
-      inside(dir) { case FileListDir(dirPath, isRoot, items) =>
+      inside(dir) { case FileListDir(dirPath, isRoot, items, _) =>
         dirPath shouldBe process.cwd()
         isRoot shouldBe false
         items shouldBe List(
@@ -43,7 +43,7 @@ class FileListApiImplSpec extends AsyncTestSpec {
     //when
     apiImp.readDir(None, FileListDir.curr).map { dir =>
       //then
-      inside(dir) { case FileListDir(dirPath, isRoot, items) =>
+      inside(dir) { case FileListDir(dirPath, isRoot, items, _) =>
         dirPath shouldBe process.cwd()
         isRoot shouldBe false
         items should not be empty
@@ -63,7 +63,7 @@ class FileListApiImplSpec extends AsyncTestSpec {
     //when
     apiImp.readDir(Some(curr), FileListItem.up.name).map { dir =>
       //then
-      inside(dir) { case FileListDir(dirPath, isRoot, items) =>
+      inside(dir) { case FileListDir(dirPath, isRoot, items, _) =>
         dirPath shouldBe parentDir
         isRoot shouldBe false
         items should not be empty
@@ -83,7 +83,7 @@ class FileListApiImplSpec extends AsyncTestSpec {
     //when
     apiImp.readDir(Some(parentDir), subDir).map { dir =>
       //then
-      inside(dir) { case FileListDir(dirPath, isRoot, items) =>
+      inside(dir) { case FileListDir(dirPath, isRoot, items, _) =>
         dirPath shouldBe curr
         isRoot shouldBe false
         items should not be empty
@@ -101,7 +101,7 @@ class FileListApiImplSpec extends AsyncTestSpec {
     //when
     apiImp.readDir(Some(currRoot), FileListDir.curr).map { dir =>
       //then
-      inside(dir) { case FileListDir(dirPath, isRoot, items) =>
+      inside(dir) { case FileListDir(dirPath, isRoot, items, _) =>
         dirPath shouldBe currRoot
         isRoot shouldBe true
         items should not be empty
