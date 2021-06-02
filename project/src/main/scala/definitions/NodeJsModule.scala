@@ -41,8 +41,9 @@ object NodeJsModule {
     //Opt-in @ScalaJSDefined by default
     scalacOptions += "-P:scalajs:sjsDefinedByDefault",
     requireJsDomEnv in Test := false,
-    version in webpack := "3.5.5",
+    version in webpack := "4.29.0",
     emitSourceMaps := false,
+    webpackEmitSourceMaps := false,
     parallelExecution in Test := false,
 
     ideExcludedDirectories ++= {

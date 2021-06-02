@@ -3,6 +3,7 @@ package definitions
 import sbt.Keys._
 import sbt._
 import scommons.sbtplugin.project.CommonModule
+import xerial.sbt.Sonatype.autoImport._
 
 trait FarjsModule extends CommonModule {
 
@@ -24,12 +25,7 @@ object FarjsModule {
     //
     publishMavenStyle := true,
     publishArtifact in Test := false,
-    publishTo := {
-      if (isSnapshot.value)
-        Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
-      else
-        Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
-    },
+    publishTo := sonatypePublishToBundle.value,
     pomExtra := {
       <url>https://github.com/scommons/far-js</url>
         <licenses>

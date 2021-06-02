@@ -19,8 +19,6 @@ trait ScalaJsModule extends NodeJsModule {
     super.definition
       .settings(CommonClientModule.settings: _*)
       .settings(
-        requireJsDomEnv in Test := false,
-
         packageJsonSettings(scalaJSBundlerPackageJson, Compile),
         packageJsonSettings(scalaJSBundlerPackageJson, Test)
       )

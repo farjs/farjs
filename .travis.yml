@@ -45,6 +45,7 @@ script:
 cache:
   directories:
   - ~/.npm
+  - ~/.nvm
   - "$HOME/.ivy2/cache"
   - "$HOME/.sbt"
 before_cache:

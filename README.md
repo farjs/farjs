@@ -3,7 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/scommons/far-js/badge.svg?branch=master)](https://coveralls.io/github/scommons/far-js?branch=master)
 [![npm version](https://img.shields.io/npm/v/farjs-app)](https://www.npmjs.com/package/farjs-app)
 [![Rate on Openbase](https://badges.openbase.com/js/rating/farjs-app.svg)](https://openbase.com/js/farjs-app?utm_source=embedded&utm_medium=badge&utm_campaign=rate-badge)
-[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.17.svg)](https://www.scala-js.org)
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.29.svg)](https://www.scala-js.org)
 
 ## FAR.js
 
