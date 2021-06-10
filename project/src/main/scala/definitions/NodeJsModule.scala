@@ -1,12 +1,12 @@
 package definitions
 
 import common.{Libs, TestLibs}
+import org.scalajs.jsenv.nodejs.NodeJSEnv
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
 import sbt._
 import scommons.sbtplugin.project.CommonModule.ideExcludedDirectories
-
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
 
@@ -45,6 +45,12 @@ object NodeJsModule {
     emitSourceMaps := false,
     webpackEmitSourceMaps := false,
     parallelExecution in Test := false,
+
+    // required for node.js >= v12.12.0
+    // see:
+    //   https://github.com/nodejs/node/pull/29919
+    emitSourceMaps in Test := true,
+    jsEnv in Test := new NodeJSEnv(NodeJSEnv.Config().withArgs(List("--enable-source-maps"))),
 
     ideExcludedDirectories ++= {
       val base = baseDirectory.value
