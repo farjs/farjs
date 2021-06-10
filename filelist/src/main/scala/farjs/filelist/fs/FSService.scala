@@ -6,7 +6,6 @@ import scommons.nodejs.{path => nodePath, _}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.control.NonFatal
 
 class FSService(platform: Platform, childProcess: ChildProcess) {
 
@@ -52,8 +51,6 @@ class FSService(platform: Platform, childProcess: ChildProcess) {
         else FSDisk.fromDfCommand(output)
 
       disks.headOption
-    }.recover {
-      case NonFatal(_) => None
     }
   }
 }

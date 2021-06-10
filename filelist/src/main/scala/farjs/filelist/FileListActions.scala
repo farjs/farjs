@@ -31,12 +31,7 @@ trait FileListActions {
                 parent: Option[String],
                 dir: String): FileListDirChangeAction = {
     
-    val future = (for {
-      currDir <- readDir(parent, dir)
-      maybeDisk <- fsService.readDisk(currDir.path)
-    } yield {
-      currDir.copy(freeBytes = maybeDisk.map(_.free))
-    }).andThen {
+    val future = readDir(parent, dir).andThen {
       case Success(currDir) => dispatch(FileListDirChangedAction(isRight, dir, currDir))
     }
 
@@ -47,12 +42,7 @@ trait FileListActions {
                 isRight: Boolean,
                 path: String): FileListDirUpdateAction = {
 
-    val future = (for {
-      currDir <- api.readDir(path)
-      maybeDisk <- fsService.readDisk(currDir.path)
-    } yield {
-      currDir.copy(freeBytes = maybeDisk.map(_.free))
-    }).andThen {
+    val future = api.readDir(path).andThen {
       case Success(currDir) => dispatch(FileListDirUpdatedAction(isRight, currDir))
     }
 
@@ -72,11 +62,8 @@ trait FileListActions {
     val future = for {
       _ <- mkDirs(parent :: names)
       currDir <- api.readDir(parent)
-      maybeDisk <- fsService.readDisk(currDir.path)
     } yield {
-      dispatch(FileListDirCreatedAction(isRight, names.head, currDir.copy(
-        freeBytes = maybeDisk.map(_.free)
-      )))
+      dispatch(FileListDirCreatedAction(isRight, names.head, currDir))
       ()
     }
 

@@ -3,7 +3,7 @@ package farjs.filelist
 import farjs.filelist.FileListActions._
 import farjs.filelist.FileListActionsSpec._
 import farjs.filelist.api._
-import farjs.filelist.fs.{FSDisk, FSService}
+import farjs.filelist.fs.FSService
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.redux.task.FutureTask
@@ -44,16 +44,12 @@ class FileListActionsSpec extends AsyncTestSpec {
     val isRight = true
     val parent: Option[String] = Some("/")
     val dir = "test dir"
-    val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
 
     (api.readDir(_: Option[String], _: String)).expects(parent, dir)
       .returning(Future.successful(currDir))
-    (fsService.readDisk _).expects(currDir.path).returning(Future.successful(Some(disk)))
     
     //then
-    dispatch.expects(FileListDirChangedAction(isRight, dir, currDir.copy(
-      freeBytes = Some(disk.free)
-    )))
+    dispatch.expects(FileListDirChangedAction(isRight, dir, currDir))
     
     //when
     val FileListDirChangeAction(FutureTask(msg, future)) =
@@ -74,15 +70,11 @@ class FileListActionsSpec extends AsyncTestSpec {
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
     val isRight = true
     val path = "/test/path"
-    val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
 
     (api.readDir(_: String)).expects(path).returning(Future.successful(currDir))
-    (fsService.readDisk _).expects(currDir.path).returning(Future.successful(Some(disk)))
     
     //then
-    dispatch.expects(FileListDirUpdatedAction(isRight, currDir.copy(
-      freeBytes = Some(disk.free)
-    )))
+    dispatch.expects(FileListDirUpdatedAction(isRight, currDir))
     
     //when
     val FileListDirUpdateAction(FutureTask(msg, future)) =
@@ -104,17 +96,13 @@ class FileListActionsSpec extends AsyncTestSpec {
     val isRight = true
     val parent = "/parent"
     val dir = "test/dir"
-    val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
     val multiple = false
 
     (api.mkDirs _).expects(List(parent, dir)).returning(Future.unit)
     (api.readDir(_: String)).expects(parent).returning(Future.successful(currDir))
-    (fsService.readDisk _).expects(currDir.path).returning(Future.successful(Some(disk)))
     
     //then
-    dispatch.expects(FileListDirCreatedAction(isRight, dir, currDir.copy(
-      freeBytes = Some(disk.free)
-    )))
+    dispatch.expects(FileListDirCreatedAction(isRight, dir, currDir))
     
     //when
     val FileListDirCreateAction(FutureTask(msg, future)) =
@@ -136,17 +124,13 @@ class FileListActionsSpec extends AsyncTestSpec {
     val isRight = true
     val parent = "/parent"
     val dir = "test/dir"
-    val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
     val multiple = true
 
     (api.mkDirs _).expects(List(parent, "test", "dir")).returning(Future.unit)
     (api.readDir(_: String)).expects(parent).returning(Future.successful(currDir))
-    (fsService.readDisk _).expects(currDir.path).returning(Future.successful(Some(disk)))
     
     //then
-    dispatch.expects(FileListDirCreatedAction(isRight, "test", currDir.copy(
-      freeBytes = Some(disk.free)
-    )))
+    dispatch.expects(FileListDirCreatedAction(isRight, "test", currDir))
     
     //when
     val FileListDirCreateAction(FutureTask(msg, future)) =

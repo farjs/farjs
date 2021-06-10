@@ -2,8 +2,7 @@ package farjs.filelist.api
 
 case class FileListDir(path: String,
                        isRoot: Boolean,
-                       items: Seq[FileListItem],
-                       freeBytes: Option[Double] = None) {
+                       items: Seq[FileListItem]) {
   
   def isEmpty: Boolean = path.isEmpty
 }

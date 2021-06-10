@@ -54,10 +54,7 @@ object FileListsStateReducer {
       right = reduceFileList(isRight = true, state.map(_.right).getOrElse(FileListState(isRight = true)), action),
       popups = FileListPopupsStateReducer(state.map(_.popups), action)
     )
-    reduce(state match {
-      case Some(currState) if currState == newState => currState
-      case _ => newState
-    }, action)
+    reduce(newState, action)
   }
 
   private def reduce(state: FileListsState, action: Any): FileListsState = action match {
