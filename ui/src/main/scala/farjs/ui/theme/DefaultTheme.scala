@@ -75,6 +75,16 @@ object DefaultTheme extends Theme {
         override val fg = Color.black
       }
     }
+    val menu: BlessedStyle = new BlessedStyle {
+      override val bold = true
+      override val bg = Color.cyan
+      override val fg = Color.white
+      override val focus = new BlessedStyle {
+        override val bold = true
+        override val bg = Color.black
+        override val fg = Color.white
+      }
+    }
   }
   
   val menu: ThemeMenu = new ThemeMenu {

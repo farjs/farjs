@@ -53,10 +53,11 @@ class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils 
       focusable shouldBe true
     }, { case List(content) =>
       assertTestComponent(content, modalContentComp)({
-        case ModalContentProps(title, size, resStyle) =>
+        case ModalContentProps(title, size, resStyle, padding) =>
           title shouldBe props.title
           size shouldBe width -> height
           assertObject(resStyle, style)
+          padding shouldBe ModalContent.padding
       }, { case List(btn) =>
         assertNativeComponent(btn,
           <.button(

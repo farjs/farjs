@@ -32,10 +32,11 @@ class ModalSpec extends TestSpec with TestRendererUtils {
       onClose should be theSameInstanceAs props.onCancel
     }, inside(_) { case List(content) =>
       assertTestComponent(content, modalContentComp)({
-        case ModalContentProps(title, size, style) =>
+        case ModalContentProps(title, size, style, padding) =>
           title shouldBe props.title
           size shouldBe props.size
           style shouldBe props.style
+          padding shouldBe ModalContent.padding
       }, inside(_) { case List(child) =>
         assertNativeComponent(child, children)
       })

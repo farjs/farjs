@@ -75,6 +75,16 @@ object XTerm256Theme extends Theme {
         override val fg = "#111"
       }
     }
+    val menu: BlessedStyle = new BlessedStyle {
+      override val bold = true
+      override val bg = "#088"
+      override val fg = Color.white
+      override val focus = new BlessedStyle {
+        override val bold = true
+        override val bg = Color.black
+        override val fg = Color.white
+      }
+    }
   }
   
   val menu: ThemeMenu = new ThemeMenu {

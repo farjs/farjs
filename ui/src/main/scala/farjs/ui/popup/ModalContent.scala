@@ -6,7 +6,8 @@ import scommons.react.blessed._
 
 case class ModalContentProps(title: String,
                              size: (Int, Int),
-                             style: BlessedStyle)
+                             style: BlessedStyle,
+                             padding: BlessedPadding = ModalContent.padding)
 
 object ModalContent extends FunctionComponent[ModalContentProps] {
 
@@ -15,6 +16,7 @@ object ModalContent extends FunctionComponent[ModalContentProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val (width, height) = props.size
+    val padding = props.padding
 
     <.box(
       ^.rbClickable := true,
@@ -28,7 +30,7 @@ object ModalContent extends FunctionComponent[ModalContentProps] {
       ^.rbStyle := props.style
     )(
       <(doubleBorderComp())(^.wrapped := DoubleBorderProps(
-        size = (width - paddingHorizontal * 2, height - paddingVertical * 2),
+        size = (width - padding.left - padding.right, height - padding.top - padding.bottom),
         style = props.style,
         pos = (0, 0),
         title = Some(props.title)
@@ -41,7 +43,7 @@ object ModalContent extends FunctionComponent[ModalContentProps] {
   val paddingHorizontal = 3
   val paddingVertical = 1
 
-  private val padding = new BlessedPadding {
+  val padding: BlessedPadding = new BlessedPadding {
     val left: Int = paddingHorizontal
     val right: Int = paddingHorizontal
     val top: Int = paddingVertical

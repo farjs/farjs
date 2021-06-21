@@ -28,6 +28,7 @@ trait ThemePopup {
 
   def regular: BlessedStyle
   def error: BlessedStyle
+  def menu: BlessedStyle
 }
 
 trait ThemeMenu {
