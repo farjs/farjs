@@ -64,6 +64,10 @@ different operations:
   * **Go back** to the parent folder - `Ctrl + PageUp`
   * **Go into** a folder - `Ctrl + PageDown` / `Return`
 
+* **Drive** selection popup
+  * Show it on the **left** panel - `Alt + F1`
+  * Show it on the **right** panel - `Alt + F2`
+
 * **Open item** in default application - `Alt + PageDown`
   (see [Key Bindings](#key-bindings) for how to re-map it to `Shift + Return`)
 * **Copy Path** of current item into **Clipboard** - `Ctrl + C`
@@ -100,9 +104,11 @@ Shows possible colors with their `hex` codes for current terminal.
 action in my terminal?
   - You may re-map the keys to **send** supported **escape sequences**
   or **hex codes**.
-  For example you can re-map:
+  For example, you can re-map:
     - | Key | Supported Key | Escape Sequence ^[ ... | Hex Codes |
       | --- | --- | --- | --- |
+      | `Alt + F1` | `Alt + F1` | `[11;3~` |
+      | `Alt + F2` | `Alt + F2` | `[12;3~` |
       | `Shift + Return` | `Alt + PageDown` | `[6;3~` |
       | `CMD + PageDown` | `Ctrl + PageDown` | `[6^` |
       | `CMD + PageUp` | `Ctrl + PageUp` | `[5^` |

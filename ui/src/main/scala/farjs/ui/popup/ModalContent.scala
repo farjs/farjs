@@ -7,7 +7,8 @@ import scommons.react.blessed._
 case class ModalContentProps(title: String,
                              size: (Int, Int),
                              style: BlessedStyle,
-                             padding: BlessedPadding = ModalContent.padding)
+                             padding: BlessedPadding = ModalContent.padding,
+                             left: String = "center")
 
 object ModalContent extends FunctionComponent[ModalContentProps] {
 
@@ -24,7 +25,7 @@ object ModalContent extends FunctionComponent[ModalContentProps] {
       ^.rbWidth := width,
       ^.rbHeight := height,
       ^.rbTop := "center",
-      ^.rbLeft := "center",
+      ^.rbLeft := props.left,
       ^.rbShadow := true,
       ^.rbPadding := padding,
       ^.rbStyle := props.style

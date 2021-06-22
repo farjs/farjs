@@ -2,6 +2,7 @@ package farjs.app.filelist
 
 import farjs.filelist.FileListActions.FileListActivateAction
 import farjs.filelist._
+import farjs.filelist.fs.{FSDrivePopup, FSDrivePopupProps}
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
 import farjs.filelist.stack.PanelStack.StackItem
 import farjs.filelist.stack._
@@ -22,12 +23,15 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
 
   private[filelist] var panelStackComp: UiComponent[PanelStackProps] = PanelStack
   private[filelist] var fileListPanelComp: UiComponent[FileListPanelProps] = FileListPanel
+  private[filelist] var fsDrivePopup: UiComponent[FSDrivePopupProps] = FSDrivePopup
   private[filelist] var bottomMenuComp: UiComponent[Unit] = BottomMenu
 
   protected def render(compProps: Props): ReactElement = {
     val leftButtonRef = useRef[BlessedElement](null)
     val rightButtonRef = useRef[BlessedElement](null)
     val (isRight, setIsRight) = useStateUpdater(false)
+    val (showLeftDrive, setShowLeftDrive) = useState(false)
+    val (showRightDrive, setShowRightDrive) = useState(false)
     val props = compProps.wrapped
     val activeList = props.data.activeList
     
@@ -57,8 +61,10 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     }
     
     val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (_, key) =>
-      val screen = leftButtonRef.current.screen
+      def screen = leftButtonRef.current.screen
       key.full match {
+        case "M-f1" => setShowLeftDrive(true)
+        case "M-f2" => setShowRightDrive(true)
         case "f10" => props.dispatch(FileListPopupExitAction(show = true))
         case "tab" | "S-tab" => screen.focusNext()
         case "C-u" =>
@@ -84,7 +90,16 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         ^.rbOnKeypress := onKeypress
       )(
         <(panelStackComp())(^.wrapped := PanelStackProps(isRight, leftButtonRef.current))(
-          <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions, getState(isRight)))()
+          <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions, getState(isRight)))(),
+          if (showLeftDrive) Some {
+            <(fsDrivePopup())(^.wrapped := FSDrivePopupProps(
+              isRight = false,
+              onClose = { () =>
+                setShowLeftDrive(false)
+              }
+            ))()
+          }
+          else None
         )
       ),
       <.button(
@@ -98,7 +113,16 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         ^.rbOnKeypress := onKeypress
       )(
         <(panelStackComp())(^.wrapped := PanelStackProps(!isRight, rightButtonRef.current))(
-          <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions, getState(!isRight)))()
+          <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions, getState(!isRight)))(),
+          if (showRightDrive) Some {
+            <(fsDrivePopup())(^.wrapped := FSDrivePopupProps(
+              isRight = true,
+              onClose = { () =>
+                setShowRightDrive(false)
+              }
+            ))()
+          }
+          else None
         )
       ),
 
