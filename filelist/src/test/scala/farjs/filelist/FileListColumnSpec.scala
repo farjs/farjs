@@ -94,11 +94,11 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
       borderCh = SingleBorder.verticalCh,
       items = List(
         FileListItem.up,
-        FileListItem("dir 1 {bold}", isDir = true),
+        FileListItem("dir\t1 {bold}", isDir = true),
         FileListItem(".dir 2 looooooong", isDir = true),
         FileListItem("file 3"),
-        FileListItem(".dir 4", isDir = true),
-        FileListItem(".file 5"),
+        FileListItem(".dir \r4", isDir = true),
+        FileListItem(".file \n5"),
         FileListItem(" file 6")
       ),
       focusedIndex = 2,

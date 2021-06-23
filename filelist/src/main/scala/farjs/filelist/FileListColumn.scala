@@ -46,13 +46,17 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
           else style
         }
 
+        val text = name
+          .replace("\n", "")
+          .replace("\r", "")
+          .replace('\t', ' ')
         val content = TextBox.renderText(
           isBold = style.bold.getOrElse(false),
           fgColor = style.fg.orNull,
           bgColor = style.bg.orNull,
-          text = name.take(width).padTo(width, ' ')
+          text = text.take(width).padTo(width, ' ')
         )
-        val ending = if (name.length > width) overlapEnd else borderEnd
+        val ending = if (text.length > width) overlapEnd else borderEnd
         s"$content$ending"
     }
 
