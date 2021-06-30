@@ -157,4 +157,70 @@ class FSServiceSpec extends AsyncTestSpec {
       )
     }
   }
+
+  it should "read disks on Windows" in {
+    //given
+    val childProcess = mock[ChildProcess]
+    val service = new FSService(Platform.win32, childProcess)
+    val output =
+      """Caption  FreeSpace     Size          VolumeName
+        |C:       81697124352   156595318784  SYSTEM
+        |""".stripMargin
+    val result: (js.Object, js.Object) = (output.asInstanceOf[js.Object], new js.Object)
+
+    //then
+    (childProcess.exec _).expects(*, *).onCall { (command, options) =>
+      command shouldBe "wmic logicaldisk get Caption,VolumeName,FreeSpace,Size"
+      assertObject(options.get, new ChildProcessOptions {
+        override val windowsHide = true
+      })
+
+      (null, Future.successful(result))
+    }
+
+    //when
+    val resultF = service.readDisks()
+
+    //then
+    resultF.map { res =>
+      res shouldBe List(
+        FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM")
+      )
+    }
+  }
+
+  it should "read disks on Mac OS/Linux" in {
+    //given
+    val childProcess = mock[ChildProcess]
+    val service = new FSService(Platform.darwin, childProcess)
+    val output =
+      """Filesystem   1024-blocks      Used Available Capacity  Mounted on
+        |/dev/disk1s1   244912536 202577024  40612004    84%    /
+        |/dev/disk1s3   244912536   4194424  59259185     8%    /System/Volumes/VM
+        |/dev/disk1s4   244912536   4194424  59259180     7%    /private/var/vm
+        |/dev/disk2s1     1957408     14752   1942656     1%    /Volumes/FLASHDRIVE
+        |""".stripMargin
+    val result: (js.Object, js.Object) = (output.asInstanceOf[js.Object], new js.Object)
+
+    //then
+    (childProcess.exec _).expects(*, *).onCall { (command, options) =>
+      command shouldBe "df -kPl"
+      assertObject(options.get, new ChildProcessOptions {
+        override val windowsHide = true
+      })
+
+      (null, Future.successful(result))
+    }
+
+    //when
+    val resultF = service.readDisks()
+
+    //then
+    resultF.map { res =>
+      res shouldBe List(
+        FSDisk("/", size = 250790436864.0, free = 41586692096.0, "/"),
+        FSDisk("/Volumes/FLASHDRIVE", size = 2004385792.0, free = 1989279744.0, "FLASHDRIVE")
+      )
+    }
+  }
 }

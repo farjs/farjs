@@ -53,4 +53,35 @@ class FSService(platform: Platform, childProcess: ChildProcess) {
       disks.headOption
     }
   }
+
+  def readDisks(): Future[List[FSDisk]] = {
+    val (_, future) = childProcess.exec(
+      command = {
+        if (platform == Platform.win32) {
+          "wmic logicaldisk get Caption,VolumeName,FreeSpace,Size"
+        }
+        else "df -kPl"
+      },
+      options = Some(new raw.ChildProcessOptions {
+        override val windowsHide = true
+      })
+    )
+
+    future.map { case (stdout, _) =>
+      val output = stdout.asInstanceOf[String]
+      if (platform == Platform.win32) FSDisk.fromWmicLogicalDisk(output)
+      else {
+        FSDisk.fromDfCommand(output)
+          .filter(d => !d.root.startsWith("/private/") && !d.root.startsWith("/System/"))
+          .map { d =>
+            d.copy(name = d.name.stripPrefix("/Volumes/"))
+          }
+      }
+    }
+  }
+}
+
+object FSService {
+
+  lazy val instance: FSService = new FSService(process.platform, child_process)
 }

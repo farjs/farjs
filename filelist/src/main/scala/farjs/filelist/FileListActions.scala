@@ -5,7 +5,7 @@ import farjs.filelist.api.{FileListApi, FileListDir, FileListItem}
 import farjs.filelist.fs.FSService
 import io.github.shogowada.scalajs.reactjs.redux.Action
 import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
-import scommons.nodejs._
+import scommons.nodejs.{path => nodePath}
 import scommons.react.redux.task.{FutureTask, TaskAction}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -18,7 +18,7 @@ trait FileListActions {
 
   protected def api: FileListApi
 
-  private[filelist] var fsService: FSService = new FSService(process.platform, child_process)
+  private[filelist] var fsService: FSService = FSService.instance
 
   def openInDefaultApp(parent: String, item: String): FileListTaskAction = {
     val future = fsService.openItem(parent, item)
@@ -56,7 +56,7 @@ trait FileListActions {
                 multiple: Boolean): FileListDirCreateAction = {
 
     val names =
-      if (multiple) dir.split(path.sep.head).toList
+      if (multiple) dir.split(nodePath.sep.head).toList
       else List(dir)
     
     val future = for {

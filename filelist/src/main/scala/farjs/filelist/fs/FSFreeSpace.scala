@@ -1,7 +1,6 @@
 package farjs.filelist.fs
 
 import farjs.filelist.api.FileListDir
-import scommons.nodejs._
 import scommons.react._
 import scommons.react.hooks._
 
@@ -13,7 +12,7 @@ case class FSFreeSpaceProps(currDir: FileListDir,
 
 object FSFreeSpace extends FunctionComponent[FSFreeSpaceProps] {
 
-  private[fs] var fsService: FSService = new FSService(process.platform, child_process)
+  private[fs] var fsService: FSService = FSService.instance
 
   protected def render(compProps: Props): ReactElement = {
     val (freeBytes, setFreeBytes) = useState(Option.empty[Double])
