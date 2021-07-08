@@ -277,8 +277,11 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
     //then
     inside(findComponentProps(renderer.root, fsDrivePopup)) {
-      case FSDrivePopupProps(isRight, onClose) =>
+      case FSDrivePopupProps(resDispatch, resActions, isRight, onClose, showOnLeft) =>
+        resDispatch shouldBe dispatch
+        resActions shouldBe actions
         isRight shouldBe false
+        showOnLeft shouldBe true
         
         //when
         onClose()
@@ -320,8 +323,11 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
     //then
     inside(findComponentProps(renderer.root, fsDrivePopup)) {
-      case FSDrivePopupProps(isRight, onClose) =>
+      case FSDrivePopupProps(resDispatch, resActions, isRight, onClose, showOnLeft) =>
+        resDispatch shouldBe dispatch
+        resActions shouldBe actions
         isRight shouldBe true
+        showOnLeft shouldBe false
         
         //when
         onClose()

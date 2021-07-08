@@ -93,10 +93,13 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions, getState(isRight)))(),
           if (showLeftDrive) Some {
             <(fsDrivePopup())(^.wrapped := FSDrivePopupProps(
-              isRight = false,
+              dispatch = props.dispatch,
+              actions = props.actions,
+              isRight = isRight,
               onClose = { () =>
                 setShowLeftDrive(false)
-              }
+              },
+              showOnLeft = true
             ))()
           }
           else None
@@ -116,10 +119,13 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions, getState(!isRight)))(),
           if (showRightDrive) Some {
             <(fsDrivePopup())(^.wrapped := FSDrivePopupProps(
-              isRight = true,
+              dispatch = props.dispatch,
+              actions = props.actions,
+              isRight = !isRight,
               onClose = { () =>
                 setShowRightDrive(false)
-              }
+              },
+              showOnLeft = false
             ))()
           }
           else None
