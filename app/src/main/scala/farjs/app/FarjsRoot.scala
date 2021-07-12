@@ -51,18 +51,18 @@ class FarjsRoot(withPortalsComp: UiComponent[Unit],
       ),
       
       <(logControllerComp())(^.wrapped := LogControllerProps { content =>
-        val comp = devTool match {
-          case DevTool.Hidden => <.>()()
-          case DevTool.Logs => <(logPanelComp())(^.wrapped := LogPanelProps(content))()
-          case DevTool.Colors => <(colorPanelComp())()()
-        }
-        
         if (devTool != DevTool.Hidden) {
           <.box(
             ^.rbWidth := "30%",
             ^.rbHeight := "100%",
             ^.rbLeft := "70%"
-          )(comp)
+          )(<(devToolPanelComp())(^.wrapped := DevToolPanelProps(
+            devTool = devTool,
+            logContent = content,
+            onActivate = { tool =>
+              setDevTool(_ => tool)
+            }
+          ))())
         }
         else null
       })()
@@ -73,6 +73,5 @@ class FarjsRoot(withPortalsComp: UiComponent[Unit],
 object FarjsRoot {
 
   private[app] var logControllerComp: UiComponent[LogControllerProps] = LogController
-  private[app] var logPanelComp: UiComponent[LogPanelProps] = LogPanel
-  private[app] var colorPanelComp: UiComponent[Unit] = ColorPanel
+  private[app] var devToolPanelComp: UiComponent[DevToolPanelProps] = DevToolPanel
 }

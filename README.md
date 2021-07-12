@@ -15,9 +15,9 @@ Good old Windows **F**ile and **AR**chive Manager
   [blessed](https://github.com/chjj/blessed)
 
 Runs on [Node.js](https://nodejs.org/), thus cross-platform:
-* `Mac OS` (primary support in [iTerm2](https://iterm2.com/) terminal)
-* `Linux`
+* `Mac OS X` (primary support in [iTerm2](https://iterm2.com/) terminal)
 * `Windows`
+* `Linux`
 
 ## Install
 

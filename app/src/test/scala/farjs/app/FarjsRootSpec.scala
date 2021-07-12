@@ -21,10 +21,9 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   private val taskController = "TaskController".asInstanceOf[ReactClass]
   
   FarjsRoot.logControllerComp = () => "LogController".asInstanceOf[ReactClass]
-  FarjsRoot.logPanelComp = () => "LogPanel".asInstanceOf[ReactClass]
-  FarjsRoot.colorPanelComp = () => "ColorPanel".asInstanceOf[ReactClass]
+  FarjsRoot.devToolPanelComp = () => "DevToolPanel".asInstanceOf[ReactClass]
 
-  it should "set devToolsComp and emit resize event when on F12" in {
+  it should "set devTool and emit resize event when on F12" in {
     //given
     val root = new FarjsRoot(withPortalsComp, fileListComp, fileListPopups, taskController, DevTool.Hidden)
     val programMock = mock[BlessedProgramMock]
@@ -66,6 +65,37 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       }
       Succeeded
     }
+  }
+
+  it should "set devTool when onActivate" in {
+    //given
+    val root = new FarjsRoot(withPortalsComp, fileListComp, fileListPopups, taskController, DevTool.Colors)
+    val screenMock = mock[BlessedScreenMock]
+    val boxMock = mock[BlessedElementMock]
+    (boxMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.key _).expects(*, *)
+
+    val renderer = createTestRenderer(<(root())()(), { el =>
+      if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock.asInstanceOf[js.Any]
+      else null
+    })
+    val devToolProps = {
+      val logProps = findComponentProps(renderer.root, logControllerComp)
+      val renderedContent = createTestRenderer(logProps.render("test log content")).root
+      findComponentProps(renderedContent, devToolPanelComp)
+    }
+    devToolProps.devTool shouldBe DevTool.Colors
+
+    //when
+    devToolProps.onActivate(DevTool.Logs)
+    
+    //then
+    val updatedProps = {
+      val logProps = findComponentProps(renderer.root, logControllerComp)
+      val renderedContent = createTestRenderer(logProps.render("test log content")).root
+      findComponentProps(renderedContent, devToolPanelComp)
+    }
+    updatedProps.devTool shouldBe DevTool.Logs
   }
 
   it should "render component without DevTools" in {
@@ -131,8 +161,9 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
             ^.rbHeight := "100%",
             ^.rbLeft := "70%"
           )(), { case List(comp) =>
-            assertTestComponent(comp, logPanelComp) { case LogPanelProps(resContent) =>
-              resContent shouldBe content
+            assertTestComponent(comp, devToolPanelComp) { case DevToolPanelProps(devTool, logContent, _) =>
+              devTool shouldBe DevTool.Logs
+              logContent shouldBe content
             }
           }
         )
@@ -173,7 +204,10 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
             ^.rbHeight := "100%",
             ^.rbLeft := "70%"
           )(), { case List(comp) =>
-            assertNativeComponent(comp, <(colorPanelComp())()())
+            assertTestComponent(comp, devToolPanelComp) { case DevToolPanelProps(devTool, logContent, _) =>
+              devTool shouldBe DevTool.Colors
+              logContent shouldBe content
+            }
           }
         )
       }
