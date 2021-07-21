@@ -532,6 +532,66 @@ const apply = function () {
     return false;
   };
   
+  Program.prototype._listenInput = function() {
+    var keys = require('./keysOverrides')
+      , self = this;
+  
+    // Input
+    this.input.on('keypress', this.input._keypressHandler = function(ch, key) {
+      key = key || { ch: ch };
+  
+      if (key.name === 'undefined'
+          && (key.code === '[M' || key.code === '[I' || key.code === '[O')) {
+        // A mouse sequence. The `keys` module doesn't understand these.
+        return;
+      }
+  
+      if (key.name === 'undefined') {
+        // Not sure what this is, but we should probably ignore it.
+        return;
+      }
+  
+      if (key.name === 'enter' && key.sequence === '\n') {
+        key.name = 'linefeed';
+      }
+  
+      if (key.name === 'return' && key.sequence === '\r') {
+        self.input.emit('keypress', ch, merge({}, key, { name: 'enter' }));
+      }
+  
+      var name = (key.ctrl ? 'C-' : '')
+        + (key.meta ? 'M-' : '')
+        + (key.shift && key.name ? 'S-' : '')
+        + (key.name || ch);
+  
+      key.full = name;
+  
+      Program.instances.forEach(function(program) {
+        if (program.input !== self.input) return;
+        program.emit('keypress', ch, key);
+        program.emit('key ' + name, ch, key);
+      });
+    });
+  
+    this.input.on('data', this.input._dataHandler = function(data) {
+      Program.instances.forEach(function(program) {
+        if (program.input !== self.input) return;
+        program.emit('data', data);
+      });
+    });
+  
+    keys.emitKeypressEvents(this.input);
+  };
+  
+  function merge(out) {
+    Array.prototype.slice.call(arguments, 1).forEach(function(obj) {
+      Object.keys(obj).forEach(function(key) {
+        out[key] = obj[key];
+      });
+    });
+    return out;
+  };
+  
   //console.log("Blessed overrides!");
 }
 

@@ -10,8 +10,10 @@ class DevToolSpec extends TestSpec {
     shouldResize(Hidden, Hidden) shouldBe true
     shouldResize(Hidden, Logs) shouldBe true
     shouldResize(Logs, Hidden) shouldBe true
+    shouldResize(Colors, Hidden) shouldBe true
     shouldResize(Logs, Logs) shouldBe false
-    shouldResize(Logs, Colors) shouldBe false
+    shouldResize(Logs, Inputs) shouldBe false
+    shouldResize(Inputs, Colors) shouldBe false
   }
   
   it should "transition state from Hidden to Hidden when getNext" in {
@@ -20,7 +22,7 @@ class DevToolSpec extends TestSpec {
     state should not be Hidden
     
     //when
-    var count = 0
+    var count = 1
     while (state != Hidden && count < 10) {
       count += 1
       state = state.getNext
@@ -28,6 +30,6 @@ class DevToolSpec extends TestSpec {
 
     //then
     state shouldBe Hidden
-    count should be > 0
+    count shouldBe 4
   }
 }

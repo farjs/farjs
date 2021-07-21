@@ -65,6 +65,7 @@ different operations:
   * **Go into** a folder - `Ctrl + PageDown` / `Return`
 
 * **Drive** selection popup
+  (see [Key Bindings](#key-bindings) for how to set up keys for it)
   * Show it on the **left** panel - `Alt + F1`
   * Show it on the **right** panel - `Alt + F2`
 

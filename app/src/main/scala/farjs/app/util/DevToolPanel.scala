@@ -12,6 +12,7 @@ case class DevToolPanelProps(devTool: DevTool,
 object DevToolPanel extends FunctionComponent[DevToolPanelProps] {
 
   private[util] var logPanelComp: UiComponent[LogPanelProps] = LogPanel
+  private[util] var inputController: UiComponent[Unit] = InputController
   private[util] var colorPanelComp: UiComponent[Unit] = ColorPanel
 
   protected def render(compProps: Props): ReactElement = {
@@ -21,11 +22,13 @@ object DevToolPanel extends FunctionComponent[DevToolPanelProps] {
     val comp = props.devTool match {
       case DevTool.Hidden => null
       case DevTool.Logs => <(logPanelComp())(^.wrapped := LogPanelProps(props.logContent))()
+      case DevTool.Inputs => <(inputController())()()
       case DevTool.Colors => <(colorPanelComp())()()
     }
 
     val tabs = List[(DevTool, String)](
       (DevTool.Logs, "Logs"),
+      (DevTool.Inputs, "Inputs"),
       (DevTool.Colors, "Colors")
     ).foldLeft(List.empty[(DevTool, String, Int)]) {
       case (result, (tool, label)) =>

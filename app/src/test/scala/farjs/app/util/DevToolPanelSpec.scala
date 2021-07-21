@@ -11,6 +11,7 @@ import scommons.react.test._
 class DevToolPanelSpec extends TestSpec with TestRendererUtils {
 
   DevToolPanel.logPanelComp = () => "LogPanel".asInstanceOf[ReactClass]
+  DevToolPanel.inputController = () => "InputController".asInstanceOf[ReactClass]
   DevToolPanel.colorPanelComp = () => "ColorPanel".asInstanceOf[ReactClass]
 
   it should "call onActivate when click on tab" in {
@@ -19,7 +20,7 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
     val props = DevToolPanelProps(DevTool.Colors, "test logs", onActivate)
     val comp = createTestRenderer(<(DevToolPanel())(^.wrapped := props)()).root
     val tab1 = inside(findComponents(comp, <.text.name)) {
-      case List(t1, _) => t1
+      case List(t1, _, _) => t1
     }
 
     //then
@@ -37,7 +38,28 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
     val result = createTestRenderer(<(DevToolPanel())(^.wrapped := props)()).root
 
     //then
-    assertDevToolPanel(result, props, List(" Logs " -> 0, " Colors " -> 6), " Logs ")
+    assertDevToolPanel(
+      result = result,
+      props = props,
+      expectedTabs = List(" Logs " -> 0, " Inputs " -> 6, " Colors " -> 14),
+      activeTab = " Logs "
+    )
+  }
+  
+  it should "render Inputs component" in {
+    //given
+    val props = DevToolPanelProps(DevTool.Inputs, "test logs", _ => ())
+
+    //when
+    val result = createTestRenderer(<(DevToolPanel())(^.wrapped := props)()).root
+
+    //then
+    assertDevToolPanel(
+      result = result,
+      props = props,
+      expectedTabs = List(" Logs " -> 0, " Inputs " -> 6, " Colors " -> 14),
+      activeTab = " Inputs "
+    )
   }
   
   it should "render Colors component" in {
@@ -48,7 +70,12 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
     val result = createTestRenderer(<(DevToolPanel())(^.wrapped := props)()).root
 
     //then
-    assertDevToolPanel(result, props, List(" Logs " -> 0, " Colors " -> 6), " Colors ")
+    assertDevToolPanel(
+      result = result,
+      props = props,
+      expectedTabs = List(" Logs " -> 0, " Inputs " -> 6, " Colors " -> 14),
+      activeTab = " Colors "
+    )
   }
   
   private def assertDevToolPanel(result: TestInstance,
@@ -101,6 +128,8 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
           assertTestComponent(comp, logPanelComp) { case LogPanelProps(resContent) =>
             resContent shouldBe props.logContent
           }
+        case DevTool.Inputs =>
+          assertNativeComponent(comp, <(inputController())()())
         case DevTool.Colors =>
           assertNativeComponent(comp, <(colorPanelComp())()())
       }

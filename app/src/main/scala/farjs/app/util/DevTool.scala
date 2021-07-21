@@ -12,6 +12,7 @@ object DevTool {
   }
 
   object Hidden extends DevTool(Logs)
-  object Logs extends DevTool(Colors)
+  object Logs extends DevTool(Inputs)
+  object Inputs extends DevTool(Colors)
   object Colors extends DevTool(Hidden)
 }
