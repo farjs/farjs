@@ -160,7 +160,9 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
       }
 
       expectedContent.foreach { content =>
-        val Some(textEl) = itemsText
+        val textEl = inside(itemsText) {
+          case Some(textEl) => textEl
+        }
         
         assertNativeComponent(textEl, <.text(
           ^.rbWidth := props.size._1 + 1,

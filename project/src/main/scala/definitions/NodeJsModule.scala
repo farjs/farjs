@@ -36,20 +36,27 @@ trait NodeJsModule extends FarjsModule {
 object NodeJsModule {
 
   val settings: Seq[Setting[_]] = Seq(
-    scalaJSModuleKind := ModuleKind.CommonJSModule,
-
+    scalaJSLinkerConfig ~= {
+      _.withModuleKind(ModuleKind.CommonJSModule)
+        .withSourceMap(false)
+        .withESFeatures(_.withUseECMAScript2015(false))
+    },
     //Opt-in @ScalaJSDefined by default
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
+    scalacOptions += {
+      if (scalaJSVersion.startsWith("0.6")) "-P:scalajs:sjsDefinedByDefault"
+      else ""
+    },
     requireJsDomEnv in Test := false,
     version in webpack := "4.29.0",
-    emitSourceMaps := false,
     webpackEmitSourceMaps := false,
     parallelExecution in Test := false,
 
     // required for node.js >= v12.12.0
     // see:
     //   https://github.com/nodejs/node/pull/29919
-    emitSourceMaps in Test := true,
+    scalaJSLinkerConfig in Test ~= {
+      _.withSourceMap(true)
+    },
     jsEnv in Test := new NodeJSEnv(NodeJSEnv.Config().withArgs(List("--enable-source-maps"))),
 
     ideExcludedDirectories ++= {

@@ -35,7 +35,7 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     val props = FSDrivePopupProps(dispatch, actions, isRight = false, onClose, showOnLeft = true)
 
     var disksF: Future[_] = null
-    dispatch.expects(*).onCall { action =>
+    dispatch.expects(*).onCall { action: Any =>
       disksF = action.asInstanceOf[FileListTaskAction].task.future
     }
     (fsService.readDisks _).expects().returning(Future.successful(List(
@@ -81,7 +81,7 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     val props = FSDrivePopupProps(dispatch, actions, isRight = false, onClose = () => (), showOnLeft = true)
 
     var disksF: Future[_] = null
-    dispatch.expects(*).onCall { action =>
+    dispatch.expects(*).onCall { action: Any =>
       disksF = action.asInstanceOf[FileListTaskAction].task.future
     }
     (fsService.readDisks _).expects().returning(Future.successful(List(
@@ -118,7 +118,7 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     val props = FSDrivePopupProps(dispatch, actions, isRight = false, onClose = () => (), showOnLeft = true)
 
     var disksF: Future[_] = null
-    dispatch.expects(*).onCall { action =>
+    dispatch.expects(*).onCall { action: Any =>
       disksF = action.asInstanceOf[FileListTaskAction].task.future
     }
     (fsService.readDisks _).expects().returning(Future.successful(List(

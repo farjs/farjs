@@ -50,7 +50,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       var done = false
       
       //then
-      onDone.expects(*).onCall { total =>
+      onDone.expects(*).onCall { total: Double =>
         total shouldBe 133
         done = true
       }

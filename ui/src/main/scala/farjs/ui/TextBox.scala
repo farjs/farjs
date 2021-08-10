@@ -87,7 +87,7 @@ object TextBox extends FunctionComponent[TextBoxProps] {
       setSelStartAndEnd(selStartAndEnd)
     }
     
-    def onClick(data: MouseData): Unit = {
+    val onClick: js.Function1[MouseData, Unit] = { data =>
       val el = elementRef.current
       val screen = el.screen
       move(el, props.value, CursorMove.At(data.x - el.aleft), TextSelect.Reset)
@@ -120,7 +120,35 @@ object TextBox extends FunctionComponent[TextBoxProps] {
       el.screen.program.hideCursor()
     }
     
-    def onKeypress(ch: js.Dynamic, key: KeyboardKey): Unit = {
+    def edit(value: String, te: TextEdit): (String, CursorMove) = {
+      val res@(newVal, _) = {
+        if (selEnd - selStart > 0) {
+          te match {
+            case TextEdit.Delete | TextEdit.Backspace =>
+              (value.slice(0, selStart) + value.slice(selEnd, value.length), CursorMove.At(selStart - offset))
+            case TextEdit.Insert(s) =>
+              (value.slice(0, selStart) + s + value.slice(selEnd, value.length), CursorMove.At(selStart + s.length - offset))
+          }
+        } else {
+          val idx = offset + cursorX
+          te match {
+            case TextEdit.Delete =>
+              (value.slice(0, idx) + value.slice(idx + 1, value.length), CursorMove.At(cursorX))
+            case TextEdit.Backspace =>
+              (value.slice(0, idx - 1) + value.slice(idx, value.length), CursorMove.Left)
+            case TextEdit.Insert(s) =>
+              (value.slice(0, idx) + s + value.slice(idx, value.length), CursorMove.Right)
+          }
+        }
+      }
+
+      if (value != newVal) {
+        props.onChange(newVal)
+      }
+      res
+    }
+
+    val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (ch, key) =>
       val el = elementRef.current
 
       var processed = true
@@ -160,34 +188,6 @@ object TextBox extends FunctionComponent[TextBoxProps] {
       key.defaultPrevented = processed
     }
     
-    def edit(value: String, te: TextEdit): (String, CursorMove) = {
-      val res@(newVal, _) = {
-        if (selEnd - selStart > 0) {
-          te match {
-            case TextEdit.Delete | TextEdit.Backspace =>
-              (value.slice(0, selStart) + value.slice(selEnd, value.length), CursorMove.At(selStart - offset))
-            case TextEdit.Insert(s) =>
-              (value.slice(0, selStart) + s + value.slice(selEnd, value.length), CursorMove.At(selStart + s.length - offset))
-          }
-        } else {
-          val idx = offset + cursorX
-          te match {
-            case TextEdit.Delete =>
-              (value.slice(0, idx) + value.slice(idx + 1, value.length), CursorMove.At(cursorX))
-            case TextEdit.Backspace =>
-              (value.slice(0, idx - 1) + value.slice(idx, value.length), CursorMove.Left)
-            case TextEdit.Insert(s) =>
-              (value.slice(0, idx) + s + value.slice(idx, value.length), CursorMove.Right)
-          }
-        }
-      }
-
-      if (value != newVal) {
-        props.onChange(newVal)
-      }
-      res
-    }
-
     <.input(
       ^.reactRef := elementRef,
       ^.rbAutoFocus := false,
