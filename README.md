@@ -44,6 +44,7 @@ To exit the application - press `F10` on the keyboard.
 - [File Browser](#file-browser)
 - [Dev Tools](#dev-tools)
   - [Logs](#logs)
+  - [Inputs](#inputs)
   - [Colors](#colors)
 
 ### Other
@@ -93,9 +94,13 @@ Press `F12` again to switch between the components.
 Shows all the intercepted `console.log` and `console.error` messages,
 since the app itself is rendered to the console.
 
+### Inputs
+
+Shows input keys sequences.
+
 ### Colors
 
-Shows possible colors with their `hex` codes for current terminal.
+Shows possible colors with their `hex` codes for current terminal/theme.
 
 ## FAQ
 
