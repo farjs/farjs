@@ -4,9 +4,9 @@ import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
 import sbt._
 import scoverage.ScoverageKeys.coverageExcludedPackages
-
 import scalajsbundler.BundlingMode
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
+import scommons.sbtplugin.ScommonsPlugin.autoImport._
 
 object FarjsApp extends ScalaJsModule {
 
@@ -27,7 +27,7 @@ object FarjsApp extends ScalaJsModule {
       },
 
       scalaJSUseMainModuleInitializer := false,
-      webpackBundlingMode := BundlingMode.LibraryOnly(),
+      webpackBundlingMode := BundlingMode.Application,
       version in webpack := "4.29.0",
 
       webpackResources := {
@@ -41,12 +41,13 @@ object FarjsApp extends ScalaJsModule {
       ),
       //prod
       webpackConfigFile in fullOptJS := Some(
-        baseDirectory.value / "src" / "main" / "resources" / "dev.webpack.config.js"
+        baseDirectory.value / "src" / "main" / "resources" / "prod.webpack.config.js"
       ),
       //tests
-      //webpackConfigFile in Test := Some(
-      //  baseDirectory.value / "src" / "test" / "resources" / "test.webpack.config.js"
-      //),
+      scommonsRequireWebpackInTest := true,
+      webpackConfigFile in Test := Some(
+        baseDirectory.value / "src" / "main" / "resources" / "test.webpack.config.js"
+      ),
 
       //useYarn := true,
       //yarnExtraArgs := Seq("--frozen-lockfile"),
@@ -55,19 +56,18 @@ object FarjsApp extends ScalaJsModule {
         "webpack-merge" -> "4.1.0",
         "webpack-node-externals" -> "1.7.2",
 
-        "@babel/cli" -> "^7.0.0",
-        "@babel/core" -> "^7.0.0",
-        "@babel/plugin-proposal-class-properties" -> "^7.7.0",
-        "@babel/plugin-proposal-object-rest-spread" -> "^7.0.0",
-        "@babel/plugin-transform-flow-strip-types" -> "^7.0.0",
-        "@babel/preset-env" -> "^7.0.0",
-        "@babel/preset-react" -> "^7.0.0",
-        "@babel/register" -> "^7.0.0",
-        "rollup" -> "^0.65.0",
-        "rollup-plugin-babel" -> "^4.0.2",
-        "rollup-plugin-commonjs" -> "^9.1.6",
-        "rollup-plugin-node-resolve" -> "^3.3.0",
-        "rollup-plugin-peer-deps-external" -> "^2.2.0"
+        "@babel/cli" -> "^7.12.10",
+        "@babel/core" -> "^7.12.10",
+        "@babel/plugin-proposal-class-properties" -> "^7.12.1",
+        "@babel/plugin-proposal-object-rest-spread" -> "^7.12.1",
+        "@babel/plugin-transform-flow-strip-types" -> "^7.12.10",
+        "@babel/preset-env" -> "^7.12.11",
+        "@babel/preset-react" -> "^7.12.10",
+        "@babel/register" -> "^7.12.10",
+        "rollup" -> "^2.38.5",
+        "rollup-plugin-babel" -> "^4.4.0",
+        "rollup-plugin-commonjs" -> "^10.1.0",
+        "rollup-plugin-node-resolve" -> "^5.2.0"
       ),
 
       additionalNpmConfig in Compile := {

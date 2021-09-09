@@ -5,11 +5,11 @@ const commonConfig = require("./common.webpack.config.js")
 module.exports = merge(commonConfig, {
 
   entry: [
-    './dev.loader.js'
+    './prod.loader.js'
   ],
   output: {
-    filename: '../farjs-app-fastopt-bundle.js'
+    filename: '../farjs-app-opt-bundle.js'
   },
   
-  mode: 'development'
+  mode: 'production'
 })

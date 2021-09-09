@@ -38,19 +38,23 @@ object ScalaJsModule {
 
   val settings: Seq[Setting[_]] = Seq(
     npmDependencies in Compile ++= Seq(
-      "react" -> "^17.0.1"
+      "react" -> "^17.0.2",
+      "react-redux" -> "^7.2.4"
     ),
     npmResolutions in Compile ++= Map(
-      "react" -> "^17.0.1"
+      "react" -> "^17.0.2",
+      "react-redux" -> "^7.2.4"
     ),
 
     npmDependencies in Test ++= Seq(
-      "react" -> "^17.0.1",
-      "react-test-renderer" -> "^17.0.1"
+      "react" -> "^17.0.2",
+      "react-redux" -> "^7.2.4",
+      "react-test-renderer" -> "^17.0.2"
     ),
     npmResolutions in Test ++= Map(
-      "react" -> "^17.0.1",
-      "react-test-renderer" -> "^17.0.1"
+      "react" -> "^17.0.2",
+      "react-redux" -> "^7.2.4",
+      "react-test-renderer" -> "^17.0.2"
     )
   )  
 }

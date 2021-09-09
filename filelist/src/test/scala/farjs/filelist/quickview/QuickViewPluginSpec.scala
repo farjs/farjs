@@ -8,11 +8,17 @@ import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.react.test.TestSpec
 
 class QuickViewPluginSpec extends TestSpec {
+  
+  private def createQuickViewPlugin(actions: FileListActions): QuickViewPlugin = {
+    new QuickViewPlugin(actions) {
+      override def apply(): ReactClass = "QuickViewPlugin".asInstanceOf[ReactClass]
+    }
+  }
 
   it should "define uiComponent and triggerKey" in {
     //given
     val actions = mock[FileListActions]
-    val plugin = new QuickViewPlugin(actions)
+    val plugin = createQuickViewPlugin(actions)
     
     //when & then
     plugin.uiComponent shouldBe QuickViewPanel
@@ -24,7 +30,7 @@ class QuickViewPluginSpec extends TestSpec {
   it should "remove plugin from left panel when onTrigger" in {
     //given
     val actions = mock[FileListActions]
-    val plugin = new QuickViewPlugin(actions)
+    val plugin = createQuickViewPlugin(actions)
     val leftStack = mock[PanelStack]
     val rightStack = mock[PanelStack]
     (leftStack.peek _).expects().returning(Some((plugin(), null)))
@@ -39,7 +45,7 @@ class QuickViewPluginSpec extends TestSpec {
   it should "remove plugin from right panel when onTrigger" in {
     //given
     val actions = mock[FileListActions]
-    val plugin = new QuickViewPlugin(actions)
+    val plugin = createQuickViewPlugin(actions)
     val leftStack = mock[PanelStack]
     val rightStack = mock[PanelStack]
     (leftStack.peek _).expects().returning(None)
@@ -55,7 +61,7 @@ class QuickViewPluginSpec extends TestSpec {
   it should "add plugin to left panel when onTrigger" in {
     //given
     val actions = mock[FileListActions]
-    val plugin = new QuickViewPlugin(actions)
+    val plugin = createQuickViewPlugin(actions)
     val leftStack = mock[PanelStack]
     val rightStack = mock[PanelStack]
     (leftStack.peek _).expects().returning(None)
@@ -71,7 +77,7 @@ class QuickViewPluginSpec extends TestSpec {
   it should "add plugin to right panel when onTrigger" in {
     //given
     val actions = mock[FileListActions]
-    val plugin = new QuickViewPlugin(actions)
+    val plugin = createQuickViewPlugin(actions)
     val leftStack = mock[PanelStack]
     val rightStack = mock[PanelStack]
     (leftStack.peek _).expects().returning(None)
@@ -88,7 +94,7 @@ class QuickViewPluginSpec extends TestSpec {
     //given
     val actions = mock[FileListActions]
     val props = mock[Props[Unit]]
-    val plugin = new QuickViewPlugin(actions)
+    val plugin = createQuickViewPlugin(actions)
     val dispatch = mock[Dispatch]
     val fileListsState = mock[FileListsStateDef]
     val state = mock[FileListsGlobalState]

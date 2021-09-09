@@ -4,7 +4,7 @@
 
 To build and run all the tests use the following command:
 ```bash
-sbt test
+sbt -mem 2048 test
 ```
 
 ### How to Run
@@ -13,14 +13,14 @@ To run the app use the following commands:
 ```bash
 sbt "project farjs-app" fastOptJS::webpack
 
-node ./app/target/scala-2.13/scalajs-bundler/main/reload.index.js
+node ./app/target/scala-2.13/scalajs-bundler/main/farjs-app-fastopt-bundle.js
 ```
 
 ### How to Run with Reload Workflow
 
 ```bash
 #console 1:
-sbt
+sbt -mem 2048
 >project farjs-app
 >~fastOptJS
 

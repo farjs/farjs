@@ -10,7 +10,7 @@ module.exports = {
   
   entry: [
     'webpack/hot/poll?1000',
-    './reload.index.js'
+    './reload.loader.js'
   ],
   output: {
     filename: './bundle.js'
@@ -18,9 +18,12 @@ module.exports = {
   
   target: 'node', // important in order not to bundle built-in modules like path, fs, etc.  
   
-  externals: [nodeExternals({ // in order to ignore modules in node_modules folder from bundling
-    whitelist: ['webpack/hot/poll?1000']
-  })],
+  externals: [
+    nodeExternals({ // in order to ignore modules in node_modules folder from bundling
+      whitelist: ['webpack/hot/poll?1000', 'react-redux']
+    }),
+    { "react-redux": "commonjs react-redux/lib/alternate-renderers" }
+  ],
   
   plugins: [
       new webpack.HotModuleReplacementPlugin()
