@@ -245,7 +245,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     Succeeded
   }
 
-  it should "show Drive popup on the left when onKeypress(Alt+F1)" in {
+  it should "show Drive popup on the left when onKeypress(Alt+L)" in {
     //given
     val dispatch = mock[Dispatch]
     val actions = mock[FileListActions]
@@ -256,7 +256,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         right = state.right.copy(isActive = false)
       )
     }
-    val keyFull = "M-f1"
+    val keyFull = "M-l"
     val props = FileListBrowserProps(dispatch, actions, data)
     val leftButtonMock = mock[BlessedElementMock]
     val rightButtonMock = mock[BlessedElementMock]
@@ -291,7 +291,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
   }
   
-  it should "show Drive popup on the right when onKeypress(Alt+F2)" in {
+  it should "show Drive popup on the right when onKeypress(Alt+R)" in {
     //given
     val dispatch = mock[Dispatch]
     val actions = mock[FileListActions]
@@ -302,7 +302,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         right = state.right.copy(isActive = false)
       )
     }
-    val keyFull = "M-f2"
+    val keyFull = "M-r"
     val props = FileListBrowserProps(dispatch, actions, data)
     val leftButtonMock = mock[BlessedElementMock]
     val rightButtonMock = mock[BlessedElementMock]

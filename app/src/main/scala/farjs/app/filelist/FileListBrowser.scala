@@ -63,8 +63,8 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (_, key) =>
       def screen = leftButtonRef.current.screen
       key.full match {
-        case "M-f1" => setShowLeftDrive(true)
-        case "M-f2" => setShowRightDrive(true)
+        case "M-l" => setShowLeftDrive(true)
+        case "M-r" => setShowRightDrive(true)
         case "f10" => props.dispatch(FileListPopupExitAction(show = true))
         case "tab" | "S-tab" => screen.focusNext()
         case "C-u" =>

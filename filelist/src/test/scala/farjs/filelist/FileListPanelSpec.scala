@@ -122,7 +122,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     Succeeded
   }
 
-  it should "dispatch action when onKeypress(M-pagedown)" in {
+  it should "dispatch action when onKeypress(M-o)" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -138,7 +138,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     dispatch.expects(action)
 
     //when
-    viewProps.onKeypress(null, "M-pagedown")
+    viewProps.onKeypress(null, "M-o")
 
     action.task.future.map(_ => Succeeded)
   }

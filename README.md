@@ -16,7 +16,7 @@ Good old Windows **F**ile and **AR**chive Manager
 
 Runs on [Node.js](https://nodejs.org/), thus cross-platform:
 * `Mac OS X` (primary support in [iTerm2](https://iterm2.com/) terminal)
-* `Windows`
+* `Windows` (primary support in [Windows Terminal](https://docs.microsoft.com/en-us/windows/terminal/))
 * `Linux`
 
 ## Install
@@ -66,11 +66,11 @@ different operations:
   * **Go into** a folder - `Ctrl + PageDown` / `Return`
 
 * **Drive** selection popup
-  (see [Key Bindings](#key-bindings) for how to set up keys for it)
-  * Show it on the **left** panel - `Alt + F1`
-  * Show it on the **right** panel - `Alt + F2`
+  (see [Key Bindings](#key-bindings) for how to re-map it to `Alt + F1/F2`)
+  * Show it on the **left** panel - `Alt + L`
+  * Show it on the **right** panel - `Alt + R`
 
-* **Open item** in default application - `Alt + PageDown`
+* **Open item** in default application - `Alt + O`
   (see [Key Bindings](#key-bindings) for how to re-map it to `Shift + Return`)
 * **Copy Path** of current item into **Clipboard** - `Ctrl + C`
   (in iTerm2 only)
@@ -108,17 +108,29 @@ Shows possible colors with their `hex` codes for current terminal/theme.
 
 * Why supported key combination doesn't work or trigger another
 action in my terminal?
-  - You may re-map the keys to **send** supported **escape sequences**
+  - Some key combinations (especially `Alt+`) have to be manually re-mapped
+  in your terminal settings to **send** supported **escape sequences**
   or **hex codes**.
   For example, you can re-map:
     - | Key | Supported Key | Escape Sequence ^[ ... | Hex Codes |
       | --- | --- | --- | --- |
-      | `Alt + F1` | `Alt + F1` | `[11;3~` |
-      | `Alt + F2` | `Alt + F2` | `[12;3~` |
-      | `Shift + Return` | `Alt + PageDown` | `[6;3~` |
+      | `Alt + F1` | `Alt + L` | `l` |
+      | `Alt + F2` | `Alt + R` | `r` |
+      | `Shift + Return` | `Alt + O` | `o` |
       | `CMD + PageDown` | `Ctrl + PageDown` | `[6^` |
       | `CMD + PageUp` | `Ctrl + PageUp` | `[5^` |
       | `CMD + R` | `Ctrl + R` | | `0x12` |
   - In [iTerm2](https://iterm2.com/) it looks like this:
     - ![Keys Re Mapping](https://raw.githubusercontent.com/scommons/far-js/master/docs/images/keys_re_mapping.png)
-  
+  - In [Windows Terminal](https://docs.microsoft.com/en-us/windows/terminal/)
+  you can use [sendInput action](https://docs.microsoft.com/en-us/windows/terminal/customize-settings/actions#send-input):
+    ```json
+    //in settings.json
+    "actions": [
+
+        { "command": { "action": "sendInput", "input": "\u001bl" }, "keys": "alt+f1" },
+        { "command": { "action": "sendInput", "input": "\u001br" }, "keys": "alt+f2" },
+        { "command": { "action": "sendInput", "input": "\u001bo" }, "keys": "shift+enter" }
+
+    ]
+    ```
