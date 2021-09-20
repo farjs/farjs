@@ -22,7 +22,7 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
   it should "set path when onChange in TextBox" in {
     //given
     val path = "initial path"
-    val props = CopyItemsPopupProps(path, Seq(FileListItem("file 1")), _ => (), () => ())
+    val props = CopyItemsPopupProps(move = false, path, Seq(FileListItem("file 1")), _ => (), () => ())
     val renderer = createTestRenderer(<(CopyItemsPopup())(^.wrapped := props)())
     val textBox = findComponentProps(renderer.root, textBoxComp)
     textBox.value shouldBe path
@@ -35,48 +35,48 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     findComponentProps(renderer.root, textBoxComp).value shouldBe newFolderName
   }
   
-  it should "call onCopy when onEnter in TextBox" in {
+  it should "call onAction when onEnter in TextBox" in {
     //given
-    val onCopy = mockFunction[String, Unit]
+    val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = CopyItemsPopupProps("test", Seq(FileListItem("file 1")), onCopy, onCancel)
+    val props = CopyItemsPopupProps(move = false, "test", Seq(FileListItem("file 1")), onAction, onCancel)
     val comp = testRender(<(CopyItemsPopup())(^.wrapped := props)())
     val textBox = findComponentProps(comp, textBoxComp)
 
     //then
-    onCopy.expects("test")
+    onAction.expects("test")
     onCancel.expects().never()
 
     //when
     textBox.onEnter()
   }
   
-  it should "call onCopy when press Copy button" in {
+  it should "call onAction when press action button" in {
     //given
-    val onCopy = mockFunction[String, Unit]
+    val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = CopyItemsPopupProps("test", Seq(FileListItem("file 1")), onCopy, onCancel)
+    val props = CopyItemsPopupProps(move = false, "test", Seq(FileListItem("file 1")), onAction, onCancel)
     val comp = testRender(<(CopyItemsPopup())(^.wrapped := props)())
     val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.head
 
     //then
-    onCopy.expects("test")
+    onAction.expects("test")
     onCancel.expects().never()
     
     //when
     onPress()
   }
   
-  it should "not call onCopy if path is empty" in {
+  it should "not call onAction if path is empty" in {
     //given
-    val onCopy = mockFunction[String, Unit]
+    val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = CopyItemsPopupProps("", Seq(FileListItem("file 1")), onCopy, onCancel)
+    val props = CopyItemsPopupProps(move = false, "", Seq(FileListItem("file 1")), onAction, onCancel)
     val comp = testRender(<(CopyItemsPopup())(^.wrapped := props)())
     val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.head
 
     //then
-    onCopy.expects(*).never()
+    onAction.expects(*).never()
     onCancel.expects().never()
     
     //when
@@ -85,29 +85,40 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
   
   it should "call onCancel when press Cancel button" in {
     //given
-    val onCopy = mockFunction[String, Unit]
+    val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = CopyItemsPopupProps("", Seq(FileListItem("file 1")), onCopy, onCancel)
+    val props = CopyItemsPopupProps(move = false, "", Seq(FileListItem("file 1")), onAction, onCancel)
     val comp = testRender(<(CopyItemsPopup())(^.wrapped := props)())
     val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions(1)
 
     //then
-    onCopy.expects(*).never()
+    onAction.expects(*).never()
     onCancel.expects()
     
     //when
     onPress()
   }
   
-  it should "render component" in {
+  it should "render component when copy" in {
     //given
-    val props = CopyItemsPopupProps("test folder", Seq(FileListItem("file 1")), _ => (), () => ())
+    val props = CopyItemsPopupProps(move = false, "test folder", Seq(FileListItem("file 1")), _ => (), () => ())
 
     //when
     val result = testRender(<(CopyItemsPopup())(^.wrapped := props)())
 
     //then
     assertCopyItemsPopup(result, props, List("[ Copy ]", "[ Cancel ]"))
+  }
+
+  it should "render component when move" in {
+    //given
+    val props = CopyItemsPopupProps(move = true, "test folder", Seq(FileListItem("file 1")), _ => (), () => ())
+
+    //when
+    val result = testRender(<(CopyItemsPopup())(^.wrapped := props)())
+
+    //then
+    assertCopyItemsPopup(result, props, List("[ Move ]", "[ Cancel ]"))
   }
 
   private def assertCopyItemsPopup(result: TestInstance,
@@ -119,6 +130,8 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     val itemsText =
       if (count > 1) s"$count items"
       else s"${props.items.headOption.map(i => s""""${i.name}"""").getOrElse("")}"
+
+    val action = if (props.move) "Move" else "Copy"
     
     def assertComponents(label: TestInstance,
                          input: TestInstance,
@@ -130,7 +143,7 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
           align shouldBe TextLine.Left
           pos shouldBe 2 -> 1
           resWidth shouldBe (width - (paddingHorizontal + 2) * 2)
-          text shouldBe s"Copy $itemsText to:"
+          text shouldBe s"$action $itemsText to:"
           resStyle shouldBe style
           focused shouldBe false
           padding shouldBe 0
@@ -162,7 +175,7 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     }
     
     assertTestComponent(result, modalComp)({ case ModalProps(title, size, resStyle, onCancel) =>
-      title shouldBe "Copy"
+      title shouldBe action
       size shouldBe width -> height
       resStyle shouldBe style
       onCancel should be theSameInstanceAs props.onCancel

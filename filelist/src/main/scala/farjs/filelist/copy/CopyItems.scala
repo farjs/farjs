@@ -1,7 +1,7 @@
 package farjs.filelist.copy
 
 import farjs.filelist.FileListActions.{FileListParamsChangedAction, FileListTaskAction}
-import farjs.filelist.popups.FileListPopupsActions.FileListPopupCopyItemsAction
+import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.FileListPopupsProps
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
@@ -22,10 +22,12 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
   protected def render(compProps: Props): ReactElement = {
     val (maybeTotal, setTotal) = useState[Option[Double]](None)
     val (toPath, setToPath) = useState[Option[String]](None)
+    val (move, setMove) = useState(false)
     val copied = useRef(Set.empty[String])
+
     val props = compProps.wrapped
+    val showPopup = props.data.popups.showCopyItemsPopup || props.data.popups.showMoveItemsPopup
     
-    val showPopup = props.data.popups.showCopyItemsPopup
     val (fromState, toState) =
       if (props.data.left.isActive) (props.data.left, props.data.right)
       else (props.data.right, props.data.left)
@@ -36,10 +38,14 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
 
     def onCancel(dispatchAction: Boolean): () => Unit = { () =>
       if (dispatchAction) {
-        props.dispatch(FileListPopupCopyItemsAction(show = false))
+        if (props.data.popups.showMoveItemsPopup) {
+          props.dispatch(FileListPopupMoveItemsAction(show = false))
+        }
+        else props.dispatch(FileListPopupCopyItemsAction(show = false))
       }
       setTotal(None)
       setToPath(None)
+      setMove(false)
       copied.current = Set.empty[String]
     }
     
@@ -81,13 +87,18 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
         }
         else {
           <(copyItemsPopup())(^.wrapped := CopyItemsPopupProps(
+            move = props.data.popups.showMoveItemsPopup,
             path = toState.currDir.path,
             items = items,
-            onCopy = { path =>
+            onAction = { path =>
               val dirF = props.actions.readDir(Some(fromState.currDir.path), path)
               dirF.onComplete {
                 case Success(dir) =>
-                  props.dispatch(FileListPopupCopyItemsAction(show = false))
+                  setMove(props.data.popups.showMoveItemsPopup)
+                  if (props.data.popups.showMoveItemsPopup) {
+                    props.dispatch(FileListPopupMoveItemsAction(show = false))
+                  }
+                  else props.dispatch(FileListPopupCopyItemsAction(show = false))
                   setToPath(Some(dir.path))
                 case Failure(_) =>
                   props.dispatch(FileListTaskAction(FutureTask("Resolving target dir", dirF)))
@@ -106,7 +117,9 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
         if (fromState.currDir.path == to) {
           <(messageBoxComp())(^.wrapped := MessageBoxProps(
             title = "Error",
-            message = s"Cannot copy the item\n${items.head.name}\nonto itself",
+            message =
+              if (move) s"Cannot move the item\n${items.head.name}\nonto itself"
+              else s"Cannot copy the item\n${items.head.name}\nonto itself",
             actions = List(MessageBoxAction.OK(onCancel(dispatchAction = false))),
             style = Theme.current.popup.error
           ))()
@@ -115,6 +128,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
           <(copyProcessComp())(^.wrapped := CopyProcessProps(
             dispatch = props.dispatch,
             actions = props.actions,
+            move = move,
             fromPath = fromState.currDir.path,
             items = items,
             toPath = to,

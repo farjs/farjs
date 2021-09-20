@@ -81,6 +81,7 @@ different operations:
 * **View item**(s) - `F3`
   * Scans selected folder(s)/file(s) and calculates size(s)
 * **Copy item**(s) - `F5`
+* **Move/Rename item**(s) - `F6`
 * **Create folder** (with intermediate sub-folders) - `F7`
 * **Delete item**(s) - `F8`
 

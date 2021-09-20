@@ -8,7 +8,8 @@ case class FileListPopupsState(showHelpPopup: Boolean = false,
                                showDeletePopup: Boolean = false,
                                showMkFolderPopup: Boolean = false,
                                showViewItemsPopup: Boolean = false,
-                               showCopyItemsPopup: Boolean = false)
+                               showCopyItemsPopup: Boolean = false,
+                               showMoveItemsPopup: Boolean = false)
 
 object FileListPopupsStateReducer {
 
@@ -24,6 +25,7 @@ object FileListPopupsStateReducer {
     case FileListPopupViewItemsAction(show) => state.copy(showViewItemsPopup = show)
     case FileListItemsViewedAction(_, _) => state.copy(showViewItemsPopup = false)
     case FileListPopupCopyItemsAction(show) => state.copy(showCopyItemsPopup = show)
+    case FileListPopupMoveItemsAction(show) => state.copy(showMoveItemsPopup = show)
     case _ => state
   }
 }

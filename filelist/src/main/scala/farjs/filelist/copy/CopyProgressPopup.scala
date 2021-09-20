@@ -8,7 +8,8 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 
-case class CopyProgressPopupProps(item: String,
+case class CopyProgressPopupProps(move: Boolean,
+                                  item: String,
                                   to: String,
                                   itemPercent: Int,
                                   total: Double,
@@ -32,16 +33,16 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
     val contentLeft = 2
     val theme = Theme.current.popup.regular
     
-    <(modalComp())(^.wrapped := ModalProps("Copy", size, theme, props.onCancel))(
+    <(modalComp())(^.wrapped := ModalProps(if (props.move) "Move" else "Copy", size, theme, props.onCancel))(
       <.text(
         ^.rbLeft := contentLeft,
         ^.rbTop := 1,
         ^.rbStyle := theme,
         ^.content :=
-          """Copying the file
-            |
-            |to
-            |""".stripMargin
+          s"""${if (props.move) "Moving" else "Copying"} the file
+             |
+             |to
+             |""".stripMargin
       )(),
       <(textLineComp())(^.wrapped := TextLineProps(
         align = TextLine.Left,

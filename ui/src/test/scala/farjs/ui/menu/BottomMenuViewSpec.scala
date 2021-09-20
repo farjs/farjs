@@ -122,7 +122,7 @@ class BottomMenuViewSpec extends TestSpec with TestRendererUtils {
       (3, " View ", 16, 8),
       (4, "      ", 24, 8),
       (5, " Copy ", 32, 8),
-      (6, "      ", 40, 8),
+      (6, "Move/R", 40, 8),
       (7, "MkFold", 48, 8),
       (8, "Delete", 56, 8),
       (9, "      ", 64, 8),

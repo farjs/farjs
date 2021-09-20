@@ -17,9 +17,20 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
   CopyProgressPopup.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
   CopyProgressPopup.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
 
-  it should "render component" in {
+  it should "render component when copy" in {
     //given
-    val props = getCopyProgressPopupProps()
+    val props = getCopyProgressPopupProps(move = false)
+
+    //when
+    val result = testRender(<(CopyProgressPopup())(^.wrapped := props)())
+
+    //then
+    assertCopyProgressPopup(result, props)
+  }
+
+  it should "render component when move" in {
+    //given
+    val props = getCopyProgressPopupProps(move = true)
 
     //when
     val result = testRender(<(CopyProgressPopup())(^.wrapped := props)())
@@ -49,7 +60,8 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
     toSpeed(100000000000d) shouldBe "100Gb"
   }
   
-  private def getCopyProgressPopupProps(item: String = "test item",
+  private def getCopyProgressPopupProps(move: Boolean,
+                                        item: String = "test item",
                                         to: String = "test to",
                                         itemPercent: Int = 1,
                                         total: Double = 2,
@@ -59,6 +71,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
                                         bytesPerSecond: Double = 6,
                                         onCancel: () => Unit = () => ()): CopyProgressPopupProps = {
     CopyProgressPopupProps(
+      move = move,
       item = item,
       to = to,
       itemPercent = itemPercent,
@@ -95,10 +108,10 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           ^.rbTop := 1,
           ^.rbStyle := theme,
           ^.content :=
-            """Copying the file
-              |
-              |to
-              |""".stripMargin
+            s"""${if (props.move) "Moving" else "Copying"} the file
+               |
+               |to
+               |""".stripMargin
         )()
       )
       assertTestComponent(item, textLineComp) {
@@ -191,7 +204,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
     }
 
     assertTestComponent(result, modalComp)({ case ModalProps(title, size, resStyle, onCancel) =>
-      title shouldBe "Copy"
+      title shouldBe (if (props.move) "Move" else "Copy")
       size shouldBe width -> height
       resStyle shouldBe theme
       onCancel should be theSameInstanceAs props.onCancel

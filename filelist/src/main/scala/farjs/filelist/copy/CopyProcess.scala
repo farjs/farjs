@@ -19,6 +19,7 @@ import scala.util.{Failure, Success}
 
 case class CopyProcessProps(dispatch: Dispatch,
                             actions: FileListActions,
+                            move: Boolean,
                             fromPath: String,
                             items: Seq[FileListItem],
                             toPath: String,
@@ -73,31 +74,33 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
                 itemBytes = 0.0
               )
               var isCopied = true
-              props.actions.copyFile(List(parent), item, targetDirs, onExists = { existing =>
-                if (inProgress.current && data.current.askWhenExists) {
-                  setState(_.copy(existing = Some(existing)))
-                  existsPromise.current = Promise[Option[Boolean]]()
-                }
-                existsPromise.current.future.map { maybeOverwrite =>
-                  if (maybeOverwrite.isEmpty) {
-                    isCopied = false
+              for {
+                res <- props.actions.copyFile(List(parent), item, targetDirs, onExists = { existing =>
+                  if (inProgress.current && data.current.askWhenExists) {
+                    setState(_.copy(existing = Some(existing)))
+                    existsPromise.current = Promise[Option[Boolean]]()
                   }
-                  maybeOverwrite
-                }
-              }, onProgress = { position =>
-                data.current = data.current.copy(
-                  itemPercent = (divide(position, item.size) * 100).toInt,
-                  itemBytes = position
-                )
-                cancelPromise.current.future.map(_ => inProgress.current)
-              }).andThen {
-                case Success(true) =>
+                  existsPromise.current.future.map { maybeOverwrite =>
+                    if (maybeOverwrite.isEmpty) {
+                      isCopied = false
+                    }
+                    maybeOverwrite
+                  }
+                }, onProgress = { position =>
+                  data.current = data.current.copy(
+                    itemPercent = (divide(position, item.size) * 100).toInt,
+                    itemBytes = position
+                  )
+                  cancelPromise.current.future.map(_ => inProgress.current)
+                })
+              } yield {
+                if (res) {
                   val d = data.current
                   data.current = data.current.copy(
                     itemBytes = 0.0,
                     total = d.total + d.itemBytes
                   )
-              }.map { res =>
+                }
                 (prevCopied && isCopied, res)
               }
             case res => Future.successful(res)
@@ -122,7 +125,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
         case Success(true) => props.onDone()
         case Failure(_) =>
           props.onDone()
-          props.dispatch(FileListTaskAction(FutureTask("Copying Items", resultF)))
+          props.dispatch(FileListTaskAction(FutureTask("Copy/Move Items", resultF)))
       }
     }
 
@@ -150,6 +153,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
     
     <.>()(
       <(copyProgressPopup())(^.wrapped := CopyProgressPopupProps(
+        move = props.move,
         item = d.item.name,
         to = d.to,
         itemPercent = d.itemPercent,
@@ -197,6 +201,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
           message = "Do you really want to cancel it?",
           actions = List(
             MessageBoxAction.YES { () =>
+              setState(_.copy(cancel = false))
               inProgress.current = false
               cancelPromise.current.trySuccess(())
               props.onDone()

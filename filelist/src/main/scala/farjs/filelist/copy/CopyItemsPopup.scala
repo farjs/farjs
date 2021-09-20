@@ -9,9 +9,10 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.hooks._
 
-case class CopyItemsPopupProps(path: String,
+case class CopyItemsPopupProps(move: Boolean,
+                               path: String,
                                items: Seq[FileListItem],
-                               onCopy: String => Unit,
+                               onAction: String => Unit,
                                onCancel: () => Unit)
 
 object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
@@ -37,21 +38,22 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
 
     val onCopy = { () =>
       if (path.nonEmpty) {
-        props.onCopy(path)
+        props.onAction(path)
       }
     }
     
+    val action = if (props.move) "Move" else "Copy"
     val actions = List(
-      "[ Copy ]" -> onCopy,
+      s"[ $action ]" -> onCopy,
       "[ Cancel ]" -> props.onCancel
     )
 
-    <(modalComp())(^.wrapped := ModalProps("Copy", size, theme, props.onCancel))(
+    <(modalComp())(^.wrapped := ModalProps(action, size, theme, props.onCancel))(
       <(textLineComp())(^.wrapped := TextLineProps(
         align = TextLine.Left,
         pos = (contentLeft, 1),
         width = contentWidth,
-        text = s"Copy $itemsText to:",
+        text = s"$action $itemsText to:",
         style = theme,
         padding = 0
       ))(),
