@@ -93,10 +93,24 @@ object FileListsStateReducer {
       )
     case FileListDirUpdatedAction(`isRight`, currDir) =>
       val processed = processDir(currDir)
-      state.copy(currDir = processed)
+      val newIndex = state.currentItem.map { currItem =>
+        val index = processed.items.indexWhere(_.name == currItem.name)
+        if (index < 0) {
+          val currIndex = state.offset + state.index
+          math.min(currIndex, currDir.items.size)
+        }
+        else index
+      }.getOrElse(0)
+      
+      state.copy(
+        offset = 0,
+        index = newIndex,
+        currDir = processed
+      )
     case FileListDirCreatedAction(`isRight`, dir, currDir) =>
       val processed = processDir(currDir)
       state.copy(
+        offset = 0,
         index = math.max(processed.items.indexWhere(_.name == dir), 0),
         currDir = processed
       )

@@ -5,6 +5,7 @@ import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.FileListPopupsProps
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
+import scommons.nodejs.path
 import scommons.react._
 import scommons.react.hooks._
 import scommons.react.redux.task.FutureTask
@@ -21,7 +22,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val (maybeTotal, setTotal) = useState[Option[Double]](None)
-    val (toPath, setToPath) = useState[Option[String]](None)
+    val (maybeToPath, setToPath) = useState[Option[String]](None)
     val (move, setMove) = useState(false)
     val copied = useRef(Set.empty[String])
 
@@ -111,15 +112,28 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
       else None,
 
       for {
-        to <- toPath
+        toPath <- maybeToPath
         total <- maybeTotal
       } yield {
-        if (fromState.currDir.path == to) {
+        val fromPath = fromState.currDir.path
+        val error =
+          if (fromPath == toPath) {
+            if (move) s"Cannot move the item\n${items.head.name}\nonto itself"
+            else s"Cannot copy the item\n${items.head.name}\nonto itself"
+          }
+          else if (move && toPath.startsWith(fromPath + path.sep)) {
+            val toSuffix = toPath.stripPrefix(fromPath + path.sep)
+            val maybeSelf = items.find(i => toSuffix == i.name || toSuffix.startsWith(i.name + path.sep))
+            maybeSelf.map { self =>
+              s"Cannot move the item\n${self.name}\ninto itself"
+            }.getOrElse("")
+          }
+          else ""
+        
+        if (error.nonEmpty) {
           <(messageBoxComp())(^.wrapped := MessageBoxProps(
             title = "Error",
-            message =
-              if (move) s"Cannot move the item\n${items.head.name}\nonto itself"
-              else s"Cannot copy the item\n${items.head.name}\nonto itself",
+            message = error,
             actions = List(MessageBoxAction.OK(onCancel(dispatchAction = false))),
             style = Theme.current.popup.error
           ))()
@@ -129,9 +143,9 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
             dispatch = props.dispatch,
             actions = props.actions,
             move = move,
-            fromPath = fromState.currDir.path,
+            fromPath = fromPath,
             items = items,
-            toPath = to,
+            toPath = toPath,
             total = total,
             onTopItem = { item =>
               copied.current += item.name

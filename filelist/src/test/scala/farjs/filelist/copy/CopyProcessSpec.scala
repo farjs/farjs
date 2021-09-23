@@ -141,7 +141,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       
       //then
       onTopItem.expects(*).never()
-      onDone.expects()
+      var onDoneCalled = false
+      onDone.expects().onCall { () =>
+        onDoneCalled = true
+      }
 
       //when
       cancelProps.actions.head.onAction()
@@ -153,7 +156,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
         //complete
         p.success(false)
-        p.future.map(_ => Succeeded)
+        p.future.flatMap(_ => eventually(onDoneCalled shouldBe true)).map(_ => Succeeded)
       }
     }
   }
@@ -224,18 +227,22 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       
       //then
       onTopItem.expects(*).never()
-      onDone.expects()
+      var onDoneCalled = false
+      onDone.expects().onCall { () =>
+        onDoneCalled = true
+      }
       
       //when
       existsProps.onCancel()
       
       //then
+      findProps(renderer.root, fileExistsPopup) should be (empty)
       existsF.flatMap { res =>
         res shouldBe None
 
         //complete
         p.success(false)
-        p.future.map(_ => Succeeded)
+        p.future.flatMap(_ => eventually(onDoneCalled shouldBe true)).map(_ => Succeeded)
       }
     }
   }
@@ -273,11 +280,14 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
         //then
         onTopItem.expects(*).never()
-        onDone.expects()
+        var onDoneCalled = false
+        onDone.expects().onCall { () =>
+          onDoneCalled = true
+        }
         
         //complete
         p.success(true)
-        p.future.map(_ => Succeeded)
+        p.future.flatMap(_ => eventually(onDoneCalled shouldBe true)).map(_ => Succeeded)
       }
     }
   }
@@ -312,9 +322,15 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       existsF.flatMap { res =>
         res shouldBe Some(false)
 
+        //then
+        var onDoneCalled = false
+        onDone.expects().onCall { () =>
+          onDoneCalled = true
+        }
+
         //complete
         p.success(false)
-        p.future.map(_ => Succeeded)
+        p.future.flatMap(_ => eventually(onDoneCalled shouldBe true)).map(_ => Succeeded)
       }
     }
   }
@@ -359,9 +375,15 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         existsF.flatMap { res =>
           res shouldBe Some(true)
 
+          //then
+          var onDoneCalled = false
+          onDone.expects().onCall { () =>
+            onDoneCalled = true
+          }
+
           //complete
           p.success(false)
-          p.future.map(_ => Succeeded)
+          p.future.flatMap(_ => eventually(onDoneCalled shouldBe true)).map(_ => Succeeded)
         }
       }
     }
@@ -396,9 +418,15 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       existsF.flatMap { res =>
         res shouldBe None
         
+        //then
+        var onDoneCalled = false
+        onDone.expects().onCall { () =>
+          onDoneCalled = true
+        }
+
         //complete
         p.success(false)
-        p.future.map(_ => Succeeded)
+        p.future.flatMap(_ => eventually(onDoneCalled shouldBe true)).map(_ => Succeeded)
       }
     }
   }
@@ -447,9 +475,15 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
           existsF2.flatMap { res =>
             res shouldBe Some(true)
             
+            //then
+            var onDoneCalled = false
+            onDone.expects().onCall { () =>
+              onDoneCalled = true
+            }
+
             //complete
             p2.success(false)
-            p2.future.map(_ => Succeeded)
+            p2.future.flatMap(_ => eventually(onDoneCalled shouldBe true)).map(_ => Succeeded)
           }
         }
       }
@@ -500,9 +534,15 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
           existsF2.flatMap { res =>
             res shouldBe None
             
+            //then
+            var onDoneCalled = false
+            onDone.expects().onCall { () =>
+              onDoneCalled = true
+            }
+
             //complete
             p2.success(false)
-            p2.future.map(_ => Succeeded)
+            p2.future.flatMap(_ => eventually(onDoneCalled shouldBe true)).map(_ => Succeeded)
           }
         }
       }
@@ -551,17 +591,20 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
           //then
           onTopItem.expects(item)
-          onDone.expects()
+          var onDoneCalled = false
+          onDone.expects().onCall { () =>
+            onDoneCalled = true
+          }
 
           //when & then
           p.success(res)
-          p.future.map(_ => Succeeded)
+          p.future.flatMap(_ => eventually(onDoneCalled shouldBe true)).map(_ => Succeeded)
         }
       }
     }
   }
 
-  it should "not call onTopItem/onDone if cancelled when unmount" in {
+  it should "not call onTopItem if cancelled when unmount" in {
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
@@ -593,11 +636,14 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
         //then
         onTopItem.expects(*).never()
-        onDone.expects().never()
+        var onDoneCalled = false
+        onDone.expects().onCall { () =>
+          onDoneCalled = true
+        }
 
         //when & then
         p.success(res)
-        p.future.map(_ => Succeeded)
+        p.future.flatMap(_ => eventually(onDoneCalled shouldBe true)).map(_ => Succeeded)
       }
     }
   }
@@ -683,6 +729,54 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     }
   }
 
+  it should "make target dir, move file, update progress and call onDone" in {
+    //given
+    val onTopItem = mockFunction[FileListItem, Unit]
+    val onDone = mockFunction[Unit]
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val item = FileListItem("file 1", size = 246)
+    val dir = FileListItem("dir 1", isDir = true)
+    val props = CopyProcessProps(dispatch, actions, move = true, "/from/path", List(dir), "/to/path", 492, onTopItem, onDone)
+    val dirList = FileListDir("/from/path/dir 1", isRoot = false, List(item))
+    val p = Promise[Boolean]()
+
+    (actions.readDir _).expects(Some("/from/path"), "dir 1").returning(Future.successful(dirList))
+    (actions.mkDirs _).expects(List("/to/path", "dir 1")).returning(Future.unit)
+    
+    var onProgressFn: Double => Future[Boolean] = null
+    (actions.copyFile _).expects(List("/from/path/dir 1"), item, List("/to/path", "dir 1"), *, *).onCall { (_, _, _, _, onProgress) =>
+      onProgressFn = onProgress
+      p.future
+    }
+    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    eventually {
+      onProgressFn should not be null
+    }.flatMap { _ =>
+      //when
+      onProgressFn(123).flatMap { res =>
+        //then
+        res shouldBe true
+        assertCopyProgressPopup(renderer, props, "/dir 1", "file 1", itemPercent = 50, totalPercent = 25)
+        (actions.delete _).expects("/from/path/dir 1", Seq(item)).returning(Future.unit)
+        (actions.delete _).expects("/from/path", Seq(dir)).returning(Future.unit)
+  
+        //then
+        onTopItem.expects(dir)
+        var onDoneCalled = false
+        onDone.expects().onCall { () =>
+          onDoneCalled = true
+        }
+
+        //when & then
+        p.success(res)
+        p.future.flatMap(_ => eventually(onDoneCalled shouldBe true)).map { _ =>
+          assertCopyProgressPopup(renderer, props, "/dir 1", "file 1", itemPercent = 50, totalPercent = 25)
+        }
+      }
+    }
+  }
+
   it should "copy two files and update progress" in {
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
@@ -691,7 +785,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val actions = mock[FileListActions]
     val item1 = FileListItem("file 1", size = 246)
     val item2 = FileListItem("file 2", size = 123)
-    val props = CopyProcessProps(dispatch, actions, move = true, "/from/path", List(item1, item2), "/to/path", 492, onTopItem, onDone)
+    val props = CopyProcessProps(dispatch, actions, move = false, "/from/path", List(item1, item2), "/to/path", 492, onTopItem, onDone)
     
     val p1 = Promise[Boolean]()
     var onProgressFn1: Double => Future[Boolean] = null
@@ -732,11 +826,81 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
             assertCopyProgressPopup(renderer, props, "", "file 2", itemPercent = 100, totalPercent = 50)
             
             //then
-            onDone.expects()
+            var onDoneCalled = false
+            onDone.expects().onCall { () =>
+              onDoneCalled = true
+            }
 
             //when & then
             p2.success(res)
-            p2.future.map { _ =>
+            p2.future.flatMap(_ => eventually(onDoneCalled shouldBe true)).map { _ =>
+              assertCopyProgressPopup(renderer, props, "", "file 2", itemPercent = 100, totalPercent = 50)
+            }
+          }
+        }
+      }
+    }
+  }
+
+  it should "move two files and update progress" in {
+    //given
+    val onTopItem = mockFunction[FileListItem, Unit]
+    val onDone = mockFunction[Unit]
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val item1 = FileListItem("file 1", size = 246)
+    val item2 = FileListItem("file 2", size = 123)
+    val props = CopyProcessProps(dispatch, actions, move = true, "/from/path", List(item1, item2), "/to/path", 492, onTopItem, onDone)
+    
+    val p1 = Promise[Boolean]()
+    var onProgressFn1: Double => Future[Boolean] = null
+    (actions.copyFile _).expects(List("/from/path"), item1, List("/to/path"), *, *).onCall { (_, _, _, _, onProgress) =>
+      onProgressFn1 = onProgress
+      p1.future
+    }
+    val p2 = Promise[Boolean]()
+    var onProgressFn2: Double => Future[Boolean] = null
+    (actions.copyFile _).expects(List("/from/path"), item2, List("/to/path"), *, *).onCall { (_, _, _, _, onProgress) =>
+      onProgressFn2 = onProgress
+      p2.future
+    }
+    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    eventually {
+      onProgressFn1 should not be null
+    }.flatMap { _ =>
+      //then
+      onTopItem.expects(item1)
+      
+      //when
+      onProgressFn1(123).flatMap { res =>
+        //then
+        res shouldBe true
+        assertCopyProgressPopup(renderer, props, "", "file 1", itemPercent = 50, totalPercent = 25)
+        (actions.delete _).expects("/from/path", Seq(item1)).returning(Future.unit)
+
+        p1.success(res)
+        p1.future.flatMap(_ => eventually {
+          onProgressFn2 should not be null
+        }).flatMap { _ =>
+          //then
+          onTopItem.expects(item2)
+
+          //when
+          onProgressFn2(123).flatMap { res =>
+            //then
+            res shouldBe true
+            assertCopyProgressPopup(renderer, props, "", "file 2", itemPercent = 100, totalPercent = 50)
+            (actions.delete _).expects("/from/path", Seq(item2)).returning(Future.unit)
+            
+            //then
+            var onDoneCalled = false
+            onDone.expects().onCall { () =>
+              onDoneCalled = true
+            }
+
+            //when & then
+            p2.success(res)
+            p2.future.flatMap(_ => eventually(onDoneCalled shouldBe true)).map { _ =>
               assertCopyProgressPopup(renderer, props, "", "file 2", itemPercent = 100, totalPercent = 50)
             }
           }

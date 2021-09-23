@@ -65,6 +65,10 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
                 dstDirs = targetDirs :+ item.name
                 _ <- props.actions.mkDirs(dstDirs)
                 res <- loop(prevCopied, dirList.path, dstDirs, dirList.items)
+                (isCopied, done) = res
+                _ <-
+                  if (isCopied && done && props.move) props.actions.delete(parent, Seq(item))
+                  else Future.unit
               } yield res
             case (prevCopied, true) if !item.isDir && inProgress.current =>
               data.current = data.current.copy(
@@ -75,7 +79,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
               )
               var isCopied = true
               for {
-                res <- props.actions.copyFile(List(parent), item, targetDirs, onExists = { existing =>
+                done <- props.actions.copyFile(List(parent), item, targetDirs, onExists = { existing =>
                   if (inProgress.current && data.current.askWhenExists) {
                     setState(_.copy(existing = Some(existing)))
                     existsPromise.current = Promise[Option[Boolean]]()
@@ -93,15 +97,18 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
                   )
                   cancelPromise.current.future.map(_ => inProgress.current)
                 })
+                _ <-
+                  if (isCopied && done && props.move) props.actions.delete(parent, Seq(item))
+                  else Future.unit
               } yield {
-                if (res) {
+                if (done) {
                   val d = data.current
                   data.current = data.current.copy(
                     itemBytes = 0.0,
                     total = d.total + d.itemBytes
                   )
                 }
-                (prevCopied && isCopied, res)
+                (prevCopied && isCopied, done)
               }
             case res => Future.successful(res)
           }
@@ -111,18 +118,17 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
       val resultF = props.items.foldLeft(Future.successful(true)) { (resF, topItem) =>
         resF.flatMap {
           case true if inProgress.current =>
-            loop(copied = true, props.fromPath, List(props.toPath), Seq(topItem)).map { case (isCopied, res) =>
-              if (isCopied && res) {
+            loop(copied = true, props.fromPath, List(props.toPath), Seq(topItem)).map { case (isCopied, done) =>
+              if (isCopied && done) {
                 props.onTopItem(topItem)
               }
-              res
+              done
             }
           case res => Future.successful(res)
         }
       }
       resultF.onComplete {
-        case Success(false) => // already cancelled
-        case Success(true) => props.onDone()
+        case Success(_) => props.onDone()
         case Failure(_) =>
           props.onDone()
           props.dispatch(FileListTaskAction(FutureTask("Copy/Move Items", resultF)))
@@ -188,9 +194,9 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
             }
           },
           onCancel = { () =>
+            setState(_.copy(existing = None))
             inProgress.current = false
             existsPromise.current.trySuccess(None)
-            props.onDone()
           }
         ))()
       },
@@ -204,7 +210,6 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
               setState(_.copy(cancel = false))
               inProgress.current = false
               cancelPromise.current.trySuccess(())
-              props.onDone()
             },
             MessageBoxAction.NO { () =>
               setState(_.copy(cancel = false))

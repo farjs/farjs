@@ -74,12 +74,14 @@ trait FileListActions {
 
   def readDir(parent: Option[String], dir: String): Future[FileListDir] = api.readDir(parent, dir)
 
-  def deleteItems(dispatch: Dispatch,
-                  isRight: Boolean,
-                  dir: String,
-                  items: Seq[FileListItem]): FileListItemsDeleteAction = {
+  def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = api.delete(parent, items)
+
+  def deleteAction(dispatch: Dispatch,
+                   isRight: Boolean,
+                   dir: String,
+                   items: Seq[FileListItem]): FileListItemsDeleteAction = {
     
-    val future = api.delete(dir, items).andThen {
+    val future = delete(dir, items).andThen {
       case Success(_) => dispatch(FileListItemsDeletedAction(isRight))
     }
 

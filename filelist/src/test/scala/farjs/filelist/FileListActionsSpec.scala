@@ -157,7 +157,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     
     //when
     val FileListItemsDeleteAction(FutureTask(msg, future)) =
-      actions.deleteItems(dispatch, isRight, dir, items)
+      actions.deleteAction(dispatch, isRight, dir, items)
     
     //then
     msg shouldBe "Deleting Items"

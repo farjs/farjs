@@ -195,7 +195,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val items = List(FileListItem("file 1"))
 
     //then
-    (actions.deleteItems _).expects(dispatch, false, currDir.path, items).returning(deleteAction)
+    (actions.deleteAction _).expects(dispatch, false, currDir.path, items).returning(deleteAction)
     (actions.updateDir _).expects(dispatch, false, currDir.path).returning(updateAction)
     dispatch.expects(deleteAction)
     dispatch.expects(updateAction)
@@ -239,7 +239,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val items = List(FileListItem("file 2"))
 
     //then
-    (actions.deleteItems _).expects(dispatch, true, currDir.path, items).returning(deleteAction)
+    (actions.deleteAction _).expects(dispatch, true, currDir.path, items).returning(deleteAction)
     (actions.updateDir _).expects(dispatch, true, currDir.path).returning(updateAction)
     dispatch.expects(deleteAction)
     dispatch.expects(updateAction)
