@@ -93,19 +93,28 @@ object FileListsStateReducer {
       )
     case FileListDirUpdatedAction(`isRight`, currDir) =>
       val processed = processDir(currDir)
+      val currIndex = state.offset + state.index
       val newIndex = state.currentItem.map { currItem =>
         val index = processed.items.indexWhere(_.name == currItem.name)
         if (index < 0) {
-          val currIndex = state.offset + state.index
           math.min(currIndex, currDir.items.size)
         }
         else index
       }.getOrElse(0)
       
+      val (offset, index) =
+        if (newIndex == currIndex) (state.offset, state.index)
+        else (0, newIndex)
+      
       state.copy(
-        offset = 0,
-        index = newIndex,
-        currDir = processed
+        offset = offset,
+        index = index,
+        currDir = processed,
+        selectedNames =
+          if (state.selectedNames.nonEmpty) {
+            state.selectedNames.intersect(processed.items.map(_.name).toSet)
+          }
+          else state.selectedNames
       )
     case FileListDirCreatedAction(`isRight`, dir, currDir) =>
       val processed = processDir(currDir)
@@ -113,39 +122,6 @@ object FileListsStateReducer {
         offset = 0,
         index = math.max(processed.items.indexWhere(_.name == dir), 0),
         currDir = processed
-      )
-    case FileListItemsDeletedAction(`isRight`) =>
-      val selected =
-        if (state.selectedNames.nonEmpty) state.selectedNames
-        else state.currentItem.map(_.name).toSet
-      
-      val oldItems = state.currDir.items
-      val items = oldItems.filter(i => !selected.contains(i.name))
-      val (offset, index) = {
-        val oldIndex = state.offset + state.index
-        val newIndex = {
-          val index = oldItems.indexWhere(i => !selected.contains(i.name), oldIndex)
-          if (index < 0) {
-            oldItems.lastIndexWhere(i => !selected.contains(i.name), oldIndex)
-          }
-          else index
-        }
-        val index =
-          if (newIndex >= 0) {
-            val item = oldItems(newIndex)
-            math.max(items.indexWhere(_.name == item.name), 0)
-          }
-          else 0
-        
-        if (index >= state.offset) (state.offset, index - state.offset)
-        else (index, 0)
-      }
-      
-      state.copy(
-        offset = offset,
-        index = index,
-        currDir = state.currDir.copy(items = items),
-        selectedNames = Set.empty
       )
     case FileListItemsViewedAction(`isRight`, sizes) =>
       val updatedItems = state.currDir.items.map { item =>

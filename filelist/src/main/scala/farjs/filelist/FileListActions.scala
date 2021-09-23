@@ -79,13 +79,17 @@ trait FileListActions {
   def deleteAction(dispatch: Dispatch,
                    isRight: Boolean,
                    dir: String,
-                   items: Seq[FileListItem]): FileListItemsDeleteAction = {
+                   items: Seq[FileListItem]): FileListTaskAction = {
     
-    val future = delete(dir, items).andThen {
-      case Success(_) => dispatch(FileListItemsDeletedAction(isRight))
+    val future = for {
+      _ <- delete(dir, items)
+      currDir <- api.readDir(dir)
+    } yield {
+      dispatch(FileListDirUpdatedAction(isRight, currDir))
+      ()
     }
 
-    FileListItemsDeleteAction(FutureTask("Deleting Items", future))
+    FileListTaskAction(FutureTask("Deleting Items", future))
   }
 
   def scanDirs(parent: String,
@@ -173,9 +177,6 @@ object FileListActions {
   
   case class FileListDirCreateAction(task: FutureTask[Unit]) extends TaskAction
   case class FileListDirCreatedAction(isRight: Boolean, dir: String, currDir: FileListDir) extends Action
-  
-  case class FileListItemsDeleteAction(task: FutureTask[Unit]) extends TaskAction
-  case class FileListItemsDeletedAction(isRight: Boolean) extends Action
   
   case class FileListItemsViewedAction(isRight: Boolean, sizes: Map[String, Double]) extends Action
 }

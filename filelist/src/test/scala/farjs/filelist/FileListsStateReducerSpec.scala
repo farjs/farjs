@@ -157,7 +157,7 @@ class FileListsStateReducerSpec extends TestSpec {
           FileListItem.up,
           FileListItem("file 1")
         )),
-        selectedNames = Set("test")
+        selectedNames = Set("test", "dir 1")
       )
     )
     val currDir = FileListDir("/root/sub-dir", isRoot = false, items = List(
@@ -175,7 +175,7 @@ class FileListsStateReducerSpec extends TestSpec {
           FileListItem("dir 1", isDir = true),
           FileListItem("file 1")
         )),
-        selectedNames = Set("test")
+        selectedNames = Set("dir 1")
       ))
     }
   }
@@ -190,7 +190,7 @@ class FileListsStateReducerSpec extends TestSpec {
           FileListItem.up,
           FileListItem("file 1")
         )),
-        selectedNames = Set("test")
+        selectedNames = Set("test", "file 1")
       )
     )
     val currDir = FileListDir("/root/sub-dir", isRoot = false, items = List(
@@ -200,13 +200,13 @@ class FileListsStateReducerSpec extends TestSpec {
     //when & then
     reduce(Some(state), FileListDirUpdatedAction(isRight = false, currDir)) shouldBe {
       state.copy(left = state.left.copy(
-        offset = 0,
-        index = 1,
+        offset = 1,
+        index = 0,
         currDir = currDir.copy(items = List(
           FileListItem.up,
           FileListItem("dir 1", isDir = true)
         )),
-        selectedNames = Set("test")
+        selectedNames = Set.empty
       ))
     }
   }
@@ -222,7 +222,7 @@ class FileListsStateReducerSpec extends TestSpec {
           FileListItem("file 1"),
           FileListItem("dir 1", isDir = true)
         )),
-        selectedNames = Set("test")
+        selectedNames = Set("file 1")
       )
     )
     val currDir = FileListDir("/root/sub-dir", isRoot = false, items = Seq.empty)
@@ -235,7 +235,7 @@ class FileListsStateReducerSpec extends TestSpec {
         currDir = currDir.copy(items = List(
           FileListItem.up
         )),
-        selectedNames = Set("test")
+        selectedNames = Set.empty
       ))
     }
   }
@@ -246,8 +246,7 @@ class FileListsStateReducerSpec extends TestSpec {
       left = FileListState(
         offset = 1,
         index = 1,
-        currDir = FileListDir("/root/sub-dir/dir 2", isRoot = true, items = Nil),
-        selectedNames = Set("test")
+        currDir = FileListDir("/root/sub-dir/dir 2", isRoot = true, items = Nil)
       )
     )
     val currDir = FileListDir("/root/sub-dir", isRoot = false, items = Seq.empty)
@@ -260,7 +259,7 @@ class FileListsStateReducerSpec extends TestSpec {
         currDir = currDir.copy(items = List(
           FileListItem.up
         )),
-        selectedNames = Set("test")
+        selectedNames = Set.empty
       ))
     }
   }
@@ -311,85 +310,6 @@ class FileListsStateReducerSpec extends TestSpec {
     }
   }
 
-  it should "update FileListState when FileListItemsDeletedAction(currItem)" in {
-    //given
-    val currDir = FileListDir("/", isRoot = true, items = List(
-      FileListItem("file 1"),
-      FileListItem("file 2")
-    ))
-    val state = {
-      val state = FileListsState()
-      state.copy(
-        left = state.left.copy(currDir = currDir),
-        right = state.right.copy(index = 1, currDir = currDir)
-      )
-    }
-
-    //when & then
-    reduce(Some(state), FileListItemsDeletedAction(isRight = false)) shouldBe {
-      state.copy(left = FileListState(
-        currDir = currDir.copy(items = List(
-          FileListItem("file 2")
-        )),
-        isActive = true
-      ))
-    }
-    //when & then
-    reduce(Some(state), FileListItemsDeletedAction(isRight = true)) shouldBe {
-      state.copy(right = FileListState(
-        currDir = currDir.copy(items = List(
-          FileListItem("file 1")
-        )),
-        isRight = true
-      ))
-    }
-  }
-  
-  it should "update FileListState when FileListItemsDeletedAction(selectedItems)" in {
-    //given
-    val currDir = FileListDir("/", isRoot = true, items = List(
-      FileListItem("file 0"),
-      FileListItem("file 1"),
-      FileListItem("file 2"),
-      FileListItem("file 3"),
-      FileListItem("file 4")
-    ))
-    val state = {
-      val state = FileListsState()
-      state.copy(
-        left = state.left.copy(index = 2, currDir = currDir, selectedNames = Set("file 1", "file 2")),
-        right = state.right.copy(offset = 3, currDir = currDir, selectedNames = Set("file 3", "file 4"))
-      )
-    }
-
-    //when & then
-    reduce(Some(state), FileListItemsDeletedAction(isRight = false)) shouldBe {
-      state.copy(left = FileListState(
-        currDir = currDir.copy(items = List(
-          FileListItem("file 0"),
-          FileListItem("file 3"),
-          FileListItem("file 4")
-        )),
-        index = 1,
-        selectedNames = Set.empty,
-        isActive = true
-      ))
-    }
-    //when & then
-    reduce(Some(state), FileListItemsDeletedAction(isRight = true)) shouldBe {
-      state.copy(right = FileListState(
-        currDir = currDir.copy(items = List(
-          FileListItem("file 0"),
-          FileListItem("file 1"),
-          FileListItem("file 2")
-        )),
-        offset = 2,
-        selectedNames = Set.empty,
-        isRight = true
-      ))
-    }
-  }
-  
   it should "update state when FileListItemsViewedAction" in {
     //given
     val currDir = FileListDir("/", isRoot = true, items = List(

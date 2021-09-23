@@ -77,16 +77,12 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
                 else state.currentItem.toList
               
               props.dispatch(FileListPopupDeleteAction(show = false))
-              val deleteAction = props.actions.deleteAction(
+              props.dispatch(props.actions.deleteAction(
                 dispatch = props.dispatch,
                 isRight = state.isRight,
                 dir = state.currDir.path,
                 items = items
-              )
-              deleteAction.task.future.foreach { _ =>
-                props.dispatch(props.actions.updateDir(props.dispatch, state.isRight, state.currDir.path))
-              }
-              props.dispatch(deleteAction)
+              ))
             },
             MessageBoxAction.NO { () =>
               props.dispatch(FileListPopupDeleteAction(show = false))
