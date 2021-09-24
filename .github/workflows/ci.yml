@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+    tags:
+      - '*'
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Git checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '12'
+
+    - name: Set up JDK 8
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'
+        distribution: 'adopt'
+
+    - name: Cache sbt
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.sbt
+          ~/.ivy2/cache
+          ~/.coursier/cache/v1
+          ~/.cache/coursier/v1
+        key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt', 'project/**/*.scala') }}
+
+    - name: Cache node_modules
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.npm
+          ~/.nvm
+          ~/work/far-js/far-js/app/target/scala-2.13/scalajs-bundler/main/node_modules
+          ~/work/far-js/far-js/app/target/scala-2.13/scalajs-bundler/main/package-lock.json
+          ~/work/far-js/far-js/app/target/scala-2.13/scalajs-bundler/test/node_modules
+          ~/work/far-js/far-js/app/target/scala-2.13/scalajs-bundler/test/package-lock.json
+          ~/work/far-js/far-js/filelist/target/scala-2.13/scalajs-bundler/test/node_modules
+          ~/work/far-js/far-js/filelist/target/scala-2.13/scalajs-bundler/test/package-lock.json
+          ~/work/far-js/far-js/ui/target/scala-2.13/scalajs-bundler/test/node_modules
+          ~/work/far-js/far-js/ui/target/scala-2.13/scalajs-bundler/test/package-lock.json
+        key: ${{ runner.os }}-node_modules-cache-v2-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node_modules-cache-v2-
+
+    - name: Run tests
+      run: sbt coverage test && sbt coverageAggregate coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+
+    - name: Extract Tag Name
+      run: echo "TAG_NAME=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
+      if: ${{ startsWith(github.ref, 'refs/tags') }}
+
+    - name: Publish SNAPSHOT
+      run:
+        sbt clean "project farjs-app" fullOptJS::webpack &&
+        cd app/target/scala-2.13/scalajs-bundler/main &&
+        npm run build &&
+        npm pack
+      if: ${{ !github.event.pull_request && env.TAG_NAME == '' }}
+
+    - name: Publish RELEASE
+      run:
+        VERSION="$(echo "$TAG_NAME" | cut -d'v' -f 2)" &&
+        echo "Publish a release version=$VERSION for tag $TAG_NAME" &&
+        version=$VERSION sbt clean "project farjs-app" fullOptJS::webpack &&
+        cd app/target/scala-2.13/scalajs-bundler/main &&
+        npm run build &&
+        npm pack &&
+        echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc &&
+        npm publish farjs-app-${VERSION}.tgz
+      if: ${{ env.TAG_NAME != '' }}
+      env:
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

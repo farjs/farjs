@@ -1,5 +1,5 @@
 
-[![Build Status](https://travis-ci.com/scommons/far-js.svg?branch=master)](https://travis-ci.com/scommons/far-js)
+[![CI](https://github.com/scommons/far-js/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/scommons/far-js/actions/workflows/ci.yml?query=workflow%3Aci+branch%3Amaster)
 [![Coverage Status](https://coveralls.io/repos/github/scommons/far-js/badge.svg?branch=master)](https://coveralls.io/github/scommons/far-js?branch=master)
 [![npm version](https://img.shields.io/npm/v/farjs-app)](https://www.npmjs.com/package/farjs-app)
 [![Rate on Openbase](https://badges.openbase.com/js/rating/farjs-app.svg)](https://openbase.com/js/farjs-app?utm_source=embedded&utm_medium=badge&utm_campaign=rate-badge)
