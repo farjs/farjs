@@ -42,18 +42,20 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
       }
     }
     
-    val action = if (props.move) "Move" else "Copy"
+    val title = if (props.move) "Rename/Move" else "Copy"
+    val text = if (props.move) "Rename or move" else "Copy"
+    val action = if (props.move) "Rename" else "Copy"
     val actions = List(
       s"[ $action ]" -> onCopy,
       "[ Cancel ]" -> props.onCancel
     )
 
-    <(modalComp())(^.wrapped := ModalProps(action, size, theme, props.onCancel))(
+    <(modalComp())(^.wrapped := ModalProps(title, size, theme, props.onCancel))(
       <(textLineComp())(^.wrapped := TextLineProps(
         align = TextLine.Left,
         pos = (contentLeft, 1),
         width = contentWidth,
-        text = s"$action $itemsText to:",
+        text = s"$text $itemsText to:",
         style = theme,
         padding = 0
       ))(),

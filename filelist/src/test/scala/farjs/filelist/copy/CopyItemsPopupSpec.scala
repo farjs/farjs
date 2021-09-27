@@ -118,7 +118,7 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(CopyItemsPopup())(^.wrapped := props)())
 
     //then
-    assertCopyItemsPopup(result, props, List("[ Move ]", "[ Cancel ]"))
+    assertCopyItemsPopup(result, props, List("[ Rename ]", "[ Cancel ]"))
   }
 
   private def assertCopyItemsPopup(result: TestInstance,
@@ -131,7 +131,8 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
       if (count > 1) s"$count items"
       else s"${props.items.headOption.map(i => s""""${i.name}"""").getOrElse("")}"
 
-    val action = if (props.move) "Move" else "Copy"
+    val title = if (props.move) "Rename/Move" else "Copy"
+    val text = if (props.move) "Rename or move" else "Copy"
     
     def assertComponents(label: TestInstance,
                          input: TestInstance,
@@ -139,11 +140,11 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
                          actionsBox: TestInstance): Assertion = {
 
       assertTestComponent(label, textLineComp) {
-        case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
+        case TextLineProps(align, pos, resWidth, resText, resStyle, focused, padding) =>
           align shouldBe TextLine.Left
           pos shouldBe 2 -> 1
           resWidth shouldBe (width - (paddingHorizontal + 2) * 2)
-          text shouldBe s"$action $itemsText to:"
+          resText shouldBe s"$text $itemsText to:"
           resStyle shouldBe style
           focused shouldBe false
           padding shouldBe 0
@@ -174,8 +175,8 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
       }
     }
     
-    assertTestComponent(result, modalComp)({ case ModalProps(title, size, resStyle, onCancel) =>
-      title shouldBe action
+    assertTestComponent(result, modalComp)({ case ModalProps(resTitle, size, resStyle, onCancel) =>
+      resTitle shouldBe title
       size shouldBe width -> height
       resStyle shouldBe style
       onCancel should be theSameInstanceAs props.onCancel
