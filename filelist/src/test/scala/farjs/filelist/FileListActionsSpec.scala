@@ -360,7 +360,7 @@ class FileListActionsSpec extends AsyncTestSpec {
         Some(target)
       }
     }
-    (api.readFile _).expects(srcDirs, file, existing.size).returning(Future.successful(source))
+    (api.readFile _).expects(srcDirs, file, 0.0).returning(Future.successful(source))
     onProgress.expects(position).returning(Future.successful(true))
     
     //when

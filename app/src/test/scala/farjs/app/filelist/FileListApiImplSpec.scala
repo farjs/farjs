@@ -368,7 +368,7 @@ class FileListApiImplSpec extends AsyncTestSpec {
     
     //when
     val resultF = for {
-      source <- apiImp.readFile(List(tmpDir), FileListItem("example.txt"), existing.size)
+      source <- apiImp.readFile(List(tmpDir), FileListItem("example.txt"), 0)
       maybeTarget <- apiImp.writeFile(List(tmpDir), "example2.txt", onExists)
       _ <- maybeTarget.map(loop(source, _)).getOrElse(Future.unit)
       _ <- maybeTarget.map(_.close()).getOrElse(Future.unit)
@@ -378,13 +378,13 @@ class FileListApiImplSpec extends AsyncTestSpec {
     resultF.flatMap { maybeTarget =>
       //then
       val stats2 = fs.lstatSync(file2)
-      stats2.size shouldBe srcItem.size
+      stats2.size shouldBe (existing.size + srcItem.size)
       toDateTimeStr(stats2.atimeMs) shouldBe toDateTimeStr(srcItem.atimeMs)
       toDateTimeStr(stats2.mtimeMs) shouldBe toDateTimeStr(srcItem.mtimeMs)
 
       fs.readFileSync(file2, new FileOptions {
         override val encoding = "utf8"
-      }) shouldBe "hello, World!!!"
+      }) shouldBe "hellohello, World!!!"
 
       //cleanup
       fs.unlinkSync(file1)

@@ -114,16 +114,10 @@ trait FileListActions {
                onExists: FileListItem => Future[Option[Boolean]],
                onProgress: Double => Future[Boolean]): Future[Boolean] = {
 
-    var srcPosition: Double = 0.0
-    
-    api.writeFile(dstDirs, file.name, { existing =>
-      onExists(existing).andThen {
-        case Success(Some(overwrite)) if !overwrite => srcPosition = existing.size
-      }
-    }).flatMap {
+    api.writeFile(dstDirs, file.name, onExists).flatMap {
       case None => onProgress(file.size)
       case Some(target) =>
-        api.readFile(srcDirs, file, srcPosition).flatMap { source =>
+        api.readFile(srcDirs, file, 0.0).flatMap { source =>
           val buff = new Uint8Array(copyBufferBytes)
 
           def loop(): Future[Boolean] = {
