@@ -9,7 +9,7 @@ trait FileTarget {
   
   def writeNextBytes(buff: Uint8Array, length: Int): Future[Double]
   
-  def setModTime(src: FileListItem): Future[Unit]
+  def setAttributes(src: FileListItem): Future[Unit]
 
   def close(): Future[Unit]
 

@@ -247,7 +247,7 @@ class FileListApiImplSpec extends AsyncTestSpec {
 
     def loop(source: FileSource, target: FileTarget): Future[Unit] = {
       source.readNextBytes(buff).flatMap { bytesRead =>
-        if (bytesRead == 0) target.setModTime(getFileListItem("example.txt", stats1))
+        if (bytesRead == 0) target.setAttributes(getFileListItem("example.txt", stats1))
         else target.writeNextBytes(buff, bytesRead).flatMap(_ => loop(source, target))
       }
     }
@@ -291,8 +291,8 @@ class FileListApiImplSpec extends AsyncTestSpec {
 
     val file1 = path.join(tmpDir, "example.txt")
     val file2 = path.join(tmpDir, "example2.txt")
-    fs.writeFileSync(file1, "hello, World!!!")
-    fs.writeFileSync(file2, "hello, World")
+    fs.writeFileSync(file1, "hello, World")
+    fs.writeFileSync(file2, "hello, World!!!")
     fs.existsSync(file1) shouldBe true
     fs.existsSync(file2) shouldBe true
 
@@ -303,7 +303,7 @@ class FileListApiImplSpec extends AsyncTestSpec {
 
     def loop(source: FileSource, target: FileTarget): Future[Unit] = {
       source.readNextBytes(buff).flatMap { bytesRead =>
-        if (bytesRead == 0) target.setModTime(srcItem)
+        if (bytesRead == 0) target.setAttributes(srcItem)
         else target.writeNextBytes(buff, bytesRead).flatMap(_ => loop(source, target))
       }
     }
@@ -329,7 +329,7 @@ class FileListApiImplSpec extends AsyncTestSpec {
 
       fs.readFileSync(file2, new FileOptions {
         override val encoding = "utf8"
-      }) shouldBe "hello, World!!!"
+      }) shouldBe "hello, World"
 
       //cleanup
       fs.unlinkSync(file1)
@@ -358,7 +358,7 @@ class FileListApiImplSpec extends AsyncTestSpec {
 
     def loop(source: FileSource, target: FileTarget): Future[Unit] = {
       source.readNextBytes(buff).flatMap { bytesRead =>
-        if (bytesRead == 0) target.setModTime(srcItem)
+        if (bytesRead == 0) target.setAttributes(srcItem)
         else target.writeNextBytes(buff, bytesRead).flatMap(_ => loop(source, target))
       }
     }

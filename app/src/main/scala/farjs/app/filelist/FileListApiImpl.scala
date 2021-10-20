@@ -145,8 +145,10 @@ class FileListApiImpl extends FileListApi {
             }
           }
 
-          def setModTime(src: FileListItem): Future[Unit] = Future {
-            fs.futimesSync(fd, src.atimeMs / 1000, src.mtimeMs / 1000)
+          def setAttributes(src: FileListItem): Future[Unit] = {
+            fs.ftruncate(fd, pos).map { _ =>
+              fs.futimesSync(fd, src.atimeMs / 1000, src.mtimeMs / 1000)
+            }
           }
 
           def close(): Future[Unit] = Future(fs.closeSync(fd))

@@ -122,7 +122,7 @@ trait FileListActions {
 
           def loop(): Future[Boolean] = {
             source.readNextBytes(buff).flatMap { bytesRead =>
-              if (bytesRead == 0) target.setModTime(file).map(_ => true)
+              if (bytesRead == 0) target.setAttributes(file).map(_ => true)
               else {
                 target.writeNextBytes(buff, bytesRead).flatMap { position =>
                   onProgress(position).flatMap {

@@ -252,7 +252,7 @@ class FileListActionsSpec extends AsyncTestSpec {
       length shouldBe 123
       Future.successful(position)
     }
-    (target.setModTime _).expects(file).returning(Future.unit)
+    (target.setAttributes _).expects(file).returning(Future.unit)
     (target.close _).expects().returning(Future.unit)
 
     //then
@@ -298,7 +298,7 @@ class FileListActionsSpec extends AsyncTestSpec {
       length shouldBe 123
       Future.successful(position)
     }
-    (target.setModTime _).expects(file).returning(Future.unit)
+    (target.setAttributes _).expects(file).returning(Future.unit)
     (target.close _).expects().returning(Future.unit)
 
     //then
@@ -349,7 +349,7 @@ class FileListActionsSpec extends AsyncTestSpec {
       length shouldBe 123
       Future.successful(position)
     }
-    (target.setModTime _).expects(file).returning(Future.unit)
+    (target.setAttributes _).expects(file).returning(Future.unit)
     (target.close _).expects().returning(Future.unit)
 
     //then
