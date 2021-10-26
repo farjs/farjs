@@ -16,6 +16,7 @@ import scala.util.{Failure, Success}
 case class CopyItemsStatsProps(dispatch: Dispatch,
                                actions: FileListActions,
                                state: FileListState,
+                               title: String,
                                onDone: Double => Unit,
                                onCancel: () => Unit)
 
@@ -57,7 +58,7 @@ object CopyItemsStats extends FunctionComponent[CopyItemsStatsProps] {
           props.onDone(filesSize)
         case Failure(_) =>
           props.onCancel()
-          props.dispatch(FileListTaskAction(FutureTask("Copy dir scan", resultF)))
+          props.dispatch(FileListTaskAction(FutureTask(s"${props.title} dir scan", resultF)))
       }
     }
 
@@ -75,7 +76,7 @@ object CopyItemsStats extends FunctionComponent[CopyItemsStatsProps] {
 
     <(statusPopupComp())(^.wrapped := StatusPopupProps(
       text = s"Calculating total size\n$currDir",
-      title = "Copy",
+      title = props.title,
       closable = true,
       onClose = props.onCancel
     ))()

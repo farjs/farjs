@@ -27,7 +27,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       FileListItem("file 1", size = 10)
     ))
     val state = FileListState(currDir = currDir, selectedNames = Set("dir 1", "file 1"))
-    val props = CopyItemsStatsProps(dispatch, actions, state, onDone, onCancel)
+    val props = CopyItemsStatsProps(dispatch, actions, state, "Move", onDone, onCancel)
     val p = Promise[Boolean]()
     (actions.scanDirs _).expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
       onNextDir("/path", List(
@@ -42,7 +42,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       assertTestComponent(renderer.root.children(0), statusPopupComp) {
         case StatusPopupProps(text, title, closable, onClose) =>
           text shouldBe "Calculating total size\ndir 1"
-          title shouldBe "Copy"
+          title shouldBe "Move"
           closable shouldBe true
           onClose shouldBe props.onCancel
       }
@@ -75,7 +75,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       FileListItem("dir 1", isDir = true)
     ))
     val state = FileListState(currDir = currDir)
-    val props = CopyItemsStatsProps(dispatch, actions, state, onDone, onCancel)
+    val props = CopyItemsStatsProps(dispatch, actions, state, "Copy", onDone, onCancel)
     val p = Promise[Boolean]()
     val resultF = p.future
     var onNextDirFn: (String, Seq[FileListItem]) => Boolean = null
@@ -117,7 +117,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       FileListItem("dir 1", isDir = true)
     ))
     val state = FileListState(currDir = currDir)
-    val props = CopyItemsStatsProps(dispatch, actions, state, onDone, onCancel)
+    val props = CopyItemsStatsProps(dispatch, actions, state, "Copy", onDone, onCancel)
     val p = Promise[Boolean]()
     (actions.scanDirs _).expects(currDir.path, Seq(currDir.items.head), *).returning(p.future)
     
@@ -130,6 +130,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     dispatch.expects(*).onCall { action: Any =>
       inside(action) { case action: FileListTaskAction =>
         resultF = action.task.future
+        action.task.message shouldBe "Copy dir scan"
       }
     }
 

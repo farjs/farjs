@@ -24,6 +24,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
     val (maybeTotal, setTotal) = useState[Option[Double]](None)
     val (maybeToPath, setToPath) = useState[Option[String]](None)
     val (move, setMove) = useState(false)
+    val (needTotal, setNeedTotal) = useState(false)
     val copied = useRef(Set.empty[String])
 
     val props = compProps.wrapped
@@ -47,6 +48,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
       setTotal(None)
       setToPath(None)
       setMove(false)
+      setNeedTotal(false)
       copied.current = Set.empty[String]
     }
     
@@ -72,87 +74,88 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
           props.dispatch(rightAction)
       }
     }
+
+    val fromPath = fromState.currDir.path
+    val maybeError = maybeToPath.flatMap { toPath =>
+      val op = if (move) "move" else "copy"
+      if (fromPath == toPath) Some {
+        s"Cannot $op the item\n${items.head.name}\nonto itself"
+      }
+      else if (toPath.startsWith(fromPath + path.sep)) {
+        val toSuffix = toPath.stripPrefix(fromPath + path.sep)
+        val maybeSelf = items.find(i => toSuffix == i.name || toSuffix.startsWith(i.name + path.sep))
+        maybeSelf.map { self =>
+          s"Cannot $op the item\n${self.name}\ninto itself"
+        }
+      }
+      else None
+    }
     
     <.>()(
       if (showPopup) Some {
-        if (maybeTotal.isEmpty) {
-          <(copyItemsStats())(^.wrapped := CopyItemsStatsProps(
-            dispatch = props.dispatch,
-            actions = props.actions,
-            state = fromState,
-            onDone = { total =>
-              setTotal(Some(total))
-            },
-            onCancel = onCancel(dispatchAction = true)
-          ))()
-        }
-        else {
-          <(copyItemsPopup())(^.wrapped := CopyItemsPopupProps(
-            move = props.data.popups.showMoveItemsPopup,
-            path = toState.currDir.path,
-            items = items,
-            onAction = { path =>
-              val dirF = props.actions.readDir(Some(fromState.currDir.path), path)
-              dirF.onComplete {
-                case Success(dir) =>
-                  setMove(props.data.popups.showMoveItemsPopup)
-                  if (props.data.popups.showMoveItemsPopup) {
-                    props.dispatch(FileListPopupMoveItemsAction(show = false))
-                  }
-                  else props.dispatch(FileListPopupCopyItemsAction(show = false))
-                  setToPath(Some(dir.path))
-                case Failure(_) =>
-                  props.dispatch(FileListTaskAction(FutureTask("Resolving target dir", dirF)))
-              }
-            },
-            onCancel = onCancel(dispatchAction = true)
-          ))()
-        }
+        <(copyItemsPopup())(^.wrapped := CopyItemsPopupProps(
+          move = props.data.popups.showMoveItemsPopup,
+          path = toState.currDir.path,
+          items = items,
+          onAction = { path =>
+            val dirF = props.actions.readDir(Some(fromPath), path)
+            dirF.onComplete {
+              case Success(dir) =>
+                setMove(props.data.popups.showMoveItemsPopup)
+                if (props.data.popups.showMoveItemsPopup) {
+                  props.dispatch(FileListPopupMoveItemsAction(show = false))
+                }
+                else props.dispatch(FileListPopupCopyItemsAction(show = false))
+                setToPath(Some(dir.path))
+                setNeedTotal(true)
+              case Failure(_) =>
+                props.dispatch(FileListTaskAction(FutureTask("Resolving target dir", dirF)))
+            }
+          },
+          onCancel = onCancel(dispatchAction = true)
+        ))()
       }
       else None,
 
+      if (needTotal && maybeError.isEmpty) Some {
+        <(copyItemsStats())(^.wrapped := CopyItemsStatsProps(
+          dispatch = props.dispatch,
+          actions = props.actions,
+          state = fromState,
+          title = if (move) "Move" else "Copy",
+          onDone = { total =>
+            setNeedTotal(false)
+            setTotal(Some(total))
+          },
+          onCancel = onCancel(dispatchAction = false)
+        ))()
+      }
+      else maybeError.map { error =>
+        <(messageBoxComp())(^.wrapped := MessageBoxProps(
+          title = "Error",
+          message = error,
+          actions = List(MessageBoxAction.OK(onCancel(dispatchAction = false))),
+          style = Theme.current.popup.error
+        ))()
+      },
+
       for {
         toPath <- maybeToPath
-        total <- maybeTotal
+        total <- maybeTotal if maybeError.isEmpty
       } yield {
-        val fromPath = fromState.currDir.path
-        val error =
-          if (fromPath == toPath) {
-            if (move) s"Cannot move the item\n${items.head.name}\nonto itself"
-            else s"Cannot copy the item\n${items.head.name}\nonto itself"
-          }
-          else if (move && toPath.startsWith(fromPath + path.sep)) {
-            val toSuffix = toPath.stripPrefix(fromPath + path.sep)
-            val maybeSelf = items.find(i => toSuffix == i.name || toSuffix.startsWith(i.name + path.sep))
-            maybeSelf.map { self =>
-              s"Cannot move the item\n${self.name}\ninto itself"
-            }.getOrElse("")
-          }
-          else ""
-        
-        if (error.nonEmpty) {
-          <(messageBoxComp())(^.wrapped := MessageBoxProps(
-            title = "Error",
-            message = error,
-            actions = List(MessageBoxAction.OK(onCancel(dispatchAction = false))),
-            style = Theme.current.popup.error
-          ))()
-        }
-        else {
-          <(copyProcessComp())(^.wrapped := CopyProcessProps(
-            dispatch = props.dispatch,
-            actions = props.actions,
-            move = move,
-            fromPath = fromPath,
-            items = items,
-            toPath = toPath,
-            total = total,
-            onTopItem = { item =>
-              copied.current += item.name
-            },
-            onDone = onDone
-          ))()
-        }
+        <(copyProcessComp())(^.wrapped := CopyProcessProps(
+          dispatch = props.dispatch,
+          actions = props.actions,
+          move = move,
+          fromPath = fromPath,
+          items = items,
+          toPath = toPath,
+          total = total,
+          onTopItem = { item =>
+            copied.current += item.name
+          },
+          onDone = onDone
+        ))()
       }
     )
   }

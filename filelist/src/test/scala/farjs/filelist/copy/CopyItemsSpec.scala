@@ -23,31 +23,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   CopyItems.copyProcessComp = () => "CopyProcess".asInstanceOf[ReactClass]
   CopyItems.messageBoxComp = () => "MessageBox".asInstanceOf[ReactClass]
   
-  it should "show CopyItemsStats when showCopyItemsPopup=true" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val currDir = FileListDir("/folder", isRoot = false, List(
-      FileListItem("dir 1", isDir = true)
-    ))
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
-      left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyItemsPopup = true)
-    ))
-
-    //when
-    val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-
-    //then
-    assertTestComponent(renderer.root.children(0), copyItemsStats) {
-      case CopyItemsStatsProps(resDispatch, resActions, state, _, _) =>
-        resDispatch shouldBe dispatch
-        resActions shouldBe actions
-        state shouldBe props.data.activeList
-    }
-  }
-
-  it should "hide CopyItemsStats when onCancel and copy" in {
+  it should "show CopyItemsStats when copy" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -59,25 +35,43 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       popups = FileListPopupsState(showCopyItemsPopup = true)
     ))
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
+    val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
+    val toDir = FileListDir("/to/path", isRoot = false, Nil)
+    val to = "test to path"
 
     //then
+    (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
     dispatch.expects(FileListPopupCopyItemsAction(show = false))
-    
+
     //when
-    statsPopup.onCancel()
+    copyPopup.onAction(to)
 
     //then
     TestRenderer.act { () =>
       renderer.update(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(popups = FileListPopupsState())
+        data = FileListsState(
+          left = props.data.left,
+          popups = FileListPopupsState()
+        )
       ))())
     }
 
-    renderer.root.children.toList should be (empty)
+    eventually {
+      assertTestComponent(renderer.root.children(0), copyItemsStats) {
+        case CopyItemsStatsProps(resDispatch, resActions, state, title, _, _) =>
+          resDispatch shouldBe dispatch
+          resActions shouldBe actions
+          state shouldBe props.data.activeList
+          title shouldBe "Copy"
+      }
+    }.map { _ =>
+      //when & then
+      findComponentProps(renderer.root, copyItemsStats).onCancel()
+      renderer.root.children.toList should be (empty)
+    }
   }
 
-  it should "hide CopyItemsStats when onCancel and move" in {
+  it should "show CopyItemsStats when move" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -89,22 +83,40 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       popups = FileListPopupsState(showMoveItemsPopup = true)
     ))
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
+    val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
+    val toDir = FileListDir("/to/path", isRoot = false, Nil)
+    val to = "test to path"
 
     //then
+    (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
     dispatch.expects(FileListPopupMoveItemsAction(show = false))
     
     //when
-    statsPopup.onCancel()
+    copyPopup.onAction(to)
 
     //then
     TestRenderer.act { () =>
       renderer.update(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(popups = FileListPopupsState())
+        data = FileListsState(
+          left = props.data.left,
+          popups = FileListPopupsState()
+        )
       ))())
     }
 
-    renderer.root.children.toList should be (empty)
+    eventually {
+      assertTestComponent(renderer.root.children(0), copyItemsStats) {
+        case CopyItemsStatsProps(resDispatch, resActions, state, title, _, _) =>
+          resDispatch shouldBe dispatch
+          resActions shouldBe actions
+          state shouldBe props.data.activeList
+          title shouldBe "Move"
+      }
+    }.map { _ =>
+      //when & then
+      findComponentProps(renderer.root, copyItemsStats).onCancel()
+      renderer.root.children.toList should be (empty)
+    }
   }
 
   it should "hide CopyItemsPopup when onCancel and copy" in {
@@ -120,8 +132,6 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ))
     
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
-    statsPopup.onDone(123)
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
 
     //then
@@ -153,8 +163,6 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ))
     
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
-    statsPopup.onDone(123)
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
 
     //then
@@ -185,10 +193,6 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ))
 
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
-    val total = 123456789
-    statsPopup.onDone(total)
-    
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
     val p = Promise[FileListDir]()
     val to = "test to path"
@@ -215,7 +219,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     }
   }
 
-  it should "render error popup if same path when copy" in {
+  it should "render error popup if same path" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -227,9 +231,6 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ))
 
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
-    val total = 123456789
-    statsPopup.onDone(total)
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
     val toDir = FileListDir("/folder", isRoot = false, Nil)
     val to = "test to path"
@@ -261,55 +262,10 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
           }
           style shouldBe Theme.current.popup.error
       }
-    }
-  }
-
-  it should "render error popup if same path when move" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val item = FileListItem("dir 1", isDir = true)
-    val currDir = FileListDir("/folder", isRoot = false, List(item))
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
-      left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showMoveItemsPopup = true)
-    ))
-
-    val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
-    val total = 123456789
-    statsPopup.onDone(total)
-    val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
-    val toDir = FileListDir("/folder", isRoot = false, Nil)
-    val to = "test to path"
-
-    //then
-    (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
-    dispatch.expects(FileListPopupMoveItemsAction(show = false))
-
-    //when
-    copyPopup.onAction(to)
-
-    //then
-    TestRenderer.act { () =>
-      renderer.update(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(
-          left = props.data.left,
-          popups = FileListPopupsState()
-        )
-      ))())
-    }
-
-    eventually {
-      assertTestComponent(renderer.root.children.head, messageBoxComp) {
-        case MessageBoxProps(title, message, resActions, style) =>
-          title shouldBe "Error"
-          message shouldBe s"Cannot move the item\n${item.name}\nonto itself"
-          inside(resActions) { case List(ok) =>
-            ok.label shouldBe "OK"
-          }
-          style shouldBe Theme.current.popup.error
-      }
+    }.map { _ =>
+      //when & then
+      findComponentProps(renderer.root, messageBoxComp).actions.head.onAction()
+      renderer.root.children.toList should be (empty)
     }
   }
 
@@ -325,9 +281,6 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ))
 
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
-    val total = 123456789
-    statsPopup.onDone(total)
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
     val toDir = FileListDir("/folder/dir 1", isRoot = false, Nil)
     val to = "test to path"
@@ -359,10 +312,14 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
           }
           style shouldBe Theme.current.popup.error
       }
+    }.map { _ =>
+      //when & then
+      findComponentProps(renderer.root, messageBoxComp).actions.head.onAction()
+      renderer.root.children.toList should be (empty)
     }
   }
 
-  it should "render error popup when move into itself in sub-folder" in {
+  it should "render error popup when copy into itself in sub-folder" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -370,20 +327,17 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val currDir = FileListDir("/folder", isRoot = false, List(item))
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showMoveItemsPopup = true)
+      popups = FileListPopupsState(showCopyItemsPopup = true)
     ))
 
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
-    val total = 123456789
-    statsPopup.onDone(total)
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
     val toDir = FileListDir("/folder/dir 1/dir 2", isRoot = false, Nil)
     val to = "test to path"
 
     //then
     (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
-    dispatch.expects(FileListPopupMoveItemsAction(show = false))
+    dispatch.expects(FileListPopupCopyItemsAction(show = false))
 
     //when
     copyPopup.onAction(to)
@@ -402,54 +356,15 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       assertTestComponent(renderer.root.children.head, messageBoxComp) {
         case MessageBoxProps(title, message, resActions, style) =>
           title shouldBe "Error"
-          message shouldBe s"Cannot move the item\n${item.name}\ninto itself"
+          message shouldBe s"Cannot copy the item\n${item.name}\ninto itself"
           inside(resActions) { case List(ok) =>
             ok.label shouldBe "OK"
           }
           style shouldBe Theme.current.popup.error
       }
-    }
-  }
-
-  it should "hide error popup when OK action" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val item = FileListItem("dir 1", isDir = true)
-    val currDir = FileListDir("/folder", isRoot = false, List(item))
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
-      left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyItemsPopup = true)
-    ))
-
-    val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
-    val total = 123456789
-    statsPopup.onDone(total)
-    val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
-    val toDir = FileListDir("/folder", isRoot = false, Nil)
-    val to = "test to path"
-    
-    (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
-    dispatch.expects(FileListPopupCopyItemsAction(show = false))
-    copyPopup.onAction(to)
-
-    TestRenderer.act { () =>
-      renderer.update(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(
-          left = props.data.left,
-          popups = FileListPopupsState()
-        )
-      ))())
-    }
-
-    eventually(findProps(renderer.root, messageBoxComp) should not be empty).map { _ =>
-      val errorProps = findComponentProps(renderer.root, messageBoxComp)
-      
-      //when
-      errorProps.actions.head.onAction()
-      
-      //then
+    }.map { _ =>
+      //when & then
+      findComponentProps(renderer.root, messageBoxComp).actions.head.onAction()
       renderer.root.children.toList should be (empty)
     }
   }
@@ -469,9 +384,6 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ))
 
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
-    val total = 123456789
-    statsPopup.onDone(total)
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
     val toDir = FileListDir("/to/path/dir 1", isRoot = false, Nil)
     val to = "test to path"
@@ -494,6 +406,10 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     }
 
     eventually {
+      val statsPopup = findComponentProps(renderer.root, copyItemsStats)
+      val total = 123456789
+      statsPopup.onDone(total)
+
       assertTestComponent(renderer.root.children.head, copyProcessComp) {
         case CopyProcessProps(resDispatch, resActions, move, fromPath, items, resToPath, resTotal, _, _) =>
           resDispatch shouldBe dispatch
@@ -522,9 +438,6 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ))
 
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
-    val total = 123456789
-    statsPopup.onDone(total)
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
     val toDir = FileListDir("/folder/dir to", isRoot = false, Nil)
     val to = "test to path"
@@ -547,6 +460,10 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     }
 
     eventually {
+      val statsPopup = findComponentProps(renderer.root, copyItemsStats)
+      val total = 123456789
+      statsPopup.onDone(total)
+
       assertTestComponent(renderer.root.children.head, copyProcessComp) {
         case CopyProcessProps(resDispatch, resActions, move, fromPath, items, resToPath, resTotal, _, _) =>
           resDispatch shouldBe dispatch
@@ -578,8 +495,6 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ))
 
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
-    statsPopup.onDone(123)
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
 
     val toDir = FileListDir("/to/path/dir 1", isRoot = false, Nil)
@@ -589,6 +504,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     copyPopup.onAction(to)
     
     eventually {
+      val statsPopup = findComponentProps(renderer.root, copyItemsStats)
+      statsPopup.onDone(123)
+
       findProps(renderer.root, copyProcessComp) should not be empty
     }.flatMap { _ =>
       val progressPopup = findComponentProps(renderer.root, copyProcessComp)
@@ -643,8 +561,6 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ))
 
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
-    statsPopup.onDone(123)
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
 
     val toDir = FileListDir("/to/path/dir 1", isRoot = false, Nil)
@@ -654,6 +570,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     copyPopup.onAction("test to path")
 
     eventually {
+      val statsPopup = findComponentProps(renderer.root, copyItemsStats)
+      statsPopup.onDone(123)
+
       findProps(renderer.root, copyProcessComp) should not be empty
     }.flatMap { _ =>
       val progressPopup = findComponentProps(renderer.root, copyProcessComp)
@@ -713,11 +632,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       right = FileListState(currDir = FileListDir("/test-path", isRoot = false, Nil)),
       popups = FileListPopupsState(showCopyItemsPopup = true)
     ))
-    val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
 
     //when
-    statsPopup.onDone(123)
+    val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
 
     //then
     assertTestComponent(renderer.root.children(0), copyItemsPopup) {
@@ -738,11 +655,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       right = FileListState(currDir = FileListDir("/test-path", isRoot = false, Nil)),
       popups = FileListPopupsState(showMoveItemsPopup = true)
     ))
-    val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
 
     //when
-    statsPopup.onDone(123)
+    val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
 
     //then
     assertTestComponent(renderer.root.children(0), copyItemsPopup) {
@@ -771,11 +686,8 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       popups = FileListPopupsState(showCopyItemsPopup = true)
     ))
 
-    val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
-    val statsPopup = findComponentProps(renderer.root, copyItemsStats)
-
     //when
-    statsPopup.onDone(123)
+    val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
 
     //then
     assertTestComponent(renderer.root.children(0), copyItemsPopup) {
