@@ -1,6 +1,7 @@
 package farjs.filelist.copy
 
 import farjs.filelist.FileListActions.{FileListParamsChangedAction, FileListTaskAction}
+import farjs.filelist.fs.FSService
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.FileListPopupsProps
 import farjs.ui.popup._
@@ -11,7 +12,8 @@ import scommons.react.hooks._
 import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{Failure, Success}
+import scala.concurrent.Future
+import scala.util.Success
 
 object CopyItems extends FunctionComponent[FileListPopupsProps] {
 
@@ -19,6 +21,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
   private[copy] var copyItemsPopup: UiComponent[CopyItemsPopupProps] = CopyItemsPopup
   private[copy] var copyProcessComp: UiComponent[CopyProcessProps] = CopyProcess
   private[copy] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
+  private[copy] var fsService: FSService = FSService.instance
 
   protected def render(compProps: Props): ReactElement = {
     val (maybeTotal, setTotal) = useState[Option[Double]](None)
@@ -76,6 +79,25 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
     }
 
     val fromPath = fromState.currDir.path
+    
+    def onAction(path: String): Unit = {
+      val move = props.data.popups.showMoveItemsPopup
+      val dirF = for {
+        dir <- props.actions.readDir(Some(fromPath), path)
+        sameDrive <-
+          if (move) checkSameDrive(fromPath, dir.path)
+          else Future.successful(false)
+      } yield {
+        setMove(move)
+        if (move) props.dispatch(FileListPopupMoveItemsAction(show = false))
+        else props.dispatch(FileListPopupCopyItemsAction(show = false))
+
+        setToPath(Some(dir.path))
+        setNeedTotal(true)
+      }
+      props.dispatch(FileListTaskAction(FutureTask("Resolving target dir", dirF)))
+    }
+
     val maybeError = maybeToPath.flatMap { toPath =>
       val op = if (move) "move" else "copy"
       if (fromPath == toPath) Some {
@@ -97,66 +119,67 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
           move = props.data.popups.showMoveItemsPopup,
           path = toState.currDir.path,
           items = items,
-          onAction = { path =>
-            val dirF = props.actions.readDir(Some(fromPath), path)
-            dirF.onComplete {
-              case Success(dir) =>
-                setMove(props.data.popups.showMoveItemsPopup)
-                if (props.data.popups.showMoveItemsPopup) {
-                  props.dispatch(FileListPopupMoveItemsAction(show = false))
-                }
-                else props.dispatch(FileListPopupCopyItemsAction(show = false))
-                setToPath(Some(dir.path))
-                setNeedTotal(true)
-              case Failure(_) =>
-                props.dispatch(FileListTaskAction(FutureTask("Resolving target dir", dirF)))
-            }
-          },
+          onAction = onAction,
           onCancel = onCancel(dispatchAction = true)
         ))()
       }
-      else None,
-
-      if (needTotal && maybeError.isEmpty) Some {
-        <(copyItemsStats())(^.wrapped := CopyItemsStatsProps(
-          dispatch = props.dispatch,
-          actions = props.actions,
-          state = fromState,
-          title = if (move) "Move" else "Copy",
-          onDone = { total =>
-            setNeedTotal(false)
-            setTotal(Some(total))
-          },
-          onCancel = onCancel(dispatchAction = false)
-        ))()
-      }
-      else maybeError.map { error =>
+      else if (maybeError.isDefined) maybeError.map { error =>
         <(messageBoxComp())(^.wrapped := MessageBoxProps(
           title = "Error",
           message = error,
           actions = List(MessageBoxAction.OK(onCancel(dispatchAction = false))),
           style = Theme.current.popup.error
         ))()
-      },
-
-      for {
-        toPath <- maybeToPath
-        total <- maybeTotal if maybeError.isEmpty
-      } yield {
-        <(copyProcessComp())(^.wrapped := CopyProcessProps(
+      }
+      else if (needTotal) Some {
+        <(copyItemsStats())(^.wrapped := CopyItemsStatsProps(
           dispatch = props.dispatch,
           actions = props.actions,
-          move = move,
-          fromPath = fromPath,
-          items = items,
-          toPath = toPath,
-          total = total,
-          onTopItem = { item =>
-            copied.current += item.name
+          state = fromState,
+          title = if (move) "Move" else "Copy",
+          onDone = { total =>
+            setTotal(Some(total))
+            setNeedTotal(false)
           },
-          onDone = onDone
+          onCancel = onCancel(dispatchAction = false)
         ))()
       }
+      else {
+        for {
+          toPath <- maybeToPath
+          total <- maybeTotal
+        } yield {
+          <(copyProcessComp())(^.wrapped := CopyProcessProps(
+            dispatch = props.dispatch,
+            actions = props.actions,
+            move = move,
+            fromPath = fromPath,
+            items = items,
+            toPath = toPath,
+            total = total,
+            onTopItem = { item =>
+              copied.current += item.name
+            },
+            onDone = onDone
+          ))()
+        }
+      }
     )
+  }
+  
+  private def checkSameDrive(fromPath: String, toPath: String): Future[Boolean] = {
+    for {
+      maybeFromDisk <- fsService.readDisk(fromPath)
+      maybeToDisk <- fsService.readDisk(toPath)
+    } yield {
+      val maybeSameDrive = for {
+        fromDisk <- maybeFromDisk
+        toDisk <- maybeToDisk
+      } yield {
+        fromDisk.root == toDisk.root
+      }
+
+      maybeSameDrive.getOrElse(false)
+    }
   }
 }
