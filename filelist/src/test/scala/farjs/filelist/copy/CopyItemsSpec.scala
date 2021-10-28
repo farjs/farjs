@@ -4,7 +4,7 @@ import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.copy.CopyItems._
-import farjs.filelist.fs.FSService
+import farjs.filelist.fs.{FSDisk, FSService}
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.{FileListPopupsProps, FileListPopupsState}
 import farjs.ui.popup.MessageBoxProps
@@ -23,6 +23,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   CopyItems.copyItemsPopup = () => "CopyItemsPopup".asInstanceOf[ReactClass]
   CopyItems.copyProcessComp = () => "CopyProcess".asInstanceOf[ReactClass]
   CopyItems.messageBoxComp = () => "MessageBox".asInstanceOf[ReactClass]
+  CopyItems.moveItems = () => "MoveItems".asInstanceOf[ReactClass]
   
   it should "show CopyItemsStats when copy" in {
     //given
@@ -352,6 +353,61 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       //when & then
       findComponentProps(renderer.root, messageBoxComp).actions.head.onAction()
       renderer.root.children.toList should be (empty)
+    }
+  }
+
+  it should "render MoveItems when onAction and move within same drive" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = mock[FileListActions]
+    val fsService = mock[FSService]
+    CopyItems.fsService = fsService
+    val item = FileListItem("dir 1", isDir = true)
+    val currDir = FileListDir("/folder", isRoot = false, List(
+      item,
+      FileListItem("file 1")
+    ))
+    val props = FileListPopupsProps(dispatch, actions, FileListsState(
+      left = FileListState(currDir = currDir, isActive = true),
+      popups = FileListPopupsState(showMoveItemsPopup = true)
+    ))
+    val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
+    val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
+    val toDir = FileListDir("/to/path", isRoot = false, Nil)
+    val to = "test to path"
+    val sameDrive = FSDisk("same", 0, 0, "SameDrive")
+
+    //then
+    (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
+    (fsService.readDisk _).expects(currDir.path).returning(Future.successful(Some(sameDrive)))
+    (fsService.readDisk _).expects(toDir.path).returning(Future.successful(Some(sameDrive)))
+    dispatch.expects(FileListPopupMoveItemsAction(show = false))
+    dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
+      action.task.message shouldBe "Resolving target dir"
+    })
+
+    //when
+    copyPopup.onAction(to)
+
+    //then
+    TestRenderer.act { () =>
+      renderer.update(<(CopyItems())(^.wrapped := props.copy(
+        data = FileListsState(
+          left = props.data.left,
+          popups = FileListPopupsState()
+        )
+      ))())
+    }
+
+    eventually {
+      assertTestComponent(renderer.root.children(0), moveItems) {
+        case MoveItemsProps(resDispatch, resActions, fromPath, items, toPath, _, _) =>
+          resDispatch shouldBe dispatch
+          resActions shouldBe actions
+          fromPath shouldBe currDir.path
+          items shouldBe List(item)
+          toPath shouldBe toDir.path
+      }
     }
   }
 
