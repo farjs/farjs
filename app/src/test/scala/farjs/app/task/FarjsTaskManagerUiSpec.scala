@@ -134,47 +134,54 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
     findProps(renderer.root, messageBoxComp) should be (empty)
   }
 
-  it should "render status popup if loading" in {
+  it should "render only status popup if loading and prev error" in {
     //given
     val props = getTaskManagerUiProps(
       showLoading = true,
-      status = Some("Some status message")
+      status = Some("Some status message"),
+      error = Some("Error: \nSome prev error "),
+      errorDetails = Some("Some prev error details")
     )
     val component = <(FarjsTaskManagerUi())(^.wrapped := props)()
 
     //when
-    val result = testRender(component)
+    val result = createTestRenderer(component).root
 
     //then
-    assertTestComponent(result, statusPopupComp) {
-      case StatusPopupProps(message, title, closable, _) =>
-        message shouldBe props.status.getOrElse("")
-        title shouldBe "Status"
-        closable shouldBe false
+    inside(result.children.toList) { case List(status) =>
+      assertTestComponent(status, statusPopupComp) {
+        case StatusPopupProps(message, title, closable, _) =>
+          message shouldBe props.status.getOrElse("")
+          title shouldBe "Status"
+          closable shouldBe false
+      }
     }
   }
 
-  it should "render MessageBox if error" in {
+  it should "render MessageBox if error and no status/loading" in {
     //given
     val props = getTaskManagerUiProps(
+      status = Some("Test status..."),
       error = Some("Error: \nSome error "),
       errorDetails = Some("Some error details")
     )
     val component = <(FarjsTaskManagerUi())(^.wrapped := props)()
 
     //when
-    val result = testRender(component)
+    val result = createTestRenderer(component).root
 
     //then
-    assertTestComponent(result, messageBoxComp) {
-      case MessageBoxProps(title, message, resActions, style) =>
-        title shouldBe "Error"
-        message shouldBe "Some error"
-        inside(resActions) { case List(ok) =>
-          ok.label shouldBe "OK"
-          ok.triggeredOnClose shouldBe true
-        }
-        style shouldBe Theme.current.popup.error
+    inside(result.children.toList) { case List(msgBox) =>
+      assertTestComponent(msgBox, messageBoxComp) {
+        case MessageBoxProps(title, message, resActions, style) =>
+          title shouldBe "Error"
+          message shouldBe "Some error"
+          inside(resActions) { case List(ok) =>
+            ok.label shouldBe "OK"
+            ok.triggeredOnClose shouldBe true
+          }
+          style shouldBe Theme.current.popup.error
+      }
     }
   }
 
