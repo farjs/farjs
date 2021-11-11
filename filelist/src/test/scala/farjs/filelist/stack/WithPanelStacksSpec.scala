@@ -3,7 +3,6 @@ package farjs.filelist.stack
 import java.util.concurrent.atomic.AtomicReference
 
 import farjs.filelist.stack.PanelStack.StackItem
-import farjs.filelist.stack.WithPanelStacksSpec.TestErrorBoundary
 import scommons.react._
 import scommons.react.hooks._
 import scommons.react.test._
@@ -74,31 +73,5 @@ class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
         <.>()()
       }
     }.apply())
-  }
-}
-
-object WithPanelStacksSpec {
-
-  object TestErrorBoundary extends ClassComponent[Unit] {
-    
-    private case class TestErrorBoundaryState(error: Option[js.Object] = None)
-
-    protected def create(): ReactClass = createClass[TestErrorBoundaryState](
-      getInitialState = { _ =>
-        TestErrorBoundaryState()
-      },
-      componentDidCatch = { (self, error, _) =>
-        self.setState(TestErrorBoundaryState(Option(error)))
-      },
-      render = { self =>
-        self.state.error match {
-          case None => self.props.children
-          case Some(error) =>
-            <.div()(
-              s"$error"
-            )
-        }
-      }
-    )
   }
 }

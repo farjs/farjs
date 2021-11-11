@@ -1,5 +1,6 @@
 package definitions
 
+import common.Libs
 import sbt.Keys._
 import sbt._
 import scommons.sbtplugin.project.CommonModule
@@ -7,6 +8,8 @@ import xerial.sbt.Sonatype.autoImport._
 
 trait FarjsModule extends CommonModule {
 
+  val scommonsNodejsVersion: String = Libs.scommonsNodejsVersion
+  
   override val repoName = "far-js"
 
   override def definition: Project = {

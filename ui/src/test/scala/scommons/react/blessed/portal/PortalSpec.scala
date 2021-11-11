@@ -1,7 +1,6 @@
 package scommons.react.blessed.portal
 
 import scommons.react._
-import scommons.react.blessed.portal.PortalSpec._
 import scommons.react.test._
 
 import scala.scalajs.js
@@ -116,31 +115,5 @@ class PortalSpec extends TestSpec with TestRendererUtils {
     //cleanup
     onRemove.expects(portalId)
     renderer.unmount()
-  }
-}
-
-object PortalSpec {
-
-  private case class TestErrorBoundaryState(error: Option[js.Object] = None)
-
-  private object TestErrorBoundary extends ClassComponent[Unit] {
-    
-    protected def create(): ReactClass = createClass[TestErrorBoundaryState](
-      getInitialState = { _ =>
-        TestErrorBoundaryState()
-      },
-      componentDidCatch = { (self, error, _) =>
-        self.setState(TestErrorBoundaryState(Option(error)))
-      },
-      render = { self =>
-        self.state.error match {
-          case None => self.props.children
-          case Some(error) =>
-            <.div()(
-              s"$error"
-            )
-        }
-      }
-    )
   }
 }

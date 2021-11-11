@@ -2,15 +2,9 @@ package definitions
 
 import common.{Libs, TestLibs}
 import sbt._
-import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
 
 trait ScalaJsModule extends NodeJsModule {
 
-  override def definition: Project = {
-    super.definition
-      .settings(ScalaJsModule.settings: _*)
-  }
-  
   override def superRepoProjectsDependencies: Seq[(String, String, Option[String])] = {
     super.superRepoProjectsDependencies ++ Seq(
       ("scommons-react", "scommons-react-core", None),
@@ -32,29 +26,4 @@ trait ScalaJsModule extends NodeJsModule {
       TestLibs.scommonsReactTest.value
     ).map(_ % "test")
   }
-}
-
-object ScalaJsModule {
-
-  val settings: Seq[Setting[_]] = Seq(
-    npmDependencies in Compile ++= Seq(
-      "react" -> "^17.0.2",
-      "react-redux" -> "^7.2.4"
-    ),
-    npmResolutions in Compile ++= Map(
-      "react" -> "^17.0.2",
-      "react-redux" -> "^7.2.4"
-    ),
-
-    npmDependencies in Test ++= Seq(
-      "react" -> "^17.0.2",
-      "react-redux" -> "^7.2.4",
-      "react-test-renderer" -> "^17.0.2"
-    ),
-    npmResolutions in Test ++= Map(
-      "react" -> "^17.0.2",
-      "react-redux" -> "^7.2.4",
-      "react-test-renderer" -> "^17.0.2"
-    )
-  )  
 }

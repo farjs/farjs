@@ -4,7 +4,6 @@ import java.util.concurrent.atomic.AtomicReference
 
 import farjs.filelist.stack.PanelStack._
 import farjs.filelist.stack.PanelStackSpec.TestParams
-import farjs.filelist.stack.WithPanelStacksSpec.TestErrorBoundary
 import scommons.react._
 import scommons.react.hooks._
 import scommons.react.test._
