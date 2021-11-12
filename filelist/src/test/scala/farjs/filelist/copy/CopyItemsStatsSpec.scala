@@ -7,14 +7,13 @@ import farjs.filelist.copy.CopyItemsStats._
 import farjs.ui.popup.StatusPopupProps
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react._
 import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
 
 class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  CopyItemsStats.statusPopupComp = () => "StatusPopup".asInstanceOf[ReactClass]
+  CopyItemsStats.statusPopupComp = mockUiComponent("StatusPopup")
 
   it should "call onDone with calculated total size" in {
     //given

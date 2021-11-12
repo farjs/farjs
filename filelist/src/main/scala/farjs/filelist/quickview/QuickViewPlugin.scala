@@ -3,9 +3,8 @@ package farjs.filelist.quickview
 import farjs.filelist._
 import farjs.filelist.stack.PanelStack
 import io.github.shogowada.scalajs.reactjs.React.Props
-import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.react.UiComponent
-import scommons.react.redux.BaseStateController
+import scommons.react.redux._
 
 class QuickViewPlugin(actions: FileListActions)
   extends BaseStateController[FileListsGlobalState, QuickViewPanelProps] with FileListPlugin {

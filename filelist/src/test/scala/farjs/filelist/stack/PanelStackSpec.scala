@@ -12,7 +12,7 @@ import scala.scalajs.js
 
 class PanelStackSpec extends TestSpec with TestRendererUtils {
 
-  PanelStack.withSizeComp = () => "WithSize".asInstanceOf[ReactClass]
+  PanelStack.withSizeComp = mockUiComponent("WithSize")
 
   private val (width, height) = (25, 15)
 

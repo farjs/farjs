@@ -20,9 +20,9 @@ import scala.concurrent.Future
 
 class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  FSDrivePopup.popupComp = () => "Popup".asInstanceOf[ReactClass]
-  FSDrivePopup.modalContentComp = () => "ModalContent".asInstanceOf[ReactClass]
-  FSDrivePopup.buttonComp = () => "Button".asInstanceOf[ReactClass]
+  FSDrivePopup.popupComp = mockUiComponent("Popup")
+  FSDrivePopup.modalContentComp = mockUiComponent("ModalContent")
+  FSDrivePopup.buttonComp = mockUiComponent("Button")
 
   it should "dispatch FileListDirChangeAction and call onClose when onPress item" in {
     //given

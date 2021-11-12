@@ -7,15 +7,14 @@ import farjs.ui.popup.ModalContent._
 import farjs.ui.popup.ModalProps
 import farjs.ui.theme.Theme
 import org.scalatest.Assertion
-import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
 
 class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
 
-  CopyProgressPopup.modalComp = () => "Modal".asInstanceOf[ReactClass]
-  CopyProgressPopup.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
-  CopyProgressPopup.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
+  CopyProgressPopup.modalComp = mockUiComponent("Modal")
+  CopyProgressPopup.textLineComp = mockUiComponent("TextLine")
+  CopyProgressPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
 
   it should "render component when copy" in {
     //given

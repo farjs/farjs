@@ -7,8 +7,8 @@ import scommons.react.test._
 
 class PopupSpec extends TestSpec with TestRendererUtils {
 
-  Popup.portalComp = () => "Portal".asInstanceOf[ReactClass]
-  Popup.popupOverlayComp = () => "PopupOverlay".asInstanceOf[ReactClass]
+  Popup.portalComp = mockUiComponent("Portal")
+  Popup.popupOverlayComp = mockUiComponent("PopupOverlay")
 
   it should "render component" in {
     //given

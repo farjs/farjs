@@ -1,13 +1,12 @@
 package farjs.ui
 
 import farjs.ui.CheckBox._
-import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
 
 class CheckBoxSpec extends TestSpec with TestRendererUtils {
 
-  CheckBox.buttonComp = () => "Button".asInstanceOf[ReactClass]
+  CheckBox.buttonComp = mockUiComponent("Button")
 
   it should "call onChange when press button" in {
     //given

@@ -7,16 +7,15 @@ import farjs.ui.border._
 import farjs.ui.popup.ModalProps
 import farjs.ui.theme.Theme
 import org.scalatest.Assertion
-import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
 
 class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
 
-  FileExistsPopup.modalComp = () => "Modal".asInstanceOf[ReactClass]
-  FileExistsPopup.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
-  FileExistsPopup.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
-  FileExistsPopup.buttonsPanelComp = () => "ButtonsPanel".asInstanceOf[ReactClass]
+  FileExistsPopup.modalComp = mockUiComponent("Modal")
+  FileExistsPopup.textLineComp = mockUiComponent("TextLine")
+  FileExistsPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
+  FileExistsPopup.buttonsPanelComp = mockUiComponent("ButtonsPanel")
 
   it should "call onAction(Overwrite) when press Overwrite button" in {
     //given

@@ -9,7 +9,6 @@ import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react._
 import scommons.react.blessed.BlessedScreen
 import scommons.react.redux.task.FutureTask
 import scommons.react.test._
@@ -19,8 +18,8 @@ import scala.scalajs.js.annotation.JSExportAll
 
 class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  FileListPanel.fileListPanelView = () => "FileListPanelView".asInstanceOf[ReactClass]
-  FileListPanel.fileListQuickSearch = () => "FileListQuickSearch".asInstanceOf[ReactClass]
+  FileListPanel.fileListPanelView = mockUiComponent("FileListPanelView")
+  FileListPanel.fileListQuickSearch = mockUiComponent("FileListQuickSearch")
 
   it should "dispatch popups actions when F-keys" in {
     //given

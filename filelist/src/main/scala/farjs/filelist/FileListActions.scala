@@ -3,9 +3,8 @@ package farjs.filelist
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListApi, FileListDir, FileListItem}
 import farjs.filelist.fs.FSService
-import io.github.shogowada.scalajs.reactjs.redux.Action
-import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.nodejs.{path => nodePath}
+import scommons.react.redux._
 import scommons.react.redux.task.{FutureTask, TaskAction}
 
 import scala.concurrent.ExecutionContext.Implicits.global

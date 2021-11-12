@@ -8,11 +8,10 @@ import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.fs.FSDrivePopupProps
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
 import farjs.filelist.stack._
-import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react._
 import scommons.react.blessed._
+import scommons.react.redux.Dispatch
 import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
@@ -22,10 +21,10 @@ import scala.scalajs.js.annotation.JSExportAll
 
 class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
   
-  FileListBrowser.panelStackComp = () => "PanelStack".asInstanceOf[ReactClass]
-  FileListBrowser.fileListPanelComp = () => "FileListPanel".asInstanceOf[ReactClass]
-  FileListBrowser.fsDrivePopup = () => "FSDrivePopup".asInstanceOf[ReactClass]
-  FileListBrowser.bottomMenuComp = () => "BottomMenu".asInstanceOf[ReactClass]
+  FileListBrowser.panelStackComp = mockUiComponent("PanelStack")
+  FileListBrowser.fileListPanelComp = mockUiComponent("FileListPanel")
+  FileListBrowser.fsDrivePopup = mockUiComponent("FSDrivePopup")
+  FileListBrowser.bottomMenuComp = mockUiComponent("BottomMenu")
 
   it should "dispatch FileListActivateAction when onFocus in left panel" in {
     //given

@@ -20,8 +20,8 @@ import scala.scalajs.js
 class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
   with TestRendererUtils {
 
-  QuickViewDir.statusPopupComp = () => "StatusPopup".asInstanceOf[ReactClass]
-  QuickViewDir.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
+  QuickViewDir.statusPopupComp = mockUiComponent("StatusPopup")
+  QuickViewDir.textLineComp = mockUiComponent("TextLine")
 
   private val currComp = "QuickViewPanel".asInstanceOf[ReactClass]
 

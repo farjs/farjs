@@ -1,6 +1,6 @@
 package farjs.filelist.popups
 
-import io.github.shogowada.scalajs.reactjs.redux.Action
+import scommons.react.redux.Action
 
 object FileListPopupsActions {
 

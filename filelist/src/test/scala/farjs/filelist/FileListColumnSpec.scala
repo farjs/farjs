@@ -6,13 +6,12 @@ import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.theme.{Theme, XTerm256Theme}
 import org.scalatest.Assertion
-import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
 class FileListColumnSpec extends TestSpec with TestRendererUtils {
 
-  FileListColumn.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
+  FileListColumn.textLineComp = mockUiComponent("TextLine")
 
   it should "not re-render component if the same props" in {
     //given

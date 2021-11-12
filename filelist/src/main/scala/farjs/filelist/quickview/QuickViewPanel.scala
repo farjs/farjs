@@ -6,9 +6,9 @@ import farjs.filelist.{FileListActions, FileListsStateDef}
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.theme.Theme
-import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.react._
 import scommons.react.blessed._
+import scommons.react.redux.Dispatch
 
 case class QuickViewPanelProps(dispatch: Dispatch,
                                actions: FileListActions,

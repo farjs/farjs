@@ -16,8 +16,8 @@ import scala.scalajs.js.annotation.JSExportAll
 
 class FileListViewSpec extends TestSpec with TestRendererUtils {
 
-  FileListView.verticalLineComp = () => "VerticalLine".asInstanceOf[ReactClass]
-  FileListView.fileListColumnComp = () => "FileListColumn".asInstanceOf[ReactClass]
+  FileListView.verticalLineComp = mockUiComponent("VerticalLine")
+  FileListView.fileListColumnComp = mockUiComponent("FileListColumn")
 
   it should "call onWheel when onWheelup/onWheeldown" in {
     //given

@@ -3,11 +3,11 @@ package farjs.filelist
 import farjs.filelist.FileListActions.FileListParamsChangedAction
 import farjs.filelist.api.FileListItem
 import farjs.filelist.popups.FileListPopupsActions._
-import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.nodejs.path
 import scommons.react._
 import scommons.react.hooks._
 import scommons.react.blessed.BlessedScreen
+import scommons.react.redux.Dispatch
 
 case class FileListPanelProps(dispatch: Dispatch,
                               actions: FileListActions,

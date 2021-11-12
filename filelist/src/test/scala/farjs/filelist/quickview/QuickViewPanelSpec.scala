@@ -19,10 +19,10 @@ import scala.scalajs.js
 class QuickViewPanelSpec extends AsyncTestSpec with BaseTestSpec
   with TestRendererUtils {
 
-  QuickViewPanel.doubleBorderComp = () => "DoubleBorder".asInstanceOf[ReactClass]
-  QuickViewPanel.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
-  QuickViewPanel.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
-  QuickViewPanel.quickViewDirComp = () => "QuickViewDir".asInstanceOf[ReactClass]
+  QuickViewPanel.doubleBorderComp = mockUiComponent("DoubleBorder")
+  QuickViewPanel.horizontalLineComp = mockUiComponent("HorizontalLine")
+  QuickViewPanel.textLineComp = mockUiComponent("TextLine")
+  QuickViewPanel.quickViewDirComp = mockUiComponent("QuickViewDir")
 
   private val currComp = "QuickViewPanel".asInstanceOf[ReactClass]
   private val (width, height) = (25, 15)

@@ -7,10 +7,10 @@ import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
 import farjs.filelist.stack.PanelStack.StackItem
 import farjs.filelist.stack._
 import farjs.ui.menu.BottomMenu
-import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
+import scommons.react.redux.Dispatch
 
 import scala.scalajs.js
 

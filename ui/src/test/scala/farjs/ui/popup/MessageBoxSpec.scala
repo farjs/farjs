@@ -5,15 +5,14 @@ import farjs.ui.popup.MessageBox._
 import farjs.ui.popup.ModalContent._
 import farjs.ui.theme.Theme
 import org.scalatest.{Assertion, Succeeded}
-import scommons.react._
 import scommons.react.test._
 
 class MessageBoxSpec extends TestSpec with TestRendererUtils {
 
-  MessageBox.popupComp = () => "Popup".asInstanceOf[ReactClass]
-  MessageBox.modalContentComp = () => "ModalContent".asInstanceOf[ReactClass]
-  MessageBox.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
-  MessageBox.buttonsPanelComp = () => "ButtonsPanel".asInstanceOf[ReactClass]
+  MessageBox.popupComp = mockUiComponent("Popup")
+  MessageBox.modalContentComp = mockUiComponent("ModalContent")
+  MessageBox.textLineComp = mockUiComponent("TextLine")
+  MessageBox.buttonsPanelComp = mockUiComponent("ButtonsPanel")
 
   "OK popup" should "call OK action when onClose popup" in {
     //given

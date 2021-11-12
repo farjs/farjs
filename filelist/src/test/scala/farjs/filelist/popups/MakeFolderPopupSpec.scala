@@ -6,17 +6,16 @@ import farjs.ui.border._
 import farjs.ui.popup.ModalProps
 import farjs.ui.theme.Theme
 import org.scalatest.Assertion
-import scommons.react.ReactClass
 import scommons.react.test._
 
 class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
 
-  MakeFolderPopup.modalComp = () => "Modal".asInstanceOf[ReactClass]
-  MakeFolderPopup.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
-  MakeFolderPopup.textBoxComp = () => "TextBox".asInstanceOf[ReactClass]
-  MakeFolderPopup.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
-  MakeFolderPopup.checkBoxComp = () => "CheckBox".asInstanceOf[ReactClass]
-  MakeFolderPopup.buttonsPanelComp = () => "ButtonsPanel".asInstanceOf[ReactClass]
+  MakeFolderPopup.modalComp = mockUiComponent("Modal")
+  MakeFolderPopup.textLineComp = mockUiComponent("TextLine")
+  MakeFolderPopup.textBoxComp = mockUiComponent("TextBox")
+  MakeFolderPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
+  MakeFolderPopup.checkBoxComp = mockUiComponent("CheckBox")
+  MakeFolderPopup.buttonsPanelComp = mockUiComponent("ButtonsPanel")
 
   it should "set folderName when onChange in TextBox" in {
     //given

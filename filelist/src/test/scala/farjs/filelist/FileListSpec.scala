@@ -6,7 +6,6 @@ import farjs.filelist.api.{FileListDir, FileListItem}
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react.ReactClass
 import scommons.react.blessed.BlessedScreen
 import scommons.react.redux.task.FutureTask
 import scommons.react.test._
@@ -16,7 +15,7 @@ import scala.scalajs.js
 
 class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  FileList.fileListViewComp = () => "FileListView".asInstanceOf[ReactClass]
+  FileList.fileListViewComp = mockUiComponent("FileListView")
 
   it should "dispatch action only once when mount but not when update" in {
     //given

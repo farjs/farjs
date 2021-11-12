@@ -12,7 +12,6 @@ import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs._
 import scommons.nodejs.raw.Timers
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react._
 import scommons.react.test._
 import scommons.react.test.raw.TestRenderer
 
@@ -22,9 +21,9 @@ import scala.scalajs.js.annotation.JSExportAll
 
 class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  CopyProcess.copyProgressPopup = () => "CopyProgressPopup".asInstanceOf[ReactClass]
-  CopyProcess.fileExistsPopup = () => "FileExistsPopup".asInstanceOf[ReactClass]
-  CopyProcess.messageBoxComp = () => "MessageBox".asInstanceOf[ReactClass]
+  CopyProcess.copyProgressPopup = mockUiComponent("CopyProgressPopup")
+  CopyProcess.fileExistsPopup = mockUiComponent("FileExistsPopup")
+  CopyProcess.messageBoxComp = mockUiComponent("MessageBox")
   
   CopyProcess.timers = new TimersMock {
 

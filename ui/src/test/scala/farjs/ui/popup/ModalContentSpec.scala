@@ -10,7 +10,7 @@ import scommons.react.test._
 
 class ModalContentSpec extends TestSpec with TestRendererUtils {
 
-  ModalContent.doubleBorderComp = () => "DoubleBorder".asInstanceOf[ReactClass]
+  ModalContent.doubleBorderComp = mockUiComponent("DoubleBorder")
 
   it should "render component" in {
     //given

@@ -5,11 +5,11 @@ import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.api.FileListItem
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
-import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.nodejs
 import scommons.nodejs.raw.Timers
 import scommons.react._
 import scommons.react.hooks._
+import scommons.react.redux.Dispatch
 import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global

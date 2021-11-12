@@ -4,15 +4,14 @@ import farjs.app.util.DevToolPanel._
 import farjs.ui.TextBox
 import farjs.ui.theme.Theme
 import org.scalatest.{Assertion, Succeeded}
-import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
 
 class DevToolPanelSpec extends TestSpec with TestRendererUtils {
 
-  DevToolPanel.logPanelComp = () => "LogPanel".asInstanceOf[ReactClass]
-  DevToolPanel.inputController = () => "InputController".asInstanceOf[ReactClass]
-  DevToolPanel.colorPanelComp = () => "ColorPanel".asInstanceOf[ReactClass]
+  DevToolPanel.logPanelComp = mockUiComponent("LogPanel")
+  DevToolPanel.inputController = mockUiComponent("InputController")
+  DevToolPanel.colorPanelComp = mockUiComponent("ColorPanel")
 
   it should "call onActivate when click on tab" in {
     //given

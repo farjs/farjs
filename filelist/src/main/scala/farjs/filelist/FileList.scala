@@ -2,10 +2,10 @@ package farjs.filelist
 
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.react._
 import scommons.react.blessed.BlessedScreen
 import scommons.react.hooks._
+import scommons.react.redux.Dispatch
 
 case class FileListProps(dispatch: Dispatch,
                          actions: FileListActions,

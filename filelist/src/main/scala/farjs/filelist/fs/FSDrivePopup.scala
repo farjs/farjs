@@ -7,12 +7,12 @@ import farjs.ui._
 import farjs.ui.border.SingleBorder
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
-import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.nodejs.Process.Platform
 import scommons.nodejs.process
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
+import scommons.react.redux.Dispatch
 import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global

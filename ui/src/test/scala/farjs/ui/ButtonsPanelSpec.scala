@@ -3,13 +3,12 @@ package farjs.ui
 import farjs.ui.ButtonsPanel._
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
 
 class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  ButtonsPanel.buttonComp = () => "Button".asInstanceOf[ReactClass]
+  ButtonsPanel.buttonComp = mockUiComponent("Button")
 
   it should "call onAction1 when press button1" in {
     //given

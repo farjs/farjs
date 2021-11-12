@@ -10,7 +10,6 @@ import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
 import scommons.nodejs._
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react._
 import scommons.react.blessed._
 import scommons.react.redux.task.FutureTask
 import scommons.react.test._
@@ -21,10 +20,10 @@ import scala.scalajs.js
 class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
   with TestRendererUtils {
 
-  FileListPopups.messageBoxComp = () => "MessageBox".asInstanceOf[ReactClass]
-  FileListPopups.makeFolderPopupComp = () => "MakeFolderPopup".asInstanceOf[ReactClass]
-  FileListPopups.viewItemsPopupComp = () => "ViewItemsPopup".asInstanceOf[ReactClass]
-  FileListPopups.copyItemsComp = () => "CopyItems".asInstanceOf[ReactClass]
+  FileListPopups.messageBoxComp = mockUiComponent("MessageBox")
+  FileListPopups.makeFolderPopupComp = mockUiComponent("MakeFolderPopup")
+  FileListPopups.viewItemsPopupComp = mockUiComponent("ViewItemsPopup")
+  FileListPopups.copyItemsComp = mockUiComponent("CopyItems")
 
   it should "render initial component" in {
     //given

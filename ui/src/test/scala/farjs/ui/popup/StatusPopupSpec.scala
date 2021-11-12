@@ -6,15 +6,14 @@ import farjs.ui.popup.StatusPopup._
 import farjs.ui.theme.Theme
 import org.scalatest._
 import scommons.nodejs.test.TestSpec
-import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
 
 class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils {
 
-  StatusPopup.popupComp = () => "Popup".asInstanceOf[ReactClass]
-  StatusPopup.modalContentComp = () => "ModalContent".asInstanceOf[ReactClass]
-  StatusPopup.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
+  StatusPopup.popupComp = mockUiComponent("Popup")
+  StatusPopup.modalContentComp = mockUiComponent("ModalContent")
+  StatusPopup.textLineComp = mockUiComponent("TextLine")
 
   private val theme = Theme.current.popup.regular
   private val style = new BlessedStyle {

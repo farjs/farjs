@@ -11,7 +11,6 @@ import farjs.ui.popup.MessageBoxProps
 import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react._
 import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
@@ -19,11 +18,11 @@ import scala.concurrent.Future
 
 class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  CopyItems.copyItemsStats = () => "CopyItemsStats".asInstanceOf[ReactClass]
-  CopyItems.copyItemsPopup = () => "CopyItemsPopup".asInstanceOf[ReactClass]
-  CopyItems.copyProcessComp = () => "CopyProcess".asInstanceOf[ReactClass]
-  CopyItems.messageBoxComp = () => "MessageBox".asInstanceOf[ReactClass]
-  CopyItems.moveItems = () => "MoveItems".asInstanceOf[ReactClass]
+  CopyItems.copyItemsStats = mockUiComponent("CopyItemsStats")
+  CopyItems.copyItemsPopup = mockUiComponent("CopyItemsPopup")
+  CopyItems.copyProcessComp = mockUiComponent("CopyProcess")
+  CopyItems.messageBoxComp = mockUiComponent("MessageBox")
+  CopyItems.moveItems = mockUiComponent("MoveItems")
   
   it should "show CopyItemsStats when copy" in {
     //given

@@ -1,14 +1,13 @@
 package farjs.ui.border
 
 import farjs.ui.border.SingleBorder._
-import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
 
 class SingleBorderSpec extends TestSpec with TestRendererUtils {
 
-  SingleBorder.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
-  SingleBorder.verticalLineComp = () => "VerticalLine".asInstanceOf[ReactClass]
+  SingleBorder.horizontalLineComp = mockUiComponent("HorizontalLine")
+  SingleBorder.verticalLineComp = mockUiComponent("VerticalLine")
 
   it should "render component" in {
     //given

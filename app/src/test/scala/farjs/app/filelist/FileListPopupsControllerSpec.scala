@@ -4,7 +4,7 @@ import farjs.app.FarjsStateDef
 import farjs.filelist.popups.{FileListPopups, FileListPopupsProps}
 import farjs.filelist.{FileListActions, FileListsStateDef}
 import io.github.shogowada.scalajs.reactjs.React.Props
-import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
+import scommons.react.redux.Dispatch
 import scommons.react.test.TestSpec
 
 class FileListPopupsControllerSpec extends TestSpec {

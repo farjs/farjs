@@ -9,15 +9,14 @@ import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.nodejs.{FS, path}
-import scommons.react._
 import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
 
 class MoveItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  MoveItems.statusPopupComp = () => "StatusPopup".asInstanceOf[ReactClass]
-  MoveItems.messageBoxComp = () => "MessageBox".asInstanceOf[ReactClass]
+  MoveItems.statusPopupComp = mockUiComponent("StatusPopup")
+  MoveItems.messageBoxComp = mockUiComponent("MessageBox")
 
   it should "call onTopItem/onDone when success" in {
     //given

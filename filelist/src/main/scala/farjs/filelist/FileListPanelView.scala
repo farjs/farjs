@@ -6,9 +6,9 @@ import farjs.filelist.stack.PanelStack
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.theme.Theme
-import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.react._
 import scommons.react.blessed._
+import scommons.react.redux.Dispatch
 
 import scala.scalajs.js
 

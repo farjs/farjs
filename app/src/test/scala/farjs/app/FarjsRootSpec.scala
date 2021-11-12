@@ -5,7 +5,6 @@ import farjs.app.FarjsRootSpec._
 import farjs.app.util._
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react._
 import scommons.react.blessed._
 import scommons.react.blessed.raw.BlessedProgram
 import scommons.react.test._
@@ -15,13 +14,13 @@ import scala.scalajs.js.annotation.JSExportAll
 
 class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  private val withPortalsComp: UiComponent[Unit] = () => "WithPortals".asInstanceOf[ReactClass]
-  private val fileListComp = "FileListBrowser".asInstanceOf[ReactClass]
-  private val fileListPopups = "FileListPopups".asInstanceOf[ReactClass]
-  private val taskController = "TaskController".asInstanceOf[ReactClass]
+  private val withPortalsComp = mockUiComponent[Unit]("WithPortals")
+  private val fileListComp = mockUiComponent[Unit]("FileListBrowser").apply()
+  private val fileListPopups = mockUiComponent[Unit]("FileListPopups").apply()
+  private val taskController = mockUiComponent[Unit]("TaskController").apply()
   
-  FarjsRoot.logControllerComp = () => "LogController".asInstanceOf[ReactClass]
-  FarjsRoot.devToolPanelComp = () => "DevToolPanel".asInstanceOf[ReactClass]
+  FarjsRoot.logControllerComp = mockUiComponent("LogController")
+  FarjsRoot.devToolPanelComp = mockUiComponent("DevToolPanel")
 
   it should "set devTool and emit resize event when on F12" in {
     //given

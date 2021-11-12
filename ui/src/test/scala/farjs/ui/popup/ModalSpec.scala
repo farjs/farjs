@@ -8,8 +8,8 @@ import scommons.react.test._
 
 class ModalSpec extends TestSpec with TestRendererUtils {
 
-  Modal.popupComp = () => "Popup".asInstanceOf[ReactClass]
-  Modal.modalContentComp = () => "ModalContent".asInstanceOf[ReactClass]
+  Modal.popupComp = mockUiComponent("Popup")
+  Modal.modalContentComp = mockUiComponent("ModalContent")
 
   it should "render component" in {
     //given

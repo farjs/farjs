@@ -2,13 +2,12 @@ package farjs.ui.menu
 
 import farjs.ui._
 import farjs.ui.menu.BottomMenu._
-import scommons.react._
 import scommons.react.test._
 
 class BottomMenuSpec extends TestSpec with TestRendererUtils {
 
-  BottomMenu.withSizeComp = () => "WithSize".asInstanceOf[ReactClass]
-  BottomMenu.bottomMenuViewComp = () => "BottomMenuView".asInstanceOf[ReactClass]
+  BottomMenu.withSizeComp = mockUiComponent("WithSize")
+  BottomMenu.bottomMenuViewComp = mockUiComponent("BottomMenuView")
 
   it should "render component" in {
     //when

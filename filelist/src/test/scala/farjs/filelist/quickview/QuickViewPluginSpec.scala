@@ -3,8 +3,8 @@ package farjs.filelist.quickview
 import farjs.filelist._
 import farjs.filelist.stack.PanelStack
 import io.github.shogowada.scalajs.reactjs.React.Props
-import io.github.shogowada.scalajs.reactjs.classes.ReactClass
-import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
+import scommons.react.ReactClass
+import scommons.react.redux.Dispatch
 import scommons.react.test.TestSpec
 
 class QuickViewPluginSpec extends TestSpec {

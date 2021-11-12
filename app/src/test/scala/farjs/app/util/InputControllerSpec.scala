@@ -1,7 +1,6 @@
 package farjs.app.util
 
 import farjs.app.util.InputController._
-import scommons.react._
 import scommons.react.test._
 
 import scala.scalajs.js
@@ -9,7 +8,7 @@ import scala.scalajs.js.Dynamic.{global => g}
 
 class InputControllerSpec extends TestSpec with TestRendererUtils {
 
-  InputController.logPanelComp = () => "LogPanel".asInstanceOf[ReactClass]
+  InputController.logPanelComp = mockUiComponent("LogPanel")
   InputController.maxBufferLength = 10
 
   it should "render component and collect keys input" in {

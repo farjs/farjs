@@ -4,7 +4,6 @@ import farjs.filelist.FileListQuickSearch._
 import farjs.filelist.FileListQuickSearchSpec._
 import farjs.ui.border.DoubleBorderProps
 import farjs.ui.theme.Theme
-import scommons.react._
 import scommons.react.blessed._
 import scommons.react.blessed.raw.{BlessedCursor, BlessedProgram}
 import scommons.react.test._
@@ -14,7 +13,7 @@ import scala.scalajs.js.annotation.JSExportAll
 
 class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
 
-  FileListQuickSearch.doubleBorderComp = () => "DoubleBorder".asInstanceOf[ReactClass]
+  FileListQuickSearch.doubleBorderComp = mockUiComponent("DoubleBorder")
 
   it should "call onClose when onClick" in {
     //given

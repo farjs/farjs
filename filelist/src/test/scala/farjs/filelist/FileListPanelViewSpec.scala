@@ -14,11 +14,11 @@ import scommons.react.test._
 
 class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
 
-  FileListPanelView.doubleBorderComp = () => "DoubleBorder".asInstanceOf[ReactClass]
-  FileListPanelView.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
-  FileListPanelView.fileListComp = () => "FileList".asInstanceOf[ReactClass]
-  FileListPanelView.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
-  FileListPanelView.fsFreeSpaceComp = () => "FSFreeSpace".asInstanceOf[ReactClass]
+  FileListPanelView.doubleBorderComp = mockUiComponent("DoubleBorder")
+  FileListPanelView.horizontalLineComp = mockUiComponent("HorizontalLine")
+  FileListPanelView.fileListComp = mockUiComponent("FileList")
+  FileListPanelView.textLineComp = mockUiComponent("TextLine")
+  FileListPanelView.fsFreeSpaceComp = mockUiComponent("FSFreeSpace")
 
   private val (width, height) = (25, 15)
   

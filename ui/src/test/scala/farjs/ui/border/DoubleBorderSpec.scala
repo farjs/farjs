@@ -3,15 +3,14 @@ package farjs.ui.border
 import farjs.ui._
 import farjs.ui.border.DoubleBorder._
 import org.scalatest.Assertion
-import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
 
 class DoubleBorderSpec extends TestSpec with TestRendererUtils {
 
-  DoubleBorder.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
-  DoubleBorder.verticalLineComp = () => "VerticalLine".asInstanceOf[ReactClass]
-  DoubleBorder.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
+  DoubleBorder.horizontalLineComp = mockUiComponent("HorizontalLine")
+  DoubleBorder.verticalLineComp = mockUiComponent("VerticalLine")
+  DoubleBorder.textLineComp = mockUiComponent("TextLine")
 
   it should "render component" in {
     //given

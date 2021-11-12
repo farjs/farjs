@@ -8,16 +8,15 @@ import farjs.ui.popup.ModalContent._
 import farjs.ui.popup.ModalProps
 import farjs.ui.theme.Theme
 import org.scalatest.Assertion
-import scommons.react._
 import scommons.react.test._
 
 class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
 
-  CopyItemsPopup.modalComp = () => "Modal".asInstanceOf[ReactClass]
-  CopyItemsPopup.textLineComp = () => "TextLine".asInstanceOf[ReactClass]
-  CopyItemsPopup.textBoxComp = () => "TextBox".asInstanceOf[ReactClass]
-  CopyItemsPopup.horizontalLineComp = () => "HorizontalLine".asInstanceOf[ReactClass]
-  CopyItemsPopup.buttonsPanelComp = () => "ButtonsPanel".asInstanceOf[ReactClass]
+  CopyItemsPopup.modalComp = mockUiComponent("Modal")
+  CopyItemsPopup.textLineComp = mockUiComponent("TextLine")
+  CopyItemsPopup.textBoxComp = mockUiComponent("TextBox")
+  CopyItemsPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
+  CopyItemsPopup.buttonsPanelComp = mockUiComponent("ButtonsPanel")
 
   it should "set path when onChange in TextBox" in {
     //given

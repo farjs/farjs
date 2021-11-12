@@ -5,10 +5,10 @@ import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.{FileListActions, FileListsStateDef}
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
-import io.github.shogowada.scalajs.reactjs.redux.Redux.Dispatch
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.hooks._
+import scommons.react.redux.Dispatch
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js

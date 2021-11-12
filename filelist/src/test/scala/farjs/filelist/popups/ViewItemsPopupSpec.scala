@@ -8,7 +8,6 @@ import farjs.filelist.popups.ViewItemsPopup._
 import farjs.ui.popup.StatusPopupProps
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react._
 import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
@@ -16,7 +15,7 @@ import scala.concurrent.{Future, Promise}
 class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
   with TestRendererUtils {
 
-  ViewItemsPopup.statusPopupComp = () => "StatusPopup".asInstanceOf[ReactClass]
+  ViewItemsPopup.statusPopupComp = mockUiComponent("StatusPopup")
 
   it should "dispatch action with calculated items sizes" in {
     //given
