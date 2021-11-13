@@ -33,7 +33,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ))
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyItemsPopup = true)
+      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     ))
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
@@ -42,7 +42,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
-    dispatch.expects(FileListPopupCopyItemsAction(show = false))
+    dispatch.expects(FileListPopupCopyMoveAction(CopyMoveHidden))
     dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
       action.task.message shouldBe "Resolving target dir"
     })
@@ -86,7 +86,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ))
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showMoveItemsPopup = true)
+      popups = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
     ))
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
@@ -97,7 +97,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
     (fsService.readDisk _).expects(currDir.path).returning(Future.successful(None))
     (fsService.readDisk _).expects(toDir.path).returning(Future.successful(None))
-    dispatch.expects(FileListPopupMoveItemsAction(show = false))
+    dispatch.expects(FileListPopupCopyMoveAction(CopyMoveHidden))
     dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
       action.task.message shouldBe "Resolving target dir"
     })
@@ -139,14 +139,14 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ))
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyItemsPopup = true)
+      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     ))
     
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
 
     //then
-    dispatch.expects(FileListPopupCopyItemsAction(show = false))
+    dispatch.expects(FileListPopupCopyMoveAction(CopyMoveHidden))
 
     //when
     copyPopup.onCancel()
@@ -170,14 +170,14 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ))
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showMoveItemsPopup = true)
+      popups = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
     ))
     
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
 
     //then
-    dispatch.expects(FileListPopupMoveItemsAction(show = false))
+    dispatch.expects(FileListPopupCopyMoveAction(CopyMoveHidden))
 
     //when
     copyPopup.onCancel()
@@ -200,7 +200,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val currDir = FileListDir("/folder", isRoot = false, List(item))
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyItemsPopup = true)
+      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     ))
 
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
@@ -210,7 +210,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
-    dispatch.expects(FileListPopupCopyItemsAction(show = false))
+    dispatch.expects(FileListPopupCopyMoveAction(CopyMoveHidden))
     dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
       action.task.message shouldBe "Resolving target dir"
     })
@@ -255,7 +255,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val currDir = FileListDir("/folder", isRoot = false, List(item))
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showMoveItemsPopup = true)
+      popups = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
     ))
 
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
@@ -267,7 +267,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
     (fsService.readDisk _).expects(currDir.path).returning(Future.successful(None))
     (fsService.readDisk _).expects(toDir.path).returning(Future.successful(None))
-    dispatch.expects(FileListPopupMoveItemsAction(show = false))
+    dispatch.expects(FileListPopupCopyMoveAction(CopyMoveHidden))
     dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
       action.task.message shouldBe "Resolving target dir"
     })
@@ -310,7 +310,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val currDir = FileListDir("/folder", isRoot = false, List(item))
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyItemsPopup = true)
+      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     ))
 
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
@@ -320,7 +320,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
-    dispatch.expects(FileListPopupCopyItemsAction(show = false))
+    dispatch.expects(FileListPopupCopyMoveAction(CopyMoveHidden))
     dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
       action.task.message shouldBe "Resolving target dir"
     })
@@ -368,7 +368,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ))
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showMoveItemsPopup = true)
+      popups = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
     ))
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
@@ -380,7 +380,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
     (fsService.readDisk _).expects(currDir.path).returning(Future.successful(Some(sameDrive)))
     (fsService.readDisk _).expects(toDir.path).returning(Future.successful(Some(sameDrive)))
-    dispatch.expects(FileListPopupMoveItemsAction(show = false))
+    dispatch.expects(FileListPopupCopyMoveAction(CopyMoveHidden))
     dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
       action.task.message shouldBe "Resolving target dir"
     })
@@ -421,7 +421,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ))
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyItemsPopup = true)
+      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     ))
 
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
@@ -431,7 +431,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
-    dispatch.expects(FileListPopupCopyItemsAction(show = false))
+    dispatch.expects(FileListPopupCopyMoveAction(CopyMoveHidden))
     dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
       action.task.message shouldBe "Resolving target dir"
     })
@@ -480,7 +480,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ))
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showMoveItemsPopup = true)
+      popups = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
     ))
 
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
@@ -492,7 +492,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     (actions.readDir _).expects(Some(currDir.path), to).returning(Future.successful(toDir))
     (fsService.readDisk _).expects(currDir.path).returning(Future.successful(None))
     (fsService.readDisk _).expects(toDir.path).returning(Future.successful(None))
-    dispatch.expects(FileListPopupMoveItemsAction(show = false))
+    dispatch.expects(FileListPopupCopyMoveAction(CopyMoveHidden))
     dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
       action.task.message shouldBe "Resolving target dir"
     })
@@ -542,7 +542,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       left = FileListState(index = 1, currDir = leftDir, isActive = true, selectedNames = Set(dir.name, "file 1")),
       right = FileListState(currDir = rightDir, isRight = true),
-      popups = FileListPopupsState(showCopyItemsPopup = true)
+      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     ))
 
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
@@ -551,7 +551,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val toDir = FileListDir("/to/path/dir 1", isRoot = false, Nil)
     val to = "test to path"
     (actions.readDir _).expects(Some(leftDir.path), to).returning(Future.successful(toDir))
-    dispatch.expects(FileListPopupCopyItemsAction(show = false))
+    dispatch.expects(FileListPopupCopyMoveAction(CopyMoveHidden))
     dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
       action.task.message shouldBe "Resolving target dir"
     })
@@ -621,7 +621,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       left = FileListState(index = 1, currDir = leftDir, isActive = true, selectedNames = Set("file 1")),
       right = FileListState(currDir = rightDir, isRight = true),
-      popups = FileListPopupsState(showCopyItemsPopup = true)
+      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     ))
 
     val renderer = createTestRenderer(<(CopyItems())(^.wrapped := props)())
@@ -630,7 +630,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val toDir = FileListDir("/to/path/dir 1", isRoot = false, Nil)
     val to = "test to path"
     (actions.readDir _).expects(Some(leftDir.path), to).returning(Future.successful(toDir))
-    dispatch.expects(FileListPopupCopyItemsAction(show = false))
+    dispatch.expects(FileListPopupCopyMoveAction(CopyMoveHidden))
     dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
       action.task.message shouldBe "Resolving target dir"
     })
@@ -707,7 +707,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       left = FileListState(currDir = FileListDir("/folder", isRoot = false, List(item)), isActive = true),
       right = FileListState(currDir = FileListDir("/test-path", isRoot = false, Nil)),
-      popups = FileListPopupsState(showCopyItemsPopup = true)
+      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     ))
 
     //when
@@ -730,7 +730,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val props = FileListPopupsProps(dispatch, actions, FileListsState(
       left = FileListState(currDir = FileListDir("/folder", isRoot = false, List(item)), isActive = true),
       right = FileListState(currDir = FileListDir("/test-path", isRoot = false, Nil)),
-      popups = FileListPopupsState(showMoveItemsPopup = true)
+      popups = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
     ))
 
     //when
@@ -760,7 +760,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
         isActive = true,
         selectedNames = Set("file 1", "dir 1")
       ),
-      popups = FileListPopupsState(showCopyItemsPopup = true)
+      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     ))
 
     //when

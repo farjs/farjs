@@ -47,12 +47,12 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
         case "f5" =>
           val currItem = props.state.currentItem.filter(_ != FileListItem.up)
           if (props.state.selectedNames.nonEmpty || currItem.nonEmpty) {
-            props.dispatch(FileListPopupCopyItemsAction(show = true))
+            props.dispatch(FileListPopupCopyMoveAction(ShowCopyToTarget))
           }
         case "f6" =>
           val currItem = props.state.currentItem.filter(_ != FileListItem.up)
           if (props.state.selectedNames.nonEmpty || currItem.nonEmpty) {
-            props.dispatch(FileListPopupMoveItemsAction(show = true))
+            props.dispatch(FileListPopupCopyMoveAction(ShowMoveToTarget))
           }
         case "f7" => props.dispatch(FileListPopupMkFolderAction(show = true))
         case "f8" | "delete" =>

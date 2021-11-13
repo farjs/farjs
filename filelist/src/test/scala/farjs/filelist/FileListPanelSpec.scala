@@ -64,16 +64,16 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     check("f3", FileListPopupViewItemsAction(show = true), index = 2)
 
     //when & then
-    check("f5", FileListPopupCopyItemsAction(show = true), never = true)
-    check("f5", FileListPopupCopyItemsAction(show = true), index = 1)
-    check("f5", FileListPopupCopyItemsAction(show = true), index = 2)
-    check("f5", FileListPopupCopyItemsAction(show = true), selectedNames = Set("file 1"))
+    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), never = true)
+    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), index = 1)
+    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), index = 2)
+    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), selectedNames = Set("file 1"))
 
     //when & then
-    check("f6", FileListPopupMoveItemsAction(show = true), never = true)
-    check("f6", FileListPopupMoveItemsAction(show = true), index = 1)
-    check("f6", FileListPopupMoveItemsAction(show = true), index = 2)
-    check("f6", FileListPopupMoveItemsAction(show = true), selectedNames = Set("file 1"))
+    check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), never = true)
+    check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), index = 1)
+    check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), index = 2)
+    check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), selectedNames = Set("file 1"))
 
     //when & then
     check("f7", FileListPopupMkFolderAction(show = true))

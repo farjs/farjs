@@ -34,7 +34,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
     val copied = useRef(Set.empty[String])
 
     val props = compProps.wrapped
-    val showPopup = props.data.popups.showCopyItemsPopup || props.data.popups.showMoveItemsPopup
+    val showPopup = props.data.popups.showCopyMovePopup != CopyMoveHidden
     
     val (fromState, toState) =
       if (props.data.left.isActive) (props.data.left, props.data.right)
@@ -46,10 +46,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
 
     def onCancel(dispatchAction: Boolean): () => Unit = { () =>
       if (dispatchAction) {
-        if (props.data.popups.showMoveItemsPopup) {
-          props.dispatch(FileListPopupMoveItemsAction(show = false))
-        }
-        else props.dispatch(FileListPopupCopyItemsAction(show = false))
+        props.dispatch(FileListPopupCopyMoveAction(CopyMoveHidden))
       }
       setTotal(None)
       setToPath(None)
@@ -87,7 +84,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
     val fromPath = fromState.currDir.path
     
     def onAction(path: String): Unit = {
-      val move = props.data.popups.showMoveItemsPopup
+      val move = props.data.popups.showCopyMovePopup == ShowMoveToTarget
       val dirF = for {
         dir <- props.actions.readDir(Some(fromPath), path)
         sameDrive <-
@@ -95,8 +92,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
           else Future.successful(false)
       } yield {
         setMove(move)
-        if (move) props.dispatch(FileListPopupMoveItemsAction(show = false))
-        else props.dispatch(FileListPopupCopyItemsAction(show = false))
+        props.dispatch(FileListPopupCopyMoveAction(CopyMoveHidden))
 
         setToPath(Some(dir.path))
         if (move && sameDrive) setShowMove(true)
@@ -123,7 +119,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
     <.>()(
       if (showPopup) Some {
         <(copyItemsPopup())(^.wrapped := CopyItemsPopupProps(
-          move = props.data.popups.showMoveItemsPopup,
+          move = props.data.popups.showCopyMovePopup == ShowMoveToTarget,
           path = toState.currDir.path,
           items = items,
           onAction = onAction,
