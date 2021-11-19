@@ -22,7 +22,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
   private[copy] var copyItemsPopup: UiComponent[CopyItemsPopupProps] = CopyItemsPopup
   private[copy] var copyProcessComp: UiComponent[CopyProcessProps] = CopyProcess
   private[copy] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
-  private[copy] var moveItems: UiComponent[MoveItemsProps] = MoveItems
+  private[copy] var moveProcessComp: UiComponent[MoveProcessProps] = MoveProcess
   private[copy] var fsService: FSService = FSService.instance
 
   protected def render(compProps: Props): ReactElement = {
@@ -148,11 +148,11 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
         ))()
       }
       else if (showMove) maybeToPath.map { toPath =>
-        <(moveItems())(^.wrapped := MoveItemsProps(
+        <(moveProcessComp())(^.wrapped := MoveProcessProps(
           dispatch = props.dispatch,
           actions = props.actions,
           fromPath = fromPath,
-          items = items,
+          items = items.map(i => (i, i.name)),
           toPath = toPath,
           onTopItem = onTopItem,
           onDone = onDone
@@ -168,7 +168,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
             actions = props.actions,
             move = move,
             fromPath = fromPath,
-            items = items,
+            items = items.map(i => (i, i.name)),
             toPath = toPath,
             total = total,
             onTopItem = onTopItem,

@@ -254,15 +254,16 @@ class FileListActionsSpec extends AsyncTestSpec {
     }
     (target.setAttributes _).expects(file).returning(Future.unit)
     (target.close _).expects().returning(Future.unit)
+    val dstName = "newName"
 
     //then
-    (api.writeFile _).expects(dstDirs, file.name, *).returning(Future.successful(Some(target)))
+    (api.writeFile _).expects(dstDirs, dstName, *).returning(Future.successful(Some(target)))
     (api.readFile _).expects(srcDirs, file, 0.0).returning(Future.successful(source))
     onExists.expects(*).never()
     onProgress.expects(position).returning(Future.successful(true))
     
     //when
-    val resultF = actions.copyFile(srcDirs, file, dstDirs, onExists, onProgress)
+    val resultF = actions.copyFile(srcDirs, file, dstDirs, dstName, onExists, onProgress)
     
     //then
     resultF.map { res =>
@@ -300,10 +301,11 @@ class FileListActionsSpec extends AsyncTestSpec {
     }
     (target.setAttributes _).expects(file).returning(Future.unit)
     (target.close _).expects().returning(Future.unit)
+    val dstName = "newName"
 
     //then
     onExists.expects(existing).returning(Future.successful(Some(true)))
-    (api.writeFile _).expects(dstDirs, file.name, *).onCall { (_, _, onExists) =>
+    (api.writeFile _).expects(dstDirs, dstName, *).onCall { (_, _, onExists) =>
       onExists(existing).map { res =>
         res shouldBe Some(true)
         Some(target)
@@ -313,7 +315,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     onProgress.expects(position).returning(Future.successful(true))
     
     //when
-    val resultF = actions.copyFile(srcDirs, file, dstDirs, onExists, onProgress)
+    val resultF = actions.copyFile(srcDirs, file, dstDirs, dstName, onExists, onProgress)
     
     //then
     resultF.map { res =>
@@ -351,10 +353,11 @@ class FileListActionsSpec extends AsyncTestSpec {
     }
     (target.setAttributes _).expects(file).returning(Future.unit)
     (target.close _).expects().returning(Future.unit)
+    val dstName = "newName"
 
     //then
     onExists.expects(existing).returning(Future.successful(Some(false)))
-    (api.writeFile _).expects(dstDirs, file.name, *).onCall { (_, _, onExists) =>
+    (api.writeFile _).expects(dstDirs, dstName, *).onCall { (_, _, onExists) =>
       onExists(existing).map { res =>
         res shouldBe Some(false)
         Some(target)
@@ -364,7 +367,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     onProgress.expects(position).returning(Future.successful(true))
     
     //when
-    val resultF = actions.copyFile(srcDirs, file, dstDirs, onExists, onProgress)
+    val resultF = actions.copyFile(srcDirs, file, dstDirs, dstName, onExists, onProgress)
     
     //then
     resultF.map { res =>
@@ -382,10 +385,11 @@ class FileListActionsSpec extends AsyncTestSpec {
     val dstDirs = List("target-dir")
     val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
     val onProgress = mockFunction[Double, Future[Boolean]]
+    val dstName = "newName"
     
     //then
     onExists.expects(existing).returning(Future.successful(None))
-    (api.writeFile _).expects(dstDirs, file.name, *).onCall { (_, _, onExists) =>
+    (api.writeFile _).expects(dstDirs, dstName, *).onCall { (_, _, onExists) =>
       onExists(existing).map { res =>
         res shouldBe None
         None
@@ -394,7 +398,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     onProgress.expects(file.size).returning(Future.successful(false))
     
     //when
-    val resultF = actions.copyFile(srcDirs, file, dstDirs, onExists, onProgress)
+    val resultF = actions.copyFile(srcDirs, file, dstDirs, dstName, onExists, onProgress)
     
     //then
     resultF.map { res =>
@@ -428,15 +432,16 @@ class FileListActionsSpec extends AsyncTestSpec {
     }
     (target.close _).expects().returning(Future.unit)
     (target.delete _).expects().returning(Future.unit)
+    val dstName = "newName"
 
     //then
-    (api.writeFile _).expects(dstDirs, file.name, *).returning(Future.successful(Some(target)))
+    (api.writeFile _).expects(dstDirs, dstName, *).returning(Future.successful(Some(target)))
     (api.readFile _).expects(srcDirs, file, 0.0).returning(Future.successful(source))
     onExists.expects(*).never()
     onProgress.expects(position).returning(Future.successful(false))
     
     //when
-    val resultF = actions.copyFile(srcDirs, file, dstDirs, onExists, onProgress)
+    val resultF = actions.copyFile(srcDirs, file, dstDirs, dstName, onExists, onProgress)
     
     //then
     resultF.map { res =>

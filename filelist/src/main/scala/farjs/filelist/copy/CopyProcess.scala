@@ -21,7 +21,7 @@ case class CopyProcessProps(dispatch: Dispatch,
                             actions: FileListActions,
                             move: Boolean,
                             fromPath: String,
-                            items: Seq[FileListItem],
+                            items: Seq[(FileListItem, String)],
                             toPath: String,
                             total: Double,
                             onTopItem: FileListItem => Unit,
@@ -56,15 +56,19 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
     
     def doCopy(): Unit = {
 
-      def loop(copied: Boolean, parent: String, targetDirs: List[String], items: Seq[FileListItem]): Future[(Boolean, Boolean)] = {
-        items.foldLeft(Future.successful((copied, inProgress.current))) { (resF, item) =>
+      def loop(copied: Boolean,
+               parent: String,
+               targetDirs: List[String],
+               items: Seq[(FileListItem, String)]): Future[(Boolean, Boolean)] = {
+        
+        items.foldLeft(Future.successful((copied, inProgress.current))) { case (resF, (item, toName)) =>
           resF.flatMap {
             case (prevCopied, true) if item.isDir && inProgress.current =>
               for {
                 dirList <- props.actions.readDir(Some(parent), item.name)
-                dstDirs = targetDirs :+ item.name
+                dstDirs = targetDirs :+ toName
                 _ <- props.actions.mkDirs(dstDirs)
-                res <- loop(prevCopied, dirList.path, dstDirs, dirList.items)
+                res <- loop(prevCopied, dirList.path, dstDirs, dirList.items.map(i => (i, i.name)))
                 (isCopied, done) = res
                 _ <-
                   if (isCopied && done && props.move) props.actions.delete(parent, Seq(item))
@@ -73,13 +77,13 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
             case (prevCopied, true) if !item.isDir && inProgress.current =>
               data.current = data.current.copy(
                 item = item,
-                to = nodejs.path.join(targetDirs :+ item.name: _*),
+                to = nodejs.path.join(targetDirs :+ toName: _*),
                 itemPercent = 0,
                 itemBytes = 0.0
               )
               var isCopied = true
               for {
-                done <- props.actions.copyFile(List(parent), item, targetDirs, onExists = { existing =>
+                done <- props.actions.copyFile(List(parent), item, targetDirs, toName, onExists = { existing =>
                   if (inProgress.current && data.current.askWhenExists) {
                     setState(_.copy(existing = Some(existing)))
                     existsPromise.current = Promise[Option[Boolean]]()
@@ -115,12 +119,12 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
         }
       }
 
-      val resultF = props.items.foldLeft(Future.successful(true)) { (resF, topItem) =>
+      val resultF = props.items.foldLeft(Future.successful(true)) { case (resF, topItem@(item, _)) =>
         resF.flatMap {
           case true if inProgress.current =>
             loop(copied = true, props.fromPath, List(props.toPath), Seq(topItem)).map { case (isCopied, done) =>
               if (isCopied && done) {
-                props.onTopItem(topItem)
+                props.onTopItem(item)
               }
               done
             }

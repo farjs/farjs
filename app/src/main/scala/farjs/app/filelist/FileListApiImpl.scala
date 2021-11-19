@@ -159,7 +159,7 @@ class FileListApiImpl extends FileListApi {
     }
   }
 
-  private def toFileListItem(targetDir: String, name: String) = {
+  private def toFileListItem(targetDir: String, name: String): FileListItem = {
     Try(fs.lstatSync(path.join(targetDir, name))) match {
       case Failure(_) => FileListItem(name)
       case Success(stats) =>

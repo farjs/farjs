@@ -22,7 +22,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   CopyItems.copyItemsPopup = mockUiComponent("CopyItemsPopup")
   CopyItems.copyProcessComp = mockUiComponent("CopyProcess")
   CopyItems.messageBoxComp = mockUiComponent("MessageBox")
-  CopyItems.moveItems = mockUiComponent("MoveItems")
+  CopyItems.moveProcessComp = mockUiComponent("MoveProcess")
   
   it should "show CopyItemsStats when copy" in {
     //given
@@ -355,7 +355,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     }
   }
 
-  it should "render MoveItems when onAction and move within same drive" in {
+  it should "render MoveProcess when onAction and move within same drive" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -399,12 +399,12 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     }
 
     eventually {
-      assertTestComponent(renderer.root.children(0), moveItems) {
-        case MoveItemsProps(resDispatch, resActions, fromPath, items, toPath, _, _) =>
+      assertTestComponent(renderer.root.children(0), moveProcessComp) {
+        case MoveProcessProps(resDispatch, resActions, fromPath, items, toPath, _, _) =>
           resDispatch shouldBe dispatch
           resActions shouldBe actions
           fromPath shouldBe currDir.path
-          items shouldBe List(item)
+          items shouldBe List((item, item.name))
           toPath shouldBe toDir.path
       }
     }
@@ -460,7 +460,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
           resActions shouldBe actions
           move shouldBe false
           fromPath shouldBe currDir.path
-          items shouldBe List(item)
+          items shouldBe List((item, item.name))
           resToPath shouldBe toDir.path
           resTotal shouldBe total
       }
@@ -521,7 +521,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
           resActions shouldBe actions
           move shouldBe true
           fromPath shouldBe currDir.path
-          items shouldBe List(item)
+          items shouldBe List((item, item.name))
           resToPath shouldBe toDir.path
           resTotal shouldBe total
       }

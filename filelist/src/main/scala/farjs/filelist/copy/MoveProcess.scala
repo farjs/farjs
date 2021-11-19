@@ -15,15 +15,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 import scala.util.{Failure, Success}
 
-case class MoveItemsProps(dispatch: Dispatch,
-                          actions: FileListActions,
-                          fromPath: String,
-                          items: Seq[FileListItem],
-                          toPath: String,
-                          onTopItem: FileListItem => Unit,
-                          onDone: () => Unit)
+case class MoveProcessProps(dispatch: Dispatch,
+                            actions: FileListActions,
+                            fromPath: String,
+                            items: Seq[(FileListItem, String)],
+                            toPath: String,
+                            onTopItem: FileListItem => Unit,
+                            onDone: () => Unit)
 
-object MoveItems extends FunctionComponent[MoveItemsProps] {
+object MoveProcess extends FunctionComponent[MoveProcessProps] {
 
   private[copy] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
   private[copy] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
@@ -40,12 +40,12 @@ object MoveItems extends FunctionComponent[MoveItemsProps] {
     val props = compProps.wrapped
 
     def moveItems(): Unit = {
-      val resultF = props.items.foldLeft(Future.successful(true)) { (resF, currItem) =>
+      val resultF = props.items.foldLeft(Future.successful(true)) { case (resF, (currItem, toName)) =>
         resF.flatMap {
           case true if inProgress.current =>
             setState(_.copy(currItem = currItem.name))
             val oldPath = path.join(props.fromPath, currItem.name)
-            val newPath = path.join(props.toPath, currItem.name)
+            val newPath = path.join(props.toPath, toName)
             val exists = !currItem.isDir && fs.existsSync(newPath)
 
             if (exists && askWhenExists.current) {

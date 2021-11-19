@@ -108,20 +108,21 @@ trait FileListActions {
   }
 
   def copyFile(srcDirs: List[String],
-               file: FileListItem,
+               srcItem: FileListItem,
                dstDirs: List[String],
+               dstName: String,
                onExists: FileListItem => Future[Option[Boolean]],
                onProgress: Double => Future[Boolean]): Future[Boolean] = {
 
-    api.writeFile(dstDirs, file.name, onExists).flatMap {
-      case None => onProgress(file.size)
+    api.writeFile(dstDirs, dstName, onExists).flatMap {
+      case None => onProgress(srcItem.size)
       case Some(target) =>
-        api.readFile(srcDirs, file, 0.0).flatMap { source =>
+        api.readFile(srcDirs, srcItem, 0.0).flatMap { source =>
           val buff = new Uint8Array(copyBufferBytes)
 
           def loop(): Future[Boolean] = {
             source.readNextBytes(buff).flatMap { bytesRead =>
-              if (bytesRead == 0) target.setAttributes(file).map(_ => true)
+              if (bytesRead == 0) target.setAttributes(srcItem).map(_ => true)
               else {
                 target.writeNextBytes(buff, bytesRead).flatMap { position =>
                   onProgress(position).flatMap {
