@@ -1,7 +1,8 @@
 package farjs.filelist.copy
 
+import farjs.filelist.FileListActions
 import farjs.filelist.FileListActions.FileListTaskAction
-import farjs.filelist.{FileListActions, FileListState}
+import farjs.filelist.api.FileListItem
 import farjs.ui.popup.{StatusPopup, StatusPopupProps}
 import scommons.react._
 import scommons.react.hooks._
@@ -15,7 +16,8 @@ import scala.util.{Failure, Success}
 
 case class CopyItemsStatsProps(dispatch: Dispatch,
                                actions: FileListActions,
-                               state: FileListState,
+                               fromPath: String,
+                               items: Seq[FileListItem],
                                title: String,
                                onDone: Double => Unit,
                                onCancel: () => Unit)
@@ -30,13 +32,9 @@ object CopyItemsStats extends FunctionComponent[CopyItemsStatsProps] {
     val props = compProps.wrapped
 
     def scanDir(): Unit = {
-      val parent = props.state.currDir.path
-      val currItems =
-        if (props.state.selectedItems.nonEmpty) props.state.selectedItems
-        else props.state.currentItem.toList
-
+      val parent = props.fromPath
       var filesSize = 0.0
-      val resultF = currItems.foldLeft(Future.successful(true)) { (resF, currItem) =>
+      val resultF = props.items.foldLeft(Future.successful(true)) { (resF, currItem) =>
         resF.flatMap {
           case true if currItem.isDir && inProgress.current =>
             setCurrDir(currItem.name)

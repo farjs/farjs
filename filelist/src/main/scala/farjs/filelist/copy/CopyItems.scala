@@ -28,6 +28,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
   protected def render(compProps: Props): ReactElement = {
     val (maybeTotal, setTotal) = useState[Option[Double]](None)
     val (maybeToPath, setToPath) = useState[Option[String]](None)
+    val (inplace, setInplace) = useState(false)
     val (move, setMove) = useState(false)
     val (showStats, setShowStats) = useState(false)
     val (showMove, setShowMove) = useState(false)
@@ -40,16 +41,13 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
       if (props.data.left.isActive) (props.data.left, props.data.right)
       else (props.data.right, props.data.left)
 
-    val items =
-      if (fromState.selectedItems.nonEmpty) fromState.selectedItems
-      else fromState.currentItem.toList
-
     def onCancel(dispatchAction: Boolean): () => Unit = { () =>
       if (dispatchAction) {
         props.dispatch(FileListPopupCopyMoveAction(CopyMoveHidden))
       }
       setTotal(None)
       setToPath(None)
+      setInplace(false)
       setMove(false)
       setShowStats(false)
       setShowMove(false)
@@ -81,27 +79,55 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
       }
     }
 
+    def isMove: Boolean =
+      move ||
+      props.data.popups.showCopyMovePopup == ShowMoveToTarget ||
+        props.data.popups.showCopyMovePopup == ShowMoveInplace
+
+    def isInplace: Boolean = {
+      inplace ||
+      props.data.popups.showCopyMovePopup == ShowCopyInplace ||
+        props.data.popups.showCopyMovePopup == ShowMoveInplace
+    }
+
     val fromPath = fromState.currDir.path
+    val items =
+      if (!isInplace && fromState.selectedItems.nonEmpty) fromState.selectedItems
+      else fromState.currentItem.toList
     
     def onAction(path: String): Unit = {
-      val move = props.data.popups.showCopyMovePopup == ShowMoveToTarget
+      val move = isMove
+      val inplace = isInplace
+      val resolveF =
+        if (!inplace) resolveTargetDir(move, path)
+        else Future.successful((path, true))
+      
+      resolveF.map { case (toPath, sameDrive) =>
+        setInplace(inplace)
+        setMove(move)
+        props.dispatch(FileListPopupCopyMoveAction(CopyMoveHidden))
+
+        setToPath(Some(toPath))
+        if (move && sameDrive) setShowMove(true)
+        else setShowStats(true)
+      }
+    }
+
+    def resolveTargetDir(move: Boolean, path: String): Future[(String, Boolean)] = {
       val dirF = for {
         dir <- props.actions.readDir(Some(fromPath), path)
         sameDrive <-
           if (move) checkSameDrive(fromPath, dir.path)
           else Future.successful(false)
       } yield {
-        setMove(move)
-        props.dispatch(FileListPopupCopyMoveAction(CopyMoveHidden))
-
-        setToPath(Some(dir.path))
-        if (move && sameDrive) setShowMove(true)
-        else setShowStats(true)
+        (dir.path, sameDrive)
       }
+      
       props.dispatch(FileListTaskAction(FutureTask("Resolving target dir", dirF)))
+      dirF
     }
 
-    val maybeError = maybeToPath.flatMap { toPath =>
+    val maybeError = maybeToPath.filter(_ => !inplace).flatMap { toPath =>
       val op = if (move) "move" else "copy"
       if (fromPath == toPath) Some {
         s"Cannot $op the item\n${items.head.name}\nonto itself"
@@ -119,8 +145,10 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
     <.>()(
       if (showPopup) Some {
         <(copyItemsPopup())(^.wrapped := CopyItemsPopupProps(
-          move = props.data.popups.showCopyMovePopup == ShowMoveToTarget,
-          path = toState.currDir.path,
+          move = isMove,
+          path =
+            if (!isInplace) toState.currDir.path
+            else fromState.currentItem.map(_.name).getOrElse(""),
           items = items,
           onAction = onAction,
           onCancel = onCancel(dispatchAction = true)
@@ -138,7 +166,8 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
         <(copyItemsStats())(^.wrapped := CopyItemsStatsProps(
           dispatch = props.dispatch,
           actions = props.actions,
-          state = fromState,
+          fromPath = fromPath,
+          items = items,
           title = if (move) "Move" else "Copy",
           onDone = { total =>
             setTotal(Some(total))
@@ -152,8 +181,12 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
           dispatch = props.dispatch,
           actions = props.actions,
           fromPath = fromPath,
-          items = items.map(i => (i, i.name)),
-          toPath = toPath,
+          items =
+            if (!inplace) items.map(i => (i, i.name))
+            else items.map(i => (i, toPath)),
+          toPath =
+            if (!inplace) toPath
+            else fromPath,
           onTopItem = onTopItem,
           onDone = onDone
         ))()
@@ -168,8 +201,12 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
             actions = props.actions,
             move = move,
             fromPath = fromPath,
-            items = items.map(i => (i, i.name)),
-            toPath = toPath,
+            items =
+              if (!inplace) items.map(i => (i, i.name))
+              else items.map(i => (i, toPath)),
+            toPath =
+              if (!inplace) toPath
+              else fromPath,
             total = total,
             onTopItem = onTopItem,
             onDone = onDone

@@ -14,7 +14,7 @@ object FileListPopupsActions {
   sealed trait FileListPopupCopyMove
   case object CopyMoveHidden extends FileListPopupCopyMove
   case object ShowCopyToTarget extends FileListPopupCopyMove
-  case object ShowCopyToCurrent extends FileListPopupCopyMove
+  case object ShowCopyInplace extends FileListPopupCopyMove
   case object ShowMoveToTarget extends FileListPopupCopyMove
-  case object ShowMoveToCurrent extends FileListPopupCopyMove
+  case object ShowMoveInplace extends FileListPopupCopyMove
 }

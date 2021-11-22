@@ -2,7 +2,7 @@ package farjs.filelist.copy
 
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
-import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.filelist.api.FileListItem
 import farjs.filelist.copy.CopyItemsStats._
 import farjs.ui.popup.StatusPopupProps
 import org.scalatest.Succeeded
@@ -21,14 +21,12 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val onCancel = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val props = CopyItemsStatsProps(dispatch, actions, "/folder", List(
       FileListItem("dir 1", isDir = true),
       FileListItem("file 1", size = 10)
-    ))
-    val state = FileListState(currDir = currDir, selectedNames = Set("dir 1", "file 1"))
-    val props = CopyItemsStatsProps(dispatch, actions, state, "Move", onDone, onCancel)
+    ), "Move", onDone, onCancel)
     val p = Promise[Boolean]()
-    (actions.scanDirs _).expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
+    (actions.scanDirs _).expects(props.fromPath, Seq(props.items.head), *).onCall { (_, _, onNextDir) =>
       onNextDir("/path", List(
         FileListItem("dir 2", isDir = true),
         FileListItem("file 2", size = 123)
@@ -70,15 +68,13 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val onCancel = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val props = CopyItemsStatsProps(dispatch, actions, "/folder", List(
       FileListItem("dir 1", isDir = true)
-    ))
-    val state = FileListState(currDir = currDir)
-    val props = CopyItemsStatsProps(dispatch, actions, state, "Copy", onDone, onCancel)
+    ), "Copy", onDone, onCancel)
     val p = Promise[Boolean]()
     val resultF = p.future
     var onNextDirFn: (String, Seq[FileListItem]) => Boolean = null
-    (actions.scanDirs _).expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
+    (actions.scanDirs _).expects(props.fromPath, Seq(props.items.head), *).onCall { (_, _, onNextDir) =>
       onNextDirFn = onNextDir
       resultF
     }
@@ -112,13 +108,11 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val onCancel = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val props = CopyItemsStatsProps(dispatch, actions, "/folder", List(
       FileListItem("dir 1", isDir = true)
-    ))
-    val state = FileListState(currDir = currDir)
-    val props = CopyItemsStatsProps(dispatch, actions, state, "Copy", onDone, onCancel)
+    ), "Copy", onDone, onCancel)
     val p = Promise[Boolean]()
-    (actions.scanDirs _).expects(currDir.path, Seq(currDir.items.head), *).returning(p.future)
+    (actions.scanDirs _).expects(props.fromPath, Seq(props.items.head), *).returning(p.future)
     
     val renderer = createTestRenderer(<(CopyItemsStats())(^.wrapped := props)())
     findProps(renderer.root, statusPopupComp) should not be empty

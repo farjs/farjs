@@ -37,26 +37,31 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
     }
 
     def onKeypress(screen: BlessedScreen, key: String): Unit = {
+      val currItem = props.state.currentItem.filter(_ != FileListItem.up)
       key match {
         case "f1" => props.dispatch(FileListPopupHelpAction(show = true))
         case "f3" =>
-          val currItem = props.state.currentItem.filter(_ != FileListItem.up)
           if (props.state.selectedNames.nonEmpty || currItem.exists(_.isDir)) {
             props.dispatch(FileListPopupViewItemsAction(show = true))
           }
         case "f5" =>
-          val currItem = props.state.currentItem.filter(_ != FileListItem.up)
           if (props.state.selectedNames.nonEmpty || currItem.nonEmpty) {
             props.dispatch(FileListPopupCopyMoveAction(ShowCopyToTarget))
           }
         case "f6" =>
-          val currItem = props.state.currentItem.filter(_ != FileListItem.up)
           if (props.state.selectedNames.nonEmpty || currItem.nonEmpty) {
             props.dispatch(FileListPopupCopyMoveAction(ShowMoveToTarget))
           }
+        case "S-f5" =>
+          if (currItem.nonEmpty) {
+            props.dispatch(FileListPopupCopyMoveAction(ShowCopyInplace))
+          }
+        case "S-f6" =>
+          if (currItem.nonEmpty) {
+            props.dispatch(FileListPopupCopyMoveAction(ShowMoveInplace))
+          }
         case "f7" => props.dispatch(FileListPopupMkFolderAction(show = true))
         case "f8" | "delete" =>
-          val currItem = props.state.currentItem.filter(_ != FileListItem.up)
           if (props.state.selectedNames.nonEmpty || currItem.isDefined) {
             props.dispatch(FileListPopupDeleteAction(show = true))
           }
