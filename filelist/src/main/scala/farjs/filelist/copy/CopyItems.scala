@@ -87,7 +87,8 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
     def isInplace: Boolean = {
       inplace ||
       props.data.popups.showCopyMovePopup == ShowCopyInplace ||
-        props.data.popups.showCopyMovePopup == ShowMoveInplace
+        props.data.popups.showCopyMovePopup == ShowMoveInplace ||
+        fromState.currDir.path == toState.currDir.path && fromState.selectedItems.isEmpty
     }
 
     val fromPath = fromState.currDir.path

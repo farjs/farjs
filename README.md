@@ -78,12 +78,14 @@ different operations:
 * **Quick View** of current item on in-active panel - `Ctrl + Q`
 * Show **Quick Search** box - `Ctrl + S`
 * **Refresh** active panel - `Ctrl + R`
-* **View item**(s) - `F3`
+* **View item(s)** - `F3`
   * Scans selected folder(s)/file(s) and calculates size(s)
-* **Copy item**(s) - `F5`
-* **Rename/Move item**(s) - `F6`
+* **Copy item(s)** - `F5`
+* **Copy current item inplace** - `Shift + F5`
+* **Rename/Move item(s)** - `F6`
+* **Rename/Move current item inplace** - `Shift + F6`
 * **Create folder** (with intermediate sub-folders) - `F7`
-* **Delete item**(s) - `F8`
+* **Delete item(s)** - `F8`
 
 ## Dev Tools
 
