@@ -179,6 +179,12 @@ function emitKeys(stream, s) {
 
       // Parse the key itself
       switch (code) {
+        /* iTerm2 ESC [ letter */
+        case '[P': key.name = 'f1'; break;
+        case '[Q': key.name = 'f2'; break;
+        case '[R': key.name = 'f3'; break;
+        case '[S': key.name = 'f4'; break;
+
         /* xterm/gnome ESC O letter */
         case 'OP': key.name = 'f1'; break;
         case 'OQ': key.name = 'f2'; break;
@@ -207,6 +213,18 @@ function emitKeys(stream, s) {
         case '[21~': key.name = 'f10'; break;
         case '[23~': key.name = 'f11'; break;
         case '[24~': key.name = 'f12'; break;
+
+        /* Windows */
+        case '[25~': key.name = 'f3'; key.shift = true; break;
+        case '[26~': key.name = 'f4'; key.shift = true; break;
+        case '[28~': key.name = 'f5'; key.shift = true; break;
+        case '[29~': key.name = 'f6'; key.shift = true; break;
+        case '[31~': key.name = 'f7'; key.shift = true; break;
+        case '[32~': key.name = 'f8'; key.shift = true; break;
+        case '[33~': key.name = 'f9'; key.shift = true; break;
+        case '[34~': key.name = 'f10'; key.shift = true; break;
+        case '[23$': key.name = 'f11'; key.shift = true; break;
+        case '[24$': key.name = 'f12'; key.shift = true; break;
 
         /* xterm ESC [ letter */
         case '[A': key.name = 'up'; break;

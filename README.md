@@ -137,3 +137,9 @@ action in my terminal?
 
     ]
     ```
+### Mouse Support
+
+* Why on `Windows` platform `mouse` doesn't work?
+  - Indeed, on `Windows` mouse may not work,
+    please, check [this thread/issue](https://github.com/microsoft/terminal/issues/376#issuecomment-973178777)
+    for more details.
