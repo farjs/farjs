@@ -167,6 +167,10 @@ object TextBox extends FunctionComponent[TextBoxProps] {
         case "end"     => move(el, props.value, CursorMove.End, TextSelect.Reset)
         case "S-end"   => move(el, props.value, CursorMove.End, TextSelect.TillTheEnd)
         case "C-a"     => move(el, props.value, CursorMove.End, TextSelect.All)
+        case "C-c" =>
+          if (selEnd - selStart > 0) {
+            el.screen.copyToClipboard(props.value.slice(selStart, selEnd))
+          }
         case "delete" =>
           val (newVal, curMove) = edit(props.value, TextEdit.Delete)
           if (props.value != newVal) {

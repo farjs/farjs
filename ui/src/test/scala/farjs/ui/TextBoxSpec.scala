@@ -170,6 +170,39 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     key.defaultPrevented.getOrElse(false) shouldBe true
   }
   
+  it should "copy selection to clipboard if C-c key when onKeypress" in {
+    //given
+    val onEnter = mockFunction[Unit]
+    val props = getTextBoxProps(onEnter = onEnter)
+    val programMock = mock[BlessedProgramMock]
+    val screenMock = mock[BlessedScreenMock]
+    val inputMock = mock[BlessedElementMock]
+    val width = props.width
+    val (aleft, atop) = props.pos
+    val cursorX = width - 1
+    (inputMock.screen _).expects().anyNumberOfTimes().returning(screenMock.asInstanceOf[BlessedScreen])
+    (screenMock.program _).expects().anyNumberOfTimes().returning(programMock.asInstanceOf[BlessedProgram])
+    (inputMock.width _).expects().anyNumberOfTimes().returning(width)
+    (inputMock.aleft _).expects().anyNumberOfTimes().returning(aleft)
+    (inputMock.atop _).expects().anyNumberOfTimes().returning(atop)
+    (programMock.omove _).expects(aleft + cursorX, atop)
+
+    val inputEl = testRender(<(TextBox())(^.wrapped := props)(), { el =>
+      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
+      else null
+    })
+    val key = js.Dynamic.literal("full" -> "C-c").asInstanceOf[KeyboardKey]
+
+    //then
+    (screenMock.copyToClipboard _).expects(props.value)
+
+    //when
+    inputEl.props.onKeypress(null, key)
+
+    //then
+    key.defaultPrevented.getOrElse(false) shouldBe true
+  }
+  
   it should "process key and prevent default when onKeypress" in {
     //given
     val onChange = mockFunction[String, Unit]
@@ -391,6 +424,8 @@ object TextBoxSpec {
     def focused: BlessedElement
 
     def cursorShape(shape: String, blink: Boolean): Boolean
+
+    def copyToClipboard(text: String): Boolean
   }
 
   @JSExportAll
