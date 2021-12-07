@@ -1,7 +1,7 @@
 package farjs.app.filelist
 
-import farjs.app.filelist.FileListApiImplSpec.TestApiImpl
-import farjs.filelist.api.{FileListDir, FileListItem, FileSource, FileTarget}
+import farjs.app.filelist.FSFileListApiSpec.TestApiFS
+import farjs.filelist.api._
 import org.scalatest.Succeeded
 import scommons.nodejs._
 import scommons.nodejs.raw.{FSConstants, FileOptions}
@@ -11,14 +11,14 @@ import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 
-class FileListApiImplSpec extends AsyncTestSpec {
+class FSFileListApiSpec extends AsyncTestSpec {
   
-  private val apiImp = new FileListApiImpl
+  private val apiImp = new FSFileListApi
 
   it should "not fail if fs.lstatSync fail when readDir" in {
     //given
     val fs = mock[FS]
-    val apiImp = new TestApiImpl(fs)
+    val apiImp = new TestApiFS(fs)
     val targetDir = path.resolve(FileListDir.curr)
 
     (fs.readdir _).expects(targetDir).returning(Future.successful(List("file1", "file2")))
@@ -488,9 +488,9 @@ class FileListApiImplSpec extends AsyncTestSpec {
   }
 }
 
-object FileListApiImplSpec {
+object FSFileListApiSpec {
 
-  class TestApiImpl(fsMock: FS) extends FileListApiImpl {
+  class TestApiFS(fsMock: FS) extends FSFileListApi {
     
     override private[filelist] val fs = fsMock
   }

@@ -1,6 +1,6 @@
 package farjs.app.filelist
 
-import farjs.app.filelist.FileListApiImpl._
+import farjs.app.filelist.FSFileListApi._
 import farjs.filelist.api._
 import scommons.nodejs._
 import scommons.nodejs.raw.FSConstants
@@ -11,7 +11,7 @@ import scala.scalajs.js.JavaScriptException
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.{Failure, Success, Try}
 
-class FileListApiImpl extends FileListApi {
+class FSFileListApi extends FileListApi {
 
   private[filelist] def fs: FS = scommons.nodejs.fs
 
@@ -198,7 +198,7 @@ class FileListApiImpl extends FileListApi {
   }
 }
 
-object FileListApiImpl {
+object FSFileListApi {
 
   private val S_IFDIR: Int = FSConstants.S_IFDIR
   private val S_IRUSR: Int = FSConstants.S_IRUSR.getOrElse(0)
