@@ -80,9 +80,13 @@ object FileList extends FunctionComponent[FileListProps] {
           val isFirst = selectIndex == 0
           val isLast = selectIndex == items.size - 1
           val selection = {
-            if (isFirst && selectIndex < currIndex) items.view.slice(selectIndex, currIndex + 1)
+            if (isFirst && (selectIndex == currIndex || selectIndex + 1 < currIndex)) {
+              items.view.slice(selectIndex, currIndex + 1)
+            }
             else if (selectIndex < currIndex) items.view.slice(selectIndex + 1, currIndex + 1)
-            else if (isLast && selectIndex > currIndex) items.view.slice(currIndex, selectIndex + 1)
+            else if (isLast && (selectIndex == currIndex || selectIndex > currIndex + 1)) {
+              items.view.slice(currIndex, selectIndex + 1)
+            }
             else items.view.slice(currIndex, selectIndex)
           }.map(_.name).toSet
   

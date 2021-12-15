@@ -216,6 +216,9 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     check("down",    List("item 1", "item 2", "item 3", "item 4"), 0, 3, Set("item 1", "item 2"))
     check("down",    List("item 2", "item 3", "item 4", "item 5"), 1, 3, Set("item 1", "item 2"))
     check("S-down",  List("item 3", "item 4", "item 5", "item 6"), 2, 3, Set("item 1", "item 2", "item 5"))
+    check("S-down",  List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6"))
+    check("S-down",  List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6", "item 7"))
+    check("S-down",  List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6"))
     check("S-down",  List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6", "item 7"))
     check("down",    List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 5", "item 6", "item 7"), changed = false)
 
@@ -225,6 +228,9 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     check("S-up",    List("item 4", "item 5", "item 6", "item 7"), 3, 0, Set("item 1", "item 2"))
     check("up",      List("item 3", "item 4", "item 5", "item 6"), 2, 0, Set("item 1", "item 2"))
     check("up",      List("item 2", "item 3", "item 4", "item 5"), 1, 0, Set("item 1", "item 2"))
+    check("S-up",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set("item 1"))
+    check("S-up",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
+    check("S-up",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set("item 1"))
     check("S-up",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
     check("up",      List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
 
@@ -257,14 +263,16 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //when & then
     check("home",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
     check("home",    List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
-    
+
     //when & then
     check("S-end",   List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 3", "item 4", "item 5", "item 6", "item 7"))
-    check("S-end",   List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 3", "item 4", "item 5", "item 6", "item 7"), changed = false)
+    check("S-end",   List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 3", "item 4", "item 5", "item 6"))
+    check("S-end",   List("item 4", "item 5", "item 6", "item 7"), 3, 3, Set("item 1", "item 2", "item 3", "item 4", "item 5", "item 6", "item 7"))
 
     //when & then
     check("S-home",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
-    check("S-home",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty, changed = false)
+    check("S-home",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set("item 1"))
+    check("S-home",  List("item 1", "item 2", "item 3", "item 4"), 0, 0, Set.empty)
 
     //given
     val nonRootProps = rootProps.copy(state = rootProps.state.copy(
