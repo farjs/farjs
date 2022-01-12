@@ -1,11 +1,14 @@
 package farjs.app.util
 
+import scommons.nodejs.global
 import scommons.react._
 import scommons.react.test._
 
-import scala.scalajs.js.Dynamic.{global => g}
+import scala.scalajs.js
 
 class LogControllerSpec extends TestSpec with TestRendererUtils {
+
+  private val g: js.Dynamic = global.asInstanceOf[js.Dynamic]
 
   it should "render component and redirect log output" in {
     //given

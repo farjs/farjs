@@ -1,14 +1,16 @@
 package farjs.app.util
 
+import scommons.nodejs.global
 import scommons.react._
 import scommons.react.hooks._
 
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{global => g}
 
 case class LogControllerProps(render: String => ReactElement)
 
 object LogController extends FunctionComponent[LogControllerProps] {
+
+  private val g: js.Dynamic = global.asInstanceOf[js.Dynamic]
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
