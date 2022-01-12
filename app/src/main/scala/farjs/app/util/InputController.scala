@@ -1,12 +1,14 @@
 package farjs.app.util
 
+import scommons.nodejs.global
 import scommons.react._
 import scommons.react.hooks._
 
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{global => g}
 
 object InputController extends FunctionComponent[Unit] {
+
+  private val g: js.Dynamic = global.asInstanceOf[js.Dynamic]
 
   private[util] var logPanelComp: UiComponent[LogPanelProps] = LogPanel
   private[util] var maxBufferLength: Int = 4000

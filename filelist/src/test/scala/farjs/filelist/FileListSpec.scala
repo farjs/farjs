@@ -7,6 +7,7 @@ import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.blessed.BlessedScreen
+import scommons.react.redux.Dispatch
 import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
@@ -17,12 +18,21 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
   FileList.fileListViewComp = mockUiComponent("FileListView")
 
+  //noinspection TypeAnnotation
+  class Actions {
+    val changeDir = mockFunction[Dispatch, Boolean, Option[String], String, FileListDirChangeAction]
+
+    val actions = new MockFileListActions(
+      changeDirMock = changeDir
+    )
+  }
+
   it should "dispatch action only once when mount but not when update" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
+    val actions = new Actions
     val state1 = FileListState()
-    val props1 = FileListProps(dispatch, actions, state1, (7, 2), columns = 2)
+    val props1 = FileListProps(dispatch, actions.actions, state1, (7, 2), columns = 2)
     val state2 = state1.copy(isActive = true)
     val props2 = props1.copy(state = state2)
     val action = FileListDirChangeAction(
@@ -30,7 +40,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     )
     
     //then
-    (actions.changeDir _).expects(dispatch, state1.isRight, None, FileListDir.curr).returning(action)
+    actions.changeDir.expects(dispatch, state1.isRight, None, FileListDir.curr).returning(action)
     dispatch.expects(action)
     
     //when
@@ -46,8 +56,8 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
   it should "focus item when onWheel and active" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListProps(dispatch, actions, FileListState(
+    val actions = new Actions
+    val props = FileListProps(dispatch, actions.actions, FileListState(
       currDir = FileListDir("/", isRoot = true, items = List(
         FileListItem("item 1"),
         FileListItem("item 2"),
@@ -95,8 +105,8 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
   it should "not focus item when onWheel and not active" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListProps(dispatch, actions, FileListState(
+    val actions = new Actions
+    val props = FileListProps(dispatch, actions.actions, FileListState(
       currDir = FileListDir("/", isRoot = true, items = List(
         FileListItem("item 1"),
         FileListItem("item 2")
@@ -120,8 +130,8 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
   it should "focus item when onClick" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListProps(dispatch, actions, FileListState(
+    val actions = new Actions
+    val props = FileListProps(dispatch, actions.actions, FileListState(
       currDir = FileListDir("/", isRoot = true, items = List(
         FileListItem("item 1"),
         FileListItem("item 2"),
@@ -160,7 +170,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onKeypress = mockFunction[BlessedScreen, String, Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
+    val actions = new Actions
     val items = List(
       FileListItem("item 1"),
       FileListItem("item 2"),
@@ -170,7 +180,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       FileListItem("item 6"),
       FileListItem("item 7")
     )
-    val rootProps = FileListProps(dispatch, actions, FileListState(
+    val rootProps = FileListProps(dispatch, actions.actions, FileListState(
       currDir = FileListDir("/", isRoot = true, items = items),
       isActive = true
     ), (7, 3), columns = 2, onKeypress = onKeypress)
@@ -291,12 +301,12 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
   it should "render empty component" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListProps(dispatch, actions, FileListState(), (7, 2), columns = 2)
+    val actions = new Actions
+    val props = FileListProps(dispatch, actions.actions, FileListState(), (7, 2), columns = 2)
     val dirAction = FileListDirChangeAction(
       FutureTask("Changing dir", Future.successful(props.state.currDir))
     )
-    (actions.changeDir _).expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
+    actions.changeDir.expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
     dispatch.expects(dirAction)
 
     //when
@@ -315,8 +325,8 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
   it should "render non-empty component" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListProps(dispatch, actions, FileListState(
+    val actions = new Actions
+    val props = FileListProps(dispatch, actions.actions, FileListState(
       currDir = FileListDir("/", isRoot = true, items = List(
         FileListItem("item 1"),
         FileListItem("item 2"),

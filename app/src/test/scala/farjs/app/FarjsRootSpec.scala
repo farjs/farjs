@@ -1,16 +1,14 @@
 package farjs.app
 
 import farjs.app.FarjsRoot._
-import farjs.app.FarjsRootSpec._
 import farjs.app.util._
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.blessed._
-import scommons.react.blessed.raw.BlessedProgram
 import scommons.react.test._
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExportAll
+import scala.scalajs.js.Dynamic.literal
 
 class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -25,24 +23,24 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   it should "set devTool and emit resize event when on F12" in {
     //given
     val root = new FarjsRoot(withPortalsComp, fileListComp, fileListPopups, taskController, DevTool.Hidden)
-    val programMock = mock[BlessedProgramMock]
-    val screenMock = mock[BlessedScreenMock]
-    val boxMock = mock[BlessedElementMock]
+    val emitMock = mockFunction[String, Unit]
+    val program = literal("emit" -> emitMock)
+    val keyMock = mockFunction[js.Array[String], js.Function2[js.Object, KeyboardKey, Unit], Unit]
+    val screen = literal("program" -> program, "key" -> keyMock)
+    val boxMock = literal("screen" -> screen)
     var keyListener: js.Function2[js.Object, KeyboardKey, Unit] = null
 
-    (boxMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-    (screenMock.key _).expects(*, *).onCall { (keys, listener) =>
+    keyMock.expects(*, *).onCall { (keys, listener) =>
       keys.toList shouldBe List("f12")
       keyListener = listener
     }
     var emitCalled = false
-    (programMock.emit _).expects("resize").onCall { _: String =>
+    emitMock.expects("resize").onCall { _: String =>
       emitCalled = true
     }
     
     val renderer = createTestRenderer(<(root())()(), { el =>
-      if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock.asInstanceOf[js.Any]
+      if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock
       else null
     })
     findComponents(renderer.root.children(0), <.box.name).head.props.width shouldBe "100%"
@@ -69,13 +67,13 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   it should "set devTool when onActivate" in {
     //given
     val root = new FarjsRoot(withPortalsComp, fileListComp, fileListPopups, taskController, DevTool.Colors)
-    val screenMock = mock[BlessedScreenMock]
-    val boxMock = mock[BlessedElementMock]
-    (boxMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.key _).expects(*, *)
+    val keyMock = mockFunction[js.Array[String], js.Function2[js.Object, KeyboardKey, Unit], Unit]
+    val screen = literal("key" -> keyMock)
+    val boxMock = literal("screen" -> screen)
+    keyMock.expects(*, *)
 
     val renderer = createTestRenderer(<(root())()(), { el =>
-      if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock.asInstanceOf[js.Any]
+      if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock
       else null
     })
     val devToolProps = {
@@ -100,14 +98,14 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   it should "render component without DevTools" in {
     //given
     val root = new FarjsRoot(withPortalsComp, fileListComp, fileListPopups, taskController, DevTool.Hidden)
-    val screenMock = mock[BlessedScreenMock]
-    val boxMock = mock[BlessedElementMock]
-    (boxMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.key _).expects(*, *)
+    val keyMock = mockFunction[js.Array[String], js.Function2[js.Object, KeyboardKey, Unit], Unit]
+    val screen = literal("key" -> keyMock)
+    val boxMock = literal("screen" -> screen)
+    keyMock.expects(*, *)
 
     //when
     val result = createTestRenderer(<(root())()(), { el =>
-      if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock.asInstanceOf[js.Any]
+      if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock
       else null
     }).root
 
@@ -130,14 +128,14 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   it should "render component with LogPanel" in {
     //given
     val root = new FarjsRoot(withPortalsComp, fileListComp, fileListPopups, taskController, DevTool.Logs)
-    val screenMock = mock[BlessedScreenMock]
-    val boxMock = mock[BlessedElementMock]
-    (boxMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.key _).expects(*, *)
+    val keyMock = mockFunction[js.Array[String], js.Function2[js.Object, KeyboardKey, Unit], Unit]
+    val screen = literal("key" -> keyMock)
+    val boxMock = literal("screen" -> screen)
+    keyMock.expects(*, *)
 
     //when
     val result = createTestRenderer(<(root())()(), { el =>
-      if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock.asInstanceOf[js.Any]
+      if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock
       else null
     }).root
 
@@ -173,14 +171,14 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   it should "render component with ColorPanel" in {
     //given
     val root = new FarjsRoot(withPortalsComp, fileListComp, fileListPopups, taskController, DevTool.Colors)
-    val screenMock = mock[BlessedScreenMock]
-    val boxMock = mock[BlessedElementMock]
-    (boxMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.key _).expects(*, *)
+    val keyMock = mockFunction[js.Array[String], js.Function2[js.Object, KeyboardKey, Unit], Unit]
+    val screen = literal("key" -> keyMock)
+    val boxMock = literal("screen" -> screen)
+    keyMock.expects(*, *)
 
     //when
     val result = createTestRenderer(<(root())()(), { el =>
-      if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock.asInstanceOf[js.Any]
+      if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock
       else null
     }).root
 
@@ -211,28 +209,5 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
         )
       }
     }
-  }
-}
-
-object FarjsRootSpec {
-
-  @JSExportAll
-  trait BlessedProgramMock {
-
-    def emit(eventName: String): Unit
-  }
-
-  @JSExportAll
-  trait BlessedScreenMock {
-
-    def program: BlessedProgram
-
-    def key(keys: js.Array[String], onKey: js.Function2[js.Object, KeyboardKey, Unit]): Unit
-  }
-
-  @JSExportAll
-  trait BlessedElementMock {
-
-    def screen: BlessedScreen
   }
 }

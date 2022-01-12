@@ -3,7 +3,7 @@ package farjs.filelist
 import farjs.filelist.FileListActions._
 import farjs.filelist.FileListActionsSpec._
 import farjs.filelist.api._
-import farjs.filelist.fs.FSService
+import farjs.filelist.fs.MockFSService
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.redux.task.FutureTask
@@ -13,16 +13,71 @@ import scala.scalajs.js.typedarray.Uint8Array
 
 class FileListActionsSpec extends AsyncTestSpec {
 
+  //noinspection TypeAnnotation
+  class FsService {
+    val openItem = mockFunction[String, String, Future[Unit]]
+
+    val fsService = new MockFSService(
+      openItemMock = openItem
+    )
+  }
+  
+  //noinspection TypeAnnotation
+  class Api {
+    val readDir2 = mockFunction[Option[String], String, Future[FileListDir]]
+    val readDir = mockFunction[String, Future[FileListDir]]
+    val delete = mockFunction[String, Seq[FileListItem], Future[Unit]]
+    val mkDirs = mockFunction[List[String], Future[Unit]]
+    val readFile = mockFunction[List[String], FileListItem, Double, Future[FileSource]]
+    val writeFile = mockFunction[List[String], String, FileListItem => Future[Option[Boolean]], Future[Option[FileTarget]]]
+    
+    val api = new MockFileListApi(
+      readDir2Mock = readDir2,
+      readDirMock = readDir,
+      deleteMock = delete,
+      mkDirsMock = mkDirs,
+      readFileMock = readFile,
+      writeFileMock = writeFile
+    )
+  }
+
+  //noinspection TypeAnnotation
+  class Source {
+    val readNextBytes = mockFunction[Uint8Array, Future[Int]]
+    val close = mockFunction[Future[Unit]]
+
+    val source = new MockFileSource(
+      readNextBytesMock = readNextBytes,
+      closeMock = close
+    )
+  }
+
+  //noinspection TypeAnnotation
+  class Target {
+    val writeNextBytes = mockFunction[Uint8Array, Int, Future[Double]]
+    val setAttributes = mockFunction[FileListItem, Future[Unit]]
+    val close = mockFunction[Future[Unit]]
+    val delete = mockFunction[Future[Unit]]
+
+    val target = new MockFileTarget(
+      writeNextBytesMock = writeNextBytes,
+      setAttributesMock = setAttributes,
+      closeMock = close,
+      deleteMock = delete
+    )
+  }
+
   it should "dispatch FileListTaskAction when openInDefaultApp" in {
     //given
-    val fsService = mock[FSService]
-    val actions = new FileListActionsTest(mock[FileListApi])
-    actions.fsService = fsService
+    val api = new Api
+    val fsService = new FsService
+    val actions = new FileListActionsTest(api.api)
+    actions.fsService = fsService.fsService
     val parent = "test dir"
     val item = "test item"
     
     //then
-    (fsService.openItem _).expects(parent, item).returning(Future.unit)
+    fsService.openItem.expects(parent, item).returning(Future.unit)
     
     //when
     val FileListTaskAction(FutureTask(msg, future)) =
@@ -35,18 +90,17 @@ class FileListActionsSpec extends AsyncTestSpec {
   
   it should "dispatch FileListDirChangedAction when changeDir" in {
     //given
-    val api = mock[FileListApi]
-    val fsService = mock[FSService]
-    val actions = new FileListActionsTest(api)
-    actions.fsService = fsService
+    val api = new Api
+    val fsService = new FsService
+    val actions = new FileListActionsTest(api.api)
+    actions.fsService = fsService.fsService
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
     val isRight = true
     val parent: Option[String] = Some("/")
     val dir = "test dir"
 
-    (api.readDir(_: Option[String], _: String)).expects(parent, dir)
-      .returning(Future.successful(currDir))
+    api.readDir2.expects(parent, dir).returning(Future.successful(currDir))
     
     //then
     dispatch.expects(FileListDirChangedAction(isRight, dir, currDir))
@@ -62,16 +116,16 @@ class FileListActionsSpec extends AsyncTestSpec {
   
   it should "dispatch FileListDirUpdatedAction when updateDir" in {
     //given
-    val api = mock[FileListApi]
-    val fsService = mock[FSService]
-    val actions = new FileListActionsTest(api)
-    actions.fsService = fsService
+    val api = new Api
+    val fsService = new FsService
+    val actions = new FileListActionsTest(api.api)
+    actions.fsService = fsService.fsService
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
     val isRight = true
     val path = "/test/path"
 
-    (api.readDir(_: String)).expects(path).returning(Future.successful(currDir))
+    api.readDir.expects(path).returning(Future.successful(currDir))
     
     //then
     dispatch.expects(FileListDirUpdatedAction(isRight, currDir))
@@ -87,10 +141,10 @@ class FileListActionsSpec extends AsyncTestSpec {
   
   it should "dispatch FileListDirChangedAction when createDir(multiple=false)" in {
     //given
-    val api = mock[FileListApi]
-    val fsService = mock[FSService]
-    val actions = new FileListActionsTest(api)
-    actions.fsService = fsService
+    val api = new Api
+    val fsService = new FsService
+    val actions = new FileListActionsTest(api.api)
+    actions.fsService = fsService.fsService
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
     val isRight = true
@@ -98,8 +152,8 @@ class FileListActionsSpec extends AsyncTestSpec {
     val dir = "test/dir"
     val multiple = false
 
-    (api.mkDirs _).expects(List(parent, dir)).returning(Future.unit)
-    (api.readDir(_: String)).expects(parent).returning(Future.successful(currDir))
+    api.mkDirs.expects(List(parent, dir)).returning(Future.unit)
+    api.readDir.expects(parent).returning(Future.successful(currDir))
     
     //then
     dispatch.expects(FileListDirCreatedAction(isRight, dir, currDir))
@@ -115,10 +169,10 @@ class FileListActionsSpec extends AsyncTestSpec {
   
   it should "dispatch FileListDirChangedAction when createDir(multiple=true)" in {
     //given
-    val api = mock[FileListApi]
-    val fsService = mock[FSService]
-    val actions = new FileListActionsTest(api)
-    actions.fsService = fsService
+    val api = new Api
+    val fsService = new FsService
+    val actions = new FileListActionsTest(api.api)
+    actions.fsService = fsService.fsService
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
     val isRight = true
@@ -126,8 +180,8 @@ class FileListActionsSpec extends AsyncTestSpec {
     val dir = "test/dir"
     val multiple = true
 
-    (api.mkDirs _).expects(List(parent, "test", "dir")).returning(Future.unit)
-    (api.readDir(_: String)).expects(parent).returning(Future.successful(currDir))
+    api.mkDirs.expects(List(parent, "test", "dir")).returning(Future.unit)
+    api.readDir.expects(parent).returning(Future.successful(currDir))
     
     //then
     dispatch.expects(FileListDirCreatedAction(isRight, "test", currDir))
@@ -143,16 +197,16 @@ class FileListActionsSpec extends AsyncTestSpec {
   
   it should "dispatch FileListDirUpdatedAction when deleteAction" in {
     //given
-    val api = mock[FileListApi]
-    val actions = new FileListActionsTest(api)
+    val api = new Api
+    val actions = new FileListActionsTest(api.api)
     val dispatch = mockFunction[Any, Any]
     val dir = "test dir"
     val items = List(FileListItem("file 1"))
     val isRight = true
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
 
-    (api.delete _).expects(dir, items).returning(Future.successful(()))
-    (api.readDir(_: String)).expects(dir).returning(Future.successful(currDir))
+    api.delete.expects(dir, items).returning(Future.successful(()))
+    api.readDir.expects(dir).returning(Future.successful(currDir))
     
     //then
     dispatch.expects(FileListDirUpdatedAction(isRight, currDir))
@@ -168,9 +222,9 @@ class FileListActionsSpec extends AsyncTestSpec {
   
   it should "process sub-dirs and return true when scanDirs" in {
     //given
-    val api = mock[FileListApi]
+    val api = new Api
     val onNextDir = mockFunction[String, Seq[FileListItem], Boolean]
-    val actions = new FileListActionsTest(api)
+    val actions = new FileListActionsTest(api.api)
     val parent = "parent-dir"
     val items = List(
       FileListItem("dir 1", isDir = true),
@@ -181,9 +235,9 @@ class FileListActionsSpec extends AsyncTestSpec {
       FileListItem("file 4")
     ))
 
-    (api.readDir(_: Option[String], _: String)).expects(Some(parent), "dir 1")
+    api.readDir2.expects(Some(parent), "dir 1")
       .returning(Future.successful(res))
-    (api.readDir(_: Option[String], _: String)).expects(Some(res.path), "dir 3")
+    api.readDir2.expects(Some(res.path), "dir 3")
       .returning(Future.successful(FileListDir("dir3", isRoot = false, Nil)))
     onNextDir.expects(res.path, res.items).returning(true)
     onNextDir.expects("dir3", Nil).returning(true)
@@ -199,9 +253,9 @@ class FileListActionsSpec extends AsyncTestSpec {
   
   it should "process sub-dirs and return false when scanDirs" in {
     //given
-    val api = mock[FileListApi]
+    val api = new Api
     val onNextDir = mockFunction[String, Seq[FileListItem], Boolean]
-    val actions = new FileListActionsTest(api)
+    val actions = new FileListActionsTest(api.api)
     val parent = "parent-dir"
     val items = List(
       FileListItem("dir 1", isDir = true),
@@ -212,7 +266,7 @@ class FileListActionsSpec extends AsyncTestSpec {
       FileListItem("file 4")
     ))
 
-    (api.readDir(_: Option[String], _: String)).expects(Some(parent), "dir 1")
+    api.readDir2.expects(Some(parent), "dir 1")
       .returning(Future.successful(res))
     onNextDir.expects(res.path, res.items).returning(false)
     
@@ -227,8 +281,8 @@ class FileListActionsSpec extends AsyncTestSpec {
 
   it should "copy new file when copyFile" in {
     //given
-    val api = mock[FileListApi]
-    val actions = new FileListActionsTest(api)
+    val api = new Api
+    val actions = new FileListActionsTest(api.api)
     val srcDirs = List("parent-dir")
     val file = FileListItem("test_file")
     val dstDirs = List("target-dir")
@@ -236,29 +290,29 @@ class FileListActionsSpec extends AsyncTestSpec {
     val onProgress = mockFunction[Double, Future[Boolean]]
     val position = 1234.0
     
-    val source = mock[FileSource]
-    (source.readNextBytes _).expects(*).onCall { buff: Uint8Array =>
+    val source = new Source
+    source.readNextBytes.expects(*).onCall { buff: Uint8Array =>
       buff.length shouldBe (64 * 1024)
       Future.successful(123)
     }
-    (source.readNextBytes _).expects(*).onCall { _: Uint8Array =>
+    source.readNextBytes.expects(*).onCall { _: Uint8Array =>
       Future.successful(0)
     }
-    (source.close _).expects().returning(Future.unit)
+    source.close.expects().returning(Future.unit)
     
-    val target = mock[FileTarget]
-    (target.writeNextBytes _).expects(*, *).onCall { (buff: Uint8Array, length: Int) =>
+    val target = new Target
+    target.writeNextBytes.expects(*, *).onCall { (buff: Uint8Array, length: Int) =>
       buff.length shouldBe (64 * 1024)
       length shouldBe 123
       Future.successful(position)
     }
-    (target.setAttributes _).expects(file).returning(Future.unit)
-    (target.close _).expects().returning(Future.unit)
+    target.setAttributes.expects(file).returning(Future.unit)
+    target.close.expects().returning(Future.unit)
     val dstName = "newName"
 
     //then
-    (api.writeFile _).expects(dstDirs, dstName, *).returning(Future.successful(Some(target)))
-    (api.readFile _).expects(srcDirs, file, 0.0).returning(Future.successful(source))
+    api.writeFile.expects(dstDirs, dstName, *).returning(Future.successful(Some(target.target)))
+    api.readFile.expects(srcDirs, file, 0.0).returning(Future.successful(source.source))
     onExists.expects(*).never()
     onProgress.expects(position).returning(Future.successful(true))
     
@@ -273,8 +327,8 @@ class FileListActionsSpec extends AsyncTestSpec {
 
   it should "overwrite existing file when copyFile" in {
     //given
-    val api = mock[FileListApi]
-    val actions = new FileListActionsTest(api)
+    val api = new Api
+    val actions = new FileListActionsTest(api.api)
     val srcDirs = List("parent-dir")
     val file = FileListItem("test_file")
     val existing = FileListItem("existing_file", size = 12)
@@ -283,35 +337,35 @@ class FileListActionsSpec extends AsyncTestSpec {
     val onProgress = mockFunction[Double, Future[Boolean]]
     val position = 1234.0
     
-    val source = mock[FileSource]
-    (source.readNextBytes _).expects(*).onCall { buff: Uint8Array =>
+    val source = new Source
+    source.readNextBytes.expects(*).onCall { buff: Uint8Array =>
       buff.length shouldBe (64 * 1024)
       Future.successful(123)
     }
-    (source.readNextBytes _).expects(*).onCall { _: Uint8Array =>
+    source.readNextBytes.expects(*).onCall { _: Uint8Array =>
       Future.successful(0)
     }
-    (source.close _).expects().returning(Future.unit)
+    source.close.expects().returning(Future.unit)
     
-    val target = mock[FileTarget]
-    (target.writeNextBytes _).expects(*, *).onCall { (buff: Uint8Array, length: Int) =>
+    val target = new Target
+    target.writeNextBytes.expects(*, *).onCall { (buff: Uint8Array, length: Int) =>
       buff.length shouldBe (64 * 1024)
       length shouldBe 123
       Future.successful(position)
     }
-    (target.setAttributes _).expects(file).returning(Future.unit)
-    (target.close _).expects().returning(Future.unit)
+    target.setAttributes.expects(file).returning(Future.unit)
+    target.close.expects().returning(Future.unit)
     val dstName = "newName"
 
     //then
     onExists.expects(existing).returning(Future.successful(Some(true)))
-    (api.writeFile _).expects(dstDirs, dstName, *).onCall { (_, _, onExists) =>
+    api.writeFile.expects(dstDirs, dstName, *).onCall { (_, _, onExists) =>
       onExists(existing).map { res =>
         res shouldBe Some(true)
-        Some(target)
+        Some(target.target)
       }
     }
-    (api.readFile _).expects(srcDirs, file, 0.0).returning(Future.successful(source))
+    api.readFile.expects(srcDirs, file, 0.0).returning(Future.successful(source.source))
     onProgress.expects(position).returning(Future.successful(true))
     
     //when
@@ -325,8 +379,8 @@ class FileListActionsSpec extends AsyncTestSpec {
 
   it should "append to existing file when copyFile" in {
     //given
-    val api = mock[FileListApi]
-    val actions = new FileListActionsTest(api)
+    val api = new Api
+    val actions = new FileListActionsTest(api.api)
     val srcDirs = List("parent-dir")
     val file = FileListItem("test_file")
     val existing = FileListItem("existing_file", size = 12)
@@ -335,35 +389,35 @@ class FileListActionsSpec extends AsyncTestSpec {
     val onProgress = mockFunction[Double, Future[Boolean]]
     val position = 1234.0
     
-    val source = mock[FileSource]
-    (source.readNextBytes _).expects(*).onCall { buff: Uint8Array =>
+    val source = new Source
+    source.readNextBytes.expects(*).onCall { buff: Uint8Array =>
       buff.length shouldBe (64 * 1024)
       Future.successful(123)
     }
-    (source.readNextBytes _).expects(*).onCall { _: Uint8Array =>
+    source.readNextBytes.expects(*).onCall { _: Uint8Array =>
       Future.successful(0)
     }
-    (source.close _).expects().returning(Future.unit)
+    source.close.expects().returning(Future.unit)
     
-    val target = mock[FileTarget]
-    (target.writeNextBytes _).expects(*, *).onCall { (buff: Uint8Array, length: Int) =>
+    val target = new Target
+    target.writeNextBytes.expects(*, *).onCall { (buff: Uint8Array, length: Int) =>
       buff.length shouldBe (64 * 1024)
       length shouldBe 123
       Future.successful(position)
     }
-    (target.setAttributes _).expects(file).returning(Future.unit)
-    (target.close _).expects().returning(Future.unit)
+    target.setAttributes.expects(file).returning(Future.unit)
+    target.close.expects().returning(Future.unit)
     val dstName = "newName"
 
     //then
     onExists.expects(existing).returning(Future.successful(Some(false)))
-    (api.writeFile _).expects(dstDirs, dstName, *).onCall { (_, _, onExists) =>
+    api.writeFile.expects(dstDirs, dstName, *).onCall { (_, _, onExists) =>
       onExists(existing).map { res =>
         res shouldBe Some(false)
-        Some(target)
+        Some(target.target)
       }
     }
-    (api.readFile _).expects(srcDirs, file, 0.0).returning(Future.successful(source))
+    api.readFile.expects(srcDirs, file, 0.0).returning(Future.successful(source.source))
     onProgress.expects(position).returning(Future.successful(true))
     
     //when
@@ -377,8 +431,8 @@ class FileListActionsSpec extends AsyncTestSpec {
 
   it should "call onProgress(file.size) if skip existing when copyFile" in {
     //given
-    val api = mock[FileListApi]
-    val actions = new FileListActionsTest(api)
+    val api = new Api
+    val actions = new FileListActionsTest(api.api)
     val srcDirs = List("parent-dir")
     val file = FileListItem("test_file", size = 123)
     val existing = FileListItem("existing_file", size = 12)
@@ -389,7 +443,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     
     //then
     onExists.expects(existing).returning(Future.successful(None))
-    (api.writeFile _).expects(dstDirs, dstName, *).onCall { (_, _, onExists) =>
+    api.writeFile.expects(dstDirs, dstName, *).onCall { (_, _, onExists) =>
       onExists(existing).map { res =>
         res shouldBe None
         None
@@ -408,8 +462,8 @@ class FileListActionsSpec extends AsyncTestSpec {
 
   it should "return false and delete target file if cancelled when copyFile" in {
     //given
-    val api = mock[FileListApi]
-    val actions = new FileListActionsTest(api)
+    val api = new Api
+    val actions = new FileListActionsTest(api.api)
     val srcDirs = List("parent-dir")
     val file = FileListItem("test_file")
     val dstDirs = List("target-dir")
@@ -417,26 +471,26 @@ class FileListActionsSpec extends AsyncTestSpec {
     val onProgress = mockFunction[Double, Future[Boolean]]
     val position = 1234.0
     
-    val source = mock[FileSource]
-    (source.readNextBytes _).expects(*).onCall { buff: Uint8Array =>
+    val source = new Source
+    source.readNextBytes.expects(*).onCall { buff: Uint8Array =>
       buff.length shouldBe (64 * 1024)
       Future.successful(123)
     }
-    (source.close _).expects().returning(Future.unit)
+    source.close.expects().returning(Future.unit)
     
-    val target = mock[FileTarget]
-    (target.writeNextBytes _).expects(*, *).onCall { (buff: Uint8Array, length: Int) =>
+    val target = new Target
+    target.writeNextBytes.expects(*, *).onCall { (buff: Uint8Array, length: Int) =>
       buff.length shouldBe (64 * 1024)
       length shouldBe 123
       Future.successful(position)
     }
-    (target.close _).expects().returning(Future.unit)
-    (target.delete _).expects().returning(Future.unit)
+    target.close.expects().returning(Future.unit)
+    target.delete.expects().returning(Future.unit)
     val dstName = "newName"
 
     //then
-    (api.writeFile _).expects(dstDirs, dstName, *).returning(Future.successful(Some(target)))
-    (api.readFile _).expects(srcDirs, file, 0.0).returning(Future.successful(source))
+    api.writeFile.expects(dstDirs, dstName, *).returning(Future.successful(Some(target.target)))
+    api.readFile.expects(srcDirs, file, 0.0).returning(Future.successful(source.source))
     onExists.expects(*).never()
     onProgress.expects(position).returning(Future.successful(false))
     

@@ -1,7 +1,6 @@
 package farjs.filelist
 
 import farjs.filelist.FileListView._
-import farjs.filelist.FileListViewSpec._
 import farjs.filelist.api.FileListItem
 import farjs.filelist.stack.{PanelStack, PanelStackProps}
 import farjs.ui.border._
@@ -12,7 +11,6 @@ import scommons.react.test._
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
-import scala.scalajs.js.annotation.JSExportAll
 
 class FileListViewSpec extends TestSpec with TestRendererUtils {
 
@@ -26,21 +24,25 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
       FileListItem("item 1"),
       FileListItem("item 2")
     ), onWheel = onWheel)
-    val inputMock = mock[BlessedElementMock]
-    val input = inputMock.asInstanceOf[BlessedElement]
+    val onMock = mockFunction[String, js.Function, BlessedEventEmitter]
+    val offMock = mockFunction[String, js.Function, BlessedEventEmitter]
+    val input = literal(
+      "on" -> onMock,
+      "off" -> offMock
+    ).asInstanceOf[BlessedElement]
 
     var wheelupListener: js.Function1[MouseData, Unit] = null
     var wheeldownListener: js.Function1[MouseData, Unit] = null
-    (inputMock.on _).expects("wheelup", *).onCall { (_: String, listener: js.Function) =>
+    onMock.expects("wheelup", *).onCall { (_: String, listener: js.Function) =>
       wheelupListener = listener.asInstanceOf[js.Function1[MouseData, Unit]]
       input
     }
-    (inputMock.on _).expects("wheeldown", *).onCall { (_: String, listener: js.Function) =>
+    onMock.expects("wheeldown", *).onCall { (_: String, listener: js.Function) =>
       wheeldownListener = listener.asInstanceOf[js.Function1[MouseData, Unit]]
       input
     }
-    (inputMock.on _).expects("keypress", *)
-    (inputMock.on _).expects("click", *)
+    onMock.expects("keypress", *)
+    onMock.expects("click", *)
     
     val renderer = createTestRenderer(withContext(<(FileListView())(^.wrapped := props)(), input), { el =>
       if (el.`type` == <.box.name.asInstanceOf[js.Any]) literal(aleft = 5, atop = 3)
@@ -67,10 +69,10 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     check(up = true, shift = true)
     
     //cleanup
-    (inputMock.off _).expects("click", *)
-    (inputMock.off _).expects("keypress", *)
-    (inputMock.off _).expects("wheelup", wheelupListener)
-    (inputMock.off _).expects("wheeldown", wheeldownListener)
+    offMock.expects("click", *)
+    offMock.expects("keypress", *)
+    offMock.expects("wheelup", wheelupListener)
+    offMock.expects("wheeldown", wheeldownListener)
     renderer.unmount()
   }
 
@@ -82,17 +84,21 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
       FileListItem("item 2"),
       FileListItem("item 3")
     ), onClick = onClick)
-    val inputMock = mock[BlessedElementMock]
-    val input = inputMock.asInstanceOf[BlessedElement]
+    val onMock = mockFunction[String, js.Function, BlessedEventEmitter]
+    val offMock = mockFunction[String, js.Function, BlessedEventEmitter]
+    val input = literal(
+      "on" -> onMock,
+      "off" -> offMock
+    ).asInstanceOf[BlessedElement]
 
     var clickListener: js.Function1[MouseData, Unit] = null
-    (inputMock.on _).expects("click", *).onCall { (_: String, listener: js.Function) =>
+    onMock.expects("click", *).onCall { (_: String, listener: js.Function) =>
       clickListener = listener.asInstanceOf[js.Function1[MouseData, Unit]]
       input
     }
-    (inputMock.on _).expects("keypress", *)
-    (inputMock.on _).expects("wheelup", *)
-    (inputMock.on _).expects("wheeldown", *)
+    onMock.expects("keypress", *)
+    onMock.expects("wheelup", *)
+    onMock.expects("wheeldown", *)
     
     val renderer = createTestRenderer(withContext(<(FileListView())(^.wrapped := props)(), input), { el =>
       if (el.`type` == <.box.name.asInstanceOf[js.Any]) literal(aleft = 5, atop = 3)
@@ -120,10 +126,10 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     check(x = 8, y = 5, index = 3) // last item in col 2
     
     //cleanup
-    (inputMock.off _).expects("click", clickListener)
-    (inputMock.off _).expects("keypress", *)
-    (inputMock.off _).expects("wheelup", *)
-    (inputMock.off _).expects("wheeldown", *)
+    offMock.expects("click", clickListener)
+    offMock.expects("keypress", *)
+    offMock.expects("wheelup", *)
+    offMock.expects("wheeldown", *)
     renderer.unmount()
   }
 
@@ -134,19 +140,23 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
       FileListItem("item 1"),
       FileListItem("item 2")
     ), onKeypress = onKeypress)
-    val inputMock = mock[BlessedElementMock]
-    val input = inputMock.asInstanceOf[BlessedElement]
-    val screen = js.Dynamic.literal().asInstanceOf[BlessedScreen]
-    (inputMock.screen _).expects().returning(screen)
+    val onMock = mockFunction[String, js.Function, BlessedEventEmitter]
+    val offMock = mockFunction[String, js.Function, BlessedEventEmitter]
+    val screen = literal().asInstanceOf[BlessedScreen]
+    val input = literal(
+      "screen" -> screen,
+      "on" -> onMock,
+      "off" -> offMock
+    ).asInstanceOf[BlessedElement]
 
     var keyListener: js.Function2[js.Object, KeyboardKey, Unit] = null
-    (inputMock.on _).expects("keypress", *).onCall { (_: String, listener: js.Function) =>
+    onMock.expects("keypress", *).onCall { (_: String, listener: js.Function) =>
       keyListener = listener.asInstanceOf[js.Function2[js.Object, KeyboardKey, Unit]]
       input
     }
-    (inputMock.on _).expects("wheelup", *)
-    (inputMock.on _).expects("wheeldown", *)
-    (inputMock.on _).expects("click", *)
+    onMock.expects("wheelup", *)
+    onMock.expects("wheeldown", *)
+    onMock.expects("click", *)
     
     val renderer = createTestRenderer(withContext(<(FileListView())(^.wrapped := props)(), input))
     val keyFull = "some-key"
@@ -158,10 +168,10 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     keyListener(null, literal(full = keyFull).asInstanceOf[KeyboardKey])
 
     //cleanup
-    (inputMock.off _).expects("keypress", keyListener)
-    (inputMock.off _).expects("wheelup", *)
-    (inputMock.off _).expects("wheeldown", *)
-    (inputMock.off _).expects("click", *)
+    offMock.expects("keypress", keyListener)
+    offMock.expects("wheelup", *)
+    offMock.expects("wheeldown", *)
+    offMock.expects("click", *)
     renderer.unmount()
   }
 
@@ -263,17 +273,5 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
           (items, focusedPos, selectedNames) shouldBe expectedData(1)
       }
     })
-  }
-}
-
-object FileListViewSpec {
-
-  @JSExportAll
-  trait BlessedElementMock {
-
-    def screen: BlessedScreen
-
-    def on(eventName: String, listener: js.Function): BlessedEventEmitter
-    def off(eventName: String, listener: js.Function): BlessedEventEmitter
   }
 }

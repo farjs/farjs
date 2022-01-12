@@ -4,11 +4,12 @@ import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.FileListItem
 import farjs.filelist.copy.MoveProcess._
+import farjs.filelist.fs.MockFS
 import farjs.ui.popup.{MessageBoxProps, StatusPopupProps}
 import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
+import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.nodejs.{FS, path}
 import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
@@ -18,14 +19,25 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   MoveProcess.statusPopupComp = mockUiComponent("StatusPopup")
   MoveProcess.messageBoxComp = mockUiComponent("MessageBox")
 
+  //noinspection TypeAnnotation
+  class FS {
+    val rename = mockFunction[String, String, Future[Unit]]
+    val existsSync = mockFunction[String, Boolean]
+
+    val fs = new MockFS(
+      renameMock = rename,
+      existsSyncMock = existsSync
+    )
+  }
+
   it should "call onTopItem/onDone when success" in {
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val fs = mock[FS]
-    MoveProcess.fs = fs
+    val actions = new MockFileListActions
+    val fs = new FS
+    MoveProcess.fs = fs.fs
     val item1 = FileListItem("dir 1", isDir = true)
     val item2 = FileListItem("file 1", size = 10)
     val props = MoveProcessProps(dispatch, actions, "/from/path", List(
@@ -33,7 +45,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       (item2, item2.name)
     ), "/to/path", onTopItem, onDone)
     val p = Promise[Unit]()
-    (fs.rename _).expects(path.join(props.fromPath, "dir 1"), path.join(props.toPath, "newName1")).returning(p.future)
+    fs.rename.expects(path.join(props.fromPath, "dir 1"), path.join(props.toPath, "newName1")).returning(p.future)
     val renderer = createTestRenderer(<(MoveProcess())(^.wrapped := props)())
 
     eventually {
@@ -45,8 +57,8 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       }
     }.flatMap { _ =>
       //then
-      (fs.existsSync _).expects(path.join(props.toPath, "file 1")).returning(false)
-      (fs.rename _).expects(path.join(props.fromPath, "file 1"), path.join(props.toPath, "file 1")).returning(p.future)
+      fs.existsSync.expects(path.join(props.toPath, "file 1")).returning(false)
+      fs.rename.expects(path.join(props.fromPath, "file 1"), path.join(props.toPath, "file 1")).returning(p.future)
       onTopItem.expects(item1)
       onTopItem.expects(item2)
       var done = false
@@ -69,9 +81,9 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val fs = mock[FS]
-    MoveProcess.fs = fs
+    val actions = new MockFileListActions
+    val fs = new FS
+    MoveProcess.fs = fs.fs
     val item1 = FileListItem("dir 1", isDir = true)
     val item2 = FileListItem("file 1", size = 10)
     val props = MoveProcessProps(dispatch, actions, "/from/path", List(
@@ -79,7 +91,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       (item2, item2.name)
     ), "/to/path", onTopItem, onDone)
     val p = Promise[Unit]()
-    (fs.rename _).expects(path.join(props.fromPath, "dir 1"), path.join(props.toPath, "dir 1")).returning(p.future)
+    fs.rename.expects(path.join(props.fromPath, "dir 1"), path.join(props.toPath, "dir 1")).returning(p.future)
     createTestRenderer(<(MoveProcess())(^.wrapped := props)())
 
     //then
@@ -106,9 +118,9 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val fs = mock[FS]
-    MoveProcess.fs = fs
+    val actions = new MockFileListActions
+    val fs = new FS
+    MoveProcess.fs = fs.fs
     val item1 = FileListItem("dir 1", isDir = true)
     val item2 = FileListItem("file 1", size = 10)
     val props = MoveProcessProps(dispatch, actions, "/from/path", List(
@@ -116,7 +128,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       (item2, item2.name)
     ), "/to/path", onTopItem, onDone)
     val p = Promise[Unit]()
-    (fs.rename _).expects(path.join(props.fromPath, "dir 1"), path.join(props.toPath, "dir 1")).returning(p.future)
+    fs.rename.expects(path.join(props.fromPath, "dir 1"), path.join(props.toPath, "dir 1")).returning(p.future)
     val renderer = createTestRenderer(<(MoveProcess())(^.wrapped := props)())
 
     eventually {
@@ -150,9 +162,9 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val fs = mock[FS]
-    MoveProcess.fs = fs
+    val actions = new MockFileListActions
+    val fs = new FS
+    MoveProcess.fs = fs.fs
     val item1 = FileListItem("file 1", size = 1)
     val item2 = FileListItem("file 2", size = 10)
     val props = MoveProcessProps(dispatch, actions, "/from/path", List(
@@ -160,7 +172,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       (item2, item2.name)
     ), "/to/path", onTopItem, onDone)
     val newPath = path.join(props.toPath, "file 1")
-    (fs.existsSync _).expects(newPath).returning(true)
+    fs.existsSync.expects(newPath).returning(true)
     val renderer = createTestRenderer(<(MoveProcess())(^.wrapped := props)())
 
     eventually {
@@ -203,9 +215,9 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val fs = mock[FS]
-    MoveProcess.fs = fs
+    val actions = new MockFileListActions
+    val fs = new FS
+    MoveProcess.fs = fs.fs
     val item1 = FileListItem("file 1", size = 1)
     val item2 = FileListItem("file 2", size = 10)
     val props = MoveProcessProps(dispatch, actions, "/from/path", List(
@@ -213,7 +225,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       (item2, item2.name)
     ), "/to/path", onTopItem, onDone)
     val newPath1 = path.join(props.toPath, "file 1")
-    (fs.existsSync _).expects(newPath1).returning(true)
+    fs.existsSync.expects(newPath1).returning(true)
     val renderer = createTestRenderer(<(MoveProcess())(^.wrapped := props)())
 
     eventually {
@@ -225,7 +237,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       }
     }.flatMap { _ =>
       //then
-      (fs.rename _).expects(path.join(props.fromPath, "file 1"), newPath1).returning(Future.unit)
+      fs.rename.expects(path.join(props.fromPath, "file 1"), newPath1).returning(Future.unit)
       onTopItem.expects(item1)
       
       //when
@@ -234,7 +246,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       //then
       findProps(renderer.root, messageBoxComp) should be (empty)
       val newPath2 = path.join(props.toPath, "file 2")
-      (fs.existsSync _).expects(newPath2).returning(true)
+      fs.existsSync.expects(newPath2).returning(true)
 
       eventually {
         inside(renderer.root.children.toList) { case List(_, existsMessage) =>
@@ -245,7 +257,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         }
       }.flatMap { _ =>
         //then
-        (fs.rename _).expects(path.join(props.fromPath, "file 2"), newPath2).returning(Future.unit)
+        fs.rename.expects(path.join(props.fromPath, "file 2"), newPath2).returning(Future.unit)
         onTopItem.expects(item2)
         
         var done = false
@@ -270,9 +282,9 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val fs = mock[FS]
-    MoveProcess.fs = fs
+    val actions = new MockFileListActions
+    val fs = new FS
+    MoveProcess.fs = fs.fs
     val item1 = FileListItem("file 1", size = 1)
     val item2 = FileListItem("file 2", size = 10)
     val props = MoveProcessProps(dispatch, actions, "/from/path", List(
@@ -280,7 +292,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       (item2, item2.name)
     ), "/to/path", onTopItem, onDone)
     val newPath1 = path.join(props.toPath, "file 1")
-    (fs.existsSync _).expects(newPath1).returning(true)
+    fs.existsSync.expects(newPath1).returning(true)
     val renderer = createTestRenderer(<(MoveProcess())(^.wrapped := props)())
 
     eventually {
@@ -292,12 +304,12 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       }
     }.flatMap { _ =>
       //then
-      (fs.rename _).expects(path.join(props.fromPath, "file 1"), newPath1).returning(Future.unit)
+      fs.rename.expects(path.join(props.fromPath, "file 1"), newPath1).returning(Future.unit)
       onTopItem.expects(item1)
       
       val newPath2 = path.join(props.toPath, "file 2")
-      (fs.existsSync _).expects(newPath2).returning(true)
-      (fs.rename _).expects(path.join(props.fromPath, "file 2"), newPath2).returning(Future.unit)
+      fs.existsSync.expects(newPath2).returning(true)
+      fs.rename.expects(path.join(props.fromPath, "file 2"), newPath2).returning(Future.unit)
       onTopItem.expects(item2)
       
       var done = false
@@ -321,9 +333,9 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val fs = mock[FS]
-    MoveProcess.fs = fs
+    val actions = new MockFileListActions
+    val fs = new FS
+    MoveProcess.fs = fs.fs
     val item1 = FileListItem("file 1", size = 1)
     val item2 = FileListItem("file 2", size = 10)
     val props = MoveProcessProps(dispatch, actions, "/from/path", List(
@@ -331,7 +343,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       (item2, item2.name)
     ), "/to/path", onTopItem, onDone)
     val newPath1 = path.join(props.toPath, "file 1")
-    (fs.existsSync _).expects(newPath1).returning(true)
+    fs.existsSync.expects(newPath1).returning(true)
     val renderer = createTestRenderer(<(MoveProcess())(^.wrapped := props)())
 
     eventually {
@@ -348,7 +360,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       //then
       findProps(renderer.root, messageBoxComp) should be (empty)
       val newPath2 = path.join(props.toPath, "file 2")
-      (fs.existsSync _).expects(newPath2).returning(true)
+      fs.existsSync.expects(newPath2).returning(true)
 
       eventually {
         inside(renderer.root.children.toList) { case List(_, existsMessage) =>
@@ -380,9 +392,9 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val fs = mock[FS]
-    MoveProcess.fs = fs
+    val actions = new MockFileListActions
+    val fs = new FS
+    MoveProcess.fs = fs.fs
     val item1 = FileListItem("file 1", size = 1)
     val item2 = FileListItem("file 2", size = 10)
     val item3 = FileListItem("file 3", size = 11)
@@ -392,7 +404,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       (item3, item3.name)
     ), "/to/path", onTopItem, onDone)
     val newPath1 = path.join(props.toPath, "file 1")
-    (fs.existsSync _).expects(newPath1).returning(true)
+    fs.existsSync.expects(newPath1).returning(true)
     val renderer = createTestRenderer(<(MoveProcess())(^.wrapped := props)())
 
     eventually {
@@ -403,10 +415,10 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         }
       }
     }.flatMap { _ =>
-      (fs.existsSync _).expects(path.join(props.toPath, "file 2")).returning(true)
+      fs.existsSync.expects(path.join(props.toPath, "file 2")).returning(true)
       val newPath3 = path.join(props.toPath, "file 3")
-      (fs.existsSync _).expects(newPath3).returning(false)
-      (fs.rename _).expects(path.join(props.fromPath, "file 3"), newPath3).returning(Future.unit)
+      fs.existsSync.expects(newPath3).returning(false)
+      fs.rename.expects(path.join(props.fromPath, "file 3"), newPath3).returning(Future.unit)
       onTopItem.expects(item3)
 
       var done = false

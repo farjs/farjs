@@ -1,9 +1,9 @@
 package farjs.app.task
 
-import farjs.app.FarjsStateDef
+import farjs.app.TestFarjsState
 import io.github.shogowada.scalajs.reactjs.React.Props
 import scommons.react.redux.Dispatch
-import scommons.react.redux.task.{FutureTask, TaskManager, TaskManagerProps}
+import scommons.react.redux.task._
 import scommons.react.test.TestSpec
 
 import scala.concurrent.Future
@@ -20,8 +20,9 @@ class FarjsTaskControllerSpec extends TestSpec {
     val props = mock[Props[Unit]]
     val dispatch = mock[Dispatch]
     val currentTask = Some(FutureTask("test task", Future.successful(())))
-    val state = mock[FarjsStateDef]
-    (state.currentTask _).expects().returning(currentTask)
+    val currentTaskMock = mockFunction[Option[AbstractTask]]
+    val state = TestFarjsState(currentTaskMock = currentTaskMock)
+    currentTaskMock.expects().returning(currentTask)
 
     //when
     val result = FarjsTaskController.mapStateToProps(dispatch, state, props)

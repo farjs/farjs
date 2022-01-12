@@ -25,10 +25,19 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
 
   private val currComp = "QuickViewPanel".asInstanceOf[ReactClass]
 
+  //noinspection TypeAnnotation
+  class Actions {
+    val scanDirs = mockFunction[String, Seq[FileListItem], (String, Seq[FileListItem]) => Boolean, Future[Boolean]]
+
+    val actions = new MockFileListActions(
+      scanDirsMock = scanDirs
+    )
+  }
+
   it should "update params with calculated stats" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
+    val actions = new Actions
     val currItem = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, List(
       currItem,
@@ -40,9 +49,9 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val stack = new PanelStack(stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
       stackState = f(stackState)
     })
-    val props = QuickViewDirProps(dispatch, actions, FileListState(currDir = currDir), stack, 25, currItem)
+    val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
     val p = Promise[Boolean]()
-    (actions.scanDirs _).expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
+    actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
       onNextDir("/path", List(
         FileListItem("dir 2", isDir = true),
         FileListItem("file 2", size = 122),
@@ -70,7 +79,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
   it should "handle cancel action and hide StatusPopup when onClose" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
+    val actions = new Actions
     val currItem = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, List(
       currItem,
@@ -82,10 +91,10 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val stack = new PanelStack(stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
       stackState = f(stackState)
     })
-    val props = QuickViewDirProps(dispatch, actions, FileListState(currDir = currDir), stack, 25, currItem)
+    val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
     val p = Promise[Boolean]()
     var onNextDirFn: (String, Seq[FileListItem]) => Boolean = null
-    (actions.scanDirs _).expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
+    actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
       onNextDirFn = onNextDir
       p.future
     }
@@ -117,7 +126,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
   it should "dispatch action when failure" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
+    val actions = new Actions
     val currItem = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, List(
       currItem,
@@ -129,9 +138,9 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val stack = new PanelStack(stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
       stackState = f(stackState)
     })
-    val props = QuickViewDirProps(dispatch, actions, FileListState(currDir = currDir), stack, 25, currItem)
+    val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
     val p = Promise[Boolean]()
-    (actions.scanDirs _).expects(currDir.path, Seq(currDir.items.head), *).returning(p.future)
+    actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).returning(p.future)
 
     val renderer = createTestRenderer(<(QuickViewDir())(^.wrapped := props)())
     findProps(renderer.root, statusPopupComp) should not be empty
@@ -158,7 +167,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
   it should "render component with existing params" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
+    val actions = new Actions
     val currItem = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, List(
       currItem,
@@ -171,7 +180,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val stack = new PanelStack(stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
       stackState = f(stackState)
     })
-    val props = QuickViewDirProps(dispatch, actions, FileListState(currDir = currDir), stack, 25, currItem)
+    val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
 
     //when
     val result = createTestRenderer(<(QuickViewDir())(^.wrapped := props)()).root

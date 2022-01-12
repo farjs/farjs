@@ -1,6 +1,5 @@
 package farjs.ui
 
-import farjs.ui.TextBoxSpec._
 import farjs.ui.theme.Theme
 import org.scalactic.source.Position
 import scommons.react.blessed._
@@ -8,69 +7,62 @@ import scommons.react.blessed.raw._
 import scommons.react.test._
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExportAll
+import scala.scalajs.js.Dynamic.literal
 
 class TextBoxSpec extends TestSpec with TestRendererUtils {
 
   it should "move cursor and grab focus when onClick" in {
     //given
     val props = getTextBoxProps()
-    val programMock = mock[BlessedProgramMock]
-    val screenMock = mock[BlessedScreenMock]
-    val inputMock = mock[BlessedElementMock]
-    
-    (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-    (inputMock.width _).expects().twice().returning(10)
-    (inputMock.aleft _).expects().returning(1)
-    (inputMock.atop _).expects().returning(3)
-    (programMock.omove _).expects(10, 3)
+    val omoveMock = mockFunction[Int, Int, Unit]
+    val programMock = literal("omove" -> omoveMock)
+    val screenMock = literal("program" -> programMock)
+    val focusMock = mockFunction[Unit]
+    val inputMock = literal("screen" -> screenMock, "focus" -> focusMock)
+    inputMock.width = 10
+    inputMock.aleft = 1
+    inputMock.atop = 3
+    omoveMock.expects(10, 3)
 
     val root = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
-      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
+      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     }).root
 
     //then
-    (inputMock.screen _).expects().twice().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-    (inputMock.width _).expects().returning(10)
-    (inputMock.aleft _).expects().twice().returning(1)
-    (inputMock.atop _).expects().returning(3)
-    (programMock.omove _).expects(2, 3)
-    (screenMock.focused _).expects().returning(null)
-    (inputMock.focus _).expects()
+    inputMock.width = 10
+    inputMock.aleft = 1
+    inputMock.atop = 3
+    omoveMock.expects(2, 3)
+    focusMock.expects()
 
     //when
-    root.children(0).props.onClick(js.Dynamic.literal(x = 2, y = 3))
+    root.children(0).props.onClick(literal(x = 2, y = 3))
   }
 
   it should "keep cursor position when onResize" in {
     //given
     val props = getTextBoxProps(value = "test")
-    val programMock = mock[BlessedProgramMock]
-    val screenMock = mock[BlessedScreenMock]
-    val inputMock = mock[BlessedElementMock]
-
-    (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-    (inputMock.width _).expects().twice().returning(10)
-    (inputMock.aleft _).expects().returning(1)
-    (inputMock.atop _).expects().returning(2)
-    (programMock.omove _).expects(5, 2)
+    val omoveMock = mockFunction[Int, Int, Unit]
+    val programMock = literal("omove" -> omoveMock)
+    val screenMock = literal("program" -> programMock)
+    val focusMock = mockFunction[Unit]
+    val inputMock = literal("screen" -> screenMock, "focus" -> focusMock)
+    inputMock.width = 10
+    inputMock.aleft = 1
+    inputMock.atop = 2
+    omoveMock.expects(5, 2)
     
     val root = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
-      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
+      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     }).root
 
     //then
-    (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-    (inputMock.aleft _).expects().returning(1)
-    (inputMock.atop _).expects().returning(2)
-    (programMock.omove _).expects(5, 2)
-    (screenMock.focused _).expects().returning(inputMock.asInstanceOf[BlessedElement])
+    inputMock.aleft = 1
+    inputMock.atop = 2
+    omoveMock.expects(5, 2)
+    screenMock.focused = inputMock
 
     //when
     root.children(0).props.onResize()
@@ -79,31 +71,30 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
   it should "show cursor when onFocus" in {
     //given
     val props = getTextBoxProps(value = "test")
-    val programMock = mock[BlessedProgramMock]
-    val screenMock = mock[BlessedScreenMock]
-    val cursorMock = mock[BlessedCursorMock]
-    val inputMock = mock[BlessedElementMock]
-
-    (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-    (inputMock.width _).expects().twice().returning(10)
-    (inputMock.aleft _).expects().returning(1)
-    (inputMock.atop _).expects().returning(2)
-    (programMock.omove _).expects(5, 2)
+    val omoveMock = mockFunction[Int, Int, Unit]
+    val programMock = literal("omove" -> omoveMock)
+    val screenMock = literal("program" -> programMock)
+    val focusMock = mockFunction[Unit]
+    val inputMock = literal("screen" -> screenMock, "focus" -> focusMock)
+    inputMock.width = 10
+    inputMock.aleft = 1
+    inputMock.atop = 2
+    omoveMock.expects(5, 2)
     
     val root = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
-      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
+      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     }).root
 
     //then
-    (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-    (screenMock.cursor _).expects().returning(cursorMock.asInstanceOf[BlessedCursor])
-    (cursorMock.shape _).expects().returning("underline")
-    (cursorMock.blink _).expects().returning(false)
-    (screenMock.cursorShape _).expects("underline", true)
-    (programMock.showCursor _).expects()
+    val cursorMock = literal("shape" -> "underline", "blink" -> false)
+    val cursorShapeMock = mockFunction[String, Boolean, Boolean]
+    val showCursorMock = mockFunction[Unit]
+    screenMock.cursor = cursorMock
+    screenMock.cursorShape = cursorShapeMock
+    programMock.showCursor = showCursorMock
+    cursorShapeMock.expects("underline", true)
+    showCursorMock.expects()
 
     //when
     root.children(0).props.onFocus()
@@ -112,26 +103,24 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
   it should "hide cursor when onBlur" in {
     //given
     val props = getTextBoxProps()
-    val programMock = mock[BlessedProgramMock]
-    val screenMock = mock[BlessedScreenMock]
-    val inputMock = mock[BlessedElementMock]
-
-    (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-    (inputMock.width _).expects().twice().returning(10)
-    (inputMock.aleft _).expects().returning(1)
-    (inputMock.atop _).expects().returning(2)
-    (programMock.omove _).expects(10, 2)
+    val omoveMock = mockFunction[Int, Int, Unit]
+    val programMock = literal("omove" -> omoveMock)
+    val screenMock = literal("program" -> programMock)
+    val inputMock = literal("screen" -> screenMock)
+    inputMock.width = 10
+    inputMock.aleft = 1
+    inputMock.atop = 2
+    omoveMock.expects(10, 2)
 
     val root = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
-      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
+      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     }).root
 
     //then
-    (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-    (programMock.hideCursor _).expects()
+    val hideCursorMock = mockFunction[Unit]
+    programMock.hideCursor = hideCursorMock
+    hideCursorMock.expects()
 
     //when
     root.children(0).props.onBlur()
@@ -141,24 +130,23 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     //given
     val onEnter = mockFunction[Unit]
     val props = getTextBoxProps(onEnter = onEnter)
-    val programMock = mock[BlessedProgramMock]
-    val screenMock = mock[BlessedScreenMock]
-    val inputMock = mock[BlessedElementMock]
+    val omoveMock = mockFunction[Int, Int, Unit]
+    val programMock = literal("omove" -> omoveMock)
+    val screenMock = literal("program" -> programMock)
+    val inputMock = literal("screen" -> screenMock)
     val width = props.width
     val (aleft, atop) = props.pos
     val cursorX = width - 1
-    (inputMock.screen _).expects().anyNumberOfTimes().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.program _).expects().anyNumberOfTimes().returning(programMock.asInstanceOf[BlessedProgram])
-    (inputMock.width _).expects().anyNumberOfTimes().returning(width)
-    (inputMock.aleft _).expects().anyNumberOfTimes().returning(aleft)
-    (inputMock.atop _).expects().anyNumberOfTimes().returning(atop)
-    (programMock.omove _).expects(aleft + cursorX, atop)
+    inputMock.width = width
+    inputMock.aleft = aleft
+    inputMock.atop = atop
+    omoveMock.expects(aleft + cursorX, atop)
 
     val inputEl = testRender(<(TextBox())(^.wrapped := props)(), { el =>
-      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
+      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
-    val key = js.Dynamic.literal("full" -> "return").asInstanceOf[KeyboardKey]
+    val key = literal("full" -> "return").asInstanceOf[KeyboardKey]
 
     //then
     onEnter.expects()
@@ -174,27 +162,28 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     //given
     val onEnter = mockFunction[Unit]
     val props = getTextBoxProps(onEnter = onEnter)
-    val programMock = mock[BlessedProgramMock]
-    val screenMock = mock[BlessedScreenMock]
-    val inputMock = mock[BlessedElementMock]
+    val omoveMock = mockFunction[Int, Int, Unit]
+    val programMock = literal("omove" -> omoveMock)
+    val screenMock = literal("program" -> programMock)
+    val inputMock = literal("screen" -> screenMock)
     val width = props.width
     val (aleft, atop) = props.pos
     val cursorX = width - 1
-    (inputMock.screen _).expects().anyNumberOfTimes().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.program _).expects().anyNumberOfTimes().returning(programMock.asInstanceOf[BlessedProgram])
-    (inputMock.width _).expects().anyNumberOfTimes().returning(width)
-    (inputMock.aleft _).expects().anyNumberOfTimes().returning(aleft)
-    (inputMock.atop _).expects().anyNumberOfTimes().returning(atop)
-    (programMock.omove _).expects(aleft + cursorX, atop)
+    inputMock.width = width
+    inputMock.aleft = aleft
+    inputMock.atop = atop
+    omoveMock.expects(aleft + cursorX, atop)
 
     val inputEl = testRender(<(TextBox())(^.wrapped := props)(), { el =>
-      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
+      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
-    val key = js.Dynamic.literal("full" -> "C-c").asInstanceOf[KeyboardKey]
+    val key = literal("full" -> "C-c").asInstanceOf[KeyboardKey]
 
     //then
-    (screenMock.copyToClipboard _).expects(props.value)
+    val copyToClipboardMock = mockFunction[String, Boolean]
+    screenMock.copyToClipboard = copyToClipboardMock
+    copyToClipboardMock.expects(props.value)
 
     //when
     inputEl.props.onKeypress(null, key)
@@ -208,32 +197,31 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     val onChange = mockFunction[String, Unit]
     var value = "initial name"
     val props = getTextBoxProps(value, onChange)
-    val programMock = mock[BlessedProgramMock]
-    val screenMock = mock[BlessedScreenMock]
-    val inputMock = mock[BlessedElementMock]
+    val omoveMock = mockFunction[Int, Int, Unit]
+    val programMock = literal("omove" -> omoveMock)
+    val screenMock = literal("program" -> programMock)
+    val inputMock = literal("screen" -> screenMock)
     val width = 10
     val aleft = 1
     val atop = 2
     
-    def maxOffset = value.length - width + 1
-    def maxCursorX = width - 1
+    def maxOffset: Int = value.length - width + 1
+    def maxCursorX: Int = width - 1
 
     var offset = maxOffset
     var cursorX = maxCursorX
     var selStart = 0
     var selEnd = value.length
     
-    def currIdx = offset + cursorX
+    def currIdx: Int = offset + cursorX
 
-    (inputMock.screen _).expects().anyNumberOfTimes().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.program _).expects().anyNumberOfTimes().returning(programMock.asInstanceOf[BlessedProgram])
-    (inputMock.width _).expects().anyNumberOfTimes().returning(width)
-    (inputMock.aleft _).expects().anyNumberOfTimes().returning(aleft)
-    (inputMock.atop _).expects().anyNumberOfTimes().returning(atop)
-    (programMock.omove _).expects(aleft + cursorX, atop)
+    inputMock.width = width
+    inputMock.aleft = aleft
+    inputMock.atop = atop
+    omoveMock.expects(aleft + cursorX, atop)
 
     val renderer = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
-      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
+      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
     
@@ -248,14 +236,14 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
              )(implicit pos: Position): Unit = {
       
       //given
-      val key = js.Dynamic.literal("full" -> fullKey).asInstanceOf[KeyboardKey]
+      val key = literal("full" -> fullKey).asInstanceOf[KeyboardKey]
       
       offset = idx
       selStart = startIdx
       selEnd = endIdx
       if (cursorX != posX) {
         cursorX = posX
-        (programMock.omove _).expects(aleft + cursorX, atop)
+        omoveMock.expects(aleft + cursorX, atop)
       }
 
       if (value != newVal) {
@@ -351,20 +339,18 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
   it should "render initial component" in {
     //given
     val props = getTextBoxProps()
-    val programMock = mock[BlessedProgramMock]
-    val screenMock = mock[BlessedScreenMock]
-    val inputMock = mock[BlessedElementMock]
-
-    (inputMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-    (inputMock.width _).expects().twice().returning(10)
-    (inputMock.aleft _).expects().returning(1)
-    (inputMock.atop _).expects().returning(3)
-    (programMock.omove _).expects(10, 3)
+    val omoveMock = mockFunction[Int, Int, Unit]
+    val programMock = literal("omove" -> omoveMock)
+    val screenMock = literal("program" -> programMock)
+    val inputMock = literal("screen" -> screenMock)
+    inputMock.width = 10
+    inputMock.aleft = 1
+    inputMock.atop = 3
+    omoveMock.expects(10, 3)
 
     //when
     val result = testRender(<(TextBox())(^.wrapped := props)(), { el =>
-      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock.asInstanceOf[js.Any]
+      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
 
@@ -401,49 +387,5 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
         ^.content := TextBox.renderText(theme.selected, selectedText)
       )()
     )
-  }
-}
-
-object TextBoxSpec {
-
-  @JSExportAll
-  trait BlessedProgramMock {
-
-    def showCursor(): Unit
-    def hideCursor(): Unit
-
-    def omove(x: Int, y: Int): Unit
-  }
-
-  @JSExportAll
-  trait BlessedScreenMock {
-
-    def program: BlessedProgram
-    def cursor: BlessedCursor
-
-    def focused: BlessedElement
-
-    def cursorShape(shape: String, blink: Boolean): Boolean
-
-    def copyToClipboard(text: String): Boolean
-  }
-
-  @JSExportAll
-  trait BlessedCursorMock {
-
-    def shape: String
-    def blink: Boolean
-  }
-
-  @JSExportAll
-  trait BlessedElementMock {
-
-    def width: Int
-    
-    def aleft: Int
-    def atop: Int
-
-    def screen: BlessedScreen
-    def focus(): Unit
   }
 }

@@ -1,6 +1,6 @@
 package farjs.app.filelist
 
-import farjs.app.FarjsStateDef
+import farjs.app.TestFarjsState
 import farjs.filelist._
 import io.github.shogowada.scalajs.reactjs.React.Props
 import scommons.react.redux.Dispatch
@@ -24,8 +24,9 @@ class FileListControllerSpec extends TestSpec {
     val controller = new FileListController(actions)
     val dispatch = mock[Dispatch]
     val fileListsState = mock[FileListsStateDef]
-    val state = mock[FarjsStateDef]
-    (state.fileListsState _).expects().returning(fileListsState)
+    val fileListsStateMock = mockFunction[FileListsStateDef]
+    val state = TestFarjsState(fileListsStateMock = fileListsStateMock)
+    fileListsStateMock.expects().returning(fileListsState)
 
     //when
     val result = controller.mapStateToProps(dispatch, state, props)

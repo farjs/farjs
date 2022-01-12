@@ -13,11 +13,11 @@ class InputControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "render component and collect keys input" in {
     //given
-    g.farjsLogKeys shouldBe js.undefined
+    js.typeOf(g.farjsLogKeys) shouldBe "undefined"
     
     //when & then
     val renderer = createTestRenderer(<(InputController())()())
-    g.farjsLogKeys should not be js.undefined
+    js.typeOf(g.farjsLogKeys) should not be "undefined"
 
     //when & then
     g.farjsLogKeys("key 1")
@@ -41,6 +41,6 @@ class InputControllerSpec extends TestSpec with TestRendererUtils {
     TestRenderer.act { () =>
       renderer.unmount()
     }
-    g.farjsLogKeys shouldBe js.undefined
+    js.typeOf(g.farjsLogKeys) shouldBe "undefined"
   }
 }

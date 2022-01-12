@@ -1,7 +1,8 @@
 package farjs.filelist.quickview
 
 import farjs.filelist._
-import farjs.filelist.stack.PanelStack
+import farjs.filelist.stack.MockPanelStack
+import farjs.filelist.stack.PanelStack.StackItem
 import io.github.shogowada.scalajs.reactjs.React.Props
 import scommons.react.ReactClass
 import scommons.react.redux.Dispatch
@@ -15,9 +16,26 @@ class QuickViewPluginSpec extends TestSpec {
     }
   }
 
+  //noinspection TypeAnnotation
+  class Stack {
+    val push = mockFunction[ReactClass, QuickViewParams, Unit]
+    val update = mockFunction[QuickViewParams, Unit]
+    val pop = mockFunction[Unit]
+    val peek = mockFunction[Option[StackItem]]
+    val params = mockFunction[QuickViewParams]
+
+    val stack = new MockPanelStack[QuickViewParams](
+      pushMock = push,
+      updateMock = update,
+      popMock = pop,
+      peekMock = peek,
+      paramsMock = params
+    )
+  }
+
   it should "define uiComponent and triggerKey" in {
     //given
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val plugin = createQuickViewPlugin(actions)
     
     //when & then
@@ -29,76 +47,79 @@ class QuickViewPluginSpec extends TestSpec {
   
   it should "remove plugin from left panel when onTrigger" in {
     //given
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val plugin = createQuickViewPlugin(actions)
-    val leftStack = mock[PanelStack]
-    val rightStack = mock[PanelStack]
-    (leftStack.peek _).expects().returning(Some((plugin(), null)))
+    val leftStack = new Stack
+    val rightStack = new Stack
+    leftStack.peek.expects().returning(Some((plugin(), null)))
     
     //then
-    (leftStack.pop _).expects()
+    leftStack.pop.expects()
 
     //when
-    plugin.onTrigger(isRight = false, leftStack, rightStack)
+    plugin.onTrigger(isRight = false, leftStack.stack, rightStack.stack)
   }
   
   it should "remove plugin from right panel when onTrigger" in {
     //given
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val plugin = createQuickViewPlugin(actions)
-    val leftStack = mock[PanelStack]
-    val rightStack = mock[PanelStack]
-    (leftStack.peek _).expects().returning(None)
-    (rightStack.peek _).expects().returning(Some((plugin(), null)))
+    val leftStack = new Stack
+    val rightStack = new Stack
+    leftStack.peek.expects().returning(None)
+    rightStack.peek.expects().returning(Some((plugin(), null)))
     
     //then
-    (rightStack.pop _).expects()
+    rightStack.pop.expects()
 
     //when
-    plugin.onTrigger(isRight = false, leftStack, rightStack)
+    plugin.onTrigger(isRight = false, leftStack.stack, rightStack.stack)
   }
   
   it should "add plugin to left panel when onTrigger" in {
     //given
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val plugin = createQuickViewPlugin(actions)
-    val leftStack = mock[PanelStack]
-    val rightStack = mock[PanelStack]
-    (leftStack.peek _).expects().returning(None)
-    (rightStack.peek _).expects().returning(Some(("testComp".asInstanceOf[ReactClass], null)))
+    val leftStack = new Stack
+    val rightStack = new Stack
+    leftStack.peek.expects().returning(None)
+    rightStack.peek.expects().returning(Some(("testComp".asInstanceOf[ReactClass], null)))
     
     //then
-    (leftStack.push(_: ReactClass, _: QuickViewParams)).expects(plugin(), QuickViewParams())
+    leftStack.push.expects(plugin(), QuickViewParams())
 
     //when
-    plugin.onTrigger(isRight = true, leftStack, rightStack)
+    plugin.onTrigger(isRight = true, leftStack.stack, rightStack.stack)
   }
   
   it should "add plugin to right panel when onTrigger" in {
     //given
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val plugin = createQuickViewPlugin(actions)
-    val leftStack = mock[PanelStack]
-    val rightStack = mock[PanelStack]
-    (leftStack.peek _).expects().returning(None)
-    (rightStack.peek _).expects().returning(Some(("testComp".asInstanceOf[ReactClass], null)))
+    val leftStack = new Stack
+    val rightStack = new Stack
+    leftStack.peek.expects().returning(None)
+    rightStack.peek.expects().returning(Some(("testComp".asInstanceOf[ReactClass], null)))
     
     //then
-    (rightStack.push(_: ReactClass, _: QuickViewParams)).expects(plugin(), QuickViewParams())
+    rightStack.push.expects(plugin(), QuickViewParams())
 
     //when
-    plugin.onTrigger(isRight = false, leftStack, rightStack)
+    plugin.onTrigger(isRight = false, leftStack.stack, rightStack.stack)
   }
   
   it should "map state to props" in {
     //given
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val props = mock[Props[Unit]]
     val plugin = createQuickViewPlugin(actions)
     val dispatch = mock[Dispatch]
-    val fileListsState = mock[FileListsStateDef]
-    val state = mock[FileListsGlobalState]
-    (state.fileListsState _).expects().returning(fileListsState)
+    val fileListsState = FileListsState()
+    val fileListsStateMock = mockFunction[FileListsStateDef]
+    val state = new FileListsGlobalState {
+      override def fileListsState: FileListsStateDef = fileListsStateMock()
+    }
+    fileListsStateMock.expects().returning(fileListsState)
 
     //when
     val result = plugin.mapStateToProps(dispatch, state, props)

@@ -10,18 +10,27 @@ import scala.concurrent.{Future, Promise}
 
 class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
+  //noinspection TypeAnnotation
+  class FsService {
+    val readDisk = mockFunction[String, Future[Option[FSDisk]]]
+
+    val fsService = new MockFSService(
+      readDiskMock = readDisk
+    )
+  }
+
   it should "call onRender(Some(...)) when readDisk returns Some(...)" in {
     //given
     val onRender = mockFunction[Option[Double], ReactElement]
-    val fsService = mock[FSService]
-    FSFreeSpace.fsService = fsService
+    val fsService = new FsService
+    FSFreeSpace.fsService = fsService.fsService
     val props = FSFreeSpaceProps(FileListDir("/", isRoot = false, Nil), onRender)
     val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
     val renderRes = <.button()()
     val resultF = Future.successful(Some(disk))
 
     //then
-    (fsService.readDisk _).expects(props.currDir.path).returning(resultF)
+    fsService.readDisk.expects(props.currDir.path).returning(resultF)
     onRender.expects(None).returning(renderRes)
     onRender.expects(Some(disk.free)).returning(renderRes)
     
@@ -36,14 +45,14 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "call onRender(None) when readDisk returns None" in {
     //given
     val onRender = mockFunction[Option[Double], ReactElement]
-    val fsService = mock[FSService]
-    FSFreeSpace.fsService = fsService
+    val fsService = new FsService
+    FSFreeSpace.fsService = fsService.fsService
     val props = FSFreeSpaceProps(FileListDir("/", isRoot = false, Nil), onRender)
     val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
     val renderRes = <.button()()
     val resultF = Future.successful(Some(disk))
 
-    (fsService.readDisk _).expects(props.currDir.path).returning(resultF)
+    fsService.readDisk.expects(props.currDir.path).returning(resultF)
     onRender.expects(None).returning(renderRes)
     onRender.expects(Some(disk.free)).returning(renderRes)
 
@@ -53,7 +62,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     resultF.flatMap { _ =>
       //then
-      (fsService.readDisk _).expects(props2.currDir.path).returning(resultF2)
+      fsService.readDisk.expects(props2.currDir.path).returning(resultF2)
       onRender.expects(Some(disk.free)).returning(renderRes)
       onRender.expects(None).returning(renderRes)
 
@@ -71,14 +80,14 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "call onRender(None) when readDisk fails" in {
     //given
     val onRender = mockFunction[Option[Double], ReactElement]
-    val fsService = mock[FSService]
-    FSFreeSpace.fsService = fsService
+    val fsService = new FsService
+    FSFreeSpace.fsService = fsService.fsService
     val props = FSFreeSpaceProps(FileListDir("/", isRoot = false, Nil), onRender)
     val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
     val renderRes = <.button()()
     val resultF = Future.successful(Some(disk))
 
-    (fsService.readDisk _).expects(props.currDir.path).returning(resultF)
+    fsService.readDisk.expects(props.currDir.path).returning(resultF)
     onRender.expects(None).returning(renderRes)
     onRender.expects(Some(disk.free)).returning(renderRes)
 
@@ -88,7 +97,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     resultF.flatMap { _ =>
       //then
-      (fsService.readDisk _).expects(props2.currDir.path).returning(resultF2)
+      fsService.readDisk.expects(props2.currDir.path).returning(resultF2)
       onRender.expects(Some(disk.free)).returning(renderRes)
       onRender.expects(None).returning(renderRes)
 
@@ -106,14 +115,14 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "not call readDisk if currDir is not changed when re-render" in {
     //given
     val onRender = mockFunction[Option[Double], ReactElement]
-    val fsService = mock[FSService]
-    FSFreeSpace.fsService = fsService
+    val fsService = new FsService
+    FSFreeSpace.fsService = fsService.fsService
     val props = FSFreeSpaceProps(FileListDir("/", isRoot = false, Nil), onRender)
     val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
     val renderRes = <.button()()
     val resultF = Future.successful(Some(disk))
 
-    (fsService.readDisk _).expects(props.currDir.path).returning(resultF)
+    fsService.readDisk.expects(props.currDir.path).returning(resultF)
     onRender.expects(None).returning(renderRes)
     onRender.expects(Some(disk.free)).returning(renderRes)
 
@@ -137,8 +146,8 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "update state and call onRender only for the same (current) dir instance" in {
     //given
     val onRender = mockFunction[Option[Double], ReactElement]
-    val fsService = mock[FSService]
-    FSFreeSpace.fsService = fsService
+    val fsService = new FsService
+    FSFreeSpace.fsService = fsService.fsService
     val props = FSFreeSpaceProps(FileListDir("/", isRoot = false, Nil), onRender)
     val props2 = props.copy(currDir = props.currDir.copy(path = "/2"))
     val disk1 = FSDisk("/", size = 123.0, free = 456.0, "/")
@@ -150,8 +159,8 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val resultF2 = p2.future
 
     //then
-    (fsService.readDisk _).expects(props.currDir.path).returning(resultF1)
-    (fsService.readDisk _).expects(props2.currDir.path).returning(resultF2)
+    fsService.readDisk.expects(props.currDir.path).returning(resultF1)
+    fsService.readDisk.expects(props2.currDir.path).returning(resultF2)
     onRender.expects(None).returning(renderRes)
     onRender.expects(None).returning(renderRes)
     onRender.expects(Some(disk2.free)).returning(renderRes)

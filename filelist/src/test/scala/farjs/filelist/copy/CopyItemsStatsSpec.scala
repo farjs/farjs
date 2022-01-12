@@ -15,18 +15,27 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
 
   CopyItemsStats.statusPopupComp = mockUiComponent("StatusPopup")
 
+  //noinspection TypeAnnotation
+  class Actions {
+    val scanDirs = mockFunction[String, Seq[FileListItem], (String, Seq[FileListItem]) => Boolean, Future[Boolean]]
+
+    val actions = new MockFileListActions(
+      scanDirsMock = scanDirs
+    )
+  }
+
   it should "call onDone with calculated total size" in {
     //given
     val onDone = mockFunction[Double, Unit]
     val onCancel = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = CopyItemsStatsProps(dispatch, actions, "/folder", List(
+    val actions = new Actions
+    val props = CopyItemsStatsProps(dispatch, actions.actions, "/folder", List(
       FileListItem("dir 1", isDir = true),
       FileListItem("file 1", size = 10)
     ), "Move", onDone, onCancel)
     val p = Promise[Boolean]()
-    (actions.scanDirs _).expects(props.fromPath, Seq(props.items.head), *).onCall { (_, _, onNextDir) =>
+    actions.scanDirs.expects(props.fromPath, Seq(props.items.head), *).onCall { (_, _, onNextDir) =>
       onNextDir("/path", List(
         FileListItem("dir 2", isDir = true),
         FileListItem("file 2", size = 123)
@@ -67,14 +76,14 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val onDone = mockFunction[Double, Unit]
     val onCancel = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = CopyItemsStatsProps(dispatch, actions, "/folder", List(
+    val actions = new Actions
+    val props = CopyItemsStatsProps(dispatch, actions.actions, "/folder", List(
       FileListItem("dir 1", isDir = true)
     ), "Copy", onDone, onCancel)
     val p = Promise[Boolean]()
     val resultF = p.future
     var onNextDirFn: (String, Seq[FileListItem]) => Boolean = null
-    (actions.scanDirs _).expects(props.fromPath, Seq(props.items.head), *).onCall { (_, _, onNextDir) =>
+    actions.scanDirs.expects(props.fromPath, Seq(props.items.head), *).onCall { (_, _, onNextDir) =>
       onNextDirFn = onNextDir
       resultF
     }
@@ -107,12 +116,12 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val onDone = mockFunction[Double, Unit]
     val onCancel = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = CopyItemsStatsProps(dispatch, actions, "/folder", List(
+    val actions = new Actions
+    val props = CopyItemsStatsProps(dispatch, actions.actions, "/folder", List(
       FileListItem("dir 1", isDir = true)
     ), "Copy", onDone, onCancel)
     val p = Promise[Boolean]()
-    (actions.scanDirs _).expects(props.fromPath, Seq(props.items.head), *).returning(p.future)
+    actions.scanDirs.expects(props.fromPath, Seq(props.items.head), *).returning(p.future)
     
     val renderer = createTestRenderer(<(CopyItemsStats())(^.wrapped := props)())
     findProps(renderer.root, statusPopupComp) should not be empty

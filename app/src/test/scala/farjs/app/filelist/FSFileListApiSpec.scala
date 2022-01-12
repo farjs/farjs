@@ -17,13 +17,18 @@ class FSFileListApiSpec extends AsyncTestSpec {
 
   it should "not fail if fs.lstatSync fail when readDir" in {
     //given
-    val fs = mock[FS]
+    val readdirMock = mockFunction[String, Future[Seq[String]]]
+    val lstatSyncMock = mockFunction[String, Stats]
+    val fs = new FS {
+      override def readdir(path: String): Future[Seq[String]] = readdirMock(path)
+      override def lstatSync(path: String): Stats = lstatSyncMock(path)
+    }
     val apiImp = new TestApiFS(fs)
     val targetDir = path.resolve(FileListDir.curr)
 
-    (fs.readdir _).expects(targetDir).returning(Future.successful(List("file1", "file2")))
-    (fs.lstatSync _).expects(path.join(targetDir, "file1")).throwing(new Exception("test error"))
-    (fs.lstatSync _).expects(path.join(targetDir, "file2")).throwing(new Exception("test error"))
+    readdirMock.expects(targetDir).returning(Future.successful(List("file1", "file2")))
+    lstatSyncMock.expects(path.join(targetDir, "file1")).throwing(new Exception("test error"))
+    lstatSyncMock.expects(path.join(targetDir, "file2")).throwing(new Exception("test error"))
     
     //when
     apiImp.readDir(targetDir).map { dir =>

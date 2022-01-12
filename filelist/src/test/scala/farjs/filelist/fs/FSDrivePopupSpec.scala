@@ -1,7 +1,7 @@
 package farjs.filelist.fs
 
-import farjs.filelist.FileListActions
 import farjs.filelist.FileListActions.{FileListDirChangeAction, FileListTaskAction}
+import farjs.filelist.MockFileListActions
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.fs.FSDrivePopup._
 import farjs.filelist.stack.{PanelStack, PanelStackProps}
@@ -13,6 +13,7 @@ import scommons.nodejs.Process.Platform
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
 import scommons.react.blessed._
+import scommons.react.redux.Dispatch
 import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
@@ -24,21 +25,39 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
   FSDrivePopup.modalContentComp = mockUiComponent("ModalContent")
   FSDrivePopup.buttonComp = mockUiComponent("Button")
 
+  //noinspection TypeAnnotation
+  class Actions {
+    val changeDir = mockFunction[Dispatch, Boolean, Option[String], String, FileListDirChangeAction]
+
+    val actions = new MockFileListActions(
+      changeDirMock = changeDir
+    )
+  }
+
+  //noinspection TypeAnnotation
+  class FsService {
+    val readDisks = mockFunction[Future[List[FSDisk]]]
+
+    val fsService = new MockFSService(
+      readDisksMock = readDisks
+    )
+  }
+
   it should "dispatch FileListDirChangeAction and call onClose when onPress item" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
+    val actions = new Actions
     val onClose = mockFunction[Unit]
-    val fsService = mock[FSService]
+    val fsService = new FsService
     FSDrivePopup.platform = Platform.win32
-    FSDrivePopup.fsService = fsService
-    val props = FSDrivePopupProps(dispatch, actions, isRight = false, onClose, showOnLeft = true)
+    FSDrivePopup.fsService = fsService.fsService
+    val props = FSDrivePopupProps(dispatch, actions.actions, isRight = false, onClose, showOnLeft = true)
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
       disksF = action.asInstanceOf[FileListTaskAction].task.future
     }
-    (fsService.readDisks _).expects().returning(Future.successful(List(
+    fsService.readDisks.expects().returning(Future.successful(List(
       FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
       FSDisk("D:", size = 842915639296.0, free = 352966430720.0, "DATA"),
       FSDisk("E:", size = 0.0, free = 0.0, "")
@@ -59,7 +78,7 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
           ))
 
           //then
-          (actions.changeDir _).expects(dispatch, props.isRight, None, "C:").returning(action)
+          actions.changeDir.expects(dispatch, props.isRight, None, "C:").returning(action)
           dispatch.expects(action)
           onClose.expects()
           
@@ -74,17 +93,17 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
   it should "render component on Windows" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val fsService = mock[FSService]
+    val actions = new Actions
+    val fsService = new FsService
     FSDrivePopup.platform = Platform.win32
-    FSDrivePopup.fsService = fsService
-    val props = FSDrivePopupProps(dispatch, actions, isRight = false, onClose = () => (), showOnLeft = true)
+    FSDrivePopup.fsService = fsService.fsService
+    val props = FSDrivePopupProps(dispatch, actions.actions, isRight = false, onClose = () => (), showOnLeft = true)
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
       disksF = action.asInstanceOf[FileListTaskAction].task.future
     }
-    (fsService.readDisks _).expects().returning(Future.successful(List(
+    fsService.readDisks.expects().returning(Future.successful(List(
       FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
       FSDisk("D:", size = 842915639296.0, free = 352966430720.0, "DATA"),
       FSDisk("E:", size = 0.0, free = 0.0, "")
@@ -111,17 +130,17 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
   it should "render component on Mac OS/Linux" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val fsService = mock[FSService]
+    val actions = new Actions
+    val fsService = new FsService
     FSDrivePopup.platform = Platform.darwin
-    FSDrivePopup.fsService = fsService
-    val props = FSDrivePopupProps(dispatch, actions, isRight = false, onClose = () => (), showOnLeft = true)
+    FSDrivePopup.fsService = fsService.fsService
+    val props = FSDrivePopupProps(dispatch, actions.actions, isRight = false, onClose = () => (), showOnLeft = true)
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
       disksF = action.asInstanceOf[FileListTaskAction].task.future
     }
-    (fsService.readDisks _).expects().returning(Future.successful(List(
+    fsService.readDisks.expects().returning(Future.successful(List(
       FSDisk("/", size = 156595318784.0, free = 81697124352.0, "/"),
       FSDisk("/Volumes/TestDrive", size = 842915639296.0, free = 352966430720.0, "TestDrive")
     )))

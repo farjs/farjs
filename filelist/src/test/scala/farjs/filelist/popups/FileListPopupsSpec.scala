@@ -4,13 +4,14 @@ import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.popups.FileListPopups._
 import farjs.filelist.popups.FileListPopupsActions._
-import farjs.filelist.{FileListActions, FileListsState}
+import farjs.filelist.{FileListsState, MockFileListActions}
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
 import scommons.nodejs._
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.blessed._
+import scommons.react.redux.Dispatch
 import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
@@ -25,11 +26,22 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
   FileListPopups.viewItemsPopupComp = mockUiComponent("ViewItemsPopup")
   FileListPopups.copyItemsComp = mockUiComponent("CopyItems")
 
+  //noinspection TypeAnnotation
+  class Actions {
+    val deleteAction = mockFunction[Dispatch, Boolean, String, Seq[FileListItem], FileListTaskAction]
+    val createDir = mockFunction[Dispatch, Boolean, String, String, Boolean, FileListDirCreateAction]
+
+    val actions = new MockFileListActions(
+      createDirMock = createDir,
+      deleteActionMock = deleteAction
+    )
+  }
+
   it should "render initial component" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListPopupsProps(dispatch, actions, FileListsState())
+    val actions = new Actions
+    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState())
 
     //when
     val result = createTestRenderer(<(FileListPopups())(^.wrapped := props)()).root
@@ -48,8 +60,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
   "Help popup" should "dispatch FileListPopupHelpAction when OK action" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
+    val actions = new Actions
+    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
       popups = FileListPopupsState(showHelpPopup = true)
     ))
     val comp = testRender(<(FileListPopups())(^.wrapped := props)())
@@ -68,8 +80,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
   it should "render component" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
+    val actions = new Actions
+    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
       popups = FileListPopupsState(showHelpPopup = true)
     ))
 
@@ -91,8 +103,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
   "Exit popup" should "dispatch FileListPopupExitAction and emit Ctrl+Q when YES action" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
+    val actions = new Actions
+    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
       popups = FileListPopupsState(showExitPopup = true)
     ))
     val comp = testRender(<(FileListPopups())(^.wrapped := props)())
@@ -126,8 +138,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
   it should "dispatch FileListPopupExitAction when NO action" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
+    val actions = new Actions
+    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
       popups = FileListPopupsState(showExitPopup = true)
     ))
     val comp = testRender(<(FileListPopups())(^.wrapped := props)())
@@ -146,8 +158,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
   it should "render component" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
+    val actions = new Actions
+    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
       popups = FileListPopupsState(showExitPopup = true)
     ))
 
@@ -169,7 +181,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
   "Delete popup" should "call api and delete currItem when YES action" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
+    val actions = new Actions
     val currDir = FileListDir("/sub-dir", isRoot = false, items = List(
       FileListItem("file 1"),
       FileListItem("file 2")
@@ -181,7 +193,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
         popups = FileListPopupsState(showDeletePopup = true)
       )
     }
-    val props = FileListPopupsProps(dispatch, actions, state)
+    val props = FileListPopupsProps(dispatch, actions.actions, state)
     val comp = testRender(<(FileListPopups())(^.wrapped := props)())
     val msgBox = findComponentProps(comp, messageBoxComp)
     val deleteAction = FileListTaskAction(
@@ -190,7 +202,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val items = List(FileListItem("file 1"))
 
     //then
-    (actions.deleteAction _).expects(dispatch, false, currDir.path, items).returning(deleteAction)
+    actions.deleteAction.expects(dispatch, false, currDir.path, items).returning(deleteAction)
     dispatch.expects(deleteAction)
     dispatch.expects(FileListPopupDeleteAction(show = false))
 
@@ -203,7 +215,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
   it should "call api and delete selectedItems when YES action" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
+    val actions = new Actions
     val currDir = FileListDir("/sub-dir", isRoot = false, items = List(
       FileListItem("file 1"),
       FileListItem("file 2")
@@ -216,7 +228,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
         popups = FileListPopupsState(showDeletePopup = true)
       )
     }
-    val props = FileListPopupsProps(dispatch, actions, state)
+    val props = FileListPopupsProps(dispatch, actions.actions, state)
     val comp = testRender(<(FileListPopups())(^.wrapped := props)())
     val msgBox = findComponentProps(comp, messageBoxComp)
     val deleteAction = FileListTaskAction(
@@ -225,7 +237,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val items = List(FileListItem("file 2"))
 
     //then
-    (actions.deleteAction _).expects(dispatch, true, currDir.path, items).returning(deleteAction)
+    actions.deleteAction.expects(dispatch, true, currDir.path, items).returning(deleteAction)
     dispatch.expects(deleteAction)
     dispatch.expects(FileListPopupDeleteAction(show = false))
 
@@ -238,8 +250,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
   it should "dispatch FileListPopupDeleteAction when NO action" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
+    val actions = new Actions
+    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
       popups = FileListPopupsState(showDeletePopup = true)
     ))
     val comp = testRender(<(FileListPopups())(^.wrapped := props)())
@@ -258,8 +270,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
   it should "render component" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
+    val actions = new Actions
+    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
       popups = FileListPopupsState(showDeletePopup = true)
     ))
 
@@ -281,7 +293,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
   "MkFolder popup" should "call api and update state when OK action" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
+    val actions = new Actions
     val currDir = FileListDir("/sub-dir", isRoot = false, items = Seq.empty)
     val state = {
       val state = FileListsState()
@@ -290,7 +302,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
         popups = FileListPopupsState(showMkFolderPopup = true)
       )
     }
-    val props = FileListPopupsProps(dispatch, actions, state)
+    val props = FileListPopupsProps(dispatch, actions.actions, state)
     val renderer = createTestRenderer(<(FileListPopups())(^.wrapped := props)())
     val popup = findComponentProps(renderer.root, makeFolderPopupComp)
     val action = FileListDirCreateAction(
@@ -300,7 +312,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val multiple = true
 
     //then
-    (actions.createDir _).expects(dispatch, false, currDir.path, dir, multiple).returning(action)
+    actions.createDir.expects(dispatch, false, currDir.path, dir, multiple).returning(action)
     dispatch.expects(action)
     dispatch.expects(FileListPopupMkFolderAction(show = false))
 
@@ -318,8 +330,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
   it should "dispatch FileListPopupMkFolderAction when Cancel action" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
+    val actions = new Actions
+    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
       popups = FileListPopupsState(showMkFolderPopup = true)
     ))
     val comp = testRender(<(FileListPopups())(^.wrapped := props)())
@@ -338,8 +350,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
   it should "render component" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
+    val actions = new Actions
+    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
       popups = FileListPopupsState(showMkFolderPopup = true)
     ))
 

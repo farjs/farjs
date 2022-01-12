@@ -1,15 +1,13 @@
 package scommons.react.blessed.portal
 
 import java.util.concurrent.atomic.AtomicReference
-
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.blessed.portal.WithPortalsSpec._
 import scommons.react.hooks._
 import scommons.react.test._
 
-import scala.scalajs.js.annotation.JSExportAll
+import scala.scalajs.js.Dynamic.literal
 
 class WithPortalsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -40,15 +38,13 @@ class WithPortalsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val (portalsCtx, portalsComp) = getPortalsCtxHook
     val (portalCtx1, portalComp1) = getPortalCtxHook("portal content 1")
     val (portalCtx2, portalComp2) = getPortalCtxHook("portal content 2")
-    val screenMock = mock[BlessedScreenMock]
+    val focused1 = literal()
+    val screenMock = literal("focused" -> focused1)
     val withPortals = new WithPortals(screenMock.asInstanceOf[BlessedScreen])
     val root = createTestRenderer(<(withPortals())()(
       <(portalsComp).empty,
       <.>()("some other content")
     )).root
-
-    val focused1 = mock[BlessedElementMock]
-    (screenMock.focused _).expects().returning(focused1.asInstanceOf[BlessedElement])
     
     //when & then
     portalsCtx.get.onRender(1, <(portalComp1).empty)
@@ -59,8 +55,8 @@ class WithPortalsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       portal1.`type` shouldBe portalComp1
     }
     
-    val focused2 = mock[BlessedElementMock]
-    (screenMock.focused _).expects().returning(focused2.asInstanceOf[BlessedElement])
+    val focused2 = literal()
+    screenMock.focused = focused2
     
     //when & then
     portalsCtx.get.onRender(2, <(portalComp2).empty)
@@ -79,8 +75,7 @@ class WithPortalsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val (portalsCtx, portalsComp) = getPortalsCtxHook
     val (portalCtx1, portalComp1) = getPortalCtxHook("portal content 1")
     val (portalCtx2, portalComp2) = getPortalCtxHook("portal content 2")
-    val screenMock = mock[BlessedScreenMock]
-    (screenMock.focused _).expects().returning(null).twice()
+    val screenMock = literal("focused" -> null)
     
     val withPortals = new WithPortals(screenMock.asInstanceOf[BlessedScreen])
     val root = createTestRenderer(<(withPortals())()(
@@ -124,34 +119,43 @@ class WithPortalsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val (portalCtx1, portalComp1) = getPortalCtxHook("portal content 1")
     val (portalCtx2, portalComp2) = getPortalCtxHook("portal content 2")
     val (portalCtx3, portalComp3) = getPortalCtxHook("portal content 3")
-    val screenMock = mock[BlessedScreenMock]
-    val focused1 = mock[BlessedElementMock]
-    val focused2 = mock[BlessedElementMock]
-    val focused3 = mock[BlessedElementMock]
-    (screenMock.focused _).expects().returning(null)
-    (screenMock.focused _).expects().returning(focused1.asInstanceOf[BlessedElement])
-    (screenMock.focused _).expects().returning(focused2.asInstanceOf[BlessedElement])
-    (screenMock.focused _).expects().returning(focused3.asInstanceOf[BlessedElement])
+    val renderMock = mockFunction[Unit]
+    val screenMock = literal("focused" -> null, "render" -> renderMock)
     
     var renderNum = 0
-    (screenMock.render _).expects().onCall { () =>
+    renderMock.expects().onCall { () =>
       renderNum += 1
     }.repeated(4)
 
-    //then
-    (focused3.focus _).expects()
-    (focused1.focus _).expects()
-    (focused2.focus _).expects().never()
-    
     val withPortals = new WithPortals(screenMock.asInstanceOf[BlessedScreen])
     val root = createTestRenderer(<(withPortals())()(
       <(portalsComp).empty,
       <.>()("some other content")
     )).root
     portalsCtx.get.onRender(0, <(portalComp0).empty)
+
+    //given & when
+    val focus1Mock = mockFunction[Unit]
+    val focused1 = literal("focus" -> focus1Mock)
+    screenMock.focused = focused1
+    focus1Mock.expects()
     portalsCtx.get.onRender(1, <(portalComp1).empty)
+
+    //given & when
+    val focus2Mock = mockFunction[Unit]
+    val focused2 = literal("focus" -> focus2Mock)
+    screenMock.focused = focused2
+    focus2Mock.expects().never()
     portalsCtx.get.onRender(2, <(portalComp2).empty)
+
+    //given & when
+    val focus3Mock = mockFunction[Unit]
+    val focused3 = literal("focus" -> focus3Mock)
+    screenMock.focused = focused3
+    focus3Mock.expects()
     portalsCtx.get.onRender(3, <(portalComp3).empty)
+
+    //then
     portalCtx0.get.isActive shouldBe false
     portalCtx1.get.isActive shouldBe false
     portalCtx2.get.isActive shouldBe false
@@ -203,8 +207,9 @@ class WithPortalsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "do nothing if portal not found when onRemove" in {
     //given
     val (portalsCtx, portalsComp) = getPortalsCtxHook
-    val screenMock = mock[BlessedScreenMock]
-    (screenMock.render _).expects().never()
+    val renderMock = mockFunction[Unit]
+    val screenMock = literal("render" -> renderMock)
+    renderMock.expects().never()
 
     val withPortals = new WithPortals(screenMock.asInstanceOf[BlessedScreen])
     val root = createTestRenderer(<(withPortals())()(
@@ -218,21 +223,5 @@ class WithPortalsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       resCtxHook.`type` shouldBe portalsComp
       otherContent shouldBe "some other content"
     }
-  }
-}
-
-object WithPortalsSpec {
-
-  @JSExportAll
-  trait BlessedScreenMock {
-
-    def focused: BlessedElement
-    def render(): Unit
-  }
-  
-  @JSExportAll
-  trait BlessedElementMock {
-
-    def focus(): Unit
   }
 }

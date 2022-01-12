@@ -1,6 +1,6 @@
 package farjs.app.filelist
 
-import farjs.app.FarjsStateDef
+import farjs.app.TestFarjsState
 import farjs.filelist.popups.{FileListPopups, FileListPopupsProps}
 import farjs.filelist.{FileListActions, FileListsStateDef}
 import io.github.shogowada.scalajs.reactjs.React.Props
@@ -25,8 +25,9 @@ class FileListPopupsControllerSpec extends TestSpec {
     val controller = new FileListPopupsController(actions)
     val dispatch = mock[Dispatch]
     val fileListsState = mock[FileListsStateDef]
-    val state = mock[FarjsStateDef]
-    (state.fileListsState _).expects().returning(fileListsState)
+    val fileListsStateMock = mockFunction[FileListsStateDef]
+    val state = TestFarjsState(fileListsStateMock = fileListsStateMock)
+    fileListsStateMock.expects().returning(fileListsState)
 
     //when
     val result = controller.mapStateToProps(dispatch, state, props)

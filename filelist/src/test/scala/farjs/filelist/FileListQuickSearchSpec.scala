@@ -1,15 +1,13 @@
 package farjs.filelist
 
 import farjs.filelist.FileListQuickSearch._
-import farjs.filelist.FileListQuickSearchSpec._
 import farjs.ui.border.DoubleBorderProps
 import farjs.ui.theme.Theme
 import scommons.react.blessed._
-import scommons.react.blessed.raw.{BlessedCursor, BlessedProgram}
 import scommons.react.test._
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExportAll
+import scala.scalajs.js.Dynamic.literal
 
 class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
 
@@ -19,23 +17,22 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
     //given
     val onClose = mockFunction[Unit]
     val props = FileListQuickSearchProps("text", onClose)
-    val programMock = mock[BlessedProgramMock]
-    val screenMock = mock[BlessedScreenMock]
-    val cursorMock = mock[BlessedCursorMock]
-    val textMock = mock[BlessedElementMock]
-    (textMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen]).twice()
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram]).twice()
-    (screenMock.cursor _).expects().returning(cursorMock.asInstanceOf[BlessedCursor])
-    (cursorMock.shape _).expects().returning("underline")
-    (cursorMock.blink _).expects().returning(false)
-    (screenMock.cursorShape _).expects("underline", true)
-    (programMock.showCursor _).expects()
-    (textMock.aleft _).expects().returning(1)
-    (textMock.atop _).expects().returning(3)
-    (programMock.omove _).expects(5, 3)
+    val omoveMock = mockFunction[Int, Int, Unit]
+    val cursorShapeMock = mockFunction[String, Boolean, Boolean]
+    val showCursorMock = mockFunction[Unit]
+    val programMock = literal("omove" -> omoveMock, "showCursor" -> showCursorMock)
+    val cursorMock = literal("shape" -> "underline", "blink" -> false)
+    val screenMock = literal("program" -> programMock, "cursor" -> cursorMock,
+      "cursorShape" -> cursorShapeMock)
+    val textMock = literal("screen" -> screenMock)
+    cursorShapeMock.expects("underline", true)
+    showCursorMock.expects()
+    textMock.aleft = 1
+    textMock.atop = 3
+    omoveMock.expects(5, 3)
     
     val comp = testRender(<(FileListQuickSearch())(^.wrapped := props)(), { el =>
-      if (el.`type` == "text".asInstanceOf[js.Any]) textMock.asInstanceOf[js.Any]
+      if (el.`type` == "text".asInstanceOf[js.Any]) textMock
       else null
     })
     
@@ -49,33 +46,30 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
   it should "move cursor when onResize" in {
     //given
     val props = FileListQuickSearchProps("text", () => ())
-    val programMock = mock[BlessedProgramMock]
-    val screenMock = mock[BlessedScreenMock]
-    val cursorMock = mock[BlessedCursorMock]
-    val textMock = mock[BlessedElementMock]
-    (textMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen]).twice()
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram]).twice()
-    (screenMock.cursor _).expects().returning(cursorMock.asInstanceOf[BlessedCursor])
-    (cursorMock.shape _).expects().returning("underline")
-    (cursorMock.blink _).expects().returning(false)
-    (screenMock.cursorShape _).expects("underline", true)
-    (programMock.showCursor _).expects()
-    (textMock.aleft _).expects().returning(1)
-    (textMock.atop _).expects().returning(3)
-    (programMock.omove _).expects(5, 3)
+    val omoveMock = mockFunction[Int, Int, Unit]
+    val cursorShapeMock = mockFunction[String, Boolean, Boolean]
+    val showCursorMock = mockFunction[Unit]
+    val programMock = literal("omove" -> omoveMock, "showCursor" -> showCursorMock)
+    val cursorMock = literal("shape" -> "underline", "blink" -> false)
+    val screenMock = literal("program" -> programMock, "cursor" -> cursorMock,
+      "cursorShape" -> cursorShapeMock)
+    val textMock = literal("screen" -> screenMock)
+    cursorShapeMock.expects("underline", true)
+    showCursorMock.expects()
+    textMock.aleft = 1
+    textMock.atop = 3
+    omoveMock.expects(5, 3)
     
     val renderer = createTestRenderer(<(FileListQuickSearch())(^.wrapped := props)(), { el =>
-      if (el.`type` == "text".asInstanceOf[js.Any]) textMock.asInstanceOf[js.Any]
+      if (el.`type` == "text".asInstanceOf[js.Any]) textMock
       else null
     })
     val List(formComp) = findComponents(renderer.root, <.form.name)
 
     //then
-    (textMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-    (textMock.aleft _).expects().returning(2)
-    (textMock.atop _).expects().returning(3)
-    (programMock.omove _).expects(6, 3)
+    textMock.aleft = 2
+    textMock.atop = 3
+    omoveMock.expects(6, 3)
     
     //when
     formComp.props.onResize()
@@ -84,32 +78,29 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
   it should "move cursor when update" in {
     //given
     val props = FileListQuickSearchProps("text", () => ())
-    val programMock = mock[BlessedProgramMock]
-    val screenMock = mock[BlessedScreenMock]
-    val cursorMock = mock[BlessedCursorMock]
-    val textMock = mock[BlessedElementMock]
-    (textMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen]).twice()
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram]).twice()
-    (screenMock.cursor _).expects().returning(cursorMock.asInstanceOf[BlessedCursor])
-    (cursorMock.shape _).expects().returning("underline")
-    (cursorMock.blink _).expects().returning(false)
-    (screenMock.cursorShape _).expects("underline", true)
-    (programMock.showCursor _).expects()
-    (textMock.aleft _).expects().returning(1)
-    (textMock.atop _).expects().returning(3)
-    (programMock.omove _).expects(5, 3)
+    val omoveMock = mockFunction[Int, Int, Unit]
+    val cursorShapeMock = mockFunction[String, Boolean, Boolean]
+    val showCursorMock = mockFunction[Unit]
+    val programMock = literal("omove" -> omoveMock, "showCursor" -> showCursorMock)
+    val cursorMock = literal("shape" -> "underline", "blink" -> false)
+    val screenMock = literal("program" -> programMock, "cursor" -> cursorMock,
+      "cursorShape" -> cursorShapeMock)
+    val textMock = literal("screen" -> screenMock)
+    cursorShapeMock.expects("underline", true)
+    showCursorMock.expects()
+    textMock.aleft = 1
+    textMock.atop = 3
+    omoveMock.expects(5, 3)
     
     val renderer = createTestRenderer(<(FileListQuickSearch())(^.wrapped := props)(), { el =>
-      if (el.`type` == "text".asInstanceOf[js.Any]) textMock.asInstanceOf[js.Any]
+      if (el.`type` == "text".asInstanceOf[js.Any]) textMock
       else null
     })
 
     //then
-    (textMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen])
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram])
-    (textMock.aleft _).expects().returning(1)
-    (textMock.atop _).expects().returning(3)
-    (programMock.omove _).expects(6, 3)
+    textMock.aleft = 1
+    textMock.atop = 3
+    omoveMock.expects(6, 3)
     
     //when
     TestRenderer.act { () =>
@@ -120,28 +111,29 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
   it should "hide cursor when unmount" in {
     //given
     val props = FileListQuickSearchProps("text", () => ())
-    val programMock = mock[BlessedProgramMock]
-    val screenMock = mock[BlessedScreenMock]
-    val cursorMock = mock[BlessedCursorMock]
-    val textMock = mock[BlessedElementMock]
-    (textMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen]).twice()
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram]).twice()
-    (screenMock.cursor _).expects().returning(cursorMock.asInstanceOf[BlessedCursor])
-    (cursorMock.shape _).expects().returning("underline")
-    (cursorMock.blink _).expects().returning(false)
-    (screenMock.cursorShape _).expects("underline", true)
-    (programMock.showCursor _).expects()
-    (textMock.aleft _).expects().returning(1)
-    (textMock.atop _).expects().returning(3)
-    (programMock.omove _).expects(5, 3)
+    val omoveMock = mockFunction[Int, Int, Unit]
+    val cursorShapeMock = mockFunction[String, Boolean, Boolean]
+    val showCursorMock = mockFunction[Unit]
+    val programMock = literal("omove" -> omoveMock, "showCursor" -> showCursorMock)
+    val cursorMock = literal("shape" -> "underline", "blink" -> false)
+    val screenMock = literal("program" -> programMock, "cursor" -> cursorMock,
+      "cursorShape" -> cursorShapeMock)
+    val textMock = literal("screen" -> screenMock)
+    cursorShapeMock.expects("underline", true)
+    showCursorMock.expects()
+    textMock.aleft = 1
+    textMock.atop = 3
+    omoveMock.expects(5, 3)
     
     val renderer = createTestRenderer(<(FileListQuickSearch())(^.wrapped := props)(), { el =>
-      if (el.`type` == "text".asInstanceOf[js.Any]) textMock.asInstanceOf[js.Any]
+      if (el.`type` == "text".asInstanceOf[js.Any]) textMock
       else null
     })
 
     //then
-    (programMock.hideCursor _).expects()
+    val hideCursorMock = mockFunction[Unit]
+    programMock.hideCursor = hideCursorMock
+    hideCursorMock.expects()
     
     //when
     TestRenderer.act { () =>
@@ -152,24 +144,23 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
   it should "render component" in {
     //given
     val props = FileListQuickSearchProps("some quick search text", () => ())
-    val programMock = mock[BlessedProgramMock]
-    val screenMock = mock[BlessedScreenMock]
-    val cursorMock = mock[BlessedCursorMock]
-    val textMock = mock[BlessedElementMock]
-    (textMock.screen _).expects().returning(screenMock.asInstanceOf[BlessedScreen]).twice()
-    (screenMock.program _).expects().returning(programMock.asInstanceOf[BlessedProgram]).twice()
-    (screenMock.cursor _).expects().returning(cursorMock.asInstanceOf[BlessedCursor])
-    (cursorMock.shape _).expects().returning("underline")
-    (cursorMock.blink _).expects().returning(false)
-    (screenMock.cursorShape _).expects("underline", true)
-    (programMock.showCursor _).expects()
-    (textMock.aleft _).expects().returning(1)
-    (textMock.atop _).expects().returning(3)
-    (programMock.omove _).expects(23, 3)
+    val omoveMock = mockFunction[Int, Int, Unit]
+    val cursorShapeMock = mockFunction[String, Boolean, Boolean]
+    val showCursorMock = mockFunction[Unit]
+    val programMock = literal("omove" -> omoveMock, "showCursor" -> showCursorMock)
+    val cursorMock = literal("shape" -> "underline", "blink" -> false)
+    val screenMock = literal("program" -> programMock, "cursor" -> cursorMock,
+      "cursorShape" -> cursorShapeMock)
+    val textMock = literal("screen" -> screenMock)
+    cursorShapeMock.expects("underline", true)
+    showCursorMock.expects()
+    textMock.aleft = 1
+    textMock.atop = 3
+    omoveMock.expects(23, 3)
 
     //when
     val result = testRender(<(FileListQuickSearch())(^.wrapped := props)(), { el =>
-      if (el.`type` == "text".asInstanceOf[js.Any]) textMock.asInstanceOf[js.Any]
+      if (el.`type` == "text".asInstanceOf[js.Any]) textMock
       else null
     })
 
@@ -220,42 +211,5 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
         )
       })
     })
-  }
-}
-
-object FileListQuickSearchSpec {
-
-  @JSExportAll
-  trait BlessedProgramMock {
-
-    def showCursor(): Unit
-    def hideCursor(): Unit
-
-    def omove(x: Int, y: Int): Unit
-  }
-
-  @JSExportAll
-  trait BlessedScreenMock {
-
-    def program: BlessedProgram
-    def cursor: BlessedCursor
-
-    def cursorShape(shape: String, blink: Boolean): Boolean
-  }
-
-  @JSExportAll
-  trait BlessedCursorMock {
-
-    def shape: String
-    def blink: Boolean
-  }
-
-  @JSExportAll
-  trait BlessedElementMock {
-
-    def aleft: Int
-    def atop: Int
-
-    def screen: BlessedScreen
   }
 }

@@ -1,6 +1,5 @@
 package farjs.ui.popup
 
-import farjs.ui.popup.PopupOverlaySpec._
 import org.scalatest._
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
@@ -8,7 +7,7 @@ import scommons.react.blessed._
 import scommons.react.test._
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExportAll
+import scala.scalajs.js.Dynamic.literal
 
 class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -16,20 +15,21 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     //given
     val onOpen = mockFunction[Unit]
     val props = PopupProps(onClose = () => (), onOpen = onOpen)
-    val formMock = mock[FormElementMock]
-
-    (formMock.on _).expects("element keypress", *)
-    (formMock.on _).expects("element focus", *)
+    val onMock = mockFunction[String, js.Function, Unit]
+    val focusFirstMock = mockFunction[Unit]
+    val formMock = literal("on" -> onMock, "focusFirst" -> focusFirstMock)
+    onMock.expects("element keypress", *)
+    onMock.expects("element focus", *)
     
     var focused = false
-    (formMock.focusFirst _).expects().onCall { () =>
+    focusFirstMock.expects().onCall { () =>
       focused = true
     }
     onOpen.expects()
 
     //when
     createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
-      if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
+      if (el.`type` == "form".asInstanceOf[js.Any]) formMock
       else null
     })
 
@@ -43,18 +43,19 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     //given
     val onOpen = mockFunction[Unit]
     val props = PopupProps(onClose = () => (), onOpen = onOpen, focusable = false)
-    val formMock = mock[FormElementMock]
-
-    (formMock.on _).expects("element keypress", *)
-    (formMock.on _).expects("element focus", *)
+    val onMock = mockFunction[String, js.Function, Unit]
+    val focusFirstMock = mockFunction[Unit]
+    val formMock = literal("on" -> onMock, "focusFirst" -> focusFirstMock)
+    onMock.expects("element keypress", *)
+    onMock.expects("element focus", *)
     
     //then
-    (formMock.focusFirst _).expects().never()
+    focusFirstMock.expects().never()
     onOpen.expects()
 
     //when
     createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
-      if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
+      if (el.`type` == "form".asInstanceOf[js.Any]) formMock
       else null
     })
     
@@ -64,10 +65,11 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
   it should "remove listeners when unmount" in {
     //given
     val props = PopupProps(onClose = () => (), focusable = false)
-    val formMock = mock[FormElementMock]
-
-    (formMock.on _).expects("element keypress", *)
-    (formMock.on _).expects("element focus", *)
+    val onMock = mockFunction[String, js.Function, Unit]
+    val offMock = mockFunction[String, js.Function, Unit]
+    val formMock = literal("on" -> onMock, "off" -> offMock)
+    onMock.expects("element keypress", *)
+    onMock.expects("element focus", *)
     
     val renderer = createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
@@ -75,8 +77,8 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     })
 
     //then
-    (formMock.off _).expects("element keypress", *)
-    (formMock.off _).expects("element focus", *)
+    offMock.expects("element keypress", *)
+    offMock.expects("element focus", *)
 
     //when
     renderer.unmount()
@@ -87,10 +89,11 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
   it should "re-subscribe element listeners when update" in {
     //given
     val props = PopupProps(onClose = () => (), focusable = false)
-    val formMock = mock[FormElementMock]
-
-    (formMock.on _).expects("element keypress", *)
-    (formMock.on _).expects("element focus", *)
+    val onMock = mockFunction[String, js.Function, Unit]
+    val offMock = mockFunction[String, js.Function, Unit]
+    val formMock = literal("on" -> onMock, "off" -> offMock)
+    onMock.expects("element keypress", *)
+    onMock.expects("element focus", *)
     
     val renderer = createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
@@ -98,10 +101,10 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     })
 
     //then
-    (formMock.on _).expects("element keypress", *)
-    (formMock.on _).expects("element focus", *)
-    (formMock.off _).expects("element keypress", *)
-    (formMock.off _).expects("element focus", *)
+    onMock.expects("element keypress", *)
+    onMock.expects("element focus", *)
+    offMock.expects("element keypress", *)
+    offMock.expects("element focus", *)
 
     //when
     renderer.update(<(PopupOverlay())(^.wrapped := props.copy(onClose = () => ()))())
@@ -113,15 +116,24 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     //given
     val onClose = mockFunction[Unit]
     val props = PopupProps(onClose = onClose, focusable = false)
-    val formMock = mock[FormElementMock]
+    val onMock = mockFunction[String, js.Function, Unit]
+    val offMock = mockFunction[String, js.Function, Unit]
+    val focusNextMock = mockFunction[Unit]
+    val focusPreviousMock = mockFunction[Unit]
+    val formMock = literal(
+      "on" -> onMock,
+      "off" -> offMock,
+      "focusNext" -> focusNextMock,
+      "focusPrevious" -> focusPreviousMock
+    )
 
     var keyListener: js.Function3[BlessedElement, js.Object, KeyboardKey, Unit] = null
-    (formMock.on _).expects("element keypress", *).onCall { (_, listener) =>
+    onMock.expects("element keypress", *).onCall { (_, listener) =>
       keyListener = listener.asInstanceOf[js.Function3[BlessedElement, js.Object, KeyboardKey, Unit]]
     }
-    (formMock.on _).expects("element focus", *)
+    onMock.expects("element focus", *)
     createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
-      if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
+      if (el.`type` == "form".asInstanceOf[js.Any]) formMock
       else null
     })
 
@@ -129,12 +141,12 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
       //then
       if (!defaultPrevented) key match {
         case "escape" => onClose.expects()
-        case "tab" | "down" | "right" => (formMock.focusNext _).expects()
-        case "S-tab" | "up" | "left" => (formMock.focusPrevious _).expects()
+        case "tab" | "down" | "right" => focusNextMock.expects()
+        case "S-tab" | "up" | "left" => focusPreviousMock.expects()
         case _ =>
       }
       //when
-      keyListener(null, null, js.Dynamic.literal(
+      keyListener(null, null, literal(
         "full" -> key,
         "defaultPrevented" -> defaultPrevented
       ).asInstanceOf[KeyboardKey])
@@ -157,21 +169,22 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     //given
     val onClose = mockFunction[Unit]
     val props = PopupProps(onClose = onClose, focusable = false, closable = false)
-    val formMock = mock[FormElementMock]
+    val onMock = mockFunction[String, js.Function, Unit]
+    val formMock = literal("on" -> onMock)
     
     //then
     onClose.expects().never()
 
-    (formMock.on _).expects("element keypress", *).onCall { (_, listener) =>
+    onMock.expects("element keypress", *).onCall { (_, listener) =>
       //when
       val keyListener = listener.asInstanceOf[js.Function3[BlessedElement, js.Object, KeyboardKey, Unit]]
-      keyListener(null, null, js.Dynamic.literal("full" -> "escape").asInstanceOf[KeyboardKey])
+      keyListener(null, null, literal("full" -> "escape").asInstanceOf[KeyboardKey])
     }
-    (formMock.on _).expects("element focus", *)
+    onMock.expects("element focus", *)
 
     //when
     createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
-      if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
+      if (el.`type` == "form".asInstanceOf[js.Any]) formMock
       else null
     })
 
@@ -181,14 +194,13 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
   it should "set form._selected element when child element is focused" in {
     //given
     val props = PopupProps(onClose = () => (), focusable = false, closable = false)
-    val formMock = mock[FormElementMock]
-    val childElement = js.Dynamic.literal("some" -> "childElement").asInstanceOf[BlessedElement]
+    val childElement = literal("some" -> "childElement").asInstanceOf[BlessedElement]
+    val onMock = mockFunction[String, js.Function, Unit]
+    val formMock = literal("on" -> onMock, "_selected" -> childElement)
     
     //then
-    (formMock._selected_= _).expects(childElement)
-    
-    (formMock.on _).expects("element keypress", *)
-    (formMock.on _).expects("element focus", *).onCall { (_, listener) =>
+    onMock.expects("element keypress", *)
+    onMock.expects("element focus", *).onCall { (_, listener) =>
       //when
       val focusListener = listener.asInstanceOf[js.Function1[BlessedElement, Unit]]
       focusListener(childElement)
@@ -196,7 +208,7 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
 
     //when
     createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
-      if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
+      if (el.`type` == "form".asInstanceOf[js.Any]) formMock
       else null
     })
 
@@ -207,14 +219,16 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     //given
     val onClose = mockFunction[Unit]
     val props = PopupProps(onClose = onClose)
-    val formMock = mock[FormElementMock]
+    val onMock = mockFunction[String, js.Function, Unit]
+    val focusFirstMock = mockFunction[Unit]
+    val formMock = literal("on" -> onMock, "focusFirst" -> focusFirstMock)
 
-    (formMock.focusFirst _).expects()
-    (formMock.on _).expects("element keypress", *)
-    (formMock.on _).expects("element focus", *)
+    focusFirstMock.expects()
+    onMock.expects("element keypress", *)
+    onMock.expects("element focus", *)
 
     val form = createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
-      if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
+      if (el.`type` == "form".asInstanceOf[js.Any]) formMock
       else null
     }).root.children(0)
 
@@ -231,14 +245,15 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     //given
     val onClose = mockFunction[Unit]
     val props = PopupProps(onClose = onClose, closable = false)
-    val formMock = mock[FormElementMock]
-
-    (formMock.focusFirst _).expects()
-    (formMock.on _).expects("element keypress", *)
-    (formMock.on _).expects("element focus", *)
+    val onMock = mockFunction[String, js.Function, Unit]
+    val focusFirstMock = mockFunction[Unit]
+    val formMock = literal("on" -> onMock, "focusFirst" -> focusFirstMock)
+    focusFirstMock.expects()
+    onMock.expects("element keypress", *)
+    onMock.expects("element focus", *)
 
     val form = createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
-      if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
+      if (el.`type` == "form".asInstanceOf[js.Any]) formMock
       else null
     }).root.children(0)
 
@@ -255,26 +270,24 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     //given
     val children: ReactElement = <.box()("test popup child")
     val props = PopupProps(onClose = () => ())
-    val formMock = mock[FormElementMock]
-
-    (formMock.focusFirst _).expects()
-    (formMock.on _).expects("element keypress", *)
-    (formMock.on _).expects("element focus", *)
+    val onMock = mockFunction[String, js.Function, Unit]
+    val focusFirstMock = mockFunction[Unit]
+    val formMock = literal("on" -> onMock, "focusFirst" -> focusFirstMock)
+    focusFirstMock.expects()
+    onMock.expects("element keypress", *)
+    onMock.expects("element focus", *)
 
     //when
     val result = createTestRenderer(<(PopupOverlay())(^.wrapped := props)(children), { el =>
-      if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
+      if (el.`type` == "form".asInstanceOf[js.Any]) formMock
       else null
     }).root.children(0)
 
     //then
-    assertPopupOverlay(result, props, children)
+    assertPopupOverlay(result, children)
   }
 
-  private def assertPopupOverlay(result: TestInstance,
-                                 props: PopupProps,
-                                 children: ReactElement): Assertion = {
-    
+  private def assertPopupOverlay(result: TestInstance, children: ReactElement): Assertion = {
     assertNativeComponent(result,
       <.form(
         ^.rbClickable := true,
@@ -285,20 +298,5 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
         children
       )
     )
-  }
-}
-
-object PopupOverlaySpec {
-
-  @JSExportAll
-  trait FormElementMock {
-    
-    def _selected_=(el: BlessedElement): Unit
-    def focusFirst(): Unit
-    def focusNext(): Unit
-    def focusPrevious(): Unit
-    
-    def on(event: String, listener: js.Function): Unit
-    def off(event: String, listener: js.Function): Unit
   }
 }
