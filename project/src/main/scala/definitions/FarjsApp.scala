@@ -26,6 +26,12 @@ object FarjsApp extends ScalaJsModule {
           ";farjs.app.FarjsActions"
       },
 
+      //TODO: temporarily disabled
+      //  @see: https://github.com/scalameta/metabrowse/issues/271
+      scalaJSLinkerConfig in fullOptJS ~= {
+        _.withOptimizer(false)
+      },
+
       scalaJSUseMainModuleInitializer := false,
       webpackBundlingMode := BundlingMode.Application,
       version in webpack := "4.29.0",
