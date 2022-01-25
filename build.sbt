@@ -6,7 +6,7 @@ lazy val `farjs` = (project in file("."))
   .settings(CommonModule.settings: _*)
   .settings(FarjsModule.settings: _*)
   .settings(
-    skip in publish := true,
+    publish / skip := true,
     publish := ((): Unit),
     publishLocal := ((): Unit),
     publishM2 := ((): Unit)

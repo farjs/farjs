@@ -248,7 +248,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
       ^.rbHeight := props.size._2,
       ^.rbLeft := 1,
       ^.rbTop := 1
-    )(), { case List(sep, col1, col2) =>
+    )(), inside(_) { case List(sep, col1, col2) =>
       assertTestComponent(sep, verticalLineComp) {
         case VerticalLineProps(pos, resLength, ch, style, start, end) =>
           pos shouldBe 2 -> -1

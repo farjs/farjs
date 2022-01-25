@@ -26,10 +26,10 @@ class PopupSpec extends TestSpec with TestRendererUtils {
                           props: PopupProps,
                           children: ReactElement): Unit = {
     
-    assertNativeComponent(result, <(portalComp()).empty, { case List(content) =>
+    assertNativeComponent(result, <(portalComp()).empty, inside(_) { case List(content) =>
       assertTestComponent(content, popupOverlayComp)({ resProps =>
         resProps should be theSameInstanceAs props
-      }, {
+      }, inside(_) {
         case List(child) => assertNativeComponent(child, children)
       })
     })

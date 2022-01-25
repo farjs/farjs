@@ -167,7 +167,7 @@ class QuickViewPanelSpec extends AsyncTestSpec with BaseTestSpec
       )
     }
 
-    assertNativeComponent(result, <.box(^.rbStyle := theme.regularItem)(), {
+    assertNativeComponent(result, <.box(^.rbStyle := theme.regularItem)(), inside(_) {
       case List(border, line, header, content, item)  =>
         assertComponents(border, line, header, content, item)
     })

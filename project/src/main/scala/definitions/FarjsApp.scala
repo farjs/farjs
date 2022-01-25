@@ -16,7 +16,7 @@ object FarjsApp extends ScalaJsModule {
 
   override def definition: Project = super.definition
     .settings(
-      skip in publish := true,
+      publish / skip := true,
       publish := ((): Unit),
       publishLocal := ((): Unit),
       publishM2 := ((): Unit),
@@ -28,13 +28,13 @@ object FarjsApp extends ScalaJsModule {
 
       //TODO: temporarily disabled
       //  @see: https://github.com/scalameta/metabrowse/issues/271
-      scalaJSLinkerConfig in fullOptJS ~= {
+      fullOptJS / scalaJSLinkerConfig ~= {
         _.withOptimizer(false)
       },
 
       scalaJSUseMainModuleInitializer := false,
       webpackBundlingMode := BundlingMode.Application,
-      version in webpack := "4.29.0",
+      webpack / version := "4.29.0",
 
       webpackResources := {
         baseDirectory.value / ".." / "LICENSE.txt" +++
@@ -42,23 +42,23 @@ object FarjsApp extends ScalaJsModule {
       },
       
       //dev
-      webpackConfigFile in fastOptJS := Some(
+      fastOptJS / webpackConfigFile := Some(
         baseDirectory.value / "src" / "main" / "resources" / "dev.webpack.config.js"
       ),
       //prod
-      webpackConfigFile in fullOptJS := Some(
+      fullOptJS / webpackConfigFile := Some(
         baseDirectory.value / "src" / "main" / "resources" / "prod.webpack.config.js"
       ),
       //tests
       scommonsRequireWebpackInTest := true,
-      webpackConfigFile in Test := Some(
+      Test / webpackConfigFile := Some(
         baseDirectory.value / "src" / "main" / "resources" / "test.webpack.config.js"
       ),
 
       //useYarn := true,
       //yarnExtraArgs := Seq("--frozen-lockfile"),
 
-      npmDevDependencies in Compile ++= Seq(
+      Compile / npmDevDependencies ++= Seq(
         "webpack-merge" -> "4.1.0",
         "webpack-node-externals" -> "1.7.2",
 
@@ -76,7 +76,7 @@ object FarjsApp extends ScalaJsModule {
         "rollup-plugin-node-resolve" -> "^5.2.0"
       ),
 
-      additionalNpmConfig in Compile := {
+      Compile / additionalNpmConfig := {
         import scalajsbundler.util.JSON._
         Map(
           "name" -> str("farjs-app"),

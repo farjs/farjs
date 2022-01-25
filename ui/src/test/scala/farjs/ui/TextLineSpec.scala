@@ -151,7 +151,9 @@ class TextLineSpec extends TestSpec with TestRendererUtils {
     
     val children = result.children.toList
     if (text.nonEmpty) {
-      val List(textEl) = children
+      val textEl = inside(children) {
+        case List(te) => te
+      }
       assertNativeComponent(textEl,
         <.text(
           ^.rbWidth := text.length,

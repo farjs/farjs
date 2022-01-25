@@ -48,7 +48,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock
       else null
     })
-    val List(leftButton, _) = findComponents(comp, <.button.name)
+    val leftButton = inside(findComponents(comp, <.button.name)) {
+      case List(leftButton, _) => leftButton
+    }
     
     //then
     dispatch.expects(FileListActivateAction(isRight = false))
@@ -75,7 +77,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock
       else null
     })
-    val List(_, rightButton) = findComponents(comp, <.button.name)
+    val rightButton = inside(findComponents(comp, <.button.name)) {
+      case List(_, rightButton) => rightButton
+    }
     
     //then
     dispatch.expects(FileListActivateAction(isRight = true))
@@ -99,7 +103,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
-    val List(button, _) = findComponents(comp, <.button.name)
+    val button = inside(findComponents(comp, <.button.name)) {
+      case List(button, _) => button
+    }
     val keyFull = "f10"
     
     //then
@@ -126,7 +132,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
-    val List(button, _) = findComponents(comp, <.button.name)
+    val button = inside(findComponents(comp, <.button.name)) {
+      case List(button, _) => button
+    }
     
     def check(keyFull: String, focus: Boolean): Unit = {
       if (focus) {
@@ -161,7 +169,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
-    val List(button, _) = findComponents(comp, <.button.name)
+    val button = inside(findComponents(comp, <.button.name)) {
+      case List(button, _) => button
+    }
     val keyFull = "C-u"
     
     //then
@@ -171,7 +181,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     button.props.onKeypress(screen, literal(full = keyFull).asInstanceOf[KeyboardKey])
 
     //then
-    val List(leftPanel, rightPanel) = findProps(comp, fileListPanelComp)
+    val (leftPanel, rightPanel) = inside(findProps(comp, fileListPanelComp)) {
+      case List(leftPanel, rightPanel) => (leftPanel, rightPanel)
+    }
     leftPanel.state shouldBe props.data.right
     rightPanel.state shouldBe props.data.left
   }
@@ -205,7 +217,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
-    val List(button, _) = findComponents(comp, <.button.name)
+    val button = inside(findComponents(comp, <.button.name)) {
+      case List(button, _) => button
+    }
     val keyFull = "C-r"
     val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
       FileListItem("file 1")
@@ -244,7 +258,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       else null
     })
     val WithPanelStacksProps(leftStack, rightStack) = findComponentProps(comp, WithPanelStacks)
-    val List(button, _) = findComponents(comp, <.button.name)
+    val button = inside(findComponents(comp, <.button.name)) {
+      case List(button, _) => button
+    }
     
     //then
     onTriggerMock.expects(false, leftStack, rightStack)
@@ -279,7 +295,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock
       else null
     })
-    val List(leftButton, _) = findComponents(renderer.root, <.button.name)
+    val leftButton = inside(findComponents(renderer.root, <.button.name)) {
+      case List(leftButton, _) => leftButton
+    }
 
     //when
     TestRenderer.act { () =>
@@ -326,7 +344,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock
       else null
     })
-    val List(leftButton, _) = findComponents(renderer.root, <.button.name)
+    val leftButton = inside(findComponents(renderer.root, <.button.name)) {
+      case List(leftButton, _) => leftButton
+    }
 
     //when
     TestRenderer.act { () =>
@@ -384,15 +404,15 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     assertTestComponent(result, WithPanelStacks)({ case WithPanelStacksProps(leftStack, rightStack) =>
       leftStack should not be null
       rightStack should not be null
-    }, { case List(left, right, menu) =>
+    }, inside(_) { case List(left, right, menu) =>
       assertNativeComponent(left, <.button(
         ^.rbMouse := true,
         ^.rbWidth := "50%",
         ^.rbHeight := "100%-1"
-      )(), { case List(stack) =>
+      )(), inside(_) { case List(stack) =>
         assertTestComponent(stack, panelStackComp)({ case PanelStackProps(isRight, _, _, _, _) =>
           isRight shouldBe false
-        }, { case List(panel) =>
+        }, inside(_) { case List(panel) =>
           assertTestComponent(panel, fileListPanelComp) {
             case FileListPanelProps(resDispatch, resActions, state) =>
               resDispatch should be theSameInstanceAs props.dispatch
@@ -406,10 +426,10 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         ^.rbWidth := "50%",
         ^.rbHeight := "100%-1",
         ^.rbLeft := "50%"
-      )(), { case List(stack) =>
+      )(), inside(_) { case List(stack) =>
         assertTestComponent(stack, panelStackComp)({ case PanelStackProps(isRight, _, _, _, _) =>
           isRight shouldBe true
-        }, { case List(panel) =>
+        }, inside(_) { case List(panel) =>
           assertTestComponent(panel, fileListPanelComp) {
             case FileListPanelProps(resDispatch, resActions, state) =>
               resDispatch should be theSameInstanceAs props.dispatch

@@ -50,7 +50,7 @@ class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils 
       onClose should be theSameInstanceAs props.onClose
       resClosable shouldBe props.closable
       focusable shouldBe true
-    }, { case List(content) =>
+    }, inside(_) { case List(content) =>
       assertTestComponent(content, modalContentComp)({
         case ModalContentProps(title, size, resStyle, padding, left) =>
           title shouldBe props.title
@@ -58,7 +58,7 @@ class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils 
           assertObject(resStyle, style)
           padding shouldBe ModalContent.padding
           left shouldBe "center"
-      }, { case List(btn) =>
+      }, inside(_) { case List(btn) =>
         assertNativeComponent(btn,
           <.button(
             ^.rbWidth := textWidth,

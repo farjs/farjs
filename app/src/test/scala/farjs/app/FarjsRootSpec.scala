@@ -157,7 +157,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
             ^.rbWidth := "30%",
             ^.rbHeight := "100%",
             ^.rbLeft := "70%"
-          )(), { case List(comp) =>
+          )(), inside(_) { case List(comp) =>
             assertTestComponent(comp, devToolPanelComp) { case DevToolPanelProps(devTool, logContent, _) =>
               devTool shouldBe DevTool.Logs
               logContent shouldBe content
@@ -200,7 +200,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
             ^.rbWidth := "30%",
             ^.rbHeight := "100%",
             ^.rbLeft := "70%"
-          )(), { case List(comp) =>
+          )(), inside(_) { case List(comp) =>
             assertTestComponent(comp, devToolPanelComp) { case DevToolPanelProps(devTool, logContent, _) =>
               devTool shouldBe DevTool.Colors
               logContent shouldBe content

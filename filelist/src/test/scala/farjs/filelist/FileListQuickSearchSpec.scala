@@ -64,7 +64,9 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
       if (el.`type` == "text".asInstanceOf[js.Any]) textMock
       else null
     })
-    val List(formComp) = findComponents(renderer.root, <.form.name)
+    val formComp = inside(findComponents(renderer.root, <.form.name)) {
+      case List(formComp) => formComp
+    }
 
     //then
     textMock.aleft = 2
@@ -181,7 +183,7 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
       ^.rbMouse := true,
       ^.rbAutoFocus := false,
       ^.rbStyle := overlayStyle
-    )(), { case List(box) =>
+    )(), inside(_) { case List(box) =>
       assertNativeComponent(box, <.box(
         ^.rbClickable := true,
         ^.rbAutoFocus := false,
@@ -190,7 +192,7 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
         ^.rbTop := "100%-3",
         ^.rbLeft := 10,
         ^.rbStyle := boxStyle
-      )(), { case List(border, text) =>
+      )(), inside(_) { case List(border, text) =>
         assertTestComponent(border, doubleBorderComp) {
           case DoubleBorderProps(resSize, style, pos, title) =>
             resSize shouldBe (width -> height)

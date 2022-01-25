@@ -21,7 +21,9 @@ class SingleBorderSpec extends TestSpec with TestRendererUtils {
     val result = createTestRenderer(comp).root
 
     //then
-    val List(line1, line2, line3, line4) = result.children.toList
+    val (line1, line2, line3, line4) = inside(result.children.toList) {
+      case List(line1, line2, line3, line4) => (line1, line2, line3, line4)
+    }
     assertTestComponent(line1, horizontalLineComp) {
       case HorizontalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
         pos shouldBe 0 -> 0

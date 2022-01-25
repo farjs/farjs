@@ -178,11 +178,9 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
       ^.rbHeight := props.size._2,
       ^.rbLeft := props.left,
       ^.rbStyle := theme.regularItem
-    )(), { children: List[TestInstance] =>
-      children match {
-        case List(header, itemsText) => assertElements(header, Some(itemsText))
-        case List(header) => assertElements(header, None)
-      }
+    )(), inside(_) {
+      case List(header, itemsText) => assertElements(header, Some(itemsText))
+      case List(header) => assertElements(header, None)
     })
   }
 }

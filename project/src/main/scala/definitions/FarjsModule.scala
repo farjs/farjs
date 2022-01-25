@@ -27,7 +27,7 @@ object FarjsModule {
     // publish/release related settings:
     //
     publishMavenStyle := true,
-    publishArtifact in Test := false,
+    Test / publishArtifact := false,
     publishTo := sonatypePublishToBundle.value,
     pomExtra := {
       <url>https://github.com/scommons/far-js</url>

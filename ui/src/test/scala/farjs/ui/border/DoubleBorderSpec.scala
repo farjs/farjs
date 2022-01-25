@@ -105,7 +105,7 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
       }
     }
 
-    result.children.toList match {
+    inside(result.children.toList) {
       case List(line1, line2, line3, line4) =>
         assertComponents(line1, None, line2, line3, line4)
       case List(line1, title, line2, line3, line4) =>

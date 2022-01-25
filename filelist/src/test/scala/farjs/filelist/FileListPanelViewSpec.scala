@@ -326,7 +326,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
       }
     }
     
-    assertNativeComponent(result, <.box(^.rbStyle := theme.regularItem)(), {
+    assertNativeComponent(result, <.box(^.rbStyle := theme.regularItem)(), inside(_) {
       case List(border, line, list, currFolder, currFile, fileSize, filePerm, fileDate, fsFreeSpace) =>
         assertComponents(border, line, list, currFolder, None, currFile, fileSize, filePerm, fileDate, fsFreeSpace)
       case List(border, line, list, currFolder, selection, currFile, fileSize, filePerm, fileDate, fsFreeSpace) =>
