@@ -1,7 +1,7 @@
 //resolvers += "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 
-//addSbtPlugin(("org.scommons.sbt" % "sbt-scommons-plugin" % "0.7.0-SNAPSHOT").changing())
-addSbtPlugin("org.scommons.sbt" % "sbt-scommons-plugin" % "0.7.0")
+//addSbtPlugin(("org.scommons.sbt" % "sbt-scommons-plugin" % "0.8.0-SNAPSHOT").changing())
+addSbtPlugin("org.scommons.sbt" % "sbt-scommons-plugin" % "0.8.0")
 
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.5.1")
 addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.20.0")
