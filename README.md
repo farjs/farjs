@@ -1,6 +1,6 @@
 
-[![CI](https://github.com/scommons/far-js/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/scommons/far-js/actions/workflows/ci.yml?query=workflow%3Aci+branch%3Amaster)
-[![Coverage Status](https://coveralls.io/repos/github/scommons/far-js/badge.svg?branch=master)](https://coveralls.io/github/scommons/far-js?branch=master)
+[![CI](https://github.com/scommons/far-js/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/scommons/far-js/actions/workflows/ci.yml?query=workflow%3Aci+branch%3Amain)
+[![Coverage Status](https://coveralls.io/repos/github/scommons/far-js/badge.svg?branch=main)](https://coveralls.io/github/scommons/far-js?branch=main)
 [![npm version](https://img.shields.io/npm/v/farjs-app)](https://www.npmjs.com/package/farjs-app)
 [![Rate on Openbase](https://badges.openbase.com/js/rating/farjs-app.svg)](https://openbase.com/js/farjs-app?utm_source=embedded&utm_medium=badge&utm_campaign=rate-badge)
 [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.5.0.svg)](https://www.scala-js.org)
@@ -33,7 +33,7 @@ then you can run the application from your favorite terminal:
 $ farjs
 ```
 
-![Screenshots](https://raw.githubusercontent.com/scommons/far-js/master/docs/images/screenshots.png)
+![Screenshots](https://raw.githubusercontent.com/scommons/far-js/main/docs/images/screenshots.png)
 
 To exit the application - press `F10` on the keyboard.
 
@@ -50,7 +50,7 @@ To exit the application - press `F10` on the keyboard.
 ### Other
 
 - Developing
-  - See [develop.md](https://github.com/scommons/far-js/blob/master/develop.md)
+  - See [develop.md](https://github.com/scommons/far-js/blob/main/develop.md)
 - [FAQ](#faq)
   - [Key Bindings](#key-bindings)
 
@@ -124,18 +124,20 @@ action in my terminal?
       | `CMD + PageUp` | `Ctrl + PageUp` | `[5^` |
       | `CMD + R` | `Ctrl + R` | | `0x12` |
   - In [iTerm2](https://iterm2.com/) it looks like this:
-    - ![Keys Re Mapping](https://raw.githubusercontent.com/scommons/far-js/master/docs/images/keys_re_mapping.png)
+    - ![Keys Re Mapping](https://raw.githubusercontent.com/scommons/far-js/main/docs/images/keys_re_mapping.png)
   - In [Windows Terminal](https://docs.microsoft.com/en-us/windows/terminal/)
-  you can use [sendInput action](https://docs.microsoft.com/en-us/windows/terminal/customize-settings/actions#send-input):
+    you can use [sendInput action](https://docs.microsoft.com/en-us/windows/terminal/customize-settings/actions#send-input)
+    (in `settings.json`):
     ```json
-    //in settings.json
-    "actions": [
+    {
+      "actions": [
 
-        { "command": { "action": "sendInput", "input": "\u001bl" }, "keys": "alt+f1" },
-        { "command": { "action": "sendInput", "input": "\u001br" }, "keys": "alt+f2" },
-        { "command": { "action": "sendInput", "input": "\u001bo" }, "keys": "shift+enter" }
-
-    ]
+          { "command": { "action": "sendInput", "input": "\u001bl" }, "keys": "alt+f1" },
+          { "command": { "action": "sendInput", "input": "\u001br" }, "keys": "alt+f2" },
+          { "command": { "action": "sendInput", "input": "\u001bo" }, "keys": "shift+enter" }
+  
+      ]
+    }
     ```
 ### Mouse Support
 

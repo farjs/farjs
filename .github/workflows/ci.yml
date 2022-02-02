@@ -2,11 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     tags:
       - '*'
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -71,7 +71,7 @@ jobs:
 
     - name: Publish SNAPSHOT
       run: |
-        sbt clean "project farjs-app" fullOptJS::webpack
+        sbt -mem 2048 clean "project farjs-app" fullOptJS::webpack
         cd app/target/scala-2.13/scalajs-bundler/main
         npm run build
         npm pack
