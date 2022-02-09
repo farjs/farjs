@@ -72,6 +72,8 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
               else path.join(props.state.currDir.path, item.name)
             screen.copyToClipboard(text)
           }
+        case "C-r" =>
+          props.dispatch(props.actions.updateDir(props.dispatch, props.state.isRight, props.state.currDir.path))
         case "M-o" =>
           props.state.currentItem.foreach { item =>
             props.dispatch(props.actions.openInDefaultApp(props.state.currDir.path, item.name))

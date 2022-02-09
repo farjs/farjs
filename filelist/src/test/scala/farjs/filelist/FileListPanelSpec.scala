@@ -25,10 +25,12 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
   class Actions {
     val openInDefaultApp = mockFunction[String, String, FileListTaskAction]
     val changeDir = mockFunction[Dispatch, Boolean, Option[String], String, FileListDirChangeAction]
+    val updateDir = mockFunction[Dispatch, Boolean, String, FileListDirUpdateAction]
 
     val actions = new MockFileListActions(
       openInDefaultAppMock = openInDefaultApp,
-      changeDirMock = changeDir
+      changeDirMock = changeDir,
+      updateDirMock = updateDir
     )
   }
 
@@ -150,6 +152,30 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     viewProps.onKeypress(screenMock.asInstanceOf[BlessedScreen], "C-c")
 
     Succeeded
+  }
+
+  it should "dispatch action when onKeypress(C-r)" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = new Actions
+    val props = FileListPanelProps(dispatch, actions.actions, FileListState(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
+    ))
+    val comp = testRender(<(FileListPanel())(^.wrapped := props)())
+    val viewProps = findComponentProps(comp, fileListPanelView)
+    val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
+      FileListItem("file 1")
+    ))
+    val action = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
+
+    //then
+    actions.updateDir.expects(dispatch, false, "/sub-dir").returning(action)
+    dispatch.expects(action)
+
+    //when
+    viewProps.onKeypress(null, "C-r")
+
+    action.task.future.map(_ => Succeeded)
   }
 
   it should "dispatch action when onKeypress(M-o)" in {

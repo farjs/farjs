@@ -1,8 +1,8 @@
 package farjs.app.filelist
 
-import farjs.filelist.FileListActions.{FileListActivateAction, FileListDirUpdateAction}
+import farjs.filelist.FileListActions.FileListActivateAction
 import farjs.filelist._
-import farjs.filelist.api.{FileListApi, FileListDir, FileListItem}
+import farjs.filelist.api.FileListApi
 import farjs.filelist.fs.FSDrivePopupProps
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
 import farjs.filelist.stack._
@@ -11,10 +11,8 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.redux.Dispatch
-import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
-import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
 
@@ -196,58 +194,12 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
   }
 
-  it should "update active panel when onKeypress(Ctrl+R)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val updateDirMock = mockFunction[Dispatch, Boolean, String, FileListDirUpdateAction]
-    val actions = new FileListActions {
-      protected def api: FileListApi = ???
-
-      override def updateDir(dispatch: Dispatch, isRight: Boolean, path: String): FileListDirUpdateAction = {
-        updateDirMock(dispatch, isRight, path)
-      }
-    }
-    val leftDir = FileListDir("/left/dir", isRoot = false, List(
-      FileListItem("dir 1", isDir = true)
-    ))
-    val rightDir = FileListDir("/right/dir", isRoot = false, List(
-      FileListItem("dir 2", isDir = true)
-    ))
-    val props = FileListBrowserProps(dispatch, actions, FileListsState(
-      left = FileListState(currDir = leftDir, isActive = true),
-      right = FileListState(currDir = rightDir, isRight = true)
-    ))
-    val focusMock = mockFunction[Unit]
-    val buttonMock = literal("focus" -> focusMock)
-    focusMock.expects()
-
-    val comp = testRender(<(fileListBrowser())(^.wrapped := props)(), { el =>
-      if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
-      else null
-    })
-    val button = inside(findComponents(comp, <.button.name)) {
-      case List(button, _) => button
-    }
-    val keyFull = "C-r"
-    val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
-      FileListItem("file 1")
-    ))
-    val action = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
-    
-    //then
-    updateDirMock.expects(dispatch, false, leftDir.path).returning(action)
-    dispatch.expects(action)
-
-    //when
-    button.props.onKeypress(null, literal(full = keyFull).asInstanceOf[KeyboardKey])
-
-    action.task.future.map(_ => Succeeded)
-  }
-
   it should "trigger plugin when onKeypress(triggerKey)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
+    val actions = new FileListActions {
+      protected def api: FileListApi = ???
+    }
     val onTriggerMock = mockFunction[Boolean, PanelStack, PanelStack, Unit]
     val keyFull = "C-p"
     val plugin = new FileListPlugin {

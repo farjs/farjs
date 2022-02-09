@@ -69,8 +69,6 @@ class FileListBrowser(fsControllerComp: ReactClass) extends FunctionComponent[Fi
         case "C-u" =>
           setIsRight(!_)
           screen.focusNext()
-        case "C-r" =>
-          props.dispatch(props.actions.updateDir(props.dispatch, activeList.isRight, activeList.currDir.path))
         case keyFull =>
           props.plugins.find(_.triggerKey == keyFull).foreach { plugin =>
             plugin.onTrigger(activeList.isRight, leftStack, rightStack)
