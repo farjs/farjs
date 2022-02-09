@@ -1,41 +1,41 @@
-package farjs.app.filelist
+package farjs.filelist.fs
 
-import farjs.app.TestFarjsState
 import farjs.filelist._
 import io.github.shogowada.scalajs.reactjs.React.Props
 import scommons.react.test.TestSpec
 
-class FileListControllerSpec extends TestSpec {
+class FSControllerSpec extends TestSpec {
 
-  ignore should "return component" in {
+  it should "return component" in {
     //given
-    val actions = mock[FileListActions]
-    val controller = new FileListController(actions)
+    val actions = new MockFileListActions
+    val controller = new FSController(actions)
     
     //when & then
-    controller.uiComponent shouldBe new FileListBrowser(???)
+    controller.uiComponent shouldBe FSPanel
   }
   
   it should "map state to props" in {
     //given
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val props = mock[Props[Unit]]
-    val controller = new FileListController(actions)
+    val controller = new FSController(actions)
     val dispatch = mockFunction[Any, Any]
     val fileListsState = mock[FileListsStateDef]
     val fileListsStateMock = mockFunction[FileListsStateDef]
-    val state = TestFarjsState(fileListsStateMock = fileListsStateMock)
+    val state = new FileListsGlobalState {
+      override def fileListsState: FileListsStateDef = fileListsStateMock()
+    }
     fileListsStateMock.expects().returning(fileListsState)
 
     //when
     val result = controller.mapStateToProps(dispatch, state, props)
     
     //then
-    inside(result) { case FileListBrowserProps(disp, resActions, data, plugins) =>
+    inside(result) { case FSPanelProps(disp, resActions, data) =>
       disp shouldBe dispatch
       resActions shouldBe resActions
       data shouldBe fileListsState
-      plugins should not be Nil
     }
   }
 }

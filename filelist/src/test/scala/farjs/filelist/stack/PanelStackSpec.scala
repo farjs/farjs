@@ -1,10 +1,10 @@
 package farjs.filelist.stack
 
 import java.util.concurrent.atomic.AtomicReference
-
 import farjs.filelist.stack.PanelStack._
 import farjs.filelist.stack.PanelStackSpec.TestParams
 import scommons.react._
+import scommons.react.blessed.BlessedElement
 import scommons.react.hooks._
 import scommons.react.test._
 
@@ -167,7 +167,7 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     )
   }
   
-  it should "render top component if non-empty stack" in {
+  it should "render top component and children if non-empty stack" in {
     //given
     val props = PanelStackProps(isRight = true, null)
     val leftStack = new PanelStack(None, null)
@@ -183,10 +183,13 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     )
 
     //then
-    result.`type` shouldBe "TestComp"
+    inside(result.children.toList) { case List(resComp, otherContent) =>
+      resComp.`type` shouldBe "TestComp"
+      otherContent shouldBe "some other content"
+    }
   }
 
-  it should "render children if empty stack" in {
+  it should "render only children if empty stack" in {
     //given
     val (stackCtx, stackComp) = getStackCtxHook
     val props = PanelStackProps(isRight = false, null)
@@ -232,4 +235,23 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
 object PanelStackSpec {
 
   private case class TestParams(name: String)
+
+  def withContext(element: ReactElement,
+                  isRight: Boolean = false,
+                  panelInput: BlessedElement = null,
+                  stack: PanelStack = null,
+                  width: Int = 0,
+                  height: Int = 0
+                 ): ReactElement = {
+
+    <(PanelStack.Context.Provider)(^.contextValue := PanelStackProps(
+      isRight = isRight,
+      panelInput = panelInput,
+      stack = stack,
+      width = width,
+      height = height
+    ))(
+      element
+    )
+  }
 }

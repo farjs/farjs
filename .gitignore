@@ -6,6 +6,7 @@
 .history
 .lib/
 .idea/
+.bsp/
 dist/*
 target/
 build/

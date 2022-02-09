@@ -1,6 +1,5 @@
 package farjs.app.filelist
 
-import farjs.app.filelist.FileListBrowser._
 import farjs.filelist.FileListActions.{FileListActivateAction, FileListDirUpdateAction}
 import farjs.filelist._
 import farjs.filelist.api.{FileListApi, FileListDir, FileListItem}
@@ -9,6 +8,7 @@ import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
 import farjs.filelist.stack._
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.redux.Dispatch
 import scommons.react.redux.task.FutureTask
@@ -20,10 +20,13 @@ import scala.scalajs.js.Dynamic.literal
 
 class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
   
-  FileListBrowser.panelStackComp = mockUiComponent("PanelStack")
-  FileListBrowser.fileListPanelComp = mockUiComponent("FileListPanel")
-  FileListBrowser.fsDrivePopup = mockUiComponent("FSDrivePopup")
-  FileListBrowser.bottomMenuComp = mockUiComponent("BottomMenu")
+  private val fileListBrowser = new FileListBrowser("test_fsController".asInstanceOf[ReactClass])
+
+  fileListBrowser.panelStackComp = mockUiComponent("PanelStack")
+  fileListBrowser.fsDrivePopup = mockUiComponent("FSDrivePopup")
+  fileListBrowser.bottomMenuComp = mockUiComponent("BottomMenu")
+  
+  import fileListBrowser._
 
   it should "dispatch FileListActivateAction when onFocus in left panel" in {
     //given
@@ -42,7 +45,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val rightButtonMock = literal("focus" -> focusMock)
     focusMock.expects()
 
-    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
+    val comp = testRender(<(fileListBrowser())(^.wrapped := props)(), { el =>
       val isRight = el.props.isRight.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false)
       if (isRight && el.`type` == <.button.name.asInstanceOf[js.Any]) rightButtonMock
       else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock
@@ -71,7 +74,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val rightButtonMock = literal()
     focusMock.expects()
 
-    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
+    val comp = testRender(<(fileListBrowser())(^.wrapped := props)(), { el =>
       val isRight = el.props.isRight.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false)
       if (isRight && el.`type` == <.button.name.asInstanceOf[js.Any]) rightButtonMock
       else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock
@@ -99,7 +102,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val buttonMock = literal("focus" -> focusMock)
     focusMock.expects()
 
-    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
+    val comp = testRender(<(fileListBrowser())(^.wrapped := props)(), { el =>
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
@@ -128,7 +131,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val buttonMock = literal("screen" -> screen, "focus" -> focusMock)
     focusMock.expects()
 
-    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
+    val comp = testRender(<(fileListBrowser())(^.wrapped := props)(), { el =>
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
@@ -165,12 +168,17 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val buttonMock = literal("screen" -> screen, "focus" -> focusMock)
     focusMock.expects()
 
-    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
+    val comp = testRender(<(fileListBrowser())(^.wrapped := props)(), { el =>
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
     val button = inside(findComponents(comp, <.button.name)) {
       case List(button, _) => button
+    }
+    inside(findProps(comp, panelStackComp)) {
+      case List(leftStack, rightStack) =>
+        leftStack.isRight shouldBe false
+        rightStack.isRight shouldBe true
     }
     val keyFull = "C-u"
     
@@ -181,11 +189,11 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     button.props.onKeypress(screen, literal(full = keyFull).asInstanceOf[KeyboardKey])
 
     //then
-    val (leftPanel, rightPanel) = inside(findProps(comp, fileListPanelComp)) {
-      case List(leftPanel, rightPanel) => (leftPanel, rightPanel)
+    inside(findProps(comp, panelStackComp)) {
+      case List(leftStack, rightStack) =>
+        leftStack.isRight shouldBe true
+        rightStack.isRight shouldBe false
     }
-    leftPanel.state shouldBe props.data.right
-    rightPanel.state shouldBe props.data.left
   }
 
   it should "update active panel when onKeypress(Ctrl+R)" in {
@@ -213,7 +221,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val buttonMock = literal("focus" -> focusMock)
     focusMock.expects()
 
-    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
+    val comp = testRender(<(fileListBrowser())(^.wrapped := props)(), { el =>
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
@@ -253,7 +261,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val buttonMock = literal("focus" -> focusMock)
     focusMock.expects()
 
-    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
+    val comp = testRender(<(fileListBrowser())(^.wrapped := props)(), { el =>
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
@@ -289,7 +297,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val rightButtonMock = literal()
     focusMock.expects()
 
-    val renderer = createTestRenderer(<(FileListBrowser())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(<(fileListBrowser())(^.wrapped := props)(), { el =>
       val isRight = el.props.isRight.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false)
       if (isRight && el.`type` == <.button.name.asInstanceOf[js.Any]) rightButtonMock
       else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock
@@ -338,7 +346,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val rightButtonMock = literal()
     focusMock.expects()
 
-    val renderer = createTestRenderer(<(FileListBrowser())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(<(fileListBrowser())(^.wrapped := props)(), { el =>
       val isRight = el.props.isRight.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false)
       if (isRight && el.`type` == <.button.name.asInstanceOf[js.Any]) rightButtonMock
       else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock
@@ -389,7 +397,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     focusMock.expects()
 
     //when
-    val result = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
+    val result = testRender(<(fileListBrowser())(^.wrapped := props)(), { el =>
       val isRight = el.props.isRight.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false)
       if (isRight && el.`type` == <.button.name.asInstanceOf[js.Any]) rightButtonMock
       else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock
@@ -410,16 +418,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         ^.rbWidth := "50%",
         ^.rbHeight := "100%-1"
       )(), inside(_) { case List(stack) =>
-        assertTestComponent(stack, panelStackComp)({ case PanelStackProps(isRight, _, _, _, _) =>
+        assertTestComponent(stack, panelStackComp) { case PanelStackProps(isRight, _, _, _, _) =>
           isRight shouldBe false
-        }, inside(_) { case List(panel) =>
-          assertTestComponent(panel, fileListPanelComp) {
-            case FileListPanelProps(resDispatch, resActions, state) =>
-              resDispatch should be theSameInstanceAs props.dispatch
-              resActions should be theSameInstanceAs props.actions
-              state shouldBe props.data.left
-          }
-        })
+        }
       })
       assertNativeComponent(right, <.button(
         ^.rbMouse := true,
@@ -427,16 +428,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         ^.rbHeight := "100%-1",
         ^.rbLeft := "50%"
       )(), inside(_) { case List(stack) =>
-        assertTestComponent(stack, panelStackComp)({ case PanelStackProps(isRight, _, _, _, _) =>
+        assertTestComponent(stack, panelStackComp) { case PanelStackProps(isRight, _, _, _, _) =>
           isRight shouldBe true
-        }, inside(_) { case List(panel) =>
-          assertTestComponent(panel, fileListPanelComp) {
-            case FileListPanelProps(resDispatch, resActions, state) =>
-              resDispatch should be theSameInstanceAs props.dispatch
-              resActions should be theSameInstanceAs props.actions
-              state shouldBe props.data.right
-          }
-        })
+        }
       })
 
       assertNativeComponent(menu,

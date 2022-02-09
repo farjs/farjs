@@ -81,14 +81,12 @@ class QuickViewPanelSpec extends AsyncTestSpec with BaseTestSpec
   }
 
   private def withContext(isRight: Boolean, stack: PanelStack, element: ReactElement): ReactElement = {
-    <(PanelStack.Context.Provider)(^.contextValue := PanelStackProps(
+    PanelStackSpec.withContext(
+      element = element,
       isRight = isRight,
-      panelInput = null,
       stack = stack,
       width = width,
       height = height
-    ))(
-      element
     )
   }
   

@@ -72,10 +72,10 @@ object PanelStack extends FunctionComponent[PanelStackProps] {
 
     <(withSizeComp())(^.wrapped := WithSizeProps({ (width, height) =>
       <(PanelStack.Context.Provider)(^.contextValue := props.copy(stack = stack, width = width, height = height))(
-        maybeTop match {
-          case None => compProps.children
-          case Some((comp, _)) => <(comp)()()
-        }
+        maybeTop.map { case (comp, _) =>
+          <(comp)()()
+        },
+        compProps.children
       )
     }))()
   }

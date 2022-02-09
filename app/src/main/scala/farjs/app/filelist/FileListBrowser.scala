@@ -19,10 +19,9 @@ case class FileListBrowserProps(dispatch: Dispatch,
                                 data: FileListsStateDef,
                                 plugins: Seq[FileListPlugin] = Nil)
 
-object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
+class FileListBrowser(fsControllerComp: ReactClass) extends FunctionComponent[FileListBrowserProps] {
 
   private[filelist] var panelStackComp: UiComponent[PanelStackProps] = PanelStack
-  private[filelist] var fileListPanelComp: UiComponent[FileListPanelProps] = FileListPanel
   private[filelist] var fsDrivePopup: UiComponent[FSDrivePopupProps] = FSDrivePopup
   private[filelist] var bottomMenuComp: UiComponent[Unit] = BottomMenu
 
@@ -35,8 +34,8 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     val props = compProps.wrapped
     val activeList = props.data.activeList
     
-    val (leftStackData, setLeftStackData) = useStateUpdater(List.empty[StackItem])
-    val (rightStackData, setRightStackData) = useStateUpdater(List.empty[StackItem])
+    val (leftStackData, setLeftStackData) = useStateUpdater(List[StackItem]((fsControllerComp, js.undefined)))
+    val (rightStackData, setRightStackData) = useStateUpdater(List[StackItem]((fsControllerComp, js.undefined)))
     val leftStack = new PanelStack(leftStackData.headOption, setLeftStackData)
     val rightStack = new PanelStack(rightStackData.headOption, setRightStackData)
 
@@ -90,7 +89,6 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         ^.rbOnKeypress := onKeypress
       )(
         <(panelStackComp())(^.wrapped := PanelStackProps(isRight, leftButtonRef.current))(
-          <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions, getState(isRight)))(),
           if (showLeftDrive) Some {
             <(fsDrivePopup())(^.wrapped := FSDrivePopupProps(
               dispatch = props.dispatch,
@@ -116,7 +114,6 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         ^.rbOnKeypress := onKeypress
       )(
         <(panelStackComp())(^.wrapped := PanelStackProps(!isRight, rightButtonRef.current))(
-          <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions, getState(!isRight)))(),
           if (showRightDrive) Some {
             <(fsDrivePopup())(^.wrapped := FSDrivePopupProps(
               dispatch = props.dispatch,
