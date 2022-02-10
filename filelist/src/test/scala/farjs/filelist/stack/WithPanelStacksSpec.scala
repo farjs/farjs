@@ -47,7 +47,10 @@ class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
     val (stacksCtx, stacksComp) = getStacksCtxHook
     val updater: js.Function1[js.Function1[List[StackItem], List[StackItem]], Unit] = { _ =>
     }
-    val props = WithPanelStacksProps(new PanelStack(None, updater), new PanelStack(None, updater))
+    val props = WithPanelStacksProps(
+      new PanelStack(isActive = true, None, updater),
+      new PanelStack(isActive = false, None, updater)
+    )
 
     //when
     val result = createTestRenderer(<(WithPanelStacks())(^.wrapped := props)(

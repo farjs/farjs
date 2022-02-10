@@ -46,7 +46,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     var stackState = List[StackItem](
       (currComp, QuickViewParams().asInstanceOf[js.Any])
     )
-    val stack = new PanelStack(stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
+    val stack = new PanelStack(isActive = false, stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
       stackState = f(stackState)
     })
     val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
@@ -88,7 +88,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     var stackState = List[StackItem](
       (currComp, QuickViewParams().asInstanceOf[js.Any])
     )
-    val stack = new PanelStack(stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
+    val stack = new PanelStack(isActive = false, stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
       stackState = f(stackState)
     })
     val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
@@ -135,7 +135,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     var stackState = List[StackItem](
       (currComp, QuickViewParams().asInstanceOf[js.Any])
     )
-    val stack = new PanelStack(stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
+    val stack = new PanelStack(isActive = false, stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
       stackState = f(stackState)
     })
     val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
@@ -177,7 +177,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     var stackState = List[StackItem](
       (currComp, params.asInstanceOf[js.Any])
     )
-    val stack = new PanelStack(stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
+    val stack = new PanelStack(isActive = false, stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
       stackState = f(stackState)
     })
     val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)

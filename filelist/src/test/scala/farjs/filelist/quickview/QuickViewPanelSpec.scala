@@ -40,7 +40,7 @@ class QuickViewPanelSpec extends AsyncTestSpec with BaseTestSpec
     var stackState = List[StackItem](
       (currComp, QuickViewParams().asInstanceOf[js.Any])
     )
-    val stack = new PanelStack(stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
+    val stack = new PanelStack(isActive = false, stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
       stackState = f(stackState)
     })
 
@@ -67,7 +67,7 @@ class QuickViewPanelSpec extends AsyncTestSpec with BaseTestSpec
     var stackState = List[StackItem](
       (currComp, QuickViewParams().asInstanceOf[js.Any])
     )
-    val stack = new PanelStack(stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
+    val stack = new PanelStack(isActive = false, stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
       stackState = f(stackState)
     })
 

@@ -167,6 +167,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     <(PanelStack.Context.Provider)(^.contextValue := PanelStackProps(
       isRight = false,
       panelInput = null,
+      stack = null,
       width = width,
       height = height
     ))(

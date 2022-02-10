@@ -26,7 +26,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   
   import fileListBrowser._
 
-  it should "dispatch FileListActivateAction when onFocus in left panel" in {
+  it should "activate left stack when onFocus in left panel" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -52,6 +52,13 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val leftButton = inside(findComponents(comp, <.button.name)) {
       case List(leftButton, _) => leftButton
     }
+    inside(findProps(comp, panelStackComp)) {
+      case List(leftStack, rightStack) =>
+        leftStack.isRight shouldBe false
+        leftStack.stack.isActive shouldBe false
+        rightStack.isRight shouldBe true
+        rightStack.stack.isActive shouldBe true
+    }
     
     //then
     dispatch.expects(FileListActivateAction(isRight = false))
@@ -59,10 +66,17 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     //when
     leftButton.props.onFocus()
     
-    Succeeded
+    //then
+    inside(findProps(comp, panelStackComp)) {
+      case List(leftStack, rightStack) =>
+        leftStack.isRight shouldBe false
+        leftStack.stack.isActive shouldBe true
+        rightStack.isRight shouldBe true
+        rightStack.stack.isActive shouldBe false
+    }
   }
 
-  it should "dispatch FileListActivateAction when onFocus in right panel" in {
+  it should "activate right stack when onFocus in right panel" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -81,6 +95,13 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val rightButton = inside(findComponents(comp, <.button.name)) {
       case List(_, rightButton) => rightButton
     }
+    inside(findProps(comp, panelStackComp)) {
+      case List(leftStack, rightStack) =>
+        leftStack.isRight shouldBe false
+        leftStack.stack.isActive shouldBe true
+        rightStack.isRight shouldBe true
+        rightStack.stack.isActive shouldBe false
+    }
     
     //then
     dispatch.expects(FileListActivateAction(isRight = true))
@@ -88,7 +109,14 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     //when
     rightButton.props.onFocus()
     
-    Succeeded
+    //then
+    inside(findProps(comp, panelStackComp)) {
+      case List(leftStack, rightStack) =>
+        leftStack.isRight shouldBe false
+        leftStack.stack.isActive shouldBe false
+        rightStack.isRight shouldBe true
+        rightStack.stack.isActive shouldBe true
+    }
   }
 
   it should "dispatch FileListPopupExitAction when onKeypress(F10)" in {
@@ -176,7 +204,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     inside(findProps(comp, panelStackComp)) {
       case List(leftStack, rightStack) =>
         leftStack.isRight shouldBe false
+        leftStack.stack.isActive shouldBe true
         rightStack.isRight shouldBe true
+        rightStack.stack.isActive shouldBe false
     }
     val keyFull = "C-u"
     
@@ -190,7 +220,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     inside(findProps(comp, panelStackComp)) {
       case List(leftStack, rightStack) =>
         leftStack.isRight shouldBe true
+        leftStack.stack.isActive shouldBe false
         rightStack.isRight shouldBe false
+        rightStack.stack.isActive shouldBe true
     }
   }
 
@@ -370,8 +402,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         ^.rbWidth := "50%",
         ^.rbHeight := "100%-1"
       )(), inside(_) { case List(stack) =>
-        assertTestComponent(stack, panelStackComp) { case PanelStackProps(isRight, _, _, _, _) =>
+        assertTestComponent(stack, panelStackComp) { case PanelStackProps(isRight, _, stack, _, _) =>
           isRight shouldBe false
+          stack.isActive shouldBe false
         }
       })
       assertNativeComponent(right, <.button(
@@ -380,8 +413,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         ^.rbHeight := "100%-1",
         ^.rbLeft := "50%"
       )(), inside(_) { case List(stack) =>
-        assertTestComponent(stack, panelStackComp) { case PanelStackProps(isRight, _, _, _, _) =>
+        assertTestComponent(stack, panelStackComp) { case PanelStackProps(isRight, _, stack, _, _) =>
           isRight shouldBe true
+          stack.isActive shouldBe true
         }
       })
 

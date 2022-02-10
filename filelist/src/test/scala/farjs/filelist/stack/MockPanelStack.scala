@@ -10,7 +10,7 @@ class MockPanelStack[P](
   popMock: () => Unit = () => ???,
   peekMock: () => Option[StackItem] = () => ???,
   paramsMock: () => P = () => ???
-) extends PanelStack(None, _ => ???) {
+) extends PanelStack(isActive = false, None, _ => ???) {
 
   override def push[T](comp: ReactClass, params: T): Unit =
     pushMock(comp, params.asInstanceOf[P])

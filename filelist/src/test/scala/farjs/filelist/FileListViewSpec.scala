@@ -234,7 +234,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
   }
   
   private def withContext(element: ReactElement, panelInput: BlessedElement = null): ReactElement = {
-    <(PanelStack.Context.Provider)(^.contextValue := PanelStackProps(isRight = false, panelInput))(
+    <(PanelStack.Context.Provider)(^.contextValue := PanelStackProps(isRight = false, panelInput, stack = null))(
       element
     )
   }

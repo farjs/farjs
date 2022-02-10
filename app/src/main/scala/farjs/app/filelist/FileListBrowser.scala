@@ -26,26 +26,32 @@ class FileListBrowser(fsControllerComp: ReactClass) extends FunctionComponent[Fi
   private[filelist] var bottomMenuComp: UiComponent[Unit] = BottomMenu
 
   protected def render(compProps: Props): ReactElement = {
+    val props = compProps.wrapped
+    val activeList = props.data.activeList
     val leftButtonRef = useRef[BlessedElement](null)
     val rightButtonRef = useRef[BlessedElement](null)
     val (isRight, setIsRight) = useStateUpdater(false)
+    val (isRightActive, setIsRightActive) = useState(activeList.isRight)
     val (showLeftDrive, setShowLeftDrive) = useState(false)
     val (showRightDrive, setShowRightDrive) = useState(false)
-    val props = compProps.wrapped
-    val activeList = props.data.activeList
     
-    val (leftStackData, setLeftStackData) = useStateUpdater(List[StackItem]((fsControllerComp, js.undefined)))
-    val (rightStackData, setRightStackData) = useStateUpdater(List[StackItem]((fsControllerComp, js.undefined)))
-    val leftStack = new PanelStack(leftStackData.headOption, setLeftStackData)
-    val rightStack = new PanelStack(rightStackData.headOption, setRightStackData)
+    val (leftStackData, setLeftStackData) = useStateUpdater(() => List[StackItem]((fsControllerComp, js.undefined)))
+    val (rightStackData, setRightStackData) = useStateUpdater(() => List[StackItem]((fsControllerComp, js.undefined)))
+    val leftStack = new PanelStack(!isRightActive, leftStackData.headOption, setLeftStackData)
+    val rightStack = new PanelStack(isRightActive, rightStackData.headOption, setRightStackData)
 
     useLayoutEffect({ () =>
       val element = 
-        if (activeList.isRight) rightButtonRef.current
+        if (isRightActive) rightButtonRef.current
         else leftButtonRef.current
       
       element.focus()
     }, Nil)
+    
+    def getStack(isRight: Boolean): PanelStack = {
+      if (isRight) rightStack
+      else leftStack
+    }
     
     def getState(isRight: Boolean): FileListState = {
       if (isRight) props.data.right
@@ -56,6 +62,11 @@ class FileListBrowser(fsControllerComp: ReactClass) extends FunctionComponent[Fi
       val state = getState(isRight)
       if (!state.isActive) {
         props.dispatch(FileListActivateAction(state.isRight))
+      }
+
+      val stack = getStack(isRight)
+      if (!stack.isActive) {
+        setIsRightActive(isRight)
       }
     }
     
@@ -71,7 +82,7 @@ class FileListBrowser(fsControllerComp: ReactClass) extends FunctionComponent[Fi
           screen.focusNext()
         case keyFull =>
           props.plugins.find(_.triggerKey == keyFull).foreach { plugin =>
-            plugin.onTrigger(activeList.isRight, leftStack, rightStack)
+            plugin.onTrigger(isRightActive, leftStack, rightStack)
           }
       }
     }
@@ -86,7 +97,7 @@ class FileListBrowser(fsControllerComp: ReactClass) extends FunctionComponent[Fi
         ^.rbOnFocus := onActivate(isRight),
         ^.rbOnKeypress := onKeypress
       )(
-        <(panelStackComp())(^.wrapped := PanelStackProps(isRight, leftButtonRef.current))(
+        <(panelStackComp())(^.wrapped := PanelStackProps(isRight, leftButtonRef.current, getStack(isRight)))(
           if (showLeftDrive) Some {
             <(fsDrivePopup())(^.wrapped := FSDrivePopupProps(
               dispatch = props.dispatch,
@@ -111,7 +122,7 @@ class FileListBrowser(fsControllerComp: ReactClass) extends FunctionComponent[Fi
         ^.rbOnFocus := onActivate(!isRight),
         ^.rbOnKeypress := onKeypress
       )(
-        <(panelStackComp())(^.wrapped := PanelStackProps(!isRight, rightButtonRef.current))(
+        <(panelStackComp())(^.wrapped := PanelStackProps(!isRight, rightButtonRef.current, getStack(!isRight)))(
           if (showRightDrive) Some {
             <(fsDrivePopup())(^.wrapped := FSDrivePopupProps(
               dispatch = props.dispatch,

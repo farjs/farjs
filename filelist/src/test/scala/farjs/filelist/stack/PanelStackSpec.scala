@@ -19,7 +19,7 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
   it should "push new component when push" in {
     //given
     val updater = mockFunction[js.Function1[List[StackItem], List[StackItem]], Unit]
-    val stack = new PanelStack(None, updater)
+    val stack = new PanelStack(isActive = false, None, updater)
     val comp = "new comp".asInstanceOf[ReactClass]
     val params = TestParams("test name")
     val data = List[StackItem](("existing comp".asInstanceOf[ReactClass], null))
@@ -40,7 +40,7 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
   it should "do nothing if empty stack data when update" in {
     //given
     val updater = mockFunction[js.Function1[List[StackItem], List[StackItem]], Unit]
-    val stack = new PanelStack(None, updater)
+    val stack = new PanelStack(isActive = false, None, updater)
     val params = TestParams("test name")
     val data = List.empty[StackItem]
     
@@ -60,7 +60,7 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
   it should "update top component params when update" in {
     //given
     val updater = mockFunction[js.Function1[List[StackItem], List[StackItem]], Unit]
-    val stack = new PanelStack(None, updater)
+    val stack = new PanelStack(isActive = false, None, updater)
     val params = TestParams("test name")
     val top = "top comp".asInstanceOf[ReactClass]
     val other: StackItem = ("other comp".asInstanceOf[ReactClass], null)
@@ -82,7 +82,7 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
   it should "remove top component when pop" in {
     //given
     val updater = mockFunction[js.Function1[List[StackItem], List[StackItem]], Unit]
-    val stack = new PanelStack(None, updater)
+    val stack = new PanelStack(isActive = false, None, updater)
     val other: StackItem = ("other comp".asInstanceOf[ReactClass], null)
     val data = List(("top comp".asInstanceOf[ReactClass], null), other)
     
@@ -103,7 +103,7 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     //given
     val params = TestParams(name = "test")
     val top: StackItem = ("top comp".asInstanceOf[ReactClass], params.asInstanceOf[js.Any])
-    val stack = new PanelStack(Some(top), null)
+    val stack = new PanelStack(isActive = false, Some(top), null)
     
     //when
     val result = stack.peek
@@ -116,7 +116,7 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     //given
     val params = TestParams(name = "test")
     val top: StackItem = ("top comp".asInstanceOf[ReactClass], params.asInstanceOf[js.Any])
-    val stack = new PanelStack(Some(top), null)
+    val stack = new PanelStack(isActive = false, Some(top), null)
     
     //when
     val result = stack.params[TestParams]
@@ -127,7 +127,7 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
   
   it should "return null if None when params" in {
     //given
-    val stack = new PanelStack(None, null)
+    val stack = new PanelStack(isActive = false, None, null)
     
     //when
     val result = stack.params[TestParams]
@@ -169,45 +169,42 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
   
   it should "render top component and children if non-empty stack" in {
     //given
-    val props = PanelStackProps(isRight = true, null)
-    val leftStack = new PanelStack(None, null)
-    val rightStack = new PanelStack(Some(("TestComp".asInstanceOf[ReactClass], null)), null)
+    val (stackCtx, stackComp) = getStackCtxHook
+    val stack = new PanelStack(isActive = false, Some(("TopComp".asInstanceOf[ReactClass], null)), null)
+    val props = PanelStackProps(isRight = true, panelInput = null, stack)
 
     //when
     val result = renderWithSize(
-      <(WithPanelStacks.Context.Provider)(^.contextValue := WithPanelStacksProps(leftStack, rightStack))(
-        <(PanelStack())(^.wrapped := props)(
-          <.>()("some other content")
-        )
+      <(PanelStack())(^.wrapped := props)(
+        <(stackComp).empty
       )
     )
 
     //then
-    inside(result.children.toList) { case List(resComp, otherContent) =>
-      resComp.`type` shouldBe "TestComp"
-      otherContent shouldBe "some other content"
+    stackCtx.get() shouldBe props.copy(width = width, height = height)
+    
+    inside(result.children.toList) { case List(resTopComp, resCtxHook) =>
+      resTopComp.`type` shouldBe "TopComp"
+      resCtxHook.`type` shouldBe stackComp
     }
   }
 
   it should "render only children if empty stack" in {
     //given
     val (stackCtx, stackComp) = getStackCtxHook
-    val props = PanelStackProps(isRight = false, null)
-    val leftStack = new PanelStack(None, null)
-    val rightStack = new PanelStack(Some(("test comp".asInstanceOf[ReactClass], null)), null)
+    val stack = new PanelStack(isActive = false, None, null)
+    val props = PanelStackProps(isRight = false, panelInput = null, stack)
 
     //when
     val result = renderWithSize(
-      <(WithPanelStacks.Context.Provider)(^.contextValue := WithPanelStacksProps(leftStack, rightStack))(
-        <(PanelStack())(^.wrapped := props)(
-          <(stackComp).empty,
-          <.>()("some other content")
-        )
+      <(PanelStack())(^.wrapped := props)(
+        <(stackComp).empty,
+        <.>()("some other content")
       )
     )
 
     //then
-    stackCtx.get() shouldBe props.copy(stack = leftStack, width = width, height = height)
+    stackCtx.get() shouldBe props.copy(width = width, height = height)
 
     inside(result.children.toList) { case List(resCtxHook, otherContent) =>
       resCtxHook.`type` shouldBe stackComp

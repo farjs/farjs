@@ -8,7 +8,8 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-class PanelStack(top: Option[StackItem],
+class PanelStack(val isActive: Boolean,
+                 top: Option[StackItem],
                  updater: js.Function1[js.Function1[List[StackItem], List[StackItem]], Unit]) {
 
   def push[T](comp: ReactClass, params: T): Unit = {
@@ -38,7 +39,7 @@ class PanelStack(top: Option[StackItem],
 
 case class PanelStackProps(isRight: Boolean,
                            panelInput: BlessedElement,
-                           stack: PanelStack = null,
+                           stack: PanelStack,
                            width: Int = 0,
                            height: Int = 0)
 
@@ -63,15 +64,10 @@ object PanelStack extends FunctionComponent[PanelStackProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val stacks = WithPanelStacks.usePanelStacks
-    val stack =
-      if (props.isRight) stacks.rightStack
-      else stacks.leftStack
-
-    val maybeTop = stack.peek
+    val maybeTop = props.stack.peek
 
     <(withSizeComp())(^.wrapped := WithSizeProps({ (width, height) =>
-      <(PanelStack.Context.Provider)(^.contextValue := props.copy(stack = stack, width = width, height = height))(
+      <(PanelStack.Context.Provider)(^.contextValue := props.copy(width = width, height = height))(
         maybeTop.map { case (comp, _) =>
           <(comp)()()
         },
