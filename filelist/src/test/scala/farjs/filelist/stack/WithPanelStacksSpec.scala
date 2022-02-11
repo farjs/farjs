@@ -2,7 +2,6 @@ package farjs.filelist.stack
 
 import java.util.concurrent.atomic.AtomicReference
 
-import farjs.filelist.stack.PanelStack.StackItem
 import scommons.react._
 import scommons.react.hooks._
 import scommons.react.test._
@@ -45,11 +44,11 @@ class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
   it should "render component with context provider" in {
     //given
     val (stacksCtx, stacksComp) = getStacksCtxHook
-    val updater: js.Function1[js.Function1[List[StackItem], List[StackItem]], Unit] = { _ =>
+    val updater: js.Function1[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit] = { _ =>
     }
     val props = WithPanelStacksProps(
-      new PanelStack(isActive = true, None, updater),
-      new PanelStack(isActive = false, None, updater)
+      new PanelStack(isActive = true, Nil, updater),
+      new PanelStack(isActive = false, Nil, updater)
     )
 
     //when

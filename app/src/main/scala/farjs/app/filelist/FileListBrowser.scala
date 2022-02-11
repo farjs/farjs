@@ -4,7 +4,6 @@ import farjs.filelist.FileListActions.FileListActivateAction
 import farjs.filelist._
 import farjs.filelist.fs.{FSDrivePopup, FSDrivePopupProps}
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
-import farjs.filelist.stack.PanelStack.StackItem
 import farjs.filelist.stack._
 import farjs.ui.menu.BottomMenu
 import scommons.react._
@@ -35,10 +34,14 @@ class FileListBrowser(fsControllerComp: ReactClass) extends FunctionComponent[Fi
     val (showLeftDrive, setShowLeftDrive) = useState(false)
     val (showRightDrive, setShowRightDrive) = useState(false)
     
-    val (leftStackData, setLeftStackData) = useStateUpdater(() => List[StackItem]((fsControllerComp, js.undefined)))
-    val (rightStackData, setRightStackData) = useStateUpdater(() => List[StackItem]((fsControllerComp, js.undefined)))
-    val leftStack = new PanelStack(!isRightActive, leftStackData.headOption, setLeftStackData)
-    val rightStack = new PanelStack(isRightActive, rightStackData.headOption, setRightStackData)
+    val (leftStackData, setLeftStackData) = useStateUpdater(() => List[PanelStackItem[_]](
+      PanelStackItem[Unit](fsControllerComp, None, None, None)
+    ))
+    val (rightStackData, setRightStackData) = useStateUpdater(() => List[PanelStackItem[_]](
+      PanelStackItem[Unit](fsControllerComp, None, None, None)
+    ))
+    val leftStack = new PanelStack(!isRightActive, leftStackData, setLeftStackData)
+    val rightStack = new PanelStack(isRightActive, rightStackData, setRightStackData)
 
     useLayoutEffect({ () =>
       val element = 

@@ -1,6 +1,5 @@
 package farjs.filelist.stack
 
-import farjs.filelist.stack.PanelStack.StackItem
 import farjs.ui.{WithSize, WithSizeProps}
 import scommons.react._
 import scommons.react.blessed.BlessedElement
@@ -9,32 +8,30 @@ import scommons.react.hooks._
 import scala.scalajs.js
 
 class PanelStack(val isActive: Boolean,
-                 top: Option[StackItem],
-                 updater: js.Function1[js.Function1[List[StackItem], List[StackItem]], Unit]) {
+                 data: List[PanelStackItem[_]],
+                 updater: js.Function1[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]) {
 
-  def push[T](comp: ReactClass, params: T): Unit = {
-    updater { stack =>
-      (comp, params.asInstanceOf[js.Any]) :: stack
-    }
-  }
+  def push[T](item: PanelStackItem[T]): Unit = updater(item :: _)
 
-  def update[T](params: T): Unit = {
+  def update[T](f: PanelStackItem[T] => PanelStackItem[T]): Unit = {
     updater { stack =>
-      if (stack.nonEmpty) {
-        val (comp, _) = stack.head
-        (comp, params.asInstanceOf[js.Any]) :: stack.tail
-      }
-      else stack
+      if (stack.isEmpty) stack
+      else f(stack.head.asInstanceOf[PanelStackItem[T]]) :: stack.tail
     }
   }
 
   def pop(): Unit = {
-    updater(_.tail)
+    updater {
+      case _ :: tail if tail.nonEmpty => tail
+      case stack => stack
+    }
   }
 
-  def peek: Option[StackItem] = top
+  def peek[T]: PanelStackItem[T] = data.head.asInstanceOf[PanelStackItem[T]]
   
-  def params[T]: T = top.map(_._2).orNull.asInstanceOf[T]
+  def peekLast[T]: PanelStackItem[T] = data.last.asInstanceOf[PanelStackItem[T]]
+  
+  def params[T]: T = peek[T].state.asInstanceOf[Option[js.Any]].orNull.asInstanceOf[T]
 }
 
 case class PanelStackProps(isRight: Boolean,
@@ -45,8 +42,6 @@ case class PanelStackProps(isRight: Boolean,
 
 object PanelStack extends FunctionComponent[PanelStackProps] {
   
-  type StackItem = (ReactClass, js.Any)
-
   val Context: ReactContext[PanelStackProps] = ReactContext[PanelStackProps](defaultValue = null)
 
   private[stack] var withSizeComp: UiComponent[WithSizeProps] = WithSize
@@ -64,13 +59,11 @@ object PanelStack extends FunctionComponent[PanelStackProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val maybeTop = props.stack.peek
+    val topComp = props.stack.peek.component
 
     <(withSizeComp())(^.wrapped := WithSizeProps({ (width, height) =>
       <(PanelStack.Context.Provider)(^.contextValue := props.copy(width = width, height = height))(
-        maybeTop.map { case (comp, _) =>
-          <(comp)()()
-        },
+        <(topComp)()(),
         compProps.children
       )
     }))()

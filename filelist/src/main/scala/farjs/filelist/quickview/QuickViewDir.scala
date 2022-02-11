@@ -42,7 +42,7 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
       val parent = props.state.currDir.path
       val currItems = List(props.currItem)
       val params = QuickViewParams(props.currItem.name)
-      stack.update(params)
+      stack.update[QuickViewParams](_.withState(params))
 
       var folders = 0d
       var files = 0d
@@ -61,7 +61,8 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
         case Success(false) => // already cancelled
         case Success(true) =>
           setShowPopup(false)
-          stack.update(params.copy(folders = folders, files = files, filesSize = filesSize))
+          val newParams = params.copy(folders = folders, files = files, filesSize = filesSize)
+          stack.update[QuickViewParams](_.withState(newParams))
         case Failure(_) =>
           setShowPopup(false)
           props.dispatch(FileListTaskAction(FutureTask("Quick view dir scan", resultF)))

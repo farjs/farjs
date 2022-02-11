@@ -1,8 +1,7 @@
 package farjs.filelist.quickview
 
 import farjs.filelist._
-import farjs.filelist.stack.MockPanelStack
-import farjs.filelist.stack.PanelStack.StackItem
+import farjs.filelist.stack.{MockPanelStack, PanelStackItem}
 import io.github.shogowada.scalajs.reactjs.React.Props
 import scommons.react.ReactClass
 import scommons.react.redux.Dispatch
@@ -18,10 +17,10 @@ class QuickViewPluginSpec extends TestSpec {
 
   //noinspection TypeAnnotation
   class Stack {
-    val push = mockFunction[ReactClass, QuickViewParams, Unit]
-    val update = mockFunction[QuickViewParams, Unit]
+    val push = mockFunction[PanelStackItem[QuickViewParams], Unit]
+    val update = mockFunction[PanelStackItem[QuickViewParams] => PanelStackItem[QuickViewParams], Unit]
     val pop = mockFunction[Unit]
-    val peek = mockFunction[Option[StackItem]]
+    val peek = mockFunction[PanelStackItem[QuickViewParams]]
     val params = mockFunction[QuickViewParams]
 
     val stack = new MockPanelStack[QuickViewParams](
@@ -51,7 +50,7 @@ class QuickViewPluginSpec extends TestSpec {
     val plugin = createQuickViewPlugin(actions)
     val leftStack = new Stack
     val rightStack = new Stack
-    leftStack.peek.expects().returning(Some((plugin(), null)))
+    leftStack.peek.expects().returning(PanelStackItem(plugin(), None, None, None))
     
     //then
     leftStack.pop.expects()
@@ -66,8 +65,8 @@ class QuickViewPluginSpec extends TestSpec {
     val plugin = createQuickViewPlugin(actions)
     val leftStack = new Stack
     val rightStack = new Stack
-    leftStack.peek.expects().returning(None)
-    rightStack.peek.expects().returning(Some((plugin(), null)))
+    leftStack.peek.expects().returning(PanelStackItem("other".asInstanceOf[ReactClass], None, None, None))
+    rightStack.peek.expects().returning(PanelStackItem(plugin(), None, None, None))
     
     //then
     rightStack.pop.expects()
@@ -82,11 +81,11 @@ class QuickViewPluginSpec extends TestSpec {
     val plugin = createQuickViewPlugin(actions)
     val leftStack = new Stack
     val rightStack = new Stack
-    leftStack.peek.expects().returning(None)
-    rightStack.peek.expects().returning(Some(("testComp".asInstanceOf[ReactClass], null)))
+    leftStack.peek.expects().returning(PanelStackItem("other1".asInstanceOf[ReactClass], None, None, None))
+    rightStack.peek.expects().returning(PanelStackItem("other2".asInstanceOf[ReactClass], None, None, None))
     
     //then
-    leftStack.push.expects(plugin(), QuickViewParams())
+    leftStack.push.expects(PanelStackItem(plugin(), None, None, Some(QuickViewParams())))
 
     //when
     plugin.onTrigger(isRight = true, leftStack.stack, rightStack.stack)
@@ -98,11 +97,11 @@ class QuickViewPluginSpec extends TestSpec {
     val plugin = createQuickViewPlugin(actions)
     val leftStack = new Stack
     val rightStack = new Stack
-    leftStack.peek.expects().returning(None)
-    rightStack.peek.expects().returning(Some(("testComp".asInstanceOf[ReactClass], null)))
+    leftStack.peek.expects().returning(PanelStackItem("other1".asInstanceOf[ReactClass], None, None, None))
+    rightStack.peek.expects().returning(PanelStackItem("other2".asInstanceOf[ReactClass], None, None, None))
     
     //then
-    rightStack.push.expects(plugin(), QuickViewParams())
+    rightStack.push.expects(PanelStackItem(plugin(), None, None, Some(QuickViewParams())))
 
     //when
     plugin.onTrigger(isRight = false, leftStack.stack, rightStack.stack)

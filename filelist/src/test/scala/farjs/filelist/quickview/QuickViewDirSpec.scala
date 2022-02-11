@@ -4,8 +4,7 @@ import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.quickview.QuickViewDir._
-import farjs.filelist.stack.PanelStack
-import farjs.filelist.stack.PanelStack.StackItem
+import farjs.filelist.stack.{PanelStack, PanelStackItem}
 import farjs.ui.theme.Theme
 import farjs.ui.{TextLine, TextLineProps}
 import org.scalatest.Assertion
@@ -43,12 +42,12 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       currItem,
       FileListItem("file 1", size = 10)
     ))
-    var stackState = List[StackItem](
-      (currComp, QuickViewParams().asInstanceOf[js.Any])
+    var stackState = List[PanelStackItem[QuickViewParams]](
+      PanelStackItem(currComp, None, None, Some(QuickViewParams()))
     )
-    val stack = new PanelStack(isActive = false, stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
-      stackState = f(stackState)
-    })
+    val stack = new PanelStack(isActive = false, stackState, { f =>
+      stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]
+    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
     val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
     val p = Promise[Boolean]()
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
@@ -70,7 +69,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
 
       //then
       eventually {
-        stackState.head._2.asInstanceOf[QuickViewParams] shouldBe QuickViewParams("dir 1", 1, 2, 123)
+        stackState.head.state shouldBe Some(QuickViewParams("dir 1", 1, 2, 123))
         findProps(renderer.root, statusPopupComp) should be (empty)
       }
     }
@@ -85,12 +84,12 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       currItem,
       FileListItem("file 1", size = 10)
     ))
-    var stackState = List[StackItem](
-      (currComp, QuickViewParams().asInstanceOf[js.Any])
+    var stackState = List[PanelStackItem[QuickViewParams]](
+      PanelStackItem(currComp, None, None, Some(QuickViewParams()))
     )
-    val stack = new PanelStack(isActive = false, stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
-      stackState = f(stackState)
-    })
+    val stack = new PanelStack(isActive = false, stackState, { f =>
+      stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]
+    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
     val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
     val p = Promise[Boolean]()
     var onNextDirFn: (String, Seq[FileListItem]) => Boolean = null
@@ -117,7 +116,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       //then
       result shouldBe false
       eventually {
-        stackState.head._2.asInstanceOf[QuickViewParams] shouldBe QuickViewParams("dir 1")
+        stackState.head.state shouldBe Some(QuickViewParams("dir 1"))
         findProps(renderer.root, statusPopupComp) should be (empty)
       }
     }
@@ -132,12 +131,12 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       currItem,
       FileListItem("file 1", size = 10)
     ))
-    var stackState = List[StackItem](
-      (currComp, QuickViewParams().asInstanceOf[js.Any])
+    var stackState = List[PanelStackItem[QuickViewParams]](
+      PanelStackItem(currComp, None, None, Some(QuickViewParams()))
     )
-    val stack = new PanelStack(isActive = false, stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
-      stackState = f(stackState)
-    })
+    val stack = new PanelStack(isActive = false, stackState, { f =>
+      stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]
+    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
     val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
     val p = Promise[Boolean]()
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).returning(p.future)
@@ -174,12 +173,12 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("file 1", size = 10)
     ))
     val params = QuickViewParams(currItem.name, 1, 2, 3)
-    var stackState = List[StackItem](
-      (currComp, params.asInstanceOf[js.Any])
+    var stackState = List[PanelStackItem[QuickViewParams]](
+      PanelStackItem(currComp, None, None, Some(params))
     )
-    val stack = new PanelStack(isActive = false, stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
-      stackState = f(stackState)
-    })
+    val stack = new PanelStack(isActive = false, stackState, { f =>
+      stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]
+    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
     val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
 
     //when

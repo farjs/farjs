@@ -3,7 +3,6 @@ package farjs.filelist.quickview
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.quickview.QuickViewPanel._
-import farjs.filelist.stack.PanelStack.StackItem
 import farjs.filelist.stack._
 import farjs.ui.{TextLine, TextLineProps}
 import farjs.ui.border._
@@ -37,12 +36,12 @@ class QuickViewPanelSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("dir", isDir = true, size = 1)
     )))
     val props = QuickViewPanelProps(dispatch, actions, FileListsState(right = state))
-    var stackState = List[StackItem](
-      (currComp, QuickViewParams().asInstanceOf[js.Any])
+    var stackState = List[PanelStackItem[QuickViewParams]](
+      PanelStackItem(currComp, None, None, Some(QuickViewParams()))
     )
-    val stack = new PanelStack(isActive = false, stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
-      stackState = f(stackState)
-    })
+    val stack = new PanelStack(isActive = false, stackState, { f =>
+      stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]
+    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
 
     //when
     val result = testRender(
@@ -64,12 +63,12 @@ class QuickViewPanelSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("dir", isDir = true, size = 1)
     )), index = 1, isActive = true)
     val props = QuickViewPanelProps(dispatch, actions, FileListsState(left = state))
-    var stackState = List[StackItem](
-      (currComp, QuickViewParams().asInstanceOf[js.Any])
+    var stackState = List[PanelStackItem[QuickViewParams]](
+      PanelStackItem(currComp, None, None, Some(QuickViewParams()))
     )
-    val stack = new PanelStack(isActive = false, stackState.headOption, { f: js.Function1[List[StackItem], List[StackItem]] =>
-      stackState = f(stackState)
-    })
+    val stack = new PanelStack(isActive = false, stackState, { f =>
+      stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]
+    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
 
     //when
     val result = testRender(

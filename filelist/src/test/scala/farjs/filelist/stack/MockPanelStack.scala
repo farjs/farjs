@@ -1,26 +1,28 @@
 package farjs.filelist.stack
 
-import farjs.filelist.stack.PanelStack.StackItem
-import scommons.react.ReactClass
-
 //noinspection NotImplementedCode
 class MockPanelStack[P](
-  pushMock: (ReactClass, P) => Unit = (_: ReactClass, _: P) => ???,
-  updateMock: P => Unit = (_: P) => ???,
+  pushMock: PanelStackItem[P] => Unit = (_: PanelStackItem[P]) => ???,
+  updateMock: (PanelStackItem[P] => PanelStackItem[P]) => Unit = (_: PanelStackItem[P] => PanelStackItem[P]) => ???,
   popMock: () => Unit = () => ???,
-  peekMock: () => Option[StackItem] = () => ???,
+  peekMock: () => PanelStackItem[P] = () => ???,
+  peekLastMock: () => PanelStackItem[P] = () => ???,
   paramsMock: () => P = () => ???
-) extends PanelStack(isActive = false, None, _ => ???) {
+) extends PanelStack(isActive = false, Nil, _ => ???) {
 
-  override def push[T](comp: ReactClass, params: T): Unit =
-    pushMock(comp, params.asInstanceOf[P])
+  override def push[T](item: PanelStackItem[T]): Unit =
+    pushMock(item.asInstanceOf[PanelStackItem[P]])
   
-  override def update[T](params: T): Unit =
-    updateMock(params.asInstanceOf[P])
+  override def update[T](f: PanelStackItem[T] => PanelStackItem[T]): Unit =
+    updateMock(f.asInstanceOf[PanelStackItem[P] => PanelStackItem[P]])
 
   override def pop(): Unit = popMock()
 
-  override def peek: Option[StackItem] = peekMock()
+  override def peek[T]: PanelStackItem[T] =
+    peekMock().asInstanceOf[PanelStackItem[T]]
+  
+  override def peekLast[T]: PanelStackItem[T] =
+    peekLastMock().asInstanceOf[PanelStackItem[T]]
 
   override def params[T]: T = paramsMock().asInstanceOf[T]
 }

@@ -18,76 +18,80 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
 
   it should "push new component when push" in {
     //given
-    val updater = mockFunction[js.Function1[List[StackItem], List[StackItem]], Unit]
-    val stack = new PanelStack(isActive = false, None, updater)
-    val comp = "new comp".asInstanceOf[ReactClass]
-    val params = TestParams("test name")
-    val data = List[StackItem](("existing comp".asInstanceOf[ReactClass], null))
+    val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
+    val stack = new PanelStack(isActive = false, Nil, updater)
+    val data = List(
+      PanelStackItem[TestParams]("existing comp".asInstanceOf[ReactClass], None, None, None)
+    )
+    val newItem = PanelStackItem("new comp".asInstanceOf[ReactClass], None, None, Some(TestParams("test name")))
     
-    var result: List[StackItem] = null
-    updater.expects(*).onCall { updateFn: js.Function1[List[StackItem], List[StackItem]] =>
+    var result: List[PanelStackItem[_]] = null
+    updater.expects(*).onCall { updateFn: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] =>
       //when
       result = updateFn(data)
     }
     
     //when
-    stack.push(comp, params)
+    stack.push(newItem)
     
     //then
-    result shouldBe (comp, params) :: data
+    result shouldBe newItem :: data
   }
   
   it should "do nothing if empty stack data when update" in {
     //given
-    val updater = mockFunction[js.Function1[List[StackItem], List[StackItem]], Unit]
-    val stack = new PanelStack(isActive = false, None, updater)
+    val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
+    val stack = new PanelStack(isActive = false, Nil, updater)
     val params = TestParams("test name")
-    val data = List.empty[StackItem]
+    val data = List.empty[PanelStackItem[TestParams]]
     
-    var result: List[StackItem] = null
-    updater.expects(*).onCall { updateFn: js.Function1[List[StackItem], List[StackItem]] =>
+    var result: List[PanelStackItem[_]] = null
+    updater.expects(*).onCall { updateFn: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] =>
       //when
       result = updateFn(data)
     }
     
     //when
-    stack.update(params)
+    stack.update[TestParams](_.withState(params))
     
     //then
     result should be theSameInstanceAs data
   }
   
-  it should "update top component params when update" in {
+  it should "update top item when update" in {
     //given
-    val updater = mockFunction[js.Function1[List[StackItem], List[StackItem]], Unit]
-    val stack = new PanelStack(isActive = false, None, updater)
+    val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
+    val stack = new PanelStack(isActive = false, Nil, updater)
     val params = TestParams("test name")
-    val top = "top comp".asInstanceOf[ReactClass]
-    val other: StackItem = ("other comp".asInstanceOf[ReactClass], null)
-    val data = List((top, null), other)
+    val top = PanelStackItem[TestParams]("top comp".asInstanceOf[ReactClass], None, None, None)
+    val other = PanelStackItem("other comp".asInstanceOf[ReactClass], None, None, None)
+    val data = List(top, other)
     
-    var result: List[StackItem] = null
-    updater.expects(*).onCall { updateFn: js.Function1[List[StackItem], List[StackItem]] =>
+    var result: List[PanelStackItem[_]] = null
+    updater.expects(*).onCall { updateFn: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] =>
       //when
       result = updateFn(data)
     }
     
     //when
-    stack.update(params)
+    stack.update[TestParams](_.withState(params))
     
     //then
-    result shouldBe List((top, params), other)
+    result shouldBe List(top.copy(state = Some(params)), other)
   }
   
   it should "remove top component when pop" in {
     //given
-    val updater = mockFunction[js.Function1[List[StackItem], List[StackItem]], Unit]
-    val stack = new PanelStack(isActive = false, None, updater)
-    val other: StackItem = ("other comp".asInstanceOf[ReactClass], null)
-    val data = List(("top comp".asInstanceOf[ReactClass], null), other)
+    val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
+    val stack = new PanelStack(isActive = false, Nil, updater)
+    val other = PanelStackItem[Unit]("other comp".asInstanceOf[ReactClass], None, None, None)
+    val data = List(
+      PanelStackItem[TestParams]("top comp".asInstanceOf[ReactClass], None, None, None),
+      other
+    )
     
-    var result: List[StackItem] = null
-    updater.expects(*).onCall { updateFn: js.Function1[List[StackItem], List[StackItem]] =>
+    var result: List[PanelStackItem[_]] = null
+    updater.expects(*).onCall { updateFn: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] =>
       //when
       result = updateFn(data)
     }
@@ -99,24 +103,61 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     result shouldBe List(other)
   }
   
-  it should "return top when peek" in {
+  it should "not remove last item when pop" in {
+    //given
+    val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
+    val stack = new PanelStack(isActive = false, Nil, updater)
+    val data = List(
+      PanelStackItem[TestParams]("top comp".asInstanceOf[ReactClass], None, None, None)
+    )
+    
+    var result: List[PanelStackItem[_]] = null
+    updater.expects(*).onCall { updateFn: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] =>
+      //when
+      result = updateFn(data)
+    }
+    
+    //when
+    stack.pop()
+    
+    //then
+    result shouldBe data
+  }
+  
+  it should "return top item when peek" in {
     //given
     val params = TestParams(name = "test")
-    val top: StackItem = ("top comp".asInstanceOf[ReactClass], params.asInstanceOf[js.Any])
-    val stack = new PanelStack(isActive = false, Some(top), null)
+    val top = PanelStackItem("top comp".asInstanceOf[ReactClass], None, None, Some(params))
+    val other = PanelStackItem("other comp".asInstanceOf[ReactClass], None, None, None)
+    val stack = new PanelStack(isActive = false, List(top, other), null)
     
     //when
     val result = stack.peek
     
     //then
-    result shouldBe Some(top)
+    result shouldBe top
   }
   
-  it should "return params if Some(top) when params" in {
+  it should "return last item when peekLast" in {
     //given
     val params = TestParams(name = "test")
-    val top: StackItem = ("top comp".asInstanceOf[ReactClass], params.asInstanceOf[js.Any])
-    val stack = new PanelStack(isActive = false, Some(top), null)
+    val top = PanelStackItem("top comp".asInstanceOf[ReactClass], None, None, Some(params))
+    val other = PanelStackItem("other comp".asInstanceOf[ReactClass], None, None, None)
+    val stack = new PanelStack(isActive = false, List(top, other), null)
+    
+    //when
+    val result = stack.peekLast
+    
+    //then
+    result shouldBe other
+  }
+  
+  it should "return params of top item when params" in {
+    //given
+    val params = TestParams(name = "test")
+    val top = PanelStackItem("top comp".asInstanceOf[ReactClass], None, None, Some(params))
+    val other = PanelStackItem("other comp".asInstanceOf[ReactClass], None, None, None)
+    val stack = new PanelStack(isActive = false, List(top, other), null)
     
     //when
     val result = stack.params[TestParams]
@@ -127,7 +168,8 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
   
   it should "return null if None when params" in {
     //given
-    val stack = new PanelStack(isActive = false, None, null)
+    val top = PanelStackItem[TestParams]("top comp".asInstanceOf[ReactClass], None, None, None)
+    val stack = new PanelStack(isActive = false, List(top), null)
     
     //when
     val result = stack.params[TestParams]
@@ -167,10 +209,12 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     )
   }
   
-  it should "render top component and children if non-empty stack" in {
+  it should "render top component and children" in {
     //given
     val (stackCtx, stackComp) = getStackCtxHook
-    val stack = new PanelStack(isActive = false, Some(("TopComp".asInstanceOf[ReactClass], null)), null)
+    val top = PanelStackItem[TestParams]("TopComp".asInstanceOf[ReactClass], None, None, None)
+    val other = PanelStackItem[TestParams]("OtherComp".asInstanceOf[ReactClass], None, None, None)
+    val stack = new PanelStack(isActive = false, List(top, other), null)
     val props = PanelStackProps(isRight = true, panelInput = null, stack)
 
     //when
@@ -186,29 +230,6 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     inside(result.children.toList) { case List(resTopComp, resCtxHook) =>
       resTopComp.`type` shouldBe "TopComp"
       resCtxHook.`type` shouldBe stackComp
-    }
-  }
-
-  it should "render only children if empty stack" in {
-    //given
-    val (stackCtx, stackComp) = getStackCtxHook
-    val stack = new PanelStack(isActive = false, None, null)
-    val props = PanelStackProps(isRight = false, panelInput = null, stack)
-
-    //when
-    val result = renderWithSize(
-      <(PanelStack())(^.wrapped := props)(
-        <(stackComp).empty,
-        <.>()("some other content")
-      )
-    )
-
-    //then
-    stackCtx.get() shouldBe props.copy(width = width, height = height)
-
-    inside(result.children.toList) { case List(resCtxHook, otherContent) =>
-      resCtxHook.`type` shouldBe stackComp
-      otherContent shouldBe "some other content"
     }
   }
 
