@@ -1,20 +1,15 @@
 package farjs.filelist.quickview
 
+import farjs.filelist.FileListState
 import farjs.filelist.api.FileListItem
-import farjs.filelist.stack.PanelStack
-import farjs.filelist.{FileListActions, FileListsStateDef}
+import farjs.filelist.stack.{PanelStack, WithPanelStacks}
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.redux.Dispatch
 
-case class QuickViewPanelProps(dispatch: Dispatch,
-                               actions: FileListActions,
-                               data: FileListsStateDef)
-
-object QuickViewPanel extends FunctionComponent[QuickViewPanelProps] {
+object QuickViewPanel extends FunctionComponent[Unit] {
 
   private[quickview] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
   private[quickview] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
@@ -22,19 +17,23 @@ object QuickViewPanel extends FunctionComponent[QuickViewPanelProps] {
   private[quickview] var quickViewDirComp: UiComponent[QuickViewDirProps] = QuickViewDir
 
   protected def render(compProps: Props): ReactElement = {
+    val stacks = WithPanelStacks.usePanelStacks
     val panelStack = PanelStack.usePanelStack
     val width = panelStack.width
     val height = panelStack.height
     
-    val props = compProps.wrapped
     val theme = Theme.current.fileList
-    val state =
-      if (!panelStack.isRight) props.data.right
-      else props.data.left
+    val stack =
+      if (!panelStack.isRight) stacks.rightStack
+      else stacks.leftStack
+    val stackItem = stack.peek[FileListState]
 
-    val maybeCurrItem = state.currentItem.map {
-      case i if i == FileListItem.up => FileListItem.currDir
-      case i => i
+    val maybeCurrData = stackItem.getActions.zip(stackItem.state).flatMap {
+      case ((dispatch, actions), state) =>
+        state.currentItem.map {
+          case i if i == FileListItem.up => (dispatch, actions, state, FileListItem.currDir)
+          case i => (dispatch, actions, state, i)
+        }
     }
 
     <.box(^.rbStyle := theme.regularItem)(
@@ -53,15 +52,15 @@ object QuickViewPanel extends FunctionComponent[QuickViewPanelProps] {
         width = width - 2,
         text = "Quick view",
         style = theme.regularItem,
-        focused = !state.isActive
+        focused = !stackItem.state.exists(_.isActive)
       ))(),
 
-      maybeCurrItem.map { currItem =>
+      maybeCurrData.map { case (dispatch, actions, state, currItem) =>
         <.>()(
           if (currItem.isDir) {
             <(quickViewDirComp())(^.wrapped := QuickViewDirProps(
-              dispatch = props.dispatch,
-              actions = props.actions,
+              dispatch = dispatch,
+              actions = actions,
               state = state,
               stack = panelStack.stack,
               width = width,

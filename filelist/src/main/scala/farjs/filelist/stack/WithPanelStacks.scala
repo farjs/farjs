@@ -9,7 +9,7 @@ case class WithPanelStacksProps(leftStack: PanelStack, rightStack: PanelStack)
 
 object WithPanelStacks extends FunctionComponent[WithPanelStacksProps] {
   
-  private[stack] val Context = ReactContext[WithPanelStacksProps](defaultValue = null)
+  val Context: ReactContext[WithPanelStacksProps] = ReactContext[WithPanelStacksProps](defaultValue = null)
 
   def usePanelStacks: WithPanelStacksProps = {
     val ctx = useContext(Context)

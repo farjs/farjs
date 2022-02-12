@@ -10,5 +10,13 @@ case class PanelStackItem[T](
   actions: Option[FileListActions],
   state: Option[T]
 ) {
+  def withActions(dispatch: Dispatch, actions: FileListActions): PanelStackItem[T] =
+    copy(dispatch = Some(dispatch), actions = Some(actions))
+  
   def withState(s: T): PanelStackItem[T] = copy(state = Some(s))
+  
+  def getActions: Option[(Dispatch, FileListActions)] = (dispatch, actions) match {
+    case (Some(dispatch), Some(actions)) => Some((dispatch, actions))
+    case _ => None
+  }
 }

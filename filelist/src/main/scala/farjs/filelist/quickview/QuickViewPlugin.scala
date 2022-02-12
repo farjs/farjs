@@ -1,20 +1,14 @@
 package farjs.filelist.quickview
 
-import farjs.filelist._
+import farjs.filelist.FileListPlugin
 import farjs.filelist.stack.{PanelStack, PanelStackItem}
-import io.github.shogowada.scalajs.reactjs.React.Props
-import scommons.react.UiComponent
-import scommons.react.redux._
 
-class QuickViewPlugin(actions: FileListActions)
-  extends BaseStateController[FileListsGlobalState, QuickViewPanelProps] with FileListPlugin {
-
-  lazy val uiComponent: UiComponent[QuickViewPanelProps] = QuickViewPanel
+object QuickViewPlugin extends FileListPlugin {
 
   val triggerKey = "C-q"
 
   def onTrigger(isRight: Boolean, leftStack: PanelStack, rightStack: PanelStack): Unit = {
-    val compClass = apply()
+    val compClass = QuickViewPanel()
     val exists =
       if (leftStack.peek.component == compClass) {
         leftStack.pop()
@@ -38,13 +32,5 @@ class QuickViewPlugin(actions: FileListActions)
         state = Some(QuickViewParams())
       ))
     }
-  }
-
-  def mapStateToProps(dispatch: Dispatch, state: FileListsGlobalState, props: Props[Unit]): QuickViewPanelProps = {
-    QuickViewPanelProps(
-      dispatch = dispatch,
-      actions = actions,
-      data = state.fileListsState
-    )
   }
 }

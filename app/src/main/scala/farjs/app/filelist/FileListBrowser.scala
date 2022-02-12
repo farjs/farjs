@@ -35,10 +35,10 @@ class FileListBrowser(fsControllerComp: ReactClass) extends FunctionComponent[Fi
     val (showRightDrive, setShowRightDrive) = useState(false)
     
     val (leftStackData, setLeftStackData) = useStateUpdater(() => List[PanelStackItem[_]](
-      PanelStackItem[Unit](fsControllerComp, None, None, None)
+      PanelStackItem[FileListState](fsControllerComp, None, None, None)
     ))
     val (rightStackData, setRightStackData) = useStateUpdater(() => List[PanelStackItem[_]](
-      PanelStackItem[Unit](fsControllerComp, None, None, None)
+      PanelStackItem[FileListState](fsControllerComp, None, None, None)
     ))
     val leftStack = new PanelStack(!isRightActive, leftStackData, setLeftStackData)
     val rightStack = new PanelStack(isRightActive, rightStackData, setRightStackData)

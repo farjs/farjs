@@ -15,7 +15,7 @@ class FileListController(actions: FileListActions)
     new FileListBrowser(new FSController(actions).apply())
   
   private lazy val plugins: Seq[FileListPlugin] = List(
-    new QuickViewPlugin(actions)
+    QuickViewPlugin
   )
 
   def mapStateToProps(dispatch: Dispatch, state: FarjsStateDef, props: Props[Unit]): FileListBrowserProps = {
