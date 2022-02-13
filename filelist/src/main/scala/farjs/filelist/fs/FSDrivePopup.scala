@@ -1,7 +1,7 @@
 package farjs.filelist.fs
 
-import farjs.filelist.FileListActions
 import farjs.filelist.FileListActions.FileListTaskAction
+import farjs.filelist.FileListState
 import farjs.filelist.stack.PanelStack
 import farjs.ui._
 import farjs.ui.border.SingleBorder
@@ -18,8 +18,6 @@ import scommons.react.redux.task.FutureTask
 import scala.concurrent.ExecutionContext.Implicits.global
 
 case class FSDrivePopupProps(dispatch: Dispatch,
-                             actions: FileListActions,
-                             isRight: Boolean,
                              onClose: () => Unit,
                              showOnLeft: Boolean)
 
@@ -35,7 +33,7 @@ object FSDrivePopup extends FunctionComponent[FSDrivePopupProps] {
   protected def render(compProps: Props): ReactElement = {
     val (disks, setDisks) = useState(List.empty[FSDisk])
     val props = compProps.wrapped
-    val panelStack = PanelStack.usePanelStack
+    val stackProps = PanelStack.usePanelStack
 
     val data = getData(platform, disks)
     val textWidth = if (data.isEmpty) 10 else data.maxBy(_._2.length)._2.length
@@ -45,12 +43,19 @@ object FSDrivePopup extends FunctionComponent[FSDrivePopupProps] {
 
     def onAction(dir: String): () => Unit = { () =>
       props.onClose()
-      props.dispatch(props.actions.changeDir(
-        dispatch = props.dispatch,
-        isRight = props.isRight,
-        parent = None,
-        dir = dir
-      ))
+      
+      val stack = stackProps.stack
+      if (stack.peek != stack.peekLast) {
+        stack.pop()
+      }
+      stack.peekLast[FileListState].getActions.foreach { case (dispatch, actions) =>
+        dispatch(actions.changeDir(
+          dispatch = dispatch,
+          isRight = stackProps.isRight,
+          parent = None,
+          dir = dir
+        ))
+      }
     }
 
     useLayoutEffect({ () =>
@@ -69,7 +74,7 @@ object FSDrivePopup extends FunctionComponent[FSDrivePopupProps] {
           size = (width, height),
           style = theme,
           padding = padding,
-          left = getLeftPos(panelStack.width, props.showOnLeft, width)
+          left = getLeftPos(stackProps.width, props.showOnLeft, width)
         ))(
           data.zipWithIndex.map { case ((root, text), index) =>
             <(buttonComp())(^.key := s"$index", ^.wrapped := ButtonProps(

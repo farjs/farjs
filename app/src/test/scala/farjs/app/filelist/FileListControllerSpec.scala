@@ -31,9 +31,8 @@ class FileListControllerSpec extends TestSpec {
     val result = controller.mapStateToProps(dispatch, state, props)
     
     //then
-    inside(result) { case FileListBrowserProps(disp, resActions, data, plugins) =>
+    inside(result) { case FileListBrowserProps(disp, data, plugins) =>
       disp shouldBe dispatch
-      resActions shouldBe resActions
       data shouldBe fileListsState
       plugins should not be Nil
     }

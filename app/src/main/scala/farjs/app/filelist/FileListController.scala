@@ -21,7 +21,6 @@ class FileListController(actions: FileListActions)
   def mapStateToProps(dispatch: Dispatch, state: FarjsStateDef, props: Props[Unit]): FileListBrowserProps = {
     FileListBrowserProps(
       dispatch = dispatch,
-      actions = actions,
       data = state.fileListsState,
       plugins = plugins
     )

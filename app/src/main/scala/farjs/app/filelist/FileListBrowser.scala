@@ -14,7 +14,6 @@ import scommons.react.redux.Dispatch
 import scala.scalajs.js
 
 case class FileListBrowserProps(dispatch: Dispatch,
-                                actions: FileListActions,
                                 data: FileListsStateDef,
                                 plugins: Seq[FileListPlugin] = Nil)
 
@@ -104,8 +103,6 @@ class FileListBrowser(fsControllerComp: ReactClass) extends FunctionComponent[Fi
           if (showLeftDrive) Some {
             <(fsDrivePopup())(^.wrapped := FSDrivePopupProps(
               dispatch = props.dispatch,
-              actions = props.actions,
-              isRight = isRight,
               onClose = { () =>
                 setShowLeftDrive(false)
               },
@@ -129,8 +126,6 @@ class FileListBrowser(fsControllerComp: ReactClass) extends FunctionComponent[Fi
           if (showRightDrive) Some {
             <(fsDrivePopup())(^.wrapped := FSDrivePopupProps(
               dispatch = props.dispatch,
-              actions = props.actions,
-              isRight = !isRight,
               onClose = { () =>
                 setShowRightDrive(false)
               },
