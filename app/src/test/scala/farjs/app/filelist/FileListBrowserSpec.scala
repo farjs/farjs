@@ -16,7 +16,11 @@ import scala.scalajs.js.Dynamic.literal
 
 class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
   
-  private val fileListBrowser = new FileListBrowser("test_fsController".asInstanceOf[ReactClass])
+  private val fileListPopups = "test_popups".asInstanceOf[ReactClass]
+  private val fileListBrowser = new FileListBrowser(
+    "test_fsController".asInstanceOf[ReactClass],
+    fileListPopups
+  )
 
   fileListBrowser.panelStackComp = mockUiComponent("PanelStack")
   fileListBrowser.fsDrivePopup = mockUiComponent("FSDrivePopup")
@@ -376,37 +380,39 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   }
   
   private def assertFileListBrowser(result: TestInstance): Assertion = {
-    assertTestComponent(result, WithPanelStacks)({ case WithPanelStacksProps(leftStack, rightStack) =>
-      leftStack should not be null
-      rightStack should not be null
-    }, inside(_) { case List(left, right, menu) =>
-      assertNativeComponent(left, <.button(
+    assertNativeComponent(result, <(WithPanelStacks())(^.assertWrapped(inside(_) {
+      case WithPanelStacksProps(leftStack, rightStack) =>
+        leftStack should not be null
+        rightStack should not be null
+    }))(
+      <.button(
         ^.rbMouse := true,
         ^.rbWidth := "50%",
         ^.rbHeight := "100%-1"
-      )(), inside(_) { case List(stack) =>
-        assertTestComponent(stack, panelStackComp) { case PanelStackProps(isRight, _, stack, _, _) =>
-          isRight shouldBe false
-          stack.isActive shouldBe false
-        }
-      })
-      assertNativeComponent(right, <.button(
+      )(
+        <(panelStackComp())(^.assertWrapped(inside(_) {
+          case PanelStackProps(isRight, _, stack, _, _) =>
+            isRight shouldBe false
+            stack.isActive shouldBe false
+        }))()
+      ),
+      <.button(
         ^.rbMouse := true,
         ^.rbWidth := "50%",
         ^.rbHeight := "100%-1",
         ^.rbLeft := "50%"
-      )(), inside(_) { case List(stack) =>
-        assertTestComponent(stack, panelStackComp) { case PanelStackProps(isRight, _, stack, _, _) =>
-          isRight shouldBe true
-          stack.isActive shouldBe true
-        }
-      })
+      )(
+        <(panelStackComp())(^.assertWrapped(inside(_) {
+          case PanelStackProps(isRight, _, stack, _, _) =>
+            isRight shouldBe true
+            stack.isActive shouldBe true
+        }))()
+      ),
 
-      assertNativeComponent(menu,
-        <.box(^.rbTop := "100%-1")(
-          <(bottomMenuComp())()()
-        )
-      )
-    })
+      <.box(^.rbTop := "100%-1")(
+        <(bottomMenuComp())()()
+      ),
+      <(fileListPopups).empty
+    ))
   }
 }

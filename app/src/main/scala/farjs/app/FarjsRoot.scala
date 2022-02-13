@@ -12,7 +12,6 @@ import scala.scalajs.js
 
 class FarjsRoot(withPortalsComp: UiComponent[Unit],
                 fileListComp: ReactClass,
-                fileListPopups: ReactClass,
                 taskController: ReactClass,
                 initialDevTool: DevTool
                ) extends FunctionComponent[Unit] {
@@ -45,7 +44,6 @@ class FarjsRoot(withPortalsComp: UiComponent[Unit],
       )(
         <(withPortalsComp())()(
           <(fileListComp).empty,
-          <(fileListPopups).empty,
           <(taskController).empty
         )
       ),

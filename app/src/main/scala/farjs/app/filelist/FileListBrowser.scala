@@ -17,7 +17,8 @@ case class FileListBrowserProps(dispatch: Dispatch,
                                 data: FileListsStateDef,
                                 plugins: Seq[FileListPlugin] = Nil)
 
-class FileListBrowser(fsControllerComp: ReactClass) extends FunctionComponent[FileListBrowserProps] {
+class FileListBrowser(fsControllerComp: ReactClass,
+                      fileListPopups: ReactClass) extends FunctionComponent[FileListBrowserProps] {
 
   private[filelist] var panelStackComp: UiComponent[PanelStackProps] = PanelStack
   private[filelist] var fsDrivePopup: UiComponent[FSDrivePopupProps] = FSDrivePopup
@@ -138,7 +139,9 @@ class FileListBrowser(fsControllerComp: ReactClass) extends FunctionComponent[Fi
 
       <.box(^.rbTop := "100%-1")(
         <(bottomMenuComp())()()
-      )
+      ),
+
+      <(fileListPopups).empty
     )
   }
 }

@@ -14,7 +14,6 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
   private val withPortalsComp = mockUiComponent[Unit]("WithPortals")
   private val fileListComp = mockUiComponent[Unit]("FileListBrowser").apply()
-  private val fileListPopups = mockUiComponent[Unit]("FileListPopups").apply()
   private val taskController = mockUiComponent[Unit]("TaskController").apply()
   
   FarjsRoot.logControllerComp = mockUiComponent("LogController")
@@ -22,7 +21,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
   it should "set devTool and emit resize event when on F12" in {
     //given
-    val root = new FarjsRoot(withPortalsComp, fileListComp, fileListPopups, taskController, DevTool.Hidden)
+    val root = new FarjsRoot(withPortalsComp, fileListComp, taskController, DevTool.Hidden)
     val emitMock = mockFunction[String, Unit]
     val program = literal("emit" -> emitMock)
     val keyMock = mockFunction[js.Array[String], js.Function2[js.Object, KeyboardKey, Unit], Unit]
@@ -66,7 +65,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
   it should "set devTool when onActivate" in {
     //given
-    val root = new FarjsRoot(withPortalsComp, fileListComp, fileListPopups, taskController, DevTool.Colors)
+    val root = new FarjsRoot(withPortalsComp, fileListComp, taskController, DevTool.Colors)
     val keyMock = mockFunction[js.Array[String], js.Function2[js.Object, KeyboardKey, Unit], Unit]
     val screen = literal("key" -> keyMock)
     val boxMock = literal("screen" -> screen)
@@ -97,7 +96,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
   it should "render component without DevTools" in {
     //given
-    val root = new FarjsRoot(withPortalsComp, fileListComp, fileListPopups, taskController, DevTool.Hidden)
+    val root = new FarjsRoot(withPortalsComp, fileListComp, taskController, DevTool.Hidden)
     val keyMock = mockFunction[js.Array[String], js.Function2[js.Object, KeyboardKey, Unit], Unit]
     val screen = literal("key" -> keyMock)
     val boxMock = literal("screen" -> screen)
@@ -114,7 +113,6 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       assertNativeComponent(main, <.box(^.rbWidth := "100%")(
         <(withPortalsComp())()(
           <(fileListComp).empty,
-          <(fileListPopups).empty,
           <(taskController).empty
         )
       ))
@@ -127,7 +125,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   
   it should "render component with LogPanel" in {
     //given
-    val root = new FarjsRoot(withPortalsComp, fileListComp, fileListPopups, taskController, DevTool.Logs)
+    val root = new FarjsRoot(withPortalsComp, fileListComp, taskController, DevTool.Logs)
     val keyMock = mockFunction[js.Array[String], js.Function2[js.Object, KeyboardKey, Unit], Unit]
     val screen = literal("key" -> keyMock)
     val boxMock = literal("screen" -> screen)
@@ -144,7 +142,6 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       assertNativeComponent(main, <.box(^.rbWidth := "70%")(
         <(withPortalsComp())()(
           <(fileListComp).empty,
-          <(fileListPopups).empty,
           <(taskController).empty
         )
       ))
@@ -170,7 +167,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   
   it should "render component with ColorPanel" in {
     //given
-    val root = new FarjsRoot(withPortalsComp, fileListComp, fileListPopups, taskController, DevTool.Colors)
+    val root = new FarjsRoot(withPortalsComp, fileListComp, taskController, DevTool.Colors)
     val keyMock = mockFunction[js.Array[String], js.Function2[js.Object, KeyboardKey, Unit], Unit]
     val screen = literal("key" -> keyMock)
     val boxMock = literal("screen" -> screen)
@@ -187,7 +184,6 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       assertNativeComponent(main, <.box(^.rbWidth := "70%")(
         <(withPortalsComp())()(
           <(fileListComp).empty,
-          <(fileListPopups).empty,
           <(taskController).empty
         )
       ))
