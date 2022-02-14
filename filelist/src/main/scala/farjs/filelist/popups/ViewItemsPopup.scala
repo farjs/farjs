@@ -1,10 +1,13 @@
 package farjs.filelist.popups
 
-import farjs.filelist.FileListActions.{FileListTaskAction, FileListItemsViewedAction}
+import farjs.filelist.FileListActions.{FileListItemsViewedAction, FileListTaskAction}
+import farjs.filelist.{FileListActions, FileListState}
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupViewItemsAction
+import farjs.filelist.stack.WithPanelStacks
 import farjs.ui.popup._
 import scommons.react._
 import scommons.react.hooks._
+import scommons.react.redux.Dispatch
 import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -16,13 +19,19 @@ object ViewItemsPopup extends FunctionComponent[FileListPopupsProps] {
   private[popups] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
 
   protected def render(compProps: Props): ReactElement = {
+    val stacks = WithPanelStacks.usePanelStacks
     val (currDir, setCurrDir) = useState("")
     val inProgress = useRef(false)
-    val props = compProps.wrapped
-    val showPopup = props.data.popups.showViewItemsPopup
+    val showPopup = {
+      val props = compProps.wrapped
+      props.data.popups.showViewItemsPopup
+    }
+    val maybeCurrData = {
+      val stackItem = stacks.activeStack.peek[FileListState]
+      stackItem.getActions.zip(stackItem.state)
+    }
 
-    def viewItems(): Unit = {
-      val state = props.data.activeList
+    def viewItems(dispatch: Dispatch, actions: FileListActions, state: FileListState): Unit = {
       val parent = state.currDir.path
       val currItems =
         if (state.selectedItems.nonEmpty) state.selectedItems
@@ -38,7 +47,7 @@ object ViewItemsPopup extends FunctionComponent[FileListPopupsProps] {
           case true if currItem.isDir =>
             setCurrDir(currItem.name)
             var s = 0d
-            props.actions.scanDirs(parent, Seq(currItem), onNextDir = { (_, items) =>
+            actions.scanDirs(parent, Seq(currItem), onNextDir = { (_, items) =>
               s += items.foldLeft(0d) { case (res, i) =>
                 res + (if (i.isDir) 0d else i.size)
               }
@@ -52,33 +61,35 @@ object ViewItemsPopup extends FunctionComponent[FileListPopupsProps] {
       }
       resultF.onComplete {
         case Success(false) => // already cancelled
-        case Success(true) => props.dispatch(FileListItemsViewedAction(state.isRight, sizes))
+        case Success(true) => dispatch(FileListItemsViewedAction(state.isRight, sizes))
         case Failure(_) =>
-          props.dispatch(FileListPopupViewItemsAction(show = false))
-          props.dispatch(FileListTaskAction(FutureTask("Viewing Items", resultF)))
+          dispatch(FileListPopupViewItemsAction(show = false))
+          dispatch(FileListTaskAction(FutureTask("Viewing Items", resultF)))
       }
     }
 
     useLayoutEffect({ () =>
       if (!inProgress.current && showPopup) { // start scan
-        inProgress.current = true
-        setCurrDir("")
-        viewItems()
+        maybeCurrData.foreach { case ((dispatch, actions), state) =>
+          inProgress.current = true
+          setCurrDir("")
+          viewItems(dispatch, actions, state)
+        }
       } else if (inProgress.current && !showPopup) { // stop scan
         inProgress.current = false
       }
       ()
     }, List(showPopup))
     
-    if (showPopup) {
+    maybeCurrData.filter(_ => showPopup).map { case ((dispatch, _), _) =>
       <(statusPopupComp())(^.wrapped := StatusPopupProps(
         text = s"Scanning the folder\n$currDir",
         title = "View",
         closable = true,
         onClose = { () =>
-          props.dispatch(FileListPopupViewItemsAction(show = false))
+          dispatch(FileListPopupViewItemsAction(show = false))
         }
       ))()
-    } else null
+    }.orNull
   }
 }

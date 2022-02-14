@@ -5,7 +5,12 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class WithPanelStacksProps(leftStack: PanelStack, rightStack: PanelStack)
+case class WithPanelStacksProps(leftStack: PanelStack, rightStack: PanelStack) {
+  
+  def activeStack: PanelStack =
+    if (leftStack.isActive) leftStack
+    else rightStack
+}
 
 object WithPanelStacks extends FunctionComponent[WithPanelStacksProps] {
   
