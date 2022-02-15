@@ -5,6 +5,7 @@ import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupViewItemsAction
 import farjs.filelist.popups.ViewItemsPopup._
+import farjs.filelist.stack.WithPanelStacksSpec.withContext
 import farjs.filelist.stack._
 import farjs.ui.popup.StatusPopupProps
 import org.scalatest.Succeeded
@@ -231,14 +232,5 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
         title shouldBe "View"
         closable shouldBe true
     }
-  }
-
-  private def withContext(element: ReactElement,
-                          leftStack: PanelStack,
-                          rightStack: PanelStack): ReactElement = {
-    
-    <(WithPanelStacks.Context.Provider)(^.contextValue := WithPanelStacksProps(leftStack, rightStack))(
-      element
-    )
   }
 }

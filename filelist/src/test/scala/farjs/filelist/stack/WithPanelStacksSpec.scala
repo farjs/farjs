@@ -77,3 +77,12 @@ class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
     }.apply())
   }
 }
+
+object WithPanelStacksSpec {
+
+  def withContext(element: ReactElement, leftStack: PanelStack, rightStack: PanelStack): ReactElement = {
+    <(WithPanelStacks.Context.Provider)(^.contextValue := WithPanelStacksProps(leftStack, rightStack))(
+      element
+    )
+  }
+}
