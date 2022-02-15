@@ -6,9 +6,9 @@ import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.copy.CopyItems._
 import farjs.filelist.fs.{FSDisk, MockFSService}
 import farjs.filelist.popups.FileListPopupsActions._
-import farjs.filelist.popups.{FileListPopupsProps, FileListPopupsState}
-import farjs.filelist.stack.{PanelStack, PanelStackItem}
+import farjs.filelist.popups.FileListPopupsState
 import farjs.filelist.stack.WithPanelStacksSpec.withContext
+import farjs.filelist.stack.{PanelStack, PanelStackItem}
 import farjs.ui.popup.MessageBoxProps
 import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
@@ -55,15 +55,16 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val currDir = FileListDir("/folder", isRoot = false, List(
       FileListItem("dir 1", isDir = true)
     ))
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
-    ))
+    val state = FileListState(currDir = currDir, isActive = true)
+    val props = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
+    val toDispatch = mockFunction[Any, Any]
+    val toActions = new MockFileListActions
+    val toState = FileListState()
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(mockFunction[Any, Any]), Some(new MockFileListActions), Some(props.data.right))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions), Some(toState))
     ), null)
     val renderer = createTestRenderer(
       withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack)
@@ -84,12 +85,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     TestRenderer.act { () =>
-      renderer.update(withContext(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(
-          left = props.data.left,
-          popups = FileListPopupsState()
-        )
-      ))(), leftStack, rightStack))
+      renderer.update(
+        withContext(<(CopyItems())(^.wrapped := FileListPopupsState())(), leftStack, rightStack)
+      )
     }
 
     eventually {
@@ -117,15 +115,16 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val currDir = FileListDir("/folder", isRoot = false, List(
       FileListItem("dir 1", isDir = true)
     ))
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
-    ))
+    val state = FileListState(currDir = currDir, isActive = true)
+    val props = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
+    val toDispatch = mockFunction[Any, Any]
+    val toActions = new MockFileListActions
+    val toState = FileListState()
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(mockFunction[Any, Any]), Some(new MockFileListActions), Some(props.data.right))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions), Some(toState))
     ), null)
     val renderer = createTestRenderer(
       withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack)
@@ -148,12 +147,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     TestRenderer.act { () =>
-      renderer.update(withContext(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(
-          left = props.data.left,
-          popups = FileListPopupsState()
-        )
-      ))(), leftStack, rightStack))
+      renderer.update(
+        withContext(<(CopyItems())(^.wrapped := FileListPopupsState())(), leftStack, rightStack)
+      )
     }
 
     eventually {
@@ -179,15 +175,16 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val currDir = FileListDir("/folder", isRoot = false, List(
       FileListItem("dir 1", isDir = true)
     ))
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
-      left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
-    ))
+    val state = FileListState(currDir = currDir, isActive = true)
+    val props = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
     ), null)
+    val toDispatch = mockFunction[Any, Any]
+    val toActions = new MockFileListActions
+    val toState = FileListState()
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(mockFunction[Any, Any]), Some(new MockFileListActions), Some(props.data.right))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions), Some(toState))
     ), null)
     val renderer = createTestRenderer(
       withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack)
@@ -202,9 +199,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     
     //then
     TestRenderer.act { () =>
-      renderer.update(withContext(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(popups = FileListPopupsState())
-      ))(), leftStack, rightStack))
+      renderer.update(
+        withContext(<(CopyItems())(^.wrapped := FileListPopupsState())(), leftStack, rightStack)
+      )
     }
 
     renderer.root.children.toList should be (empty)
@@ -216,15 +213,16 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, List(item))
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
-    ))
+    val state = FileListState(currDir = currDir, isActive = true)
+    val props = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
+    val toDispatch = mockFunction[Any, Any]
+    val toActions = new MockFileListActions
+    val toState = FileListState()
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(mockFunction[Any, Any]), Some(new MockFileListActions), Some(props.data.right))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions), Some(toState))
     ), null)
     val renderer = createTestRenderer(
       withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack)
@@ -245,12 +243,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     TestRenderer.act { () =>
-      renderer.update(withContext(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(
-          left = props.data.left,
-          popups = FileListPopupsState()
-        )
-      ))(), leftStack, rightStack))
+      renderer.update(
+        withContext(<(CopyItems())(^.wrapped := FileListPopupsState())(), leftStack, rightStack)
+      )
     }
 
     eventually {
@@ -278,15 +273,16 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     CopyItems.fsService = fsService.fsService
     val item = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, List(item))
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
-    ))
+    val state = FileListState(currDir = currDir, isActive = true)
+    val props = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
+    val toDispatch = mockFunction[Any, Any]
+    val toActions = new MockFileListActions
+    val toState = FileListState()
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(mockFunction[Any, Any]), Some(new MockFileListActions), Some(props.data.right))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions), Some(toState))
     ), null)
     val renderer = createTestRenderer(
       withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack)
@@ -309,12 +305,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     TestRenderer.act { () =>
-      renderer.update(withContext(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(
-          left = props.data.left,
-          popups = FileListPopupsState()
-        )
-      ))(), leftStack, rightStack))
+      renderer.update(
+        withContext(<(CopyItems())(^.wrapped := FileListPopupsState())(), leftStack, rightStack)
+      )
     }
 
     eventually {
@@ -340,15 +333,16 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, List(item))
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
-    ))
+    val state = FileListState(currDir = currDir, isActive = true)
+    val props = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
+    val toDispatch = mockFunction[Any, Any]
+    val toActions = new MockFileListActions
+    val toState = FileListState()
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(mockFunction[Any, Any]), Some(new MockFileListActions), Some(props.data.right))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions), Some(toState))
     ), null)
     val renderer = createTestRenderer(
       withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack)
@@ -369,12 +363,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     TestRenderer.act { () =>
-      renderer.update(withContext(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(
-          left = props.data.left,
-          popups = FileListPopupsState()
-        )
-      ))(), leftStack, rightStack))
+      renderer.update(
+        withContext(<(CopyItems())(^.wrapped := FileListPopupsState())(), leftStack, rightStack)
+      )
     }
 
     eventually {
@@ -405,15 +396,16 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       item,
       FileListItem("file 1")
     ))
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
-    ))
+    val state = FileListState(currDir = currDir, isActive = true)
+    val props = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
+    val toDispatch = mockFunction[Any, Any]
+    val toActions = new MockFileListActions
+    val toState = FileListState()
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(mockFunction[Any, Any]), Some(new MockFileListActions), Some(props.data.right))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions), Some(toState))
     ), null)
     val renderer = createTestRenderer(
       withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack)
@@ -437,12 +429,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     TestRenderer.act { () =>
-      renderer.update(withContext(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(
-          left = props.data.left,
-          popups = FileListPopupsState()
-        )
-      ))(), leftStack, rightStack))
+      renderer.update(
+        withContext(<(CopyItems())(^.wrapped := FileListPopupsState())(), leftStack, rightStack)
+      )
     }
 
     eventually {
@@ -468,15 +457,16 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       item,
       FileListItem("file 1")
     ))
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
-      left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyMovePopup = ShowMoveInplace)
-    ))
+    val state = FileListState(currDir = currDir, isActive = true)
+    val props = FileListPopupsState(showCopyMovePopup = ShowMoveInplace)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
     ), null)
+    val toDispatch = mockFunction[Any, Any]
+    val toActions = new MockFileListActions
+    val toState = FileListState()
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(mockFunction[Any, Any]), Some(new MockFileListActions), Some(props.data.right))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions), Some(toState))
     ), null)
     val renderer = createTestRenderer(
       withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack)
@@ -492,12 +482,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     TestRenderer.act { () =>
-      renderer.update(withContext(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(
-          left = props.data.left,
-          popups = FileListPopupsState()
-        )
-      ))(), leftStack, rightStack))
+      renderer.update(
+        withContext(<(CopyItems())(^.wrapped := FileListPopupsState())(), leftStack, rightStack)
+      )
     }
 
     eventually {
@@ -521,15 +508,16 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       item,
       FileListItem("file 1")
     ))
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
-      left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyMovePopup = ShowCopyInplace)
-    ))
+    val state = FileListState(currDir = currDir, isActive = true)
+    val props = FileListPopupsState(showCopyMovePopup = ShowCopyInplace)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
     ), null)
+    val toDispatch = mockFunction[Any, Any]
+    val toActions = new MockFileListActions
+    val toState = FileListState()
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(mockFunction[Any, Any]), Some(new MockFileListActions), Some(props.data.right))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions), Some(toState))
     ), null)
     val renderer = createTestRenderer(
       withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack)
@@ -545,12 +533,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     TestRenderer.act { () =>
-      renderer.update(withContext(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(
-          left = props.data.left,
-          popups = FileListPopupsState()
-        )
-      ))(), leftStack, rightStack))
+      renderer.update(
+        withContext(<(CopyItems())(^.wrapped := FileListPopupsState())(), leftStack, rightStack)
+      )
     }
 
     eventually {
@@ -582,15 +567,16 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       item,
       FileListItem("file 1")
     ))
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
-    ))
+    val state = FileListState(currDir = currDir, isActive = true)
+    val props = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
+    val toDispatch = mockFunction[Any, Any]
+    val toActions = new MockFileListActions
+    val toState = FileListState()
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(mockFunction[Any, Any]), Some(new MockFileListActions), Some(props.data.right))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions), Some(toState))
     ), null)
     val renderer = createTestRenderer(
       withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack)
@@ -613,12 +599,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     TestRenderer.act { () =>
-      renderer.update(withContext(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(
-          left = props.data.left,
-          popups = FileListPopupsState()
-        )
-      ))(), leftStack, rightStack))
+      renderer.update(
+        withContext(<(CopyItems())(^.wrapped := FileListPopupsState())(), leftStack, rightStack)
+      )
     }
 
     eventually {
@@ -650,18 +633,16 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       FileListItem("file 1")
     ))
     val rightDir = FileListDir("/right/dir", isRoot = false, List(FileListItem("dir 2", isDir = true)))
-    val props = FileListPopupsProps(fromDispatch, fromActions.actions, FileListsState(
-      left = FileListState(index = 1, currDir = leftDir, isActive = true, selectedNames = Set(dir.name, "file 1")),
-      right = FileListState(currDir = rightDir, isRight = true),
-      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
-    ))
+    val fromState = FileListState(index = 1, currDir = leftDir, isActive = true, selectedNames = Set(dir.name, "file 1"))
+    val props = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fromDispatch), Some(fromActions.actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fromDispatch), Some(fromActions.actions), Some(fromState))
     ), null)
     val toDispatch = mockFunction[Any, Any]
     val toActions = new Actions
+    val toState = FileListState(currDir = rightDir, isRight = true)
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions.actions), Some(props.data.right))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions.actions), Some(toState))
     ), null)
     val renderer = createTestRenderer(
       withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack)
@@ -678,13 +659,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     copyPopup.onAction(to)
     
     TestRenderer.act { () =>
-      renderer.update(withContext(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(
-          left = props.data.left,
-          right = props.data.right,
-          popups = FileListPopupsState()
-        )
-      ))(), leftStack, rightStack))
+      renderer.update(
+        withContext(<(CopyItems())(^.wrapped := FileListPopupsState())(), leftStack, rightStack)
+      )
     }
 
     eventually {
@@ -738,18 +715,16 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       FileListItem("file 1")
     ))
     val rightDir = FileListDir("/right/dir", isRoot = false, List(FileListItem("dir 2", isDir = true)))
-    val props = FileListPopupsProps(fromDispatch, fromActions.actions, FileListsState(
-      left = FileListState(index = 1, currDir = leftDir, isActive = true, selectedNames = Set("file 1")),
-      right = FileListState(currDir = rightDir, isRight = true),
-      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
-    ))
+    val fromState = FileListState(index = 1, currDir = leftDir, isActive = true, selectedNames = Set("file 1"))
+    val props = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fromDispatch), Some(fromActions.actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fromDispatch), Some(fromActions.actions), Some(fromState))
     ), null)
     val toDispatch = mockFunction[Any, Any]
     val toActions = new Actions
+    val toState = FileListState(currDir = rightDir, isRight = true)
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions.actions), Some(props.data.right))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions.actions), Some(toState))
     ), null)
     val renderer = createTestRenderer(
       withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack)
@@ -766,13 +741,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     copyPopup.onAction("test to path")
 
     TestRenderer.act { () =>
-      renderer.update(withContext(<(CopyItems())(^.wrapped := props.copy(
-        data = FileListsState(
-          left = props.data.left,
-          right = props.data.right,
-          popups = FileListPopupsState()
-        )
-      ))(), leftStack, rightStack))
+      renderer.update(
+        withContext(<(CopyItems())(^.wrapped := FileListPopupsState())(), leftStack, rightStack)
+      )
     }
 
     eventually {
@@ -819,13 +790,17 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val props = FileListPopupsProps(dispatch, actions, FileListsState())
-    props.data.popups.showCopyMovePopup shouldBe CopyMoveHidden
+    val state = FileListState()
+    val props = FileListPopupsState()
+    props.showCopyMovePopup shouldBe CopyMoveHidden
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
     ), null)
+    val toDispatch = mockFunction[Any, Any]
+    val toActions = new MockFileListActions
+    val toState = FileListState()
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(mockFunction[Any, Any]), Some(new MockFileListActions), Some(props.data.right))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions), Some(toState))
     ), null)
 
     //when
@@ -842,16 +817,16 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val item = FileListItem("dir 1", isDir = true)
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
-      left = FileListState(currDir = FileListDir("/folder", isRoot = false, List(item)), isActive = true),
-      right = FileListState(currDir = FileListDir("/test-path", isRoot = false, Nil)),
-      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
-    ))
+    val state = FileListState(currDir = FileListDir("/folder", isRoot = false, List(item)), isActive = true)
+    val props = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
     ), null)
+    val toDispatch = mockFunction[Any, Any]
+    val toActions = new MockFileListActions
+    val toState = FileListState(currDir = FileListDir("/test-path", isRoot = false, Nil))
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(mockFunction[Any, Any]), Some(new MockFileListActions), Some(props.data.right))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions), Some(toState))
     ), null)
 
     //when
@@ -875,16 +850,16 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val item = FileListItem("dir 1", isDir = true)
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
-      left = FileListState(currDir = FileListDir("/folder", isRoot = false, List(item)), isActive = true),
-      right = FileListState(currDir = FileListDir("/folder", isRoot = false, Nil)),
-      popups = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
-    ))
+    val state = FileListState(currDir = FileListDir("/folder", isRoot = false, List(item)), isActive = true)
+    val props = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
     ), null)
+    val toDispatch = mockFunction[Any, Any]
+    val toActions = new MockFileListActions
+    val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, Nil))
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(mockFunction[Any, Any]), Some(new MockFileListActions), Some(props.data.right))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions), Some(toState))
     ), null)
 
     //when
@@ -905,26 +880,26 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
   it should "render CopyItemsPopup(items=multi) when move to different dir" in {
     //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
+    val fromDispatch = mockFunction[Any, Any]
+    val fromActions = mock[FileListActions]
     val items = List(
       FileListItem("file 1"),
       FileListItem("dir 1", isDir = true)
     )
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
-      left = FileListState(currDir = FileListDir("/folder", isRoot = false, Nil)),
-      right = FileListState(
-        currDir = FileListDir("/test-path", isRoot = false, items),
-        isActive = true,
-        selectedNames = Set("file 1", "dir 1")
-      ),
-      popups = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
-    ))
+    val fromState = FileListState(
+      currDir = FileListDir("/test-path", isRoot = false, items),
+      isActive = true,
+      selectedNames = Set("file 1", "dir 1")
+    )
+    val toDispatch = mockFunction[Any, Any]
+    val toActions = new MockFileListActions
+    val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, Nil))
+    val props = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
     val leftStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(mockFunction[Any, Any]), Some(new MockFileListActions), Some(props.data.left))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions), Some(toState))
     ), null)
     val rightStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(props.data.right))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fromDispatch), Some(fromActions), Some(fromState))
     ), null)
 
     //when
@@ -945,26 +920,26 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
   it should "render CopyItemsPopup(items=multi) when move to the same dir" in {
     //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
+    val fromDispatch = mockFunction[Any, Any]
+    val fromActions = mock[FileListActions]
     val items = List(
       FileListItem("file 1"),
       FileListItem("dir 1", isDir = true)
     )
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
-      left = FileListState(currDir = FileListDir("/folder", isRoot = false, Nil)),
-      right = FileListState(
-        currDir = FileListDir("/folder", isRoot = false, items),
-        isActive = true,
-        selectedNames = Set("file 1", "dir 1")
-      ),
-      popups = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
-    ))
+    val fromState = FileListState(
+      currDir = FileListDir("/folder", isRoot = false, items),
+      isActive = true,
+      selectedNames = Set("file 1", "dir 1")
+    )
+    val props = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
+    val toDispatch = mockFunction[Any, Any]
+    val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, Nil))
+    val toActions = new MockFileListActions
     val leftStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(mockFunction[Any, Any]), Some(new MockFileListActions), Some(props.data.left))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions), Some(toState))
     ), null)
     val rightStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(props.data.right))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fromDispatch), Some(fromActions), Some(fromState))
     ), null)
 
     //when
@@ -985,27 +960,27 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
   it should "render CopyItemsPopup when move inplace" in {
     //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = mock[FileListActions]
+    val fromDispatch = mockFunction[Any, Any]
+    val fromActions = mock[FileListActions]
     val item = FileListItem("file 1")
     val items = List(
       item,
       FileListItem("dir 1", isDir = true)
     )
-    val props = FileListPopupsProps(dispatch, actions, FileListsState(
-      left = FileListState(currDir = FileListDir("/folder", isRoot = false, Nil)),
-      right = FileListState(
-        currDir = FileListDir("/test-path", isRoot = false, items),
-        isActive = true,
-        selectedNames = Set("file 1", "dir 1")
-      ),
-      popups = FileListPopupsState(showCopyMovePopup = ShowMoveInplace)
-    ))
+    val fromState = FileListState(
+      currDir = FileListDir("/test-path", isRoot = false, items),
+      isActive = true,
+      selectedNames = Set("file 1", "dir 1")
+    )
+    val props = FileListPopupsState(showCopyMovePopup = ShowMoveInplace)
+    val toActions = new MockFileListActions
+    val toDispatch = mockFunction[Any, Any]
+    val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, Nil))
     val leftStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(mockFunction[Any, Any]), Some(new MockFileListActions), Some(props.data.left))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions), Some(toState))
     ), null)
     val rightStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(props.data.right))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fromDispatch), Some(fromActions), Some(fromState))
     ), null)
 
     //when

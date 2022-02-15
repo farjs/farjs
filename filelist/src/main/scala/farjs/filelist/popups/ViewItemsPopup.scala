@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-object ViewItemsPopup extends FunctionComponent[FileListPopupsProps] {
+object ViewItemsPopup extends FunctionComponent[FileListPopupsState] {
 
   private[popups] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
 
@@ -22,10 +22,7 @@ object ViewItemsPopup extends FunctionComponent[FileListPopupsProps] {
     val stacks = WithPanelStacks.usePanelStacks
     val (currDir, setCurrDir) = useState("")
     val inProgress = useRef(false)
-    val showPopup = {
-      val props = compProps.wrapped
-      props.data.popups.showViewItemsPopup
-    }
+    val showPopup = compProps.wrapped.showViewItemsPopup
     val maybeCurrData = {
       val stackItem = stacks.activeStack.peek[FileListState]
       stackItem.getActions.zip(stackItem.state)

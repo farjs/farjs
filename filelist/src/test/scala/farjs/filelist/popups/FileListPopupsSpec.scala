@@ -4,12 +4,15 @@ import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.popups.FileListPopups._
 import farjs.filelist.popups.FileListPopupsActions._
-import farjs.filelist.{FileListsState, MockFileListActions}
+import farjs.filelist.stack.WithPanelStacksSpec.withContext
+import farjs.filelist.stack.{PanelStack, PanelStackItem}
+import farjs.filelist.{FileListState, MockFileListActions}
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
 import scommons.nodejs._
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.redux.Dispatch
 import scommons.react.redux.task.FutureTask
@@ -41,10 +44,19 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState())
+    val state = FileListState()
+    val props = FileListPopupsState()
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
 
     //when
-    val result = createTestRenderer(<(FileListPopups())(^.wrapped := props)()).root
+    val result = createTestRenderer(
+      withContext(<(FileListPopups())(^.wrapped := props)(), leftStack, rightStack)
+    ).root
 
     //then
     inside(result.children.toList) { case List(viewItems, copyItems) =>
@@ -61,10 +73,17 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      popups = FileListPopupsState(showHelpPopup = true)
-    ))
-    val comp = testRender(<(FileListPopups())(^.wrapped := props)())
+    val state = FileListState()
+    val props = FileListPopupsState(showHelpPopup = true)
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
+    val comp = testRender(
+      withContext(<(FileListPopups())(^.wrapped := props)(), leftStack, rightStack)
+    )
     val msgBox = findComponentProps(comp, messageBoxComp)
     val action = FileListPopupHelpAction(show = false)
 
@@ -81,12 +100,19 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      popups = FileListPopupsState(showHelpPopup = true)
-    ))
+    val state = FileListState()
+    val props = FileListPopupsState(showHelpPopup = true)
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
 
     //when
-    val result = testRender(<(FileListPopups())(^.wrapped := props)())
+    val result = testRender(
+      withContext(<(FileListPopups())(^.wrapped := props)(), leftStack, rightStack)
+    )
 
     //then
     assertTestComponent(result, messageBoxComp) {
@@ -104,10 +130,17 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      popups = FileListPopupsState(showExitPopup = true)
-    ))
-    val comp = testRender(<(FileListPopups())(^.wrapped := props)())
+    val state = FileListState()
+    val props = FileListPopupsState(showExitPopup = true)
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
+    val comp = testRender(
+      withContext(<(FileListPopups())(^.wrapped := props)(), leftStack, rightStack)
+    )
     val msgBox = findComponentProps(comp, messageBoxComp)
     val action = FileListPopupExitAction(show = false)
 
@@ -139,10 +172,17 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      popups = FileListPopupsState(showExitPopup = true)
-    ))
-    val comp = testRender(<(FileListPopups())(^.wrapped := props)())
+    val state = FileListState()
+    val props = FileListPopupsState(showExitPopup = true)
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
+    val comp = testRender(
+      withContext(<(FileListPopups())(^.wrapped := props)(), leftStack, rightStack)
+    )
     val msgBox = findComponentProps(comp, messageBoxComp)
     val action = FileListPopupExitAction(show = false)
 
@@ -159,12 +199,19 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      popups = FileListPopupsState(showExitPopup = true)
-    ))
+    val state = FileListState()
+    val props = FileListPopupsState(showExitPopup = true)
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
 
     //when
-    val result = testRender(<(FileListPopups())(^.wrapped := props)())
+    val result = testRender(
+      withContext(<(FileListPopups())(^.wrapped := props)(), leftStack, rightStack)
+    )
 
     //then
     assertTestComponent(result, messageBoxComp) {
@@ -186,15 +233,17 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("file 1"),
       FileListItem("file 2")
     ))
-    val state = {
-      val state = FileListsState()
-      state.copy(
-        left = state.left.copy(currDir = currDir),
-        popups = FileListPopupsState(showDeletePopup = true)
-      )
-    }
-    val props = FileListPopupsProps(dispatch, actions.actions, state)
-    val comp = testRender(<(FileListPopups())(^.wrapped := props)())
+    val state = FileListState(currDir = currDir)
+    val props = FileListPopupsState(showDeletePopup = true)
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
+    val comp = testRender(
+      withContext(<(FileListPopups())(^.wrapped := props)(), leftStack, rightStack)
+    )
     val msgBox = findComponentProps(comp, messageBoxComp)
     val deleteAction = FileListTaskAction(
       FutureTask("Deleting Items", Future.successful(()))
@@ -220,16 +269,17 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("file 1"),
       FileListItem("file 2")
     ))
-    val state = {
-      val state = FileListsState()
-      state.copy(
-        left = state.left.copy(isActive = false),
-        right = state.right.copy(isActive = true, currDir = currDir, selectedNames = Set("file 2")),
-        popups = FileListPopupsState(showDeletePopup = true)
-      )
-    }
-    val props = FileListPopupsProps(dispatch, actions.actions, state)
-    val comp = testRender(<(FileListPopups())(^.wrapped := props)())
+    val state = FileListState(isActive = true, currDir = currDir, selectedNames = Set("file 2"))
+    val props = FileListPopupsState(showDeletePopup = true)
+    val leftStack = new PanelStack(isActive = false, List(
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
+    val rightStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
+    ), null)
+    val comp = testRender(
+      withContext(<(FileListPopups())(^.wrapped := props)(), leftStack, rightStack)
+    )
     val msgBox = findComponentProps(comp, messageBoxComp)
     val deleteAction = FileListTaskAction(
       FutureTask("Deleting Items", Future.successful(()))
@@ -237,7 +287,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val items = List(FileListItem("file 2"))
 
     //then
-    actions.deleteAction.expects(dispatch, true, currDir.path, items).returning(deleteAction)
+    actions.deleteAction.expects(dispatch, state.isRight, currDir.path, items).returning(deleteAction)
     dispatch.expects(deleteAction)
     dispatch.expects(FileListPopupDeleteAction(show = false))
 
@@ -251,10 +301,17 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      popups = FileListPopupsState(showDeletePopup = true)
-    ))
-    val comp = testRender(<(FileListPopups())(^.wrapped := props)())
+    val state = FileListState()
+    val props = FileListPopupsState(showDeletePopup = true)
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
+    val comp = testRender(
+      withContext(<(FileListPopups())(^.wrapped := props)(), leftStack, rightStack)
+    )
     val msgBox = findComponentProps(comp, messageBoxComp)
     val action = FileListPopupDeleteAction(show = false)
 
@@ -271,12 +328,19 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      popups = FileListPopupsState(showDeletePopup = true)
-    ))
+    val state = FileListState()
+    val props = FileListPopupsState(showDeletePopup = true)
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
 
     //when
-    val result = testRender(<(FileListPopups())(^.wrapped := props)())
+    val result = testRender(
+      withContext(<(FileListPopups())(^.wrapped := props)(), leftStack, rightStack)
+    )
 
     //then
     assertTestComponent(result, messageBoxComp) {
@@ -295,15 +359,17 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val currDir = FileListDir("/sub-dir", isRoot = false, items = Seq.empty)
-    val state = {
-      val state = FileListsState()
-      state.copy(
-        left = state.left.copy(isActive = true, currDir = currDir),
-        popups = FileListPopupsState(showMkFolderPopup = true)
-      )
-    }
-    val props = FileListPopupsProps(dispatch, actions.actions, state)
-    val renderer = createTestRenderer(<(FileListPopups())(^.wrapped := props)())
+    val state = FileListState(isActive = true, currDir = currDir)
+    val props = FileListPopupsState(showMkFolderPopup = true)
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
+    val renderer = createTestRenderer(
+      withContext(<(FileListPopups())(^.wrapped := props)(), leftStack, rightStack)
+    )
     val popup = findComponentProps(renderer.root, makeFolderPopupComp)
     val action = FileListDirCreateAction(
       FutureTask("Creating...", Future.successful(()))
@@ -331,10 +397,17 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      popups = FileListPopupsState(showMkFolderPopup = true)
-    ))
-    val comp = testRender(<(FileListPopups())(^.wrapped := props)())
+    val state = FileListState()
+    val props = FileListPopupsState(showMkFolderPopup = true)
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
+    val comp = testRender(
+      withContext(<(FileListPopups())(^.wrapped := props)(), leftStack, rightStack)
+    )
     val popup = findComponentProps(comp, makeFolderPopupComp)
     val action = FileListPopupMkFolderAction(show = false)
 
@@ -351,12 +424,19 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      popups = FileListPopupsState(showMkFolderPopup = true)
-    ))
+    val state = FileListState()
+    val props = FileListPopupsState(showMkFolderPopup = true)
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
 
     //when
-    val result = testRender(<(FileListPopups())(^.wrapped := props)())
+    val result = testRender(
+      withContext(<(FileListPopups())(^.wrapped := props)(), leftStack, rightStack)
+    )
 
     //then
     assertTestComponent(result, makeFolderPopupComp) {

@@ -37,11 +37,8 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("dir 1", isDir = true),
       FileListItem("file 1", size = 10)
     ))
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      left = FileListState(),
-      right = FileListState(currDir = currDir, isRight = true, isActive = true, selectedNames = Set("dir 1", "file 1")),
-      popups = FileListPopupsState(showViewItemsPopup = true)
-    ))
+    val state = FileListState(currDir = currDir, isRight = true, isActive = true, selectedNames = Set("dir 1", "file 1"))
+    val props = FileListPopupsState(showViewItemsPopup = true)
     val p = Promise[Boolean]()
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
       onNextDir("/path", List(
@@ -54,7 +51,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
       PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
     ), null)
     val rightStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(props.data.right))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
     val renderer = createTestRenderer(
       withContext(<(ViewItemsPopup())(^.wrapped := props)(), leftStack, rightStack)
@@ -97,15 +94,13 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val currDir = FileListDir("/folder", isRoot = false, List(
       FileListItem("dir 1", isDir = true)
     ))
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showViewItemsPopup = true)
-    ))
+    val state = FileListState(currDir = currDir, isActive = true)
+    val props = FileListPopupsState(showViewItemsPopup = true)
     val p = Promise[Boolean]()
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).returning(p.future)
     
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
     val rightStack = new PanelStack(isActive = false, List(
       PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
@@ -124,9 +119,9 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     
     //then
     TestRenderer.act { () =>
-      renderer.update(withContext(<(ViewItemsPopup())(^.wrapped := props.copy(
-        data = FileListsState(popups = FileListPopupsState())
-      ))(), leftStack, rightStack))
+      renderer.update(
+        withContext(<(ViewItemsPopup())(^.wrapped := FileListPopupsState())(), leftStack, rightStack)
+      )
     }
 
     renderer.root.children.toList should be (empty)
@@ -142,15 +137,13 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val currDir = FileListDir("/folder", isRoot = false, List(
       FileListItem("dir 1", isDir = true)
     ))
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      left = FileListState(currDir = currDir, isActive = true),
-      popups = FileListPopupsState(showViewItemsPopup = true)
-    ))
+    val state = FileListState(currDir = currDir, isActive = true)
+    val props = FileListPopupsState(showViewItemsPopup = true)
     val p = Promise[Boolean]()
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).returning(p.future)
     
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
     val rightStack = new PanelStack(isActive = false, List(
       PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
@@ -185,9 +178,10 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState())
+    val state = FileListState()
+    val props = FileListPopupsState()
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
     val rightStack = new PanelStack(isActive = false, List(
       PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
@@ -206,12 +200,11 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val props = FileListPopupsProps(dispatch, actions.actions, FileListsState(
-      popups = FileListPopupsState(showViewItemsPopup = true)
-    ))
+    val state = FileListState()
+    val props = FileListPopupsState(showViewItemsPopup = true)
     val action = FileListItemsViewedAction(isRight = false, Map.empty)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(props.data.left))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
     val rightStack = new PanelStack(isActive = false, List(
       PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)

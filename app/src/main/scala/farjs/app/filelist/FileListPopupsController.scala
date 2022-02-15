@@ -1,18 +1,16 @@
 package farjs.app.filelist
 
 import farjs.app.FarjsStateDef
-import farjs.filelist.FileListActions
-import farjs.filelist.popups.{FileListPopups, FileListPopupsProps}
+import farjs.filelist.popups.{FileListPopups, FileListPopupsState}
 import io.github.shogowada.scalajs.reactjs.React.Props
 import scommons.react.UiComponent
 import scommons.react.redux._
 
-class FileListPopupsController(actions: FileListActions)
-  extends BaseStateController[FarjsStateDef, FileListPopupsProps] {
+object FileListPopupsController extends BaseStateController[FarjsStateDef, FileListPopupsState] {
 
-  lazy val uiComponent: UiComponent[FileListPopupsProps] = FileListPopups
+  lazy val uiComponent: UiComponent[FileListPopupsState] = FileListPopups
 
-  def mapStateToProps(dispatch: Dispatch, state: FarjsStateDef, props: Props[Unit]): FileListPopupsProps = {
-    FileListPopupsProps(dispatch, actions, state.fileListsState)
+  def mapStateToProps(dispatch: Dispatch, state: FarjsStateDef, props: Props[Unit]): FileListPopupsState = {
+    state.fileListsState.popups
   }
 }

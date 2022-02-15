@@ -40,7 +40,7 @@ object FarjsApp {
     val store = Redux.createStore(FarjsStateReducer.reduce)
     val actions = FarjsActions
     
-    val fileListPopups = new FileListPopupsController(actions).apply()    
+    val fileListPopups = FileListPopupsController.apply()    
     val root = new FarjsRoot(
       withPortalsComp = new WithPortals(screen),
       fileListComp = new FileListController(actions, fileListPopups).apply(),

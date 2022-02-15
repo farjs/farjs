@@ -1,12 +1,12 @@
 package farjs.filelist.copy
 
-import farjs.filelist.{FileListActions, FileListState}
 import farjs.filelist.FileListActions.{FileListParamsChangedAction, FileListTaskAction}
 import farjs.filelist.api.FileListItem
 import farjs.filelist.fs.FSService
 import farjs.filelist.popups.FileListPopupsActions._
-import farjs.filelist.popups.FileListPopupsProps
+import farjs.filelist.popups.FileListPopupsState
 import farjs.filelist.stack.{PanelStack, WithPanelStacks}
+import farjs.filelist.{FileListActions, FileListState}
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
 import scommons.nodejs.path
@@ -19,7 +19,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Success
 
-object CopyItems extends FunctionComponent[FileListPopupsProps] {
+object CopyItems extends FunctionComponent[FileListPopupsState] {
 
   private[copy] var copyItemsStats: UiComponent[CopyItemsStatsProps] = CopyItemsStats
   private[copy] var copyItemsPopup: UiComponent[CopyItemsPopupProps] = CopyItemsPopup
@@ -45,10 +45,7 @@ object CopyItems extends FunctionComponent[FileListPopupsProps] {
     val (showMove, setShowMove) = useState(false)
     val copied = useRef(Set.empty[String])
 
-    val showCopyMovePopup = {
-      val props = compProps.wrapped
-      props.data.popups.showCopyMovePopup
-    }
+    val showCopyMovePopup = compProps.wrapped.showCopyMovePopup
     
     def getData(stack: PanelStack): Option[Data] = {
       val item = stack.peek[FileListState]
