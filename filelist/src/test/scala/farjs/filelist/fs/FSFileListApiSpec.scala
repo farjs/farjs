@@ -1,7 +1,7 @@
-package farjs.app.filelist
+package farjs.filelist.fs
 
-import farjs.app.filelist.FSFileListApiSpec.TestApiFS
 import farjs.filelist.api._
+import farjs.filelist.fs.FSFileListApiSpec.TestApiFS
 import org.scalatest.Succeeded
 import scommons.nodejs._
 import scommons.nodejs.raw.{FSConstants, FileOptions}

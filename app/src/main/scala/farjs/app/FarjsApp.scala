@@ -3,6 +3,7 @@ package farjs.app
 import farjs.app.filelist._
 import farjs.app.task.FarjsTaskController
 import farjs.app.util.DevTool
+import farjs.filelist.fs.FSFileListActions
 import farjs.ui.theme.{Theme, XTerm256Theme}
 import io.github.shogowada.scalajs.reactjs.redux.ReactRedux._
 import io.github.shogowada.scalajs.reactjs.redux.Redux
@@ -38,7 +39,7 @@ object FarjsApp {
     })
 
     val store = Redux.createStore(FarjsStateReducer.reduce)
-    val actions = FarjsActions
+    val actions = FSFileListActions
     
     val fileListPopups = FileListPopupsController.apply()    
     val root = new FarjsRoot(

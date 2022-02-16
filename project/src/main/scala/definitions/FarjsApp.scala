@@ -21,10 +21,7 @@ object FarjsApp extends ScalaJsModule {
       publishLocal := ((): Unit),
       publishM2 := ((): Unit),
 
-      coverageExcludedPackages := {
-        "farjs.app.FarjsApp" +
-          ";farjs.app.FarjsActions"
-      },
+      coverageExcludedPackages := "farjs.app.FarjsApp",
 
       //TODO: temporarily disabled
       //  @see: https://github.com/scalameta/metabrowse/issues/271
