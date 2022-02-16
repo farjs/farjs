@@ -80,6 +80,29 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     result shouldBe List(top.copy(state = Some(params)), other)
   }
   
+  it should "update item when updateFor" in {
+    //given
+    val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
+    val stack = new PanelStack(isActive = false, Nil, updater)
+    val params = TestParams("test name")
+    val top = PanelStackItem[TestParams]("top comp".asInstanceOf[ReactClass], None, None, None)
+    val component = "other comp".asInstanceOf[ReactClass]
+    val other = PanelStackItem[TestParams](component, None, None, None)
+    val data = List(top, other)
+    
+    var result: List[PanelStackItem[_]] = null
+    updater.expects(*).onCall { updateFn: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] =>
+      //when
+      result = updateFn(data)
+    }
+    
+    //when
+    stack.updateFor[TestParams](component)(_.withState(params))
+    
+    //then
+    result shouldBe List(top, other.copy(state = Some(params)))
+  }
+  
   it should "remove top component when pop" in {
     //given
     val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]

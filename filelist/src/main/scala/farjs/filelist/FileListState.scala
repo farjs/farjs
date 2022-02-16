@@ -50,8 +50,6 @@ object FileListsStateReducer {
 
   def apply(state: Option[FileListsState], action: Any): FileListsState = {
     val newState = FileListsState(
-      left = reduceFileList(isRight = false, state.map(_.left).getOrElse(FileListState(isActive = true)), action),
-      right = reduceFileList(isRight = true, state.map(_.right).getOrElse(FileListState(isRight = true)), action),
       popups = FileListPopupsStateReducer(state.map(_.popups), action)
     )
     reduce(newState, action)
@@ -65,7 +63,7 @@ object FileListsStateReducer {
     case _ => state
   }
   
-  private def reduceFileList(isRight: Boolean, state: FileListState, action: Any): FileListState = action match {
+  def reduceFileList(isRight: Boolean, state: FileListState, action: Any): FileListState = action match {
     case FileListParamsChangedAction(`isRight`, offset, index, selectedNames) =>
       state.copy(
         offset = offset,

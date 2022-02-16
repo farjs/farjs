@@ -2,7 +2,7 @@ package farjs.app.filelist
 
 import farjs.filelist.FileListActions.FileListActivateAction
 import farjs.filelist._
-import farjs.filelist.fs.{FSDrivePopup, FSDrivePopupProps}
+import farjs.filelist.fs.{FSDrivePopup, FSDrivePopupProps, FSPlugin}
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
 import farjs.filelist.stack._
 import farjs.ui.menu.BottomMenu
@@ -17,12 +17,12 @@ case class FileListBrowserProps(dispatch: Dispatch,
                                 data: FileListsStateDef,
                                 plugins: Seq[FileListPlugin] = Nil)
 
-class FileListBrowser(fsControllerComp: ReactClass,
-                      fileListPopups: ReactClass) extends FunctionComponent[FileListBrowserProps] {
+class FileListBrowser(fileListPopups: ReactClass) extends FunctionComponent[FileListBrowserProps] {
 
   private[filelist] var panelStackComp: UiComponent[PanelStackProps] = PanelStack
   private[filelist] var fsDrivePopup: UiComponent[FSDrivePopupProps] = FSDrivePopup
   private[filelist] var bottomMenuComp: UiComponent[Unit] = BottomMenu
+  private[filelist] var fsPlugin: FSPlugin = FSPlugin
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -35,15 +35,18 @@ class FileListBrowser(fsControllerComp: ReactClass,
     val (showRightDrive, setShowRightDrive) = useState(false)
     
     val (leftStackData, setLeftStackData) = useStateUpdater(() => List[PanelStackItem[_]](
-      PanelStackItem[FileListState](fsControllerComp, None, None, None)
+      PanelStackItem[FileListState](fsPlugin.component, None, None, None)
     ))
     val (rightStackData, setRightStackData) = useStateUpdater(() => List[PanelStackItem[_]](
-      PanelStackItem[FileListState](fsControllerComp, None, None, None)
+      PanelStackItem[FileListState](fsPlugin.component, None, None, None)
     ))
     val leftStack = new PanelStack(!isRightActive, leftStackData, setLeftStackData)
     val rightStack = new PanelStack(isRightActive, rightStackData, setRightStackData)
 
     useLayoutEffect({ () =>
+      fsPlugin.init(props.dispatch, isRight = false, leftStack)
+      fsPlugin.init(props.dispatch, isRight = true, rightStack)
+
       val element = 
         if (isRightActive) rightButtonRef.current
         else leftButtonRef.current

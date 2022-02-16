@@ -2,7 +2,7 @@ package farjs.app.filelist
 
 import farjs.filelist.FileListActions.FileListActivateAction
 import farjs.filelist._
-import farjs.filelist.fs.FSDrivePopupProps
+import farjs.filelist.fs.{FSDrivePopupProps, FSPlugin}
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
 import farjs.filelist.stack._
 import org.scalatest.{Assertion, Succeeded}
@@ -17,14 +17,12 @@ import scala.scalajs.js.Dynamic.literal
 class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
   
   private val fileListPopups = "test_popups".asInstanceOf[ReactClass]
-  private val fileListBrowser = new FileListBrowser(
-    "test_fsController".asInstanceOf[ReactClass],
-    fileListPopups
-  )
+  private val fileListBrowser = new FileListBrowser(fileListPopups)
 
   fileListBrowser.panelStackComp = mockUiComponent("PanelStack")
   fileListBrowser.fsDrivePopup = mockUiComponent("FSDrivePopup")
   fileListBrowser.bottomMenuComp = mockUiComponent("BottomMenu")
+  fileListBrowser.fsPlugin = new FSPlugin((_, s, _) => s)
   
   import fileListBrowser._
 

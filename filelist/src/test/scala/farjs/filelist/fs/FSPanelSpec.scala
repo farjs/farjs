@@ -12,73 +12,58 @@ class FSPanelSpec extends TestSpec with TestRendererUtils {
 
   FSPanel.fileListPanelComp = mockUiComponent("FileListPanel")
 
-  it should "render component with left state" in {
+  it should "render component and update isActive" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
-    val props = FSPanelProps(dispatch, actions, FileListsState())
-    val state = props.data.left
-    val isRight = false
+    val state = FileListState()
+    state.isActive shouldBe false
     
     var stackState = List[PanelStackItem[FileListState]](
-      PanelStackItem[FileListState](FSPanel(), None, None, None)
+      PanelStackItem[FileListState](FSPanel(), Some(dispatch), Some(actions), Some(state))
     )
-    val stack = new PanelStack(isActive = false, stackState, { f =>
+    val stack = new PanelStack(isActive = true, stackState, { f =>
       stackState = f(stackState).asInstanceOf[List[PanelStackItem[FileListState]]]
     }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
 
-    //when
-    val result = testRender(
-      withContext(<(FSPanel())(^.wrapped := props)(), isRight, stack = stack)
+    //when & then
+    val renderer = createTestRenderer(
+      withContext(<(FSPanel())()(), stack = stack)
     )
-
-    //then
-    inside(stackState.head) { case PanelStackItem(_, resDispatch, resActions, resState) =>
-      resDispatch shouldBe Some(dispatch)
-      resActions shouldBe Some(actions)
-      resState shouldBe Some(state)
-    }
-    
-    assertTestComponent(result, fileListPanelComp) {
+    assertTestComponent(renderer.root.children(0), fileListPanelComp) {
       case FileListPanelProps(resDispatch, resActions, resState) =>
         resDispatch shouldBe dispatch
         resActions shouldBe actions
         resState shouldBe state
     }
-  }
-
-  it should "render component with right state" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions
-    val props = FSPanelProps(dispatch, actions, FileListsState())
-    val state = props.data.right
-    val isRight = true
-    
-    var stackState = List[PanelStackItem[FileListState]](
-      PanelStackItem[FileListState](FSPanel(), None, None, None)
-    )
-    val stack = new PanelStack(isActive = false, stackState, { f =>
-      stackState = f(stackState).asInstanceOf[List[PanelStackItem[FileListState]]]
-    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
-
-    //when
-    val result = testRender(
-      withContext(<(FSPanel())(^.wrapped := props)(), isRight, stack = stack)
-    )
 
     //then
     inside(stackState.head) { case PanelStackItem(_, resDispatch, resActions, resState) =>
       resDispatch shouldBe Some(dispatch)
       resActions shouldBe Some(actions)
-      resState shouldBe Some(state)
+      resState shouldBe Some(state.copy(isActive = true))
     }
-
-    assertTestComponent(result, fileListPanelComp) {
+    val updaterMock = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
+    updaterMock.expects(*).never()
+    
+    //when & then
+    TestRenderer.act { () =>
+      renderer.update(
+        withContext(<(FSPanel())()(), stack = new PanelStack(isActive = true, stackState, updaterMock))
+      )
+    }
+    assertTestComponent(renderer.root.children(0), fileListPanelComp) {
       case FileListPanelProps(resDispatch, resActions, resState) =>
         resDispatch shouldBe dispatch
         resActions shouldBe actions
-        resState shouldBe state
+        resState shouldBe state.copy(isActive = true)
+    }
+
+    //then
+    inside(stackState.head) { case PanelStackItem(_, resDispatch, resActions, resState) =>
+      resDispatch shouldBe Some(dispatch)
+      resActions shouldBe Some(actions)
+      resState shouldBe Some(state.copy(isActive = true))
     }
   }
 }

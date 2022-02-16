@@ -16,7 +16,7 @@ class FileListControllerSpec extends TestSpec {
     val controller = new FileListController(actions, fileListPopups)
     
     //when & then
-    controller.uiComponent shouldBe new FileListBrowser(???, fileListPopups)
+    controller.uiComponent shouldBe new FileListBrowser(fileListPopups)
   }
   
   it should "map state to props" in {

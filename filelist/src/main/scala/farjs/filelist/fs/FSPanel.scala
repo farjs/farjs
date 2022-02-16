@@ -4,33 +4,28 @@ import farjs.filelist._
 import farjs.filelist.stack.PanelStack
 import scommons.react._
 import scommons.react.hooks._
-import scommons.react.redux.Dispatch
 
-import scala.scalajs.js
-
-case class FSPanelProps(dispatch: Dispatch,
-                        actions: FileListActions,
-                        data: FileListsStateDef)
-
-object FSPanel extends FunctionComponent[FSPanelProps] {
+object FSPanel extends FunctionComponent[Unit] {
 
   private[fs] var fileListPanelComp: UiComponent[FileListPanelProps] = FileListPanel
   
   protected def render(compProps: Props): ReactElement = {
     val stackProps = PanelStack.usePanelStack
-    val props = compProps.wrapped
-    val state =
-      if (stackProps.isRight) props.data.right
-      else props.data.left
+    val stack = stackProps.stack
+    val maybeCurrData = {
+      val stackItem = stack.peek[FileListState]
+      stackItem.getActions.zip(stackItem.state)
+    }
 
     useLayoutEffect({ () =>
-      stackProps.stack.update[FileListState](
-        _.withActions(props.dispatch, props.actions)
-          .withState(state)
+      stack.update[FileListState](
+        _.updateState(_.copy(isActive = stack.isActive))
       )
       ()
-    }, List(state.asInstanceOf[js.Any]))
+    }, List(stack.isActive))
     
-    <(fileListPanelComp())(^.wrapped := FileListPanelProps(props.dispatch, props.actions, state))()
+    maybeCurrData.map { case ((dispatch, actions), state) =>
+      <(fileListPanelComp())(^.wrapped := FileListPanelProps(dispatch, actions, state))()
+    }.orNull
   }
 }

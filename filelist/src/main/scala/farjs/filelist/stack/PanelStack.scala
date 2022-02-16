@@ -20,6 +20,16 @@ class PanelStack(val isActive: Boolean,
     }
   }
 
+  def updateFor[T](component: ReactClass)(f: PanelStackItem[T] => PanelStackItem[T]): Unit = {
+    updater { stack =>
+      stack.collect {
+        case item if item.component == component =>
+          f(item.asInstanceOf[PanelStackItem[T]])
+        case item => item
+      }
+    }
+  }
+
   def pop(): Unit = {
     updater {
       case _ :: tail if tail.nonEmpty => tail

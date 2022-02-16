@@ -15,6 +15,8 @@ case class PanelStackItem[T](
   
   def withState(s: T): PanelStackItem[T] = copy(state = Some(s))
   
+  def updateState(f: T => T): PanelStackItem[T] = copy(state = state.map(f))
+  
   def getActions: Option[(Dispatch, FileListActions)] = (dispatch, actions) match {
     case (Some(dispatch), Some(actions)) => Some((dispatch, actions))
     case _ => None
