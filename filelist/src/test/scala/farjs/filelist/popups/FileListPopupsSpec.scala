@@ -45,7 +45,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val state = FileListState()
-    val props = FileListPopupsState()
+    val props = FileListPopupsProps(dispatch, FileListPopupsState())
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
@@ -61,10 +61,10 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     //then
     inside(result.children.toList) { case List(viewItems, copyItems) =>
       assertTestComponent(viewItems, viewItemsPopupComp) { popupProps =>
-        popupProps should be theSameInstanceAs props
+        popupProps should be theSameInstanceAs props.popups
       }
       assertTestComponent(copyItems, copyItemsComp) { popupProps =>
-        popupProps should be theSameInstanceAs props
+        popupProps should be theSameInstanceAs props.popups
       }
     }
   }
@@ -74,7 +74,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val state = FileListState()
-    val props = FileListPopupsState(showHelpPopup = true)
+    val props = FileListPopupsProps(dispatch, FileListPopupsState(showHelpPopup = true))
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
@@ -101,7 +101,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val state = FileListState()
-    val props = FileListPopupsState(showHelpPopup = true)
+    val props = FileListPopupsProps(dispatch, FileListPopupsState(showHelpPopup = true))
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
@@ -131,7 +131,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val state = FileListState()
-    val props = FileListPopupsState(showExitPopup = true)
+    val props = FileListPopupsProps(dispatch, FileListPopupsState(showExitPopup = true))
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
@@ -173,7 +173,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val state = FileListState()
-    val props = FileListPopupsState(showExitPopup = true)
+    val props = FileListPopupsProps(dispatch, FileListPopupsState(showExitPopup = true))
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
@@ -200,7 +200,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val state = FileListState()
-    val props = FileListPopupsState(showExitPopup = true)
+    val props = FileListPopupsProps(dispatch, FileListPopupsState(showExitPopup = true))
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
@@ -234,7 +234,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("file 2")
     ))
     val state = FileListState(currDir = currDir)
-    val props = FileListPopupsState(showDeletePopup = true)
+    val props = FileListPopupsProps(dispatch, FileListPopupsState(showDeletePopup = true))
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
@@ -270,7 +270,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("file 2")
     ))
     val state = FileListState(isActive = true, currDir = currDir, selectedNames = Set("file 2"))
-    val props = FileListPopupsState(showDeletePopup = true)
+    val props = FileListPopupsProps(dispatch, FileListPopupsState(showDeletePopup = true))
     val leftStack = new PanelStack(isActive = false, List(
       PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
     ), null)
@@ -302,7 +302,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val state = FileListState()
-    val props = FileListPopupsState(showDeletePopup = true)
+    val props = FileListPopupsProps(dispatch, FileListPopupsState(showDeletePopup = true))
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
@@ -329,7 +329,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val state = FileListState()
-    val props = FileListPopupsState(showDeletePopup = true)
+    val props = FileListPopupsProps(dispatch, FileListPopupsState(showDeletePopup = true))
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
@@ -360,7 +360,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val actions = new Actions
     val currDir = FileListDir("/sub-dir", isRoot = false, items = Seq.empty)
     val state = FileListState(isActive = true, currDir = currDir)
-    val props = FileListPopupsState(showMkFolderPopup = true)
+    val props = FileListPopupsProps(dispatch, FileListPopupsState(showMkFolderPopup = true))
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
@@ -398,7 +398,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val state = FileListState()
-    val props = FileListPopupsState(showMkFolderPopup = true)
+    val props = FileListPopupsProps(dispatch, FileListPopupsState(showMkFolderPopup = true))
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
@@ -425,7 +425,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val state = FileListState()
-    val props = FileListPopupsState(showMkFolderPopup = true)
+    val props = FileListPopupsProps(dispatch, FileListPopupsState(showMkFolderPopup = true))
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)

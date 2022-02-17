@@ -2,7 +2,6 @@ package farjs.filelist
 
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.popups.{FileListPopupsState, FileListPopupsStateReducer}
 
 case class FileListState(offset: Int = 0,
                          index: Int = 0,
@@ -27,41 +26,7 @@ case class FileListState(offset: Int = 0,
   }
 }
 
-trait FileListsStateDef {
-
-  def left: FileListState
-  def right: FileListState
-  def popups: FileListPopupsState
-  def activeList: FileListState
-}
-
-case class FileListsState(left: FileListState = FileListState(isActive = true),
-                          right: FileListState = FileListState(isRight = true),
-                          popups: FileListPopupsState = FileListPopupsState()
-                         ) extends FileListsStateDef {
-  
-  lazy val activeList: FileListState = {
-    if (left.isActive) left
-    else right
-  }
-}
-
-object FileListsStateReducer {
-
-  def apply(state: Option[FileListsState], action: Any): FileListsState = {
-    val newState = FileListsState(
-      popups = FileListPopupsStateReducer(state.map(_.popups), action)
-    )
-    reduce(newState, action)
-  }
-
-  private def reduce(state: FileListsState, action: Any): FileListsState = action match {
-    case FileListActivateAction(isRight) => state.copy(
-      right = state.right.copy(isActive = isRight),
-      left = state.left.copy(isActive = !isRight)
-    )
-    case _ => state
-  }
+object FileListStateReducer {
   
   def reduceFileList(isRight: Boolean, state: FileListState, action: Any): FileListState = action match {
     case FileListParamsChangedAction(`isRight`, offset, index, selectedNames) =>

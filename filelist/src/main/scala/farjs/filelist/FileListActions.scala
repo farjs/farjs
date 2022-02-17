@@ -157,7 +157,6 @@ object FileListActions {
 
   case class FileListTaskAction(task: FutureTask[_]) extends TaskAction
 
-  case class FileListActivateAction(isRight: Boolean) extends Action
   case class FileListParamsChangedAction(isRight: Boolean,
                                          offset: Int,
                                          index: Int,

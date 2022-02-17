@@ -1,6 +1,5 @@
 package farjs.app.filelist
 
-import farjs.filelist.FileListActions.FileListActivateAction
 import farjs.filelist._
 import farjs.filelist.fs.{FSDrivePopup, FSDrivePopupProps, FSPlugin}
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
@@ -14,23 +13,23 @@ import scommons.react.redux.Dispatch
 import scala.scalajs.js
 
 case class FileListBrowserProps(dispatch: Dispatch,
-                                data: FileListsStateDef,
+                                isRightInitiallyActive: Boolean = false,
                                 plugins: Seq[FileListPlugin] = Nil)
 
-class FileListBrowser(fileListPopups: ReactClass) extends FunctionComponent[FileListBrowserProps] {
+object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
 
   private[filelist] var panelStackComp: UiComponent[PanelStackProps] = PanelStack
   private[filelist] var fsDrivePopup: UiComponent[FSDrivePopupProps] = FSDrivePopup
   private[filelist] var bottomMenuComp: UiComponent[Unit] = BottomMenu
   private[filelist] var fsPlugin: FSPlugin = FSPlugin
+  private[filelist] var fileListPopups: ReactClass = FileListPopupsController()
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val activeList = props.data.activeList
     val leftButtonRef = useRef[BlessedElement](null)
     val rightButtonRef = useRef[BlessedElement](null)
     val (isRight, setIsRight) = useStateUpdater(false)
-    val (isRightActive, setIsRightActive) = useState(activeList.isRight)
+    val (isRightActive, setIsRightActive) = useState(props.isRightInitiallyActive)
     val (showLeftDrive, setShowLeftDrive) = useState(false)
     val (showRightDrive, setShowRightDrive) = useState(false)
     
@@ -59,17 +58,7 @@ class FileListBrowser(fileListPopups: ReactClass) extends FunctionComponent[File
       else leftStack
     }
     
-    def getState(isRight: Boolean): FileListState = {
-      if (isRight) props.data.right
-      else props.data.left
-    }
-    
     def onActivate(isRight: Boolean): js.Function0[Unit] = { () =>
-      val state = getState(isRight)
-      if (!state.isActive) {
-        props.dispatch(FileListActivateAction(state.isRight))
-      }
-
       val stack = getStack(isRight)
       if (!stack.isActive) {
         setIsRightActive(isRight)

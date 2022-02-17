@@ -1,7 +1,7 @@
 package farjs.filelist.fs
 
 import farjs.filelist.stack.PanelStack
-import farjs.filelist.{FileListState, FileListsStateReducer}
+import farjs.filelist.{FileListState, FileListStateReducer}
 import scommons.react.ReactClass
 import scommons.react.redux.Dispatch
 
@@ -26,4 +26,4 @@ class FSPlugin(reduce: (Boolean, FileListState, Any) => FileListState) {
   }
 }
 
-object FSPlugin extends FSPlugin(FileListsStateReducer.reduceFileList)
+object FSPlugin extends FSPlugin(FileListStateReducer.reduceFileList)

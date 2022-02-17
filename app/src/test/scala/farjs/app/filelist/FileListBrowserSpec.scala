@@ -1,6 +1,6 @@
 package farjs.app.filelist
 
-import farjs.filelist.FileListActions.FileListActivateAction
+import farjs.app.filelist.FileListBrowser._
 import farjs.filelist._
 import farjs.filelist.fs.{FSDrivePopupProps, FSPlugin}
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
@@ -16,33 +16,61 @@ import scala.scalajs.js.Dynamic.literal
 
 class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
   
-  private val fileListPopups = "test_popups".asInstanceOf[ReactClass]
-  private val fileListBrowser = new FileListBrowser(fileListPopups)
-
-  fileListBrowser.panelStackComp = mockUiComponent("PanelStack")
-  fileListBrowser.fsDrivePopup = mockUiComponent("FSDrivePopup")
-  fileListBrowser.bottomMenuComp = mockUiComponent("BottomMenu")
-  fileListBrowser.fsPlugin = new FSPlugin((_, s, _) => s)
+  FileListBrowser.panelStackComp = mockUiComponent("PanelStack")
+  FileListBrowser.fsDrivePopup = mockUiComponent("FSDrivePopup")
+  FileListBrowser.bottomMenuComp = mockUiComponent("BottomMenu")
+  FileListBrowser.fsPlugin = new FSPlugin((_, s, _) => s)
+  FileListBrowser.fileListPopups = "test_popups".asInstanceOf[ReactClass]
   
-  import fileListBrowser._
+  it should "not activate left stack if already active when onFocus in left panel" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val props = FileListBrowserProps(dispatch)
+    val focusMock = mockFunction[Unit]
+    val leftButtonMock = literal("focus" -> focusMock)
+    val rightButtonMock = literal()
+    focusMock.expects()
+
+    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
+      val isRight = el.props.isRight.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false)
+      if (isRight && el.`type` == <.button.name.asInstanceOf[js.Any]) rightButtonMock
+      else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock
+      else null
+    })
+    val leftButton = inside(findComponents(comp, <.button.name)) {
+      case List(leftButton, _) => leftButton
+    }
+    inside(findProps(comp, panelStackComp)) {
+      case List(leftStack, rightStack) =>
+        leftStack.isRight shouldBe false
+        leftStack.stack.isActive shouldBe true
+        rightStack.isRight shouldBe true
+        rightStack.stack.isActive shouldBe false
+    }
+    
+    //when
+    leftButton.props.onFocus()
+
+    //then
+    inside(findProps(comp, panelStackComp)) {
+      case List(leftStack, rightStack) =>
+        leftStack.isRight shouldBe false
+        leftStack.stack.isActive shouldBe true
+        rightStack.isRight shouldBe true
+        rightStack.stack.isActive shouldBe false
+    }
+  }
 
   it should "activate left stack when onFocus in left panel" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val data = {
-      val state = FileListsState()
-      state.copy(
-        left = state.left.copy(isActive = false),
-        right = state.right.copy(isActive = true)
-      )
-    }
-    val props = FileListBrowserProps(dispatch, data)
+    val props = FileListBrowserProps(dispatch, isRightInitiallyActive = true)
     val leftButtonMock = literal()
     val focusMock = mockFunction[Unit]
     val rightButtonMock = literal("focus" -> focusMock)
     focusMock.expects()
 
-    val comp = testRender(<(fileListBrowser())(^.wrapped := props)(), { el =>
+    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
       val isRight = el.props.isRight.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false)
       if (isRight && el.`type` == <.button.name.asInstanceOf[js.Any]) rightButtonMock
       else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock
@@ -59,9 +87,6 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         rightStack.stack.isActive shouldBe true
     }
     
-    //then
-    dispatch.expects(FileListActivateAction(isRight = false))
-
     //when
     leftButton.props.onFocus()
     
@@ -78,13 +103,13 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   it should "activate right stack when onFocus in right panel" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FileListBrowserProps(dispatch, FileListsState())
+    val props = FileListBrowserProps(dispatch)
     val focusMock = mockFunction[Unit]
     val leftButtonMock = literal("focus" -> focusMock)
     val rightButtonMock = literal()
     focusMock.expects()
 
-    val comp = testRender(<(fileListBrowser())(^.wrapped := props)(), { el =>
+    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
       val isRight = el.props.isRight.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false)
       if (isRight && el.`type` == <.button.name.asInstanceOf[js.Any]) rightButtonMock
       else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock
@@ -101,9 +126,6 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         rightStack.stack.isActive shouldBe false
     }
     
-    //then
-    dispatch.expects(FileListActivateAction(isRight = true))
-
     //when
     rightButton.props.onFocus()
     
@@ -120,12 +142,12 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   it should "dispatch FileListPopupExitAction when onKeypress(F10)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FileListBrowserProps(dispatch, FileListsState())
+    val props = FileListBrowserProps(dispatch)
     val focusMock = mockFunction[Unit]
     val buttonMock = literal("focus" -> focusMock)
     focusMock.expects()
 
-    val comp = testRender(<(fileListBrowser())(^.wrapped := props)(), { el =>
+    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
@@ -146,14 +168,14 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   it should "focus next panel when onKeypress(tab|S-tab)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FileListBrowserProps(dispatch, FileListsState())
+    val props = FileListBrowserProps(dispatch)
     val focusNextMock = mockFunction[Unit]
     val screen = literal("focusNext" -> focusNextMock).asInstanceOf[BlessedScreen]
     val focusMock = mockFunction[Unit]
     val buttonMock = literal("screen" -> screen, "focus" -> focusMock)
     focusMock.expects()
 
-    val comp = testRender(<(fileListBrowser())(^.wrapped := props)(), { el =>
+    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
@@ -182,14 +204,14 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   it should "swap the panels when onKeypress(Ctrl+U)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FileListBrowserProps(dispatch, FileListsState())
+    val props = FileListBrowserProps(dispatch)
     val focusNextMock = mockFunction[Unit]
     val screen = literal("focusNext" -> focusNextMock).asInstanceOf[BlessedScreen]
     val focusMock = mockFunction[Unit]
     val buttonMock = literal("screen" -> screen, "focus" -> focusMock)
     focusMock.expects()
 
-    val comp = testRender(<(fileListBrowser())(^.wrapped := props)(), { el =>
+    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
@@ -232,12 +254,12 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         onTriggerMock(isRight, leftStack, rightStack)
       }
     }
-    val props = FileListBrowserProps(dispatch, FileListsState(), List(plugin))
+    val props = FileListBrowserProps(dispatch, plugins = List(plugin))
     val focusMock = mockFunction[Unit]
     val buttonMock = literal("focus" -> focusMock)
     focusMock.expects()
 
-    val comp = testRender(<(fileListBrowser())(^.wrapped := props)(), { el =>
+    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
@@ -258,21 +280,14 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   it should "show Drive popup on the left when onKeypress(Alt+L)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val data = {
-      val state = FileListsState()
-      state.copy(
-        left = state.left.copy(isActive = true),
-        right = state.right.copy(isActive = false)
-      )
-    }
     val keyFull = "M-l"
-    val props = FileListBrowserProps(dispatch, data)
+    val props = FileListBrowserProps(dispatch)
     val focusMock = mockFunction[Unit]
     val leftButtonMock = literal("focus" -> focusMock)
     val rightButtonMock = literal()
     focusMock.expects()
 
-    val renderer = createTestRenderer(<(fileListBrowser())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(<(FileListBrowser())(^.wrapped := props)(), { el =>
       val isRight = el.props.isRight.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false)
       if (isRight && el.`type` == <.button.name.asInstanceOf[js.Any]) rightButtonMock
       else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock
@@ -304,21 +319,14 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   it should "show Drive popup on the right when onKeypress(Alt+R)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val data = {
-      val state = FileListsState()
-      state.copy(
-        left = state.left.copy(isActive = true),
-        right = state.right.copy(isActive = false)
-      )
-    }
     val keyFull = "M-r"
-    val props = FileListBrowserProps(dispatch, data)
+    val props = FileListBrowserProps(dispatch)
     val focusMock = mockFunction[Unit]
     val leftButtonMock = literal("focus" -> focusMock)
     val rightButtonMock = literal()
     focusMock.expects()
 
-    val renderer = createTestRenderer(<(fileListBrowser())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(<(FileListBrowser())(^.wrapped := props)(), { el =>
       val isRight = el.props.isRight.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false)
       if (isRight && el.`type` == <.button.name.asInstanceOf[js.Any]) rightButtonMock
       else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock
@@ -350,14 +358,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   it should "render initial component and focus active panel" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val data = {
-      val state = FileListsState()
-      state.copy(
-        left = state.left.copy(isActive = false),
-        right = state.right.copy(isActive = true)
-      )
-    }
-    val props = FileListBrowserProps(dispatch, data)
+    val props = FileListBrowserProps(dispatch, isRightInitiallyActive = true)
     val leftButtonMock = literal()
     val focusMock = mockFunction[Unit]
     val rightButtonMock = literal("focus" -> focusMock)
@@ -366,7 +367,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     focusMock.expects()
 
     //when
-    val result = testRender(<(fileListBrowser())(^.wrapped := props)(), { el =>
+    val result = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
       val isRight = el.props.isRight.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false)
       if (isRight && el.`type` == <.button.name.asInstanceOf[js.Any]) rightButtonMock
       else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock

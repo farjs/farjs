@@ -1,39 +1,11 @@
 package farjs.filelist
 
 import farjs.filelist.FileListActions._
-import farjs.filelist.FileListsStateReducer.reduceFileList
+import farjs.filelist.FileListStateReducer.reduceFileList
 import farjs.filelist.api.{FileListDir, FileListItem}
 import scommons.react.test.TestSpec
 
-class FileListsStateReducerSpec extends TestSpec {
-
-  private val reduce = FileListsStateReducer.apply _
-  
-  it should "return default state when state is None" in {
-    //when & then
-    reduce(None, "") shouldBe FileListsState()
-  }
-  
-  it should "set isActive when FileListActivateAction" in {
-    //given
-    val state = FileListsState()
-    val action = FileListActivateAction(isRight = false)
-    
-    //when & then
-    reduce(Some(state), action) shouldBe {
-      state.copy(
-        left = FileListState(isActive = true),
-        right = FileListState(isRight = true)
-      )
-    }
-    //when & then
-    reduce(Some(state), action.copy(isRight = true)) shouldBe {
-      state.copy(
-        left = FileListState(),
-        right = FileListState(isRight = true, isActive = true)
-      )
-    }
-  }
+class FileListStateReducerSpec extends TestSpec {
   
   it should "set params when FileListParamsChangedAction" in {
     //given
