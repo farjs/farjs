@@ -51,7 +51,6 @@ object FSDrivePopup extends FunctionComponent[FSDrivePopupProps] {
       stack.peekLast[FileListState].getActions.foreach { case (dispatch, actions) =>
         dispatch(actions.changeDir(
           dispatch = dispatch,
-          isRight = stackProps.isRight,
           parent = None,
           dir = dir
         ))

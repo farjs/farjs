@@ -20,7 +20,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
   //noinspection TypeAnnotation
   class Actions {
-    val changeDir = mockFunction[Dispatch, Boolean, Option[String], String, FileListDirChangeAction]
+    val changeDir = mockFunction[Dispatch, Option[String], String, FileListDirChangeAction]
 
     val actions = new MockFileListActions(
       changeDirMock = changeDir
@@ -40,7 +40,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     )
     
     //then
-    actions.changeDir.expects(dispatch, state1.isRight, None, FileListDir.curr).returning(action)
+    actions.changeDir.expects(dispatch, None, FileListDir.curr).returning(action)
     dispatch.expects(action)
     
     //when
@@ -75,7 +75,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       val state = props.state.copy(offset = offset, index = index)
       if (changed) {
         //then
-        dispatch.expects(FileListParamsChangedAction(state.isRight, offset, index, Set.empty))
+        dispatch.expects(FileListParamsChangedAction(offset, index, Set.empty))
       }
       
       //when
@@ -147,7 +147,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       val state = props.state.copy(offset = 0, index = index)
       if (changed) {
         //then
-        dispatch.expects(FileListParamsChangedAction(state.isRight, 0, index, Set.empty))
+        dispatch.expects(FileListParamsChangedAction(0, index, Set.empty))
       }
 
       //when
@@ -201,7 +201,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       val state = props.state.copy(offset = offset, index = index, selectedNames = selected)
       if (changed) {
         //then
-        dispatch.expects(FileListParamsChangedAction(state.isRight, offset, index, selected))
+        dispatch.expects(FileListParamsChangedAction(offset, index, selected))
       }
       
       //then
@@ -306,7 +306,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val dirAction = FileListDirChangeAction(
       FutureTask("Changing dir", Future.successful(props.state.currDir))
     )
-    actions.changeDir.expects(dispatch, props.state.isRight, None, FileListDir.curr).returning(dirAction)
+    actions.changeDir.expects(dispatch, None, FileListDir.curr).returning(dirAction)
     dispatch.expects(dirAction)
 
     //when

@@ -30,7 +30,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   
   //noinspection TypeAnnotation
   class Actions {
-    val updateDir = mockFunction[Dispatch, Boolean, String, FileListDirUpdateAction]
+    val updateDir = mockFunction[Dispatch, String, FileListDirUpdateAction]
     val readDir = mockFunction[Option[String], String, Future[FileListDir]]
 
     val actions = new MockFileListActions(
@@ -640,7 +640,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ), null)
     val toDispatch = mockFunction[Any, Any]
     val toActions = new Actions
-    val toState = FileListState(currDir = rightDir, isRight = true)
+    val toState = FileListState(currDir = rightDir)
     val rightStack = new PanelStack(isActive = false, List(
       PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions.actions), Some(toState))
     ), null)
@@ -681,13 +681,12 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
       //then
       fromDispatch.expects(FileListParamsChangedAction(
-        isRight = false,
         offset = 0,
         index = 1,
         selectedNames = Set("file 1")
       ))
-      fromActions.updateDir.expects(fromDispatch, false, leftDir.path).returning(leftAction)
-      toActions.updateDir.expects(toDispatch, true, rightDir.path).returning(rightAction)
+      fromActions.updateDir.expects(fromDispatch, leftDir.path).returning(leftAction)
+      toActions.updateDir.expects(toDispatch, rightDir.path).returning(rightAction)
       fromDispatch.expects(leftAction)
       toDispatch.expects(rightAction)
 
@@ -722,7 +721,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     ), null)
     val toDispatch = mockFunction[Any, Any]
     val toActions = new Actions
-    val toState = FileListState(currDir = rightDir, isRight = true)
+    val toState = FileListState(currDir = rightDir)
     val rightStack = new PanelStack(isActive = false, List(
       PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions.actions), Some(toState))
     ), null)
@@ -763,13 +762,12 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
       //then
       fromDispatch.expects(FileListParamsChangedAction(
-        isRight = false,
         offset = 0,
         index = 1,
         selectedNames = Set("file 1")
       )).never()
-      fromActions.updateDir.expects(fromDispatch, false, leftDir.path).returning(leftAction)
-      toActions.updateDir.expects(toDispatch, true, rightDir.path).returning(rightAction)
+      fromActions.updateDir.expects(fromDispatch, leftDir.path).returning(leftAction)
+      toActions.updateDir.expects(toDispatch, rightDir.path).returning(rightAction)
       fromDispatch.expects(leftAction)
       toDispatch.expects(rightAction)
 

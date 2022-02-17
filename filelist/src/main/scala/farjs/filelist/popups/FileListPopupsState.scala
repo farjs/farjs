@@ -22,7 +22,7 @@ object FileListPopupsStateReducer {
     case FileListPopupDeleteAction(show) => state.copy(showDeletePopup = show)
     case FileListPopupMkFolderAction(show) => state.copy(showMkFolderPopup = show)
     case FileListPopupViewItemsAction(show) => state.copy(showViewItemsPopup = show)
-    case FileListItemsViewedAction(_, _) => state.copy(showViewItemsPopup = false)
+    case FileListItemsViewedAction(_) => state.copy(showViewItemsPopup = false)
     case FileListPopupCopyMoveAction(cm) => state.copy(showCopyMovePopup = cm)
     case _ => state
   }

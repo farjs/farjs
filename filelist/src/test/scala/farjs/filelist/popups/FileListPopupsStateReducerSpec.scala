@@ -71,7 +71,7 @@ class FileListPopupsStateReducerSpec extends TestSpec {
   it should "reset showViewItemsPopup when FileListItemsViewedAction" in {
     //given
     val state = FileListPopupsState(showViewItemsPopup = true)
-    val action = FileListItemsViewedAction(isRight = false, sizes = Map("file 1" -> 123))
+    val action = FileListItemsViewedAction(sizes = Map("file 1" -> 123))
     
     //when & then
     reduce(Some(state), action) shouldBe {

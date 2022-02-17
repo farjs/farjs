@@ -79,7 +79,6 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
         val updatedSelection = from.state.selectedNames -- copied.current
         if (updatedSelection != from.state.selectedNames) {
           from.dispatch(FileListParamsChangedAction(
-            isRight = from.state.isRight,
             offset = from.state.offset,
             index = from.state.index,
             selectedNames = updatedSelection
@@ -88,11 +87,11 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
 
         onCancel(dispatchAction = false)()
 
-        val updateAction = from.actions.updateDir(from.dispatch, from.state.isRight, from.path)
+        val updateAction = from.actions.updateDir(from.dispatch, from.path)
         from.dispatch(updateAction)
         updateAction.task.future.andThen {
           case Success(_) => maybeTo.foreach { to =>
-            to.dispatch(to.actions.updateDir(to.dispatch, to.state.isRight, to.path))
+            to.dispatch(to.actions.updateDir(to.dispatch, to.path))
           }
         }
       }

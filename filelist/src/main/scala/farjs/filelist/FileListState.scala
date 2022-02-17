@@ -7,7 +7,6 @@ case class FileListState(offset: Int = 0,
                          index: Int = 0,
                          currDir: FileListDir = FileListDir("", isRoot = false, Seq.empty),
                          selectedNames: Set[String] = Set.empty,
-                         isRight: Boolean = false,
                          isActive: Boolean = false) {
 
   lazy val currentItem: Option[FileListItem] = {
@@ -28,14 +27,14 @@ case class FileListState(offset: Int = 0,
 
 object FileListStateReducer {
   
-  def reduceFileList(isRight: Boolean, state: FileListState, action: Any): FileListState = action match {
-    case FileListParamsChangedAction(`isRight`, offset, index, selectedNames) =>
+  def apply(state: FileListState, action: Any): FileListState = action match {
+    case FileListParamsChangedAction(offset, index, selectedNames) =>
       state.copy(
         offset = offset,
         index = index,
         selectedNames = selectedNames
       )
-    case FileListDirChangedAction(`isRight`, dir, currDir) =>
+    case FileListDirChangedAction(dir, currDir) =>
       val processed = processDir(currDir)
       val index =
         if (dir == FileListItem.up.name) {
@@ -54,7 +53,7 @@ object FileListStateReducer {
         currDir = processed,
         selectedNames = Set.empty
       )
-    case FileListDirUpdatedAction(`isRight`, currDir) =>
+    case FileListDirUpdatedAction(currDir) =>
       val processed = processDir(currDir)
       val currIndex = state.offset + state.index
       val newIndex = state.currentItem.map { currItem =>
@@ -79,14 +78,14 @@ object FileListStateReducer {
           }
           else state.selectedNames
       )
-    case FileListDirCreatedAction(`isRight`, dir, currDir) =>
+    case FileListDirCreatedAction(dir, currDir) =>
       val processed = processDir(currDir)
       state.copy(
         offset = 0,
         index = math.max(processed.items.indexWhere(_.name == dir), 0),
         currDir = processed
       )
-    case FileListItemsViewedAction(`isRight`, sizes) =>
+    case FileListItemsViewedAction(sizes) =>
       val updatedItems = state.currDir.items.map { item =>
         sizes.get(item.name) match {
           case Some(size) => item.copy(size = size)

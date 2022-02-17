@@ -96,18 +96,17 @@ class FileListActionsSpec extends AsyncTestSpec {
     actions.fsService = fsService.fsService
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
-    val isRight = true
     val parent: Option[String] = Some("/")
     val dir = "test dir"
 
     api.readDir2.expects(parent, dir).returning(Future.successful(currDir))
     
     //then
-    dispatch.expects(FileListDirChangedAction(isRight, dir, currDir))
+    dispatch.expects(FileListDirChangedAction(dir, currDir))
     
     //when
     val FileListDirChangeAction(FutureTask(msg, future)) =
-      actions.changeDir(dispatch, isRight, parent, dir)
+      actions.changeDir(dispatch, parent, dir)
     
     //then
     msg shouldBe "Changing Dir"
@@ -122,17 +121,16 @@ class FileListActionsSpec extends AsyncTestSpec {
     actions.fsService = fsService.fsService
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
-    val isRight = true
     val path = "/test/path"
 
     api.readDir.expects(path).returning(Future.successful(currDir))
     
     //then
-    dispatch.expects(FileListDirUpdatedAction(isRight, currDir))
+    dispatch.expects(FileListDirUpdatedAction(currDir))
     
     //when
     val FileListDirUpdateAction(FutureTask(msg, future)) =
-      actions.updateDir(dispatch, isRight, path)
+      actions.updateDir(dispatch, path)
     
     //then
     msg shouldBe "Updating Dir"
@@ -147,7 +145,6 @@ class FileListActionsSpec extends AsyncTestSpec {
     actions.fsService = fsService.fsService
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
-    val isRight = true
     val parent = "/parent"
     val dir = "test/dir"
     val multiple = false
@@ -156,11 +153,11 @@ class FileListActionsSpec extends AsyncTestSpec {
     api.readDir.expects(parent).returning(Future.successful(currDir))
     
     //then
-    dispatch.expects(FileListDirCreatedAction(isRight, dir, currDir))
+    dispatch.expects(FileListDirCreatedAction(dir, currDir))
     
     //when
     val FileListDirCreateAction(FutureTask(msg, future)) =
-      actions.createDir(dispatch, isRight, parent, dir, multiple)
+      actions.createDir(dispatch, parent, dir, multiple)
     
     //then
     msg shouldBe "Creating Dir"
@@ -175,7 +172,6 @@ class FileListActionsSpec extends AsyncTestSpec {
     actions.fsService = fsService.fsService
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
-    val isRight = true
     val parent = "/parent"
     val dir = "test/dir"
     val multiple = true
@@ -184,11 +180,11 @@ class FileListActionsSpec extends AsyncTestSpec {
     api.readDir.expects(parent).returning(Future.successful(currDir))
     
     //then
-    dispatch.expects(FileListDirCreatedAction(isRight, "test", currDir))
+    dispatch.expects(FileListDirCreatedAction("test", currDir))
     
     //when
     val FileListDirCreateAction(FutureTask(msg, future)) =
-      actions.createDir(dispatch, isRight, parent, dir, multiple)
+      actions.createDir(dispatch, parent, dir, multiple)
     
     //then
     msg shouldBe "Creating Dir"
@@ -202,18 +198,17 @@ class FileListActionsSpec extends AsyncTestSpec {
     val dispatch = mockFunction[Any, Any]
     val dir = "test dir"
     val items = List(FileListItem("file 1"))
-    val isRight = true
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
 
     api.delete.expects(dir, items).returning(Future.successful(()))
     api.readDir.expects(dir).returning(Future.successful(currDir))
     
     //then
-    dispatch.expects(FileListDirUpdatedAction(isRight, currDir))
+    dispatch.expects(FileListDirUpdatedAction(currDir))
     
     //when
     val FileListTaskAction(FutureTask(msg, future)) =
-      actions.deleteAction(dispatch, isRight, dir, items)
+      actions.deleteAction(dispatch, dir, items)
     
     //then
     msg shouldBe "Deleting Items"

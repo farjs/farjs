@@ -37,7 +37,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("dir 1", isDir = true),
       FileListItem("file 1", size = 10)
     ))
-    val state = FileListState(currDir = currDir, isRight = true, isActive = true, selectedNames = Set("dir 1", "file 1"))
+    val state = FileListState(currDir = currDir, isActive = true, selectedNames = Set("dir 1", "file 1"))
     val props = FileListPopupsState(showViewItemsPopup = true)
     val p = Promise[Boolean]()
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
@@ -79,7 +79,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
       //then
       eventually {
         resAction should not be null
-        resAction shouldBe FileListItemsViewedAction(isRight = true, Map(
+        resAction shouldBe FileListItemsViewedAction(Map(
           "dir 1" -> 123,
           "file 1" -> 10
         ))
@@ -202,7 +202,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val actions = new Actions
     val state = FileListState()
     val props = FileListPopupsState(showViewItemsPopup = true)
-    val action = FileListItemsViewedAction(isRight = false, Map.empty)
+    val action = FileListItemsViewedAction(Map.empty)
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)

@@ -24,8 +24,8 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
   //noinspection TypeAnnotation
   class Actions {
     val openInDefaultApp = mockFunction[String, String, FileListTaskAction]
-    val changeDir = mockFunction[Dispatch, Boolean, Option[String], String, FileListDirChangeAction]
-    val updateDir = mockFunction[Dispatch, Boolean, String, FileListDirUpdateAction]
+    val changeDir = mockFunction[Dispatch, Option[String], String, FileListDirChangeAction]
+    val updateDir = mockFunction[Dispatch, String, FileListDirUpdateAction]
 
     val actions = new MockFileListActions(
       openInDefaultAppMock = openInDefaultApp,
@@ -169,7 +169,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val action = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
 
     //then
-    actions.updateDir.expects(dispatch, false, "/sub-dir").returning(action)
+    actions.updateDir.expects(dispatch, "/sub-dir").returning(action)
     dispatch.expects(action)
 
     //when
@@ -214,7 +214,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     )
 
     //then
-    actions.changeDir.expects(dispatch, props.state.isRight, Some("/sub-dir"), "dir 1").returning(action)
+    actions.changeDir.expects(dispatch, Some("/sub-dir"), "dir 1").returning(action)
     dispatch.expects(action)
 
     //when
@@ -238,7 +238,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     )
 
     //then
-    actions.changeDir.expects(dispatch, props.state.isRight, Some("/sub-dir"), "..").returning(action)
+    actions.changeDir.expects(dispatch, Some("/sub-dir"), "..").returning(action)
     dispatch.expects(action)
 
     //when
@@ -262,7 +262,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     )
 
     //then
-    actions.changeDir.expects(dispatch, props.state.isRight, Some("/sub-dir"), "dir 1").returning(action)
+    actions.changeDir.expects(dispatch, Some("/sub-dir"), "dir 1").returning(action)
     dispatch.expects(action)
 
     //when
@@ -383,7 +383,6 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       if (dispatchAction) {
         //then
         dispatch.expects(FileListParamsChangedAction(
-          isRight = props.state.isRight,
           offset = 0,
           index = index,
           selectedNames = props.state.selectedNames

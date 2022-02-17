@@ -15,8 +15,8 @@ class FSPluginSpec extends TestSpec {
 
   it should "initialize dispatch, actions and state when init" in {
     //given
-    val reduce = mockFunction[Boolean, FileListState, Any, FileListState]
-    val plugin = new FSPlugin(reduce)
+    val reducer = mockFunction[FileListState, Any, FileListState]
+    val plugin = new FSPlugin(reducer)
     val parentDispatch = mockFunction[Any, Any]
     val item = PanelStackItem[FileListState](FSPlugin.component, None, None, None)
     var stackData = List[PanelStackItem[_]](item)
@@ -25,7 +25,7 @@ class FSPluginSpec extends TestSpec {
     }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
     
     //when
-    plugin.init(parentDispatch, isRight = false, stack)
+    plugin.init(parentDispatch, stack)
     
     //then
     inside(stackData.head) { case PanelStackItem(component, Some(dispatch), actions, state) =>
@@ -40,7 +40,7 @@ class FSPluginSpec extends TestSpec {
       currState should not be updatedState
       
       //then
-      reduce.expects(false, currState, action).returning(updatedState)
+      reducer.expects(currState, action).returning(updatedState)
       parentDispatch.expects(action)
       
       //when

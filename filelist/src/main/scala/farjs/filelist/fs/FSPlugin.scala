@@ -5,15 +5,15 @@ import farjs.filelist.{FileListState, FileListStateReducer}
 import scommons.react.ReactClass
 import scommons.react.redux.Dispatch
 
-class FSPlugin(reduce: (Boolean, FileListState, Any) => FileListState) {
+class FSPlugin(reducer: (FileListState, Any) => FileListState) {
 
   val component: ReactClass = FSPanel()
 
-  def init(parentDispatch: Dispatch, isRight: Boolean, stack: PanelStack): Unit = {
+  def init(parentDispatch: Dispatch, stack: PanelStack): Unit = {
     val dispatch: Any => Any = { action =>
       stack.updateFor[FileListState](component) { item =>
         item.updateState { state =>
-          reduce(isRight, state, action)
+          reducer(state, action)
         }
       }
       parentDispatch(action)
@@ -21,9 +21,9 @@ class FSPlugin(reduce: (Boolean, FileListState, Any) => FileListState) {
 
     stack.updateFor[FileListState](component) {
       _.withActions(dispatch, FSFileListActions)
-        .withState(FileListState(isRight = isRight, isActive = stack.isActive))
+        .withState(FileListState(isActive = stack.isActive))
     }
   }
 }
 
-object FSPlugin extends FSPlugin(FileListStateReducer.reduceFileList)
+object FSPlugin extends FSPlugin(FileListStateReducer.apply)

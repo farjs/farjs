@@ -58,7 +58,7 @@ object ViewItemsPopup extends FunctionComponent[FileListPopupsState] {
       }
       resultF.onComplete {
         case Success(false) => // already cancelled
-        case Success(true) => dispatch(FileListItemsViewedAction(state.isRight, sizes))
+        case Success(true) => dispatch(FileListItemsViewedAction(sizes))
         case Failure(_) =>
           dispatch(FileListPopupViewItemsAction(show = false))
           dispatch(FileListTaskAction(FutureTask("Viewing Items", resultF)))

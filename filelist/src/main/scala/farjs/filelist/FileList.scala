@@ -45,7 +45,6 @@ object FileList extends FunctionComponent[FileListProps] {
       if (props.state.currDir.isEmpty) {
         props.dispatch(props.actions.changeDir(
           dispatch = props.dispatch,
-          isRight = props.state.isRight,
           parent = None,
           dir = FileListDir.curr
         ))
@@ -104,7 +103,6 @@ object FileList extends FunctionComponent[FileListProps] {
         || props.state.selectedNames != newSelected) {
         
         props.dispatch(FileListParamsChangedAction(
-          isRight = props.state.isRight,
           offset = newOffset,
           index = newIndex,
           selectedNames = newSelected

@@ -26,30 +26,25 @@ trait FileListActions {
   }
   
   def changeDir(dispatch: Dispatch,
-                isRight: Boolean,
                 parent: Option[String],
                 dir: String): FileListDirChangeAction = {
     
     val future = readDir(parent, dir).andThen {
-      case Success(currDir) => dispatch(FileListDirChangedAction(isRight, dir, currDir))
+      case Success(currDir) => dispatch(FileListDirChangedAction(dir, currDir))
     }
 
     FileListDirChangeAction(FutureTask("Changing Dir", future))
   }
 
-  def updateDir(dispatch: Dispatch,
-                isRight: Boolean,
-                path: String): FileListDirUpdateAction = {
-
+  def updateDir(dispatch: Dispatch, path: String): FileListDirUpdateAction = {
     val future = api.readDir(path).andThen {
-      case Success(currDir) => dispatch(FileListDirUpdatedAction(isRight, currDir))
+      case Success(currDir) => dispatch(FileListDirUpdatedAction(currDir))
     }
 
     FileListDirUpdateAction(FutureTask("Updating Dir", future))
   }
 
   def createDir(dispatch: Dispatch,
-                isRight: Boolean,
                 parent: String,
                 dir: String,
                 multiple: Boolean): FileListDirCreateAction = {
@@ -62,7 +57,7 @@ trait FileListActions {
       _ <- mkDirs(parent :: names)
       currDir <- api.readDir(parent)
     } yield {
-      dispatch(FileListDirCreatedAction(isRight, names.head, currDir))
+      dispatch(FileListDirCreatedAction(names.head, currDir))
       ()
     }
 
@@ -76,7 +71,6 @@ trait FileListActions {
   def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = api.delete(parent, items)
 
   def deleteAction(dispatch: Dispatch,
-                   isRight: Boolean,
                    dir: String,
                    items: Seq[FileListItem]): FileListTaskAction = {
     
@@ -84,7 +78,7 @@ trait FileListActions {
       _ <- delete(dir, items)
       currDir <- api.readDir(dir)
     } yield {
-      dispatch(FileListDirUpdatedAction(isRight, currDir))
+      dispatch(FileListDirUpdatedAction(currDir))
       ()
     }
 
@@ -157,19 +151,18 @@ object FileListActions {
 
   case class FileListTaskAction(task: FutureTask[_]) extends TaskAction
 
-  case class FileListParamsChangedAction(isRight: Boolean,
-                                         offset: Int,
+  case class FileListParamsChangedAction(offset: Int,
                                          index: Int,
                                          selectedNames: Set[String]) extends Action
 
   case class FileListDirChangeAction(task: FutureTask[FileListDir]) extends TaskAction
-  case class FileListDirChangedAction(isRight: Boolean, dir: String, currDir: FileListDir) extends Action
+  case class FileListDirChangedAction(dir: String, currDir: FileListDir) extends Action
   
   case class FileListDirUpdateAction(task: FutureTask[FileListDir]) extends TaskAction
-  case class FileListDirUpdatedAction(isRight: Boolean, currDir: FileListDir) extends Action
+  case class FileListDirUpdatedAction(currDir: FileListDir) extends Action
   
   case class FileListDirCreateAction(task: FutureTask[Unit]) extends TaskAction
-  case class FileListDirCreatedAction(isRight: Boolean, dir: String, currDir: FileListDir) extends Action
+  case class FileListDirCreatedAction(dir: String, currDir: FileListDir) extends Action
   
-  case class FileListItemsViewedAction(isRight: Boolean, sizes: Map[String, Double]) extends Action
+  case class FileListItemsViewedAction(sizes: Map[String, Double]) extends Action
 }

@@ -31,8 +31,8 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
 
   //noinspection TypeAnnotation
   class Actions {
-    val deleteAction = mockFunction[Dispatch, Boolean, String, Seq[FileListItem], FileListTaskAction]
-    val createDir = mockFunction[Dispatch, Boolean, String, String, Boolean, FileListDirCreateAction]
+    val deleteAction = mockFunction[Dispatch, String, Seq[FileListItem], FileListTaskAction]
+    val createDir = mockFunction[Dispatch, String, String, Boolean, FileListDirCreateAction]
 
     val actions = new MockFileListActions(
       createDirMock = createDir,
@@ -251,7 +251,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val items = List(FileListItem("file 1"))
 
     //then
-    actions.deleteAction.expects(dispatch, false, currDir.path, items).returning(deleteAction)
+    actions.deleteAction.expects(dispatch, currDir.path, items).returning(deleteAction)
     dispatch.expects(deleteAction)
     dispatch.expects(FileListPopupDeleteAction(show = false))
 
@@ -287,7 +287,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val items = List(FileListItem("file 2"))
 
     //then
-    actions.deleteAction.expects(dispatch, state.isRight, currDir.path, items).returning(deleteAction)
+    actions.deleteAction.expects(dispatch, currDir.path, items).returning(deleteAction)
     dispatch.expects(deleteAction)
     dispatch.expects(FileListPopupDeleteAction(show = false))
 
@@ -378,7 +378,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     val multiple = true
 
     //then
-    actions.createDir.expects(dispatch, false, currDir.path, dir, multiple).returning(action)
+    actions.createDir.expects(dispatch, currDir.path, dir, multiple).returning(action)
     dispatch.expects(action)
     dispatch.expects(FileListPopupMkFolderAction(show = false))
 

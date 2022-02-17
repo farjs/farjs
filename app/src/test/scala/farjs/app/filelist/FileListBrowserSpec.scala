@@ -19,7 +19,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   FileListBrowser.panelStackComp = mockUiComponent("PanelStack")
   FileListBrowser.fsDrivePopup = mockUiComponent("FSDrivePopup")
   FileListBrowser.bottomMenuComp = mockUiComponent("BottomMenu")
-  FileListBrowser.fsPlugin = new FSPlugin((_, s, _) => s)
+  FileListBrowser.fsPlugin = new FSPlugin((s, _) => s)
   FileListBrowser.fileListPopups = "test_popups".asInstanceOf[ReactClass]
   
   it should "not activate left stack if already active when onFocus in left panel" in {

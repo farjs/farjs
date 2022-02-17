@@ -28,7 +28,7 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
 
   //noinspection TypeAnnotation
   class Actions {
-    val changeDir = mockFunction[Dispatch, Boolean, Option[String], String, FileListDirChangeAction]
+    val changeDir = mockFunction[Dispatch, Option[String], String, FileListDirChangeAction]
 
     val actions = new MockFileListActions(
       changeDirMock = changeDir
@@ -87,7 +87,7 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
           ))
 
           //then
-          actions.changeDir.expects(dispatch, false, None, "C:").returning(action)
+          actions.changeDir.expects(dispatch, None, "C:").returning(action)
           dispatch.expects(action)
           onClose.expects()
           

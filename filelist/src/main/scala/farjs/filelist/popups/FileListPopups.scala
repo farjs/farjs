@@ -85,7 +85,6 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
                   dispatch(FileListPopupDeleteAction(show = false))
                   dispatch(actions.deleteAction(
                     dispatch = dispatch,
-                    isRight = state.isRight,
                     dir = state.currDir.path,
                     items = items
                   ))
@@ -105,7 +104,6 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
               onOk = { (dir, multiple) =>
                 val action = actions.createDir(
                   dispatch = dispatch,
-                  isRight = state.isRight,
                   parent = state.currDir.path,
                   dir = dir,
                   multiple = multiple

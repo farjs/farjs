@@ -26,7 +26,6 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
       val index = props.state.currDir.items.indexWhere(_.name.startsWith(text))
       if (index >= 0) {
         props.dispatch(FileListParamsChangedAction(
-          isRight = props.state.isRight,
           offset = 0,
           index = index,
           selectedNames = props.state.selectedNames
@@ -73,7 +72,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
             screen.copyToClipboard(text)
           }
         case "C-r" =>
-          props.dispatch(props.actions.updateDir(props.dispatch, props.state.isRight, props.state.currDir.path))
+          props.dispatch(props.actions.updateDir(props.dispatch, props.state.currDir.path))
         case "M-o" =>
           props.state.currentItem.foreach { item =>
             props.dispatch(props.actions.openInDefaultApp(props.state.currDir.path, item.name))
@@ -86,7 +85,6 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           targetDir.foreach { dir =>
             props.dispatch(props.actions.changeDir(
               dispatch = props.dispatch,
-              isRight = props.state.isRight,
               parent = Some(props.state.currDir.path),
               dir = dir.name
             ))

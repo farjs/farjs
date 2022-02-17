@@ -43,8 +43,8 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     val rightStack = new PanelStack(isRightActive, rightStackData, setRightStackData)
 
     useLayoutEffect({ () =>
-      fsPlugin.init(props.dispatch, isRight = false, leftStack)
-      fsPlugin.init(props.dispatch, isRight = true, rightStack)
+      fsPlugin.init(props.dispatch, leftStack)
+      fsPlugin.init(props.dispatch, rightStack)
 
       val element = 
         if (isRightActive) rightButtonRef.current
