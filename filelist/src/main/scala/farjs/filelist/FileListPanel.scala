@@ -11,7 +11,8 @@ import scommons.react.redux.Dispatch
 
 case class FileListPanelProps(dispatch: Dispatch,
                               actions: FileListActions,
-                              state: FileListState)
+                              state: FileListState,
+                              onKeypress: (BlessedScreen, String) => Boolean = (_, _) => false)
 
 object FileListPanel extends FunctionComponent[FileListPanelProps] {
 
@@ -36,61 +37,59 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
     }
 
     def onKeypress(screen: BlessedScreen, key: String): Unit = {
-      val currItem = props.state.currentItem.filter(_ != FileListItem.up)
-      key match {
-        case "f1" => props.dispatch(FileListPopupHelpAction(show = true))
-        case "f3" =>
-          if (props.state.selectedNames.nonEmpty || currItem.exists(_.isDir)) {
-            props.dispatch(FileListPopupViewItemsAction(show = true))
-          }
-        case "f5" =>
-          if (props.state.selectedNames.nonEmpty || currItem.nonEmpty) {
-            props.dispatch(FileListPopupCopyMoveAction(ShowCopyToTarget))
-          }
-        case "f6" =>
-          if (props.state.selectedNames.nonEmpty || currItem.nonEmpty) {
-            props.dispatch(FileListPopupCopyMoveAction(ShowMoveToTarget))
-          }
-        case "S-f5" =>
-          if (currItem.nonEmpty) {
-            props.dispatch(FileListPopupCopyMoveAction(ShowCopyInplace))
-          }
-        case "S-f6" =>
-          if (currItem.nonEmpty) {
-            props.dispatch(FileListPopupCopyMoveAction(ShowMoveInplace))
-          }
-        case "f7" => props.dispatch(FileListPopupMkFolderAction(show = true))
-        case "f8" | "delete" =>
-          if (props.state.selectedNames.nonEmpty || currItem.isDefined) {
-            props.dispatch(FileListPopupDeleteAction(show = true))
-          }
-        case "C-c" =>
-          props.state.currentItem.foreach { item =>
-            val text =
-              if (item.name == FileListItem.up.name) props.state.currDir.path
-              else path.join(props.state.currDir.path, item.name)
-            screen.copyToClipboard(text)
-          }
-        case "C-r" =>
-          props.dispatch(props.actions.updateDir(props.dispatch, props.state.currDir.path))
-        case "M-o" =>
-          props.state.currentItem.foreach { item =>
-            props.dispatch(props.actions.openInDefaultApp(props.state.currDir.path, item.name))
-          }
-        case k@("enter" | "C-pageup" | "C-pagedown") =>
-          val targetDir = k match {
-            case "C-pageup" => Some(FileListItem.up)
-            case _ => props.state.currentItem.filter(_.isDir)
-          }
-          targetDir.foreach { dir =>
-            props.dispatch(props.actions.changeDir(
-              dispatch = props.dispatch,
-              parent = Some(props.state.currDir.path),
-              dir = dir.name
-            ))
-          }
-        case "C-s" => setMaybeQuickSearch(Some(""))
-        case _ =>
+      if (!props.onKeypress(screen, key)) {
+        val currItem = props.state.currentItem.filter(_ != FileListItem.up)
+        key match {
+          case "f1" => props.dispatch(FileListPopupHelpAction(show = true))
+          case "f3" =>
+            if (props.state.selectedNames.nonEmpty || currItem.exists(_.isDir)) {
+              props.dispatch(FileListPopupViewItemsAction(show = true))
+            }
+          case "f5" =>
+            if (props.state.selectedNames.nonEmpty || currItem.nonEmpty) {
+              props.dispatch(FileListPopupCopyMoveAction(ShowCopyToTarget))
+            }
+          case "f6" =>
+            if (props.state.selectedNames.nonEmpty || currItem.nonEmpty) {
+              props.dispatch(FileListPopupCopyMoveAction(ShowMoveToTarget))
+            }
+          case "S-f5" =>
+            if (currItem.nonEmpty) {
+              props.dispatch(FileListPopupCopyMoveAction(ShowCopyInplace))
+            }
+          case "S-f6" =>
+            if (currItem.nonEmpty) {
+              props.dispatch(FileListPopupCopyMoveAction(ShowMoveInplace))
+            }
+          case "f7" => props.dispatch(FileListPopupMkFolderAction(show = true))
+          case "f8" | "delete" =>
+            if (props.state.selectedNames.nonEmpty || currItem.isDefined) {
+              props.dispatch(FileListPopupDeleteAction(show = true))
+            }
+          case "C-c" =>
+            props.state.currentItem.foreach { item =>
+              val text =
+                if (item.name == FileListItem.up.name) props.state.currDir.path
+                else path.join(props.state.currDir.path, item.name)
+              screen.copyToClipboard(text)
+            }
+          case "C-r" =>
+            props.dispatch(props.actions.updateDir(props.dispatch, props.state.currDir.path))
+          case k@("enter" | "C-pageup" | "C-pagedown") =>
+            val targetDir = k match {
+              case "C-pageup" => Some(FileListItem.up)
+              case _ => props.state.currentItem.filter(_.isDir)
+            }
+            targetDir.foreach { dir =>
+              props.dispatch(props.actions.changeDir(
+                dispatch = props.dispatch,
+                parent = Some(props.state.currDir.path),
+                dir = dir.name
+              ))
+            }
+          case "C-s" => setMaybeQuickSearch(Some(""))
+          case _ =>
+        }
       }
 
       maybeQuickSearch.foreach { text =>

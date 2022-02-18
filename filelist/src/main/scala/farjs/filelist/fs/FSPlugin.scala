@@ -1,13 +1,13 @@
 package farjs.filelist.fs
 
 import farjs.filelist.stack.PanelStack
-import farjs.filelist.{FileListState, FileListStateReducer}
+import farjs.filelist._
 import scommons.react.ReactClass
 import scommons.react.redux.Dispatch
 
 class FSPlugin(reducer: (FileListState, Any) => FileListState) {
 
-  val component: ReactClass = FSPanel()
+  val component: ReactClass = new FileListPanelController(FSPanel).apply()
 
   def init(parentDispatch: Dispatch, stack: PanelStack): Unit = {
     val dispatch: Any => Any = { action =>

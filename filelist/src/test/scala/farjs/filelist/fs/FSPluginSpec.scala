@@ -8,17 +8,12 @@ import scala.scalajs.js
 
 class FSPluginSpec extends TestSpec {
 
-  it should "return correct component" in {
-    //when & then
-    FSPlugin.component shouldBe FSPanel()
-  }
-
   it should "initialize dispatch, actions and state when init" in {
     //given
     val reducer = mockFunction[FileListState, Any, FileListState]
     val plugin = new FSPlugin(reducer)
     val parentDispatch = mockFunction[Any, Any]
-    val item = PanelStackItem[FileListState](FSPlugin.component, None, None, None)
+    val item = PanelStackItem[FileListState](plugin.component, None, None, None)
     var stackData = List[PanelStackItem[_]](item)
     val stack = new PanelStack(isActive = true, stackData, { f =>
       stackData = f(stackData)
@@ -30,7 +25,7 @@ class FSPluginSpec extends TestSpec {
     //then
     inside(stackData.head) { case PanelStackItem(component, Some(dispatch), actions, state) =>
       val currState = FileListState(isActive = true)
-      component shouldBe FSPlugin.component
+      component shouldBe plugin.component
       actions shouldBe Some(FSFileListActions)
       state shouldBe Some(currState)
       
@@ -47,11 +42,12 @@ class FSPluginSpec extends TestSpec {
       dispatch(action)
       
       //then
-      inside(stackData.head) { case PanelStackItem(component, Some(resDispatch), resActions, resState) =>
-        component shouldBe FSPlugin.component
-        resDispatch should be theSameInstanceAs dispatch
-        resActions should be theSameInstanceAs actions
-        resState shouldBe Some(updatedState)
+      inside(stackData.head) {
+        case PanelStackItem(component, Some(resDispatch), resActions, resState) =>
+          component shouldBe plugin.component
+          resDispatch should be theSameInstanceAs dispatch
+          resActions should be theSameInstanceAs actions
+          resState shouldBe Some(updatedState)
       }
     }
   }

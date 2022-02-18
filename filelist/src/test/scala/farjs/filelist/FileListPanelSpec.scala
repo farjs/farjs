@@ -14,6 +14,7 @@ import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
 import scala.concurrent.Future
+import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
 
 class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
@@ -23,12 +24,10 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   //noinspection TypeAnnotation
   class Actions {
-    val openInDefaultApp = mockFunction[String, String, FileListTaskAction]
     val changeDir = mockFunction[Dispatch, Option[String], String, FileListDirChangeAction]
     val updateDir = mockFunction[Dispatch, String, FileListDirUpdateAction]
 
     val actions = new MockFileListActions(
-      openInDefaultAppMock = openInDefaultApp,
       changeDirMock = changeDir,
       updateDirMock = updateDir
     )
@@ -37,6 +36,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
   it should "dispatch popups actions when F-keys" in {
     //given
     val dispatch = mockFunction[Any, Any]
+    val onKeypress = mockFunction[BlessedScreen, String, Boolean]
     val actions = new Actions
     val state = FileListState(
       currDir = FileListDir("/sub-dir", isRoot = false, items = List(
@@ -45,13 +45,15 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         FileListItem("dir 1", isDir = true)
       ))
     )
-    val props = FileListPanelProps(dispatch, actions.actions, state)
+    val props = FileListPanelProps(dispatch, actions.actions, state, onKeypress)
+    val screen = js.Dynamic.literal().asInstanceOf[BlessedScreen]
 
     val renderer = createTestRenderer(<(FileListPanel())(^.wrapped := props)())
 
     def check(fullKey: String,
               action: Any,
               index: Int = 0,
+              handled: Boolean = false,
               selectedNames: Set[String] = Set.empty,
               never: Boolean = false): Unit = {
       //given
@@ -60,11 +62,12 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       ))())
 
       //then
+      onKeypress.expects(screen, fullKey).returning(handled)
       if (never) dispatch.expects(action).never()
       else dispatch.expects(action)
 
       //when
-      findComponentProps(renderer.root, fileListPanelView).onKeypress(null, fullKey)
+      findComponentProps(renderer.root, fileListPanelView).onKeypress(screen, fullKey)
     }
 
     //when & then
@@ -101,6 +104,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     check("S-f6", FileListPopupCopyMoveAction(ShowMoveInplace), selectedNames = Set("file 1"), never = true)
 
     //when & then
+    check("f7", FileListPopupMkFolderAction(show = true), handled = true, never = true)
     check("f7", FileListPopupMkFolderAction(show = true))
 
     //when & then
@@ -174,27 +178,6 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
     //when
     viewProps.onKeypress(null, "C-r")
-
-    action.task.future.map(_ => Succeeded)
-  }
-
-  it should "dispatch action when onKeypress(M-o)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = new Actions
-    val props = FileListPanelProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
-    ))
-    val comp = testRender(<(FileListPanel())(^.wrapped := props)())
-    val viewProps = findComponentProps(comp, fileListPanelView)
-    val action = FileListTaskAction(FutureTask("Opening item", Future.unit))
-
-    //then
-    actions.openInDefaultApp.expects("/sub-dir", "item 1").returning(action)
-    dispatch.expects(action)
-
-    //when
-    viewProps.onKeypress(null, "M-o")
 
     action.task.future.map(_ => Succeeded)
   }
@@ -425,18 +408,13 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
   private def assertFileListPanel(result: TestInstance,
                                   props: FileListPanelProps): Assertion = {
     
-    def assertComponents(view: TestInstance): Assertion = {
-
-      assertTestComponent(view, fileListPanelView) {
+    assertComponents(result.children, List(
+      <(fileListPanelView())(^.assertWrapped(inside(_) {
         case FileListPanelViewProps(dispatch, actions, state, _) =>
           dispatch shouldBe props.dispatch
           actions shouldBe props.actions
           state shouldBe props.state
-      }
-    }
-    
-    inside(result.children.toList) {
-      case List(view) => assertComponents(view)
-    }
+      }))()
+    ))
   }
 }

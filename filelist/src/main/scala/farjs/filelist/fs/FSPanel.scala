@@ -1,31 +1,30 @@
 package farjs.filelist.fs
 
 import farjs.filelist._
-import farjs.filelist.stack.PanelStack
 import scommons.react._
-import scommons.react.hooks._
+import scommons.react.blessed.BlessedScreen
 
-object FSPanel extends FunctionComponent[Unit] {
+object FSPanel extends FunctionComponent[FileListPanelProps] {
 
   private[fs] var fileListPanelComp: UiComponent[FileListPanelProps] = FileListPanel
   
   protected def render(compProps: Props): ReactElement = {
-    val stackProps = PanelStack.usePanelStack
-    val stack = stackProps.stack
-    val maybeCurrData = {
-      val stackItem = stack.peek[FileListState]
-      stackItem.getActions.zip(stackItem.state)
+    val props = compProps.wrapped
+
+    def onKeypress(screen: BlessedScreen, key: String): Boolean = {
+      var processed = true
+      key match {
+        case "M-o" =>
+          props.state.currentItem.foreach { item =>
+            props.dispatch(props.actions.openInDefaultApp(props.state.currDir.path, item.name))
+          }
+        case _ =>
+          processed = false
+      }
+
+      processed
     }
 
-    useLayoutEffect({ () =>
-      stack.update[FileListState](
-        _.updateState(_.copy(isActive = stack.isActive))
-      )
-      ()
-    }, List(stack.isActive))
-    
-    maybeCurrData.map { case ((dispatch, actions), state) =>
-      <(fileListPanelComp())(^.wrapped := FileListPanelProps(dispatch, actions, state))()
-    }.orNull
+    <(fileListPanelComp())(^.wrapped := props.copy(onKeypress = onKeypress))()
   }
 }
