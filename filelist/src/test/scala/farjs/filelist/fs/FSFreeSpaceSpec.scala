@@ -1,9 +1,9 @@
 package farjs.filelist.fs
 
+import farjs.filelist.FileListActions.FileListDiskSpaceUpdatedAction
 import farjs.filelist.api.FileListDir
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react._
 import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
@@ -19,42 +19,40 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     )
   }
 
-  it should "call onRender(Some(...)) when readDisk returns Some(...)" in {
+  it should "dispatch action when readDisk returns Some(...)" in {
     //given
-    val onRender = mockFunction[Option[Double], ReactElement]
+    val dispatch = mockFunction[Any, Any]
     val fsService = new FsService
     FSFreeSpace.fsService = fsService.fsService
-    val props = FSFreeSpaceProps(FileListDir("/", isRoot = false, Nil), onRender)
+    val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, Nil))
     val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
-    val renderRes = <.button()()
     val resultF = Future.successful(Some(disk))
+    val action = FileListDiskSpaceUpdatedAction(disk.free)
 
     //then
     fsService.readDisk.expects(props.currDir.path).returning(resultF)
-    onRender.expects(None).returning(renderRes)
-    onRender.expects(Some(disk.free)).returning(renderRes)
+    dispatch.expects(action)
     
     //when
-    val result = testRender(<(FSFreeSpace())(^.wrapped := props)())
+    val result = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)()).root
 
     //then
-    assertNativeComponent(result, renderRes)
+    result.children.toList should be (empty)
     resultF.map(_ => Succeeded)
   }
 
-  it should "call onRender(None) when readDisk returns None" in {
+  it should "not dispatch action when readDisk returns None" in {
     //given
-    val onRender = mockFunction[Option[Double], ReactElement]
+    val dispatch = mockFunction[Any, Any]
     val fsService = new FsService
     FSFreeSpace.fsService = fsService.fsService
-    val props = FSFreeSpaceProps(FileListDir("/", isRoot = false, Nil), onRender)
+    val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, Nil))
     val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
-    val renderRes = <.button()()
     val resultF = Future.successful(Some(disk))
+    val action = FileListDiskSpaceUpdatedAction(disk.free)
 
     fsService.readDisk.expects(props.currDir.path).returning(resultF)
-    onRender.expects(None).returning(renderRes)
-    onRender.expects(Some(disk.free)).returning(renderRes)
+    dispatch.expects(action)
 
     val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
     val props2 = props.copy(currDir = props.currDir.copy(path = "/2"))
@@ -63,8 +61,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     resultF.flatMap { _ =>
       //then
       fsService.readDisk.expects(props2.currDir.path).returning(resultF2)
-      onRender.expects(Some(disk.free)).returning(renderRes)
-      onRender.expects(None).returning(renderRes)
+      dispatch.expects(*).never()
 
       //when
       TestRenderer.act { () =>
@@ -72,24 +69,23 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       }
 
       //then
-      assertNativeComponent(renderer.root.children(0), renderRes)
+      renderer.root.children.toList should be (empty)
       resultF2.map(_ => Succeeded)
     }
   }
 
-  it should "call onRender(None) when readDisk fails" in {
+  it should "not dispatch action when readDisk fails" in {
     //given
-    val onRender = mockFunction[Option[Double], ReactElement]
+    val dispatch = mockFunction[Any, Any]
     val fsService = new FsService
     FSFreeSpace.fsService = fsService.fsService
-    val props = FSFreeSpaceProps(FileListDir("/", isRoot = false, Nil), onRender)
+    val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, Nil))
     val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
-    val renderRes = <.button()()
     val resultF = Future.successful(Some(disk))
+    val action = FileListDiskSpaceUpdatedAction(disk.free)
 
     fsService.readDisk.expects(props.currDir.path).returning(resultF)
-    onRender.expects(None).returning(renderRes)
-    onRender.expects(Some(disk.free)).returning(renderRes)
+    dispatch.expects(action)
 
     val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
     val props2 = props.copy(currDir = props.currDir.copy(path = "/2"))
@@ -98,8 +94,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     resultF.flatMap { _ =>
       //then
       fsService.readDisk.expects(props2.currDir.path).returning(resultF2)
-      onRender.expects(Some(disk.free)).returning(renderRes)
-      onRender.expects(None).returning(renderRes)
+      dispatch.expects(*).never()
 
       //when
       TestRenderer.act { () =>
@@ -107,31 +102,32 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       }
 
       //then
-      assertNativeComponent(renderer.root.children(0), renderRes)
+      renderer.root.children.toList should be (empty)
       resultF2.failed.map(_ => Succeeded)
     }
   }
 
   it should "not call readDisk if currDir is not changed when re-render" in {
     //given
-    val onRender = mockFunction[Option[Double], ReactElement]
+    val dispatch = mockFunction[Any, Any]
     val fsService = new FsService
     FSFreeSpace.fsService = fsService.fsService
-    val props = FSFreeSpaceProps(FileListDir("/", isRoot = false, Nil), onRender)
+    val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, Nil))
     val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
-    val renderRes = <.button()()
     val resultF = Future.successful(Some(disk))
+    val action = FileListDiskSpaceUpdatedAction(disk.free)
 
+    //then
     fsService.readDisk.expects(props.currDir.path).returning(resultF)
-    onRender.expects(None).returning(renderRes)
-    onRender.expects(Some(disk.free)).returning(renderRes)
+    dispatch.expects(action)
 
     val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
     val props2 = props.copy(currDir = props.currDir)
 
     resultF.map { _ =>
       //then
-      onRender.expects(Some(disk.free)).returning(renderRes)
+      fsService.readDisk.expects(*).never()
+      dispatch.expects(*).never()
 
       //when
       TestRenderer.act { () =>
@@ -139,40 +135,38 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       }
 
       //then
-      assertNativeComponent(renderer.root.children(0), renderRes)
+      renderer.root.children.toList should be (empty)
     }
   }
 
-  it should "update state and call onRender only for the same (current) dir instance" in {
+  it should "dispatch action only for the same (current) dir instance" in {
     //given
-    val onRender = mockFunction[Option[Double], ReactElement]
+    val dispatch = mockFunction[Any, Any]
     val fsService = new FsService
     FSFreeSpace.fsService = fsService.fsService
-    val props = FSFreeSpaceProps(FileListDir("/", isRoot = false, Nil), onRender)
+    val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, Nil))
     val props2 = props.copy(currDir = props.currDir.copy(path = "/2"))
     val disk1 = FSDisk("/", size = 123.0, free = 456.0, "/")
     val disk2 = FSDisk("/2", size = 124.0, free = 457.0, "/")
-    val renderRes = <.button()()
     val p1 = Promise[Option[FSDisk]]()
     val resultF1 = p1.future
     val p2 = Promise[Option[FSDisk]]()
     val resultF2 = p2.future
+    val action = FileListDiskSpaceUpdatedAction(disk2.free)
 
     //then
     fsService.readDisk.expects(props.currDir.path).returning(resultF1)
     fsService.readDisk.expects(props2.currDir.path).returning(resultF2)
-    onRender.expects(None).returning(renderRes)
-    onRender.expects(None).returning(renderRes)
-    onRender.expects(Some(disk2.free)).returning(renderRes)
-
-    val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
+    dispatch.expects(action)
 
     //when
+    val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
     TestRenderer.act { () =>
       renderer.update(<(FSFreeSpace())(^.wrapped := props2)())
     }
     
     //then
+    renderer.root.children.toList should be (empty)
     p2.success(Some(disk2))
     p1.success(Some(disk1))
     resultF1.flatMap { _ =>

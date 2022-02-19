@@ -156,4 +156,6 @@ object FileListActions {
   case class FileListDirCreatedAction(dir: String, currDir: FileListDir) extends Action
   
   case class FileListItemsViewedAction(sizes: Map[String, Double]) extends Action
+  
+  case class FileListDiskSpaceUpdatedAction(diskSpace: Double) extends Action
 }

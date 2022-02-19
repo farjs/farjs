@@ -7,7 +7,8 @@ case class FileListState(offset: Int = 0,
                          index: Int = 0,
                          currDir: FileListDir = FileListDir("", isRoot = false, Seq.empty),
                          selectedNames: Set[String] = Set.empty,
-                         isActive: Boolean = false) {
+                         isActive: Boolean = false,
+                         diskSpace: Option[Double] = None) {
 
   lazy val currentItem: Option[FileListItem] = {
     val itemIndex = offset + index
@@ -94,6 +95,10 @@ object FileListStateReducer {
       }
       state.copy(
         currDir = state.currDir.copy(items = updatedItems)
+      )
+    case FileListDiskSpaceUpdatedAction(diskSpace) =>
+      state.copy(
+        diskSpace = Some(diskSpace)
       )
     case _ => state
   }

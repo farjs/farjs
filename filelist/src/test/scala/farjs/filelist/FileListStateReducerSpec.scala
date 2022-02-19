@@ -251,4 +251,16 @@ class FileListStateReducerSpec extends TestSpec {
       )
     }
   }
+
+  it should "update state when FileListDiskSpaceUpdatedAction" in {
+    //given
+    val state = FileListState()
+    val action = FileListDiskSpaceUpdatedAction(123.45)
+    state.diskSpace shouldBe None
+
+    //when & then
+    reduce(state, action) shouldBe state.copy(
+      diskSpace = Some(123.45)
+    )
+  }
 }

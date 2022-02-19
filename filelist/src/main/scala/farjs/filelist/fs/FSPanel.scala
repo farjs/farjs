@@ -9,6 +9,7 @@ import scommons.react.redux.task.FutureTask
 object FSPanel extends FunctionComponent[FileListPanelProps] {
 
   private[fs] var fileListPanelComp: UiComponent[FileListPanelProps] = FileListPanel
+  private[fs] var fsFreeSpaceComp: UiComponent[FSFreeSpaceProps] = FSFreeSpace
   private[fs] var fsService: FSService = FSService.instance
   
   protected def render(compProps: Props): ReactElement = {
@@ -28,7 +29,14 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
       processed
     }
 
-    <(fileListPanelComp())(^.wrapped := props.copy(onKeypress = onKeypress))()
+    <.>()(
+      <(fileListPanelComp())(^.wrapped := props.copy(onKeypress = onKeypress))(),
+
+      <(fsFreeSpaceComp())(^.wrapped := FSFreeSpaceProps(
+        dispatch = props.dispatch,
+        currDir = props.state.currDir
+      ))()
+    )
   }
 
   private def openInDefaultApp(parent: String, item: String): FileListTaskAction = {

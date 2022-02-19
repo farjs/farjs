@@ -2,12 +2,10 @@ package farjs.filelist
 
 import farjs.filelist.FileListPanelView._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.fs.FSFreeSpaceProps
 import farjs.filelist.stack.{PanelStack, PanelStackProps}
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.theme.Theme
-import org.scalatest.{Assertion, Succeeded}
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
@@ -18,7 +16,6 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   FileListPanelView.horizontalLineComp = mockUiComponent("HorizontalLine")
   FileListPanelView.fileListComp = mockUiComponent("FileList")
   FileListPanelView.textLineComp = mockUiComponent("TextLine")
-  FileListPanelView.fsFreeSpaceComp = mockUiComponent("FSFreeSpace")
 
   private val (width, height) = (25, 15)
   
@@ -35,7 +32,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     assertFileListPanelView(result, props, FileListState())
   }
   
-  it should "render component with selected one file and with free size" in {
+  it should "render component with selected one file and with diskSpace" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
@@ -43,7 +40,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
       FileListItem("dir 1", isDir = true, size = 1),
       FileListItem("dir 2", isDir = true, size = 2),
       FileListItem("file", size = 3)
-    )), selectedNames = Set("dir 2"))
+    )), selectedNames = Set("dir 2"), diskSpace = Some(123.45))
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
@@ -51,7 +48,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
 
     //then
     assertFileListPanelView(result, props, state, "file", "3", showDate = true,
-      selected = Some("2 in 1 file"), dirSize = "3 (1)", freeBytes = Some(12345))
+      selected = Some("2 in 1 file"), dirSize = "3 (1)", diskSpace = Some(123.45))
   }
   
   it should "render component with selected more than one file" in {
@@ -184,29 +181,19 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
                                       showDate: Boolean = false,
                                       selected: Option[String] = None,
                                       dirSize: String = "0 (0)",
-                                      freeBytes: Option[Double] = None): Unit = {
+                                      diskSpace: Option[Double] = None): Unit = {
     
     val theme = Theme.current.fileList
     
-    def assertComponents(border: TestInstance,
-                         line: TestInstance,
-                         list: TestInstance,
-                         currFolder: TestInstance,
-                         selection: Option[TestInstance],
-                         currFile: TestInstance,
-                         fileSize: TestInstance,
-                         filePerm: TestInstance,
-                         fileDate: TestInstance,
-                         fsFreeSpace: TestInstance): Assertion = {
-
-      assertTestComponent(border, doubleBorderComp) {
+    assertNativeComponent(result, <.box(^.rbStyle := theme.regularItem)(
+      <(doubleBorderComp())(^.assertWrapped(inside(_) {
         case DoubleBorderProps(resSize, style, pos, title) =>
           resSize shouldBe width -> height
           style shouldBe theme.regularItem
           pos shouldBe 0 -> 0
           title shouldBe None
-      }
-      assertTestComponent(line, horizontalLineComp) {
+      }))(),
+      <(horizontalLineComp())(^.assertWrapped(inside(_) {
         case HorizontalLineProps(pos, len, lineCh, style, startCh, endCh) =>
           pos shouldBe 0 -> (height - 4)
           len shouldBe width
@@ -214,8 +201,8 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           style shouldBe theme.regularItem
           startCh shouldBe Some(DoubleBorder.leftSingleCh)
           endCh shouldBe Some(DoubleBorder.rightSingleCh)
-      }
-      assertTestComponent(list, fileListComp) {
+      }))(),
+      <(fileListComp())(^.assertWrapped(inside(_) {
         case FileListProps(dispatch, actions, resState, resSize, columns, onKeypress) =>
           dispatch shouldBe props.dispatch
           actions shouldBe props.actions
@@ -223,8 +210,8 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           resSize shouldBe (width - 2) -> (height - 5)
           columns shouldBe 2
           onKeypress shouldBe props.onKeypress
-      }
-      assertTestComponent(currFolder, textLineComp) {
+      }))(),
+      <(textLineComp())(^.assertWrapped(inside(_) {
         case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
           align shouldBe TextLine.Center
           pos shouldBe 1 -> 0
@@ -233,23 +220,22 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           style shouldBe theme.regularItem
           focused shouldBe props.state.isActive
           padding shouldBe 1
-      }
+      }))(),
       
-      selection.size shouldBe selected.size
-      selection.foreach { selectedText =>
-        assertTestComponent(selectedText, textLineComp) {
+      selected.map { selectedText =>
+        <(textLineComp())(^.assertWrapped(inside(_) {
           case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
             align shouldBe TextLine.Center
             pos shouldBe 1 -> (height - 4)
             resWidth shouldBe (width - 2)
-            text shouldBe selected.get
+            text shouldBe selectedText
             style shouldBe theme.selectedItem
             focused shouldBe false
             padding shouldBe 1
-        }
-      }
+        }))()
+      },
       
-      assertTestComponent(currFile, textLineComp) {
+      <(textLineComp())(^.assertWrapped(inside(_) {
         case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
           align shouldBe TextLine.Left
           pos shouldBe 1 -> (height - 3)
@@ -258,8 +244,8 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           style shouldBe theme.regularItem
           focused shouldBe false
           padding shouldBe 0
-      }
-      assertTestComponent(fileSize, textLineComp) {
+      }))(),
+      <(textLineComp())(^.assertWrapped(inside(_) {
         case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
           align shouldBe TextLine.Right
           pos shouldBe (1 + width - 2 - 12) -> (height - 3)
@@ -268,9 +254,9 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           style shouldBe theme.regularItem
           focused shouldBe false
           padding shouldBe 0
-      }
+      }))(),
       
-      assertTestComponent(filePerm, textLineComp) {
+      <(textLineComp())(^.assertWrapped(inside(_) {
         case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
           align shouldBe TextLine.Left
           pos shouldBe 1 -> (height - 2)
@@ -279,8 +265,8 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           style shouldBe theme.regularItem
           focused shouldBe false
           padding shouldBe 0
-      }
-      assertTestComponent(fileDate, textLineComp) {
+      }))(),
+      <(textLineComp())(^.assertWrapped(inside(_) {
         case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
           align shouldBe TextLine.Right
           pos shouldBe (1 + width - 2 - 25) -> (height - 2)
@@ -290,48 +276,30 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           style shouldBe theme.regularItem
           focused shouldBe false
           padding shouldBe 0
-      }
+      }))(),
       
-      assertTestComponent(fsFreeSpace, fsFreeSpaceComp) {
-        case FSFreeSpaceProps(currDir, onRender) =>
-          currDir shouldBe props.state.currDir
-          val result = createTestRenderer(onRender(freeBytes)).root
-          val (folderSize, free) = inside(result.children.toList) {
-            case Nil => (result, None)
-            case List(comp1, comp2) => (comp1, Some(comp2))
-          }
-          assertTestComponent(folderSize, textLineComp) {
-            case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-              align shouldBe TextLine.Center
-              pos shouldBe 1 -> (height - 1)
-              resWidth shouldBe (if (freeBytes.isEmpty) width - 2 else (width - 2) / 2)
-              text shouldBe dirSize
-              style shouldBe theme.regularItem
-              focused shouldBe false
-              padding shouldBe 1
-          }
-          free.size shouldBe freeBytes.size
-          free.foreach { freeText =>
-            assertTestComponent(freeText, textLineComp) {
-              case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-                align shouldBe TextLine.Center
-                pos shouldBe ((width - 2) / 2 + 1) -> (height - 1)
-                resWidth shouldBe (width - 2) / 2
-                text shouldBe f"${freeBytes.get}%,.0f"
-                style shouldBe theme.regularItem
-                focused shouldBe false
-                padding shouldBe 1
-            }
-          }
-          Succeeded
+      <(textLineComp())(^.assertWrapped(inside(_) {
+        case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
+          align shouldBe TextLine.Center
+          pos shouldBe 1 -> (height - 1)
+          resWidth shouldBe (if (diskSpace.isEmpty) width - 2 else (width - 2) / 2)
+          text shouldBe dirSize
+          style shouldBe theme.regularItem
+          focused shouldBe false
+          padding shouldBe 1
+      }))(),
+      diskSpace.map { bytes =>
+        <(textLineComp())(^.assertWrapped(inside(_) {
+          case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
+            align shouldBe TextLine.Center
+            pos shouldBe ((width - 2) / 2 + 1) -> (height - 1)
+            resWidth shouldBe (width - 2) / 2
+            text shouldBe f"$bytes%,.0f"
+            style shouldBe theme.regularItem
+            focused shouldBe false
+            padding shouldBe 1
+        }))()
       }
-    }
-    
-    assertNativeComponent(result, <.box(^.rbStyle := theme.regularItem)(), inside(_) {
-      case List(border, line, list, currFolder, currFile, fileSize, filePerm, fileDate, fsFreeSpace) =>
-        assertComponents(border, line, list, currFolder, None, currFile, fileSize, filePerm, fileDate, fsFreeSpace)
-      case List(border, line, list, currFolder, selection, currFile, fileSize, filePerm, fileDate, fsFreeSpace) =>
-        assertComponents(border, line, list, currFolder, Some(selection), currFile, fileSize, filePerm, fileDate, fsFreeSpace)
-    })
+    ))
   }
 }

@@ -14,6 +14,7 @@ import scala.concurrent.Future
 class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   FSPanel.fileListPanelComp = mockUiComponent("FileListPanel")
+  FSPanel.fsFreeSpaceComp = mockUiComponent("FSFreeSpace")
   FSPanel.fsService = new FsService().fsService
 
   //noinspection TypeAnnotation
@@ -73,14 +74,22 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     val props = FileListPanelProps(dispatch, actions, state)
     
     //when
-    val result = testRender(<(FSPanel())(^.wrapped := props)())
+    val result = createTestRenderer(<(FSPanel())(^.wrapped := props)()).root
 
     //then
-    assertTestComponent(result, fileListPanelComp) {
-      case FileListPanelProps(resDispatch, resActions, resState, _) =>
-        resDispatch shouldBe dispatch
-        resActions shouldBe actions
-        resState shouldBe state
-    }
+    assertComponents(result.children, List(
+      <(fileListPanelComp())(^.assertWrapped(inside(_) {
+        case FileListPanelProps(resDispatch, resActions, resState, _) =>
+          resDispatch shouldBe dispatch
+          resActions shouldBe actions
+          resState shouldBe state
+      }))(),
+
+      <(fsFreeSpaceComp())(^.assertWrapped(inside(_) {
+        case FSFreeSpaceProps(resDispatch, currDir) =>
+          resDispatch shouldBe dispatch
+          currDir shouldBe props.state.currDir
+      }))(),
+    ))
   }
 }

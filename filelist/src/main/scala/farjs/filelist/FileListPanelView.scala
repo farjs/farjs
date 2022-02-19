@@ -1,7 +1,6 @@
 package farjs.filelist
 
 import farjs.filelist.api.FileListItem
-import farjs.filelist.fs.{FSFreeSpace, FSFreeSpaceProps}
 import farjs.filelist.stack.PanelStack
 import farjs.ui._
 import farjs.ui.border._
@@ -23,7 +22,6 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
   private[filelist] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
   private[filelist] var fileListComp: UiComponent[FileListProps] = FileList
   private[filelist] var textLineComp: UiComponent[TextLineProps] = TextLine
-  private[filelist] var fsFreeSpaceComp: UiComponent[FSFreeSpaceProps] = FSFreeSpace
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -119,33 +117,26 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         padding = 0
       ))(),
 
-      <(fsFreeSpaceComp())(^.wrapped := FSFreeSpaceProps(
-        currDir = props.state.currDir,
-        onRender = { maybeFreeSpace =>
-          <.>()(
-            <(textLineComp())(^.wrapped := TextLineProps(
-              align = TextLine.Center,
-              pos = (1, height - 1),
-              width = if (maybeFreeSpace.isEmpty) width - 2 else (width - 2) / 2,
-              text = {
-                val files = props.state.currDir.items.filter(!_.isDir)
-                val filesSize = files.foldLeft(0.0)((res, f) => res + f.size)
-                f"$filesSize%,.0f (${files.size}%d)"
-              },
-              style = theme.regularItem
-            ))(),
-            maybeFreeSpace.map { freeBytes =>
-              <(textLineComp())(^.wrapped := TextLineProps(
-                align = TextLine.Center,
-                pos = ((width - 2) / 2 + 1, height - 1),
-                width = (width - 2) / 2,
-                text = f"$freeBytes%,.0f",
-                style = theme.regularItem
-              ))()
-            }
-          )
-        }
-      ))()
+      <(textLineComp())(^.wrapped := TextLineProps(
+        align = TextLine.Center,
+        pos = (1, height - 1),
+        width = if (props.state.diskSpace.isEmpty) width - 2 else (width - 2) / 2,
+        text = {
+          val files = props.state.currDir.items.filter(!_.isDir)
+          val filesSize = files.foldLeft(0.0)((res, f) => res + f.size)
+          f"$filesSize%,.0f (${files.size}%d)"
+        },
+        style = theme.regularItem
+      ))(),
+      props.state.diskSpace.map { bytes =>
+        <(textLineComp())(^.wrapped := TextLineProps(
+          align = TextLine.Center,
+          pos = ((width - 2) / 2 + 1, height - 1),
+          width = (width - 2) / 2,
+          text = f"$bytes%,.0f",
+          style = theme.regularItem
+        ))()
+      }
     )
   }
 }
