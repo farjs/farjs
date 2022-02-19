@@ -7,7 +7,7 @@ import io.github.shogowada.scalajs.reactjs.React.Props
 import scommons.react.UiComponent
 import scommons.react.redux._
 
-object FileListController extends BaseStateController[FarjsStateDef, FileListBrowserProps] {
+object FileListBrowserController extends BaseStateController[FarjsStateDef, FileListBrowserProps] {
 
   lazy val uiComponent: UiComponent[FileListBrowserProps] = FileListBrowser
   

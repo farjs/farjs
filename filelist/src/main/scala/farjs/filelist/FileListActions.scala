@@ -2,7 +2,6 @@ package farjs.filelist
 
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListApi, FileListDir, FileListItem}
-import farjs.filelist.fs.FSService
 import scommons.nodejs.{path => nodePath}
 import scommons.react.redux._
 import scommons.react.redux.task.{FutureTask, TaskAction}
@@ -17,14 +16,6 @@ trait FileListActions {
 
   protected def api: FileListApi
 
-  private[filelist] var fsService: FSService = FSService.instance
-
-  def openInDefaultApp(parent: String, item: String): FileListTaskAction = {
-    val future = fsService.openItem(parent, item)
-    
-    FileListTaskAction(FutureTask("Opening default app", future))
-  }
-  
   def changeDir(dispatch: Dispatch,
                 parent: Option[String],
                 dir: String): FileListDirChangeAction = {

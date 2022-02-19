@@ -1,6 +1,6 @@
 package farjs.app
 
-import farjs.app.filelist.FileListController
+import farjs.app.filelist.FileListBrowserController
 import farjs.app.task.FarjsTaskController
 import farjs.app.util.DevTool
 import farjs.ui.theme.{Theme, XTerm256Theme}
@@ -41,7 +41,7 @@ object FarjsApp {
     
     val root = new FarjsRoot(
       withPortalsComp = new WithPortals(screen),
-      fileListComp = FileListController(),
+      fileListComp = FileListBrowserController(),
       taskController = FarjsTaskController(),
       initialDevTool = if (showDevTools) DevTool.Logs else DevTool.Hidden
     )

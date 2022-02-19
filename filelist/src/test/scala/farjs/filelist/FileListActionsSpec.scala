@@ -3,7 +3,6 @@ package farjs.filelist
 import farjs.filelist.FileListActions._
 import farjs.filelist.FileListActionsSpec._
 import farjs.filelist.api._
-import farjs.filelist.fs.MockFSService
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.redux.task.FutureTask
@@ -13,15 +12,6 @@ import scala.scalajs.js.typedarray.Uint8Array
 
 class FileListActionsSpec extends AsyncTestSpec {
 
-  //noinspection TypeAnnotation
-  class FsService {
-    val openItem = mockFunction[String, String, Future[Unit]]
-
-    val fsService = new MockFSService(
-      openItemMock = openItem
-    )
-  }
-  
   //noinspection TypeAnnotation
   class Api {
     val readDir2 = mockFunction[Option[String], String, Future[FileListDir]]
@@ -67,33 +57,10 @@ class FileListActionsSpec extends AsyncTestSpec {
     )
   }
 
-  it should "dispatch FileListTaskAction when openInDefaultApp" in {
-    //given
-    val api = new Api
-    val fsService = new FsService
-    val actions = new FileListActionsTest(api.api)
-    actions.fsService = fsService.fsService
-    val parent = "test dir"
-    val item = "test item"
-    
-    //then
-    fsService.openItem.expects(parent, item).returning(Future.unit)
-    
-    //when
-    val FileListTaskAction(FutureTask(msg, future)) =
-      actions.openInDefaultApp(parent, item)
-    
-    //then
-    msg shouldBe "Opening default app"
-    future.map(_ => Succeeded)
-  }
-  
   it should "dispatch FileListDirChangedAction when changeDir" in {
     //given
     val api = new Api
-    val fsService = new FsService
     val actions = new FileListActionsTest(api.api)
-    actions.fsService = fsService.fsService
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
     val parent: Option[String] = Some("/")
@@ -116,9 +83,7 @@ class FileListActionsSpec extends AsyncTestSpec {
   it should "dispatch FileListDirUpdatedAction when updateDir" in {
     //given
     val api = new Api
-    val fsService = new FsService
     val actions = new FileListActionsTest(api.api)
-    actions.fsService = fsService.fsService
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
     val path = "/test/path"
@@ -140,9 +105,7 @@ class FileListActionsSpec extends AsyncTestSpec {
   it should "dispatch FileListDirChangedAction when createDir(multiple=false)" in {
     //given
     val api = new Api
-    val fsService = new FsService
     val actions = new FileListActionsTest(api.api)
-    actions.fsService = fsService.fsService
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
     val parent = "/parent"
@@ -167,9 +130,7 @@ class FileListActionsSpec extends AsyncTestSpec {
   it should "dispatch FileListDirChangedAction when createDir(multiple=true)" in {
     //given
     val api = new Api
-    val fsService = new FsService
     val actions = new FileListActionsTest(api.api)
-    actions.fsService = fsService.fsService
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
     val parent = "/parent"

@@ -14,21 +14,23 @@ import scala.concurrent.Future
 class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   FSPanel.fileListPanelComp = mockUiComponent("FileListPanel")
+  FSPanel.fsService = new FsService().fsService
 
   //noinspection TypeAnnotation
-  class Actions {
-    val openInDefaultApp = mockFunction[String, String, FileListTaskAction]
+  class FsService {
+    val openItem = mockFunction[String, String, Future[Unit]]
 
-    val actions = new MockFileListActions(
-      openInDefaultAppMock = openInDefaultApp
+    val fsService = new MockFSService(
+      openItemMock = openItem
     )
   }
 
   it should "return false when onKeypress(unknown key)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = new Actions
-    val props = FileListPanelProps(dispatch, actions.actions, FileListState())
+    val actions = new MockFileListActions
+    FSPanel.fsService = new FsService().fsService
+    val props = FileListPanelProps(dispatch, actions, FileListState())
     val comp = testRender(<(FSPanel())(^.wrapped := props)())
     val panelProps = findComponentProps(comp, fileListPanelComp)
 
@@ -39,30 +41,36 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
   it should "dispatch action when onKeypress(M-o)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = new Actions
-    val props = FileListPanelProps(dispatch, actions.actions, FileListState(
+    val actions = new MockFileListActions
+    val fsService = new FsService()
+    FSPanel.fsService = fsService.fsService
+    val props = FileListPanelProps(dispatch, actions, FileListState(
       currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
     ))
     val comp = testRender(<(FSPanel())(^.wrapped := props)())
     val panelProps = findComponentProps(comp, fileListPanelComp)
-    val action = FileListTaskAction(FutureTask("Opening item", Future.unit))
 
     //then
-    actions.openInDefaultApp.expects("/sub-dir", "item 1").returning(action)
-    dispatch.expects(action)
+    fsService.openItem.expects("/sub-dir", "item 1").returning(Future.unit)
+    var resultAction: Any = null
+    dispatch.expects(*).onCall { action: Any =>
+      resultAction = action
+    }
 
     //when & then
     panelProps.onKeypress(null, "M-o") shouldBe true
 
-    action.task.future.map(_ => Succeeded)
+    inside(resultAction) { case FileListTaskAction(FutureTask("Opening default app", future)) =>
+      future.map(_ => Succeeded)
+    }
   }
 
   it should "render initial component" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = new Actions
+    val actions = new MockFileListActions
     val state = FileListState()
-    val props = FileListPanelProps(dispatch, actions.actions, state)
+    val props = FileListPanelProps(dispatch, actions, state)
     
     //when
     val result = testRender(<(FSPanel())(^.wrapped := props)())
@@ -71,7 +79,7 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     assertTestComponent(result, fileListPanelComp) {
       case FileListPanelProps(resDispatch, resActions, resState, _) =>
         resDispatch shouldBe dispatch
-        resActions shouldBe actions.actions
+        resActions shouldBe actions
         resState shouldBe state
     }
   }

@@ -8,7 +8,6 @@ import scala.concurrent.Future
 
 //noinspection NotImplementedCode
 class MockFileListActions(
-  openInDefaultAppMock: (String, String) => FileListTaskAction = (_, _) => ???,
   changeDirMock: (Dispatch, Option[String], String) => FileListDirChangeAction = (_, _, _) => ???,
   updateDirMock: (Dispatch, String) => FileListDirUpdateAction = (_, _) => ???,
   createDirMock: (Dispatch, String, String, Boolean) => FileListDirCreateAction = (_, _, _, _) => ???,
@@ -22,9 +21,6 @@ class MockFileListActions(
 ) extends FileListActions {
 
   protected def api: FileListApi = ???
-
-  override def openInDefaultApp(parent: String, item: String): FileListTaskAction =
-    openInDefaultAppMock(parent, item)
 
   override def changeDir(dispatch: Dispatch,
                          parent: Option[String],
