@@ -49,7 +49,7 @@ module.exports = {
     npm install -g ${packageJson.name}
 
   to get the latest version. See the changelog here:
-    https://github.com/scommons/far-js/releases
+    https://github.com/farjs/farjs/releases
 `
         ))
       }

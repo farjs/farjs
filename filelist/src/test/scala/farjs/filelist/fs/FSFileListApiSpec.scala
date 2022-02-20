@@ -116,7 +116,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
   
   it should "delete items when delete" in {
     //given
-    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
+    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"))
     fs.existsSync(tmpDir) shouldBe true
 
     def create(parent: String, name: String, isDir: Boolean): (String, String) = {
@@ -165,7 +165,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
   
   it should "create multiple directories when mkDirs" in {
     //given
-    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
+    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"))
     fs.existsSync(tmpDir) shouldBe true
     val dirs = List("test1", "test2", "", "test3", "")
 
@@ -189,7 +189,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
   
   it should "not fail if dirs already exists when mkDirs" in {
     //given
-    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
+    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"))
     fs.existsSync(tmpDir) shouldBe true
     val topDir = "test1"
     val dirs = List(topDir, "test2", "", "test3", "")
@@ -216,7 +216,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
   
   it should "create single directory when mkDirs" in {
     //given
-    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
+    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"))
     fs.existsSync(tmpDir) shouldBe true
     val dir = "test123"
 
@@ -238,7 +238,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
   
   it should "copy new file when readFile/writeFile" in {
     //given
-    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
+    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"))
     fs.existsSync(tmpDir) shouldBe true
 
     val file1 = path.join(tmpDir, "example.txt")
@@ -291,7 +291,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
 
   it should "overwrite existing file when readFile/writeFile" in {
     //given
-    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
+    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"))
     fs.existsSync(tmpDir) shouldBe true
 
     val file1 = path.join(tmpDir, "example.txt")
@@ -346,7 +346,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
 
   it should "append to existing file when readFile/writeFile" in {
     //given
-    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
+    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"))
     fs.existsSync(tmpDir) shouldBe true
 
     val file1 = path.join(tmpDir, "example.txt")
@@ -402,7 +402,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
 
   it should "return None if skip existing file when writeFile" in {
     //given
-    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "far-js-test-"))
+    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"))
     fs.existsSync(tmpDir) shouldBe true
 
     val file = path.join(tmpDir, "example2.txt")

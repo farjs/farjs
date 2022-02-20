@@ -3,10 +3,10 @@ package definitions
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
 import sbt._
-import scoverage.ScoverageKeys.coverageExcludedPackages
 import scalajsbundler.BundlingMode
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
 import scommons.sbtplugin.ScommonsPlugin.autoImport._
+import scoverage.ScoverageKeys.coverageExcludedPackages
 
 object FarjsApp extends ScalaJsModule {
 
@@ -74,61 +74,37 @@ object FarjsApp extends ScalaJsModule {
       ),
 
       Compile / additionalNpmConfig := {
+        import com.fasterxml.jackson.databind.node._
+        import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
+        import scalajsbundler.util.JSON
         import scalajsbundler.util.JSON._
-        Map(
-          "name" -> str("farjs-app"),
-          "version" -> str(version.value),
-          "description" -> str("File and Archive Manager (FAR) app built with Scala.js/React.js and runs on Node.js"),
-          "scripts" -> obj(
-            "build" -> str("rollup -c")
-          ),
-          "repository" -> obj(
-            "type" -> str("git"),
-            "url" -> str("git+https://github.com/scommons/far-js.git")
-          ),
-          "bugs" -> obj(
-            "url" -> str("https://github.com/scommons/far-js/issues")
-          ),
-          "homepage" -> str("https://github.com/scommons/far-js#readme"),
-          "browserslist" -> str("maintained node versions"),
-          "private" -> bool(false),
-          "license" -> str("MIT"),
-          "author" -> str("viktor-podzigun"),
-          "keywords" -> arr(
-            str("farmanager"),
-            str("react"),
-            str("reactjs"),
-            str("react-js"),
-            str("react-blessed"),
-            str("blessed"),
-            str("scala"),
-            str("scalajs"),
-            str("scala-js"),
-            str("cli"),
-            str("cli-app"),
-            str("terminal"),
-            str("xterm"),
-            str("file-manager"),
-            str("filemanager"),
-            str("filemanager-ui"),
-            str("filemanagement"),
-            str("file-edit"),
-            str("file-editor"),
-            str("editor"),
-            str("console"),
-            str("tui"),
-            str("text-ui")
-          ),
-          "bin" -> obj(
-            "farjs" -> str("bin/farjs.js")
-          ),
-          "files" -> arr(
-            str("bin/farjs.js"),
-            str("dist/far.js"),
-            str("dist/versionChecker.js"),
-            str("LICENSE.txt"),
-            str("README.md")
-          )
+
+        import scala.collection.JavaConverters._
+        
+        def convertObjectNode(json: ObjectNode): List[(String, JSON)] = {
+          json.fields().asScala.toList.map { entry =>
+            val key = entry.getKey
+            (key, convertJsonNode(key, entry.getValue))
+          }
+        }
+        
+        def convertJsonNode(key: String, value: JsonNode): JSON = {
+          if (value.isBoolean) bool(value.asBoolean())
+          else if (value.isTextual) str(value.asText())
+          else if (value.isArray) {
+            arr(value.asInstanceOf[ArrayNode].elements().asScala.toList.map(j => convertJsonNode(key, j)): _*)
+          }
+          else if (value.isObject) {
+            obj(convertObjectNode(value.asInstanceOf[ObjectNode]): _*)
+          }
+          else sys.error(s"Unknown package.json field: $key")
+        }
+        
+        val mapper = new ObjectMapper()
+        val packageJson = IO.read(baseDirectory.value / ".." / "package.json")
+        val json = mapper.readTree(packageJson).asInstanceOf[ObjectNode]
+        convertObjectNode(json.remove(List("dependencies", "devDependencies").asJava)).toMap ++ Map(
+          "version" -> str(version.value)
         )
       }
     )

@@ -10,7 +10,7 @@ trait FarjsModule extends CommonModule {
 
   val scommonsNodejsVersion: String = Libs.scommonsNodejsVersion
   
-  override val repoName = "far-js"
+  override val repoName = "farjs"
 
   override def definition: Project = {
     super.definition
@@ -30,7 +30,7 @@ object FarjsModule {
     Test / publishArtifact := false,
     publishTo := sonatypePublishToBundle.value,
     pomExtra := {
-      <url>https://github.com/scommons/far-js</url>
+      <url>https://github.com/farjs/farjs</url>
         <licenses>
           <license>
             <name>The MIT License</name>
@@ -39,8 +39,8 @@ object FarjsModule {
           </license>
         </licenses>
         <scm>
-          <url>git@github.com:scommons/far-js.git</url>
-          <connection>scm:git@github.com:scommons/far-js.git</connection>
+          <url>git@github.com:farjs/farjs.git</url>
+          <connection>scm:git@github.com:farjs/farjs.git</connection>
         </scm>
         <developers>
           <developer>

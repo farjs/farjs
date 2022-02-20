@@ -1,0 +1,83 @@
+{
+  "author": "viktor-podzigun",
+  "name": "farjs-app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/farjs/farjs.git"
+  },
+  "private": false,
+  "description": "FAR.js: File and Archive Manager app built with Scala.js/React.js and runs on Node.js",
+  "files": [
+    "bin/farjs.js",
+    "dist/far.js",
+    "dist/versionChecker.js",
+    "LICENSE.txt",
+    "README.md"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/farjs/farjs/issues"
+  },
+  "homepage": "https://farjs.github.io",
+  "keywords": [
+    "farmanager",
+    "react",
+    "reactjs",
+    "react-js",
+    "react-blessed",
+    "blessed",
+    "scala",
+    "scalajs",
+    "scala-js",
+    "cli",
+    "cli-app",
+    "terminal",
+    "xterm",
+    "file-manager",
+    "filemanager",
+    "filemanager-ui",
+    "filemanagement",
+    "file-edit",
+    "file-editor",
+    "editor",
+    "console",
+    "tui",
+    "text-ui"
+  ],
+  "bin": {
+    "farjs": "bin/farjs.js"
+  },
+  "preferGlobal": true,
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "browserslist": "maintained node versions",
+  "dependencies": {
+    "react-blessed": "0.7.2",
+    "react": "^17.0.1",
+    "blessed": "0.1.81",
+    "react-redux": "^7.2.4",
+    "redux": "^3.6.0"
+  },
+  "devDependencies": {
+    "webpack-node-externals": "1.7.2",
+    "source-map-loader": "0.2.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.12.1",
+    "@babel/register": "^7.12.10",
+    "webpack-merge": "4.1.0",
+    "@babel/core": "^7.12.10",
+    "@babel/preset-react": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "webpack": "4.29.0",
+    "concat-with-sourcemaps": "1.0.7",
+    "@babel/cli": "^7.12.10",
+    "webpack-cli": "3.3.2",
+    "rollup-plugin-babel": "^4.4.0",
+    "@babel/plugin-transform-flow-strip-types": "^7.12.10",
+    "webpack-dev-server": "3.4.1",
+    "rollup": "^2.38.5"
+  }
+}
