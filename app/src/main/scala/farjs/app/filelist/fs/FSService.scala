@@ -1,4 +1,4 @@
-package farjs.filelist.fs
+package farjs.app.filelist.fs
 
 import farjs.filelist.api.{FileListDir, FileListItem}
 import scommons.nodejs.Process.Platform

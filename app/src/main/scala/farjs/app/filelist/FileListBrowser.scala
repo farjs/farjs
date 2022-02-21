@@ -1,7 +1,7 @@
 package farjs.app.filelist
 
+import farjs.app.filelist.fs.{FSDrivePopup, FSDrivePopupProps, FSPlugin}
 import farjs.filelist._
-import farjs.filelist.fs.{FSDrivePopup, FSDrivePopupProps, FSPlugin}
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
 import farjs.filelist.stack._
 import farjs.ui.menu.BottomMenu

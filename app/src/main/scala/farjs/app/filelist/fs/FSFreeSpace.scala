@@ -1,4 +1,4 @@
-package farjs.filelist.fs
+package farjs.app.filelist.fs
 
 import farjs.filelist.FileListActions.FileListDiskSpaceUpdatedAction
 import farjs.filelist.api.FileListDir

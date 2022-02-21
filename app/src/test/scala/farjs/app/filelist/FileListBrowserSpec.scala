@@ -1,8 +1,8 @@
 package farjs.app.filelist
 
 import farjs.app.filelist.FileListBrowser._
+import farjs.app.filelist.fs.{FSDrivePopupProps, FSPlugin}
 import farjs.filelist._
-import farjs.filelist.fs.{FSDrivePopupProps, FSPlugin}
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
 import farjs.filelist.stack._
 import org.scalatest.{Assertion, Succeeded}

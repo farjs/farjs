@@ -1,6 +1,6 @@
-package farjs.filelist.fs
+package farjs.app.filelist.fs
 
-import farjs.filelist.api.MockFileListApi
+import farjs.filelist.api.FileListApi
 import scommons.nodejs.test.AsyncTestSpec
 
 import scala.concurrent.Future
@@ -18,7 +18,7 @@ class FSFileListActionsSpec extends AsyncTestSpec {
   
   it should "call fsService.readDisk when getDriveRoot" in {
     //given
-    val api = new MockFileListApi
+    val api = mock[FileListApi]
     val fsService = new FsService
     val actions = new FSFileListActions(api, fsService.fsService)
     val path = "test path"

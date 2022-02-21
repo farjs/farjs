@@ -1,9 +1,10 @@
-package farjs.filelist.fs
+package farjs.app.filelist.fs
 
+import farjs.app.filelist.MockFileListActions
+import farjs.app.filelist.fs.FSPanel._
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.fs.FSPanel._
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.redux.task.FutureTask

@@ -1,4 +1,4 @@
-package farjs.filelist.fs
+package farjs.app.filelist.fs
 
 import farjs.filelist.FileListState
 import farjs.filelist.stack.{PanelStack, PanelStackItem}

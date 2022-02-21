@@ -1,9 +1,9 @@
-package farjs.filelist.fs
+package farjs.app.filelist.fs
 
+import farjs.app.filelist.MockFileListActions
+import farjs.app.filelist.fs.FSDrivePopup._
 import farjs.filelist.FileListActions.{FileListDirChangeAction, FileListTaskAction}
-import farjs.filelist.MockFileListActions
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.fs.FSDrivePopup._
 import farjs.filelist.stack.{PanelStack, PanelStackItem, PanelStackProps}
 import farjs.ui._
 import farjs.ui.popup.{ModalContentProps, PopupProps}

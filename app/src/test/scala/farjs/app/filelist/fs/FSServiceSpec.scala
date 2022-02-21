@@ -1,4 +1,4 @@
-package farjs.filelist.fs
+package farjs.app.filelist.fs
 
 import org.scalatest.Succeeded
 import scommons.nodejs.ChildProcess._

@@ -1,6 +1,6 @@
-package farjs.filelist.fs
+package farjs.app.filelist.fs
 
-import farjs.filelist.fs.FSDisk._
+import farjs.app.filelist.fs.FSDisk._
 import scommons.nodejs.test.TestSpec
 
 class FSDiskSpec extends TestSpec {

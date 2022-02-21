@@ -1,7 +1,7 @@
-package farjs.filelist.fs
+package farjs.app.filelist.fs
 
-import farjs.filelist.stack.PanelStack
 import farjs.filelist._
+import farjs.filelist.stack.PanelStack
 import scommons.react.ReactClass
 import scommons.react.redux.Dispatch
 

@@ -1,4 +1,4 @@
-package farjs.filelist.fs
+package farjs.app.filelist.fs
 
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.FileListState
