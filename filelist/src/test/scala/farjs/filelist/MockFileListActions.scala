@@ -8,6 +8,7 @@ import scala.concurrent.Future
 
 //noinspection NotImplementedCode
 class MockFileListActions(
+  getDriveRootMock: String => Future[Option[String]] = _ => ???,
   changeDirMock: (Dispatch, Option[String], String) => FileListDirChangeAction = (_, _, _) => ???,
   updateDirMock: (Dispatch, String) => FileListDirUpdateAction = (_, _) => ???,
   createDirMock: (Dispatch, String, String, Boolean) => FileListDirCreateAction = (_, _, _, _) => ???,
@@ -21,6 +22,9 @@ class MockFileListActions(
 ) extends FileListActions {
 
   protected def api: FileListApi = ???
+
+  override def getDriveRoot(path: String): Future[Option[String]] =
+    getDriveRootMock(path)
 
   override def changeDir(dispatch: Dispatch,
                          parent: Option[String],

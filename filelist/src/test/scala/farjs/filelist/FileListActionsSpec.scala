@@ -460,11 +460,14 @@ class FileListActionsSpec extends AsyncTestSpec {
   }
 }
 
+//noinspection NotImplementedCode
 object FileListActionsSpec {
 
   private class FileListActionsTest(apiMock: FileListApi)
     extends FileListActions {
 
     protected def api: FileListApi = apiMock
+
+    def getDriveRoot(path: String): Future[Option[String]] = ???
   }
 }

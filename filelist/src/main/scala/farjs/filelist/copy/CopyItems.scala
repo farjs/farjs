@@ -2,7 +2,6 @@ package farjs.filelist.copy
 
 import farjs.filelist.FileListActions.{FileListParamsChangedAction, FileListTaskAction}
 import farjs.filelist.api.FileListItem
-import farjs.filelist.fs.FSService
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.FileListPopupsState
 import farjs.filelist.stack.{PanelStack, WithPanelStacks}
@@ -26,7 +25,6 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
   private[copy] var copyProcessComp: UiComponent[CopyProcessProps] = CopyProcess
   private[copy] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
   private[copy] var moveProcessComp: UiComponent[MoveProcessProps] = MoveProcess
-  private[copy] var fsService: FSService = FSService.instance
 
   private class Data(val dispatch: Dispatch,
                      val actions: FileListActions,
@@ -134,7 +132,7 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
         val dirF = for {
           dir <- from.actions.readDir(Some(from.path), path)
           sameDrive <-
-            if (move) checkSameDrive(from.path, dir.path)
+            if (move) checkSameDrive(from, dir.path)
             else Future.successful(false)
         } yield {
           (dir.path, sameDrive)
@@ -234,16 +232,16 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
     }.orNull
   }
   
-  private def checkSameDrive(fromPath: String, toPath: String): Future[Boolean] = {
+  private def checkSameDrive(from: Data, toPath: String): Future[Boolean] = {
     for {
-      maybeFromDisk <- fsService.readDisk(fromPath)
-      maybeToDisk <- fsService.readDisk(toPath)
+      maybeFromRoot <- from.actions.getDriveRoot(from.path)
+      maybeToRoot <- from.actions.getDriveRoot(toPath)
     } yield {
       val maybeSameDrive = for {
-        fromDisk <- maybeFromDisk
-        toDisk <- maybeToDisk
+        fromRoot <- maybeFromRoot
+        toRoot <- maybeToRoot
       } yield {
-        fromDisk.root == toDisk.root
+        fromRoot == toRoot
       }
 
       maybeSameDrive.getOrElse(false)

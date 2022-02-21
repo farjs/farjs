@@ -4,7 +4,6 @@ import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.copy.CopyItems._
-import farjs.filelist.fs.{FSDisk, MockFSService}
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.FileListPopupsState
 import farjs.filelist.stack.WithPanelStacksSpec.withContext
@@ -30,21 +29,14 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   
   //noinspection TypeAnnotation
   class Actions {
+    val getDriveRoot = mockFunction[String, Future[Option[String]]]
     val updateDir = mockFunction[Dispatch, String, FileListDirUpdateAction]
     val readDir = mockFunction[Option[String], String, Future[FileListDir]]
 
     val actions = new MockFileListActions(
+      getDriveRootMock = getDriveRoot,
       updateDirMock = updateDir,
       readDirMock = readDir
-    )
-  }
-
-  //noinspection TypeAnnotation
-  class FsService {
-    val readDisk = mockFunction[String, Future[Option[FSDisk]]]
-
-    val fsService = new MockFSService(
-      readDiskMock = readDisk
     )
   }
 
@@ -110,8 +102,6 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val fsService = new FsService
-    CopyItems.fsService = fsService.fsService
     val currDir = FileListDir("/folder", isRoot = false, List(
       FileListItem("dir 1", isDir = true)
     ))
@@ -135,8 +125,8 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
-    fsService.readDisk.expects(currDir.path).returning(Future.successful(None))
-    fsService.readDisk.expects(toDir.path).returning(Future.successful(None))
+    actions.getDriveRoot.expects(currDir.path).returning(Future.successful(None))
+    actions.getDriveRoot.expects(toDir.path).returning(Future.successful(None))
     dispatch.expects(FileListPopupCopyMoveAction(CopyMoveHidden))
     dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
       action.task.message shouldBe "Resolving target dir"
@@ -269,8 +259,6 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val fsService = new FsService
-    CopyItems.fsService = fsService.fsService
     val item = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, List(item))
     val state = FileListState(currDir = currDir, isActive = true)
@@ -293,8 +281,8 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
-    fsService.readDisk.expects(currDir.path).returning(Future.successful(None))
-    fsService.readDisk.expects(toDir.path).returning(Future.successful(None))
+    actions.getDriveRoot.expects(currDir.path).returning(Future.successful(None))
+    actions.getDriveRoot.expects(toDir.path).returning(Future.successful(None))
     dispatch.expects(FileListPopupCopyMoveAction(CopyMoveHidden))
     dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
       action.task.message shouldBe "Resolving target dir"
@@ -389,8 +377,6 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val fsService = new FsService
-    CopyItems.fsService = fsService.fsService
     val item = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, List(
       item,
@@ -413,12 +399,12 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
     val toDir = FileListDir("/to/path", isRoot = false, Nil)
     val to = "test to path"
-    val sameDrive = FSDisk("same", 0, 0, "SameDrive")
+    val driveRoot = "same"
 
     //then
     actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
-    fsService.readDisk.expects(currDir.path).returning(Future.successful(Some(sameDrive)))
-    fsService.readDisk.expects(toDir.path).returning(Future.successful(Some(sameDrive)))
+    actions.getDriveRoot.expects(currDir.path).returning(Future.successful(Some(driveRoot)))
+    actions.getDriveRoot.expects(toDir.path).returning(Future.successful(Some(driveRoot)))
     dispatch.expects(FileListPopupCopyMoveAction(CopyMoveHidden))
     dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
       action.task.message shouldBe "Resolving target dir"
@@ -450,8 +436,6 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val fsService = new FsService
-    CopyItems.fsService = fsService.fsService
     val item = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, List(
       item,
@@ -560,8 +544,6 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val fsService = new FsService
-    CopyItems.fsService = fsService.fsService
     val item = FileListItem("dir", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, List(
       item,
@@ -587,8 +569,8 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
-    fsService.readDisk.expects(currDir.path).returning(Future.successful(None))
-    fsService.readDisk.expects(toDir.path).returning(Future.successful(None))
+    actions.getDriveRoot.expects(currDir.path).returning(Future.successful(None))
+    actions.getDriveRoot.expects(toDir.path).returning(Future.successful(None))
     dispatch.expects(FileListPopupCopyMoveAction(CopyMoveHidden))
     dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
       action.task.message shouldBe "Resolving target dir"
