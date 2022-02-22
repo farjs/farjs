@@ -2,13 +2,14 @@ package farjs.filelist.stack
 
 //noinspection NotImplementedCode
 class MockPanelStack[P](
+  isActive: Boolean = false,
   pushMock: PanelStackItem[P] => Unit = (_: PanelStackItem[P]) => ???,
   updateMock: (PanelStackItem[P] => PanelStackItem[P]) => Unit = (_: PanelStackItem[P] => PanelStackItem[P]) => ???,
   popMock: () => Unit = () => ???,
   peekMock: () => PanelStackItem[P] = () => ???,
   peekLastMock: () => PanelStackItem[P] = () => ???,
   paramsMock: () => P = () => ???
-) extends PanelStack(isActive = false, Nil, _ => ???) {
+) extends PanelStack(isActive, Nil, _ => ???) {
 
   override def push[T](item: PanelStackItem[T]): Unit =
     pushMock(item.asInstanceOf[PanelStackItem[P]])

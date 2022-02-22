@@ -76,8 +76,8 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           setIsRight(!_)
           screen.focusNext()
         case keyFull =>
-          props.plugins.find(_.triggerKey == keyFull).foreach { plugin =>
-            plugin.onTrigger(isRightActive, leftStack, rightStack)
+          props.plugins.find(_.triggerKey.contains(keyFull)).foreach { plugin =>
+            plugin.onKeyTrigger(leftStack, rightStack)
           }
       }
     }

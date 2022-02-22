@@ -4,7 +4,7 @@ import farjs.filelist.stack.PanelStack
 
 trait FileListPlugin {
 
-  def triggerKey: String
+  val triggerKey: Option[String] = None
   
-  def onTrigger(isRight: Boolean, leftStack: PanelStack, rightStack: PanelStack): Unit
+  def onKeyTrigger(leftStack: PanelStack, rightStack: PanelStack): Unit = ()
 }

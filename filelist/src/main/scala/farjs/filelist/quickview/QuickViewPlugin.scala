@@ -2,19 +2,21 @@ package farjs.filelist.quickview
 
 import farjs.filelist.FileListPlugin
 import farjs.filelist.stack.{PanelStack, PanelStackItem}
+import scommons.react.ReactClass
 
 object QuickViewPlugin extends FileListPlugin {
 
-  val triggerKey = "C-q"
+  override val triggerKey: Option[String] = Some("C-q")
 
-  def onTrigger(isRight: Boolean, leftStack: PanelStack, rightStack: PanelStack): Unit = {
-    val compClass = QuickViewPanel()
+  private val component: ReactClass = QuickViewPanel()
+
+  override def onKeyTrigger(leftStack: PanelStack, rightStack: PanelStack): Unit = {
     val exists =
-      if (leftStack.peek.component == compClass) {
+      if (leftStack.peek.component == component) {
         leftStack.pop()
         true
       }
-      else if (rightStack.peek.component == compClass) {
+      else if (rightStack.peek.component == component) {
         rightStack.pop()
         true
       }
@@ -22,11 +24,11 @@ object QuickViewPlugin extends FileListPlugin {
     
     if (!exists) {
       val stack =
-        if (!isRight) rightStack
+        if (!rightStack.isActive) rightStack
         else leftStack
 
       stack.push(PanelStackItem(
-        component = compClass,
+        component = component,
         dispatch = None,
         actions = None,
         state = Some(QuickViewParams())
