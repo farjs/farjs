@@ -46,7 +46,7 @@ object FarjsApp {
       initialDevTool = if (showDevTools) DevTool.Logs else DevTool.Hidden
     )
     
-    ReactBlessed.render(
+    ReactBlessed.createBlessedRenderer(Blessed)(
       <.Provider(^.store := store)(
         <(root()).empty
       ),

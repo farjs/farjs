@@ -7,7 +7,7 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport
 
 @js.native
-@JSImport("blessed", JSImport.Default)
+@JSImport("@farjs/blessed", JSImport.Default)
 object Blessed extends js.Object {
 
   def screen(config: BlessedScreenConfig): BlessedScreen = js.native

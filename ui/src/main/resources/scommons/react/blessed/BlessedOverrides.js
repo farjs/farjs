@@ -1,4 +1,4 @@
-const blessed = require("blessed")
+const blessed = require("@farjs/blessed")
 
 const colors = blessed.colors
 const unicode = blessed.unicode

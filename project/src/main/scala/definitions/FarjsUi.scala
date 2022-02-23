@@ -16,7 +16,8 @@ object FarjsUi extends ScalaJsModule {
       coverageExcludedPackages := "scommons.react.blessed.raw",
 
       Compile / npmDependencies ++= Seq(
-        "blessed" -> "0.1.81",
+        //"blessed" -> "0.1.81",
+        "@farjs/blessed" -> "0.2.1",
         //"neo-blessed" -> "0.2.0",
         //"@medv/blessed" -> "2.0.0",
         "react-blessed" -> "0.7.2"
