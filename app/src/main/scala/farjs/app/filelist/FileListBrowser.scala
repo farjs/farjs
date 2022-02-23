@@ -82,58 +82,68 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       }
     }
     
-    <(WithPanelStacks())(^.wrapped := WithPanelStacksProps(leftStack, rightStack))(
-      <.button(
-        ^("isRight") := false,
-        ^.reactRef := leftButtonRef,
-        ^.rbMouse := true,
-        ^.rbWidth := "50%",
-        ^.rbHeight := "100%-1",
-        ^.rbOnFocus := onActivate(isRight),
-        ^.rbOnKeypress := onKeypress
-      )(
-        <(panelStackComp())(^.wrapped := PanelStackProps(isRight, leftButtonRef.current, getStack(isRight)))(
-          if (showLeftDrive) Some {
-            <(fsDrivePopup())(^.wrapped := FSDrivePopupProps(
-              dispatch = props.dispatch,
-              onClose = { () =>
-                setShowLeftDrive(false)
-              },
-              showOnLeft = true
-            ))()
-          }
-          else None
-        )
-      ),
-      <.button(
-        ^("isRight") := true,
-        ^.reactRef := rightButtonRef,
-        ^.rbMouse := true,
-        ^.rbWidth := "50%",
-        ^.rbHeight := "100%-1",
-        ^.rbLeft := "50%",
-        ^.rbOnFocus := onActivate(!isRight),
-        ^.rbOnKeypress := onKeypress
-      )(
-        <(panelStackComp())(^.wrapped := PanelStackProps(!isRight, rightButtonRef.current, getStack(!isRight)))(
-          if (showRightDrive) Some {
-            <(fsDrivePopup())(^.wrapped := FSDrivePopupProps(
-              dispatch = props.dispatch,
-              onClose = { () =>
-                setShowRightDrive(false)
-              },
-              showOnLeft = false
-            ))()
-          }
-          else None
-        )
-      ),
-
-      <.box(^.rbTop := "100%-1")(
-        <(bottomMenuComp())()()
-      ),
-
-      <(fileListPopups).empty
+    <(FileListPlugin.Context.Provider)(^.contextValue := props.plugins)(
+      <(WithPanelStacks())(^.wrapped := WithPanelStacksProps(leftStack, rightStack))(
+        <.button(
+          ^("isRight") := false,
+          ^.reactRef := leftButtonRef,
+          ^.rbMouse := true,
+          ^.rbWidth := "50%",
+          ^.rbHeight := "100%-1",
+          ^.rbOnFocus := onActivate(isRight),
+          ^.rbOnKeypress := onKeypress
+        )(
+          <(panelStackComp())(^.wrapped := PanelStackProps(
+            isRight = isRight,
+            panelInput = leftButtonRef.current,
+            stack = getStack(isRight)
+          ))(
+            if (showLeftDrive) Some {
+              <(fsDrivePopup())(^.wrapped := FSDrivePopupProps(
+                dispatch = props.dispatch,
+                onClose = { () =>
+                  setShowLeftDrive(false)
+                },
+                showOnLeft = true
+              ))()
+            }
+            else None
+          )
+        ),
+        <.button(
+          ^("isRight") := true,
+          ^.reactRef := rightButtonRef,
+          ^.rbMouse := true,
+          ^.rbWidth := "50%",
+          ^.rbHeight := "100%-1",
+          ^.rbLeft := "50%",
+          ^.rbOnFocus := onActivate(!isRight),
+          ^.rbOnKeypress := onKeypress
+        )(
+          <(panelStackComp())(^.wrapped := PanelStackProps(
+            isRight = !isRight,
+            panelInput = rightButtonRef.current,
+            stack = getStack(!isRight)
+          ))(
+            if (showRightDrive) Some {
+              <(fsDrivePopup())(^.wrapped := FSDrivePopupProps(
+                dispatch = props.dispatch,
+                onClose = { () =>
+                  setShowRightDrive(false)
+                },
+                showOnLeft = false
+              ))()
+            }
+            else None
+          )
+        ),
+  
+        <.box(^.rbTop := "100%-1")(
+          <(bottomMenuComp())()()
+        ),
+  
+        <(fileListPopups).empty
+      )
     )
   }
 }
