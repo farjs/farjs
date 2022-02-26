@@ -78,9 +78,9 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           screen.focusNext()
         case "enter" =>
           val stack = getStack(isRightActive)
-          val maybeState = stack.peek[FileListState].state
-          maybeState.filter(_.currentItem.exists(!_.isDir)).foreach { state =>
-            openCurrItem(props.plugins, stack, state)
+          stack.peek[js.Any].state.collect {
+            case state: FileListState if state.currentItem.exists(!_.isDir) =>
+              openCurrItem(props.plugins, props.dispatch, stack, state)
           }
         case keyFull =>
           props.plugins.find(_.triggerKey.contains(keyFull)).foreach { plugin =>
@@ -153,6 +153,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
   }
 
   private def openCurrItem(plugins: Seq[FileListPlugin],
+                           parentDispatch: Dispatch,
                            stack: PanelStack,
                            state: FileListState): Unit = {
 
@@ -162,13 +163,13 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       }
 
       val filePath = path.join(state.currDir.path, item.name)
-      val maybePluginItem = plugins.foldLeft(Option.empty[PanelStackItem[_]]) {
+      val maybePluginItem = plugins.foldLeft(Option.empty[PanelStackItem[FileListState]]) {
         case (None, plugin) => plugin.onFileTrigger(filePath, onClose)
         case (res@Some(_), _) => res
       }
 
       maybePluginItem.foreach { item =>
-        stack.push(item)
+        stack.push(PanelStackItem.initDispatch(parentDispatch, FileListStateReducer.apply, stack, item))
       }
     }
   }

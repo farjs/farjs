@@ -248,9 +248,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   it should "not trigger plugin if dir when onKeypress(enter)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val onTriggerMock = mockFunction[String, () => Unit, Option[PanelStackItem[_]]]
+    val onTriggerMock = mockFunction[String, () => Unit, Option[PanelStackItem[FileListState]]]
     val plugin = new FileListPlugin {
-      override def onFileTrigger(filePath: String, onClose: () => Unit): Option[PanelStackItem[_]] = {
+      override def onFileTrigger(filePath: String, onClose: () => Unit): Option[PanelStackItem[FileListState]] = {
         onTriggerMock(filePath, onClose)
       }
     }
@@ -294,16 +294,16 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   it should "trigger plugin if file when onKeypress(enter)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val onTrigger2Mock = mockFunction[String, () => Unit, Option[PanelStackItem[_]]]
-    val onTrigger3Mock = mockFunction[String, () => Unit, Option[PanelStackItem[_]]]
+    val onTrigger2Mock = mockFunction[String, () => Unit, Option[PanelStackItem[FileListState]]]
+    val onTrigger3Mock = mockFunction[String, () => Unit, Option[PanelStackItem[FileListState]]]
     val plugin1 = new FileListPlugin {}
     val plugin2 = new FileListPlugin {
-      override def onFileTrigger(filePath: String, onClose: () => Unit): Option[PanelStackItem[_]] = {
+      override def onFileTrigger(filePath: String, onClose: () => Unit): Option[PanelStackItem[FileListState]] = {
         onTrigger2Mock(filePath, onClose)
       }
     }
     val plugin3 = new FileListPlugin {
-      override def onFileTrigger(filePath: String, onClose: () => Unit): Option[PanelStackItem[_]] = {
+      override def onFileTrigger(filePath: String, onClose: () => Unit): Option[PanelStackItem[FileListState]] = {
         onTrigger3Mock(filePath, onClose)
       }
     }
@@ -345,7 +345,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     //when & then
     button.props.onKeypress(null, literal(full = keyFull).asInstanceOf[KeyboardKey])
     inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _) =>
-      leftStack.peek[FileListState] shouldBe pluginItem
+      val item = leftStack.peek[FileListState]
+      item.component shouldBe pluginItem.component
+      item.dispatch should not be None
     }
 
     //when & then

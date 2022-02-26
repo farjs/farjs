@@ -8,5 +8,5 @@ trait FileListPlugin {
   
   def onKeyTrigger(leftStack: PanelStack, rightStack: PanelStack): Unit = ()
 
-  def onFileTrigger(filePath: String, onClose: () => Unit): Option[PanelStackItem[_]] = None
+  def onFileTrigger(filePath: String, onClose: () => Unit): Option[PanelStackItem[FileListState]] = None
 }
