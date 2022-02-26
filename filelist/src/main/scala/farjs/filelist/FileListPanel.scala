@@ -3,7 +3,6 @@ package farjs.filelist
 import farjs.filelist.FileListActions.FileListParamsChangedAction
 import farjs.filelist.api.FileListItem
 import farjs.filelist.popups.FileListPopupsActions._
-import farjs.filelist.stack.{PanelStack, PanelStackItem}
 import scommons.nodejs.path
 import scommons.react._
 import scommons.react.hooks._
@@ -21,8 +20,6 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
   private[filelist] var fileListQuickSearch: UiComponent[FileListQuickSearchProps] = FileListQuickSearch
 
   protected def render(compProps: Props): ReactElement = {
-    val plugins = useContext(FileListPlugin.Context)
-    val panelStack = PanelStack.usePanelStack
     val (maybeQuickSearch, setMaybeQuickSearch) = useState(Option.empty[String])
     val props = compProps.wrapped
 
@@ -78,8 +75,6 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
             }
           case "C-r" =>
             props.dispatch(props.actions.updateDir(props.dispatch, props.state.currDir.path))
-          case "enter" if props.state.currentItem.exists(!_.isDir) =>
-            openCurrItem(plugins, panelStack.stack, props.state)
           case k@("enter" | "C-pageup" | "C-pagedown") =>
             val targetDir = k match {
               case "C-pageup" => Some(FileListItem.up)
@@ -129,24 +124,5 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
         ))()
       }
     )
-  }
-  
-  private def openCurrItem(plugins: Seq[FileListPlugin],
-                           stack: PanelStack,
-                           state: FileListState): Unit = {
-
-    state.currentItem.foreach { item =>
-      def onClose: () => Unit = { () =>
-        stack.pop()
-      }
-
-      val filePath = path.join(state.currDir.path, item.name)
-      val maybePluginItem = plugins.foldLeft(Option.empty[PanelStackItem[_]]) {
-        case (None, plugin) => plugin.onFileTrigger(filePath, onClose)
-        case (res@Some(_), _) => res
-      }
-      
-      maybePluginItem.foreach(item => stack.push(item))
-    }
   }
 }
