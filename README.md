@@ -37,9 +37,9 @@ $ farjs
 
 ## Documentation
 
-- Developing
-  - See [develop.md](https://github.com/farjs/farjs/blob/main/develop.md)
+Visit [FAR.js](https://farjs.github.io) web-site
+for full documentation.
 
-Please, visit [FAR.js](https://farjs.github.io) web-site
-for more information.
+## Contributing
 
+See [develop.md](https://github.com/farjs/farjs/blob/main/develop.md)
