@@ -6,7 +6,8 @@ class ZipActionsSpec extends AsyncTestSpec {
 
   it should "return None when getDriveRoot" in {
     //given
-    val actions = new ZipActions("filePath.zip")
+    val api = mock[ZipApi]
+    val actions = new ZipActions(api)
     
     //when
     val resultF = actions.getDriveRoot("path")

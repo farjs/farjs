@@ -5,10 +5,10 @@ import farjs.filelist.api._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ZipApi(filePath: String) extends FileListApi {
+class ZipApi(filePath: String, rootPath: String) extends FileListApi {
 
   def readDir(parent: Option[String], dir: String): Future[FileListDir] = Future {
-    val root = FileListDir(s"ZIP://$filePath", isRoot = false, List(
+    val root = FileListDir(rootPath, isRoot = false, List(
       FileListItem("dir 1", isDir = true),
       FileListItem("file 1")
     ))

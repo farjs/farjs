@@ -6,7 +6,7 @@ import farjs.filelist.{FileListPanel, FileListPanelProps}
 import scommons.react._
 import scommons.react.blessed.BlessedScreen
 
-class ZipPanel(filePath: String, onClose: () => Unit)
+class ZipPanel(rootPath: String, onClose: () => Unit)
   extends FunctionComponent[FileListPanelProps] {
 
   protected def render(compProps: Props): ReactElement = {
@@ -17,7 +17,7 @@ class ZipPanel(filePath: String, onClose: () => Unit)
       key match {
         case "enter"
           if props.state.currentItem.exists(i => i.isDir && i.name == FileListItem.up.name)
-            && props.state.currDir.path == s"ZIP://$filePath" =>
+            && props.state.currDir.path == rootPath =>
           onClose()
         case _ =>
           processed = false

@@ -16,7 +16,7 @@ class ZipPanelSpec extends TestSpec with TestRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
     val props = FileListPanelProps(dispatch, actions, FileListState())
-    val zipPanel = new ZipPanel("filePath.zip", onClose)
+    val zipPanel = new ZipPanel("ZIP://filePath.zip", onClose)
     val comp = testRender(<(zipPanel())(^.wrapped := props)())
     val panelProps = findComponentProps(comp, fileListPanelComp)
 
@@ -35,7 +35,7 @@ class ZipPanelSpec extends TestSpec with TestRendererUtils {
         FileListItem("item 1")
       ))
     ))
-    val zipPanel = new ZipPanel("filePath.zip", onClose)
+    val zipPanel = new ZipPanel("ZIP://filePath.zip", onClose)
     val comp = testRender(<(zipPanel())(^.wrapped := props)())
     val panelProps = findComponentProps(comp, fileListPanelComp)
 
@@ -58,7 +58,7 @@ class ZipPanelSpec extends TestSpec with TestRendererUtils {
         FileListItem("dir 1", isDir = true)
       ))
     ))
-    val zipPanel = new ZipPanel("filePath.zip", onClose)
+    val zipPanel = new ZipPanel("ZIP://filePath.zip", onClose)
     val comp = testRender(<(zipPanel())(^.wrapped := props)())
     val panelProps = findComponentProps(comp, fileListPanelComp)
 
@@ -76,7 +76,7 @@ class ZipPanelSpec extends TestSpec with TestRendererUtils {
     val actions = new MockFileListActions
     val state = FileListState()
     val props = FileListPanelProps(dispatch, actions, state)
-    val zipPanel = new ZipPanel("filePath.zip", onClose)
+    val zipPanel = new ZipPanel("ZIP://filePath.zip", onClose)
     
     //when
     val result = testRender(<(zipPanel())(^.wrapped := props)())
