@@ -3,6 +3,8 @@ package farjs.app.filelist.zip
 import farjs.app.filelist.zip.ZipEntry._
 import scommons.nodejs.test.TestSpec
 
+import scala.scalajs.js
+
 class ZipEntrySpec extends TestSpec {
 
   it should "parse unzip output" in {
@@ -20,14 +22,14 @@ class ZipEntrySpec extends TestSpec {
     
     //then
     results shouldBe List(
-      ZipEntry("", "test", isDir = true, datetimeMs = 1561730940000.0),
-      ZipEntry("test", "dir", isDir = true, datetimeMs = 1561731000000.0),
-      ZipEntry("test/dir", "file.txt", size = 123456789, datetimeMs = 1561731060000.0)
+      ZipEntry("", "test", isDir = true, datetimeMs = js.Date.parse("2019-06-28T16:09:00")),
+      ZipEntry("test", "dir", isDir = true, datetimeMs = js.Date.parse("2019-06-28T16:10:00")),
+      ZipEntry("test/dir", "file.txt", size = 123456789, datetimeMs = js.Date.parse("2019-06-28T16:11:00"))
     )
   }
 
   it should "parse date and time when parseDateTime" in {
     //when & then
-    parseDateTime("06-28-2019 16:09") shouldBe 1561730940000.0
+    parseDateTime("06-28-2019 16:09") shouldBe js.Date.parse("2019-06-28T16:09:00")
   }
 }
