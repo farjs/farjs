@@ -27,9 +27,4 @@ class ZipEntrySpec extends TestSpec {
       ZipEntry("test/dir", "file.txt", size = 123456789, datetimeMs = js.Date.parse("2019-06-28T16:11:00"))
     )
   }
-
-  it should "parse date and time when parseDateTime" in {
-    //when & then
-    parseDateTime("06-28-2019 16:09") shouldBe js.Date.parse("2019-06-28T16:09:00")
-  }
 }

@@ -1,6 +1,7 @@
 package farjs.app.filelist.zip
 
-import scala.scalajs.js
+import farjs.app.util.DateTimeUtil
+
 import scala.util.matching.Regex
 
 case class ZipEntry(
@@ -14,7 +15,6 @@ case class ZipEntry(
 object ZipEntry {
 
   private lazy val unzipRegex = """(Length|Date|Time|Name)""".r
-  private lazy val dateTimeRegex = """(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2})""".r
 
   def fromUnzipCommand(output: String): List[ZipEntry] = {
     parseOutput(unzipRegex, output).map { data =>
@@ -33,7 +33,7 @@ object ZipEntry {
         name = name.stripPrefix("/"),
         isDir = pathName.endsWith("/"),
         size = toDouble(length),
-        datetimeMs = parseDateTime(s"$date $time")
+        datetimeMs = DateTimeUtil.parseDateTime(s"$date $time")
       )
     }
   }
@@ -79,13 +79,5 @@ object ZipEntry {
     }
     
     (from, to + 1)
-  }
-  
-  private[zip] def parseDateTime(input: String): Double = {
-    (for {
-      dateTimeRegex(month, date, year, hours, minutes) <- dateTimeRegex.findFirstMatchIn(input)
-    } yield {
-      new js.Date(year.toInt, month.toInt - 1, date.toInt, hours.toInt, minutes.toInt).getTime()
-    }).getOrElse(0.0)
   }
 }
