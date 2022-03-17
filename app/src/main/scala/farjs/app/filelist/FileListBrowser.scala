@@ -76,7 +76,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         case "C-u" =>
           setIsRight(!_)
           screen.focusNext()
-        case "enter" =>
+        case "enter" | "C-pagedown" =>
           val stack = getStack(isRightActive)
           stack.peek[js.Any].state.collect {
             case state: FileListState if state.currentItem.exists(!_.isDir) =>

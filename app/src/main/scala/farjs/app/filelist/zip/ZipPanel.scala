@@ -46,7 +46,9 @@ class ZipPanel(rootPath: String,
     def onKeypress(screen: BlessedScreen, key: String): Boolean = {
       var processed = true
       key match {
-        case "enter" if (
+        case "C-pageup" if props.state.currDir.path == rootPath =>
+          onClose()
+        case "enter" | "C-pagedown" if (
           props.state.currentItem.exists(i => i.isDir && i.name == FileListItem.up.name)
             && props.state.currDir.path == rootPath
           ) =>

@@ -359,6 +359,74 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     Succeeded
   }
 
+  it should "trigger plugin if file when onKeypress(C-pagedown)" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val onTrigger2Mock = mockFunction[String, () => Unit, Option[PanelStackItem[FileListState]]]
+    val onTrigger3Mock = mockFunction[String, () => Unit, Option[PanelStackItem[FileListState]]]
+    val plugin1 = new FileListPlugin {}
+    val plugin2 = new FileListPlugin {
+      override def onFileTrigger(filePath: String, onClose: () => Unit): Option[PanelStackItem[FileListState]] = {
+        onTrigger2Mock(filePath, onClose)
+      }
+    }
+    val plugin3 = new FileListPlugin {
+      override def onFileTrigger(filePath: String, onClose: () => Unit): Option[PanelStackItem[FileListState]] = {
+        onTrigger3Mock(filePath, onClose)
+      }
+    }
+    val props = FileListBrowserProps(dispatch, plugins = List(plugin1, plugin2, plugin3))
+    val focusMock = mockFunction[Unit]
+    val buttonMock = literal("focus" -> focusMock)
+    focusMock.expects()
+    val currState = FileListState(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("file 1")))
+    )
+
+    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
+      if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
+      else null
+    })
+    inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _) =>
+      leftStack.isActive shouldBe true
+      leftStack.update[FileListState](_.withState(currState))
+    }
+    val fsItem = inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _) =>
+      leftStack.peek[FileListState]
+    }
+    fsItem.state shouldBe Some(currState)
+    val button = inside(findComponents(comp, <.button.name)) {
+      case List(button, _) => button
+    }
+    val filePath = path.join("/sub-dir", "file 1")
+    val pluginItem = PanelStackItem[FileListState]("pluginPanel".asInstanceOf[ReactClass], None, None, None)
+    val keyFull = "C-pagedown"
+    
+    //then
+    var onCloseCapture: () => Unit = null
+    onTrigger2Mock.expects(filePath, *).onCall { (_, onClose) =>
+      onCloseCapture = onClose
+      Some(pluginItem)
+    }
+    onTrigger3Mock.expects(*, *).never()
+
+    //when & then
+    button.props.onKeypress(null, literal(full = keyFull).asInstanceOf[KeyboardKey])
+    inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _) =>
+      val item = leftStack.peek[FileListState]
+      item.component shouldBe pluginItem.component
+      item.dispatch should not be None
+    }
+
+    //when & then
+    onCloseCapture()
+    inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _) =>
+      leftStack.peek[FileListState] shouldBe fsItem
+    }
+
+    Succeeded
+  }
+
   it should "trigger plugin when onKeypress(triggerKey)" in {
     //given
     val dispatch = mockFunction[Any, Any]
