@@ -65,7 +65,8 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     )))
     val fsItem = PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), None)
     var stackState: List[PanelStackItem[_]] = List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None),
+      PanelStackItem("otherComp1".asInstanceOf[ReactClass], None, None, None),
+      PanelStackItem("otherComp2".asInstanceOf[ReactClass], None, None, None),
       fsItem
     )
     val stack = new PanelStack(isActive = true, stackState, { f =>

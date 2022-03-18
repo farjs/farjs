@@ -147,6 +147,51 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
     result shouldBe data
   }
   
+  it should "remove all except last item when clear" in {
+    //given
+    val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
+    val stack = new PanelStack(isActive = false, Nil, updater)
+    val other = PanelStackItem[Unit]("other comp".asInstanceOf[ReactClass], None, None, None)
+    val data = List(
+      PanelStackItem[TestParams]("top comp1".asInstanceOf[ReactClass], None, None, None),
+      PanelStackItem[TestParams]("top comp2".asInstanceOf[ReactClass], None, None, None),
+      other
+    )
+    
+    var result: List[PanelStackItem[_]] = null
+    updater.expects(*).onCall { updateFn: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] =>
+      //when
+      result = updateFn(data)
+    }
+    
+    //when
+    stack.clear()
+    
+    //then
+    result shouldBe List(other)
+  }
+
+  it should "not remove last item when clear" in {
+    //given
+    val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
+    val stack = new PanelStack(isActive = false, Nil, updater)
+    val data = List(
+      PanelStackItem[TestParams]("top comp".asInstanceOf[ReactClass], None, None, None)
+    )
+
+    var result: List[PanelStackItem[_]] = null
+    updater.expects(*).onCall { updateFn: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] =>
+      //when
+      result = updateFn(data)
+    }
+
+    //when
+    stack.clear()
+
+    //then
+    result shouldBe data
+  }
+
   it should "return top item when peek" in {
     //given
     val params = TestParams(name = "test")

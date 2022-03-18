@@ -13,14 +13,13 @@ class PanelStack(val isActive: Boolean,
 
   def push[T](item: PanelStackItem[T]): Unit = updater(item :: _)
 
-  def update[T](f: PanelStackItem[T] => PanelStackItem[T]): Unit = {
+  def update[T](f: PanelStackItem[T] => PanelStackItem[T]): Unit =
     updater { stack =>
       if (stack.isEmpty) stack
       else f(stack.head.asInstanceOf[PanelStackItem[T]]) :: stack.tail
     }
-  }
 
-  def updateFor[T](component: ReactClass)(f: PanelStackItem[T] => PanelStackItem[T]): Unit = {
+  def updateFor[T](component: ReactClass)(f: PanelStackItem[T] => PanelStackItem[T]): Unit =
     updater { stack =>
       stack.collect {
         case item if item.component == component =>
@@ -28,14 +27,18 @@ class PanelStack(val isActive: Boolean,
         case item => item
       }
     }
-  }
 
-  def pop(): Unit = {
+  def pop(): Unit =
     updater {
       case _ :: tail if tail.nonEmpty => tail
       case stack => stack
     }
-  }
+
+  def clear(): Unit =
+    updater {
+      case _ :: tail if tail.nonEmpty => tail.last :: Nil
+      case stack => stack
+    }
 
   def peek[T]: PanelStackItem[T] = data.head.asInstanceOf[PanelStackItem[T]]
   

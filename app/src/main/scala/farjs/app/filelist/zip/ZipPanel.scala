@@ -22,24 +22,26 @@ class ZipPanel(rootPath: String,
     val props = compProps.wrapped
 
     useLayoutEffect({ () =>
-      val zipF = entriesF.map { entries =>
-        val totalSize = entries.map(_.size).sum
-        props.dispatch(FileListDiskSpaceUpdatedAction(totalSize))
-        props.dispatch(FileListDirChangedAction(FileListDir.curr, FileListDir(
-          path = rootPath,
-          isRoot = false,
-          items = entries.filter(_.parent.isEmpty).map(ZipApi.convertToFileListItem)
-        )))
-      }.andThen {
-        case Failure(_) => 
+      if (props.state.currDir.items.isEmpty) {
+        val zipF = entriesF.map { entries =>
+          val totalSize = entries.map(_.size).sum
+          props.dispatch(FileListDiskSpaceUpdatedAction(totalSize))
           props.dispatch(FileListDirChangedAction(FileListDir.curr, FileListDir(
             path = rootPath,
             isRoot = false,
-            items = Nil
+            items = entries.filter(_.parent.isEmpty).map(ZipApi.convertToFileListItem)
           )))
+        }.andThen {
+          case Failure(_) =>
+            props.dispatch(FileListDirChangedAction(FileListDir.curr, FileListDir(
+              path = rootPath,
+              isRoot = false,
+              items = Nil
+            )))
+        }
+
+        props.dispatch(FileListTaskAction(FutureTask("Reading zip archive", zipF)))
       }
-      
-      props.dispatch(FileListTaskAction(FutureTask("Reading zip archive", zipF)))
       ()
     }, Nil)
     

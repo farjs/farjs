@@ -6,6 +6,7 @@ class MockPanelStack[P](
   pushMock: PanelStackItem[P] => Unit = (_: PanelStackItem[P]) => ???,
   updateMock: (PanelStackItem[P] => PanelStackItem[P]) => Unit = (_: PanelStackItem[P] => PanelStackItem[P]) => ???,
   popMock: () => Unit = () => ???,
+  clearMock: () => Unit = () => ???,
   peekMock: () => PanelStackItem[P] = () => ???,
   peekLastMock: () => PanelStackItem[P] = () => ???,
   paramsMock: () => P = () => ???
@@ -18,6 +19,8 @@ class MockPanelStack[P](
     updateMock(f.asInstanceOf[PanelStackItem[P] => PanelStackItem[P]])
 
   override def pop(): Unit = popMock()
+
+  override def clear(): Unit = clearMock()
 
   override def peek[T]: PanelStackItem[T] =
     peekMock().asInstanceOf[PanelStackItem[T]]
