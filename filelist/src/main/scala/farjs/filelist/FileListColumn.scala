@@ -39,7 +39,11 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
             if (props.selectedNames.contains(name)) theme.selectedItem
             else if (name.startsWith(".") && name != FileListItem.up.name) theme.hiddenItem
             else if (item.isDir && name != FileListItem.up.name) theme.dirItem
-            else theme.regularItem
+            else {
+              val nameLower = name.toLowerCase
+              if (nameLower.endsWith(".zip") || nameLower.endsWith(".jar")) theme.archiveItem
+              else theme.regularItem
+            }
           
           val focused = props.focusedIndex == index
           if (focused) style.focus.getOrElse(null)

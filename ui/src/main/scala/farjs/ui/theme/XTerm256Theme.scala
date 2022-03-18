@@ -6,6 +6,16 @@ object XTerm256Theme extends Theme {
 
   val fileList: ThemeFileList = new ThemeFileList {
 
+    val archiveItem: BlessedStyle = new BlessedStyle {
+      override val bold = true
+      override val bg = "#008"
+      override val fg = "#a05"
+      override val focus = new BlessedStyle {
+        override val bold = true
+        override val bg = "#088"
+        override val fg = "#800"
+      }
+    }
     val regularItem: BlessedStyle = new BlessedStyle {
       override val bold = true
       override val bg = "#008"

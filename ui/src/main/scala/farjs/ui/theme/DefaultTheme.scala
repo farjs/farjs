@@ -6,6 +6,16 @@ object DefaultTheme extends Theme {
 
   val fileList: ThemeFileList = new ThemeFileList {
 
+    val archiveItem: BlessedStyle = new BlessedStyle {
+      override val bold = false
+      override val bg = Color.blue
+      override val fg = Color.magenta
+      override val focus = new BlessedStyle {
+        override val bold = false
+        override val bg = Color.cyan
+        override val fg = Color.red
+      }
+    }
     val regularItem: BlessedStyle = new BlessedStyle {
       override val bold = false
       override val bg = Color.blue

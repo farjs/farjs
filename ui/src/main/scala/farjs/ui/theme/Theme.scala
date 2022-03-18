@@ -17,6 +17,7 @@ trait Theme {
 
 trait ThemeFileList {
 
+  def archiveItem: BlessedStyle
   def regularItem: BlessedStyle
   def dirItem: BlessedStyle
   def hiddenItem: BlessedStyle
