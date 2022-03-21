@@ -6,28 +6,37 @@ object DateTimeUtil {
 
   private val currYear = new js.Date().getFullYear().toInt
   
-  private lazy val mmddyyyyTimeRegex = """(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2})""".r
-  private lazy val ddmmyyTimeRegex = """(\d{2}).(\d{2}).(\d{2}) (\d{2}):(\d{2})""".r
+  private lazy val MMddyyyyTimeRegex = """(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2})""".r
+  private lazy val ddMMyyTimeRegex = """(\d{2})\.(\d{2})\.(\d{2}) (\d{2}):(\d{2})""".r
+  private lazy val yyyyMMddHHmmssRegex = """(\d{4})(\d{2})(\d{2})\.(\d{2})(\d{2})(\d{2})""".r
 
   def parseDateTime(input: String): Double = {
     
-    def mmddyyyyTime: Option[(Int, Int, Int, Int, Int)] =
+    def MMddyyyyTime: Option[(Int, Int, Int, Int, Int, Int)] =
       for {
-        mmddyyyyTimeRegex(month, date, year, hours, minutes) <- mmddyyyyTimeRegex.findFirstMatchIn(input)
+        MMddyyyyTimeRegex(month, date, year, hours, minutes) <- MMddyyyyTimeRegex.findFirstMatchIn(input)
       } yield {
-        (year.toInt, month.toInt, date.toInt, hours.toInt, minutes.toInt)
+        (year.toInt, month.toInt, date.toInt, hours.toInt, minutes.toInt, 0)
       }
 
-    def ddmmyyTime: Option[(Int, Int, Int, Int, Int)] =
+    def ddMMyyTime: Option[(Int, Int, Int, Int, Int, Int)] =
       for {
-        ddmmyyTimeRegex(date, month, year, hours, minutes) <- ddmmyyTimeRegex.findFirstMatchIn(input)
+        ddMMyyTimeRegex(date, month, year, hours, minutes) <- ddMMyyTimeRegex.findFirstMatchIn(input)
       } yield {
-        (year.toInt, month.toInt, date.toInt, hours.toInt, minutes.toInt)
+        (year.toInt, month.toInt, date.toInt, hours.toInt, minutes.toInt, 0)
       }
 
-    mmddyyyyTime
-      .orElse(ddmmyyTime)
-      .map { case (year, month, date, hours, minutes) =>
+    def yyyyMMddHHmmss: Option[(Int, Int, Int, Int, Int, Int)] =
+      for {
+        yyyyMMddHHmmssRegex(year, month, date, hours, minutes, seconds) <- yyyyMMddHHmmssRegex.findFirstMatchIn(input)
+      } yield {
+        (year.toInt, month.toInt, date.toInt, hours.toInt, minutes.toInt, seconds.toInt)
+      }
+
+    yyyyMMddHHmmss
+      .orElse(ddMMyyTime)
+      .orElse(MMddyyyyTime)
+      .map { case (year, month, date, hours, minutes, seconds) =>
         val fullYear =
           if (year < 100) {
             val after2000 = year + 2000
@@ -36,7 +45,7 @@ object DateTimeUtil {
           }
           else year
           
-        new js.Date(fullYear, month - 1, date, hours, minutes).getTime()
+        new js.Date(fullYear, month - 1, date, hours, minutes, seconds).getTime()
       }
       .getOrElse(0.0)
   }

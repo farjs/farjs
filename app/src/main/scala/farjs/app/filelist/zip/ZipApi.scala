@@ -54,13 +54,14 @@ object ZipApi {
       name = zip.name,
       isDir = zip.isDir,
       size = zip.size,
-      mtimeMs = zip.datetimeMs
+      mtimeMs = zip.datetimeMs,
+      permissions = zip.permissions
     )
   }
 
   def readZip(childProcess: ChildProcess, filePath: String): Future[List[ZipEntry]] = {
     val (_, future) = childProcess.exec(
-      command = s"""unzip -l "$filePath"""",
+      command = s"""unzip -ZT "$filePath"""",
       options = Some(new raw.ChildProcessOptions {
         override val windowsHide = true
       })

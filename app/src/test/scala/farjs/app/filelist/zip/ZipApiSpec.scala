@@ -12,10 +12,10 @@ import scala.scalajs.js
 class ZipApiSpec extends AsyncTestSpec {
 
   private val entriesF = Future.successful(List(
-    ZipEntry("", "dir 1", isDir = true, datetimeMs = 1.0),
-    ZipEntry("", "file 1", size = 2.0, datetimeMs = 3.0),
-    ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 4.0),
-    ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0)
+    ZipEntry("", "dir 1", isDir = true, datetimeMs = 1.0, permissions = "drwxr-xr-x"),
+    ZipEntry("", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--"),
+    ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 4.0, permissions = "drwxr-xr-x"),
+    ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--")
   ))
 
   //noinspection TypeAnnotation
@@ -42,8 +42,8 @@ class ZipApiSpec extends AsyncTestSpec {
       path shouldBe rootPath
       isRoot shouldBe false
       items shouldBe List(
-        FileListItem("dir 1", isDir = true, mtimeMs = 1.0),
-        FileListItem("file 1", size = 2.0, mtimeMs = 3.0)
+        FileListItem("dir 1", isDir = true, mtimeMs = 1.0, permissions = "drwxr-xr-x"),
+        FileListItem("file 1", size = 2.0, mtimeMs = 3.0, permissions = "-rw-r--r--")
       )
     })
   }
@@ -62,7 +62,7 @@ class ZipApiSpec extends AsyncTestSpec {
       path shouldBe s"$rootPath/dir 1"
       isRoot shouldBe false
       items shouldBe List(
-        FileListItem("dir 2", isDir = true, mtimeMs = 4.0)
+        FileListItem("dir 2", isDir = true, mtimeMs = 4.0, permissions = "drwxr-xr-x")
       )
     })
   }
@@ -81,7 +81,7 @@ class ZipApiSpec extends AsyncTestSpec {
       path shouldBe s"$rootPath/dir 1/dir 2"
       isRoot shouldBe false
       items shouldBe List(
-        FileListItem("file 2", size = 5.0, mtimeMs = 6.0)
+        FileListItem("file 2", size = 5.0, mtimeMs = 6.0, permissions = "-rw-r--r--")
       )
     })
   }
@@ -92,17 +92,15 @@ class ZipApiSpec extends AsyncTestSpec {
     val filePath = "/dir/filePath.zip"
     val output =
       """Archive:  /test/dir/file.zip
-        |  Length      Date    Time    Name
-        |---------  ---------- -----   ----
-        |        1  06-28-2019 16:11   test/dir/file.txt
-        |---------                     -------
-        |        2                     18 files
+        |Zip file size: 595630 bytes, number of entries: 18
+        |-rw-r--r--  2.1 unx     1 bX defN 20190628.161923 test/dir/file.txt
+        |18 files
         |""".stripMargin
     val result: (js.Object, js.Object) = (output.asInstanceOf[js.Object], new js.Object)
 
     //then
     childProcess.exec.expects(*, *).onCall { (command, options) =>
-      command shouldBe s"""unzip -l "$filePath""""
+      command shouldBe s"""unzip -ZT "$filePath""""
       assertObject(options.get, new ChildProcessOptions {
         override val windowsHide = true
       })
@@ -116,7 +114,7 @@ class ZipApiSpec extends AsyncTestSpec {
     //then
     resultF.map { res =>
       res shouldBe List(
-        ZipEntry("test/dir", "file.txt", size = 1, datetimeMs = js.Date.parse("2019-06-28T16:11:00"))
+        ZipEntry("test/dir", "file.txt", isDir = false, 1, js.Date.parse("2019-06-28T16:19:23"), "-rw-r--r--")
       )
     }
   }
