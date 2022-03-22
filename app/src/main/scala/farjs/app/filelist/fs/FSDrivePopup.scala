@@ -2,7 +2,7 @@ package farjs.app.filelist.fs
 
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.FileListState
-import farjs.filelist.stack.PanelStack
+import farjs.filelist.stack.{PanelStack, WithPanelStacks}
 import farjs.ui._
 import farjs.ui.border.SingleBorder
 import farjs.ui.popup._
@@ -33,6 +33,7 @@ object FSDrivePopup extends FunctionComponent[FSDrivePopupProps] {
   protected def render(compProps: Props): ReactElement = {
     val (disks, setDisks) = useState(List.empty[FSDisk])
     val props = compProps.wrapped
+    val stacks = WithPanelStacks.usePanelStacks
     val stackProps = PanelStack.usePanelStack
 
     val data = getData(platform, disks)
@@ -44,15 +45,27 @@ object FSDrivePopup extends FunctionComponent[FSDrivePopupProps] {
     def onAction(dir: String): () => Unit = { () =>
       props.onClose()
       
-      val stack = stackProps.stack
-      if (stack.peek != stack.peekLast) {
-        stack.clear()
+      val (currStack, otherStack) =
+        if (stackProps.stack == stacks.leftStack) (stackProps.stack, stacks.rightStack)
+        else (stackProps.stack, stacks.leftStack)
+      
+      if (currStack.peek != currStack.peekLast) {
+        currStack.clear()
       }
-      stack.peekLast[FileListState].getActions.foreach { case (dispatch, actions) =>
+      val targetDir =
+        otherStack.peekLast[FileListState].state.collect {
+          case s if s.currDir.path.startsWith(dir) => s.currDir.path
+        }.orElse(
+          currStack.peekLast[FileListState].state.collect {
+            case s if s.currDir.path.startsWith(dir) => s.currDir.path
+          }
+        ).getOrElse(dir)
+      
+      currStack.peekLast[FileListState].getActions.foreach { case (dispatch, actions) =>
         dispatch(actions.changeDir(
           dispatch = dispatch,
           parent = None,
-          dir = dir
+          dir = targetDir
         ))
       }
     }

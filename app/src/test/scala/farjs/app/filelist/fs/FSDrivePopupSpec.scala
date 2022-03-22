@@ -3,8 +3,9 @@ package farjs.app.filelist.fs
 import farjs.app.filelist.MockFileListActions
 import farjs.app.filelist.fs.FSDrivePopup._
 import farjs.filelist.FileListActions.{FileListDirChangeAction, FileListTaskAction}
+import farjs.filelist.FileListState
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.stack.{PanelStack, PanelStackItem, PanelStackProps}
+import farjs.filelist.stack._
 import farjs.ui._
 import farjs.ui.popup.{ModalContentProps, PopupProps}
 import farjs.ui.theme.Theme
@@ -44,7 +45,7 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     )
   }
 
-  it should "dispatch FileListDirChangeAction and call onClose when onPress item" in {
+  it should "dispatch FileListDirChangeAction(curr panel path) when onPress" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
@@ -63,18 +64,163 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
       FSDisk("D:", size = 842915639296.0, free = 352966430720.0, "DATA"),
       FSDisk("E:", size = 0.0, free = 0.0, "")
     )))
-    val fsItem = PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), None)
-    var stackState: List[PanelStackItem[_]] = List(
-      PanelStackItem("otherComp1".asInstanceOf[ReactClass], None, None, None),
-      PanelStackItem("otherComp2".asInstanceOf[ReactClass], None, None, None),
-      fsItem
+
+    val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, Nil))
+    val currFsItem = PanelStackItem(
+      "fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(currState)
     )
-    val stack = new PanelStack(isActive = true, stackState, { f =>
-      stackState = f(stackState)
+    var currStackState: List[PanelStackItem[_]] = List(
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None),
+      currFsItem
+    )
+    val currStack = new PanelStack(isActive = true, currStackState, { f =>
+      currStackState = f(currStackState)
     }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
 
+    val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, Nil))
+    val otherStack = new PanelStack(isActive = false, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(otherState))
+    ), updater = null)
+
     //when & then
-    val renderer = createTestRenderer(withContext(<(FSDrivePopup())(^.wrapped := props)(), stack = stack))
+    val renderer = createTestRenderer(
+      withContext(<(FSDrivePopup())(^.wrapped := props)(), leftStack = currStack, rightStack = otherStack)
+    )
+    renderer.root.children.isEmpty shouldBe true
+    
+    eventually {
+      disksF should not be null
+    }.flatMap(_ => disksF).map { _ =>
+      inside(findProps(renderer.root, buttonComp)) {
+        case List(item1, _, _) =>
+          //given
+          val action = FileListDirChangeAction(FutureTask("Changing Dir",
+            Future.successful(FileListDir("/", isRoot = true, items = List.empty[FileListItem]))
+          ))
+
+          //then
+          actions.changeDir.expects(dispatch, None, "C:/test").returning(action)
+          dispatch.expects(action)
+          onClose.expects()
+          
+          //when
+          item1.onPress()
+          
+          //then
+          currStackState shouldBe List(currFsItem)
+      }
+    }
+  }
+
+  it should "dispatch FileListDirChangeAction(other panel path) when onPress" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = new Actions
+    val onClose = mockFunction[Unit]
+    val fsService = new FsService
+    FSDrivePopup.platform = Platform.win32
+    FSDrivePopup.fsService = fsService.fsService
+    val props = FSDrivePopupProps(dispatch, onClose, showOnLeft = true)
+
+    var disksF: Future[_] = null
+    dispatch.expects(*).onCall { action: Any =>
+      disksF = action.asInstanceOf[FileListTaskAction].task.future
+    }
+    fsService.readDisks.expects().returning(Future.successful(List(
+      FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
+      FSDisk("D:", size = 842915639296.0, free = 352966430720.0, "DATA"),
+      FSDisk("E:", size = 0.0, free = 0.0, "")
+    )))
+
+    val currState = FileListState(currDir = FileListDir("/test2", isRoot = false, Nil))
+    val currFsItem = PanelStackItem(
+      "fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(currState)
+    )
+    var currStackState: List[PanelStackItem[_]] = List(
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None),
+      currFsItem
+    )
+    val currStack = new PanelStack(isActive = true, currStackState, { f =>
+      currStackState = f(currStackState)
+    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
+
+    val otherState = FileListState(currDir = FileListDir("C:/test", isRoot = false, Nil))
+    val otherStack = new PanelStack(isActive = false, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(otherState))
+    ), updater = null)
+
+    //when & then
+    val renderer = createTestRenderer(
+      withContext(<(FSDrivePopup())(^.wrapped := props)(), leftStack = otherStack, rightStack = currStack)
+    )
+    renderer.root.children.isEmpty shouldBe true
+    
+    eventually {
+      disksF should not be null
+    }.flatMap(_ => disksF).map { _ =>
+      inside(findProps(renderer.root, buttonComp)) {
+        case List(item1, _, _) =>
+          //given
+          val action = FileListDirChangeAction(FutureTask("Changing Dir",
+            Future.successful(FileListDir("/", isRoot = true, items = List.empty[FileListItem]))
+          ))
+
+          //then
+          actions.changeDir.expects(dispatch, None, "C:/test").returning(action)
+          dispatch.expects(action)
+          onClose.expects()
+          
+          //when
+          item1.onPress()
+          
+          //then
+          currStackState shouldBe List(currFsItem)
+      }
+    }
+  }
+
+  it should "dispatch FileListDirChangeAction(new root dir) when onPress" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = new Actions
+    val onClose = mockFunction[Unit]
+    val fsService = new FsService
+    FSDrivePopup.platform = Platform.win32
+    FSDrivePopup.fsService = fsService.fsService
+    val props = FSDrivePopupProps(dispatch, onClose, showOnLeft = true)
+
+    var disksF: Future[_] = null
+    dispatch.expects(*).onCall { action: Any =>
+      disksF = action.asInstanceOf[FileListTaskAction].task.future
+    }
+    fsService.readDisks.expects().returning(Future.successful(List(
+      FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
+      FSDisk("D:", size = 842915639296.0, free = 352966430720.0, "DATA"),
+      FSDisk("E:", size = 0.0, free = 0.0, "")
+    )))
+
+    val currState = FileListState(currDir = FileListDir("/test", isRoot = false, Nil))
+    val curFsItem = PanelStackItem(
+      "fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(currState)
+    )
+    var currStackState: List[PanelStackItem[_]] = List(
+      PanelStackItem("otherComp1".asInstanceOf[ReactClass], None, None, None),
+      PanelStackItem("otherComp2".asInstanceOf[ReactClass], None, None, None),
+      curFsItem
+    )
+    val currStack = new PanelStack(isActive = true, currStackState, { f =>
+      currStackState = f(currStackState)
+    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
+
+    val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, Nil))
+    val otherStack = new PanelStack(isActive = false, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(otherState))
+    ), updater = null)
+
+    //when & then
+    val renderer = createTestRenderer(
+      withContext(<(FSDrivePopup())(^.wrapped := props)(), leftStack = currStack, rightStack = otherStack)
+    )
     renderer.root.children.isEmpty shouldBe true
     
     eventually {
@@ -96,7 +242,7 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
           item1.onPress()
           
           //then
-          stackState shouldBe List(fsItem)
+          currStackState shouldBe List(curFsItem)
       }
     }
   }
@@ -195,10 +341,18 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
 
   private def withContext(element: ReactElement,
                           panelInput: BlessedElement = null,
-                          stack: PanelStack = null): ReactElement = {
+                          leftStack: PanelStack = new PanelStack(isActive = true, Nil, null),
+                          rightStack: PanelStack = new PanelStack(isActive = false, Nil, null)
+                         ): ReactElement = {
 
-    <(PanelStack.Context.Provider)(^.contextValue := PanelStackProps(isRight = false, panelInput, stack))(
-      element
+    <(WithPanelStacks.Context.Provider)(^.contextValue := WithPanelStacksProps(leftStack, rightStack))(
+      <(PanelStack.Context.Provider)(^.contextValue := PanelStackProps(
+        isRight = false,
+        panelInput = panelInput,
+        stack =
+          if (leftStack.isActive) leftStack
+          else rightStack
+      ))(element)
     )
   }
 
