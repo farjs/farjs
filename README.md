@@ -21,7 +21,7 @@ Runs on [Node.js](https://nodejs.org/), thus cross-platform:
 
 ## Install
 
-To install (or upgrade) it on your machine use the following command:
+To install (or upgrade) it on your computer use the following command:
 
 ``` bash
 $ npm i -g farjs-app

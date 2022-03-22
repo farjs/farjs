@@ -13,7 +13,7 @@ object DefaultTheme extends Theme {
       override val focus = new BlessedStyle {
         override val bold = false
         override val bg = Color.cyan
-        override val fg = Color.red
+        override val fg = Color.magenta
       }
     }
     val regularItem: BlessedStyle = new BlessedStyle {

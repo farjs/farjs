@@ -13,7 +13,7 @@ object XTerm256Theme extends Theme {
       override val focus = new BlessedStyle {
         override val bold = true
         override val bg = "#088"
-        override val fg = "#800"
+        override val fg = "#a05"
       }
     }
     val regularItem: BlessedStyle = new BlessedStyle {
