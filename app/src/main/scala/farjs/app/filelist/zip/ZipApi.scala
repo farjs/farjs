@@ -10,7 +10,7 @@ class ZipApi(filePath: String,
              rootPath: String,
              entriesF: Future[List[ZipEntry]]) extends FileListApi {
 
-  private lazy val entriesByParentF = entriesF.map(_.groupBy(_.parent))
+  private lazy val entriesByParentF = ZipApi.groupByParent(entriesF)
 
   def readDir(parent: Option[String], dir: String): Future[FileListDir] = {
     val path = parent.getOrElse(rootPath)
@@ -70,6 +70,46 @@ object ZipApi {
     future.map { case (stdout, _) =>
       val output = stdout.asInstanceOf[String]
       ZipEntry.fromUnzipCommand(output)
+    }
+  }
+  
+  private[zip] def groupByParent(entriesF: Future[List[ZipEntry]]): Future[Map[String, List[ZipEntry]]] = {
+    
+    @annotation.tailrec
+    def ensureDirs(entry: ZipEntry, entriesByParent: Map[String, List[ZipEntry]]): Map[String, List[ZipEntry]] = {
+      val values = entriesByParent.getOrElse(entry.parent, Nil)
+      if (entry.name == "" || values.exists(_.name == entry.name)) entriesByParent
+      else {
+        val (parent, name) = {
+          val lastSlash = entry.parent.lastIndexOf('/')
+          if (lastSlash != -1) {
+            (entry.parent.take(lastSlash), entry.parent.drop(lastSlash + 1))
+          }
+          else ("", entry.parent)
+        }
+        ensureDirs(
+          entry = ZipEntry(
+            parent = parent,
+            name = name,
+            isDir = true,
+            datetimeMs = entry.datetimeMs,
+            permissions = "drw-r--r--"
+          ),
+          entriesByParent = entriesByParent.updatedWith(entry.parent) {
+            case None => Some(entry :: Nil)
+            case Some(values) => Some(entry :: values)
+          }
+        )
+      }
+    }
+    
+    entriesF.map { entries =>
+      var entriesByParent = Map.empty[String, List[ZipEntry]]
+      entries.foreach { entry =>
+        entriesByParent = ensureDirs(entry, entriesByParent)
+      }
+
+      entriesByParent
     }
   }
 }

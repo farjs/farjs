@@ -42,8 +42,8 @@ class ZipApiSpec extends AsyncTestSpec {
       path shouldBe rootPath
       isRoot shouldBe false
       items shouldBe List(
-        FileListItem("dir 1", isDir = true, mtimeMs = 1.0, permissions = "drwxr-xr-x"),
-        FileListItem("file 1", size = 2.0, mtimeMs = 3.0, permissions = "-rw-r--r--")
+        FileListItem("file 1", size = 2.0, mtimeMs = 3.0, permissions = "-rw-r--r--"),
+        FileListItem("dir 1", isDir = true, mtimeMs = 1.0, permissions = "drwxr-xr-x")
       )
     })
   }
@@ -115,6 +115,40 @@ class ZipApiSpec extends AsyncTestSpec {
     resultF.map { res =>
       res shouldBe List(
         ZipEntry("test/dir", "file.txt", isDir = false, 1, js.Date.parse("2019-06-28T16:19:23"), "-rw-r--r--")
+      )
+    }
+  }
+  
+  it should "infer dirs when groupByParent" in {
+    //given
+    val entriesF = Future.successful(List(
+      ZipEntry("dir 1/dir 2/dir 3", "file 3", size = 7.0, datetimeMs = 8.0, permissions = "-rw-r--r--"),
+      ZipEntry("dir 1/dir 2/dir 3", "file 4", size = 9.0, datetimeMs = 10.0, permissions = "-rw-r--r--"),
+      ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--"),
+      ZipEntry("dir 1", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--")
+    ))
+    
+    //when
+    val resultF = ZipApi.groupByParent(entriesF)
+    
+    //then
+    resultF.map { res =>
+      res shouldBe Map(
+        "dir 1/dir 2/dir 3" -> List(
+          ZipEntry("dir 1/dir 2/dir 3", "file 4", size = 9.0, datetimeMs = 10.0, permissions = "-rw-r--r--"),
+          ZipEntry("dir 1/dir 2/dir 3", "file 3", size = 7.0, datetimeMs = 8.0, permissions = "-rw-r--r--")
+        ),
+        "dir 1/dir 2" -> List(
+          ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--"),
+          ZipEntry("dir 1/dir 2", "dir 3", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--")
+        ),
+        "dir 1" -> List(
+          ZipEntry("dir 1", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--"),
+          ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--")
+        ),
+        "" -> List(
+          ZipEntry("", "dir 1", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--")
+        )
       )
     }
   }
