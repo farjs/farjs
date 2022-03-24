@@ -528,9 +528,13 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       statsPopup.onDone(total)
 
       assertTestComponent(renderer.root.children.head, copyProcessComp) {
-        case CopyProcessProps(resDispatch, resActions, move, fromPath, items, resToPath, resTotal, _, _) =>
-          resDispatch shouldBe dispatch
-          resActions shouldBe actions
+        case CopyProcessProps(resFrom, resTo, move, fromPath, items, resToPath, resTotal, _, _) =>
+          inside(resFrom) { case CopyData(resDispatch, resActions, resState) =>
+            resDispatch shouldBe dispatch
+            resActions shouldBe actions
+            resState shouldBe state
+          }
+          resTo shouldBe resFrom
           move shouldBe false
           fromPath shouldBe currDir.path
           items shouldBe List((item, to))
@@ -592,9 +596,17 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       statsPopup.onDone(total)
 
       assertTestComponent(renderer.root.children.head, copyProcessComp) {
-        case CopyProcessProps(resDispatch, resActions, move, fromPath, items, resToPath, resTotal, _, _) =>
-          resDispatch shouldBe dispatch
-          resActions shouldBe actions.actions
+        case CopyProcessProps(resFrom, resTo, move, fromPath, items, resToPath, resTotal, _, _) =>
+          inside(resFrom) { case CopyData(resDispatch, resActions, resState) =>
+            resDispatch shouldBe dispatch
+            resActions shouldBe actions.actions
+            resState shouldBe state
+          }
+          inside(resTo) { case CopyData(resDispatch, resActions, resState) =>
+            resDispatch shouldBe toDispatch
+            resActions shouldBe toActions
+            resState shouldBe toState
+          }
           move shouldBe true
           fromPath shouldBe currDir.path
           items shouldBe List((item, item.name))

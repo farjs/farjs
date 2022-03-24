@@ -1,17 +1,16 @@
 package farjs.filelist.copy
 
 import farjs.filelist.FileListActions.{FileListParamsChangedAction, FileListTaskAction}
+import farjs.filelist.FileListState
 import farjs.filelist.api.FileListItem
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.FileListPopupsState
 import farjs.filelist.stack.{PanelStack, WithPanelStacks}
-import farjs.filelist.{FileListActions, FileListState}
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
 import scommons.nodejs.path
 import scommons.react._
 import scommons.react.hooks._
-import scommons.react.redux.Dispatch
 import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -26,13 +25,6 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
   private[copy] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
   private[copy] var moveProcessComp: UiComponent[MoveProcessProps] = MoveProcess
 
-  private class Data(val dispatch: Dispatch,
-                     val actions: FileListActions,
-                     val state: FileListState) {
-    
-    def path: String = state.currDir.path
-  }
-  
   protected def render(compProps: Props): ReactElement = {
     val stacks = WithPanelStacks.usePanelStacks
     val (maybeTotal, setTotal) = useState[Option[Double]](None)
@@ -45,10 +37,10 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
 
     val showCopyMovePopup = compProps.wrapped.showCopyMovePopup
     
-    def getData(stack: PanelStack): Option[Data] = {
+    def getData(stack: PanelStack): Option[CopyData] = {
       val item = stack.peek[FileListState]
       item.getActions.zip(item.state).map { case ((dispatch, actions), state) =>
-        new Data(dispatch, actions, state)
+        CopyData(dispatch, actions, state)
       }
     }
     
@@ -212,8 +204,10 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
             total <- maybeTotal
           } yield {
             <(copyProcessComp())(^.wrapped := CopyProcessProps(
-              dispatch = from.dispatch,
-              actions = from.actions,
+              from = from,
+              to =
+                if (!inplace) maybeTo.getOrElse(from)
+                else from,
               move = move,
               fromPath = from.path,
               items =
@@ -232,7 +226,7 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
     }.orNull
   }
   
-  private def checkSameDrive(from: Data, toPath: String): Future[Boolean] = {
+  private def checkSameDrive(from: CopyData, toPath: String): Future[Boolean] = {
     for {
       maybeFromRoot <- from.actions.getDriveRoot(from.path)
       maybeToRoot <- from.actions.getDriveRoot(toPath)

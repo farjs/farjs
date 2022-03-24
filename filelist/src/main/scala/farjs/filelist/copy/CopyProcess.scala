@@ -1,6 +1,5 @@
 package farjs.filelist.copy
 
-import farjs.filelist.FileListActions
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.api.FileListItem
 import farjs.ui.popup._
@@ -9,7 +8,6 @@ import scommons.nodejs
 import scommons.nodejs.raw.Timers
 import scommons.react._
 import scommons.react.hooks._
-import scommons.react.redux.Dispatch
 import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -17,8 +15,8 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.util.{Failure, Success}
 
-case class CopyProcessProps(dispatch: Dispatch,
-                            actions: FileListActions,
+case class CopyProcessProps(from: CopyData,
+                            to: CopyData,
                             move: Boolean,
                             fromPath: String,
                             items: Seq[(FileListItem, String)],
@@ -39,7 +37,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
                                cancel: Boolean = false,
                                existing: Option[FileListItem] = None)
 
-  private case class CopyData(item: FileListItem = FileListItem(""),
+  private case class CopyInfo(item: FileListItem = FileListItem(""),
                               to: String = "",
                               itemPercent: Int = 0,
                               itemBytes: Double = 0.0,
@@ -51,7 +49,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
     val inProgress = useRef(false)
     val cancelPromise = useRef(Promise.successful(()))
     val existsPromise = useRef(Promise.successful[Option[Boolean]](None))
-    val data = useRef(CopyData())
+    val data = useRef(CopyInfo())
     val props = compProps.wrapped
     
     def doCopy(): Unit = {
@@ -65,13 +63,13 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
           resF.flatMap {
             case (prevCopied, true) if item.isDir && inProgress.current =>
               for {
-                dirList <- props.actions.readDir(Some(parent), item.name)
+                dirList <- props.from.actions.readDir(Some(parent), item.name)
                 dstDirs = targetDirs :+ toName
-                _ <- props.actions.mkDirs(dstDirs)
+                _ <- props.to.actions.mkDirs(dstDirs)
                 res <- loop(prevCopied, dirList.path, dstDirs, dirList.items.map(i => (i, i.name)))
                 (isCopied, done) = res
                 _ <-
-                  if (isCopied && done && props.move) props.actions.delete(parent, Seq(item))
+                  if (isCopied && done && props.move) props.from.actions.delete(parent, Seq(item))
                   else Future.unit
               } yield res
             case (prevCopied, true) if !item.isDir && inProgress.current =>
@@ -83,7 +81,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
               )
               var isCopied = true
               for {
-                done <- props.actions.copyFile(List(parent), item, targetDirs, toName, onExists = { existing =>
+                done <- props.from.actions.copyFile(List(parent), item, targetDirs, toName, onExists = { existing =>
                   if (inProgress.current && data.current.askWhenExists) {
                     setState(_.copy(existing = Some(existing)))
                     existsPromise.current = Promise[Option[Boolean]]()
@@ -102,7 +100,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
                   cancelPromise.current.future.map(_ => inProgress.current)
                 })
                 _ <-
-                  if (isCopied && done && props.move) props.actions.delete(parent, Seq(item))
+                  if (isCopied && done && props.move) props.from.actions.delete(parent, Seq(item))
                   else Future.unit
               } yield {
                 if (done) {
@@ -135,7 +133,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
         case Success(_) => props.onDone()
         case Failure(_) =>
           props.onDone()
-          props.dispatch(FileListTaskAction(FutureTask("Copy/Move Items", resultF)))
+          props.from.dispatch(FileListTaskAction(FutureTask("Copy/Move Items", resultF)))
       }
     }
 
