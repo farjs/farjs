@@ -81,24 +81,29 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
               )
               var isCopied = true
               for {
-                done <- props.from.actions.copyFile(List(parent), item, targetDirs, toName, onExists = { existing =>
-                  if (inProgress.current && data.current.askWhenExists) {
-                    setState(_.copy(existing = Some(existing)))
-                    existsPromise.current = Promise[Option[Boolean]]()
-                  }
-                  existsPromise.current.future.map { maybeOverwrite =>
-                    if (maybeOverwrite.isEmpty) {
-                      isCopied = false
+                done <- props.from.actions.copyFile(
+                  srcDirs = List(parent),
+                  srcItem = item,
+                  dstFileF = props.to.actions.writeFile(targetDirs, toName, onExists = { existing =>
+                    if (inProgress.current && data.current.askWhenExists) {
+                      setState(_.copy(existing = Some(existing)))
+                      existsPromise.current = Promise[Option[Boolean]]()
                     }
-                    maybeOverwrite
+                    existsPromise.current.future.map { maybeOverwrite =>
+                      if (maybeOverwrite.isEmpty) {
+                        isCopied = false
+                      }
+                      maybeOverwrite
+                    }
+                  }),
+                  onProgress = { position =>
+                    data.current = data.current.copy(
+                      itemPercent = (divide(position, item.size) * 100).toInt,
+                      itemBytes = position
+                    )
+                    cancelPromise.current.future.map(_ => inProgress.current)
                   }
-                }, onProgress = { position =>
-                  data.current = data.current.copy(
-                    itemPercent = (divide(position, item.size) * 100).toInt,
-                    itemBytes = position
-                  )
-                  cancelPromise.current.future.map(_ => inProgress.current)
-                })
+                )
                 _ <-
                   if (isCopied && done && props.move) props.from.actions.delete(parent, Seq(item))
                   else Future.unit

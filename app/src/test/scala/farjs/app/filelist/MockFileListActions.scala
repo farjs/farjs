@@ -2,7 +2,7 @@ package farjs.app.filelist
 
 import farjs.filelist.FileListActions
 import farjs.filelist.FileListActions._
-import farjs.filelist.api.{FileListApi, FileListDir, FileListItem}
+import farjs.filelist.api._
 import scommons.react.redux.Dispatch
 
 import scala.concurrent.Future
@@ -18,8 +18,10 @@ class MockFileListActions(
   deleteMock: (String, Seq[FileListItem]) => Future[Unit] = (_, _) => ???,
   deleteActionMock: (Dispatch, String, Seq[FileListItem]) => FileListTaskAction = (_, _, _) => ???,
   scanDirsMock: (String, Seq[FileListItem], (String, Seq[FileListItem]) => Boolean) => Future[Boolean] = (_, _, _) => ???,
-  copyFileMock: (List[String], FileListItem, List[String], String,
-    FileListItem => Future[Option[Boolean]], Double => Future[Boolean]) => Future[Boolean] = (_, _, _, _, _, _) => ???
+  writeFileMock: (List[String], String,
+    FileListItem => Future[Option[Boolean]]) => Future[Option[FileTarget]] = (_, _, _) => ???,
+  copyFileMock: (List[String], FileListItem, Future[Option[FileTarget]],
+    Double => Future[Boolean]) => Future[Boolean] = (_, _, _, _) => ???
 ) extends FileListActions {
 
   protected def api: FileListApi = ???
@@ -66,13 +68,18 @@ class MockFileListActions(
     scanDirsMock(parent, items, onNextDir)
   }
   
+  override def writeFile(parentDirs: List[String],
+                         fileName: String,
+                         onExists: FileListItem => Future[Option[Boolean]]): Future[Option[FileTarget]] = {
+
+    writeFileMock(parentDirs, fileName, onExists)
+  }
+
   override def copyFile(srcDirs: List[String],
                         srcItem: FileListItem,
-                        dstDirs: List[String],
-                        dstName: String,
-                        onExists: FileListItem => Future[Option[Boolean]],
+                        dstFileF: Future[Option[FileTarget]],
                         onProgress: Double => Future[Boolean]): Future[Boolean] = {
 
-    copyFileMock(srcDirs, srcItem, dstDirs, dstName, onExists, onProgress)
+    copyFileMock(srcDirs, srcItem, dstFileF, onProgress)
   }
 }

@@ -273,7 +273,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     onProgress.expects(position).returning(Future.successful(true))
     
     //when
-    val resultF = actions.copyFile(srcDirs, file, dstDirs, dstName, onExists, onProgress)
+    val resultF = actions.copyFile(srcDirs, file, actions.writeFile(dstDirs, dstName, onExists), onProgress)
     
     //then
     resultF.map { res =>
@@ -325,7 +325,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     onProgress.expects(position).returning(Future.successful(true))
     
     //when
-    val resultF = actions.copyFile(srcDirs, file, dstDirs, dstName, onExists, onProgress)
+    val resultF = actions.copyFile(srcDirs, file, actions.writeFile(dstDirs, dstName, onExists), onProgress)
     
     //then
     resultF.map { res =>
@@ -377,7 +377,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     onProgress.expects(position).returning(Future.successful(true))
     
     //when
-    val resultF = actions.copyFile(srcDirs, file, dstDirs, dstName, onExists, onProgress)
+    val resultF = actions.copyFile(srcDirs, file, actions.writeFile(dstDirs, dstName, onExists), onProgress)
     
     //then
     resultF.map { res =>
@@ -408,7 +408,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     onProgress.expects(file.size).returning(Future.successful(false))
     
     //when
-    val resultF = actions.copyFile(srcDirs, file, dstDirs, dstName, onExists, onProgress)
+    val resultF = actions.copyFile(srcDirs, file, actions.writeFile(dstDirs, dstName, onExists), onProgress)
     
     //then
     resultF.map { res =>
@@ -451,7 +451,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     onProgress.expects(position).returning(Future.successful(false))
     
     //when
-    val resultF = actions.copyFile(srcDirs, file, dstDirs, dstName, onExists, onProgress)
+    val resultF = actions.copyFile(srcDirs, file, actions.writeFile(dstDirs, dstName, onExists), onProgress)
     
     //then
     resultF.map { res =>

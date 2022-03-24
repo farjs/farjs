@@ -1,7 +1,7 @@
 package farjs.filelist
 
 import farjs.filelist.FileListActions._
-import farjs.filelist.api.{FileListApi, FileListDir, FileListItem}
+import farjs.filelist.api.{FileListApi, FileListDir, FileListItem, FileTarget}
 import scommons.nodejs.{path => nodePath}
 import scommons.react.redux._
 import scommons.react.redux.task.{FutureTask, TaskAction}
@@ -94,14 +94,19 @@ trait FileListActions {
     }
   }
 
+  def writeFile(parentDirs: List[String],
+                fileName: String,
+                onExists: FileListItem => Future[Option[Boolean]]): Future[Option[FileTarget]] = {
+
+    api.writeFile(parentDirs, fileName, onExists)
+  }
+
   def copyFile(srcDirs: List[String],
                srcItem: FileListItem,
-               dstDirs: List[String],
-               dstName: String,
-               onExists: FileListItem => Future[Option[Boolean]],
+               dstFileF: Future[Option[FileTarget]],
                onProgress: Double => Future[Boolean]): Future[Boolean] = {
 
-    api.writeFile(dstDirs, dstName, onExists).flatMap {
+    dstFileF.flatMap {
       case None => onProgress(srcItem.size)
       case Some(target) =>
         api.readFile(srcDirs, srcItem, 0.0).flatMap { source =>
