@@ -16,6 +16,8 @@ trait FileListActions {
 
   protected def api: FileListApi
 
+  def isLocalFS: Boolean
+
   def getDriveRoot(path: String): Future[Option[String]]
 
   def changeDir(dispatch: Dispatch,

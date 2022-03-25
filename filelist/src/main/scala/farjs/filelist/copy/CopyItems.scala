@@ -106,7 +106,8 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
         val move = isMove
         val inplace = isInplace
         val resolveF =
-          if (!inplace) resolveTargetDir(move, path)
+          if (!from.actions.isLocalFS) Future.successful((path, false))
+          else if (!inplace) resolveTargetDir(move, path)
           else Future.successful((path, true))
 
         resolveF.map { case (toPath, sameDrive) =>

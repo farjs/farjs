@@ -468,6 +468,8 @@ object FileListActionsSpec {
 
     protected def api: FileListApi = apiMock
 
+    val isLocalFS: Boolean = true
+
     def getDriveRoot(path: String): Future[Option[String]] = ???
   }
 }

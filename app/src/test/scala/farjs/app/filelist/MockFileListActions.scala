@@ -9,6 +9,7 @@ import scala.concurrent.Future
 
 //noinspection NotImplementedCode
 class MockFileListActions(
+  isLocalFSMock: Boolean = true,
   getDriveRootMock: String => Future[Option[String]] = _ => ???,
   changeDirMock: (Dispatch, Option[String], String) => FileListDirChangeAction = (_, _, _) => ???,
   updateDirMock: (Dispatch, String) => FileListDirUpdateAction = (_, _) => ???,
@@ -25,6 +26,8 @@ class MockFileListActions(
 ) extends FileListActions {
 
   protected def api: FileListApi = ???
+
+  val isLocalFS: Boolean = isLocalFSMock
 
   override def getDriveRoot(path: String): Future[Option[String]] =
     getDriveRootMock(path)

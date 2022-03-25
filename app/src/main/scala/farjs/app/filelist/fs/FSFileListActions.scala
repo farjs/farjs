@@ -11,6 +11,8 @@ class FSFileListActions private[fs](
   fsService: FSService
 ) extends FileListActions {
 
+  val isLocalFS: Boolean = true
+
   def getDriveRoot(path: String): Future[Option[String]] = {
     fsService.readDisk(path).map(_.map(_.root))
   }
