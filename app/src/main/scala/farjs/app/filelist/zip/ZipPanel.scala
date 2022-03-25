@@ -14,7 +14,7 @@ import scala.concurrent.Future
 import scala.util.Failure
 
 class ZipPanel(rootPath: String,
-               entriesF: Future[List[ZipEntry]],
+               entriesByParentF: Future[Map[String, List[ZipEntry]]],
                onClose: () => Unit
               ) extends FunctionComponent[FileListPanelProps] {
 
@@ -23,13 +23,15 @@ class ZipPanel(rootPath: String,
 
     useLayoutEffect({ () =>
       if (props.state.currDir.items.isEmpty) {
-        val zipF = entriesF.map { entries =>
-          val totalSize = entries.map(_.size).sum
+        val zipF = entriesByParentF.map { entriesByParent =>
+          val totalSize = entriesByParent.foldLeft(0.0) { (total, entry) =>
+            total + entry._2.foldLeft(0.0)(_ + _.size)
+          }
           props.dispatch(FileListDiskSpaceUpdatedAction(totalSize))
           props.dispatch(FileListDirChangedAction(FileListDir.curr, FileListDir(
             path = rootPath,
             isRoot = false,
-            items = entries.filter(_.parent.isEmpty).map(ZipApi.convertToFileListItem)
+            items = entriesByParent.getOrElse("", Nil).map(ZipApi.convertToFileListItem)
           )))
         }.andThen {
           case Failure(_) =>

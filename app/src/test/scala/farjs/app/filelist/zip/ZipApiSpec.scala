@@ -11,11 +11,17 @@ import scala.scalajs.js
 
 class ZipApiSpec extends AsyncTestSpec {
 
-  private val entriesF = Future.successful(List(
-    ZipEntry("", "dir 1", isDir = true, datetimeMs = 1.0, permissions = "drwxr-xr-x"),
-    ZipEntry("", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--"),
-    ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 4.0, permissions = "drwxr-xr-x"),
-    ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--")
+  private val entriesByParentF = Future.successful(Map(
+    "" -> List(
+      ZipEntry("", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--"),
+      ZipEntry("", "dir 1", isDir = true, datetimeMs = 1.0, permissions = "drwxr-xr-x")
+    ),
+    "dir 1" -> List(
+      ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 4.0, permissions = "drwxr-xr-x")
+    ),
+    "dir 1/dir 2" -> List(
+      ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--")
+    )
   ))
 
   //noinspection TypeAnnotation
@@ -30,9 +36,10 @@ class ZipApiSpec extends AsyncTestSpec {
 
   it should "return root dir content when readDir(.)" in {
     //given
-    val filePath = "/dir/filePath.zip"
+    val childProcess = new ChildProcess
+    val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
-    val api = new ZipApi(filePath, rootPath, entriesF)
+    val api = new ZipApi(childProcess.childProcess, zipPath, rootPath, entriesByParentF)
     
     //when
     val resultF = api.readDir(None, FileListItem.currDir.name)
@@ -50,9 +57,10 @@ class ZipApiSpec extends AsyncTestSpec {
 
   it should "return root dir content when readDir(..)" in {
     //given
-    val filePath = "/dir/filePath.zip"
+    val childProcess = new ChildProcess
+    val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
-    val api = new ZipApi(filePath, rootPath, entriesF)
+    val api = new ZipApi(childProcess.childProcess, zipPath, rootPath, entriesByParentF)
     
     //when
     val resultF = api.readDir(Some(s"$rootPath/dir 1/dir 2"), FileListItem.up.name)
@@ -69,9 +77,10 @@ class ZipApiSpec extends AsyncTestSpec {
 
   it should "return sub-dir content when readDir" in {
     //given
-    val filePath = "/dir/filePath.zip"
+    val childProcess = new ChildProcess
+    val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
-    val api = new ZipApi(filePath, rootPath, entriesF)
+    val api = new ZipApi(childProcess.childProcess, zipPath, rootPath, entriesByParentF)
     
     //when
     val resultF = api.readDir(Some(s"$rootPath/dir 1"), "dir 2")
@@ -89,7 +98,7 @@ class ZipApiSpec extends AsyncTestSpec {
   it should "call unzip and parse output when readZip" in {
     //given
     val childProcess = new ChildProcess
-    val filePath = "/dir/filePath.zip"
+    val zipPath = "/dir/filePath.zip"
     val output =
       """Archive:  /test/dir/file.zip
         |Zip file size: 595630 bytes, number of entries: 18
@@ -100,7 +109,7 @@ class ZipApiSpec extends AsyncTestSpec {
 
     //then
     childProcess.exec.expects(*, *).onCall { (command, options) =>
-      command shouldBe s"""unzip -ZT "$filePath""""
+      command shouldBe s"""unzip -ZT "$zipPath""""
       assertObject(options.get, new ChildProcessOptions {
         override val windowsHide = true
       })
@@ -109,47 +118,53 @@ class ZipApiSpec extends AsyncTestSpec {
     }
 
     //when
-    val resultF = ZipApi.readZip(childProcess.childProcess, filePath)
+    val resultF = ZipApi.readZip(childProcess.childProcess, zipPath)
 
     //then
     resultF.map { res =>
-      res shouldBe List(
-        ZipEntry("test/dir", "file.txt", isDir = false, 1, js.Date.parse("2019-06-28T16:19:23"), "-rw-r--r--")
+      res shouldBe Map(
+        "test/dir" -> List(
+          ZipEntry("test/dir", "file.txt", isDir = false, 1, js.Date.parse("2019-06-28T16:19:23"), "-rw-r--r--")
+        ),
+        "test" -> List(
+          ZipEntry("test", "dir", isDir = true, 0, js.Date.parse("2019-06-28T16:19:23"), "drw-r--r--")
+        ),
+        "" -> List(
+          ZipEntry("", "test", isDir = true, 0, js.Date.parse("2019-06-28T16:19:23"), "drw-r--r--")
+        )
       )
     }
   }
   
   it should "infer dirs when groupByParent" in {
     //given
-    val entriesF = Future.successful(List(
+    val entriesF = List(
       ZipEntry("dir 1/dir 2/dir 3", "file 3", size = 7.0, datetimeMs = 8.0, permissions = "-rw-r--r--"),
       ZipEntry("dir 1/dir 2/dir 3", "file 4", size = 9.0, datetimeMs = 10.0, permissions = "-rw-r--r--"),
       ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--"),
       ZipEntry("dir 1", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--")
-    ))
+    )
     
     //when
-    val resultF = ZipApi.groupByParent(entriesF)
+    val result = ZipApi.groupByParent(entriesF)
     
     //then
-    resultF.map { res =>
-      res shouldBe Map(
-        "dir 1/dir 2/dir 3" -> List(
-          ZipEntry("dir 1/dir 2/dir 3", "file 4", size = 9.0, datetimeMs = 10.0, permissions = "-rw-r--r--"),
-          ZipEntry("dir 1/dir 2/dir 3", "file 3", size = 7.0, datetimeMs = 8.0, permissions = "-rw-r--r--")
-        ),
-        "dir 1/dir 2" -> List(
-          ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--"),
-          ZipEntry("dir 1/dir 2", "dir 3", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--")
-        ),
-        "dir 1" -> List(
-          ZipEntry("dir 1", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--"),
-          ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--")
-        ),
-        "" -> List(
-          ZipEntry("", "dir 1", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--")
-        )
+    result shouldBe Map(
+      "dir 1/dir 2/dir 3" -> List(
+        ZipEntry("dir 1/dir 2/dir 3", "file 4", size = 9.0, datetimeMs = 10.0, permissions = "-rw-r--r--"),
+        ZipEntry("dir 1/dir 2/dir 3", "file 3", size = 7.0, datetimeMs = 8.0, permissions = "-rw-r--r--")
+      ),
+      "dir 1/dir 2" -> List(
+        ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--"),
+        ZipEntry("dir 1/dir 2", "dir 3", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--")
+      ),
+      "dir 1" -> List(
+        ZipEntry("dir 1", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--"),
+        ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--")
+      ),
+      "" -> List(
+        ZipEntry("", "dir 1", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--")
       )
-    }
+    )
   }
 }

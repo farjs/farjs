@@ -9,7 +9,7 @@ class ZipPluginSpec extends TestSpec {
 
   it should "trigger plugin on .zip and .jar files" in {
     //given
-    val plugin = new ZipPlugin(new MockChildProcess, (_, _) => Future.successful(Nil))
+    val plugin = new ZipPlugin(new MockChildProcess, (_, _) => Future.successful(Map.empty))
     
     //when & then
     plugin.onFileTrigger("filePath.txt", () => ()) shouldBe None

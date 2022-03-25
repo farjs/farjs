@@ -6,11 +6,10 @@ import scommons.nodejs.{ChildProcess, raw}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ZipApi(filePath: String,
+class ZipApi(childProcess: ChildProcess,
+             zipPath: String,
              rootPath: String,
-             entriesF: Future[List[ZipEntry]]) extends FileListApi {
-
-  private lazy val entriesByParentF = ZipApi.groupByParent(entriesF)
+             entriesByParentF: Future[Map[String, List[ZipEntry]]]) extends FileListApi {
 
   def readDir(parent: Option[String], dir: String): Future[FileListDir] = {
     val path = parent.getOrElse(rootPath)
@@ -59,9 +58,9 @@ object ZipApi {
     )
   }
 
-  def readZip(childProcess: ChildProcess, filePath: String): Future[List[ZipEntry]] = {
+  def readZip(childProcess: ChildProcess, zipPath: String): Future[Map[String, List[ZipEntry]]] = {
     val (_, future) = childProcess.exec(
-      command = s"""unzip -ZT "$filePath"""",
+      command = s"""unzip -ZT "$zipPath"""",
       options = Some(new raw.ChildProcessOptions {
         override val windowsHide = true
       })
@@ -69,11 +68,12 @@ object ZipApi {
 
     future.map { case (stdout, _) =>
       val output = stdout.asInstanceOf[String]
-      ZipEntry.fromUnzipCommand(output)
+      val entries = ZipEntry.fromUnzipCommand(output)
+      ZipApi.groupByParent(entries)
     }
   }
   
-  private[zip] def groupByParent(entriesF: Future[List[ZipEntry]]): Future[Map[String, List[ZipEntry]]] = {
+  private[zip] def groupByParent(entries: List[ZipEntry]): Map[String, List[ZipEntry]] = {
     
     @annotation.tailrec
     def ensureDirs(entry: ZipEntry, entriesByParent: Map[String, List[ZipEntry]]): Map[String, List[ZipEntry]] = {
@@ -103,13 +103,11 @@ object ZipApi {
       }
     }
     
-    entriesF.map { entries =>
-      var entriesByParent = Map.empty[String, List[ZipEntry]]
-      entries.foreach { entry =>
-        entriesByParent = ensureDirs(entry, entriesByParent)
-      }
-
-      entriesByParent
+    var entriesByParent = Map.empty[String, List[ZipEntry]]
+    entries.foreach { entry =>
+      entriesByParent = ensureDirs(entry, entriesByParent)
     }
+
+    entriesByParent
   }
 }

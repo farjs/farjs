@@ -16,11 +16,17 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
   ZipPanel.fileListPanelComp = mockUiComponent("FileListPanel")
 
-  private val entriesF = Future.successful(List(
-    ZipEntry("", "dir 1", isDir = true, datetimeMs = 1.0),
-    ZipEntry("", "file 1", size = 2.0, datetimeMs = 3.0),
-    ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 4.0),
-    ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0)
+  private val entriesByParentF = Future.successful(Map(
+    "" -> List(
+      ZipEntry("", "dir 1", isDir = true, datetimeMs = 1.0),
+      ZipEntry("", "file 1", size = 2.0, datetimeMs = 3.0)
+    ),
+    "dir 1" -> List(
+      ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 4.0)
+    ),
+    "dir 1/dir 2" -> List(
+      ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0)
+    )
   ))
 
   it should "return false when onKeypress(unknown key)" in {
@@ -34,7 +40,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       ))
     ))
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel(rootPath, entriesF, onClose)
+    val zipPanel = new ZipPanel(rootPath, entriesByParentF, onClose)
 
     dispatch.expects(*).never()
     val comp = testRender(<(zipPanel())(^.wrapped := props)())
@@ -59,7 +65,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       ))
     ))
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel(rootPath, entriesF, onClose)
+    val zipPanel = new ZipPanel(rootPath, entriesByParentF, onClose)
 
     dispatch.expects(*).never()
     val comp = testRender(<(zipPanel())(^.wrapped := props)())
@@ -86,7 +92,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       ))
     ))
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel(rootPath, entriesF, onClose)
+    val zipPanel = new ZipPanel(rootPath, entriesByParentF, onClose)
 
     dispatch.expects(*).never()
     val comp = testRender(<(zipPanel())(^.wrapped := props)())
@@ -113,7 +119,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       ))
     ))
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel(rootPath, entriesF, onClose)
+    val zipPanel = new ZipPanel(rootPath, entriesByParentF, onClose)
 
     dispatch.expects(*).never()
     val comp = testRender(<(zipPanel())(^.wrapped := props)())
@@ -141,7 +147,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       ))
     ))
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel(rootPath, entriesF, onClose)
+    val zipPanel = new ZipPanel(rootPath, entriesByParentF, onClose)
 
     dispatch.expects(*).never()
     val comp = testRender(<(zipPanel())(^.wrapped := props)())
@@ -199,7 +205,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     )
     val props = FileListPanelProps(dispatch, actions, state)
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel(rootPath, Future.successful(Nil), onClose)
+    val zipPanel = new ZipPanel(rootPath, Future.successful(Map.empty), onClose)
     
     //then
     dispatch.expects(*).never()
@@ -219,7 +225,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val state = FileListState()
     val props = FileListPanelProps(dispatch, actions, state)
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel(rootPath, entriesF, onClose)
+    val zipPanel = new ZipPanel(rootPath, entriesByParentF, onClose)
     
     //then
     var actionF: Future[_] = null
