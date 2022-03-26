@@ -3,6 +3,7 @@ package farjs.app.filelist.zip
 import farjs.filelist.api._
 import scommons.nodejs.{ChildProcess, raw}
 
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -74,32 +75,39 @@ object ZipApi {
   }
   
   private[zip] def groupByParent(entries: List[ZipEntry]): Map[String, List[ZipEntry]] = {
+    val processedDirs = mutable.Set[String]()
     
     @annotation.tailrec
     def ensureDirs(entry: ZipEntry, entriesByParent: Map[String, List[ZipEntry]]): Map[String, List[ZipEntry]] = {
       val values = entriesByParent.getOrElse(entry.parent, Nil)
       if (entry.name == "" || values.exists(_.name == entry.name)) entriesByParent
       else {
-        val (parent, name) = {
-          val lastSlash = entry.parent.lastIndexOf('/')
-          if (lastSlash != -1) {
-            (entry.parent.take(lastSlash), entry.parent.drop(lastSlash + 1))
-          }
-          else ("", entry.parent)
+        val updatedEntries = entriesByParent.updatedWith(entry.parent) {
+          case None => Some(entry :: Nil)
+          case Some(values) => Some(entry :: values)
         }
-        ensureDirs(
-          entry = ZipEntry(
-            parent = parent,
-            name = name,
-            isDir = true,
-            datetimeMs = entry.datetimeMs,
-            permissions = "drw-r--r--"
-          ),
-          entriesByParent = entriesByParent.updatedWith(entry.parent) {
-            case None => Some(entry :: Nil)
-            case Some(values) => Some(entry :: values)
+
+        if (processedDirs.contains(entry.parent)) updatedEntries
+        else {
+          processedDirs += entry.parent
+          val (parent, name) = {
+            val lastSlash = entry.parent.lastIndexOf('/')
+            if (lastSlash != -1) {
+              (entry.parent.take(lastSlash), entry.parent.drop(lastSlash + 1))
+            }
+            else ("", entry.parent)
           }
-        )
+          ensureDirs(
+            entry = ZipEntry(
+              parent = parent,
+              name = name,
+              isDir = true,
+              datetimeMs = entry.datetimeMs,
+              permissions = "drw-r--r--"
+            ),
+            entriesByParent = updatedEntries
+          )
+        }
       }
     }
     
