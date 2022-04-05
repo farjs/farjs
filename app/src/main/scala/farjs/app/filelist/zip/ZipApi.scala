@@ -1,11 +1,14 @@
 package farjs.app.filelist.zip
 
 import farjs.filelist.api._
+import scommons.nodejs.util.SubProcess
 import scommons.nodejs.{ChildProcess, raw}
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.scalajs.js.typedarray.Uint8Array
+import scala.util.control.NonFatal
 
 class ZipApi(childProcess: ChildProcess,
              zipPath: String,
@@ -42,9 +45,57 @@ class ZipApi(childProcess: ChildProcess,
 
   def mkDirs(dirs: List[String]): Future[Unit] = ???
 
-  def readFile(parentDirs: List[String], file: FileListItem, position: Double): Future[FileSource] = ???
+  def readFile(parentDirs: List[String], item: FileListItem, position: Double): Future[FileSource] = {
+    val filePath = s"${parentDirs.mkString("/")}/${item.name}".stripPrefix(rootPath).stripPrefix("/")
+    val subprocessF = extract(zipPath, filePath)
+
+    subprocessF.map { case SubProcess(_, stdout, exitF) =>
+      new FileSource {
+        private var pos = 0
+
+        val file: String = filePath
+
+        def readNextBytes(buff: Uint8Array): Future[Int] = {
+          stdout.readNextBytes(buff.length).flatMap {
+            case None =>
+              if (pos != item.size) exitF.map(_ => 0)
+              else Future.successful(0)
+            case Some(content) => Future.successful {
+              val bytesRead = content.length
+              for (i <- 0 until bytesRead) {
+                buff(i) = content(i)
+              }
+
+              pos += bytesRead
+              bytesRead
+            }
+          }
+        }
+
+        def close(): Future[Unit] = {
+          if (pos != item.size) {
+            stdout.readable.destroy()
+          }
+
+          exitF.recover {
+            case NonFatal(_) => ()
+          }
+        }
+      }
+    }
+  }
 
   def writeFile(parentDirs: List[String], fileName: String, onExists: FileListItem => Future[Option[Boolean]]): Future[Option[FileTarget]] = ???
+
+  private[zip] def extract(zipPath: String, filePath: String): Future[SubProcess] = {
+    SubProcess.wrap(childProcess.spawn(
+      command = "unzip",
+      args = List("-p", zipPath, filePath),
+      options = Some(new raw.ChildProcessOptions {
+        override val windowsHide = true
+      })
+    ))
+  }
 }
 
 object ZipApi {

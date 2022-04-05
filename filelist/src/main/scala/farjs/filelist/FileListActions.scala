@@ -137,9 +137,10 @@ trait FileListActions {
           target.close().recover {
             case NonFatal(ex) => println(s"Failed to close dstFile: ${target.file}, error: $ex")
           }.flatMap(_ => Future.fromTry(res))
-        }.flatMap { res =>
-          if (!res) target.delete().map(_ => res)
-          else Future.successful(res)
+        }.transformWith { tryRes =>
+          val res = tryRes.getOrElse(false)
+          if (!res) target.delete().flatMap(_ => Future.fromTry(tryRes))
+          else Future.fromTry(tryRes)
         }
     }
   }

@@ -458,6 +458,45 @@ class FileListActionsSpec extends AsyncTestSpec {
       res shouldBe false
     }
   }
+
+  it should "return failed Future and delete target file if failed when copyFile" in {
+    //given
+    val api = new Api
+    val actions = new FileListActionsTest(api.api)
+    val srcDirs = List("parent-dir")
+    val file = FileListItem("test_file")
+    val dstDirs = List("target-dir")
+    val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
+    val onProgress = mockFunction[Double, Future[Boolean]]
+    val error = new Exception("test error")
+    
+    val source = new Source
+    source.readNextBytes.expects(*).onCall { buff: Uint8Array =>
+      buff.length shouldBe (64 * 1024)
+      Future.failed(error)
+    }
+    source.close.expects().returning(Future.unit)
+    
+    val target = new Target
+    target.writeNextBytes.expects(*, *).never()
+    target.close.expects().returning(Future.unit)
+    target.delete.expects().returning(Future.unit)
+    val dstName = "newName"
+
+    //then
+    api.writeFile.expects(dstDirs, dstName, *).returning(Future.successful(Some(target.target)))
+    api.readFile.expects(srcDirs, file, 0.0).returning(Future.successful(source.source))
+    onExists.expects(*).never()
+    onProgress.expects(*).never()
+    
+    //when
+    val resultF = actions.copyFile(srcDirs, file, actions.writeFile(dstDirs, dstName, onExists), onProgress)
+    
+    //then
+    resultF.failed.map { ex =>
+      ex shouldBe error
+    }
+  }
 }
 
 //noinspection NotImplementedCode
