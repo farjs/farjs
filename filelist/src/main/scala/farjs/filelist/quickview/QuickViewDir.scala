@@ -41,7 +41,7 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
     def scanDir(): Unit = {
       val parent = props.state.currDir.path
       val currItems = List(props.currItem)
-      val params = QuickViewParams(props.currItem.name)
+      val params = QuickViewParams(props.currItem.name, parent)
       stack.update[QuickViewParams](_.withState(params))
 
       var folders = 0d
@@ -80,10 +80,11 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
     }, List(showPopup))
 
     useLayoutEffect({ () =>
-      if (stack.params[QuickViewParams].name != props.currItem.name) {
+      val params = stack.params[QuickViewParams]
+      if (params.name != props.currItem.name || params.parent != props.state.currDir.path) {
         setShowPopup(true)
       }
-    }, List(props.currItem.name, stack.asInstanceOf[js.Any]))
+    }, List(props.currItem.name, props.state.currDir.path, stack.asInstanceOf[js.Any]))
 
     <.>()(
       if (showPopup) Some(

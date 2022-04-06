@@ -33,7 +33,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     )
   }
 
-  it should "update params with calculated stats" in {
+  it should "update params with calculated stats when item name changes" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
@@ -43,7 +43,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("file 1", size = 10)
     ))
     var stackState = List[PanelStackItem[QuickViewParams]](
-      PanelStackItem(currComp, None, None, Some(QuickViewParams()))
+      PanelStackItem(currComp, None, None, Some(QuickViewParams(parent = currDir.path)))
     )
     val stack = new PanelStack(isActive = false, stackState, { f =>
       stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]
@@ -69,7 +69,49 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
 
       //then
       eventually {
-        stackState.head.state shouldBe Some(QuickViewParams("dir 1", 1, 2, 123))
+        stackState.head.state shouldBe Some(QuickViewParams("dir 1", currDir.path, 1, 2, 123))
+        findProps(renderer.root, statusPopupComp) should be (empty)
+      }
+    }
+  }
+
+  it should "update params with calculated stats when curr path changes" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = new Actions
+    val currItem = FileListItem("dir 1", isDir = true)
+    val currDir = FileListDir("/folder", isRoot = false, List(
+      currItem,
+      FileListItem("file 1", size = 10)
+    ))
+    var stackState = List[PanelStackItem[QuickViewParams]](
+      PanelStackItem(currComp, None, None, Some(QuickViewParams(name = currItem.name)))
+    )
+    val stack = new PanelStack(isActive = false, stackState, { f =>
+      stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]
+    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
+    val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
+    val p = Promise[Boolean]()
+    actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
+      onNextDir("/path", List(
+        FileListItem("dir 2", isDir = true),
+        FileListItem("file 2", size = 122),
+        FileListItem("file 1", size = 1)
+      ))
+      p.future
+    }
+    val renderer = createTestRenderer(<(QuickViewDir())(^.wrapped := props)())
+    
+    eventually {
+      val popup = findComponentProps(renderer.root, statusPopupComp)
+      popup.text shouldBe "Scanning the folder\ndir 1"
+    }.flatMap { _ =>
+      //when
+      p.success(true)
+
+      //then
+      eventually {
+        stackState.head.state shouldBe Some(QuickViewParams("dir 1", currDir.path, 1, 2, 123))
         findProps(renderer.root, statusPopupComp) should be (empty)
       }
     }
@@ -116,7 +158,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       //then
       result shouldBe false
       eventually {
-        stackState.head.state shouldBe Some(QuickViewParams("dir 1"))
+        stackState.head.state shouldBe Some(QuickViewParams("dir 1", currDir.path))
         findProps(renderer.root, statusPopupComp) should be (empty)
       }
     }
@@ -172,7 +214,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       currItem,
       FileListItem("file 1", size = 10)
     ))
-    val params = QuickViewParams(currItem.name, 1, 2, 3)
+    val params = QuickViewParams(currItem.name, currDir.path, 1, 2, 3)
     var stackState = List[PanelStackItem[QuickViewParams]](
       PanelStackItem(currComp, None, None, Some(params))
     )
@@ -185,36 +227,31 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val result = createTestRenderer(<(QuickViewDir())(^.wrapped := props)()).root
 
     //then
-    assertQuickViewDir(result.children.toList, props, params)
+    assertQuickViewDir(result.children, props, params)
   }
 
-  private def assertQuickViewDir(children: List[TestInstance],
+  private def assertQuickViewDir(children: js.Array[TestInstance],
                                  props: QuickViewDirProps,
                                  params: QuickViewParams): Assertion = {
     
     val theme = Theme.current.fileList
 
-    def assertComponents(content: TestInstance,
-                         item: TestInstance,
-                         stats: TestInstance): Assertion = {
+    assertComponents(children, List(
+      <.text(
+        ^.rbLeft := 2,
+        ^.rbTop := 2,
+        ^.rbStyle := theme.regularItem,
+        ^.content :=
+          """Folder
+            |
+            |Contains:
+            |
+            |Folders
+            |Files
+            |Files size""".stripMargin
+      )(),
 
-      assertNativeComponent(content,
-        <.text(
-          ^.rbLeft := 2,
-          ^.rbTop := 2,
-          ^.rbStyle := theme.regularItem,
-          ^.content :=
-            """Folder
-              |
-              |Contains:
-              |
-              |Folders
-              |Files
-              |Files size""".stripMargin
-        )()
-      )
-
-      assertTestComponent(item, textLineComp) {
+      <(textLineComp())(^.assertWrapped(inside(_) {
         case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
           align shouldBe TextLine.Left
           pos shouldBe 12 -> 2
@@ -223,23 +260,17 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
           style shouldBe theme.regularItem
           focused shouldBe false
           padding shouldBe 0
-      }
+      }))(),
 
-      assertNativeComponent(stats,
-        <.text(
-          ^.rbLeft := 15,
-          ^.rbTop := 6,
-          ^.rbStyle := theme.selectedItem,
-          ^.content :=
-            f"""${params.folders}%,.0f
-               |${params.files}%,.0f
-               |${params.filesSize}%,.0f""".stripMargin
-        )()
-      )
-    }
-
-    inside(children) {
-      case List(content, item, stats) => assertComponents(content, item, stats)
-    }
+      <.text(
+        ^.rbLeft := 15,
+        ^.rbTop := 6,
+        ^.rbStyle := theme.selectedItem,
+        ^.content :=
+          f"""${params.folders}%,.0f
+             |${params.files}%,.0f
+             |${params.filesSize}%,.0f""".stripMargin
+      )()
+    ))
   }
 }
