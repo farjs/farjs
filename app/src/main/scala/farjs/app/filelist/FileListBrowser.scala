@@ -78,9 +78,11 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           screen.focusNext()
         case "enter" | "C-pagedown" =>
           val stack = getStack(isRightActive)
-          stack.peek[js.Any].state.collect {
-            case state: FileListState if state.currentItem.exists(!_.isDir) =>
-              openCurrItem(props.plugins, props.dispatch, stack, state)
+          val stackItem = stack.peek[js.Any]
+          stackItem.actions.zip(stackItem.state).collect {
+            case (actions, state: FileListState)
+              if actions.isLocalFS && state.currentItem.exists(!_.isDir) =>
+              openCurrItem(props.plugins, props.dispatch, stack, actions, state)
           }
         case keyFull =>
           props.plugins.find(_.triggerKey.contains(keyFull)).foreach { plugin =>
@@ -155,6 +157,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
   private def openCurrItem(plugins: Seq[FileListPlugin],
                            parentDispatch: Dispatch,
                            stack: PanelStack,
+                           actions: FileListActions,
                            state: FileListState): Unit = {
 
     state.currentItem.foreach { item =>

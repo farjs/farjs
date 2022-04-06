@@ -20,6 +20,7 @@ class MockFileListActions(
   scanDirsMock: (String, Seq[FileListItem], (String, Seq[FileListItem]) => Boolean) => Future[Boolean] = (_, _, _) => ???,
   writeFileMock: (List[String], String,
     FileListItem => Future[Option[Boolean]]) => Future[Option[FileTarget]] = (_, _, _) => ???,
+  readFileMock: (List[String], FileListItem, Double) => Future[FileSource] = (_, _, _) => ???,
   copyFileMock: (List[String], FileListItem, Future[Option[FileTarget]],
     Double => Future[Boolean]) => Future[Boolean] = (_, _, _, _) => ???
 ) extends FileListActions {
@@ -76,6 +77,9 @@ class MockFileListActions(
 
     writeFileMock(parentDirs, fileName, onExists)
   }
+
+  override def readFile(parentDirs: List[String], file: FileListItem, position: Double): Future[FileSource] =
+    readFileMock(parentDirs, file, position)
   
   override def copyFile(srcDirs: List[String],
                         srcItem: FileListItem,

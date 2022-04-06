@@ -291,6 +291,61 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     Succeeded
   }
 
+  it should "not trigger plugin if not local FS when onKeypress(enter)" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val onTriggerMock = mockFunction[String, () => Unit, Option[PanelStackItem[FileListState]]]
+    val plugin2 = new FileListPlugin {
+      override def onFileTrigger(filePath: String, onClose: () => Unit): Option[PanelStackItem[FileListState]] = {
+        onTriggerMock(filePath, onClose)
+      }
+    }
+    val props = FileListBrowserProps(dispatch, plugins = List(plugin2))
+    val focusMock = mockFunction[Unit]
+    val buttonMock = literal("focus" -> focusMock)
+    focusMock.expects()
+    val currState = FileListState(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("file 1")))
+    )
+
+    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
+      if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
+      else null
+    })
+    val nonFSActions = new MockFileListActions(isLocalFSMock = false)
+    val nonFSItem = PanelStackItem[FileListState](
+      component = "nonFSItem".asInstanceOf[ReactClass],
+      dispatch = None,
+      actions = Some(nonFSActions),
+      state = Some(currState)
+    )
+    inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _) =>
+      leftStack.isActive shouldBe true
+      leftStack.push(nonFSItem)
+    }
+    inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _) =>
+      leftStack.peek[FileListState] shouldBe nonFSItem
+    }
+    inside(nonFSItem.actions) { case Some(actions) =>
+      actions.isLocalFS shouldBe false
+    }
+    val button = inside(findComponents(comp, <.button.name)) {
+      case List(button, _) => button
+    }
+    val keyFull = "enter"
+    
+    //then
+    onTriggerMock.expects(*, *).never()
+
+    //when & then
+    button.props.onKeypress(null, literal(full = keyFull).asInstanceOf[KeyboardKey])
+    inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _) =>
+      leftStack.peek[FileListState] shouldBe nonFSItem
+    }
+
+    Succeeded
+  }
+
   it should "trigger plugin if file when onKeypress(enter)" in {
     //given
     val dispatch = mockFunction[Any, Any]
