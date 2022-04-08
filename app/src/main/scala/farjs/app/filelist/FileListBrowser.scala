@@ -1,6 +1,7 @@
 package farjs.app.filelist
 
 import farjs.app.filelist.fs.{FSDrivePopup, FSDrivePopupProps, FSPlugin}
+import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
 import farjs.filelist.stack._
@@ -10,8 +11,12 @@ import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
 import scommons.react.redux.Dispatch
+import scommons.react.redux.task.FutureTask
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
+import scala.scalajs.js.typedarray.Uint8Array
+import scala.util.Failure
 
 case class FileListBrowserProps(dispatch: Dispatch,
                                 isRightInitiallyActive: Boolean = false,
@@ -155,7 +160,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
   }
 
   private def openCurrItem(plugins: Seq[FileListPlugin],
-                           parentDispatch: Dispatch,
+                           dispatch: Dispatch,
                            stack: PanelStack,
                            actions: FileListActions,
                            state: FileListState): Unit = {
@@ -166,13 +171,26 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       }
 
       val filePath = path.join(state.currDir.path, item.name)
-      val maybePluginItem = plugins.foldLeft(Option.empty[PanelStackItem[FileListState]]) {
-        case (None, plugin) => plugin.onFileTrigger(filePath, onClose)
-        case (res@Some(_), _) => res
+      val openF = (for {
+        source <- actions.readFile(List(state.currDir.path), item, 0.0)
+        buff = new Uint8Array(64 * 1024)
+        bytesRead <- source.readNextBytes(buff)
+        _ <- source.close()
+      } yield {
+        buff.subarray(0, bytesRead)
+      }).map { fileHeader =>
+        val maybePluginItem = plugins.foldLeft(Option.empty[PanelStackItem[FileListState]]) {
+          case (None, plugin) => plugin.onFileTrigger(filePath, fileHeader, onClose)
+          case (res@Some(_), _) => res
+        }
+  
+        maybePluginItem.foreach { item =>
+          stack.push(PanelStackItem.initDispatch(dispatch, FileListStateReducer.apply, stack, item))
+        }
       }
 
-      maybePluginItem.foreach { item =>
-        stack.push(PanelStackItem.initDispatch(parentDispatch, FileListStateReducer.apply, stack, item))
+      openF.andThen {
+        case Failure(_) => dispatch(FileListTaskAction(FutureTask("Opening File", openF)))
       }
     }
   }
