@@ -5,6 +5,7 @@ import farjs.filelist.api.{FileListDir, FileListItem, FileSource}
 import scommons.nodejs.ChildProcess.ChildProcessOptions
 import scommons.nodejs._
 import scommons.nodejs.raw.CreateReadStreamOptions
+import scommons.nodejs.stream.Readable
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.nodejs.util.{StreamReader, SubProcess}
 
@@ -30,12 +31,9 @@ class ZipApiSpec extends AsyncTestSpec {
 
   //noinspection TypeAnnotation
   class ChildProcess {
-    val exec = mockFunction[String, Option[ChildProcessOptions],
-      (raw.ChildProcess, Future[(js.Object, js.Object)])]
-    val spawn = mockFunction[String, Seq[String], Option[ChildProcessOptions], raw.ChildProcess]
+    val spawn = mockFunction[String, Seq[String], Option[ChildProcessOptions], Future[SubProcess]]
 
     val childProcess = new MockChildProcess(
-      execMock = exec,
       spawnMock = spawn
     )
   }
@@ -204,10 +202,7 @@ class ZipApiSpec extends AsyncTestSpec {
 
   it should "return failed Future on readNextBytes if error when readFile" in {
     //given
-    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"))
-    val file = path.join(tmpDir, "example.txt")
-    fs.writeFileSync(file, "")
-    val stdoutStream = fs.createReadStream(file)
+    val stdoutStream = Readable.from(new js.Array[String](0))
     val childProcess = new ChildProcess
     val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
@@ -229,40 +224,27 @@ class ZipApiSpec extends AsyncTestSpec {
     val resultF = api.readFile(List(rootPath, "dir 1"), item, 0.0)
 
     //then
-    (for {
+    for {
       source <- resultF
       error <- source.readNextBytes(buff).failed
       _ <- source.close()
     } yield {
       source.file shouldBe expectedFilePath
       error.getMessage shouldBe "test error"
-    }).andThen {
-      case _ =>
-        fs.unlinkSync(file)
-        fs.existsSync(file) shouldBe false
-
-        fs.rmdirSync(tmpDir)
-        fs.existsSync(tmpDir) shouldBe false
     }
   }
 
   it should "spawn ChildProcess when extract" in {
     //given
-    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"))
-    val file = path.join(tmpDir, "example.txt")
     val expectedOutput = "hello, World!!!"
-    fs.writeFileSync(file, expectedOutput)
-    val stdoutStream = fs.createReadStream(file)
+    val stdout = new StreamReader(Readable.from(Buffer.from(expectedOutput)))
+    val rawProcess = literal().asInstanceOf[raw.ChildProcess]
+    val subProcess = SubProcess(rawProcess, stdout, Future.unit)
     val childProcess = new ChildProcess
     val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
     val api = new ZipApi(childProcess.childProcess, zipPath, rootPath, entriesByParentF)
     val filePath = s"$rootPath/dir 1/file 2.txt"
-    val onceMock = mockFunction[String, js.Function, raw.EventEmitter]
-    val rawProcess = literal(
-      "stdout" -> stdoutStream,
-      "once" -> onceMock
-    ).asInstanceOf[raw.ChildProcess]
 
     //then
     childProcess.spawn.expects("unzip", List("-p", zipPath, filePath), *).onCall { (_, _, options) =>
@@ -270,14 +252,8 @@ class ZipApiSpec extends AsyncTestSpec {
         opts.windowsHide shouldBe true
         childProcess.childProcess
       }
-      rawProcess
+      Future.successful(subProcess)
     }
-    var exitCallback: js.Function1[Int, js.Any] = null
-    onceMock.expects("exit", *).onCall { (_, callback) =>
-      exitCallback = callback.asInstanceOf[js.Function1[Int, js.Any]]
-      rawProcess
-    }
-    onceMock.expects("error", *)
 
     //when
     val resultF = api.extract(zipPath, filePath)
@@ -291,47 +267,32 @@ class ZipApiSpec extends AsyncTestSpec {
     }
 
     //then
-    (for {
-      result <- resultF
-      output <- loop(result.stdout, "")
-      _ = exitCallback(0)
-      _ <- result.exitF
-    } yield {
-      inside(result) { case SubProcess(child, stdout, _) =>
-        child shouldBe rawProcess
-        stdout.readable shouldBe stdoutStream
-        output shouldBe expectedOutput
-      }
-    }).andThen {
-      case _ =>
-        fs.unlinkSync(file)
-        fs.existsSync(file) shouldBe false
-
-        fs.rmdirSync(tmpDir)
-        fs.existsSync(tmpDir) shouldBe false
+    resultF.flatMap(res => loop(res.stdout, "")).map { output =>
+      output shouldBe expectedOutput
     }
   }
 
   it should "call unzip and parse output when readZip" in {
     //given
-    val childProcess = new ChildProcess
-    val zipPath = "/dir/filePath.zip"
-    val output =
+    val expectedOutput =
       """Archive:  /test/dir/file.zip
         |Zip file size: 595630 bytes, number of entries: 18
         |-rw-r--r--  2.1 unx     1 bX defN 20190628.161923 test/dir/file.txt
         |18 files
         |""".stripMargin
-    val result: (js.Object, js.Object) = (output.asInstanceOf[js.Object], new js.Object)
+    val stdout = new StreamReader(Readable.from(Buffer.from(expectedOutput)))
+    val rawProcess = literal().asInstanceOf[raw.ChildProcess]
+    val subProcess = SubProcess(rawProcess, stdout, Future.unit)
+    val childProcess = new ChildProcess
+    val zipPath = "/dir/filePath.zip"
 
     //then
-    childProcess.exec.expects(*, *).onCall { (command, options) =>
-      command shouldBe s"""unzip -ZT "$zipPath""""
-      assertObject(options.get, new ChildProcessOptions {
-        override val windowsHide = true
-      })
-
-      (null, Future.successful(result))
+    childProcess.spawn.expects("unzip", List("-ZT", zipPath), *).onCall { (_, _, options) =>
+      inside(options) { case Some(opts) =>
+        opts.windowsHide shouldBe true
+        childProcess.childProcess
+      }
+      Future.successful(subProcess)
     }
 
     //when

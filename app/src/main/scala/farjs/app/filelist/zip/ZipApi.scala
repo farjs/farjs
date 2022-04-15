@@ -1,12 +1,13 @@
 package farjs.app.filelist.zip
 
 import farjs.filelist.api._
-import scommons.nodejs.util.SubProcess
-import scommons.nodejs.{ChildProcess, raw}
+import scommons.nodejs.util.{StreamReader, SubProcess}
+import scommons.nodejs.{Buffer, ChildProcess, raw}
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.control.NonFatal
 
@@ -88,13 +89,13 @@ class ZipApi(childProcess: ChildProcess,
   def writeFile(parentDirs: List[String], fileName: String, onExists: FileListItem => Future[Option[Boolean]]): Future[Option[FileTarget]] = ???
 
   private[zip] def extract(zipPath: String, filePath: String): Future[SubProcess] = {
-    SubProcess.wrap(childProcess.spawn(
+    childProcess.spawn(
       command = "unzip",
       args = List("-p", zipPath, filePath),
       options = Some(new raw.ChildProcessOptions {
         override val windowsHide = true
       })
-    ))
+    )
   }
 }
 
@@ -111,17 +112,30 @@ object ZipApi {
   }
 
   def readZip(childProcess: ChildProcess, zipPath: String): Future[Map[String, List[ZipEntry]]] = {
-    val (_, future) = childProcess.exec(
-      command = s"""unzip -ZT "$zipPath"""",
+    val subprocessF = childProcess.spawn(
+      command = "unzip",
+      args = List("-ZT", zipPath),
       options = Some(new raw.ChildProcessOptions {
         override val windowsHide = true
       })
     )
 
-    future.map { case (stdout, _) =>
-      val output = stdout.asInstanceOf[String]
-      val entries = ZipEntry.fromUnzipCommand(output)
-      ZipApi.groupByParent(entries)
+    def loop(reader: StreamReader, result: js.Array[Buffer]): Future[js.Array[Buffer]] = {
+      reader.readNextBytes(64 * 1024).flatMap {
+        case None => Future.successful(result)
+        case Some(content) =>
+          result.push(content)
+          loop(reader, result)
+      }
+    }
+
+    for {
+      subprocess <- subprocessF
+      chunks <- loop(subprocess.stdout, new js.Array[Buffer](0))
+      _ <- subprocess.exitF
+    } yield {
+      val output = Buffer.concat(chunks).toString
+      ZipApi.groupByParent(ZipEntry.fromUnzipCommand(output))
     }
   }
   
