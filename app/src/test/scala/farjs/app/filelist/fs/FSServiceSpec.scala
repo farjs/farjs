@@ -148,7 +148,7 @@ class FSServiceSpec extends AsyncTestSpec {
 
     //then
     childProcess.exec.expects(*, *).onCall { (command, options) =>
-      command shouldBe s"""df -kPl "$path""""
+      command shouldBe s"""df -kP "$path""""
       assertObject(options.get, new ChildProcessOptions {
         override val cwd = path
         override val windowsHide = true
@@ -206,15 +206,18 @@ class FSServiceSpec extends AsyncTestSpec {
     val output =
       """Filesystem   1024-blocks      Used Available Capacity  Mounted on
         |/dev/disk1s1   244912536 202577024  40612004    84%    /
+        |devfs                234       234         0   100%    /dev
         |/dev/disk1s3   244912536   4194424  59259185     8%    /System/Volumes/VM
         |/dev/disk1s4   244912536   4194424  59259180     7%    /private/var/vm
+        |map -hosts             0         0         0   100%    /net
+        |map auto_home          0         0         0   100%    /home
         |/dev/disk2s1     1957408     14752   1942656     1%    /Volumes/FLASHDRIVE
         |""".stripMargin
     val result: (js.Object, js.Object) = (output.asInstanceOf[js.Object], new js.Object)
 
     //then
     childProcess.exec.expects(*, *).onCall { (command, options) =>
-      command shouldBe "df -kPl"
+      command shouldBe "df -kP"
       assertObject(options.get, new ChildProcessOptions {
         override val windowsHide = true
       })

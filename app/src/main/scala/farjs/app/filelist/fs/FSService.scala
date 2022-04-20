@@ -1,5 +1,6 @@
 package farjs.app.filelist.fs
 
+import farjs.app.filelist.fs.FSService.excludeRoots
 import farjs.filelist.api.{FileListDir, FileListItem}
 import scommons.nodejs.Process.Platform
 import scommons.nodejs.{path => nodePath, _}
@@ -36,7 +37,7 @@ class FSService(platform: Platform, childProcess: ChildProcess) {
           val root = nodePath.parse(path).root.map(_.stripSuffix("\\"))
           s"""wmic logicaldisk where "Caption='$root'" get Caption,VolumeName,FreeSpace,Size"""
         }
-        else s"""df -kPl "$path""""
+        else s"""df -kP "$path""""
       },
       options = Some(new raw.ChildProcessOptions {
         override val cwd = path
@@ -60,7 +61,7 @@ class FSService(platform: Platform, childProcess: ChildProcess) {
         if (platform == Platform.win32) {
           "wmic logicaldisk get Caption,VolumeName,FreeSpace,Size"
         }
-        else "df -kPl"
+        else "df -kP"
       },
       options = Some(new raw.ChildProcessOptions {
         override val windowsHide = true
@@ -72,7 +73,7 @@ class FSService(platform: Platform, childProcess: ChildProcess) {
       if (platform == Platform.win32) FSDisk.fromWmicLogicalDisk(output)
       else {
         FSDisk.fromDfCommand(output)
-          .filter(d => !d.root.startsWith("/private/") && !d.root.startsWith("/System/"))
+          .filter(d => !excludeRoots.exists(d.root.startsWith))
           .map { d =>
             d.copy(name = d.name.stripPrefix("/Volumes/"))
           }
@@ -84,4 +85,12 @@ class FSService(platform: Platform, childProcess: ChildProcess) {
 object FSService {
 
   lazy val instance: FSService = new FSService(process.platform, child_process)
+  
+  private lazy val excludeRoots = List(
+    "/dev",
+    "/net",
+    "/home",
+    "/private/",
+    "/System/"
+  )
 }
