@@ -5,7 +5,6 @@ import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.ModalProps
 import farjs.ui.theme.Theme
-import org.scalatest.Assertion
 import scommons.react.test._
 
 class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
@@ -128,74 +127,66 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
     val (width, height) = (75, 10)
     val style = Theme.current.popup.regular
     
-    def assertComponents(label: TestInstance,
-                         input: TestInstance,
-                         sep1: TestInstance,
-                         multi: TestInstance,
-                         sep2: TestInstance,
-                         actionsBox: TestInstance): Assertion = {
+    assertNativeComponent(result,
+      <(modalComp())(^.assertWrapped(inside(_) {
+        case ModalProps(title, size, resStyle, onCancel) =>
+          title shouldBe "Make Folder"
+          size shouldBe width -> height
+          resStyle shouldBe style
+          onCancel should be theSameInstanceAs props.onCancel
+      }))(
+        <(textLineComp())(^.assertWrapped(inside(_) {
+          case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
+            align shouldBe TextLine.Left
+            pos shouldBe 2 -> 1
+            resWidth shouldBe (width - 10)
+            text shouldBe "Create the folder"
+            resStyle shouldBe style
+            focused shouldBe false
+            padding shouldBe 0
+        }))(),
+        <(textBoxComp())(^.assertWrapped(inside(_) {
+          case TextBoxProps(pos, resWidth, resValue, _, _) =>
+            pos shouldBe 2 -> 2
+            resWidth shouldBe (width - 10)
+            resValue shouldBe props.folderName
+        }))(),
+        
+        <(horizontalLineComp())(^.assertWrapped(inside(_) {
+          case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
+            pos shouldBe 0 -> 3
+            resLength shouldBe (width - 6)
+            lineCh shouldBe SingleBorder.horizontalCh
+            resStyle shouldBe style
+            startCh shouldBe Some(DoubleBorder.leftSingleCh)
+            endCh shouldBe Some(DoubleBorder.rightSingleCh)
+        }))(),
+        <(checkBoxComp())(^.assertWrapped(inside(_) {
+          case CheckBoxProps(pos, resValue, resLabel, resStyle, _) =>
+            pos shouldBe 2 -> 4
+            resValue shouldBe false
+            resLabel shouldBe "Process multiple names"
+            resStyle shouldBe style
+        }))(),
 
-      assertTestComponent(label, textLineComp) {
-        case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
-          align shouldBe TextLine.Left
-          pos shouldBe 2 -> 1
-          resWidth shouldBe (width - 10)
-          text shouldBe "Create the folder"
-          resStyle shouldBe style
-          focused shouldBe false
-          padding shouldBe 0
-      }
-      assertTestComponent(input, textBoxComp) {
-        case TextBoxProps(pos, resWidth, resValue, _, _) =>
-          pos shouldBe 2 -> 2
-          resWidth shouldBe (width - 10)
-          resValue shouldBe props.folderName
-      }
-      
-      assertTestComponent(sep1, horizontalLineComp) {
-        case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
-          pos shouldBe 0 -> 3
-          resLength shouldBe (width - 6)
-          lineCh shouldBe SingleBorder.horizontalCh
-          resStyle shouldBe style
-          startCh shouldBe Some(DoubleBorder.leftSingleCh)
-          endCh shouldBe Some(DoubleBorder.rightSingleCh)
-      }
-      assertTestComponent(multi, checkBoxComp) {
-        case CheckBoxProps(pos, resValue, resLabel, resStyle, _) =>
-          pos shouldBe 2 -> 4
-          resValue shouldBe false
-          resLabel shouldBe "Process multiple names"
-          resStyle shouldBe style
-      }
-      
-      assertTestComponent(sep2, horizontalLineComp) {
-        case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
-          pos shouldBe 0 -> 5
-          resLength shouldBe (width - 6)
-          lineCh shouldBe SingleBorder.horizontalCh
-          resStyle shouldBe style
-          startCh shouldBe Some(DoubleBorder.leftSingleCh)
-          endCh shouldBe Some(DoubleBorder.rightSingleCh)
-      }
-      assertTestComponent(actionsBox, buttonsPanelComp) {
-        case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
-          top shouldBe 6
-          resActions.map(_._1) shouldBe actions
-          resStyle shouldBe style
-          padding shouldBe 0
-          margin shouldBe 2
-      }
-    }
-    
-    assertTestComponent(result, modalComp)({ case ModalProps(title, size, resStyle, onCancel) =>
-      title shouldBe "Make Folder"
-      size shouldBe width -> height
-      resStyle shouldBe style
-      onCancel should be theSameInstanceAs props.onCancel
-    }, inside(_) {
-      case List(label, input, sep1, multi, sep2, actionsBox) =>
-        assertComponents(label, input, sep1, multi, sep2, actionsBox)
-    })
+        <(horizontalLineComp())(^.assertWrapped(inside(_) {
+          case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
+            pos shouldBe 0 -> 5
+            resLength shouldBe (width - 6)
+            lineCh shouldBe SingleBorder.horizontalCh
+            resStyle shouldBe style
+            startCh shouldBe Some(DoubleBorder.leftSingleCh)
+            endCh shouldBe Some(DoubleBorder.rightSingleCh)
+        }))(),
+        <(buttonsPanelComp())(^.assertWrapped(inside(_) {
+          case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
+            top shouldBe 6
+            resActions.map(_._1) shouldBe actions
+            resStyle shouldBe style
+            padding shouldBe 0
+            margin shouldBe 2
+        }))()
+      )
+    )
   }
 }
