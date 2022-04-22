@@ -40,10 +40,9 @@ class ZipApiSpec extends AsyncTestSpec {
 
   it should "return root dir content when readDir(.)" in {
     //given
-    val childProcess = new ChildProcess
     val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
-    val api = new ZipApi(childProcess.childProcess, zipPath, rootPath, entriesByParentF)
+    val api = new ZipApi(zipPath, rootPath, entriesByParentF)
     
     //when
     val resultF = api.readDir(None, FileListItem.currDir.name)
@@ -61,10 +60,9 @@ class ZipApiSpec extends AsyncTestSpec {
 
   it should "return root dir content when readDir(..)" in {
     //given
-    val childProcess = new ChildProcess
     val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
-    val api = new ZipApi(childProcess.childProcess, zipPath, rootPath, entriesByParentF)
+    val api = new ZipApi(zipPath, rootPath, entriesByParentF)
     
     //when
     val resultF = api.readDir(Some(s"$rootPath/dir 1/dir 2"), FileListItem.up.name)
@@ -81,10 +79,9 @@ class ZipApiSpec extends AsyncTestSpec {
 
   it should "return sub-dir content when readDir" in {
     //given
-    val childProcess = new ChildProcess
     val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
-    val api = new ZipApi(childProcess.childProcess, zipPath, rootPath, entriesByParentF)
+    val api = new ZipApi(zipPath, rootPath, entriesByParentF)
 
     //when
     val resultF = api.readDir(Some(s"$rootPath/dir 1"), "dir 2")
@@ -106,14 +103,13 @@ class ZipApiSpec extends AsyncTestSpec {
     val expectedOutput = "hello, World!!!"
     fs.writeFileSync(file, expectedOutput)
     val stdoutStream = fs.createReadStream(file)
-    val childProcess = new ChildProcess
     val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
     val expectedFilePath = "dir 1/example.txt"
     val rawProcess = literal().asInstanceOf[raw.ChildProcess]
     val stdout = new StreamReader(stdoutStream)
     val subProcess = SubProcess(rawProcess, stdout, Future.unit)
-    val api = new ZipApi(childProcess.childProcess, zipPath, rootPath, entriesByParentF) {
+    val api = new ZipApi(zipPath, rootPath, entriesByParentF) {
       override def extract(zipPath: String, filePath: String): Future[SubProcess] = {
         zipPath shouldBe "/dir/filePath.zip"
         filePath shouldBe expectedFilePath
@@ -160,14 +156,13 @@ class ZipApiSpec extends AsyncTestSpec {
     val stdoutStream = fs.createReadStream(file, new CreateReadStreamOptions {
       override val highWaterMark: js.UndefOr[Int] = 5
     })
-    val childProcess = new ChildProcess
     val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
     val expectedFilePath = "dir 1/example.txt"
     val rawProcess = literal().asInstanceOf[raw.ChildProcess]
     val stdout = new StreamReader(stdoutStream)
     val subProcess = SubProcess(rawProcess, stdout, Future.unit)
-    val api = new ZipApi(childProcess.childProcess, zipPath, rootPath, entriesByParentF) {
+    val api = new ZipApi(zipPath, rootPath, entriesByParentF) {
       override def extract(zipPath: String, filePath: String): Future[SubProcess] = {
         zipPath shouldBe "/dir/filePath.zip"
         filePath shouldBe expectedFilePath
@@ -203,14 +198,13 @@ class ZipApiSpec extends AsyncTestSpec {
   it should "return failed Future on readNextBytes if error when readFile" in {
     //given
     val stdoutStream = Readable.from(new js.Array[String](0))
-    val childProcess = new ChildProcess
     val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
     val expectedFilePath = "dir 1/example.txt"
     val rawProcess = literal().asInstanceOf[raw.ChildProcess]
     val stdout = new StreamReader(stdoutStream)
     val subProcess = SubProcess(rawProcess, stdout, Future.failed(new Exception("test error")))
-    val api = new ZipApi(childProcess.childProcess, zipPath, rootPath, entriesByParentF) {
+    val api = new ZipApi(zipPath, rootPath, entriesByParentF) {
       override def extract(zipPath: String, filePath: String): Future[SubProcess] = {
         zipPath shouldBe "/dir/filePath.zip"
         filePath shouldBe expectedFilePath
@@ -241,9 +235,10 @@ class ZipApiSpec extends AsyncTestSpec {
     val rawProcess = literal().asInstanceOf[raw.ChildProcess]
     val subProcess = SubProcess(rawProcess, stdout, Future.unit)
     val childProcess = new ChildProcess
+    ZipApi.childProcess = childProcess.childProcess
     val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
-    val api = new ZipApi(childProcess.childProcess, zipPath, rootPath, entriesByParentF)
+    val api = new ZipApi(zipPath, rootPath, entriesByParentF)
     val filePath = s"$rootPath/dir 1/file 2.txt"
 
     //then
@@ -272,7 +267,7 @@ class ZipApiSpec extends AsyncTestSpec {
     }
   }
 
-  it should "call unzip and parse output when readZip" in {
+  it should "spawn unzip and parse output when readZip" in {
     //given
     val expectedOutput =
       """Archive:  /test/dir/file.zip
@@ -284,6 +279,7 @@ class ZipApiSpec extends AsyncTestSpec {
     val rawProcess = literal().asInstanceOf[raw.ChildProcess]
     val subProcess = SubProcess(rawProcess, stdout, Future.unit)
     val childProcess = new ChildProcess
+    ZipApi.childProcess = childProcess.childProcess
     val zipPath = "/dir/filePath.zip"
 
     //then
@@ -296,7 +292,7 @@ class ZipApiSpec extends AsyncTestSpec {
     }
 
     //when
-    val resultF = ZipApi.readZip(childProcess.childProcess, zipPath)
+    val resultF = ZipApi.readZip(zipPath)
 
     //then
     resultF.map { res =>

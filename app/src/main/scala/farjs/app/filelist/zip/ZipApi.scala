@@ -2,7 +2,7 @@ package farjs.app.filelist.zip
 
 import farjs.filelist.api._
 import scommons.nodejs.util.{StreamReader, SubProcess}
-import scommons.nodejs.{Buffer, ChildProcess, raw}
+import scommons.nodejs.{Buffer, ChildProcess, child_process, raw}
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -11,8 +11,7 @@ import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.control.NonFatal
 
-class ZipApi(childProcess: ChildProcess,
-             zipPath: String,
+class ZipApi(zipPath: String,
              rootPath: String,
              entriesByParentF: Future[Map[String, List[ZipEntry]]]) extends FileListApi {
 
@@ -44,7 +43,7 @@ class ZipApi(childProcess: ChildProcess,
 
   def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = ???
 
-  def mkDirs(dirs: List[String]): Future[Unit] = ???
+  def mkDirs(dirs: List[String]): Future[Unit] = Future.unit
 
   def readFile(parentDirs: List[String], item: FileListItem, position: Double): Future[FileSource] = {
     val filePath = s"${parentDirs.mkString("/")}/${item.name}".stripPrefix(rootPath).stripPrefix("/")
@@ -89,7 +88,7 @@ class ZipApi(childProcess: ChildProcess,
   def writeFile(parentDirs: List[String], fileName: String, onExists: FileListItem => Future[Option[Boolean]]): Future[Option[FileTarget]] = ???
 
   private[zip] def extract(zipPath: String, filePath: String): Future[SubProcess] = {
-    childProcess.spawn(
+    ZipApi.childProcess.spawn(
       command = "unzip",
       args = List("-p", zipPath, filePath),
       options = Some(new raw.ChildProcessOptions {
@@ -101,6 +100,8 @@ class ZipApi(childProcess: ChildProcess,
 
 object ZipApi {
 
+  private[zip] var childProcess: ChildProcess = child_process
+  
   def convertToFileListItem(zip: ZipEntry): FileListItem = {
     FileListItem(
       name = zip.name,
@@ -111,7 +112,7 @@ object ZipApi {
     )
   }
 
-  def readZip(childProcess: ChildProcess, zipPath: String): Future[Map[String, List[ZipEntry]]] = {
+  def readZip(zipPath: String): Future[Map[String, List[ZipEntry]]] = {
     val subprocessF = childProcess.spawn(
       command = "unzip",
       args = List("-ZT", zipPath),

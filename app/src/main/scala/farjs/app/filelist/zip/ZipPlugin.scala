@@ -3,14 +3,14 @@ package farjs.app.filelist.zip
 import farjs.filelist.api.FileListDir
 import farjs.filelist.stack.PanelStackItem
 import farjs.filelist.{FileListPanelController, FileListPlugin, FileListState}
-import scommons.nodejs.{ChildProcess, child_process, path}
+import scommons.nodejs.path
 
 import scala.concurrent.Future
 import scala.scalajs.js.typedarray.Uint8Array
 
-class ZipPlugin(childProcess: ChildProcess,
-                readZip: (ChildProcess, String) => Future[Map[String, List[ZipEntry]]]
-               ) extends FileListPlugin {
+object ZipPlugin extends FileListPlugin {
+
+  private[zip] var readZip: String => Future[Map[String, List[ZipEntry]]] = ZipApi.readZip
 
   override def onFileTrigger(filePath: String,
                              fileHeader: Uint8Array,
@@ -19,12 +19,12 @@ class ZipPlugin(childProcess: ChildProcess,
     if (pathLower.endsWith(".zip") || pathLower.endsWith(".jar") || checkFileHeader(fileHeader)) {
       val fileName = path.parse(filePath).base
       val rootPath = s"zip://$fileName"
-      val entriesByParentF = readZip(childProcess, filePath)
+      val entriesByParentF = readZip(filePath)
       
       Some(PanelStackItem(
         component = new FileListPanelController(new ZipPanel(rootPath, entriesByParentF, onClose)).apply(),
         dispatch = None,
-        actions = Some(new ZipActions(new ZipApi(childProcess, filePath, rootPath, entriesByParentF))),
+        actions = Some(new ZipActions(new ZipApi(filePath, rootPath, entriesByParentF))),
         state = Some(FileListState(
           currDir = FileListDir(rootPath, isRoot = false, items = Nil)
         ))
@@ -43,5 +43,3 @@ class ZipPlugin(childProcess: ChildProcess,
     }
   }
 }
-
-object ZipPlugin extends ZipPlugin(child_process, ZipApi.readZip)

@@ -1,6 +1,5 @@
 package farjs.app.filelist.zip
 
-import scommons.nodejs.child_process
 import scommons.nodejs.test.AsyncTestSpec
 
 import scala.concurrent.Future
@@ -9,7 +8,7 @@ class ZipActionsSpec extends AsyncTestSpec {
 
   it should "return None when getDriveRoot" in {
     //given
-    val api = new ZipApi(child_process, "file.zip", "root.path", Future.successful(Map.empty))
+    val api = new ZipApi("file.zip", "root.path", Future.successful(Map.empty))
     val actions = new ZipActions(api)
     
     //when
