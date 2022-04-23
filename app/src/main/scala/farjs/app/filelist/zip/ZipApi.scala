@@ -112,6 +112,18 @@ object ZipApi {
     )
   }
 
+  def addToZip(zipFile: String, parent: String, items: Set[String]): Future[Unit] = {
+    val (_, future) = childProcess.exec(
+      command = s"""zip -qr "$zipFile" ${items.mkString("\"", "\" \"", "\"")}""",
+      options = Some(new raw.ChildProcessOptions {
+        override val cwd = parent
+        override val windowsHide = true
+      })
+    )
+
+    future.map(_ => ())
+  }
+
   def readZip(zipPath: String): Future[Map[String, List[ZipEntry]]] = {
     val subprocessF = childProcess.spawn(
       command = "unzip",

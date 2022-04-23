@@ -3,7 +3,7 @@ package farjs.app.filelist.fs
 import farjs.app.filelist.MockFileListActions
 import farjs.app.filelist.fs.FSPanel._
 import farjs.app.filelist.zip.ZipCreatePopupProps
-import farjs.filelist.FileListActions.FileListTaskAction
+import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import org.scalatest.Succeeded
@@ -20,6 +20,15 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
   FSPanel.fsFreeSpaceComp = mockUiComponent("FSFreeSpace")
   FSPanel.fsService = new FsService().fsService
   FSPanel.zipCreatePopup = mockUiComponent("ZipCreatePopup")
+
+  //noinspection TypeAnnotation
+  class Actions {
+    val readDir = mockFunction[Option[String], String, Future[FileListDir]]
+
+    val actions = new MockFileListActions(
+      readDirMock = readDir
+    )
+  }
 
   //noinspection TypeAnnotation
   class FsService {
@@ -116,18 +125,22 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     }
   }
 
-  it should "render ZipCreatePopup if selected items when onKeypress(S-f7)" in {
+  it should "render ZipCreatePopup and call addToZip when onKeypress(S-f7)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions
-    val props = FileListPanelProps(dispatch, actions, FileListState(
+    val actions = new Actions
+    val props = FileListPanelProps(dispatch, actions.actions, FileListState(
+      index = 1,
       currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+        FileListItem.up,
         FileListItem("item 1"),
         FileListItem("item 2"),
         FileListItem("item 3")
       )),
       selectedNames = ListSet("item 3", "item 2")
     ))
+    val addToZip = mockFunction[String, String, Set[String], Future[Unit]]
+    FSPanel.addToZip = addToZip
     val renderer = createTestRenderer(<(FSPanel())(^.wrapped := props)())
     val panelProps = findComponentProps(renderer.root, fileListPanelComp)
     
@@ -138,12 +151,36 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     inside(findComponentProps(renderer.root, zipCreatePopup)) {
       case ZipCreatePopupProps(zipName, onAdd, _) =>
         zipName shouldBe "item 3.zip"
+
+        //given
+        val zipFile = "test.zip"
+        val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
+          FileListItem("file 1")
+        ))
+        
+        //then
+        addToZip.expects(zipFile, props.state.currDir.path, ListSet("item 3", "item 2"))
+          .returning(Future.unit)
+        dispatch.expects(FileListParamsChangedAction(
+          offset = 0,
+          index = 1,
+          selectedNames = Set.empty
+        ))
+        actions.readDir.expects(None, props.state.currDir.path).returning(Future.successful(updatedDir))
+        dispatch.expects(FileListItemCreatedAction(zipFile, updatedDir))
+        var resultAction: Any = null
+        dispatch.expects(*).onCall { action: Any =>
+          resultAction = action
+        }
         
         //when
-        onAdd("test.zip")
+        onAdd(zipFile)
         
         //then
         findComponents(renderer.root, zipCreatePopup()) should be (empty)
+        inside(resultAction) { case FileListTaskAction(FutureTask("Creating zip archive", future)) =>
+          future.map(_ => Succeeded)
+        }
     }
   }
 

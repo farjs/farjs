@@ -2,6 +2,7 @@ package farjs.app.filelist.zip
 
 import farjs.app.filelist.fs.MockChildProcess
 import farjs.filelist.api.{FileListDir, FileListItem, FileSource}
+import org.scalatest.Succeeded
 import scommons.nodejs.ChildProcess.ChildProcessOptions
 import scommons.nodejs._
 import scommons.nodejs.raw.CreateReadStreamOptions
@@ -9,6 +10,7 @@ import scommons.nodejs.stream.Readable
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.nodejs.util.{StreamReader, SubProcess}
 
+import scala.collection.immutable.ListSet
 import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
@@ -31,9 +33,12 @@ class ZipApiSpec extends AsyncTestSpec {
 
   //noinspection TypeAnnotation
   class ChildProcess {
+    val exec = mockFunction[String, Option[ChildProcessOptions],
+      (raw.ChildProcess, Future[(js.Object, js.Object)])]
     val spawn = mockFunction[String, Seq[String], Option[ChildProcessOptions], Future[SubProcess]]
 
     val childProcess = new MockChildProcess(
+      execMock = exec,
       spawnMock = spawn
     )
   }
@@ -265,6 +270,33 @@ class ZipApiSpec extends AsyncTestSpec {
     resultF.flatMap(res => loop(res.stdout, "")).map { output =>
       output shouldBe expectedOutput
     }
+  }
+
+  it should "execute zip command when addToZip" in {
+    //given
+    val childProcess = new ChildProcess
+    ZipApi.childProcess = childProcess.childProcess
+    val parent = "test dir"
+    val zipFile = "test.zip"
+    val items = ListSet("item 1", "item 2")
+    val result = (new js.Object, new js.Object)
+
+    //then
+    childProcess.exec.expects(*, *).onCall { (command, options) =>
+      command shouldBe """zip -qr "test.zip" "item 1" "item 2""""
+      assertObject(options.get, new ChildProcessOptions {
+        override val cwd = parent
+        override val windowsHide = true
+      })
+
+      (null, Future.successful(result))
+    }
+
+    //when
+    val resultF = ZipApi.addToZip(zipFile, parent, items)
+
+    //then
+    resultF.map(_ => Succeeded)
   }
 
   it should "spawn unzip and parse output when readZip" in {
