@@ -79,11 +79,11 @@ object FileListStateReducer {
           }
           else state.selectedNames
       )
-    case FileListDirCreatedAction(dir, currDir) =>
+    case FileListItemCreatedAction(name, currDir) =>
       val processed = processDir(currDir)
       state.copy(
         offset = 0,
-        index = math.max(processed.items.indexWhere(_.name == dir), 0),
+        index = math.max(processed.items.indexWhere(_.name == name), 0),
         currDir = processed
       )
     case FileListItemsViewedAction(sizes) =>

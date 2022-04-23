@@ -102,7 +102,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     future.map(_ => Succeeded)
   }
   
-  it should "dispatch FileListDirChangedAction when createDir(multiple=false)" in {
+  it should "dispatch FileListItemCreatedAction when createDir(multiple=false)" in {
     //given
     val api = new Api
     val actions = new FileListActionsTest(api.api)
@@ -116,7 +116,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     api.readDir.expects(parent).returning(Future.successful(currDir))
     
     //then
-    dispatch.expects(FileListDirCreatedAction(dir, currDir))
+    dispatch.expects(FileListItemCreatedAction(dir, currDir))
     
     //when
     val FileListDirCreateAction(FutureTask(msg, future)) =
@@ -127,7 +127,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     future.map(_ => Succeeded)
   }
   
-  it should "dispatch FileListDirChangedAction when createDir(multiple=true)" in {
+  it should "dispatch FileListItemCreatedAction when createDir(multiple=true)" in {
     //given
     val api = new Api
     val actions = new FileListActionsTest(api.api)
@@ -141,7 +141,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     api.readDir.expects(parent).returning(Future.successful(currDir))
     
     //then
-    dispatch.expects(FileListDirCreatedAction("test", currDir))
+    dispatch.expects(FileListItemCreatedAction("test", currDir))
     
     //when
     val FileListDirCreateAction(FutureTask(msg, future)) =

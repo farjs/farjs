@@ -52,7 +52,7 @@ trait FileListActions {
       _ <- mkDirs(parent :: names)
       currDir <- api.readDir(parent)
     } yield {
-      dispatch(FileListDirCreatedAction(names.head, currDir))
+      dispatch(FileListItemCreatedAction(names.head, currDir))
       ()
     }
 
@@ -165,9 +165,9 @@ object FileListActions {
   
   case class FileListDirUpdateAction(task: FutureTask[FileListDir]) extends TaskAction
   case class FileListDirUpdatedAction(currDir: FileListDir) extends Action
-  
   case class FileListDirCreateAction(task: FutureTask[Unit]) extends TaskAction
-  case class FileListDirCreatedAction(dir: String, currDir: FileListDir) extends Action
+
+  case class FileListItemCreatedAction(name: String, currDir: FileListDir) extends Action
   
   case class FileListItemsViewedAction(sizes: Map[String, Double]) extends Action
   

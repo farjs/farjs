@@ -195,7 +195,7 @@ class FileListStateReducerSpec extends TestSpec {
     }
   }
 
-  it should "update FileListState when FileListDirCreatedAction" in {
+  it should "update FileListState when FileListItemCreatedAction" in {
     //given
     val stateDir = FileListDir("/", isRoot = true, items = Seq.empty)
     val state = FileListState(offset = 1, currDir = stateDir, selectedNames = Set("test1"))
@@ -206,7 +206,7 @@ class FileListStateReducerSpec extends TestSpec {
       FileListItem(dir, isDir = true),
       FileListItem("dir 1", isDir = true)
     ))
-    val action = FileListDirCreatedAction(dir, currDir)
+    val action = FileListItemCreatedAction(dir, currDir)
 
     //when & then
     reduce(state, action) shouldBe {
