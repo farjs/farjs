@@ -272,6 +272,37 @@ class ZipApiSpec extends AsyncTestSpec {
     }
   }
 
+  it should "execute zip command when delete" in {
+    //given
+    val childProcess = new ChildProcess
+    ZipApi.childProcess = childProcess.childProcess
+    val result = (new js.Object, new js.Object)
+    val zipPath = "/dir/filePath.zip"
+    val rootPath = "zip://filePath.zip"
+    val api = new ZipApi(zipPath, rootPath, entriesByParentF)
+    val parent = s"$rootPath/dir 1"
+    val items = List(
+      FileListItem("file 1"),
+      FileListItem("dir 2", isDir = true)
+    )
+
+    //then
+    childProcess.exec.expects(*, *).onCall { (command, options) =>
+      command shouldBe s"""zip -qd "$zipPath" "dir 1/file 1" "dir 1/dir 2/""""
+      assertObject(options.get, new ChildProcessOptions {
+        override val windowsHide = true
+      })
+
+      (null, Future.successful(result))
+    }
+
+    //when
+    val resultF = api.delete(parent, items)
+
+    //then
+    resultF.map(_ => Succeeded)
+  }
+
   it should "execute zip command when addToZip" in {
     //given
     val childProcess = new ChildProcess

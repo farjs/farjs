@@ -41,7 +41,23 @@ class ZipApi(zipPath: String,
     }
   }
 
-  def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = ???
+  def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = {
+    val paths = items.map {
+      case item if item.isDir =>
+        s"$parent/${item.name}/".stripPrefix(rootPath).stripPrefix("/")
+      case item =>
+        s"$parent/${item.name}".stripPrefix(rootPath).stripPrefix("/")
+    }
+    
+    val (_, future) = ZipApi.childProcess.exec(
+      command = s"""zip -qd "$zipPath" ${paths.mkString("\"", "\" \"", "\"")}""",
+      options = Some(new raw.ChildProcessOptions {
+        override val windowsHide = true
+      })
+    )
+
+    future.map(_ => ())
+  }
 
   def mkDirs(dirs: List[String]): Future[Unit] = Future.unit
 
