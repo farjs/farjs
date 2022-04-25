@@ -41,15 +41,32 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     ))
     val rootPath = "zip://filePath.zip"
     val zipPanel = new ZipPanel(rootPath, entriesByParentF, onClose)
-
-    dispatch.expects(*).never()
     val comp = testRender(<(zipPanel())(^.wrapped := props)())
     val panelProps = findComponentProps(comp, fileListPanelComp)
 
     //when & then
     panelProps.onKeypress(null, "unknown") shouldBe false
+  }
 
-    Succeeded
+  it should "return true if disabled operation when onKeypress" in {
+    //given
+    val onClose = mockFunction[Unit]
+    val dispatch = mockFunction[Any, Any]
+    val actions = new MockFileListActions
+    val props = FileListPanelProps(dispatch, actions, FileListState(
+      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
+        FileListItem.up
+      ))
+    ))
+    val rootPath = "zip://filePath.zip"
+    val zipPanel = new ZipPanel(rootPath, entriesByParentF, onClose)
+    val comp = testRender(<(zipPanel())(^.wrapped := props)())
+    val panelProps = findComponentProps(comp, fileListPanelComp)
+
+    //when & then
+    panelProps.onKeypress(null, "S-f5") shouldBe true
+    panelProps.onKeypress(null, "S-f6") shouldBe true
+    panelProps.onKeypress(null, "f7") shouldBe true
   }
 
   it should "call onClose if root dir when onKeypress(C-pageup)" in {

@@ -57,6 +57,7 @@ class ZipPanel(rootPath: String,
             && props.state.currDir.path == rootPath
           ) =>
           onClose()
+        case "S-f5" | "S-f6" | "f7" => //disabled
         case _ =>
           processed = false
       }

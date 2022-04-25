@@ -44,6 +44,36 @@ class ZipApiSpec extends AsyncTestSpec {
     )
   }
 
+  it should "do nothing when mkDirs" in {
+    //given
+    val zipPath = "/dir/filePath.zip"
+    val rootPath = "zip://filePath.zip"
+    val api = new ZipApi(zipPath, rootPath, entriesByParentF)
+    
+    //when
+    val resultF = api.mkDirs(List("test"))
+
+    //then
+    resultF.map(_ => Succeeded)
+  }
+
+  it should "return None when writeFile" in {
+    //given
+    val zipPath = "/dir/filePath.zip"
+    val rootPath = "zip://filePath.zip"
+    val api = new ZipApi(zipPath, rootPath, entriesByParentF)
+    val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
+
+    //then
+    onExists.expects(*).never()
+    
+    //when
+    val resultF = api.writeFile(List("parent"), "test.file", onExists)
+
+    //then
+    resultF.map(_ shouldBe None)
+  }
+
   it should "return root dir content when readDir(.)" in {
     //given
     val zipPath = "/dir/filePath.zip"

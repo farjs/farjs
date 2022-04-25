@@ -137,7 +137,12 @@ case class ZipApi(zipPath: String,
     }
   }
 
-  def writeFile(parentDirs: List[String], fileName: String, onExists: FileListItem => Future[Option[Boolean]]): Future[Option[FileTarget]] = ???
+  def writeFile(parentDirs: List[String],
+                fileName: String,
+                onExists: FileListItem => Future[Option[Boolean]]): Future[Option[FileTarget]] = {
+
+    Future.successful(None)
+  }
 
   private[zip] def extract(zipPath: String, filePath: String): Future[SubProcess] = {
     ZipApi.childProcess.spawn(
