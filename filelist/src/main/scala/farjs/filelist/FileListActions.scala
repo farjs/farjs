@@ -69,12 +69,8 @@ trait FileListActions {
                    dir: String,
                    items: Seq[FileListItem]): FileListTaskAction = {
     
-    val future = for {
-      _ <- delete(dir, items)
-      currDir <- api.readDir(dir)
-    } yield {
-      dispatch(FileListDirUpdatedAction(currDir))
-      ()
+    val future = delete(dir, items).andThen {
+      case Success(_) => dispatch(updateDir(dispatch, dir))
     }
 
     FileListTaskAction(FutureTask("Deleting Items", future))

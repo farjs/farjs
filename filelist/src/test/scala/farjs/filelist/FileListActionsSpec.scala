@@ -166,6 +166,10 @@ class FileListActionsSpec extends AsyncTestSpec {
     
     //then
     dispatch.expects(FileListDirUpdatedAction(currDir))
+    var resultAction: Any = null
+    dispatch.expects(*).onCall { action: Any =>
+      resultAction = action
+    }
     
     //when
     val FileListTaskAction(FutureTask(msg, future)) =
@@ -173,7 +177,11 @@ class FileListActionsSpec extends AsyncTestSpec {
     
     //then
     msg shouldBe "Deleting Items"
-    future.map(_ => Succeeded)
+    future.flatMap { _ =>
+      inside(resultAction) { case FileListDirUpdateAction(FutureTask("Updating Dir", future)) =>
+        future.map(_ => Succeeded)
+      }
+    }
   }
   
   it should "process sub-dirs and return true when scanDirs" in {

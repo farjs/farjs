@@ -11,9 +11,10 @@ import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.control.NonFatal
 
-class ZipApi(zipPath: String,
-             rootPath: String,
-             entriesByParentF: Future[Map[String, List[ZipEntry]]]) extends FileListApi {
+case class ZipApi(zipPath: String,
+                  rootPath: String,
+                  private var entriesByParentF: Future[Map[String, List[ZipEntry]]]
+                 ) extends FileListApi {
 
   def readDir(parent: Option[String], dir: String): Future[FileListDir] = {
     val path = parent.getOrElse(rootPath)
@@ -42,21 +43,56 @@ class ZipApi(zipPath: String,
   }
 
   def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = {
-    val paths = items.map {
-      case item if item.isDir =>
-        s"$parent/${item.name}/".stripPrefix(rootPath).stripPrefix("/")
-      case item =>
-        s"$parent/${item.name}".stripPrefix(rootPath).stripPrefix("/")
+
+    def deleteFromState(parent: String, items: Seq[FileListItem]): Unit = {
+      entriesByParentF = entriesByParentF.map { entriesByParent =>
+        items.foldLeft(entriesByParent) { (entries, item) =>
+          val res = entries.updatedWith(parent.stripPrefix(rootPath).stripPrefix("/")) {
+            _.map(_.filter(_.name != item.name))
+          }
+          if (item.isDir) {
+            res.removed(s"$parent/${item.name}".stripPrefix(rootPath).stripPrefix("/"))
+          }
+          else res
+        }
+      }
     }
     
-    val (_, future) = ZipApi.childProcess.exec(
-      command = s"""zip -qd "$zipPath" ${paths.mkString("\"", "\" \"", "\"")}""",
-      options = Some(new raw.ChildProcessOptions {
-        override val windowsHide = true
-      })
-    )
+    def delDirItems(parent: String, items: Seq[FileListItem]): Future[Unit] = {
+      items.foldLeft(Future.successful(())) { case (res, item) =>
+        res.flatMap { _ =>
+          if (item.isDir) {
+            val dir = s"$parent/${item.name}"
+            readDir(dir).flatMap { fileListDir =>
+              if (fileListDir.items.nonEmpty) {
+                delDirItems(dir, fileListDir.items)
+              }
+              else Future.successful {
+                deleteFromState(parent, Seq(item))
+              }
+            }
+          }
+          else Future.successful(())
+        }
+      }.flatMap { _ =>
+        val paths = items.map { item =>
+          val name = if (item.isDir) s"${item.name}/" else item.name
+          s"$parent/$name".stripPrefix(rootPath).stripPrefix("/")
+        }
+  
+        val (_, future) = ZipApi.childProcess.exec(
+          command = s"""zip -qd "$zipPath" ${paths.mkString("\"", "\" \"", "\"")}""",
+          options = Some(new raw.ChildProcessOptions {
+            override val windowsHide = true
+          })
+        )
 
-    future.map(_ => ())
+        deleteFromState(parent, items)
+        future.map(_ => ())
+      }
+    }
+
+    delDirItems(parent, items)
   }
 
   def mkDirs(dirs: List[String]): Future[Unit] = Future.unit

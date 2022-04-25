@@ -11,6 +11,7 @@ import scala.scalajs.js.typedarray.Uint8Array
 object ZipPlugin extends FileListPlugin {
 
   private[zip] var readZip: String => Future[Map[String, List[ZipEntry]]] = ZipApi.readZip
+  private[zip] var createApi: (String, String, Future[Map[String, List[ZipEntry]]]) => ZipApi = ZipApi.apply
 
   override def onFileTrigger(filePath: String,
                              fileHeader: Uint8Array,
@@ -24,7 +25,7 @@ object ZipPlugin extends FileListPlugin {
       Some(PanelStackItem(
         component = new FileListPanelController(new ZipPanel(rootPath, entriesByParentF, onClose)).apply(),
         dispatch = None,
-        actions = Some(new ZipActions(new ZipApi(filePath, rootPath, entriesByParentF))),
+        actions = Some(new ZipActions(createApi(filePath, rootPath, entriesByParentF))),
         state = Some(FileListState(
           currDir = FileListDir(rootPath, isRoot = false, items = Nil)
         ))

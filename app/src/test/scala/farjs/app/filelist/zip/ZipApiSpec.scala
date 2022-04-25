@@ -11,6 +11,7 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.nodejs.util.{StreamReader, SubProcess}
 
 import scala.collection.immutable.ListSet
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
@@ -272,14 +273,26 @@ class ZipApiSpec extends AsyncTestSpec {
     }
   }
 
-  it should "execute zip command when delete" in {
+  it should "execute zip command recursively when delete" in {
     //given
     val childProcess = new ChildProcess
     ZipApi.childProcess = childProcess.childProcess
     val result = (new js.Object, new js.Object)
     val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
-    val api = new ZipApi(zipPath, rootPath, entriesByParentF)
+    val api = new ZipApi(zipPath, rootPath, Future.successful(Map(
+      "" -> List(
+        ZipEntry("", "dir 1", isDir = true, datetimeMs = 1.0, permissions = "drwxr-xr-x")
+      ),
+      "dir 1" -> List(
+        ZipEntry("dir 1", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--"),
+        ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 4.0, permissions = "drwxr-xr-x")
+      ),
+      "dir 1/dir 2" -> List(
+        ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--"),
+        ZipEntry("dir 1/dir 2", "dir 3", isDir = true, datetimeMs = 7.0, permissions = "drwxr-xr-x")
+      )
+    )))
     val parent = s"$rootPath/dir 1"
     val items = List(
       FileListItem("file 1"),
@@ -287,8 +300,9 @@ class ZipApiSpec extends AsyncTestSpec {
     )
 
     //then
-    childProcess.exec.expects(*, *).onCall { (command, options) =>
-      command shouldBe s"""zip -qd "$zipPath" "dir 1/file 1" "dir 1/dir 2/""""
+    val commands = ArrayBuffer.empty[String]
+    childProcess.exec.expects(*, *).twice().onCall { (command, options) =>
+      commands += command
       assertObject(options.get, new ChildProcessOptions {
         override val windowsHide = true
       })
@@ -297,10 +311,19 @@ class ZipApiSpec extends AsyncTestSpec {
     }
 
     //when
-    val resultF = api.delete(parent, items)
+    val resultF = for {
+      _ <- api.delete(parent, items)
+      res <- api.readDir(parent)
+    } yield res
 
     //then
-    resultF.map(_ => Succeeded)
+    resultF.map { res =>
+      res.items should be (empty)
+      commands shouldBe List(
+        s"""zip -qd "$zipPath" "dir 1/dir 2/file 2" "dir 1/dir 2/dir 3/"""",
+        s"""zip -qd "$zipPath" "dir 1/file 1" "dir 1/dir 2/""""
+      )
+    }
   }
 
   it should "execute zip command when addToZip" in {
