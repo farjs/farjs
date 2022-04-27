@@ -4,6 +4,7 @@ import scala.concurrent.Future
 
 //noinspection NotImplementedCode
 class MockFileListApi(
+  capabilitiesMock: Set[String] = Set.empty,
   readDir2Mock: (Option[String], String) => Future[FileListDir] = (_, _) => ???,
   readDirMock: String => Future[FileListDir] = _ => ???,
   deleteMock: (String, Seq[FileListItem]) => Future[Unit] = (_, _) => ???,
@@ -12,6 +13,8 @@ class MockFileListApi(
   writeFileMock: (List[String], String, FileListItem => Future[Option[Boolean]]) => Future[Option[FileTarget]] = (_, _, _) => ???
 ) extends FileListApi {
 
+  val capabilities: Set[String] = capabilitiesMock
+  
   override def readDir(parent: Option[String], dir: String): Future[FileListDir] =
     readDir2Mock(parent, dir)
 

@@ -13,7 +13,7 @@ import scala.scalajs.js.typedarray.Uint8Array
 class FileListActionsSpec extends AsyncTestSpec {
 
   //noinspection TypeAnnotation
-  class Api {
+  class Api(capabilities: Set[String] = Set.empty) {
     val readDir2 = mockFunction[Option[String], String, Future[FileListDir]]
     val readDir = mockFunction[String, Future[FileListDir]]
     val delete = mockFunction[String, Seq[FileListItem], Future[Unit]]
@@ -22,6 +22,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     val writeFile = mockFunction[List[String], String, FileListItem => Future[Option[Boolean]], Future[Option[FileTarget]]]
     
     val api = new MockFileListApi(
+      capabilitiesMock = capabilities,
       readDir2Mock = readDir2,
       readDirMock = readDir,
       deleteMock = delete,
@@ -55,6 +56,16 @@ class FileListActionsSpec extends AsyncTestSpec {
       closeMock = close,
       deleteMock = delete
     )
+  }
+
+  it should "return api capabilities" in {
+    //given
+    val capabilities = Set("test.capability")
+    val api = new Api(capabilities)
+    val actions = new FileListActionsTest(api.api)
+    
+    //when & then
+    actions.capabilities shouldBe capabilities
   }
 
   it should "dispatch FileListDirChangedAction when changeDir" in {

@@ -16,6 +16,11 @@ case class ZipApi(zipPath: String,
                   private var entriesByParentF: Future[Map[String, List[ZipEntry]]]
                  ) extends FileListApi {
 
+  val capabilities: Set[String] = Set(
+    FileListCapability.read,
+    FileListCapability.delete
+  )
+
   def readDir(parent: Option[String], dir: String): Future[FileListDir] = {
     val path = parent.getOrElse(rootPath)
     val targetDir =
@@ -42,7 +47,7 @@ case class ZipApi(zipPath: String,
     }
   }
 
-  def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = {
+  override def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = {
 
     def deleteFromState(parent: String, items: Seq[FileListItem]): Unit = {
       entriesByParentF = entriesByParentF.map { entriesByParent =>
@@ -95,9 +100,7 @@ case class ZipApi(zipPath: String,
     delDirItems(parent, items)
   }
 
-  def mkDirs(dirs: List[String]): Future[Unit] = Future.unit
-
-  def readFile(parentDirs: List[String], item: FileListItem, position: Double): Future[FileSource] = {
+  override def readFile(parentDirs: List[String], item: FileListItem, position: Double): Future[FileSource] = {
     val filePath = s"${parentDirs.mkString("/")}/${item.name}".stripPrefix(rootPath).stripPrefix("/")
     val subprocessF = extract(zipPath, filePath)
 
@@ -135,13 +138,6 @@ case class ZipApi(zipPath: String,
         }
       }
     }
-  }
-
-  def writeFile(parentDirs: List[String],
-                fileName: String,
-                onExists: FileListItem => Future[Option[Boolean]]): Future[Option[FileTarget]] = {
-
-    Future.successful(None)
   }
 
   private[zip] def extract(zipPath: String, filePath: String): Future[SubProcess] = {

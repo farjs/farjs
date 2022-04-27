@@ -20,6 +20,8 @@ trait FileListActions {
 
   def getDriveRoot(path: String): Future[Option[String]]
 
+  def capabilities: Set[String] = api.capabilities
+
   def changeDir(dispatch: Dispatch,
                 parent: Option[String],
                 dir: String): FileListDirChangeAction = {

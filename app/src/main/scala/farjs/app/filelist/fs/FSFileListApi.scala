@@ -15,6 +15,12 @@ class FSFileListApi extends FileListApi {
 
   private[filelist] def fs: FS = scommons.nodejs.fs
 
+  val capabilities: Set[String] = Set(
+    FileListCapability.read,
+    FileListCapability.write,
+    FileListCapability.delete
+  )
+
   def readDir(parent: Option[String], dir: String): Future[FileListDir] = {
     readDir(path.resolve(parent.toList :+ dir: _*))
   }
@@ -34,7 +40,7 @@ class FSFileListApi extends FileListApi {
     }
   }
 
-  def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = {
+  override def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = {
     
     def delDirItems(parent: String, items: Seq[(String, Boolean)]): Future[Unit] = {
       items.foldLeft(Future.successful(())) { case (res, (name, isDir)) =>
@@ -61,7 +67,7 @@ class FSFileListApi extends FileListApi {
     delDirItems(parent, items.map(i => (i.name, i.isDir)))
   }
 
-  def mkDirs(dirs: List[String]): Future[Unit] = {
+  override def mkDirs(dirs: List[String]): Future[Unit] = {
 
     def loop(parent: String, names: List[String]): Future[Unit] = names match {
       case Nil => Future.unit
@@ -86,7 +92,7 @@ class FSFileListApi extends FileListApi {
     loop("", dirs)
   }
   
-  def readFile(parentDirs: List[String], file: FileListItem, position: Double): Future[FileSource] = Future {
+  override def readFile(parentDirs: List[String], file: FileListItem, position: Double): Future[FileSource] = Future {
     val filePath = path.join(path.join(parentDirs: _*), file.name)
     val fd = fs.openSync(filePath, FSConstants.O_RDONLY)
     
@@ -106,9 +112,9 @@ class FSFileListApi extends FileListApi {
     }
   }
 
-  def writeFile(parentDirs: List[String],
-                fileName: String,
-                onExists: FileListItem => Future[Option[Boolean]]): Future[Option[FileTarget]] = {
+  override def writeFile(parentDirs: List[String],
+                         fileName: String,
+                         onExists: FileListItem => Future[Option[Boolean]]): Future[Option[FileTarget]] = {
 
     val targetDir = path.join(parentDirs: _*)
     val filePath = path.join(targetDir, fileName)

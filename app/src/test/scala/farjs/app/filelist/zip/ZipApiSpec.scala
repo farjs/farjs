@@ -1,7 +1,7 @@
 package farjs.app.filelist.zip
 
 import farjs.app.filelist.fs.MockChildProcess
-import farjs.filelist.api.{FileListDir, FileListItem, FileSource}
+import farjs.filelist.api._
 import org.scalatest.Succeeded
 import scommons.nodejs.ChildProcess.ChildProcessOptions
 import scommons.nodejs._
@@ -44,34 +44,17 @@ class ZipApiSpec extends AsyncTestSpec {
     )
   }
 
-  it should "do nothing when mkDirs" in {
+  it should "return supported capabilities" in {
     //given
     val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
     val api = new ZipApi(zipPath, rootPath, entriesByParentF)
     
-    //when
-    val resultF = api.mkDirs(List("test"))
-
-    //then
-    resultF.map(_ => Succeeded)
-  }
-
-  it should "return None when writeFile" in {
-    //given
-    val zipPath = "/dir/filePath.zip"
-    val rootPath = "zip://filePath.zip"
-    val api = new ZipApi(zipPath, rootPath, entriesByParentF)
-    val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
-
-    //then
-    onExists.expects(*).never()
-    
-    //when
-    val resultF = api.writeFile(List("parent"), "test.file", onExists)
-
-    //then
-    resultF.map(_ shouldBe None)
+    //when & then
+    api.capabilities shouldBe Set(
+      FileListCapability.read,
+      FileListCapability.delete
+    )
   }
 
   it should "return root dir content when readDir(.)" in {

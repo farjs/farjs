@@ -15,6 +15,15 @@ class FSFileListApiSpec extends AsyncTestSpec {
   
   private val apiImp = new FSFileListApi
 
+  it should "return supported capabilities" in {
+    //when & then
+    apiImp.capabilities shouldBe Set(
+      FileListCapability.read,
+      FileListCapability.write,
+      FileListCapability.delete
+    )
+  }
+
   it should "not fail if fs.lstatSync fail when readDir" in {
     //given
     val readdirMock = mockFunction[String, Future[Seq[String]]]
