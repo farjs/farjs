@@ -5,7 +5,7 @@ import farjs.app.filelist.fs.{FSDrivePopupProps, FSPlugin, MockFileSource}
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem, FileSource}
-import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
+import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.stack._
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.path
@@ -165,7 +165,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
   }
 
-  it should "dispatch FileListPopupExitAction when onKeypress(F10)" in {
+  it should "dispatch actions when onKeypress(F-keys)" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val props = FileListBrowserProps(dispatch)
@@ -177,16 +177,53 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
-    val button = inside(findComponents(comp, <.button.name)) {
-      case List(button, _) => button
-    }
-    val keyFull = "f10"
-    
-    //then
-    dispatch.expects(FileListPopupExitAction(show = true))
+    val currState = FileListState(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+        FileListItem.up,
+        FileListItem("file 1"),
+        FileListItem("dir 1", isDir = true)
+      ))
+    )
 
-    //when
-    button.props.onKeypress(null, literal(full = keyFull).asInstanceOf[KeyboardKey])
+    def check(fullKey: String,
+              action: Any,
+              index: Int = 0,
+              selectedNames: Set[String] = Set.empty,
+              never: Boolean = false): Unit = {
+      //given
+      inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _) =>
+        leftStack.isActive shouldBe true
+        leftStack.update[FileListState](_.withState(currState.copy(
+          index = index,
+          selectedNames = selectedNames
+        )))
+      }
+      val button = inside(findComponents(comp, <.button.name)) {
+        case List(button, _) => button
+      }
+
+      //then
+      if (never) dispatch.expects(action).never()
+      else dispatch.expects(action)
+
+      //when
+      button.props.onKeypress(null, literal(full = fullKey).asInstanceOf[KeyboardKey])
+    }
+
+    //when & then
+    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), never = true)
+    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), index = 1)
+    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), index = 2)
+    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), selectedNames = Set("file 1"))
+
+    //when & then
+    check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), never = true)
+    check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), index = 1)
+    check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), index = 2)
+    check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), selectedNames = Set("file 1"))
+
+    //when & then
+    check("f10", FileListPopupExitAction(show = true))
 
     Succeeded
   }

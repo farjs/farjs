@@ -3,7 +3,8 @@ package farjs.app.filelist
 import farjs.app.filelist.fs.{FSDrivePopup, FSDrivePopupProps, FSPlugin}
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
-import farjs.filelist.popups.FileListPopupsActions.FileListPopupExitAction
+import farjs.filelist.api.FileListItem
+import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.stack._
 import farjs.ui.menu.BottomMenu
 import scommons.nodejs.path
@@ -76,6 +77,8 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       key.full match {
         case "M-l" => setShowLeftDrive(true)
         case "M-r" => setShowRightDrive(true)
+        case "f5" => onCopyMove(move = false, getStack(isRightActive))
+        case "f6" => onCopyMove(move = true, getStack(isRightActive))
         case "f10" => props.dispatch(FileListPopupExitAction(show = true))
         case "tab" | "S-tab" => screen.focusNext()
         case "C-u" =>
@@ -192,6 +195,18 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       openF.andThen {
         case Failure(_) => dispatch(FileListTaskAction(FutureTask("Opening File", openF)))
       }
+    }
+  }
+
+  private def onCopyMove(move: Boolean, stack: PanelStack): Unit = {
+    val stackItem = stack.peek[js.Any]
+    stackItem.getActions.zip(stackItem.state).collect {
+      case ((dispatch, actions), state: FileListState) =>
+        val currItem = state.currentItem.filter(_ != FileListItem.up)
+        if (state.selectedNames.nonEmpty || currItem.nonEmpty) {
+          if (move) dispatch(FileListPopupCopyMoveAction(ShowMoveToTarget))
+          else dispatch(FileListPopupCopyMoveAction(ShowCopyToTarget))
+        }
     }
   }
 }

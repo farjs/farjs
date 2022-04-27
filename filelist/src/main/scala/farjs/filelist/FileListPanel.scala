@@ -45,14 +45,6 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
             if (props.state.selectedNames.nonEmpty || currItem.exists(_.isDir)) {
               props.dispatch(FileListPopupViewItemsAction(show = true))
             }
-          case "f5" =>
-            if (props.state.selectedNames.nonEmpty || currItem.nonEmpty) {
-              props.dispatch(FileListPopupCopyMoveAction(ShowCopyToTarget))
-            }
-          case "f6" =>
-            if (props.state.selectedNames.nonEmpty || currItem.nonEmpty) {
-              props.dispatch(FileListPopupCopyMoveAction(ShowMoveToTarget))
-            }
           case "S-f5" =>
             if (currItem.nonEmpty) {
               props.dispatch(FileListPopupCopyMoveAction(ShowCopyInplace))
