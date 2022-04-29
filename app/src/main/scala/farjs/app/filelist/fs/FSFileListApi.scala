@@ -18,7 +18,10 @@ class FSFileListApi extends FileListApi {
   val capabilities: Set[String] = Set(
     FileListCapability.read,
     FileListCapability.write,
-    FileListCapability.delete
+    FileListCapability.delete,
+    FileListCapability.mkDirs,
+    FileListCapability.copyInplace,
+    FileListCapability.moveInplace
   )
 
   def readDir(parent: Option[String], dir: String): Future[FileListDir] = {

@@ -20,7 +20,10 @@ class FSFileListApiSpec extends AsyncTestSpec {
     apiImp.capabilities shouldBe Set(
       FileListCapability.read,
       FileListCapability.write,
-      FileListCapability.delete
+      FileListCapability.delete,
+      FileListCapability.mkDirs,
+      FileListCapability.copyInplace,
+      FileListCapability.moveInplace
     )
   }
 

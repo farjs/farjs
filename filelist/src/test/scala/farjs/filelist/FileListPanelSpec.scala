@@ -2,7 +2,7 @@ package farjs.filelist
 
 import farjs.filelist.FileListActions._
 import farjs.filelist.FileListPanel._
-import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.filelist.api.{FileListCapability, FileListDir, FileListItem}
 import farjs.filelist.popups.FileListPopupsActions._
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
@@ -28,6 +28,12 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val updateDir = mockFunction[Dispatch, String, FileListDirUpdateAction]
 
     val actions = new MockFileListActions(
+      capabilitiesMock = Set(
+        FileListCapability.delete,
+        FileListCapability.mkDirs,
+        FileListCapability.copyInplace,
+        FileListCapability.moveInplace
+      ),
       changeDirMock = changeDir,
       updateDirMock = updateDir
     )

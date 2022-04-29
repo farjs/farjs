@@ -1,7 +1,7 @@
 package farjs.filelist
 
 import farjs.filelist.FileListActions.FileListParamsChangedAction
-import farjs.filelist.api.FileListItem
+import farjs.filelist.api.{FileListCapability, FileListItem}
 import farjs.filelist.popups.FileListPopupsActions._
 import scommons.nodejs.path
 import scommons.react._
@@ -45,16 +45,17 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
             if (props.state.selectedNames.nonEmpty || currItem.exists(_.isDir)) {
               props.dispatch(FileListPopupViewItemsAction(show = true))
             }
-          case "S-f5" =>
+          case "S-f5" if props.actions.capabilities.contains(FileListCapability.copyInplace) =>
             if (currItem.nonEmpty) {
               props.dispatch(FileListPopupCopyMoveAction(ShowCopyInplace))
             }
-          case "S-f6" =>
+          case "S-f6" if props.actions.capabilities.contains(FileListCapability.moveInplace) =>
             if (currItem.nonEmpty) {
               props.dispatch(FileListPopupCopyMoveAction(ShowMoveInplace))
             }
-          case "f7" => props.dispatch(FileListPopupMkFolderAction(show = true))
-          case "f8" | "delete" =>
+          case "f7" if props.actions.capabilities.contains(FileListCapability.mkDirs) =>
+            props.dispatch(FileListPopupMkFolderAction(show = true))
+          case "f8" | "delete" if props.actions.capabilities.contains(FileListCapability.delete) =>
             if (props.state.selectedNames.nonEmpty || currItem.isDefined) {
               props.dispatch(FileListPopupDeleteAction(show = true))
             }
