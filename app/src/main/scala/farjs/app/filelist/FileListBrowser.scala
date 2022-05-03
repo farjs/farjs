@@ -3,7 +3,7 @@ package farjs.app.filelist
 import farjs.app.filelist.fs.{FSDrivePopup, FSDrivePopupProps, FSPlugin}
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
-import farjs.filelist.api.FileListItem
+import farjs.filelist.api.{FileListCapability, FileListItem}
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.stack._
 import farjs.ui.menu.BottomMenu
@@ -49,15 +49,17 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     val leftStack = new PanelStack(!isRightActive, leftStackData, setLeftStackData)
     val rightStack = new PanelStack(isRightActive, rightStackData, setRightStackData)
 
+    def getInput(isRight: Boolean): BlessedElement = {
+      if (isRight) rightButtonRef.current
+      else leftButtonRef.current
+    }
+
     useLayoutEffect({ () =>
       fsPlugin.init(props.dispatch, leftStack)
       fsPlugin.init(props.dispatch, rightStack)
 
-      val element = 
-        if (isRightActive) rightButtonRef.current
-        else leftButtonRef.current
-      
-      element.focus()
+      getInput(isRightActive).focus()
+      ()
     }, Nil)
     
     def getStack(isRight: Boolean): PanelStack = {
@@ -77,8 +79,8 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       key.full match {
         case "M-l" => setShowLeftDrive(true)
         case "M-r" => setShowRightDrive(true)
-        case "f5" => onCopyMove(move = false, getStack(isRightActive))
-        case "f6" => onCopyMove(move = true, getStack(isRightActive))
+        case k@("f5" | "f6") =>
+          onCopyMove(k == "f6", getStack(isRightActive), getStack(!isRightActive), getInput(!isRightActive))
         case "f10" => props.dispatch(FileListPopupExitAction(show = true))
         case "tab" | "S-tab" => screen.focusNext()
         case "C-u" =>
@@ -198,14 +200,34 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     }
   }
 
-  private def onCopyMove(move: Boolean, stack: PanelStack): Unit = {
+  private def onCopyMove(move: Boolean,
+                         stack: PanelStack,
+                         nonActiveStack: PanelStack,
+                         nonActiveInput: BlessedElement): Unit = {
+
+    val nonActiveItem = nonActiveStack.peek[js.Any]
     val stackItem = stack.peek[js.Any]
-    stackItem.getActions.zip(stackItem.state).collect {
-      case ((dispatch, actions), state: FileListState) =>
+    stackItem.getActions.zip(stackItem.state).zip(nonActiveItem.getActions).collect {
+      case (((dispatch, actions), state: FileListState), (_, nonActiveActions)) =>
         val currItem = state.currentItem.filter(_ != FileListItem.up)
-        if (state.selectedNames.nonEmpty || currItem.nonEmpty) {
-          if (move) dispatch(FileListPopupCopyMoveAction(ShowMoveToTarget))
-          else dispatch(FileListPopupCopyMoveAction(ShowCopyToTarget))
+        if ((state.selectedNames.nonEmpty || currItem.nonEmpty) &&
+          actions.capabilities.contains(FileListCapability.read) &&
+          (!move || actions.capabilities.contains(FileListCapability.delete))) {
+
+          if (nonActiveActions.capabilities.contains(FileListCapability.write)) {
+            dispatch(
+              if (move) FileListPopupCopyMoveAction(ShowMoveToTarget)
+              else FileListPopupCopyMoveAction(ShowCopyToTarget)
+            )
+          }
+          else {
+            nonActiveInput.emit("keypress", js.undefined, js.Dynamic.literal(
+              name = "",
+              full =
+                if (move) FileListEvent.onFileListMove
+                else FileListEvent.onFileListCopy
+            ))
+          }
         }
     }
   }

@@ -4,7 +4,7 @@ import farjs.app.filelist.FileListBrowser._
 import farjs.app.filelist.fs.{FSDrivePopupProps, FSPlugin, MockFileSource}
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
-import farjs.filelist.api.{FileListDir, FileListItem, FileSource}
+import farjs.filelist.api._
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.stack._
 import org.scalatest.{Assertion, Succeeded}
@@ -29,10 +29,11 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   FileListBrowser.fileListPopups = "test_popups".asInstanceOf[ReactClass]
   
   //noinspection TypeAnnotation
-  class Actions {
+  class Actions(capabilities: Set[String] = Set.empty) {
     val readFile = mockFunction[List[String], FileListItem, Double, Future[FileSource]]
 
     val actions = new MockFileListActions(
+      capabilitiesMock = capabilities,
       readFileMock = readFile
     )
   }
@@ -165,7 +166,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
   }
 
-  it should "dispatch actions when onKeypress(F-keys)" in {
+  it should "dispatch FileListPopupExitAction when onKeypress(F10)" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val props = FileListBrowserProps(dispatch)
@@ -177,6 +178,37 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
+    val button = inside(findComponents(comp, <.button.name)) {
+      case List(button, _) => button
+    }
+    val keyFull = "f10"
+
+    //then
+    dispatch.expects(FileListPopupExitAction(show = true))
+
+    //when
+    button.props.onKeypress(null, literal(full = keyFull).asInstanceOf[KeyboardKey])
+
+    Succeeded
+  }
+
+  it should "dispatch actions when onKeypress(F5/F6)" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val props = FileListBrowserProps(dispatch)
+    val focusMock = mockFunction[Unit]
+    val emitMock = mockFunction[String, js.Any, js.Dynamic, Boolean]
+    val leftButtonMock = literal("focus" -> focusMock)
+    val rightButtonMock = literal("emit" -> emitMock)
+    focusMock.expects()
+
+    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
+      if (el.`type` == <.button.name.asInstanceOf[js.Any]) {
+        if (el.props.isRight.asInstanceOf[Boolean]) rightButtonMock
+        else leftButtonMock
+      }
+      else null
+    })
     val currState = FileListState(
       currDir = FileListDir("/sub-dir", isRoot = false, items = List(
         FileListItem.up,
@@ -184,27 +216,56 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         FileListItem("dir 1", isDir = true)
       ))
     )
+    val leftDispatch = mockFunction[Any, Any]
+    val rightDispatch = mockFunction[Any, Any]
+    val capabilities = Set(
+      FileListCapability.read,
+      FileListCapability.write,
+      FileListCapability.delete
+    )
 
     def check(fullKey: String,
               action: Any,
               index: Int = 0,
               selectedNames: Set[String] = Set.empty,
-              never: Boolean = false): Unit = {
+              never: Boolean = false,
+              leftCapabilities: Set[String] = capabilities,
+              rightCapabilities: Set[String] = capabilities,
+              emit: Option[String] = None): Unit = {
       //given
-      inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _) =>
+      val leftActions = new Actions(leftCapabilities)
+      val rightActions = new Actions(rightCapabilities)
+      inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, rightStack) =>
         leftStack.isActive shouldBe true
-        leftStack.update[FileListState](_.withState(currState.copy(
-          index = index,
-          selectedNames = selectedNames
-        )))
+        leftStack.update[FileListState](_.copy(
+          dispatch = Some(leftDispatch),
+          actions = Some(leftActions.actions),
+          state = Some(currState.copy(
+            index = index,
+            selectedNames = selectedNames
+          ))
+        ))
+        rightStack.isActive shouldBe false
+        rightStack.update[FileListState](_.copy(
+          dispatch = Some(rightDispatch),
+          actions = Some(rightActions.actions)
+        ))
       }
       val button = inside(findComponents(comp, <.button.name)) {
         case List(button, _) => button
       }
 
       //then
-      if (never) dispatch.expects(action).never()
-      else dispatch.expects(action)
+      if (never) leftDispatch.expects(action).never()
+      else leftDispatch.expects(action)
+
+      emit.foreach { event =>
+        emitMock.expects("keypress", *, *).onCall { (_, _, key) =>
+          key.name shouldBe ""
+          key.full shouldBe event
+          false
+        }
+      }
 
       //when
       button.props.onKeypress(null, literal(full = fullKey).asInstanceOf[KeyboardKey])
@@ -212,18 +273,25 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
     //when & then
     check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), never = true)
-    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), index = 1)
+    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), index = 1, never = true, leftCapabilities = Set.empty)
+    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), index = 1, never = true, rightCapabilities = Set.empty,
+      emit = Some(FileListEvent.onFileListCopy))
+    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), index = 1, leftCapabilities = Set(
+      FileListCapability.read
+    ))
     check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), index = 2)
     check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), selectedNames = Set("file 1"))
 
     //when & then
     check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), never = true)
+    check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), index = 1, never = true, leftCapabilities = Set(
+      FileListCapability.read
+    ))
+    check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), index = 1, never = true, rightCapabilities = Set.empty,
+      emit = Some(FileListEvent.onFileListMove))
     check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), index = 1)
     check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), index = 2)
     check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), selectedNames = Set("file 1"))
-
-    //when & then
-    check("f10", FileListPopupExitAction(show = true))
 
     Succeeded
   }
