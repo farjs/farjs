@@ -2,12 +2,13 @@ package farjs.app.filelist.fs
 
 import farjs.app.filelist.MockFileListActions
 import farjs.app.filelist.fs.FSPanel._
-import farjs.app.filelist.zip.ZipCreatePopupProps
+import farjs.app.filelist.zip.AddToZipControllerProps
 import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.redux.Dispatch
 import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
@@ -19,14 +20,14 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
   FSPanel.fileListPanelComp = mockUiComponent("FileListPanel")
   FSPanel.fsFreeSpaceComp = mockUiComponent("FSFreeSpace")
   FSPanel.fsService = new FsService().fsService
-  FSPanel.zipCreatePopup = mockUiComponent("ZipCreatePopup")
+  FSPanel.addToZipController = mockUiComponent("AddToZipController")
 
   //noinspection TypeAnnotation
   class Actions {
-    val readDir = mockFunction[Option[String], String, Future[FileListDir]]
+    val updateDir = mockFunction[Dispatch, String, FileListDirUpdateAction]
 
     val actions = new MockFileListActions(
-      readDirMock = readDir
+      updateDirMock = updateDir
     )
   }
 
@@ -79,7 +80,7 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     }
   }
 
-  it should "not render ZipCreatePopup if .. when onKeypress(S-f7)" in {
+  it should "not render AddToZipController if .. when onKeypress(S-f7)" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
@@ -96,10 +97,10 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     panelProps.onKeypress(null, "S-f7") shouldBe true
 
     //then
-    findComponents(renderer.root, zipCreatePopup()) should be (empty)
+    findComponents(renderer.root, addToZipController()) should be (empty)
   }
 
-  it should "render ZipCreatePopup if curr item when onKeypress(S-f7)" in {
+  it should "render AddToZipController and handle onCancel when onKeypress(S-f7)" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
@@ -113,19 +114,22 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     panelProps.onKeypress(null, "S-f7") shouldBe true
 
     //then
-    inside(findComponentProps(renderer.root, zipCreatePopup)) {
-      case ZipCreatePopupProps(zipName, _, onCancel) =>
+    inside(findComponentProps(renderer.root, addToZipController)) {
+      case AddToZipControllerProps(resDispatch, state, zipName, items, _, onCancel) =>
+        resDispatch shouldBe dispatch
+        state shouldBe props.state
         zipName shouldBe "item 1.zip"
+        items shouldBe Set("item 1")
         
         //when
         onCancel()
         
         //then
-        findComponents(renderer.root, zipCreatePopup()) should be (empty)
+        findComponents(renderer.root, addToZipController()) should be (empty)
     }
   }
 
-  it should "render ZipCreatePopup and call addToZip when onKeypress(S-f7)" in {
+  it should "render AddToZipController and handle onComplete when onKeypress(S-f7)" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
@@ -139,8 +143,6 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
       )),
       selectedNames = ListSet("item 3", "item 2")
     ))
-    val addToZip = mockFunction[String, String, Set[String], Future[Unit]]
-    FSPanel.addToZip = addToZip
     val renderer = createTestRenderer(<(FSPanel())(^.wrapped := props)())
     val panelProps = findComponentProps(renderer.root, fileListPanelComp)
     
@@ -148,39 +150,31 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     panelProps.onKeypress(null, "S-f7") shouldBe true
 
     //then
-    inside(findComponentProps(renderer.root, zipCreatePopup)) {
-      case ZipCreatePopupProps(zipName, onAdd, _) =>
+    inside(findComponentProps(renderer.root, addToZipController)) {
+      case AddToZipControllerProps(resDispatch, state, zipName, items, onComplete, _) =>
+        resDispatch shouldBe dispatch
+        state shouldBe props.state
         zipName shouldBe "item 3.zip"
+        items shouldBe ListSet("item 3", "item 2")
 
         //given
         val zipFile = "test.zip"
         val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
           FileListItem("file 1")
         ))
+        val updateAction = FileListDirUpdateAction(FutureTask("Updating...", Future.successful(updatedDir)))
         
         //then
-        addToZip.expects(zipFile, props.state.currDir.path, ListSet("item 3", "item 2"))
-          .returning(Future.unit)
-        dispatch.expects(FileListParamsChangedAction(
-          offset = 0,
-          index = 1,
-          selectedNames = Set.empty
-        ))
-        actions.readDir.expects(None, props.state.currDir.path).returning(Future.successful(updatedDir))
+        actions.updateDir.expects(dispatch, props.state.currDir.path).returning(updateAction)
         dispatch.expects(FileListItemCreatedAction(zipFile, updatedDir))
-        var resultAction: Any = null
-        dispatch.expects(*).onCall { action: Any =>
-          resultAction = action
-        }
+        dispatch.expects(updateAction)
         
         //when
-        onAdd(zipFile)
+        onComplete(zipFile)
         
         //then
-        findComponents(renderer.root, zipCreatePopup()) should be (empty)
-        inside(resultAction) { case FileListTaskAction(FutureTask("Creating zip archive", future)) =>
-          future.map(_ => Succeeded)
-        }
+        findComponents(renderer.root, addToZipController()) should be (empty)
+        updateAction.task.future.map(_ => Succeeded)
     }
   }
 

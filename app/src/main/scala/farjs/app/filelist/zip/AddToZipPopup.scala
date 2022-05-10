@@ -8,11 +8,11 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.hooks._
 
-case class ZipCreatePopupProps(zipName: String,
-                               onAdd: String => Unit,
-                               onCancel: () => Unit)
+case class AddToZipPopupProps(zipName: String,
+                              onAdd: String => Unit,
+                              onCancel: () => Unit)
 
-object ZipCreatePopup extends FunctionComponent[ZipCreatePopupProps] {
+object AddToZipPopup extends FunctionComponent[AddToZipPopupProps] {
 
   private[zip] var modalComp: UiComponent[ModalProps] = Modal
   private[zip] var textLineComp: UiComponent[TextLineProps] = TextLine

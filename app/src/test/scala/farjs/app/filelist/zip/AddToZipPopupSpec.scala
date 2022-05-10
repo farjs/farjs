@@ -1,25 +1,25 @@
 package farjs.app.filelist.zip
 
-import farjs.app.filelist.zip.ZipCreatePopup._
+import farjs.app.filelist.zip.AddToZipPopup._
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.ModalProps
 import farjs.ui.theme.Theme
 import scommons.react.test._
 
-class ZipCreatePopupSpec extends TestSpec with TestRendererUtils {
+class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
 
-  ZipCreatePopup.modalComp = mockUiComponent("Modal")
-  ZipCreatePopup.textLineComp = mockUiComponent("TextLine")
-  ZipCreatePopup.textBoxComp = mockUiComponent("TextBox")
-  ZipCreatePopup.horizontalLineComp = mockUiComponent("HorizontalLine")
-  ZipCreatePopup.buttonsPanelComp = mockUiComponent("ButtonsPanel")
+  AddToZipPopup.modalComp = mockUiComponent("Modal")
+  AddToZipPopup.textLineComp = mockUiComponent("TextLine")
+  AddToZipPopup.textBoxComp = mockUiComponent("TextBox")
+  AddToZipPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
+  AddToZipPopup.buttonsPanelComp = mockUiComponent("ButtonsPanel")
 
   it should "set zipName when onChange in TextBox" in {
     //given
     val zipName = "initial zip name"
-    val props = ZipCreatePopupProps(zipName, _ => (), () => ())
-    val renderer = createTestRenderer(<(ZipCreatePopup())(^.wrapped := props)())
+    val props = AddToZipPopupProps(zipName, _ => (), () => ())
+    val renderer = createTestRenderer(<(AddToZipPopup())(^.wrapped := props)())
     val textBox = findComponentProps(renderer.root, textBoxComp)
     textBox.value shouldBe zipName
     val newZipName = "new zip name"
@@ -35,8 +35,8 @@ class ZipCreatePopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onAdd = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = ZipCreatePopupProps("test", onAdd, onCancel)
-    val comp = testRender(<(ZipCreatePopup())(^.wrapped := props)())
+    val props = AddToZipPopupProps("test", onAdd, onCancel)
+    val comp = testRender(<(AddToZipPopup())(^.wrapped := props)())
     val textBox = findComponentProps(comp, textBoxComp)
 
     //then
@@ -51,8 +51,8 @@ class ZipCreatePopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onAdd = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = ZipCreatePopupProps("test", onAdd, onCancel)
-    val comp = testRender(<(ZipCreatePopup())(^.wrapped := props)())
+    val props = AddToZipPopupProps("test", onAdd, onCancel)
+    val comp = testRender(<(AddToZipPopup())(^.wrapped := props)())
     val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.head
 
     //then
@@ -67,8 +67,8 @@ class ZipCreatePopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onAdd = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = ZipCreatePopupProps("", onAdd, onCancel)
-    val comp = testRender(<(ZipCreatePopup())(^.wrapped := props)())
+    val props = AddToZipPopupProps("", onAdd, onCancel)
+    val comp = testRender(<(AddToZipPopup())(^.wrapped := props)())
     val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.head
 
     //then
@@ -83,8 +83,8 @@ class ZipCreatePopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onAdd = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = ZipCreatePopupProps("", onAdd, onCancel)
-    val comp = testRender(<(ZipCreatePopup())(^.wrapped := props)())
+    val props = AddToZipPopupProps("", onAdd, onCancel)
+    val comp = testRender(<(AddToZipPopup())(^.wrapped := props)())
     val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions(1)
 
     //then
@@ -97,18 +97,18 @@ class ZipCreatePopupSpec extends TestSpec with TestRendererUtils {
   
   it should "render component" in {
     //given
-    val props = ZipCreatePopupProps("test zip", _ => (), () => ())
+    val props = AddToZipPopupProps("test zip", _ => (), () => ())
 
     //when
-    val result = testRender(<(ZipCreatePopup())(^.wrapped := props)())
+    val result = testRender(<(AddToZipPopup())(^.wrapped := props)())
 
     //then
-    assertZipCreatePopup(result, props, List("[ Add ]", "[ Cancel ]"))
+    assertAddToZipPopup(result, props, List("[ Add ]", "[ Cancel ]"))
   }
 
-  private def assertZipCreatePopup(result: TestInstance,
-                                   props: ZipCreatePopupProps,
-                                   actions: List[String]): Unit = {
+  private def assertAddToZipPopup(result: TestInstance,
+                                  props: AddToZipPopupProps,
+                                  actions: List[String]): Unit = {
     val (width, height) = (75, 8)
     val style = Theme.current.popup.regular
 

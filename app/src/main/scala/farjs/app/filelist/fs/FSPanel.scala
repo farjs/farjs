@@ -10,15 +10,13 @@ import scommons.react.hooks._
 import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 object FSPanel extends FunctionComponent[FileListPanelProps] {
 
   private[fs] var fileListPanelComp: UiComponent[FileListPanelProps] = FileListPanel
   private[fs] var fsFreeSpaceComp: UiComponent[FSFreeSpaceProps] = FSFreeSpace
   private[fs] var fsService: FSService = FSService.instance
-  private[fs] var zipCreatePopup: UiComponent[ZipCreatePopupProps] = ZipCreatePopup
-  private[fs] var addToZip: (String, String, Set[String]) => Future[Unit] = ZipApi.addToZip
+  private[fs] var addToZipController: UiComponent[AddToZipControllerProps] = AddToZipController
   
   protected def render(compProps: Props): ReactElement = {
     val (zipData, setZipData) = useState(Option.empty[(String, Set[String])])
@@ -57,24 +55,18 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
       ))(),
 
       zipData.map { case (zipName, items) =>
-        <(zipCreatePopup())(^.wrapped := ZipCreatePopupProps(
+        <(addToZipController())(^.wrapped := AddToZipControllerProps(
+          dispatch = props.dispatch,
+          state = props.state,
           zipName = zipName,
-          onAdd = { zipFile =>
-            val action = createZipArchive(zipFile, props.state.currDir.path, items)
-            props.dispatch(action)
+          items = items,
+          onComplete = { zipFile =>
             setZipData(None)
 
-            action.task.future.foreach { _ =>
-              if (props.state.selectedNames.nonEmpty) {
-                props.dispatch(FileListParamsChangedAction(
-                  offset = props.state.offset,
-                  index = props.state.index,
-                  selectedNames = Set.empty
-                ))
-              }
-              props.actions.readDir(None, props.state.currDir.path).foreach { updatedDir =>
-                props.dispatch(FileListItemCreatedAction(zipFile, updatedDir))
-              }
+            val action = props.actions.updateDir(props.dispatch, props.state.currDir.path)
+            props.dispatch(action)
+            action.task.future.foreach { updatedDir =>
+              props.dispatch(FileListItemCreatedAction(zipFile, updatedDir))
             }
           },
           onCancel = { () =>
@@ -89,11 +81,5 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
     val future = fsService.openItem(parent, item)
 
     FileListTaskAction(FutureTask("Opening default app", future))
-  }
-
-  private def createZipArchive(zipFile: String, parent: String, items: Set[String]): FileListTaskAction = {
-    val future = addToZip(zipFile, parent, items)
-
-    FileListTaskAction(FutureTask("Creating zip archive", future))
   }
 }
