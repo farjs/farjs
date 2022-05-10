@@ -23,7 +23,7 @@ object ZipPlugin extends FileListPlugin {
       val entriesByParentF = readZip(filePath)
       
       Some(PanelStackItem(
-        component = new FileListPanelController(new ZipPanel(rootPath, entriesByParentF, onClose)).apply(),
+        component = new FileListPanelController(new ZipPanel(filePath, rootPath, entriesByParentF, onClose)).apply(),
         dispatch = None,
         actions = Some(new ZipActions(createApi(filePath, rootPath, entriesByParentF))),
         state = Some(FileListState(

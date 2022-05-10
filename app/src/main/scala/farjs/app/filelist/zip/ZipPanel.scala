@@ -2,8 +2,9 @@ package farjs.app.filelist.zip
 
 import farjs.app.filelist.zip.ZipPanel._
 import farjs.filelist.FileListActions._
+import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.{FileListPanel, FileListPanelProps}
+import farjs.filelist.stack.WithPanelStacks
 import scommons.react._
 import scommons.react.blessed.BlessedScreen
 import scommons.react.hooks._
@@ -13,12 +14,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Failure
 
-class ZipPanel(rootPath: String,
+class ZipPanel(zipPath: String,
+               rootPath: String,
                entriesByParentF: Future[Map[String, List[ZipEntry]]],
                onClose: () => Unit
               ) extends FunctionComponent[FileListPanelProps] {
 
   protected def render(compProps: Props): ReactElement = {
+    WithPanelStacks.usePanelStacks
     val props = compProps.wrapped
 
     useLayoutEffect({ () =>

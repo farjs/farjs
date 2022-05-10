@@ -2,11 +2,14 @@ package farjs.app.filelist.zip
 
 import farjs.app.filelist.MockFileListActions
 import farjs.app.filelist.zip.ZipPanel._
+import farjs.app.filelist.zip.ZipPanelSpec.withContext
 import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.filelist.stack._
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react._
 import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
@@ -33,15 +36,26 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions
+    val actions = new MockFileListActions(isLocalFSMock = false)
     val props = FileListPanelProps(dispatch, actions, FileListState(
       currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
         FileListItem.up
       ))
     ))
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel(rootPath, entriesByParentF, onClose)
-    val comp = testRender(<(zipPanel())(^.wrapped := props)())
+    val zipPanel = new ZipPanel("dir/file.zip", rootPath, entriesByParentF, onClose)
+    val fsDispatch = mockFunction[Any, Any]
+    val fsActions = new MockFileListActions(isLocalFSMock = true)
+    val fsState = FileListState()
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fsDispatch), Some(fsActions), Some(fsState))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("zipComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
+    val comp = testRender(
+      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+    )
     val panelProps = findComponentProps(comp, fileListPanelComp)
 
     //when & then
@@ -52,7 +66,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions
+    val actions = new MockFileListActions(isLocalFSMock = false)
     val props = FileListPanelProps(dispatch, actions, FileListState(
       index = 1,
       currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
@@ -61,10 +75,21 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       ))
     ))
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel(rootPath, entriesByParentF, onClose)
+    val zipPanel = new ZipPanel("dir/file.zip", rootPath, entriesByParentF, onClose)
+    val fsDispatch = mockFunction[Any, Any]
+    val fsActions = new MockFileListActions(isLocalFSMock = true)
+    val fsState = FileListState()
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fsDispatch), Some(fsActions), Some(fsState))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("zipComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
 
     dispatch.expects(*).never()
-    val comp = testRender(<(zipPanel())(^.wrapped := props)())
+    val comp = testRender(
+      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+    )
     val panelProps = findComponentProps(comp, fileListPanelComp)
 
     //then
@@ -76,11 +101,11 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     Succeeded
   }
 
-  it should "call onClose if on .. in root dir when onKeypress(C-pagedown)" in {
+  it should "call onClose if on .. in root dir when onKeypress(enter|C-pagedown)" in {
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions
+    val actions = new MockFileListActions(isLocalFSMock = false)
     val props = FileListPanelProps(dispatch, actions, FileListState(
       currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
         FileListItem.up,
@@ -88,53 +113,38 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       ))
     ))
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel(rootPath, entriesByParentF, onClose)
+    val zipPanel = new ZipPanel("dir/file.zip", rootPath, entriesByParentF, onClose)
+    val fsDispatch = mockFunction[Any, Any]
+    val fsActions = new MockFileListActions(isLocalFSMock = true)
+    val fsState = FileListState()
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fsDispatch), Some(fsActions), Some(fsState))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("zipComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
 
     dispatch.expects(*).never()
-    val comp = testRender(<(zipPanel())(^.wrapped := props)())
+    val comp = testRender(
+      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+    )
     val panelProps = findComponentProps(comp, fileListPanelComp)
 
     //then
-    onClose.expects()
+    onClose.expects().twice()
 
     //when & then
+    panelProps.onKeypress(null, "enter") shouldBe true
     panelProps.onKeypress(null, "C-pagedown") shouldBe true
 
     Succeeded
   }
 
-  it should "call onClose if on .. in root dir when onKeypress(enter)" in {
+  it should "not call onClose if not on .. in root dir when onKeypress(enter|C-pagedown)" in {
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions
-    val props = FileListPanelProps(dispatch, actions, FileListState(
-      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
-        FileListItem.up,
-        FileListItem("item 1")
-      ))
-    ))
-    val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel(rootPath, entriesByParentF, onClose)
-
-    dispatch.expects(*).never()
-    val comp = testRender(<(zipPanel())(^.wrapped := props)())
-    val panelProps = findComponentProps(comp, fileListPanelComp)
-
-    //then
-    onClose.expects()
-
-    //when & then
-    panelProps.onKeypress(null, "enter") shouldBe true
-
-    Succeeded
-  }
-
-  it should "not call onClose if not on .. in root dir when onKeypress(enter)" in {
-    //given
-    val onClose = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions
+    val actions = new MockFileListActions(isLocalFSMock = false)
     val props = FileListPanelProps(dispatch, actions, FileListState(
       index = 1,
       currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
@@ -143,10 +153,21 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       ))
     ))
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel(rootPath, entriesByParentF, onClose)
+    val zipPanel = new ZipPanel("dir/file.zip", rootPath, entriesByParentF, onClose)
+    val fsDispatch = mockFunction[Any, Any]
+    val fsActions = new MockFileListActions(isLocalFSMock = true)
+    val fsState = FileListState()
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fsDispatch), Some(fsActions), Some(fsState))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("zipComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
 
     dispatch.expects(*).never()
-    val comp = testRender(<(zipPanel())(^.wrapped := props)())
+    val comp = testRender(
+      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+    )
     val panelProps = findComponentProps(comp, fileListPanelComp)
 
     //then
@@ -154,6 +175,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     //when & then
     panelProps.onKeypress(null, "enter") shouldBe false
+    panelProps.onKeypress(null, "C-pagedown") shouldBe false
 
     Succeeded
   }
@@ -162,12 +184,21 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions
+    val actions = new MockFileListActions(isLocalFSMock = false)
     val state = FileListState()
     val props = FileListPanelProps(dispatch, actions, state)
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel(rootPath, Future.failed(new Exception("test")), onClose)
+    val zipPanel = new ZipPanel("dir/file.zip", rootPath, Future.failed(new Exception("test")), onClose)
     val dir = FileListDir(rootPath, isRoot = false, Nil)
+    val fsDispatch = mockFunction[Any, Any]
+    val fsActions = new MockFileListActions(isLocalFSMock = true)
+    val fsState = FileListState()
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fsDispatch), Some(fsActions), Some(fsState))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("zipComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
     
     //then
     var actionF: Future[_] = null
@@ -180,7 +211,9 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     dispatch.expects(FileListDirChangedAction(FileListDir.curr, dir))
     
     //when
-    testRender(<(zipPanel())(^.wrapped := props)())
+    testRender(
+      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+    )
 
     //then
     for {
@@ -193,7 +226,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions
+    val actions = new MockFileListActions(isLocalFSMock = false)
     val state = FileListState(
       currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
         FileListItem.up
@@ -201,13 +234,24 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     )
     val props = FileListPanelProps(dispatch, actions, state)
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel(rootPath, Future.successful(Map.empty), onClose)
+    val zipPanel = new ZipPanel("dir/file.zip", rootPath, Future.successful(Map.empty), onClose)
+    val fsDispatch = mockFunction[Any, Any]
+    val fsActions = new MockFileListActions(isLocalFSMock = true)
+    val fsState = FileListState()
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fsDispatch), Some(fsActions), Some(fsState))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("zipComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
     
     //then
     dispatch.expects(*).never()
     
     //when
-    testRender(<(zipPanel())(^.wrapped := props)())
+    testRender(
+      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+    )
 
     //then
     Succeeded
@@ -217,11 +261,20 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions
+    val actions = new MockFileListActions(isLocalFSMock = false)
     val state = FileListState()
     val props = FileListPanelProps(dispatch, actions, state)
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel(rootPath, entriesByParentF, onClose)
+    val zipPanel = new ZipPanel("dir/file.zip", rootPath, entriesByParentF, onClose)
+    val fsDispatch = mockFunction[Any, Any]
+    val fsActions = new MockFileListActions(isLocalFSMock = true)
+    val fsState = FileListState()
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fsDispatch), Some(fsActions), Some(fsState))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("zipComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
     
     //then
     var actionF: Future[_] = null
@@ -242,7 +295,9 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     )))
     
     //when
-    val result = testRender(<(zipPanel())(^.wrapped := props)())
+    val result = testRender(
+      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+    )
 
     //then
     assertTestComponent(result, fileListPanelComp) {
@@ -255,5 +310,14 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       _ <- eventually(actionF should not be null)
       _ <- actionF
     } yield Succeeded
+  }
+}
+
+object ZipPanelSpec {
+
+  def withContext(element: ReactElement, leftStack: PanelStack, rightStack: PanelStack): ReactElement = {
+    <(WithPanelStacks.Context.Provider)(^.contextValue := WithPanelStacksProps(leftStack, rightStack))(
+      element
+    )
   }
 }
