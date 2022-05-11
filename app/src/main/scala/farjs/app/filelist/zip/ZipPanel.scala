@@ -8,6 +8,7 @@ import farjs.filelist.stack.WithPanelStacks
 import scommons.react._
 import scommons.react.blessed.BlessedScreen
 import scommons.react.hooks._
+import scommons.react.redux.Dispatch
 import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -21,7 +22,8 @@ class ZipPanel(zipPath: String,
               ) extends FunctionComponent[FileListPanelProps] {
 
   protected def render(compProps: Props): ReactElement = {
-    WithPanelStacks.usePanelStacks
+    val stacks = WithPanelStacks.usePanelStacks
+    val (zipData, setZipData) = useState(Option.empty[(Dispatch, FileListState, Set[String])])
     val props = compProps.wrapped
 
     useLayoutEffect({ () =>
@@ -60,6 +62,24 @@ class ZipPanel(zipPath: String,
             && props.state.currDir.path == rootPath
           ) =>
           onClose()
+        case FileListEvent.onFileListCopy =>
+          val stackData = {
+            val stackItem = stacks.activeStack.peek[FileListState]
+            stackItem.getActions.zip(stackItem.state)
+          }
+          stackData.foreach { case ((dispatch, actions), state) =>
+            val items = {
+              if (state.selectedNames.nonEmpty) state.selectedNames
+              else {
+                val currItem = state.currentItem.filter(_ != FileListItem.up)
+                currItem.map(_.name).toSet
+              }
+            }
+            if (actions.isLocalFS && items.nonEmpty) {
+              setZipData(Some((dispatch, state, items)))
+            }
+            else processed = false
+          }
         case _ =>
           processed = false
       }
@@ -67,11 +87,30 @@ class ZipPanel(zipPath: String,
       processed
     }
 
-    <(fileListPanelComp())(^.wrapped := props.copy(onKeypress = onKeypress))()
+    <.>()(
+      <(fileListPanelComp())(^.wrapped := props.copy(onKeypress = onKeypress))(),
+
+      zipData.map { case (dispatch, state, items) =>
+        <(addToZipController())(^.wrapped := AddToZipControllerProps(
+          dispatch = dispatch,
+          state = state,
+          zipName = zipPath,
+          items = items,
+          onComplete = { _ =>
+            setZipData(None)
+            props.dispatch(props.actions.updateDir(props.dispatch, props.state.currDir.path))
+          },
+          onCancel = { () =>
+            setZipData(None)
+          }
+        ))()
+      }
+    )
   }
 }
 
 object ZipPanel {
 
   private[zip] var fileListPanelComp: UiComponent[FileListPanelProps] = FileListPanel
+  private[zip] var addToZipController: UiComponent[AddToZipControllerProps] = AddToZipController
 }

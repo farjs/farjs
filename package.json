@@ -6,7 +6,7 @@
     "url": "git+https://github.com/farjs/farjs.git"
   },
   "private": false,
-  "description": "FAR.js: File and Archive Manager app built with Scala.js/React.js and runs on Node.js",
+  "description": "FAR.js - Cross-platform File and Archive Manager app in your terminal",
   "files": [
     "bin/farjs.js",
     "dist/far.js",
