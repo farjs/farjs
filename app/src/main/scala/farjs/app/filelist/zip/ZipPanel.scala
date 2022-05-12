@@ -23,7 +23,8 @@ class ZipPanel(zipPath: String,
 
   protected def render(compProps: Props): ReactElement = {
     val stacks = WithPanelStacks.usePanelStacks
-    val (zipData, setZipData) = useState(Option.empty[(Dispatch, FileListState, Set[String])])
+    val (zipData, setZipData) =
+      useState(Option.empty[(Dispatch, FileListActions, FileListState, Seq[FileListItem], Boolean)])
     val props = compProps.wrapped
 
     useLayoutEffect({ () =>
@@ -62,21 +63,21 @@ class ZipPanel(zipPath: String,
             && props.state.currDir.path == rootPath
           ) =>
           onClose()
-        case FileListEvent.onFileListCopy =>
+        case k@(FileListEvent.onFileListCopy | FileListEvent.onFileListMove) =>
           val stackData = {
             val stackItem = stacks.activeStack.peek[FileListState]
             stackItem.getActions.zip(stackItem.state)
           }
           stackData.foreach { case ((dispatch, actions), state) =>
             val items = {
-              if (state.selectedNames.nonEmpty) state.selectedNames
+              if (state.selectedNames.nonEmpty) state.selectedItems
               else {
                 val currItem = state.currentItem.filter(_ != FileListItem.up)
-                currItem.map(_.name).toSet
+                currItem.toList
               }
             }
             if (actions.isLocalFS && items.nonEmpty) {
-              setZipData(Some((dispatch, state, items)))
+              setZipData(Some((dispatch, actions, state, items, k == FileListEvent.onFileListMove)))
             }
             else processed = false
           }
@@ -90,15 +91,22 @@ class ZipPanel(zipPath: String,
     <.>()(
       <(fileListPanelComp())(^.wrapped := props.copy(onKeypress = onKeypress))(),
 
-      zipData.map { case (dispatch, state, items) =>
+      zipData.map { case (dispatch, actions, state, items, move) =>
         <(addToZipController())(^.wrapped := AddToZipControllerProps(
           dispatch = dispatch,
           state = state,
           zipName = zipPath,
-          items = items,
+          items = items.map(_.name).toSet,
           onComplete = { _ =>
             setZipData(None)
-            props.dispatch(props.actions.updateDir(props.dispatch, props.state.currDir.path))
+
+            val updateAction = props.actions.updateDir(props.dispatch, props.state.currDir.path)
+            props.dispatch(updateAction)
+            if (move) {
+              updateAction.task.future.foreach { _ =>
+                dispatch(actions.deleteAction(dispatch, state.currDir.path, items))
+              }
+            }
           },
           onCancel = { () =>
             setZipData(None)

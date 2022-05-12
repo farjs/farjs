@@ -24,10 +24,12 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
   //noinspection TypeAnnotation
   class Actions(isLocalFS: Boolean) {
     val updateDir = mockFunction[Dispatch, String, FileListDirUpdateAction]
+    val deleteAction = mockFunction[Dispatch, String, Seq[FileListItem], FileListTaskAction]
 
     val actions = new MockFileListActions(
       isLocalFSMock = isLocalFS,
-      updateDirMock = updateDir
+      updateDirMock = updateDir,
+      deleteActionMock = deleteAction
     )
   }
 
@@ -399,6 +401,84 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         //then
         findComponents(renderer.root, addToZipController()) should be (empty)
         updateAction.task.future.map(_ => Succeeded)
+    }
+  }
+
+  it should "render AddToZipController and handle onComplete when onKeypress(onFileListMove)" in {
+    //given
+    val onClose = mockFunction[Unit]
+    val dispatch = mockFunction[Any, Any]
+    val actions = new Actions(isLocalFS = false)
+    val props = FileListPanelProps(dispatch, actions.actions, FileListState(
+      index = 1,
+      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
+        FileListItem.up,
+        FileListItem("dir 1", isDir = true)
+      ))
+    ))
+    val rootPath = "zip://filePath.zip"
+    val zipPanel = new ZipPanel("dir/file.zip", rootPath, entriesByParentF, onClose)
+    val fsDispatch = mockFunction[Any, Any]
+    val fsActions = new Actions(isLocalFS = true)
+    val items = List(
+      FileListItem("item 2"),
+      FileListItem("item 3")
+    )
+    val fsState = FileListState(
+      index = 1,
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+        FileListItem.up,
+        FileListItem("item 1")
+      ) ++ items),
+      selectedNames = Set("item 3", "item 2")
+    )
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fsDispatch), Some(fsActions.actions), Some(fsState))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("zipComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
+
+    dispatch.expects(*).never()
+    val renderer = createTestRenderer(
+      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+    )
+    val panelProps = findComponentProps(renderer.root, fileListPanelComp)
+
+    //when & then
+    panelProps.onKeypress(null, FileListEvent.onFileListMove) shouldBe true
+
+    //then
+    inside(findComponentProps(renderer.root, addToZipController)) {
+      case AddToZipControllerProps(resDispatch, state, zipName, resItems, onComplete, _) =>
+        resDispatch shouldBe fsDispatch
+        state shouldBe fsState
+        zipName shouldBe "dir/file.zip"
+        resItems shouldBe Set("item 3", "item 2")
+
+        //given
+        val zipFile = "test.zip"
+        val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
+          FileListItem("file 1")
+        ))
+        val updateAction = FileListDirUpdateAction(FutureTask("Updating...", Future.successful(updatedDir)))
+        val deleteAction = FileListTaskAction(FutureTask("Deleting...", Future.unit))
+
+        //then
+        actions.updateDir.expects(dispatch, props.state.currDir.path).returning(updateAction)
+        dispatch.expects(updateAction)
+        fsActions.deleteAction.expects(fsDispatch, fsState.currDir.path, items).returning(deleteAction)
+        fsDispatch.expects(deleteAction)
+
+        //when
+        onComplete(zipFile)
+
+        //then
+        findComponents(renderer.root, addToZipController()) should be (empty)
+        for {
+          _ <- updateAction.task.future
+          _ <- deleteAction.task.future
+        } yield Succeeded
     }
   }
 
