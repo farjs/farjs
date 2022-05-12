@@ -2,7 +2,7 @@ package farjs.app.filelist.fs
 
 import farjs.app.filelist.MockFileListActions
 import farjs.app.filelist.fs.FSPanel._
-import farjs.app.filelist.zip.AddToZipControllerProps
+import farjs.app.filelist.zip.{AddToZipAction, AddToZipControllerProps}
 import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
@@ -115,11 +115,12 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
 
     //then
     inside(findComponentProps(renderer.root, addToZipController)) {
-      case AddToZipControllerProps(resDispatch, state, zipName, items, _, onCancel) =>
+      case AddToZipControllerProps(resDispatch, state, zipName, items, action, _, onCancel) =>
         resDispatch shouldBe dispatch
         state shouldBe props.state
         zipName shouldBe "item 1.zip"
         items shouldBe Set("item 1")
+        action shouldBe AddToZipAction.Add
         
         //when
         onCancel()
@@ -151,11 +152,12 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
 
     //then
     inside(findComponentProps(renderer.root, addToZipController)) {
-      case AddToZipControllerProps(resDispatch, state, zipName, items, onComplete, _) =>
+      case AddToZipControllerProps(resDispatch, state, zipName, items, action, onComplete, _) =>
         resDispatch shouldBe dispatch
         state shouldBe props.state
         zipName shouldBe "item 3.zip"
         items shouldBe ListSet("item 3", "item 2")
+        action shouldBe AddToZipAction.Add
 
         //given
         val zipFile = "test.zip"

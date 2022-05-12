@@ -9,7 +9,8 @@ import scommons.react._
 import scommons.react.hooks._
 
 case class AddToZipPopupProps(zipName: String,
-                              onAdd: String => Unit,
+                              action: AddToZipAction,
+                              onAction: String => Unit,
                               onCancel: () => Unit)
 
 object AddToZipPopup extends FunctionComponent[AddToZipPopupProps] {
@@ -28,23 +29,23 @@ object AddToZipPopup extends FunctionComponent[AddToZipPopupProps] {
     val contentLeft = 2
     val theme = Theme.current.popup.regular
 
-    val onAdd = { () =>
+    val onAction = { () =>
       if (zipName.nonEmpty) {
-        props.onAdd(zipName)
+        props.onAction(zipName)
       }
     }
     
     val actions = List(
-      "[ Add ]" -> onAdd,
+      s"[ ${props.action} ]" -> onAction,
       "[ Cancel ]" -> props.onCancel
     )
 
-    <(modalComp())(^.wrapped := ModalProps("Add files to archive", size, theme, props.onCancel))(
+    <(modalComp())(^.wrapped := ModalProps(s"${props.action} files to archive", size, theme, props.onCancel))(
       <(textLineComp())(^.wrapped := TextLineProps(
         align = TextLine.Left,
         pos = (contentLeft, 1),
         width = contentWidth,
-        text = "Add to zip archive:",
+        text = s"${props.action} to zip archive:",
         style = theme,
         padding = 0
       ))(),
@@ -55,7 +56,7 @@ object AddToZipPopup extends FunctionComponent[AddToZipPopupProps] {
         onChange = { value =>
           setZipName(value)
         },
-        onEnter = onAdd
+        onEnter = onAction
       ))(),
       
       <(horizontalLineComp())(^.wrapped := HorizontalLineProps(

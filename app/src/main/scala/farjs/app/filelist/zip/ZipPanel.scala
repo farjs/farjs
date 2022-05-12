@@ -97,6 +97,9 @@ class ZipPanel(zipPath: String,
           state = state,
           zipName = zipPath,
           items = items.map(_.name).toSet,
+          action =
+            if (move) AddToZipAction.Move
+            else AddToZipAction.Copy,
           onComplete = { _ =>
             setZipData(None)
 

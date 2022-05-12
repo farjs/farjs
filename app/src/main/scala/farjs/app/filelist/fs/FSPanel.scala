@@ -60,6 +60,7 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
           state = props.state,
           zipName = zipName,
           items = items,
+          action = AddToZipAction.Add,
           onComplete = { zipFile =>
             setZipData(None)
 

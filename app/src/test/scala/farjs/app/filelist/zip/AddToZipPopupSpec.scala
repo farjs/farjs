@@ -18,7 +18,7 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
   it should "set zipName when onChange in TextBox" in {
     //given
     val zipName = "initial zip name"
-    val props = AddToZipPopupProps(zipName, _ => (), () => ())
+    val props = AddToZipPopupProps(zipName, AddToZipAction.Add, _ => (), () => ())
     val renderer = createTestRenderer(<(AddToZipPopup())(^.wrapped := props)())
     val textBox = findComponentProps(renderer.root, textBoxComp)
     textBox.value shouldBe zipName
@@ -31,48 +31,48 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
     findComponentProps(renderer.root, textBoxComp).value shouldBe newZipName
   }
   
-  it should "call onAdd when onEnter in TextBox" in {
+  it should "call onAction when onEnter in TextBox" in {
     //given
-    val onAdd = mockFunction[String, Unit]
+    val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = AddToZipPopupProps("test", onAdd, onCancel)
+    val props = AddToZipPopupProps("test", AddToZipAction.Add, onAction, onCancel)
     val comp = testRender(<(AddToZipPopup())(^.wrapped := props)())
     val textBox = findComponentProps(comp, textBoxComp)
 
     //then
-    onAdd.expects("test")
+    onAction.expects("test")
     onCancel.expects().never()
 
     //when
     textBox.onEnter()
   }
   
-  it should "call onAdd when press Add button" in {
+  it should "call onAction when press Action button" in {
     //given
-    val onAdd = mockFunction[String, Unit]
+    val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = AddToZipPopupProps("test", onAdd, onCancel)
+    val props = AddToZipPopupProps("test", AddToZipAction.Add, onAction, onCancel)
     val comp = testRender(<(AddToZipPopup())(^.wrapped := props)())
     val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.head
 
     //then
-    onAdd.expects("test")
+    onAction.expects("test")
     onCancel.expects().never()
     
     //when
     onPress()
   }
   
-  it should "not call onAdd if zipName is empty" in {
+  it should "not call onAction if zipName is empty" in {
     //given
-    val onAdd = mockFunction[String, Unit]
+    val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = AddToZipPopupProps("", onAdd, onCancel)
+    val props = AddToZipPopupProps("", AddToZipAction.Add, onAction, onCancel)
     val comp = testRender(<(AddToZipPopup())(^.wrapped := props)())
     val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.head
 
     //then
-    onAdd.expects(*).never()
+    onAction.expects(*).never()
     onCancel.expects().never()
     
     //when
@@ -81,14 +81,14 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
   
   it should "call onCancel when press Cancel button" in {
     //given
-    val onAdd = mockFunction[String, Unit]
+    val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = AddToZipPopupProps("", onAdd, onCancel)
+    val props = AddToZipPopupProps("", AddToZipAction.Add, onAction, onCancel)
     val comp = testRender(<(AddToZipPopup())(^.wrapped := props)())
     val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions(1)
 
     //then
-    onAdd.expects(*).never()
+    onAction.expects(*).never()
     onCancel.expects()
     
     //when
@@ -97,7 +97,7 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
   
   it should "render component" in {
     //given
-    val props = AddToZipPopupProps("test zip", _ => (), () => ())
+    val props = AddToZipPopupProps("test zip", AddToZipAction.Add, _ => (), () => ())
 
     //when
     val result = testRender(<(AddToZipPopup())(^.wrapped := props)())

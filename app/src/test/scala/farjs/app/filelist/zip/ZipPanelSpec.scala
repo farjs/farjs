@@ -320,11 +320,12 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     //then
     inside(findComponentProps(renderer.root, addToZipController)) {
-      case AddToZipControllerProps(resDispatch, state, zipName, items, _, onCancel) =>
+      case AddToZipControllerProps(resDispatch, state, zipName, items, action, _, onCancel) =>
         resDispatch shouldBe fsDispatch
         state shouldBe fsState
         zipName shouldBe "dir/file.zip"
         items shouldBe Set("file 1")
+        action shouldBe AddToZipAction.Copy
 
         //when
         onCancel()
@@ -378,11 +379,12 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     //then
     inside(findComponentProps(renderer.root, addToZipController)) {
-      case AddToZipControllerProps(resDispatch, state, zipName, items, onComplete, _) =>
+      case AddToZipControllerProps(resDispatch, state, zipName, items, action, onComplete, _) =>
         resDispatch shouldBe fsDispatch
         state shouldBe fsState
         zipName shouldBe "dir/file.zip"
         items shouldBe Set("item 3", "item 2")
+        action shouldBe AddToZipAction.Copy
 
         //given
         val zipFile = "test.zip"
@@ -450,11 +452,12 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     //then
     inside(findComponentProps(renderer.root, addToZipController)) {
-      case AddToZipControllerProps(resDispatch, state, zipName, resItems, onComplete, _) =>
+      case AddToZipControllerProps(resDispatch, state, zipName, resItems, action, onComplete, _) =>
         resDispatch shouldBe fsDispatch
         state shouldBe fsState
         zipName shouldBe "dir/file.zip"
         resItems shouldBe Set("item 3", "item 2")
+        action shouldBe AddToZipAction.Move
 
         //given
         val zipFile = "test.zip"

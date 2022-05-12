@@ -14,6 +14,7 @@ case class AddToZipControllerProps(dispatch: Dispatch,
                                    state: FileListState,
                                    zipName: String,
                                    items: Set[String],
+                                   action: AddToZipAction,
                                    onComplete: String => Unit,
                                    onCancel: () => Unit)
 
@@ -29,10 +30,11 @@ object AddToZipController extends FunctionComponent[AddToZipControllerProps] {
     if (showPopup) {
       <(addToZipPopup())(^.wrapped := AddToZipPopupProps(
         zipName = props.zipName,
-        onAdd = { zipFile =>
+        action = props.action,
+        onAction = { zipFile =>
           setShowPopup(false)
 
-          val action = addToArchive(zipFile, props.state.currDir.path, props.items)
+          val action = addToArchive(zipFile, props.state.currDir.path, props.items, props.action)
           props.dispatch(action)
           action.task.future.foreach { _ =>
             if (props.state.selectedNames.nonEmpty) {
@@ -52,9 +54,13 @@ object AddToZipController extends FunctionComponent[AddToZipControllerProps] {
     else null
   }
 
-  private def addToArchive(zipFile: String, parent: String, items: Set[String]): FileListTaskAction = {
+  private def addToArchive(zipFile: String,
+                           parent: String,
+                           items: Set[String],
+                           action: AddToZipAction): FileListTaskAction = {
+
     val future = addToZipApi(zipFile, parent, items)
 
-    FileListTaskAction(FutureTask("Adding files to zip archive", future))
+    FileListTaskAction(FutureTask(s"$action item(s) to zip archive", future))
   }
 }

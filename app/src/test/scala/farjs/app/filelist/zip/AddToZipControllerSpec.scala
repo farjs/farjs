@@ -30,7 +30,7 @@ class AddToZipControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRe
         FileListItem("item 3")
       )),
       selectedNames = items
-    ), zipName = "new.zip", items, onComplete, onCancel)
+    ), zipName = "new.zip", items, AddToZipAction.Add, onComplete, onCancel)
     val addToZipApi = mockFunction[String, String, Set[String], Future[Unit]]
     AddToZipController.addToZipApi = addToZipApi
 
@@ -39,8 +39,9 @@ class AddToZipControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRe
 
     //then
     inside(findComponentProps(renderer.root, addToZipPopup)) {
-      case AddToZipPopupProps(zipName, onAdd, onCancel) =>
+      case AddToZipPopupProps(zipName, action, onAction, onCancel) =>
         zipName shouldBe "new.zip"
+        action shouldBe AddToZipAction.Add
         onCancel shouldBe props.onCancel
 
         //given
@@ -60,12 +61,12 @@ class AddToZipControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRe
         onComplete.expects(zipFile)
 
         //when
-        onAdd(zipFile)
+        onAction(zipFile)
 
         //then
         findComponents(renderer.root, addToZipPopup()) should be (empty)
         inside(resultAction) {
-          case FileListTaskAction(FutureTask("Adding files to zip archive", future)) =>
+          case FileListTaskAction(FutureTask("Add item(s) to zip archive", future)) =>
             future.map(_ => Succeeded)
         }
     }
