@@ -7,6 +7,8 @@ import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack._
+import farjs.ui.popup.{MessageBoxAction, MessageBoxProps}
+import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
@@ -20,6 +22,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
   ZipPanel.fileListPanelComp = mockUiComponent("FileListPanel")
   ZipPanel.addToZipController = mockUiComponent("AddToZipController")
+  ZipPanel.messageBoxComp = mockUiComponent("MessageBox")
 
   //noinspection TypeAnnotation
   class Actions(isLocalFS: Boolean) {
@@ -482,6 +485,62 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
           _ <- updateAction.task.future
           _ <- deleteAction.task.future
         } yield Succeeded
+    }
+  }
+
+  it should "render MessageBox if non-root dir when onKeypress(onFileListCopy|Move)" in {
+    //given
+    val onClose = mockFunction[Unit]
+    val dispatch = mockFunction[Any, Any]
+    val actions = new Actions(isLocalFS = false)
+    val props = FileListPanelProps(dispatch, actions.actions, FileListState(
+      currDir = FileListDir("zip://filePath.zip/sub-dir", isRoot = false, items = List(
+        FileListItem.up,
+        FileListItem("dir 1", isDir = true)
+      ))
+    ))
+    val rootPath = "zip://filePath.zip"
+    val zipPanel = new ZipPanel("dir/file.zip", rootPath, entriesByParentF, onClose)
+    val fsDispatch = mockFunction[Any, Any]
+    val fsActions = new MockFileListActions(isLocalFSMock = true)
+    val fsState = FileListState(
+      index = 1,
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+        FileListItem.up,
+        FileListItem("item 1")
+      ))
+    )
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fsDispatch), Some(fsActions), Some(fsState))
+    ), null)
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("zipComp".asInstanceOf[ReactClass], None, None, None)
+    ), null)
+
+    dispatch.expects(*).never()
+    val renderer = createTestRenderer(
+      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+    )
+    val panelProps = findComponentProps(renderer.root, fileListPanelComp)
+
+    //when & then
+    panelProps.onKeypress(null, FileListEvent.onFileListCopy) shouldBe true
+
+    //then
+    findProps(renderer.root, addToZipController) should be (empty)
+    inside(findComponentProps(renderer.root, messageBoxComp)) {
+      case MessageBoxProps(title, message, resActions, style) =>
+        title shouldBe "Warning"
+        message shouldBe "Items can only be added to zip root."
+        inside(resActions) {
+          case List(MessageBoxAction("OK", onAction, true)) =>
+            //when
+            onAction()
+
+            //then
+            findProps(renderer.root, messageBoxComp) should be (empty)
+        }
+        style shouldBe Theme.current.popup.regular
     }
   }
 

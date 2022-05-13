@@ -5,6 +5,8 @@ import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack.WithPanelStacks
+import farjs.ui.popup.{MessageBox, MessageBoxAction, MessageBoxProps}
+import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed.BlessedScreen
 import scommons.react.hooks._
@@ -25,7 +27,9 @@ class ZipPanel(zipPath: String,
     val stacks = WithPanelStacks.usePanelStacks
     val (zipData, setZipData) =
       useState(Option.empty[(Dispatch, FileListActions, FileListState, Seq[FileListItem], Boolean)])
+    val (showWarning, setShowWarning) = useState(false)
     val props = compProps.wrapped
+    val theme = Theme.current.popup
 
     useLayoutEffect({ () =>
       if (props.state.currDir.items.isEmpty) {
@@ -64,22 +68,25 @@ class ZipPanel(zipPath: String,
           ) =>
           onClose()
         case k@(FileListEvent.onFileListCopy | FileListEvent.onFileListMove) =>
-          val stackData = {
-            val stackItem = stacks.activeStack.peek[FileListState]
-            stackItem.getActions.zip(stackItem.state)
-          }
-          stackData.foreach { case ((dispatch, actions), state) =>
-            val items = {
-              if (state.selectedNames.nonEmpty) state.selectedItems
-              else {
-                val currItem = state.currentItem.filter(_ != FileListItem.up)
-                currItem.toList
+          if (props.state.currDir.path != rootPath) setShowWarning(true)
+          else {
+            val stackData = {
+              val stackItem = stacks.activeStack.peek[FileListState]
+              stackItem.getActions.zip(stackItem.state)
+            }
+            stackData.foreach { case ((dispatch, actions), state) =>
+              val items = {
+                if (state.selectedNames.nonEmpty) state.selectedItems
+                else {
+                  val currItem = state.currentItem.filter(_ != FileListItem.up)
+                  currItem.toList
+                }
               }
+              if (actions.isLocalFS && items.nonEmpty) {
+                setZipData(Some((dispatch, actions, state, items, k == FileListEvent.onFileListMove)))
+              }
+              else processed = false
             }
-            if (actions.isLocalFS && items.nonEmpty) {
-              setZipData(Some((dispatch, actions, state, items, k == FileListEvent.onFileListMove)))
-            }
-            else processed = false
           }
         case _ =>
           processed = false
@@ -90,6 +97,17 @@ class ZipPanel(zipPath: String,
 
     <.>()(
       <(fileListPanelComp())(^.wrapped := props.copy(onKeypress = onKeypress))(),
+
+      if (showWarning) Some(
+        <(messageBoxComp())(^.wrapped := MessageBoxProps(
+          title = "Warning",
+          message = "Items can only be added to zip root.",
+          actions = List(MessageBoxAction.OK { () =>
+            setShowWarning(false)
+          }),
+          style = theme.regular
+        ))()
+      ) else None,
 
       zipData.map { case (dispatch, actions, state, items, move) =>
         <(addToZipController())(^.wrapped := AddToZipControllerProps(
@@ -124,4 +142,5 @@ object ZipPanel {
 
   private[zip] var fileListPanelComp: UiComponent[FileListPanelProps] = FileListPanel
   private[zip] var addToZipController: UiComponent[AddToZipControllerProps] = AddToZipController
+  private[zip] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
 }
