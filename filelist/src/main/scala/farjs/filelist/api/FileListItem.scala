@@ -8,7 +8,11 @@ case class FileListItem(name: String,
                         mtimeMs: Double = 0.0,
                         ctimeMs: Double = 0.0,
                         birthtimeMs: Double = 0.0,
-                        permissions: String = "") //optional, format: drwx---rwx
+                        permissions: String = "" //optional, format: drwx---rwx
+                       ) {
+  
+  lazy val nameNormalized: String = name.toLowerCase
+}
 
 object FileListItem {
 

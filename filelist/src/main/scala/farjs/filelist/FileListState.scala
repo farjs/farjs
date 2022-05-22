@@ -105,7 +105,7 @@ object FileListStateReducer {
   
   private def processDir(currDir: FileListDir): FileListDir = {
     val items = {
-      val sorted = currDir.items.sortBy(item => (!item.isDir, item.name))
+      val sorted = currDir.items.sortBy(item => (!item.isDir, item.nameNormalized, item.name))
 
       if (currDir.isRoot) sorted
       else FileListItem.up +: sorted

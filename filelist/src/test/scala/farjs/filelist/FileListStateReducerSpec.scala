@@ -179,7 +179,12 @@ class FileListStateReducerSpec extends TestSpec {
       index = 1,
       currDir = FileListDir("/root/sub-dir/dir 2", isRoot = true, items = Nil)
     )
-    val currDir = FileListDir("/root/sub-dir", isRoot = false, items = Seq.empty)
+    val currDir = FileListDir("/root/sub-dir", isRoot = false, items = List(
+      FileListItem("file 1"),
+      FileListItem("Fixes"),
+      FileListItem("Food", isDir = true),
+      FileListItem("dir 1", isDir = true)
+    ))
     val action = FileListDirUpdatedAction(currDir)
     
     //when & then
@@ -188,7 +193,11 @@ class FileListStateReducerSpec extends TestSpec {
         offset = 0,
         index = 0,
         currDir = currDir.copy(items = List(
-          FileListItem.up
+          FileListItem.up,
+          FileListItem("dir 1", isDir = true),
+          FileListItem("Food", isDir = true),
+          FileListItem("file 1"),
+          FileListItem("Fixes")
         )),
         selectedNames = Set.empty
       )
@@ -202,9 +211,9 @@ class FileListStateReducerSpec extends TestSpec {
     val dir = "dir 2"
     val currDir = stateDir.copy(items = List(
       FileListItem("file 2"),
-      FileListItem("file 1"),
+      FileListItem("File 1"),
       FileListItem(dir, isDir = true),
-      FileListItem("dir 1", isDir = true)
+      FileListItem("Dir 1", isDir = true)
     ))
     val action = FileListItemCreatedAction(dir, currDir)
 
@@ -214,9 +223,9 @@ class FileListStateReducerSpec extends TestSpec {
         offset = 0,
         index = 1,
         currDir = currDir.copy(items = List(
-          FileListItem("dir 1", isDir = true),
+          FileListItem("Dir 1", isDir = true),
           FileListItem("dir 2", isDir = true),
-          FileListItem("file 1"),
+          FileListItem("File 1"),
           FileListItem("file 2")
         )),
         selectedNames = Set("test1")
