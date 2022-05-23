@@ -30,6 +30,17 @@ class ZipPanel(zipPath: String,
     val (showWarning, setShowWarning) = useState(false)
     val props = compProps.wrapped
     val theme = Theme.current.popup
+    
+    def onClosePanel(): Unit = {
+      val stackData = {
+        val stackItem = stacks.activeStack.peekLast[FileListState]
+        stackItem.getActions.zip(stackItem.state)
+      }
+      stackData.foreach { case ((dispatch, actions), state) =>
+        dispatch(actions.updateDir(dispatch, state.currDir.path))
+      }
+      onClose()
+    }
 
     useLayoutEffect({ () =>
       if (props.state.currDir.items.isEmpty) {
@@ -61,12 +72,12 @@ class ZipPanel(zipPath: String,
       var processed = true
       key match {
         case "C-pageup" if props.state.currDir.path == rootPath =>
-          onClose()
+          onClosePanel()
         case "enter" | "C-pagedown" if (
           props.state.currentItem.exists(i => i.isDir && i.name == FileListItem.up.name)
             && props.state.currDir.path == rootPath
           ) =>
-          onClose()
+          onClosePanel()
         case k@(FileListEvent.onFileListCopy | FileListEvent.onFileListMove) =>
           if (props.state.currDir.path != rootPath) setShowWarning(true)
           else {
