@@ -339,24 +339,28 @@ class ZipApiSpec extends AsyncTestSpec {
     }
   }
 
-  it should "execute zip command when addToZip" in {
+  it should "spawn zip command when addToZip" in {
     //given
+    val stdout = new StreamReader(Readable.from(Buffer.from("")))
+    val rawProcess = literal().asInstanceOf[raw.ChildProcess]
+    val subProcess = SubProcess(rawProcess, stdout, Future.unit)
     val childProcess = new ChildProcess
     ZipApi.childProcess = childProcess.childProcess
     val parent = "test dir"
     val zipFile = "test.zip"
     val items = ListSet("item 1", "item 2")
-    val result = (new js.Object, new js.Object)
 
     //then
-    childProcess.exec.expects(*, *).onCall { (command, options) =>
-      command shouldBe """zip -qr "test.zip" "item 1" "item 2""""
-      assertObject(options.get, new ChildProcessOptions {
-        override val cwd = parent
-        override val windowsHide = true
-      })
-
-      (null, Future.successful(result))
+    childProcess.spawn.expects(
+      "zip",
+      List("-qr", "test.zip", "item 1", "item 2"),
+      *
+    ).onCall { (_, _, options) =>
+      inside(options) { case Some(opts) =>
+        opts.cwd shouldBe parent
+        opts.windowsHide shouldBe true
+      }
+      Future.successful(subProcess)
     }
 
     //when
@@ -385,7 +389,6 @@ class ZipApiSpec extends AsyncTestSpec {
     childProcess.spawn.expects("unzip", List("-ZT", zipPath), *).onCall { (_, _, options) =>
       inside(options) { case Some(opts) =>
         opts.windowsHide shouldBe true
-        childProcess.childProcess
       }
       Future.successful(subProcess)
     }
