@@ -3,6 +3,7 @@ package farjs.app.filelist.fs
 import farjs.app.filelist.fs.FSFileListApiSpec.TestApiFS
 import farjs.filelist.api._
 import org.scalatest.Succeeded
+import scommons.nodejs.Process.Platform
 import scommons.nodejs._
 import scommons.nodejs.raw.{FSConstants, FileOptions}
 import scommons.nodejs.test.AsyncTestSpec
@@ -460,19 +461,24 @@ class FSFileListApiSpec extends AsyncTestSpec {
         | flag(s(9), 'x', FSConstants.S_IXOTH.getOrElse(0)))
     }
     
+    def expected(s: String): String = {
+      if (process.platform == Platform.win32) s"${s.head}---------"
+      else s
+    }
+    
     //when & then
     apiImp.getPermissions(0) shouldBe "----------"
-    apiImp.getPermissions(of("d---------")) shouldBe "d---------"
-    apiImp.getPermissions(of("-r--------")) shouldBe "-r--------"
-    apiImp.getPermissions(of("--w-------")) shouldBe "--w-------"
-    apiImp.getPermissions(of("---x------")) shouldBe "---x------"
-    apiImp.getPermissions(of("----r-----")) shouldBe "----r-----"
-    apiImp.getPermissions(of("-----w----")) shouldBe "-----w----"
-    apiImp.getPermissions(of("------x---")) shouldBe "------x---"
-    apiImp.getPermissions(of("-------r--")) shouldBe "-------r--"
-    apiImp.getPermissions(of("--------w-")) shouldBe "--------w-"
-    apiImp.getPermissions(of("---------x")) shouldBe "---------x"
-    apiImp.getPermissions(of("drwxrwxrwx")) shouldBe "drwxrwxrwx"
+    apiImp.getPermissions(of("d---------")) shouldBe expected("d---------")
+    apiImp.getPermissions(of("-r--------")) shouldBe expected("-r--------")
+    apiImp.getPermissions(of("--w-------")) shouldBe expected("--w-------")
+    apiImp.getPermissions(of("---x------")) shouldBe expected("---x------")
+    apiImp.getPermissions(of("----r-----")) shouldBe expected("----r-----")
+    apiImp.getPermissions(of("-----w----")) shouldBe expected("-----w----")
+    apiImp.getPermissions(of("------x---")) shouldBe expected("------x---")
+    apiImp.getPermissions(of("-------r--")) shouldBe expected("-------r--")
+    apiImp.getPermissions(of("--------w-")) shouldBe expected("--------w-")
+    apiImp.getPermissions(of("---------x")) shouldBe expected("---------x")
+    apiImp.getPermissions(of("drwxrwxrwx")) shouldBe expected("drwxrwxrwx")
     
     Succeeded
   }

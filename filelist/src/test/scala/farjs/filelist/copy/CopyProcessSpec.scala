@@ -8,6 +8,7 @@ import farjs.ui.popup.MessageBoxProps
 import farjs.ui.theme.Theme
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{Assertion, Succeeded}
+import scommons.nodejs
 import scommons.nodejs._
 import scommons.nodejs.raw.Timers
 import scommons.nodejs.test.AsyncTestSpec
@@ -1101,7 +1102,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       ) =>
         move shouldBe props.move
         resItem shouldBe item
-        resTo shouldBe s"${props.toPath}$path/$toName"
+        resTo shouldBe nodejs.path.join(props.toPath, path, toName)
         resItemPercent shouldBe itemPercent
         resTotal shouldBe props.total
         resTotalPercent shouldBe totalPercent

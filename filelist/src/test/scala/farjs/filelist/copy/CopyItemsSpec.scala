@@ -11,6 +11,7 @@ import farjs.filelist.stack.{PanelStack, PanelStackItem}
 import farjs.ui.popup.MessageBoxProps
 import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
+import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 import scommons.react.redux.Dispatch
@@ -261,7 +262,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
-    val currDir = FileListDir("/folder", isRoot = false, List(item))
+    val currDir = FileListDir("folder", isRoot = false, List(item))
     val state = FileListState(currDir = currDir, isActive = true)
     val props = FileListPopupsState(showCopyMovePopup = ShowMoveToTarget)
     val leftStack = new PanelStack(isActive = true, List(
@@ -277,7 +278,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack)
     )
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
-    val toDir = FileListDir("/folder/dir 1", isRoot = false, Nil)
+    val toDir = FileListDir(path.join("folder", "dir 1"), isRoot = false, Nil)
     val to = "test to path"
 
     //then
@@ -321,7 +322,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
-    val currDir = FileListDir("/folder", isRoot = false, List(item))
+    val currDir = FileListDir("folder", isRoot = false, List(item))
     val state = FileListState(currDir = currDir, isActive = true)
     val props = FileListPopupsState(showCopyMovePopup = ShowCopyToTarget)
     val leftStack = new PanelStack(isActive = true, List(
@@ -337,7 +338,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack)
     )
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
-    val toDir = FileListDir("/folder/dir 1/dir 2", isRoot = false, Nil)
+    val toDir = FileListDir(path.join("folder", "dir 1", "dir 2"), isRoot = false, Nil)
     val to = "test to path"
 
     //then

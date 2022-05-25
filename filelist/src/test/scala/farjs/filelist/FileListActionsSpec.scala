@@ -4,6 +4,7 @@ import farjs.filelist.FileListActions._
 import farjs.filelist.FileListActionsSpec._
 import farjs.filelist.api._
 import org.scalatest.Succeeded
+import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.redux.task.FutureTask
 
@@ -144,8 +145,8 @@ class FileListActionsSpec extends AsyncTestSpec {
     val actions = new FileListActionsTest(api.api)
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
-    val parent = "/parent"
-    val dir = "test/dir"
+    val parent = "parent"
+    val dir = path.join("test", "dir")
     val multiple = true
 
     api.mkDirs.expects(List(parent, "test", "dir")).returning(Future.unit)
