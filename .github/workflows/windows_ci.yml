@@ -1,0 +1,58 @@
+name: Windows CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+
+    - name: Git checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '12'
+
+    - name: Set up JDK 8
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'
+        distribution: 'adopt'
+
+    - name: Cache sbt
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.sbt
+          ~/.ivy2/cache
+          ~/AppData/Local/Coursier/cache/v1
+        key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt', 'project/**/*.scala') }}
+
+    - name: Cache node_modules
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/AppData/Roaming/npm
+          D:/a/farjs/farjs/app/target/scala-2.13/scalajs-bundler/main/node_modules
+          D:/a/farjs/farjs/app/target/scala-2.13/scalajs-bundler/main/package-lock.json
+          D:/a/farjs/farjs/app/target/scala-2.13/scalajs-bundler/test/node_modules
+          D:/a/farjs/farjs/app/target/scala-2.13/scalajs-bundler/test/package-lock.json
+          D:/a/farjs/farjs/filelist/target/scala-2.13/scalajs-bundler/test/node_modules
+          D:/a/farjs/farjs/filelist/target/scala-2.13/scalajs-bundler/test/package-lock.json
+          D:/a/farjs/farjs/ui/target/scala-2.13/scalajs-bundler/test/node_modules
+          D:/a/farjs/farjs/ui/target/scala-2.13/scalajs-bundler/test/package-lock.json
+        key: ${{ runner.os }}-node_modules-cache-v2-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node_modules-cache-v2-
+
+    - name: Run tests
+      run: |
+        sbt -mem 2048 test
