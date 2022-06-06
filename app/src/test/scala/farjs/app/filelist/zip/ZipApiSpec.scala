@@ -341,7 +341,11 @@ class ZipApiSpec extends AsyncTestSpec {
 
   it should "spawn zip command when addToZip" in {
     //given
-    val stdout = new StreamReader(Readable.from(Buffer.from("")))
+    val stdout = new StreamReader(Readable.from(Buffer.from(
+      """  adding: 1/ (stored 0%)
+        |  adding: 1/2.txt (stored 1%)
+        |  adding: 1/1.txt (stored 2.3%)
+        |""".stripMargin)))
     val rawProcess = literal().asInstanceOf[raw.ChildProcess]
     val subProcess = SubProcess(rawProcess, stdout, Future.unit)
     val childProcess = new ChildProcess
@@ -349,11 +353,12 @@ class ZipApiSpec extends AsyncTestSpec {
     val parent = "test dir"
     val zipFile = "test.zip"
     val items = ListSet("item 1", "item 2")
+    val onNextItem = mockFunction[Unit]
 
     //then
     childProcess.spawn.expects(
       "zip",
-      List("-qr", "test.zip", "item 1", "item 2"),
+      List("-r", "test.zip", "item 1", "item 2"),
       *
     ).onCall { (_, _, options) =>
       inside(options) { case Some(opts) =>
@@ -362,9 +367,10 @@ class ZipApiSpec extends AsyncTestSpec {
       }
       Future.successful(subProcess)
     }
+    onNextItem.expects().repeat(3)
 
     //when
-    val resultF = ZipApi.addToZip(zipFile, parent, items)
+    val resultF = ZipApi.addToZip(zipFile, parent, items, onNextItem)
 
     //then
     resultF.map(_ => Succeeded)

@@ -104,8 +104,9 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
+    val items = List(FileListItem("item 1"))
     val props = FileListPanelProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
+      currDir = FileListDir("/sub-dir", isRoot = false, items = items)
     ))
     val renderer = createTestRenderer(<(FSPanel())(^.wrapped := props)())
     val panelProps = findComponentProps(renderer.root, fileListPanelComp)
@@ -115,11 +116,12 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
 
     //then
     inside(findComponentProps(renderer.root, addToZipController)) {
-      case AddToZipControllerProps(resDispatch, state, zipName, items, action, _, onCancel) =>
+      case AddToZipControllerProps(resDispatch, resActions, state, zipName, resItems, action, _, onCancel) =>
         resDispatch shouldBe dispatch
+        resActions shouldBe actions
         state shouldBe props.state
         zipName shouldBe "item 1.zip"
-        items shouldBe Set("item 1")
+        resItems shouldBe items
         action shouldBe AddToZipAction.Add
         
         //when
@@ -134,14 +136,16 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
+    val items = List(
+      FileListItem("item 2"),
+      FileListItem("item 3")
+    )
     val props = FileListPanelProps(dispatch, actions.actions, FileListState(
       index = 1,
       currDir = FileListDir("/sub-dir", isRoot = false, items = List(
         FileListItem.up,
-        FileListItem("item 1"),
-        FileListItem("item 2"),
-        FileListItem("item 3")
-      )),
+        FileListItem("item 1")
+      ) ++ items),
       selectedNames = ListSet("item 3", "item 2")
     ))
     val renderer = createTestRenderer(<(FSPanel())(^.wrapped := props)())
@@ -152,11 +156,12 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
 
     //then
     inside(findComponentProps(renderer.root, addToZipController)) {
-      case AddToZipControllerProps(resDispatch, state, zipName, items, action, onComplete, _) =>
+      case AddToZipControllerProps(resDispatch, resActions, state, zipName, resItems, action, onComplete, _) =>
         resDispatch shouldBe dispatch
+        resActions shouldBe actions.actions
         state shouldBe props.state
-        zipName shouldBe "item 3.zip"
-        items shouldBe ListSet("item 3", "item 2")
+        zipName shouldBe "item 2.zip"
+        resItems shouldBe items
         action shouldBe AddToZipAction.Add
 
         //given

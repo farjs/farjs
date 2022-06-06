@@ -123,9 +123,10 @@ class ZipPanel(zipPath: String,
       zipData.map { case (dispatch, actions, state, items, move) =>
         <(addToZipController())(^.wrapped := AddToZipControllerProps(
           dispatch = dispatch,
+          actions = actions,
           state = state,
           zipName = zipPath,
-          items = items.map(_.name).toSet,
+          items = items,
           action =
             if (move) AddToZipAction.Move
             else AddToZipAction.Copy,

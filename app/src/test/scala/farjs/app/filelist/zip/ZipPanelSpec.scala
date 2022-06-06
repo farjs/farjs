@@ -312,12 +312,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val zipPanel = new ZipPanel("dir/file.zip", rootPath, entriesByParentF, onClose)
     val fsDispatch = mockFunction[Any, Any]
     val fsActions = new MockFileListActions(isLocalFSMock = true)
+    val items = List(FileListItem("file 1"))
     val fsState = FileListState(
       index = 1,
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
-        FileListItem.up,
-        FileListItem("file 1")
-      ))
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem.up) ++ items)
     )
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fsDispatch), Some(fsActions), Some(fsState))
@@ -337,11 +335,12 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     //then
     inside(findComponentProps(renderer.root, addToZipController)) {
-      case AddToZipControllerProps(resDispatch, state, zipName, items, action, _, onCancel) =>
+      case AddToZipControllerProps(resDispatch, resActions, state, zipName, resItems, action, _, onCancel) =>
         resDispatch shouldBe fsDispatch
+        resActions shouldBe fsActions
         state shouldBe fsState
         zipName shouldBe "dir/file.zip"
-        items shouldBe Set("file 1")
+        resItems shouldBe items
         action shouldBe AddToZipAction.Copy
 
         //when
@@ -368,14 +367,16 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val zipPanel = new ZipPanel("dir/file.zip", rootPath, entriesByParentF, onClose)
     val fsDispatch = mockFunction[Any, Any]
     val fsActions = new MockFileListActions(isLocalFSMock = true)
+    val items = List(
+      FileListItem("item 2"),
+      FileListItem("item 3")
+    )
     val fsState = FileListState(
       index = 1,
       currDir = FileListDir("/sub-dir", isRoot = false, items = List(
         FileListItem.up,
-        FileListItem("item 1"),
-        FileListItem("item 2"),
-        FileListItem("item 3")
-      )),
+        FileListItem("item 1")
+      ) ++ items),
       selectedNames = Set("item 3", "item 2")
     )
     val leftStack = new PanelStack(isActive = true, List(
@@ -396,11 +397,12 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     //then
     inside(findComponentProps(renderer.root, addToZipController)) {
-      case AddToZipControllerProps(resDispatch, state, zipName, items, action, onComplete, _) =>
+      case AddToZipControllerProps(resDispatch, resActions, state, zipName, resItems, action, onComplete, _) =>
         resDispatch shouldBe fsDispatch
+        resActions shouldBe fsActions
         state shouldBe fsState
         zipName shouldBe "dir/file.zip"
-        items shouldBe Set("item 3", "item 2")
+        resItems shouldBe items
         action shouldBe AddToZipAction.Copy
 
         //given
@@ -469,11 +471,12 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     //then
     inside(findComponentProps(renderer.root, addToZipController)) {
-      case AddToZipControllerProps(resDispatch, state, zipName, resItems, action, onComplete, _) =>
+      case AddToZipControllerProps(resDispatch, resActions, state, zipName, resItems, action, onComplete, _) =>
         resDispatch shouldBe fsDispatch
+        resActions shouldBe fsActions.actions
         state shouldBe fsState
         zipName shouldBe "dir/file.zip"
-        resItems shouldBe Set("item 3", "item 2")
+        resItems shouldBe items
         action shouldBe AddToZipAction.Move
 
         //given

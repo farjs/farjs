@@ -165,16 +165,21 @@ object ZipApi {
     )
   }
 
-  def addToZip(zipFile: String, parent: String, items: Set[String]): Future[Unit] = {
+  def addToZip(zipFile: String, parent: String, items: Set[String], onNextItem: () => Unit): Future[Unit] = {
     for {
       subprocess <- childProcess.spawn(
         command = "zip",
-        args = List("-qr", zipFile) ++ items,
+        args = List("-r", zipFile) ++ items,
         options = Some(new raw.ChildProcessOptions {
           override val cwd = parent
           override val windowsHide = true
         })
       )
+      _ <- subprocess.stdout.readAllLines { line =>
+        if (line.contains("adding: ")) {
+          onNextItem()
+        }
+      }
       _ <- subprocess.exitF
     } yield ()
   }

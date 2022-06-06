@@ -19,7 +19,7 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
   private[fs] var addToZipController: UiComponent[AddToZipControllerProps] = AddToZipController
   
   protected def render(compProps: Props): ReactElement = {
-    val (zipData, setZipData) = useState(Option.empty[(String, Set[String])])
+    val (zipData, setZipData) = useState(Option.empty[(String, Seq[FileListItem])])
     val props = compProps.wrapped
 
     def onKeypress(screen: BlessedScreen, key: String): Boolean = {
@@ -31,13 +31,13 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
           }
         case "S-f7" =>
           val items =
-            if (props.state.selectedNames.nonEmpty) props.state.selectedNames
+            if (props.state.selectedNames.nonEmpty) props.state.selectedItems
             else {
               val currItem = props.state.currentItem.filter(_ != FileListItem.up)
-              currItem.map(_.name).toSet
+              currItem.toList
             }
           if (items.nonEmpty) {
-            setZipData(Some((s"${items.head}.zip", items)))
+            setZipData(Some((s"${items.head.name}.zip", items)))
           }
         case _ =>
           processed = false
@@ -57,6 +57,7 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
       zipData.map { case (zipName, items) =>
         <(addToZipController())(^.wrapped := AddToZipControllerProps(
           dispatch = props.dispatch,
+          actions = props.actions,
           state = props.state,
           zipName = zipName,
           items = items,
