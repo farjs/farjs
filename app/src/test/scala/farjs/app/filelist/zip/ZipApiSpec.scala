@@ -376,6 +376,38 @@ class ZipApiSpec extends AsyncTestSpec {
     resultF.map(_ => Succeeded)
   }
 
+  it should "return empty map if empty zip when readZip" in {
+    //given
+    val expectedOutput =
+      """Archive:  ./1.zip
+        |Zip file size: 22 bytes, number of entries: 0
+        |Empty zipfile.
+        |""".stripMargin
+    val stdout = new StreamReader(Readable.from(Buffer.from(expectedOutput)))
+    val rawProcess = literal().asInstanceOf[raw.ChildProcess]
+    val error = js.JavaScriptException(js.Error("sub-process exited with code=1"))
+    val subProcess = SubProcess(rawProcess, stdout, Future.failed(error))
+    val childProcess = new ChildProcess
+    ZipApi.childProcess = childProcess.childProcess
+    val zipPath = "/dir/filePath.zip"
+
+    //then
+    childProcess.spawn.expects("unzip", List("-ZT", zipPath), *).onCall { (_, _, options) =>
+      inside(options) { case Some(opts) =>
+        opts.windowsHide shouldBe true
+      }
+      Future.successful(subProcess)
+    }
+
+    //when
+    val resultF = ZipApi.readZip(zipPath)
+
+    //then
+    resultF.map { res =>
+      res shouldBe Map.empty
+    }
+  }
+  
   it should "spawn unzip and parse output when readZip" in {
     //given
     val expectedOutput =

@@ -205,9 +205,12 @@ object ZipApi {
     for {
       subprocess <- subprocessF
       chunks <- loop(subprocess.stdout, new js.Array[Buffer](0))
-      _ <- subprocess.exitF
+      output = Buffer.concat(chunks).toString
+      _ <- subprocess.exitF.recover {
+        case js.JavaScriptException(error)
+          if error.toString.contains("code=1") && output.contains("Empty zipfile.") =>
+      }
     } yield {
-      val output = Buffer.concat(chunks).toString
       ZipApi.groupByParent(ZipEntry.fromUnzipCommand(output))
     }
   }
