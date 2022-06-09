@@ -39,7 +39,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     )
   }
 
-  it should "dispatch popups actions when F-keys" in {
+  it should "dispatch popups actions" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val onKeypress = mockFunction[BlessedScreen, String, Boolean]
@@ -107,6 +107,24 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     check("delete", FileListPopupDeleteAction(show = true), never = true)
     check("delete", FileListPopupDeleteAction(show = true), selectedNames = Set("file 1"))
 
+    //when & then
+    check("+", FileListPopupSelectAction(ShowSelect))
+    check("-", FileListPopupSelectAction(ShowDeselect))
+
+    //given
+    onKeypress.expects(screen, "C-s").returning(false)
+    findComponentProps(renderer.root, fileListPanelView).onKeypress(screen, "C-s")
+    findProps(renderer.root, fileListQuickSearch) should not be empty
+
+    //when & then
+    check("+", FileListPopupSelectAction(ShowSelect), never = true)
+    check("-", FileListPopupSelectAction(ShowDeselect), never = true)
+    
+    //cleanup
+    onKeypress.expects(screen, "escape").returning(false)
+    findComponentProps(renderer.root, fileListPanelView).onKeypress(screen, "escape")
+    findProps(renderer.root, fileListQuickSearch) should be (empty)
+    
     Succeeded
   }
 

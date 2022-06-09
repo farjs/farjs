@@ -10,6 +10,7 @@ object FileListPopupsActions {
   case class FileListPopupMkFolderAction(show: Boolean) extends Action
   case class FileListPopupViewItemsAction(show: Boolean) extends Action
   case class FileListPopupCopyMoveAction(cm: FileListPopupCopyMove) extends Action
+  case class FileListPopupSelectAction(sel: FileListPopupSelect) extends Action
   
   sealed trait FileListPopupCopyMove
   case object CopyMoveHidden extends FileListPopupCopyMove
@@ -17,4 +18,13 @@ object FileListPopupsActions {
   case object ShowCopyInplace extends FileListPopupCopyMove
   case object ShowMoveToTarget extends FileListPopupCopyMove
   case object ShowMoveInplace extends FileListPopupCopyMove
+
+  sealed trait FileListPopupSelect
+  case object SelectHidden extends FileListPopupSelect
+  case object ShowSelect extends FileListPopupSelect {
+    override def toString: String = "Select"
+  }
+  case object ShowDeselect extends FileListPopupSelect {
+    override def toString: String = "Deselect"
+  }
 }

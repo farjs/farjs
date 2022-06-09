@@ -81,6 +81,10 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
               ))
             }
           case "C-s" => setMaybeQuickSearch(Some(""))
+          case "+" if maybeQuickSearch.isEmpty =>
+            props.dispatch(FileListPopupSelectAction(ShowSelect))
+          case "-" if maybeQuickSearch.isEmpty =>
+            props.dispatch(FileListPopupSelectAction(ShowDeselect))
           case _ =>
         }
       }
