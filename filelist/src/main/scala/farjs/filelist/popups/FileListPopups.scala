@@ -21,6 +21,7 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
 
   private[popups] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
   private[popups] var makeFolderPopupComp: UiComponent[MakeFolderPopupProps] = MakeFolderPopup
+  private[popups] var selectPopupComp: UiComponent[SelectPopupProps] = SelectPopup
   private[popups] var viewItemsPopupComp: UiComponent[FileListPopupsState] = ViewItemsPopup
   private[popups] var copyItemsComp: UiComponent[FileListPopupsState] = CopyItems
 
@@ -28,6 +29,7 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
     val stacks = WithPanelStacks.usePanelStacks
     val (folderName, setFolderName) = useState("")
     val (multiple, setMultiple) = useState(false)
+    val (selectPattern, setSelectPattern) = useState("")
     val props = compProps.wrapped
     val popups = props.popups
     val maybeCurrData = {
@@ -117,6 +119,19 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
               },
               onCancel = { () =>
                 dispatch(FileListPopupMkFolderAction(show = false))
+              }
+            ))()
+          ) else None,
+  
+          if (popups.showSelectPopup != SelectHidden) Some(
+            <(selectPopupComp())(^.wrapped := SelectPopupProps(
+              pattern = selectPattern,
+              action = popups.showSelectPopup,
+              onAction = { pattern =>
+                setSelectPattern(pattern)
+              },
+              onCancel = { () =>
+                dispatch(FileListPopupSelectAction(SelectHidden))
               }
             ))()
           ) else None,

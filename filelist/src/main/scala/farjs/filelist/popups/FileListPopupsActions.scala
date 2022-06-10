@@ -21,10 +21,6 @@ object FileListPopupsActions {
 
   sealed trait FileListPopupSelect
   case object SelectHidden extends FileListPopupSelect
-  case object ShowSelect extends FileListPopupSelect {
-    override def toString: String = "Select"
-  }
-  case object ShowDeselect extends FileListPopupSelect {
-    override def toString: String = "Deselect"
-  }
+  case object ShowSelect extends FileListPopupSelect
+  case object ShowDeselect extends FileListPopupSelect
 }
