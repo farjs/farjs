@@ -6,7 +6,7 @@ import farjs.filelist.popups.FileListPopups._
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.stack.WithPanelStacksSpec.withContext
 import farjs.filelist.stack.{PanelStack, PanelStackItem}
-import farjs.filelist.{FileListState, MockFileListActions}
+import farjs.filelist.{FileListData, FileListState, MockFileListActions}
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
@@ -62,7 +62,7 @@ class FileListPopupsSpec extends AsyncTestSpec with BaseTestSpec
     //then
     assertComponents(result.children, List(
       <(selectController())(^.assertWrapped(inside(_) {
-        case SelectControllerProps(`dispatch`, actions.actions, `state`, props.popups) =>
+        case SelectControllerProps(Some(FileListData(`dispatch`, actions.actions, `state`)), props.popups) =>
       }))(),
       <(viewItemsPopupComp())(^.wrapped := props.popups)(),
       <(copyItemsComp())(^.wrapped := props.popups)()

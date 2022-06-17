@@ -1,6 +1,6 @@
 package farjs.filelist.popups
 
-import farjs.filelist.FileListState
+import farjs.filelist.{FileListData, FileListState}
 import farjs.filelist.copy.CopyItems
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.stack.WithPanelStacks
@@ -122,7 +122,10 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
             ))()
           ) else None,
   
-          <(selectController())(^.wrapped := SelectControllerProps(dispatch, actions, state, popups))(),
+          <(selectController())(^.wrapped := SelectControllerProps(
+            data = Some(FileListData(dispatch, actions, state)),
+            popups = popups
+          ))(),
           <(viewItemsPopupComp())(^.wrapped := popups)(),
           <(copyItemsComp())(^.wrapped := popups)()
         )

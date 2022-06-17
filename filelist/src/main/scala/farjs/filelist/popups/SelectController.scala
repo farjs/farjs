@@ -1,17 +1,14 @@
 package farjs.filelist.popups
 
 import farjs.filelist.FileListActions.FileListParamsChangedAction
+import farjs.filelist.FileListData
 import farjs.filelist.popups.FileListPopupsActions._
-import farjs.filelist.{FileListActions, FileListState}
 import scommons.react._
 import scommons.react.hooks._
-import scommons.react.redux.Dispatch
 
 import java.util.regex.Pattern
 
-case class SelectControllerProps(dispatch: Dispatch,
-                                 actions: FileListActions,
-                                 state: FileListState,
+case class SelectControllerProps(data: Option[FileListData],
                                  popups: FileListPopupsState)
 
 object SelectController extends FunctionComponent[SelectControllerProps] {
@@ -23,39 +20,40 @@ object SelectController extends FunctionComponent[SelectControllerProps] {
     val props = compProps.wrapped
     val popups = props.popups
 
-    if (popups.showSelectPopup != SelectHidden) {
-      <(selectPopupComp())(^.wrapped := SelectPopupProps(
-        pattern = selectPattern,
-        action = popups.showSelectPopup,
-        onAction = { pattern =>
-          setSelectPattern(pattern)
+    props.data match {
+      case Some(data) if popups.showSelectPopup != SelectHidden =>
+        <(selectPopupComp())(^.wrapped := SelectPopupProps(
+          pattern = selectPattern,
+          action = popups.showSelectPopup,
+          onAction = { pattern =>
+            setSelectPattern(pattern)
 
-          val regexes = pattern.split(';')
-            .map(mask => Pattern.compile(fileMaskToRegex(mask)))
-          val matchedNames = props.state.currDir.items
-            .map(_.name)
-            .filter(n => regexes.exists(_.matcher(n).matches()))
-          val updatedSelection =
-            if (popups.showSelectPopup == ShowSelect) {
-              props.state.selectedNames ++ matchedNames
+            val regexes = pattern.split(';')
+              .map(mask => Pattern.compile(fileMaskToRegex(mask)))
+            val matchedNames = data.state.currDir.items
+              .map(_.name)
+              .filter(n => regexes.exists(_.matcher(n).matches()))
+            val updatedSelection =
+              if (popups.showSelectPopup == ShowSelect) {
+                data.state.selectedNames ++ matchedNames
+              }
+              else data.state.selectedNames -- matchedNames
+
+            if (updatedSelection != data.state.selectedNames) {
+              data.dispatch(FileListParamsChangedAction(
+                offset = data.state.offset,
+                index = data.state.index,
+                selectedNames = updatedSelection
+              ))
             }
-            else props.state.selectedNames -- matchedNames
-
-          if (updatedSelection != props.state.selectedNames) {
-            props.dispatch(FileListParamsChangedAction(
-              offset = props.state.offset,
-              index = props.state.index,
-              selectedNames = updatedSelection
-            ))
+            data.dispatch(FileListPopupSelectAction(SelectHidden))
+          },
+          onCancel = { () =>
+            data.dispatch(FileListPopupSelectAction(SelectHidden))
           }
-          props.dispatch(FileListPopupSelectAction(SelectHidden))
-        },
-        onCancel = { () =>
-          props.dispatch(FileListPopupSelectAction(SelectHidden))
-        }
-      ))()
+        ))()
+      case _ => null
     }
-    else null
   }
 
   // consider supporting full glob pattern:
