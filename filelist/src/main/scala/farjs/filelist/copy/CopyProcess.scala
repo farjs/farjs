@@ -1,6 +1,7 @@
 package farjs.filelist.copy
 
 import farjs.filelist.FileListActions.FileListTaskAction
+import farjs.filelist.FileListData
 import farjs.filelist.api.FileListItem
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
@@ -15,8 +16,8 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.util.{Failure, Success}
 
-case class CopyProcessProps(from: CopyData,
-                            to: CopyData,
+case class CopyProcessProps(from: FileListData,
+                            to: FileListData,
                             move: Boolean,
                             fromPath: String,
                             items: Seq[(FileListItem, String)],

@@ -531,7 +531,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
       assertTestComponent(renderer.root.children.head, copyProcessComp) {
         case CopyProcessProps(resFrom, resTo, move, fromPath, items, resToPath, resTotal, _, _) =>
-          inside(resFrom) { case CopyData(resDispatch, resActions, resState) =>
+          inside(resFrom) { case FileListData(resDispatch, resActions, resState) =>
             resDispatch shouldBe dispatch
             resActions shouldBe actions.actions
             resState shouldBe state
@@ -599,12 +599,12 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
       assertTestComponent(renderer.root.children.head, copyProcessComp) {
         case CopyProcessProps(resFrom, resTo, move, fromPath, items, resToPath, resTotal, _, _) =>
-          inside(resFrom) { case CopyData(resDispatch, resActions, resState) =>
+          inside(resFrom) { case FileListData(resDispatch, resActions, resState) =>
             resDispatch shouldBe dispatch
             resActions shouldBe actions.actions
             resState shouldBe state
           }
-          inside(resTo) { case CopyData(resDispatch, resActions, resState) =>
+          inside(resTo) { case FileListData(resDispatch, resActions, resState) =>
             resDispatch shouldBe toDispatch
             resActions shouldBe toActions
             resState shouldBe toState
@@ -664,12 +664,12 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
       assertTestComponent(renderer.root.children.head, copyProcessComp) {
         case CopyProcessProps(resFrom, resTo, move, fromPath, items, resToPath, resTotal, _, _) =>
-          inside(resFrom) { case CopyData(resDispatch, resActions, resState) =>
+          inside(resFrom) { case FileListData(resDispatch, resActions, resState) =>
             resDispatch shouldBe dispatch
             resActions shouldBe actions.actions
             resState shouldBe state
           }
-          inside(resTo) { case CopyData(resDispatch, resActions, resState) =>
+          inside(resTo) { case FileListData(resDispatch, resActions, resState) =>
             resDispatch shouldBe toDispatch
             resActions shouldBe toActions
             resState shouldBe toState

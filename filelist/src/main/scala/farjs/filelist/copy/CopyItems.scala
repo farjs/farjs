@@ -1,7 +1,7 @@
 package farjs.filelist.copy
 
 import farjs.filelist.FileListActions.{FileListParamsChangedAction, FileListTaskAction}
-import farjs.filelist.FileListState
+import farjs.filelist.{FileListData, FileListState}
 import farjs.filelist.api.FileListItem
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.FileListPopupsState
@@ -37,10 +37,10 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
 
     val showCopyMovePopup = compProps.wrapped.showCopyMovePopup
     
-    def getData(stack: PanelStack): Option[CopyData] = {
+    def getData(stack: PanelStack): Option[FileListData] = {
       val item = stack.peek[FileListState]
       item.getActions.zip(item.state).map { case ((dispatch, actions), state) =>
-        CopyData(dispatch, actions, state)
+        FileListData(dispatch, actions, state)
       }
     }
     
@@ -227,7 +227,7 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
     }.orNull
   }
   
-  private def checkSameDrive(from: CopyData, toPath: String): Future[Boolean] = {
+  private def checkSameDrive(from: FileListData, toPath: String): Future[Boolean] = {
     for {
       maybeFromRoot <- from.actions.getDriveRoot(from.path)
       maybeToRoot <- from.actions.getDriveRoot(toPath)
