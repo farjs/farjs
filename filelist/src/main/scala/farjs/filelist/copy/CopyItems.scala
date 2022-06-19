@@ -1,11 +1,11 @@
 package farjs.filelist.copy
 
-import farjs.filelist.FileListActions.{FileListParamsChangedAction, FileListTaskAction}
-import farjs.filelist.{FileListData, FileListState}
+import farjs.filelist.FileListActions._
 import farjs.filelist.api.FileListItem
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.FileListPopupsState
 import farjs.filelist.stack.{PanelStack, WithPanelStacks}
+import farjs.filelist.{FileListData, FileListState}
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
 import scommons.nodejs.path
@@ -65,7 +65,7 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
 
       def onTopItem(item: FileListItem): Unit = copied.current += item.name
 
-      val onDone: () => Unit = { () =>
+      def onDone(toPath: String): () => Unit = { () =>
         val updatedSelection = from.state.selectedNames -- copied.current
         if (updatedSelection != from.state.selectedNames) {
           from.dispatch(FileListParamsChangedAction(
@@ -75,14 +75,15 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
           ))
         }
 
+        val isInplace = inplace
         onCancel(dispatchAction = false)()
 
         val updateAction = from.actions.updateDir(from.dispatch, from.path)
         from.dispatch(updateAction)
         updateAction.task.future.andThen {
-          case Success(_) => maybeTo.foreach { to =>
-            to.dispatch(to.actions.updateDir(to.dispatch, to.path))
-          }
+          case Success(updatedDir) =>
+            if (isInplace) from.dispatch(FileListItemCreatedAction(toPath, updatedDir))
+            else maybeTo.foreach(to => to.dispatch(to.actions.updateDir(to.dispatch, to.path)))
         }
       }
 
@@ -196,7 +197,7 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
               if (!inplace) toPath
               else from.path,
             onTopItem = onTopItem,
-            onDone = onDone
+            onDone = onDone(toPath)
           ))()
         }
         else {
@@ -219,7 +220,7 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
                 else from.path,
               total = total,
               onTopItem = onTopItem,
-              onDone = onDone
+              onDone = onDone(toPath)
             ))()
           }
         }

@@ -233,6 +233,21 @@ class FileListStateReducerSpec extends TestSpec {
     }
   }
 
+  it should "keep current sate if item not found when FileListItemCreatedAction" in {
+    //given
+    val stateDir = FileListDir("/", isRoot = true, items = List(
+      FileListItem("Dir 1", isDir = true),
+      FileListItem("dir 2", isDir = true),
+      FileListItem("File 1"),
+      FileListItem("file 2")
+    ))
+    val state = FileListState(offset = 1, currDir = stateDir, selectedNames = Set("test1"))
+    val action = FileListItemCreatedAction("non-existing", stateDir)
+
+    //when & then
+    reduce(state, action) shouldBe state
+  }
+
   it should "update state when FileListItemsViewedAction" in {
     //given
     val currDir = FileListDir("/", isRoot = true, items = List(
