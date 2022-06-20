@@ -1,17 +1,13 @@
 package farjs.filelist.popups
 
 import farjs.filelist.FileListActions.FileListParamsChangedAction
-import farjs.filelist.FileListData
 import farjs.filelist.popups.FileListPopupsActions._
 import scommons.react._
 import scommons.react.hooks._
 
 import java.util.regex.Pattern
 
-case class SelectControllerProps(data: Option[FileListData],
-                                 popups: FileListPopupsState)
-
-object SelectController extends FunctionComponent[SelectControllerProps] {
+object SelectController extends FunctionComponent[PopupControllerProps] {
 
   private[popups] var selectPopupComp: UiComponent[SelectPopupProps] = SelectPopup
 

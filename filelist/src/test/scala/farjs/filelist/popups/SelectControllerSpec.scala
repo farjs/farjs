@@ -22,7 +22,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
       FileListItem("file2.test"),
       FileListItem("file.test3")
     )), selectedNames = Set("file.test3"), isActive = true)
-    val props = SelectControllerProps(Some(FileListData(dispatch, actions, state)),
+    val props = PopupControllerProps(Some(FileListData(dispatch, actions, state)),
       FileListPopupsState(showSelectPopup = ShowSelect))
     val renderer = createTestRenderer(<(SelectController())(^.wrapped := props)())
     val popup = findComponentProps(renderer.root, selectPopupComp)
@@ -54,7 +54,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
       FileListItem("file2.test"),
       FileListItem("file.test3")
     )), selectedNames = Set("file1.test", "file2.test", "file.test3"), isActive = true)
-    val props = SelectControllerProps(Some(FileListData(dispatch, actions, state)),
+    val props = PopupControllerProps(Some(FileListData(dispatch, actions, state)),
       FileListPopupsState(showSelectPopup = ShowDeselect))
     val renderer = createTestRenderer(<(SelectController())(^.wrapped := props)())
     val popup = findComponentProps(renderer.root, selectPopupComp)
@@ -81,7 +81,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
     val state = FileListState()
-    val props = SelectControllerProps(Some(FileListData(dispatch, actions, state)),
+    val props = PopupControllerProps(Some(FileListData(dispatch, actions, state)),
       FileListPopupsState(showSelectPopup = ShowDeselect))
     val comp = testRender(<(SelectController())(^.wrapped := props)())
     val popup = findComponentProps(comp, selectPopupComp)
@@ -101,7 +101,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
     val state = FileListState()
-    val props = SelectControllerProps(Some(FileListData(dispatch, actions, state)),
+    val props = PopupControllerProps(Some(FileListData(dispatch, actions, state)),
       FileListPopupsState(showSelectPopup = ShowSelect))
 
     //when
@@ -120,7 +120,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
     val state = FileListState()
-    val props = SelectControllerProps(Some(FileListData(dispatch, actions, state)),
+    val props = PopupControllerProps(Some(FileListData(dispatch, actions, state)),
       FileListPopupsState(showSelectPopup = SelectHidden))
 
     //when
