@@ -6,9 +6,7 @@ import farjs.filelist.FileListActions.{FileListDirChangeAction, FileListTaskActi
 import farjs.filelist.FileListState
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack._
-import farjs.ui._
-import farjs.ui.popup.{ModalContentProps, PopupProps}
-import farjs.ui.theme.Theme
+import farjs.ui.menu.MenuPopupProps
 import org.scalatest.Assertion
 import scommons.nodejs.Process.Platform
 import scommons.nodejs.test.AsyncTestSpec
@@ -23,9 +21,7 @@ import scala.scalajs.js
 
 class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  FSDrivePopup.popupComp = mockUiComponent("Popup")
-  FSDrivePopup.modalContentComp = mockUiComponent("ModalContent")
-  FSDrivePopup.buttonComp = mockUiComponent("Button")
+  FSDrivePopup.menuPopup = mockUiComponent("MenuPopup")
 
   //noinspection TypeAnnotation
   class Actions {
@@ -91,24 +87,22 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     eventually {
       disksF should not be null
     }.flatMap(_ => disksF).map { _ =>
-      inside(findProps(renderer.root, buttonComp)) {
-        case List(item1, _, _) =>
-          //given
-          val action = FileListDirChangeAction(FutureTask("Changing Dir",
-            Future.successful(FileListDir("/", isRoot = true, items = List.empty[FileListItem]))
-          ))
+      //given
+      val action = FileListDirChangeAction(FutureTask("Changing Dir",
+        Future.successful(FileListDir("/", isRoot = true, items = List.empty[FileListItem]))
+      ))
+      val menuProps = findComponentProps(renderer.root, menuPopup)
 
-          //then
-          actions.changeDir.expects(dispatch, None, "C:/test").returning(action)
-          dispatch.expects(action)
-          onClose.expects()
-          
-          //when
-          item1.onPress()
-          
-          //then
-          currStackState shouldBe List(currFsItem)
-      }
+      //then
+      actions.changeDir.expects(dispatch, None, "C:/test").returning(action)
+      dispatch.expects(action)
+      onClose.expects()
+      
+      //when
+      menuProps.onSelect(0)
+      
+      //then
+      currStackState shouldBe List(currFsItem)
     }
   }
 
@@ -158,24 +152,22 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     eventually {
       disksF should not be null
     }.flatMap(_ => disksF).map { _ =>
-      inside(findProps(renderer.root, buttonComp)) {
-        case List(item1, _, _) =>
-          //given
-          val action = FileListDirChangeAction(FutureTask("Changing Dir",
-            Future.successful(FileListDir("/", isRoot = true, items = List.empty[FileListItem]))
-          ))
+      //given
+      val action = FileListDirChangeAction(FutureTask("Changing Dir",
+        Future.successful(FileListDir("/", isRoot = true, items = List.empty[FileListItem]))
+      ))
+      val menuProps = findComponentProps(renderer.root, menuPopup)
 
-          //then
-          actions.changeDir.expects(dispatch, None, "C:/test").returning(action)
-          dispatch.expects(action)
-          onClose.expects()
-          
-          //when
-          item1.onPress()
-          
-          //then
-          currStackState shouldBe List(currFsItem)
-      }
+      //then
+      actions.changeDir.expects(dispatch, None, "C:/test").returning(action)
+      dispatch.expects(action)
+      onClose.expects()
+      
+      //when
+      menuProps.onSelect(0)
+      
+      //then
+      currStackState shouldBe List(currFsItem)
     }
   }
 
@@ -226,24 +218,22 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     eventually {
       disksF should not be null
     }.flatMap(_ => disksF).map { _ =>
-      inside(findProps(renderer.root, buttonComp)) {
-        case List(item1, _, _) =>
-          //given
-          val action = FileListDirChangeAction(FutureTask("Changing Dir",
-            Future.successful(FileListDir("/", isRoot = true, items = List.empty[FileListItem]))
-          ))
+      //given
+      val action = FileListDirChangeAction(FutureTask("Changing Dir",
+        Future.successful(FileListDir("/", isRoot = true, items = List.empty[FileListItem]))
+      ))
+      val menuProps = findComponentProps(renderer.root, menuPopup)
 
-          //then
-          actions.changeDir.expects(dispatch, None, "C:").returning(action)
-          dispatch.expects(action)
-          onClose.expects()
-          
-          //when
-          item1.onPress()
-          
-          //then
-          currStackState shouldBe List(curFsItem)
-      }
+      //then
+      actions.changeDir.expects(dispatch, None, "C:").returning(action)
+      dispatch.expects(action)
+      onClose.expects()
+      
+      //when
+      menuProps.onSelect(0)
+      
+      //then
+      currStackState shouldBe List(curFsItem)
     }
   }
 
@@ -317,17 +307,6 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     }
   }
 
-  it should "left pos when getLeftPos" in {
-    //when & then
-    getLeftPos(10, showOnLeft = true, 5) shouldBe "0%+2"
-    getLeftPos(5, showOnLeft = true, 5) shouldBe "0%+0"
-    getLeftPos(5, showOnLeft = true, 10) shouldBe "0%+0"
-    getLeftPos(5, showOnLeft = false, 5) shouldBe "50%+0"
-    getLeftPos(10, showOnLeft = false, 5) shouldBe "50%+2"
-    getLeftPos(5, showOnLeft = false, 10) shouldBe "50%-5"
-    getLeftPos(5, showOnLeft = false, 11) shouldBe "0%+0"
-  }
-
   it should "convert bytes to compact form when toCompact" in {
     //when & then
     toCompact(0) shouldBe ""
@@ -362,36 +341,13 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     
     val textWidth = expectedItems.maxBy(_.length).length
     val width = textWidth + 3 * 2
-    val height = 2 * 2 + expectedItems.size
-    val theme = Theme.current.popup.menu
 
-    assertTestComponent(result, popupComp)({
-      case PopupProps(onClose, closable, focusable, _) =>
+    assertTestComponent(result, menuPopup) {
+      case MenuPopupProps(title, items, getLeft, _, onClose) =>
+        title shouldBe "Drive"
+        items shouldBe expectedItems
+        getLeft(width) shouldBe "0%+0"
         onClose should be theSameInstanceAs props.onClose
-        closable shouldBe true
-        focusable shouldBe true
-    }, inside(_) { case List(content) =>
-      var resSize = 0 -> 0
-      assertTestComponent(content, modalContentComp)({
-        case ModalContentProps(title, size, style, padding, left) =>
-          title shouldBe "Drive"
-          resSize = size
-          style shouldBe theme
-          padding shouldBe FSDrivePopup.padding
-          left shouldBe "0%+0"
-      }, inside(_) { case lines =>
-        lines.size shouldBe expectedItems.size
-        lines.zipWithIndex.zip(expectedItems).foreach { case ((line, index), expected) =>
-          assertTestComponent(line, buttonComp) {
-            case ButtonProps(pos, label, resStyle, _) =>
-              pos shouldBe 1 -> (1 + index)
-              label shouldBe expected
-              resStyle shouldBe theme
-          }
-        }
-
-        resSize shouldBe width -> height
-      })
-    })
+    }
   }
 }
