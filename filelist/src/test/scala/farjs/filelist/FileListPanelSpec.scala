@@ -4,6 +4,7 @@ import farjs.filelist.FileListActions._
 import farjs.filelist.FileListPanel._
 import farjs.filelist.api.{FileListCapability, FileListDir, FileListItem}
 import farjs.filelist.popups.FileListPopupsActions._
+import farjs.filelist.sort.SortModesPopupProps
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.path
@@ -21,6 +22,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   FileListPanel.fileListPanelView = mockUiComponent("FileListPanelView")
   FileListPanel.fileListQuickSearch = mockUiComponent("FileListQuickSearch")
+  FileListPanel.sortModesPopup = mockUiComponent("SortModesPopup")
 
   //noinspection TypeAnnotation
   class Actions {
@@ -126,6 +128,31 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     findProps(renderer.root, fileListQuickSearch) should be (empty)
     
     Succeeded
+  }
+
+  it should "show SortModesPopup when onKeypress(C-f12)" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = new Actions
+    val props = FileListPanelProps(dispatch, actions.actions, FileListState(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("..")))
+    ))
+    val renderer = createTestRenderer(<(FileListPanel())(^.wrapped := props)())
+    val viewProps = findComponentProps(renderer.root, fileListPanelView)
+    val screen = js.Dynamic.literal().asInstanceOf[BlessedScreen]
+
+    //when
+    viewProps.onKeypress(screen, "C-f12")
+
+    //then
+    inside(findComponentProps(renderer.root, sortModesPopup)) {
+      case SortModesPopupProps(onClose) =>
+        //when
+        onClose()
+
+        //then
+        findProps(renderer.root, sortModesPopup) should be (empty)
+    }
   }
 
   it should "copy parent path into clipboard when onKeypress(C-c)" in {

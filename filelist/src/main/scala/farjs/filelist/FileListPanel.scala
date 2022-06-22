@@ -3,10 +3,11 @@ package farjs.filelist
 import farjs.filelist.FileListActions.FileListParamsChangedAction
 import farjs.filelist.api.{FileListCapability, FileListItem}
 import farjs.filelist.popups.FileListPopupsActions._
+import farjs.filelist.sort._
 import scommons.nodejs.path
 import scommons.react._
-import scommons.react.hooks._
 import scommons.react.blessed.BlessedScreen
+import scommons.react.hooks._
 import scommons.react.redux.Dispatch
 
 case class FileListPanelProps(dispatch: Dispatch,
@@ -18,9 +19,11 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
 
   private[filelist] var fileListPanelView: UiComponent[FileListPanelViewProps] = FileListPanelView
   private[filelist] var fileListQuickSearch: UiComponent[FileListQuickSearchProps] = FileListQuickSearch
+  private[filelist] var sortModesPopup: UiComponent[SortModesPopupProps] = SortModesPopup
 
   protected def render(compProps: Props): ReactElement = {
     val (maybeQuickSearch, setMaybeQuickSearch) = useState(Option.empty[String])
+    val (showSortModes, setShowSortModes) = useState(false)
     val props = compProps.wrapped
 
     def quickSearch(text: String): Unit = {
@@ -59,6 +62,8 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
             if (props.state.selectedNames.nonEmpty || currItem.isDefined) {
               props.dispatch(FileListPopupDeleteAction(show = true))
             }
+          case "C-f12" =>
+            setShowSortModes(true)
           case "C-c" =>
             props.state.currentItem.foreach { item =>
               val text =
@@ -119,7 +124,15 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
             setMaybeQuickSearch(None)
           }
         ))()
-      }
+      },
+
+      if (showSortModes) Some(
+        <(sortModesPopup())(^.wrapped := SortModesPopupProps(
+          onClose = { () =>
+            setShowSortModes(false)
+          }
+        ))()
+      ) else None
     )
   }
 }
