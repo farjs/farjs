@@ -49,9 +49,13 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     val leftStack = new PanelStack(!isRightActive, leftStackData, setLeftStackData)
     val rightStack = new PanelStack(isRightActive, rightStackData, setRightStackData)
 
-    def getInput(isRight: Boolean): BlessedElement = {
-      if (isRight) rightButtonRef.current
-      else leftButtonRef.current
+    def getInput(isRightActive: Boolean): BlessedElement = {
+      val (leftEl, rightEl) =
+        if (isRight) (rightButtonRef.current, leftButtonRef.current)
+        else (leftButtonRef.current, rightButtonRef.current)
+        
+      if (isRightActive) rightEl
+      else leftEl
     }
 
     useLayoutEffect({ () =>
@@ -96,12 +100,12 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           }
         case keyFull =>
           props.plugins.find(_.triggerKey.contains(keyFull)).foreach { plugin =>
-            plugin.onKeyTrigger(leftStack, rightStack)
+            plugin.onKeyTrigger(getStack(isRight), getStack(!isRight))
           }
       }
     }
     
-    <(WithPanelStacks())(^.wrapped := WithPanelStacksProps(leftStack, rightStack))(
+    <(WithPanelStacks())(^.wrapped := WithPanelStacksProps(getStack(isRight), getStack(!isRight)))(
       <.button(
         ^("isRight") := false,
         ^.reactRef := leftButtonRef,
@@ -112,7 +116,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         ^.rbOnKeypress := onKeypress
       )(
         <(panelStackComp())(^.wrapped := PanelStackProps(
-          isRight = isRight,
+          isRight = false,
           panelInput = leftButtonRef.current,
           stack = getStack(isRight)
         ))(
@@ -139,7 +143,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         ^.rbOnKeypress := onKeypress
       )(
         <(panelStackComp())(^.wrapped := PanelStackProps(
-          isRight = !isRight,
+          isRight = true,
           panelInput = rightButtonRef.current,
           stack = getStack(!isRight)
         ))(

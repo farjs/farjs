@@ -367,9 +367,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     //then
     inside(findProps(comp, panelStackComp)) {
       case List(leftStack, rightStack) =>
-        leftStack.isRight shouldBe true
+        leftStack.isRight shouldBe false
         leftStack.stack.isActive shouldBe false
-        rightStack.isRight shouldBe false
+        rightStack.isRight shouldBe true
         rightStack.stack.isActive shouldBe true
     }
   }
