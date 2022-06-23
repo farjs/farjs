@@ -19,7 +19,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val emitMock = mockFunction[String, js.Any, js.Dynamic, Boolean]
     val inputMock = js.Dynamic.literal("emit" -> emitMock).asInstanceOf[BlessedElement]
-    val props = SortModesPopupProps(onClose)
+    val props = SortModesPopupProps(SortMode.Name, ascending = true, onClose)
     val comp = testRender(withContext(
       <(SortModesPopup())(^.wrapped := props)(), stack = stack, width = 40, panelInput = inputMock
     ))
@@ -43,7 +43,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
     val isRight = false
     val stack = new PanelStack(isActive = true, Nil, null)
     val width = 40
-    val props = SortModesPopupProps(() => ())
+    val props = SortModesPopupProps(SortMode.Extension, ascending = false, () => ())
 
     //when
     val result = testRender(withContext(
@@ -59,7 +59,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
     val isRight = true
     val stack = new PanelStack(isActive = false, Nil, null)
     val width = 40
-    val props = SortModesPopupProps(() => ())
+    val props = SortModesPopupProps(SortMode.Extension, ascending = false, () => ())
 
     //when
     val result = testRender(withContext(
@@ -78,7 +78,15 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
     assertTestComponent(result, menuPopup) {
       case MenuPopupProps(title, items, getLeft, _, onClose) =>
         title shouldBe "Sort by"
-        items shouldBe SortModesPopup.items
+        items shouldBe List(
+          "  Name                 Ctrl-F3  ",
+          "- Extension            Ctrl-F4  ",
+          "  Modification time    Ctrl-F5  ",
+          "  Size                 Ctrl-F6  ",
+          "  Unsorted             Ctrl-F7  ",
+          "  Creation time        Ctrl-F8  ",
+          "  Access time          Ctrl-F9  "
+        )
         getLeft(50) shouldBe MenuPopup.getLeftPos(stackWidth, !isRight, 50)
         onClose should be theSameInstanceAs props.onClose
     }

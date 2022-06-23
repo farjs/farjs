@@ -2,13 +2,16 @@ package farjs.filelist
 
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.filelist.sort.SortMode
 
 case class FileListState(offset: Int = 0,
                          index: Int = 0,
                          currDir: FileListDir = FileListDir("", isRoot = false, Seq.empty),
                          selectedNames: Set[String] = Set.empty,
                          isActive: Boolean = false,
-                         diskSpace: Option[Double] = None) {
+                         diskSpace: Option[Double] = None,
+                         sortMode: SortMode = SortMode.Name,
+                         sortAscending: Boolean = true) {
 
   lazy val currentItem: Option[FileListItem] = {
     val itemIndex = offset + index

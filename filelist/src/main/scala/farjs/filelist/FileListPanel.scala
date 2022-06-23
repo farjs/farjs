@@ -128,6 +128,8 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
 
       if (showSortModes) Some(
         <(sortModesPopup())(^.wrapped := SortModesPopupProps(
+          mode = props.state.sortMode,
+          ascending = props.state.sortAscending,
           onClose = { () =>
             setShowSortModes(false)
           }

@@ -4,7 +4,7 @@ import farjs.filelist.FileListActions._
 import farjs.filelist.FileListPanel._
 import farjs.filelist.api.{FileListCapability, FileListDir, FileListItem}
 import farjs.filelist.popups.FileListPopupsActions._
-import farjs.filelist.sort.SortModesPopupProps
+import farjs.filelist.sort.{SortMode, SortModesPopupProps}
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.path
@@ -146,7 +146,10 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
     //then
     inside(findComponentProps(renderer.root, sortModesPopup)) {
-      case SortModesPopupProps(onClose) =>
+      case SortModesPopupProps(mode, ascending, onClose) =>
+        mode shouldBe SortMode.Name
+        ascending shouldBe true
+        
         //when
         onClose()
 
