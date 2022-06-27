@@ -41,7 +41,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     )
   }
 
-  it should "dispatch popups actions" in {
+  it should "dispatch actions when onKeypress" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val onKeypress = mockFunction[BlessedScreen, String, Boolean]
@@ -108,6 +108,15 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     check("f8", FileListPopupDeleteAction(show = true), index = 1)
     check("delete", FileListPopupDeleteAction(show = true), never = true)
     check("delete", FileListPopupDeleteAction(show = true), selectedNames = Set("file 1"))
+
+    //when & then
+    check("C-f3", FileListSortByAction(SortMode.Name))
+    check("C-f4", FileListSortByAction(SortMode.Extension))
+    check("C-f5", FileListSortByAction(SortMode.ModificationTime))
+    check("C-f6", FileListSortByAction(SortMode.Size))
+    check("C-f7", FileListSortByAction(SortMode.Unsorted))
+    check("C-f8", FileListSortByAction(SortMode.CreationTime))
+    check("C-f9", FileListSortByAction(SortMode.AccessTime))
 
     //when & then
     check("+", FileListPopupSelectAction(ShowSelect))

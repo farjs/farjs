@@ -12,6 +12,13 @@ case class FileListItem(name: String,
                        ) {
   
   lazy val nameNormalized: String = name.toLowerCase
+
+  lazy val ext: String = {
+    val dotIndex = name.lastIndexOf('.')
+    if (dotIndex != -1) name.drop(dotIndex + 1)
+    else name
+  }
+  lazy val extNormalized: String = ext.toLowerCase
 }
 
 object FileListItem {

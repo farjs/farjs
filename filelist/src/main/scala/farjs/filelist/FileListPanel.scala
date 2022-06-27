@@ -1,6 +1,6 @@
 package farjs.filelist
 
-import farjs.filelist.FileListActions.FileListParamsChangedAction
+import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListCapability, FileListItem}
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.sort._
@@ -62,6 +62,13 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
             if (props.state.selectedNames.nonEmpty || currItem.isDefined) {
               props.dispatch(FileListPopupDeleteAction(show = true))
             }
+          case "C-f3" => props.dispatch(FileListSortByAction(SortMode.Name))
+          case "C-f4" => props.dispatch(FileListSortByAction(SortMode.Extension))
+          case "C-f5" => props.dispatch(FileListSortByAction(SortMode.ModificationTime))
+          case "C-f6" => props.dispatch(FileListSortByAction(SortMode.Size))
+          case "C-f7" => props.dispatch(FileListSortByAction(SortMode.Unsorted))
+          case "C-f8" => props.dispatch(FileListSortByAction(SortMode.CreationTime))
+          case "C-f9" => props.dispatch(FileListSortByAction(SortMode.AccessTime))
           case "C-f12" =>
             setShowSortModes(true)
           case "C-c" =>

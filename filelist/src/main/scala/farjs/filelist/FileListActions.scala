@@ -2,6 +2,7 @@ package farjs.filelist
 
 import farjs.filelist.FileListActions._
 import farjs.filelist.api._
+import farjs.filelist.sort.SortMode
 import scommons.nodejs.{path => nodePath}
 import scommons.react.redux._
 import scommons.react.redux.task.{FutureTask, TaskAction}
@@ -170,4 +171,5 @@ object FileListActions {
   case class FileListItemsViewedAction(sizes: Map[String, Double]) extends Action
   
   case class FileListDiskSpaceUpdatedAction(diskSpace: Double) extends Action
+  case class FileListSortByAction(mode: SortMode) extends Action
 }

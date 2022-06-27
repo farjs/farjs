@@ -39,7 +39,7 @@ object FileListStateReducer {
         selectedNames = selectedNames
       )
     case FileListDirChangedAction(dir, currDir) =>
-      val processed = processDir(currDir)
+      val processed = processDir(currDir, state.sortMode, state.sortAscending)
       val index =
         if (dir == FileListItem.up.name) {
           val focusedDir = state.currDir.path
@@ -58,7 +58,7 @@ object FileListStateReducer {
         selectedNames = Set.empty
       )
     case FileListDirUpdatedAction(currDir) =>
-      val processed = processDir(currDir)
+      val processed = processDir(currDir, state.sortMode, state.sortAscending)
       val currIndex = state.offset + state.index
       val newIndex = state.currentItem.map { currItem =>
         val index = processed.items.indexWhere(_.name == currItem.name)
@@ -83,7 +83,7 @@ object FileListStateReducer {
           else state.selectedNames
       )
     case FileListItemCreatedAction(name, currDir) =>
-      val processed = processDir(currDir)
+      val processed = processDir(currDir, state.sortMode, state.sortAscending)
       val newIndex = processed.items.indexWhere(_.name == name)
       val (offset, index) =
         if (newIndex < 0) (state.offset, state.index)
@@ -93,6 +93,23 @@ object FileListStateReducer {
         offset = offset,
         index = index,
         currDir = processed
+      )
+    case FileListSortByAction(mode) =>
+      val ascending = SortMode.nextOrdering(state.sortMode, state.sortAscending, mode)
+      val processed = processDir(state.currDir, mode, ascending)
+      val newIndex = state.currentItem.map { item =>
+        processed.items.indexWhere(_.name == item.name)
+      }.getOrElse(-1)
+      val (offset, index) =
+        if (newIndex < 0) (state.offset, state.index)
+        else (0, newIndex)
+
+      state.copy(
+        offset = offset,
+        index = index,
+        currDir = processed,
+        sortMode = mode,
+        sortAscending = ascending
       )
     case FileListItemsViewedAction(sizes) =>
       val updatedItems = state.currDir.items.map { item =>
@@ -111,14 +128,28 @@ object FileListStateReducer {
     case _ => state
   }
   
-  private def processDir(currDir: FileListDir): FileListDir = {
+  private def processDir(currDir: FileListDir,
+                         mode: SortMode,
+                         ascending: Boolean): FileListDir = {
     val items = {
-      val sorted = currDir.items.sortBy(item => (!item.isDir, item.nameNormalized, item.name))
+      val (dirs, files) = currDir.items.filter(_ != FileListItem.up).partition(_.isDir)
+      val dirsSorted = sortItems(dirs, mode, ascending)
+      val filesSorted = sortItems(files, mode, ascending)
 
-      if (currDir.isRoot) sorted
-      else FileListItem.up +: sorted
+      if (currDir.isRoot) dirsSorted :++ filesSorted
+      else FileListItem.up +: dirsSorted :++ filesSorted
     }
     
     currDir.copy(items = items)
+  }
+
+  private def sortItems(items: Seq[FileListItem],
+                        mode: SortMode,
+                        ascending: Boolean): Seq[FileListItem] = {
+
+    val sorted = SortMode.sortItems(items, mode)
+    
+    if (ascending) sorted
+    else sorted.reverse
   }
 }

@@ -2,6 +2,7 @@ package farjs.filelist
 
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.filelist.sort.SortMode
 import scommons.react.test.TestSpec
 
 class FileListStateReducerSpec extends TestSpec {
@@ -82,7 +83,7 @@ class FileListStateReducerSpec extends TestSpec {
     }
   }
 
-  it should "update FileListState and keep current item when FileListDirUpdatedAction" in {
+  it should "update state and keep current item when FileListDirUpdatedAction" in {
     //given
     val state = FileListState().copy(
       offset = 1,
@@ -114,7 +115,7 @@ class FileListStateReducerSpec extends TestSpec {
     }
   }
 
-  it should "update FileListState and keep current index when FileListDirUpdatedAction" in {
+  it should "update state and keep current index when FileListDirUpdatedAction" in {
     //given
     val state = FileListState().copy(
       offset = 1,
@@ -144,7 +145,7 @@ class FileListStateReducerSpec extends TestSpec {
     }
   }
 
-  it should "update FileListState and reset index when FileListDirUpdatedAction" in {
+  it should "update state and reset index when FileListDirUpdatedAction" in {
     //given
     val state = FileListState(
       offset = 1,
@@ -172,7 +173,7 @@ class FileListStateReducerSpec extends TestSpec {
     }
   }
 
-  it should "update FileListState and set default index when FileListDirUpdatedAction" in {
+  it should "update state and set default index when FileListDirUpdatedAction" in {
     //given
     val state = FileListState(
       offset = 1,
@@ -204,7 +205,7 @@ class FileListStateReducerSpec extends TestSpec {
     }
   }
 
-  it should "update FileListState when FileListItemCreatedAction" in {
+  it should "update state when FileListItemCreatedAction" in {
     //given
     val stateDir = FileListDir("/", isRoot = true, items = Seq.empty)
     val state = FileListState(offset = 1, currDir = stateDir, selectedNames = Set("test1"))
@@ -246,6 +247,40 @@ class FileListStateReducerSpec extends TestSpec {
 
     //when & then
     reduce(state, action) shouldBe state
+  }
+
+  it should "update state when FileListSortByAction" in {
+    //given
+    val state = FileListState(offset = 1, currDir = FileListDir("/", isRoot = false, items = List(
+      FileListItem.up,
+      FileListItem("file 2"),
+      FileListItem("File 1"),
+      FileListItem("dir 2", isDir = true),
+      FileListItem("Dir 1", isDir = true)
+    )))
+    val action = FileListSortByAction(SortMode.Name)
+
+    //when & then
+    reduce(state, action) shouldBe {
+      state.copy(offset = 0, index = 3, currDir = state.currDir.copy(items = List(
+        FileListItem.up,
+        FileListItem("dir 2", isDir = true),
+        FileListItem("Dir 1", isDir = true),
+        FileListItem("file 2"),
+        FileListItem("File 1")
+      )), sortAscending = false)
+    }
+  }
+
+  it should "keep current offset/index if item not found when FileListSortByAction" in {
+    //given
+    val state = FileListState(offset = 1, currDir = FileListDir("/", isRoot = true, items = Nil))
+    val action = FileListSortByAction(SortMode.Name)
+
+    //when & then
+    reduce(state, action) shouldBe {
+      state.copy(sortAscending = false)
+    }
   }
 
   it should "update state when FileListItemsViewedAction" in {
