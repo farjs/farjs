@@ -1,6 +1,7 @@
 package farjs.filelist
 
 import farjs.filelist.api.FileListItem
+import farjs.filelist.sort.{SortIndicator, SortIndicatorProps}
 import farjs.filelist.stack.PanelStack
 import farjs.ui._
 import farjs.ui.border._
@@ -22,6 +23,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
   private[filelist] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
   private[filelist] var fileListComp: UiComponent[FileListProps] = FileList
   private[filelist] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[filelist] var sortIndicator: UiComponent[SortIndicatorProps] = SortIndicator
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -58,6 +60,10 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         text = props.state.currDir.path,
         style = theme.regularItem,
         focused = props.state.isActive
+      ))(),
+      <(sortIndicator())(^.wrapped := SortIndicatorProps(
+        mode = props.state.sortMode,
+        ascending = props.state.sortAscending
       ))(),
 
       if (selectedItems.nonEmpty) Some(

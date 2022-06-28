@@ -2,6 +2,7 @@ package farjs.filelist
 
 import farjs.filelist.FileListPanelView._
 import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.filelist.sort.SortIndicatorProps
 import farjs.filelist.stack.{PanelStack, PanelStackProps}
 import farjs.ui._
 import farjs.ui.border._
@@ -16,6 +17,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   FileListPanelView.horizontalLineComp = mockUiComponent("HorizontalLine")
   FileListPanelView.fileListComp = mockUiComponent("FileList")
   FileListPanelView.textLineComp = mockUiComponent("TextLine")
+  FileListPanelView.sortIndicator = mockUiComponent("SortIndicator")
 
   private val (width, height) = (25, 15)
   
@@ -220,6 +222,11 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           style shouldBe theme.regularItem
           focused shouldBe props.state.isActive
           padding shouldBe 1
+      }))(),
+      <(sortIndicator())(^.assertWrapped(inside(_) {
+        case SortIndicatorProps(mode, ascending) =>
+          mode shouldBe props.state.sortMode
+          ascending shouldBe props.state.sortAscending
       }))(),
       
       selected.map { selectedText =>
