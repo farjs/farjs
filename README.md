@@ -37,8 +37,8 @@ $ farjs
 
 ## Documentation
 
-Visit [FAR.js](https://farjs.github.io) web-site
-for full documentation.
+Please, visit [FAR.js](https://farjs.github.io) web-site
+for the full documentation.
 
 ## Contributing
 

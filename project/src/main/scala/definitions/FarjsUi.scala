@@ -17,7 +17,7 @@ object FarjsUi extends ScalaJsModule {
 
       Compile / npmDependencies ++= Seq(
         //"blessed" -> "0.1.81",
-        "@farjs/blessed" -> "0.2.2",
+        "@farjs/blessed" -> "0.2.3",
         //"neo-blessed" -> "0.2.0",
         //"@medv/blessed" -> "2.0.0",
         "react-blessed" -> "0.7.2"
