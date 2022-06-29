@@ -4,11 +4,14 @@ import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListCapability, FileListItem}
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.sort._
-import scommons.nodejs.path
+import farjs.filelist.stack.PanelStack
+import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed.BlessedScreen
 import scommons.react.hooks._
 import scommons.react.redux.Dispatch
+
+import scala.scalajs.js
 
 case class FileListPanelProps(dispatch: Dispatch,
                               actions: FileListActions,
@@ -22,6 +25,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
   private[filelist] var sortModesPopup: UiComponent[SortModesPopupProps] = SortModesPopup
 
   protected def render(compProps: Props): ReactElement = {
+    val stackProps = PanelStack.usePanelStack
     val (maybeQuickSearch, setMaybeQuickSearch) = useState(Option.empty[String])
     val (showSortModes, setShowSortModes) = useState(false)
     val props = compProps.wrapped
@@ -82,7 +86,19 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
             props.dispatch(props.actions.updateDir(props.dispatch, props.state.currDir.path))
           case k@("enter" | "C-pageup" | "C-pagedown") =>
             val targetDir = k match {
-              case "C-pageup" => Some(FileListItem.up)
+              case "C-pageup" =>
+                if (props.state.currDir.isRoot) {
+                  process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
+                    name =
+                      if (stackProps.isRight) "r"
+                      else "l",
+                    ctrl = false,
+                    meta = true,
+                    shift = false
+                  ))
+                  None
+                }
+                else Some(FileListItem.up)
               case _ => props.state.currentItem.filter(_.isDir)
             }
             targetDir.foreach { dir =>
