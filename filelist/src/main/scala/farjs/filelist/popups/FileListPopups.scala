@@ -13,6 +13,7 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
 
   private[popups] var helpController: UiComponent[FileListPopupsProps] = HelpController
   private[popups] var exitController: UiComponent[FileListPopupsProps] = ExitController
+  private[popups] var menuController: UiComponent[FileListPopupsProps] = MenuController
   private[popups] var deleteController: UiComponent[PopupControllerProps] = DeleteController
   private[popups] var makeFolderController: UiComponent[PopupControllerProps] = MakeFolderController
   private[popups] var selectController: UiComponent[PopupControllerProps] = SelectController
@@ -33,7 +34,8 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
     <.>()(
       <(helpController())(^.wrapped := props)(),
       <(exitController())(^.wrapped := props)(),
-
+      <(menuController())(^.wrapped := props)(),
+      
       <(deleteController())(^.wrapped := controllerProps)(),
       <(makeFolderController())(^.wrapped := controllerProps)(),
       <(selectController())(^.wrapped := controllerProps)(),

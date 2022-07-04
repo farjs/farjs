@@ -5,6 +5,7 @@ import farjs.filelist.popups.FileListPopupsActions._
 
 case class FileListPopupsState(showHelpPopup: Boolean = false,
                                showExitPopup: Boolean = false,
+                               showMenuPopup: Boolean = false,
                                showDeletePopup: Boolean = false,
                                showMkFolderPopup: Boolean = false,
                                showViewItemsPopup: Boolean = false,
@@ -20,6 +21,7 @@ object FileListPopupsStateReducer {
   private def reduce(state: FileListPopupsState, action: Any): FileListPopupsState = action match {
     case FileListPopupHelpAction(show) => state.copy(showHelpPopup = show)
     case FileListPopupExitAction(show) => state.copy(showExitPopup = show)
+    case FileListPopupMenuAction(show) => state.copy(showMenuPopup = show)
     case FileListPopupDeleteAction(show) => state.copy(showDeletePopup = show)
     case FileListPopupMkFolderAction(show) => state.copy(showMkFolderPopup = show)
     case FileListPopupViewItemsAction(show) => state.copy(showViewItemsPopup = show)

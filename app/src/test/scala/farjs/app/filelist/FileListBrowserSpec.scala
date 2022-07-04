@@ -166,6 +166,32 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
   }
 
+  it should "dispatch FileListPopupMenuAction when onKeypress(F9)" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val props = FileListBrowserProps(dispatch)
+    val focusMock = mockFunction[Unit]
+    val buttonMock = literal("focus" -> focusMock)
+    focusMock.expects()
+
+    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
+      if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
+      else null
+    })
+    val button = inside(findComponents(comp, <.button.name)) {
+      case List(button, _) => button
+    }
+    val keyFull = "f9"
+
+    //then
+    dispatch.expects(FileListPopupMenuAction(show = true))
+
+    //when
+    button.props.onKeypress(null, literal(full = keyFull).asInstanceOf[KeyboardKey])
+
+    Succeeded
+  }
+
   it should "dispatch FileListPopupExitAction when onKeypress(F10)" in {
     //given
     val dispatch = mockFunction[Any, Any]

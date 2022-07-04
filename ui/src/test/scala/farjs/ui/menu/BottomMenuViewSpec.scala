@@ -125,7 +125,7 @@ class BottomMenuViewSpec extends TestSpec with TestRendererUtils {
       (6, "RenMov", 40, 8),
       (7, "MkFold", 48, 8),
       (8, "Delete", 56, 8),
-      (9, "      ", 64, 8),
+      (9, " Menu ", 64, 8),
       (10, " Exit ", 72, 8),
       (11, "      ", 80, 8),
       (12, "DevToo", 88, 8)

@@ -11,6 +11,7 @@ class FileListPopupsSpec extends TestSpec with TestRendererUtils {
 
   FileListPopups.helpController = mockUiComponent("HelpController")
   FileListPopups.exitController = mockUiComponent("ExitController")
+  FileListPopups.menuController = mockUiComponent("MenuController")
   FileListPopups.deleteController = mockUiComponent("DeleteController")
   FileListPopups.makeFolderController = mockUiComponent("MakeFolderController")
   FileListPopups.selectController = mockUiComponent("SelectController")
@@ -39,7 +40,8 @@ class FileListPopupsSpec extends TestSpec with TestRendererUtils {
     assertComponents(result.children, List(
       <(helpController())(^.wrapped := props)(),
       <(exitController())(^.wrapped := props)(),
-
+      <(menuController())(^.wrapped := props)(),
+      
       <(deleteController())(^.assertWrapped(inside(_) {
         case PopupControllerProps(Some(FileListData(`dispatch`, `actions`, `state`)), props.popups) =>
       }))(),

@@ -28,7 +28,7 @@ object BottomMenu extends FunctionComponent[Unit] {
     /*  F6 */ "RenMov",
     /*  F7 */ "MkFolder",
     /*  F8 */ "Delete",
-    /*  F9 */ "",
+    /*  F9 */ "Menu",
     /* F10 */ "Exit",
     /* F11 */ "",
     /* F12 */ "DevTools"
