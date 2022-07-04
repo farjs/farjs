@@ -2,6 +2,7 @@ package farjs.filelist
 
 import farjs.filelist.FileListQuickSearch._
 import farjs.ui.border.DoubleBorderProps
+import farjs.ui.popup.PopupOverlay
 import farjs.ui.theme.Theme
 import scommons.react.blessed._
 import scommons.react.test._
@@ -182,7 +183,7 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
       ^.rbClickable := true,
       ^.rbMouse := true,
       ^.rbAutoFocus := false,
-      ^.rbStyle := overlayStyle
+      ^.rbStyle := PopupOverlay.style
     )(), inside(_) { case List(box) =>
       assertNativeComponent(box, <.box(
         ^.rbClickable := true,

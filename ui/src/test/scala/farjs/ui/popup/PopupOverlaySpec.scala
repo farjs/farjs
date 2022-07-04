@@ -293,7 +293,7 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
         ^.rbClickable := true,
         ^.rbMouse := true,
         ^.rbAutoFocus := false,
-        ^.rbStyle := PopupOverlay.overlayStyle
+        ^.rbStyle := PopupOverlay.style
       )(
         children
       )

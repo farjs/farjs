@@ -1,7 +1,9 @@
 package farjs.filelist.popups
 
 import farjs.filelist.popups.FileListPopupsActions._
+import farjs.ui.popup.PopupOverlay
 import scommons.react._
+import scommons.react.blessed._
 
 object MenuController extends FunctionComponent[FileListPopupsProps] {
 
@@ -18,6 +20,17 @@ object MenuController extends FunctionComponent[FileListPopupsProps] {
         }
       ))()
     }
-    else null
+    else {
+      <.box(
+        ^.rbHeight := 1,
+        ^.rbClickable := true,
+        ^.rbMouse := true,
+        ^.rbAutoFocus := false,
+        ^.rbStyle := PopupOverlay.style,
+        ^.rbOnClick := { _ =>
+          props.dispatch(FileListPopupMenuAction(show = true))
+        }
+      )()
+    }
   }
 }

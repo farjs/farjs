@@ -1,6 +1,7 @@
 package farjs.filelist
 
 import farjs.ui.border._
+import farjs.ui.popup.PopupOverlay
 import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
@@ -52,7 +53,7 @@ object FileListQuickSearch extends FunctionComponent[FileListQuickSearchProps] {
       ^.rbClickable := true,
       ^.rbMouse := true,
       ^.rbAutoFocus := false,
-      ^.rbStyle := overlayStyle,
+      ^.rbStyle := PopupOverlay.style,
       ^.rbOnResize := moveCursor,
       ^.rbOnClick := { _ =>
         props.onClose()
@@ -85,9 +86,5 @@ object FileListQuickSearch extends FunctionComponent[FileListQuickSearchProps] {
         )()
       )
     )
-  }
-
-  private[filelist] lazy val overlayStyle = new BlessedStyle {
-    override val transparent = true
   }
 }

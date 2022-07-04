@@ -2,16 +2,16 @@ package farjs.filelist.popups
 
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.MenuController._
+import farjs.ui.popup.PopupOverlay
 import org.scalatest.Succeeded
-import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.blessed._
 import scommons.react.test._
 
-class MenuControllerSpec extends AsyncTestSpec with BaseTestSpec
-  with TestRendererUtils {
+class MenuControllerSpec extends TestSpec with TestRendererUtils {
 
   MenuController.menuBarComp = mockUiComponent("MenuBar")
 
-  it should "dispatch FileListPopupMenuAction when Close action" in {
+  it should "dispatch FileListPopupMenuAction(show=false) when onClose" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val props = FileListPopupsProps(dispatch, FileListPopupsState(showMenuPopup = true))
@@ -23,8 +23,22 @@ class MenuControllerSpec extends AsyncTestSpec with BaseTestSpec
 
     //when
     popup.onClose()
+  }
 
-    Succeeded
+  it should "dispatch FileListPopupMenuAction(show=true) when onClick" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val props = FileListPopupsProps(dispatch, FileListPopupsState())
+    val comp = testRender(<(MenuController())(^.wrapped := props)())
+    val boxComp = inside(findComponents(comp, <.box.name)) {
+      case List(box) => box
+    }
+
+    //then
+    dispatch.expects(FileListPopupMenuAction(show = true))
+
+    //when
+    boxComp.props.onClick(null)
   }
 
   it should "render MenuBar component" in {
@@ -41,15 +55,23 @@ class MenuControllerSpec extends AsyncTestSpec with BaseTestSpec
     }
   }
 
-  it should "render empty component" in {
+  it should "render clickable box component" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val props = FileListPopupsProps(dispatch, FileListPopupsState())
 
     //when
-    val renderer = createTestRenderer(<(MenuController())(^.wrapped := props)())
+    val result = testRender(<(MenuController())(^.wrapped := props)())
 
     //then
-    renderer.root.children.toList should be (empty)
+    assertNativeComponent(result,
+      <.box(
+        ^.rbHeight := 1,
+        ^.rbClickable := true,
+        ^.rbMouse := true,
+        ^.rbAutoFocus := false,
+        ^.rbStyle := PopupOverlay.style
+      )()
+    )
   }
 }

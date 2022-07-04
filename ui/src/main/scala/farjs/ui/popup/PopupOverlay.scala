@@ -49,7 +49,7 @@ object PopupOverlay extends FunctionComponent[PopupProps] {
       ^.rbClickable := true,
       ^.rbMouse := true,
       ^.rbAutoFocus := false,
-      ^.rbStyle := overlayStyle,
+      ^.rbStyle := style,
       ^.rbOnClick := { _ =>
         if (props.closable) {
           props.onClose()
@@ -60,7 +60,7 @@ object PopupOverlay extends FunctionComponent[PopupProps] {
     )
   }
   
-  private[popup] lazy val overlayStyle = new BlessedStyle {
+  lazy val style: BlessedStyle = new BlessedStyle {
     override val transparent = true
   }
 }
