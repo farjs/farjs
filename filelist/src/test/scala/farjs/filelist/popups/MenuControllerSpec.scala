@@ -2,10 +2,12 @@ package farjs.filelist.popups
 
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.MenuController._
+import farjs.filelist.stack.{PanelStack, WithPanelStacksSpec}
 import farjs.ui.popup.PopupOverlay
-import org.scalatest.Succeeded
 import scommons.react.blessed._
 import scommons.react.test._
+
+import scala.scalajs.js
 
 class MenuControllerSpec extends TestSpec with TestRendererUtils {
 
@@ -15,7 +17,11 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val props = FileListPopupsProps(dispatch, FileListPopupsState(showMenuPopup = true))
-    val comp = testRender(<(MenuController())(^.wrapped := props)())
+    val comp = testRender(WithPanelStacksSpec.withContext(
+      <(MenuController())(^.wrapped := props)(),
+      leftStack = new PanelStack(isActive = true, Nil, null),
+      rightStack = new PanelStack(isActive = false, Nil, null)
+    ))
     val popup = findComponentProps(comp, menuBarComp)
 
     //then
@@ -29,7 +35,11 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val props = FileListPopupsProps(dispatch, FileListPopupsState())
-    val comp = testRender(<(MenuController())(^.wrapped := props)())
+    val comp = testRender(WithPanelStacksSpec.withContext(
+      <(MenuController())(^.wrapped := props)(),
+      leftStack = new PanelStack(isActive = true, Nil, null),
+      rightStack = new PanelStack(isActive = false, Nil, null)
+    ))
     val boxComp = inside(findComponents(comp, <.box.name)) {
       case List(box) => box
     }
@@ -45,13 +55,23 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val props = FileListPopupsProps(dispatch, FileListPopupsState(showMenuPopup = true))
+    val leftInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
+    val rightInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
 
     //when
-    val result = testRender(<(MenuController())(^.wrapped := props)())
+    val result = testRender(WithPanelStacksSpec.withContext(
+      <(MenuController())(^.wrapped := props)(),
+      leftStack = new PanelStack(isActive = true, Nil, null),
+      rightStack = new PanelStack(isActive = false, Nil, null),
+      leftInput = leftInput,
+      rightInput = rightInput
+    ))
 
     //then
     assertTestComponent(result, menuBarComp) {
-      case MenuBarProps(_) => Succeeded
+      case MenuBarProps(left, right, _) =>
+        left shouldBe leftInput
+        right shouldBe rightInput
     }
   }
 
@@ -61,7 +81,11 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListPopupsProps(dispatch, FileListPopupsState())
 
     //when
-    val result = testRender(<(MenuController())(^.wrapped := props)())
+    val result = testRender(WithPanelStacksSpec.withContext(
+      <(MenuController())(^.wrapped := props)(),
+      leftStack = new PanelStack(isActive = true, Nil, null),
+      rightStack = new PanelStack(isActive = false, Nil, null)
+    ))
 
     //then
     assertNativeComponent(result,

@@ -9,7 +9,9 @@ import scommons.react.blessed._
 
 import scala.scalajs.js
 
-case class MenuBarProps(onClose: () => Unit)
+case class MenuBarProps(leftInput: BlessedElement,
+                        rightInput: BlessedElement,
+                        onClose: () => Unit)
 
 object MenuBar extends FunctionComponent[MenuBarProps] {
 

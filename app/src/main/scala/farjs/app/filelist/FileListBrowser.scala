@@ -106,7 +106,12 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       }
     }
     
-    <(WithPanelStacks())(^.wrapped := WithPanelStacksProps(getStack(isRight), getStack(!isRight)))(
+    <(WithPanelStacks())(^.wrapped := WithPanelStacksProps(
+      leftStack = getStack(isRight),
+      leftInput = leftButtonRef.current,
+      rightStack = getStack(!isRight),
+      rightInput = rightButtonRef.current
+    ))(
       <.button(
         ^("isRight") := false,
         ^.reactRef := leftButtonRef,

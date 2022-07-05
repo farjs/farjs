@@ -324,7 +324,12 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
                           rightStack: PanelStack = new PanelStack(isActive = false, Nil, null)
                          ): ReactElement = {
 
-    <(WithPanelStacks.Context.Provider)(^.contextValue := WithPanelStacksProps(leftStack, rightStack))(
+    <(WithPanelStacks.Context.Provider)(^.contextValue := WithPanelStacksProps(
+      leftStack = leftStack,
+      leftInput = panelInput,
+      rightStack = rightStack,
+      rightInput = panelInput
+    ))(
       <(PanelStack.Context.Provider)(^.contextValue := PanelStackProps(
         isRight = false,
         panelInput = panelInput,

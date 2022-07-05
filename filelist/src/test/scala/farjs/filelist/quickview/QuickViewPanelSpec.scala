@@ -89,14 +89,16 @@ class QuickViewPanelSpec extends AsyncTestSpec with BaseTestSpec
                           rightStack: PanelStack,
                           element: ReactElement): ReactElement = {
 
-    <(WithPanelStacks.Context.Provider)(^.contextValue := WithPanelStacksProps(leftStack, rightStack))(
+    WithPanelStacksSpec.withContext(
       PanelStackSpec.withContext(
         element = element,
         isRight = isRight,
         stack = if (isRight) rightStack else leftStack,
         width = width,
         height = height
-      )
+      ),
+      leftStack,
+      rightStack
     )
   }
   

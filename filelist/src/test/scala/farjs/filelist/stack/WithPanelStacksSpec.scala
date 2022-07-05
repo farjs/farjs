@@ -1,11 +1,11 @@
 package farjs.filelist.stack
 
-import java.util.concurrent.atomic.AtomicReference
-
 import scommons.react._
+import scommons.react.blessed.BlessedElement
 import scommons.react.hooks._
 import scommons.react.test._
 
+import java.util.concurrent.atomic.AtomicReference
 import scala.scalajs.js
 
 class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
@@ -48,7 +48,9 @@ class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
     }
     val props = WithPanelStacksProps(
       new PanelStack(isActive = true, Nil, updater),
-      new PanelStack(isActive = false, Nil, updater)
+      null,
+      new PanelStack(isActive = false, Nil, updater),
+      null
     )
 
     //when
@@ -80,8 +82,18 @@ class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
 
 object WithPanelStacksSpec {
 
-  def withContext(element: ReactElement, leftStack: PanelStack, rightStack: PanelStack): ReactElement = {
-    <(WithPanelStacks.Context.Provider)(^.contextValue := WithPanelStacksProps(leftStack, rightStack))(
+  def withContext(element: ReactElement,
+                  leftStack: PanelStack,
+                  rightStack: PanelStack,
+                  leftInput: BlessedElement = null,
+                  rightInput: BlessedElement = null): ReactElement = {
+
+    <(WithPanelStacks.Context.Provider)(^.contextValue := WithPanelStacksProps(
+      leftStack = leftStack,
+      leftInput = leftInput,
+      rightStack = rightStack,
+      rightInput = rightInput
+    ))(
       element
     )
   }

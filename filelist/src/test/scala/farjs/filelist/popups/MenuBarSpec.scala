@@ -17,8 +17,10 @@ class MenuBarSpec extends TestSpec with TestRendererUtils {
 
   it should "call onClose when onKeypress(F10)" in {
     //given
+    val leftInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
+    val rightInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
     val onClose = mockFunction[Unit]
-    val props = MenuBarProps(onClose)
+    val props = MenuBarProps(leftInput, rightInput, onClose)
     val comp = testRender(<(MenuBar())(^.wrapped := props)())
     val popupProps = findComponentProps(comp, popupComp)
 
@@ -42,7 +44,9 @@ class MenuBarSpec extends TestSpec with TestRendererUtils {
     }
     process.stdin.on("keypress", listener)
 
-    val props = MenuBarProps(() => ())
+    val leftInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
+    val rightInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
+    val props = MenuBarProps(leftInput, rightInput, () => ())
     val comp = testRender(<(MenuBar())(^.wrapped := props)())
     val popupProps = findComponentProps(comp, popupComp)
 
@@ -58,7 +62,9 @@ class MenuBarSpec extends TestSpec with TestRendererUtils {
 
   it should "return true when onKeypress(up)" in {
     //given
-    val props = MenuBarProps(() => ())
+    val leftInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
+    val rightInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
+    val props = MenuBarProps(leftInput, rightInput, () => ())
     val comp = testRender(<(MenuBar())(^.wrapped := props)())
     val popupProps = findComponentProps(comp, popupComp)
 
@@ -68,7 +74,9 @@ class MenuBarSpec extends TestSpec with TestRendererUtils {
   
   it should "return false when onKeypress(other)" in {
     //given
-    val props = MenuBarProps(() => ())
+    val leftInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
+    val rightInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
+    val props = MenuBarProps(leftInput, rightInput, () => ())
     val comp = testRender(<(MenuBar())(^.wrapped := props)())
     val popupProps = findComponentProps(comp, popupComp)
 
@@ -78,7 +86,9 @@ class MenuBarSpec extends TestSpec with TestRendererUtils {
   
   it should "render component" in {
     //given
-    val props = MenuBarProps(() => ())
+    val leftInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
+    val rightInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
+    val props = MenuBarProps(leftInput, rightInput, () => ())
 
     //when
     val result = testRender(<(MenuBar())(^.wrapped := props)())
