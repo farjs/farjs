@@ -6,7 +6,8 @@ import scommons.react.blessed.portal._
 case class PopupProps(onClose: () => Unit,
                       closable: Boolean = true,
                       focusable: Boolean = true,
-                      onOpen: () => Unit = () => ())
+                      onOpen: () => Unit = () => (),
+                      onKeypress: String => Boolean = _ => false)
 
 object Popup extends FunctionComponent[PopupProps] {
   

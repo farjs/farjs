@@ -70,7 +70,7 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
     val theme = Theme.current.popup.menu
 
     assertTestComponent(result, popupComp)({
-      case PopupProps(onClose, closable, focusable, _) =>
+      case PopupProps(onClose, closable, focusable, _, _) =>
         onClose should be theSameInstanceAs props.onClose
         closable shouldBe true
         focusable shouldBe true

@@ -115,7 +115,8 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
   it should "listen to element keys and perform actions" in {
     //given
     val onClose = mockFunction[Unit]
-    val props = PopupProps(onClose = onClose, focusable = false)
+    val onKeypress = mockFunction[String, Boolean]
+    val props = PopupProps(onClose = onClose, focusable = false, onKeypress = onKeypress)
     val onMock = mockFunction[String, js.Function, Unit]
     val offMock = mockFunction[String, js.Function, Unit]
     val focusNextMock = mockFunction[Unit]
@@ -137,13 +138,18 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
       else null
     })
 
-    def check(defaultPrevented: Boolean, keys: String*): Unit = keys.foreach { key =>
+    def check(defaultPrevented: Boolean, handled: Boolean, keys: String*): Unit = keys.foreach { key =>
       //then
-      if (!defaultPrevented) key match {
-        case "escape" => onClose.expects()
-        case "tab" | "down" | "right" => focusNextMock.expects()
-        case "S-tab" | "up" | "left" => focusPreviousMock.expects()
-        case _ =>
+      if (!defaultPrevented) {
+        onKeypress.expects(key).returning(handled)
+        if (!handled) {
+          key match {
+            case "escape" => onClose.expects()
+            case "tab" | "down" | "right" => focusNextMock.expects()
+            case "S-tab" | "up" | "left" => focusPreviousMock.expects()
+            case _ =>
+          }
+        }
       }
       //when
       keyListener(null, null, literal(
@@ -153,14 +159,15 @@ class PopupOverlaySpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     }
 
     //when & then
-    check(defaultPrevented = false, "escape")
-    check(defaultPrevented = true, "escape")
-    check(defaultPrevented = false, "tab", "down", "right")
-    check(defaultPrevented = true, "tab", "down", "right")
-    check(defaultPrevented = false, "S-tab", "up", "left")
-    check(defaultPrevented = true, "S-tab", "up", "left")
-    check(defaultPrevented = false, "unknown")
-    check(defaultPrevented = true, "unknown")
+    check(defaultPrevented = false, handled = true, "escape")
+    check(defaultPrevented = false, handled = false, "escape")
+    check(defaultPrevented = true, handled = false, "escape")
+    check(defaultPrevented = false, handled = false, "tab", "down", "right")
+    check(defaultPrevented = true, handled = false, "tab", "down", "right")
+    check(defaultPrevented = false, handled = false, "S-tab", "up", "left")
+    check(defaultPrevented = true, handled = false, "S-tab", "up", "left")
+    check(defaultPrevented = false, handled = false, "unknown")
+    check(defaultPrevented = true, handled = false, "unknown")
 
     Succeeded
   }

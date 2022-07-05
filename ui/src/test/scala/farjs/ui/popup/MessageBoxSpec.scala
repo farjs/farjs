@@ -206,7 +206,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       }
     }
     
-    assertTestComponent(result, popupComp)({ case PopupProps(_, resClosable, focusable, _) =>
+    assertTestComponent(result, popupComp)({ case PopupProps(_, resClosable, focusable, _, _) =>
       resClosable shouldBe closable
       focusable shouldBe true
     }, inside(_) { case List(content) =>

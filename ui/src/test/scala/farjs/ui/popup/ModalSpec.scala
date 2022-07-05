@@ -26,7 +26,7 @@ class ModalSpec extends TestSpec with TestRendererUtils {
   }
 
   private def assertModal(result: TestInstance, props: ModalProps, children: ReactElement): Assertion = {
-    assertTestComponent(result, popupComp)({ case PopupProps(onClose, resClosable, focusable, _) =>
+    assertTestComponent(result, popupComp)({ case PopupProps(onClose, resClosable, focusable, _, _) =>
       resClosable shouldBe true
       focusable shouldBe true
       onClose should be theSameInstanceAs props.onCancel
