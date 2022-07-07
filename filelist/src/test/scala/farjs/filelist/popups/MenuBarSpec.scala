@@ -2,25 +2,43 @@ package farjs.filelist.popups
 
 import farjs.filelist.popups.MenuBar._
 import farjs.ui.ButtonsPanelProps
+import farjs.ui.menu.{SubMenu, SubMenuProps}
 import farjs.ui.popup.PopupProps
 import farjs.ui.theme.Theme
+import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs._
+import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.blessed._
 import scommons.react.test._
 
 import scala.scalajs.js
 
-class MenuBarSpec extends TestSpec with TestRendererUtils {
+class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   MenuBar.popupComp = mockUiComponent("Popup")
   MenuBar.buttonsPanel = mockUiComponent("ButtonsPanel")
+  MenuBar.subMenuComp = mockUiComponent("SubMenu")
+  
+  private val items = List(
+    "Menu 1" -> List(
+      "Item 1",
+      SubMenu.separator,
+      "Item 2",
+      "Item 3"
+    ),
+    "Menu 2" -> List(
+      "Item 4",
+      "Item 5"
+    ),
+    "Menu 3" -> List(
+      "Item 6"
+    )
+  )
 
   it should "call onClose when onKeypress(F10)" in {
     //given
-    val leftInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
-    val rightInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
     val onClose = mockFunction[Unit]
-    val props = MenuBarProps(leftInput, rightInput, onClose)
+    val props = MenuBarProps(items, (_, _) => (), onClose)
     val comp = testRender(<(MenuBar())(^.wrapped := props)())
     val popupProps = findComponentProps(comp, popupComp)
 
@@ -31,7 +49,79 @@ class MenuBarSpec extends TestSpec with TestRendererUtils {
     popupProps.onKeypress("f10") shouldBe true
   }
 
-  it should "emit keypress event when onKeypress(down)" in {
+  it should "hide sub-menu when onKeypress(escape)" in {
+    //given
+    val props = MenuBarProps(items, (_, _) => (), () => ())
+    val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
+    val buttonsProps = findComponentProps(renderer.root, buttonsPanel)
+    buttonsProps.actions.head._2.apply()
+    findProps(renderer.root, subMenuComp) should not be empty
+    val popupProps = findComponentProps(renderer.root, popupComp)
+
+    //when
+    popupProps.onKeypress("escape") shouldBe true
+    
+    //then
+    findProps(renderer.root, subMenuComp) shouldBe Nil
+  }
+
+  it should "return false if no sub-menu when onKeypress(escape)" in {
+    //given
+    val props = MenuBarProps(items, (_, _) => (), () => ())
+    val comp = testRender(<(MenuBar())(^.wrapped := props)())
+    val popupProps = findComponentProps(comp, popupComp)
+
+    //when & then
+    popupProps.onKeypress("escape") shouldBe false
+  }
+
+  it should "select sub-menu items when onKeypress(down/up)" in {
+    //given
+    val props = MenuBarProps(items, (_, _) => (), () => ())
+    val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
+    val buttonsProps = findComponentProps(renderer.root, buttonsPanel)
+    buttonsProps.actions.head._2.apply()
+    inside(findComponentProps(renderer.root, subMenuComp)) {
+      case SubMenuProps(selected, items, _, _) =>
+        selected shouldBe 0
+        items shouldBe List(
+          "Item 1",
+          SubMenu.separator,
+          "Item 2",
+          "Item 3"
+        )
+    }
+
+    //when & then
+    findComponentProps(renderer.root, popupComp).onKeypress("up") shouldBe true
+    findComponentProps(renderer.root, subMenuComp).selected shouldBe 0
+
+    //when & then
+    findComponentProps(renderer.root, popupComp).onKeypress("down") shouldBe true
+    findComponentProps(renderer.root, subMenuComp).selected shouldBe 2
+
+    //when & then
+    findComponentProps(renderer.root, popupComp).onKeypress("up") shouldBe true
+    findComponentProps(renderer.root, subMenuComp).selected shouldBe 0
+
+    //when & then
+    findComponentProps(renderer.root, popupComp).onKeypress("down") shouldBe true
+    findComponentProps(renderer.root, subMenuComp).selected shouldBe 2
+
+    //when & then
+    findComponentProps(renderer.root, popupComp).onKeypress("down") shouldBe true
+    findComponentProps(renderer.root, subMenuComp).selected shouldBe 3
+
+    //when & then
+    findComponentProps(renderer.root, popupComp).onKeypress("down") shouldBe true
+    findComponentProps(renderer.root, subMenuComp).selected shouldBe 3
+
+    //when & then
+    findComponentProps(renderer.root, popupComp).onKeypress("up") shouldBe true
+    findComponentProps(renderer.root, subMenuComp).selected shouldBe 2
+  }
+
+  it should "emit keypress(enter) if no sub-menu when onKeypress(down)" in {
     //given
     val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
     val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
@@ -44,9 +134,7 @@ class MenuBarSpec extends TestSpec with TestRendererUtils {
     }
     process.stdin.on("keypress", listener)
 
-    val leftInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
-    val rightInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
-    val props = MenuBarProps(leftInput, rightInput, () => ())
+    val props = MenuBarProps(items, (_, _) => (), () => ())
     val comp = testRender(<(MenuBar())(^.wrapped := props)())
     val popupProps = findComponentProps(comp, popupComp)
 
@@ -58,13 +146,12 @@ class MenuBarSpec extends TestSpec with TestRendererUtils {
 
     //cleanup
     process.stdin.removeListener("keypress", listener)
+    Succeeded
   }
 
-  it should "return true when onKeypress(up)" in {
+  it should "return true if no sub-menu when onKeypress(up)" in {
     //given
-    val leftInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
-    val rightInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
-    val props = MenuBarProps(leftInput, rightInput, () => ())
+    val props = MenuBarProps(items, (_, _) => (), () => ())
     val comp = testRender(<(MenuBar())(^.wrapped := props)())
     val popupProps = findComponentProps(comp, popupComp)
 
@@ -72,11 +159,67 @@ class MenuBarSpec extends TestSpec with TestRendererUtils {
     popupProps.onKeypress("up") shouldBe true
   }
   
+  it should "show next/prev sub-menu when onKeypress(right/left)" in {
+    //given
+    val props = MenuBarProps(items, (_, _) => (), () => ())
+    val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
+    val buttonsProps = findComponentProps(renderer.root, buttonsPanel)
+    buttonsProps.actions.head._2.apply()
+    findComponentProps(renderer.root, subMenuComp).left shouldBe 2
+
+    //when & then
+    findComponentProps(renderer.root, popupComp).onKeypress("left") shouldBe false
+    findComponentProps(renderer.root, subMenuComp).left shouldBe 22
+
+    //when & then
+    findComponentProps(renderer.root, popupComp).onKeypress("right") shouldBe false
+    findComponentProps(renderer.root, subMenuComp).left shouldBe 2
+
+    //when & then
+    findComponentProps(renderer.root, popupComp).onKeypress("right") shouldBe false
+    findComponentProps(renderer.root, subMenuComp).left shouldBe 12
+
+    //when & then
+    findComponentProps(renderer.root, popupComp).onKeypress("left") shouldBe false
+    findComponentProps(renderer.root, subMenuComp).left shouldBe 2
+  }
+
+  it should "call onAction when onKeypress(enter)" in {
+    //given
+    val onAction = mockFunction[Int, Int, Unit]
+    val props = MenuBarProps(items, onAction, () => ())
+    val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
+    val buttonsProps = findComponentProps(renderer.root, buttonsPanel)
+    buttonsProps.actions.head._2.apply()
+    findComponentProps(renderer.root, popupComp).onKeypress("down") shouldBe true
+    findComponentProps(renderer.root, subMenuComp).selected shouldBe 2
+
+    //then
+    var onActionCalled = false
+    onAction.expects(0, 2).onCall { (_, _) =>
+      onActionCalled = true
+    }
+    
+    //when
+    findComponentProps(renderer.root, popupComp).onKeypress("enter") shouldBe true
+
+    //then
+    eventually(onActionCalled shouldBe true)
+  }
+
+  it should "return false if no sub-menu when onKeypress(space)" in {
+    //given
+    val props = MenuBarProps(items, (_, _) => (), () => ())
+    val comp = testRender(<(MenuBar())(^.wrapped := props)())
+    val popupProps = findComponentProps(comp, popupComp)
+
+    //when & then
+    popupProps.onKeypress("space") shouldBe false
+  }
+
   it should "return false when onKeypress(other)" in {
     //given
-    val leftInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
-    val rightInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
-    val props = MenuBarProps(leftInput, rightInput, () => ())
+    val props = MenuBarProps(items, (_, _) => (), () => ())
     val comp = testRender(<(MenuBar())(^.wrapped := props)())
     val popupProps = findComponentProps(comp, popupComp)
 
@@ -84,11 +227,33 @@ class MenuBarSpec extends TestSpec with TestRendererUtils {
     popupProps.onKeypress("other") shouldBe false
   }
   
-  it should "render component" in {
+  it should "render sub-menu" in {
     //given
-    val leftInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
-    val rightInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
-    val props = MenuBarProps(leftInput, rightInput, () => ())
+    val props = MenuBarProps(items, (_, _) => (), () => ())
+    val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
+    val buttonsProps = findComponentProps(renderer.root, buttonsPanel)
+
+    //when
+    buttonsProps.actions.head._2.apply()
+
+    //then
+    inside(findComponentProps(renderer.root, subMenuComp)) {
+      case SubMenuProps(selected, items, top, left) =>
+        selected shouldBe 0
+        items shouldBe List(
+          "Item 1",
+          SubMenu.separator,
+          "Item 2",
+          "Item 3"
+        )
+        top shouldBe 1
+        left shouldBe 2
+    }
+  }
+  
+  it should "render main menu" in {
+    //given
+    val props = MenuBarProps(items, (_, _) => (), () => ())
 
     //when
     val result = testRender(<(MenuBar())(^.wrapped := props)())
@@ -97,7 +262,7 @@ class MenuBarSpec extends TestSpec with TestRendererUtils {
     assertMenuBar(result, props)
   }
   
-  private def assertMenuBar(result: TestInstance, props: MenuBarProps): Unit = {
+  private def assertMenuBar(result: TestInstance, props: MenuBarProps): Assertion = {
     val theme = Theme.current.popup.menu
     
     assertNativeComponent(result,
@@ -111,7 +276,7 @@ class MenuBarSpec extends TestSpec with TestRendererUtils {
           ^.rbStyle := theme
         )(
           <.box(
-            ^.rbWidth := 49,
+            ^.rbWidth := 30,
             ^.rbHeight := 1,
             ^.rbLeft := 2
           )(
@@ -119,11 +284,9 @@ class MenuBarSpec extends TestSpec with TestRendererUtils {
               case ButtonsPanelProps(top, actions, `theme`, padding, margin) =>
                 top shouldBe 0
                 actions.map(_._1) shouldBe List(
-                "Left",
-                "Files",
-                "Commands",
-                "Options",
-                "Right"
+                "Menu 1",
+                "Menu 2",
+                "Menu 3"
               )
               padding shouldBe 2
               margin shouldBe 0

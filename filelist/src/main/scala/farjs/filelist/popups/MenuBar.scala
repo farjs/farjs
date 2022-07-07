@@ -1,69 +1,139 @@
 package farjs.filelist.popups
 
+import farjs.ui.menu.{SubMenu, SubMenuProps}
 import farjs.ui.popup.{Popup, PopupProps}
 import farjs.ui.theme.Theme
 import farjs.ui.{ButtonsPanel, ButtonsPanelProps}
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
+import scommons.react.hooks._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.scalajs.js
 
-case class MenuBarProps(leftInput: BlessedElement,
-                        rightInput: BlessedElement,
+case class MenuBarProps(items: List[(String, List[String])],
+                        onAction: (Int, Int) => Unit,
                         onClose: () => Unit)
 
 object MenuBar extends FunctionComponent[MenuBarProps] {
 
   private[popups] var popupComp: UiComponent[PopupProps] = Popup
   private[popups] var buttonsPanel: UiComponent[ButtonsPanelProps] = ButtonsPanel
+  private[popups] var subMenuComp: UiComponent[SubMenuProps] = SubMenu
 
   protected def render(compProps: Props): ReactElement = {
+    val (maybeSubMenu, setSubMenu) = useState[Option[(Int, Int)]](None)
     val props = compProps.wrapped
     val theme = Theme.current.popup.menu
+    val marginLeft = 2
+    val padding = 2
+    val width = props.items.foldLeft(0) { (res, item) =>
+      res + item._1.length + padding * 2
+    }
+    val actions = props.items.zipWithIndex.map { case ((item, _), index) =>
+      (item, () => setSubMenu(Some(index -> 0)))
+    }
 
-    <(popupComp())(^.wrapped := PopupProps(
-      onClose = props.onClose,
-      onKeypress = { keyFull =>
-        var processed = true
-        keyFull match {
-          case "f10" => props.onClose()
-          case "down" =>
-            process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
-              name = "enter",
-              ctrl = false,
-              meta = false,
-              shift = false
-            ))
-          case "up" =>
-          case _ => processed = false
-        }
-        processed
+    def getLeftPos(menuIndex: Int): Int = {
+      var leftPos = marginLeft
+      for (i <- 0 until menuIndex) {
+        leftPos += actions(i)._1.length + padding * 2
       }
-    ))(
-      <.box(
-        ^.rbHeight := 1,
-        ^.rbStyle := theme
-      )(
+      leftPos
+    }
+    
+    def onKeypress(keyFull: String): Boolean = {
+      var processed = true
+      keyFull match {
+        case "f10" => props.onClose()
+        case "escape" =>
+          if (maybeSubMenu.isDefined) setSubMenu(None)
+          else processed = false
+        case "down" =>
+          maybeSubMenu match {
+            case Some((menuIndex, subIndex)) =>
+              val subItems = props.items(menuIndex)._2
+              val maxSubIndex = subItems.size - 1
+              if (subIndex < maxSubIndex) {
+                val newSubIndex =
+                  if (subItems(subIndex + 1) == SubMenu.separator) subIndex + 2
+                  else subIndex + 1
+                setSubMenu(Some((menuIndex, newSubIndex)))
+              }
+            case None =>
+              process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
+                name = "enter",
+                ctrl = false,
+                meta = false,
+                shift = false
+              ))
+          }
+        case "up" =>
+          maybeSubMenu.foreach { case (menuIndex, subIndex) =>
+            if (subIndex > 0) {
+              val subItems = props.items(menuIndex)._2
+              val newSubIndex =
+                if (subItems(subIndex - 1) == SubMenu.separator) subIndex - 2
+                else subIndex - 1
+              setSubMenu(Some((menuIndex, newSubIndex)))
+            }
+          }
+        case "right" =>
+          processed = false
+          maybeSubMenu.foreach { case (menuIndex, _) =>
+            val newIndex = if (menuIndex == actions.size - 1) 0 else menuIndex + 1
+            setSubMenu(Some((newIndex, 0)))
+          }
+        case "left" =>
+          processed = false
+          maybeSubMenu.foreach { case (menuIndex, _) =>
+            val newIndex = if (menuIndex == 0) actions.size - 1 else menuIndex - 1
+            setSubMenu(Some((newIndex, 0)))
+          }
+        case "enter" | "space" =>
+          maybeSubMenu match {
+            case None => processed = false
+            case Some((menuIndex, subIndex)) =>
+              Future { // call action on the next tick
+                props.onAction(menuIndex, subIndex)
+              }
+          }
+        case _ => processed = false
+      }
+      processed
+    }
+
+    <.>()(
+      <(popupComp())(^.wrapped := PopupProps(onClose = props.onClose, onKeypress = onKeypress))(
         <.box(
-          ^.rbWidth := 49,
           ^.rbHeight := 1,
-          ^.rbLeft := 2
+          ^.rbStyle := theme
         )(
-          <(buttonsPanel())(^.wrapped := ButtonsPanelProps(
-            top = 0,
-            actions = List(
-              "Left" -> {() => ()},
-              "Files" -> {() => ()},
-              "Commands" -> {() => ()},
-              "Options" -> {() => ()},
-              "Right" -> {() => ()}
-            ),
-            style = theme,
-            padding = 2
-          ))()
+          <.box(
+            ^.rbWidth := width,
+            ^.rbHeight := 1,
+            ^.rbLeft := marginLeft
+          )(
+            <(buttonsPanel())(^.wrapped := ButtonsPanelProps(
+              top = 0,
+              actions = actions,
+              style = theme,
+              padding = padding
+            ))()
+          )
         )
-      )
+      ),
+
+      maybeSubMenu.map { case (menuIndex, subIndex) =>
+        <(subMenuComp())(^.wrapped := SubMenuProps(
+          selected = subIndex,
+          items = props.items(menuIndex)._2,
+          top = 1,
+          left = getLeftPos(menuIndex)
+        ))()
+      }
     )
   }
 }
