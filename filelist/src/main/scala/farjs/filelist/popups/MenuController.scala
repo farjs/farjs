@@ -2,7 +2,7 @@ package farjs.filelist.popups
 
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.stack.WithPanelStacks
-import farjs.ui.menu.SubMenu
+import farjs.ui.menu._
 import farjs.ui.popup.PopupOverlay
 import scommons.nodejs._
 import scommons.react._

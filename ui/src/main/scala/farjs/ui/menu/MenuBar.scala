@@ -1,6 +1,5 @@
-package farjs.filelist.popups
+package farjs.ui.menu
 
-import farjs.ui.menu.{SubMenu, SubMenuProps}
 import farjs.ui.popup.{Popup, PopupProps}
 import farjs.ui.theme.Theme
 import farjs.ui.{ButtonsPanel, ButtonsPanelProps}
@@ -19,9 +18,9 @@ case class MenuBarProps(items: List[(String, List[String])],
 
 object MenuBar extends FunctionComponent[MenuBarProps] {
 
-  private[popups] var popupComp: UiComponent[PopupProps] = Popup
-  private[popups] var buttonsPanel: UiComponent[ButtonsPanelProps] = ButtonsPanel
-  private[popups] var subMenuComp: UiComponent[SubMenuProps] = SubMenu
+  private[menu] var popupComp: UiComponent[PopupProps] = Popup
+  private[menu] var buttonsPanel: UiComponent[ButtonsPanelProps] = ButtonsPanel
+  private[menu] var subMenuComp: UiComponent[SubMenuProps] = SubMenu
 
   protected def render(compProps: Props): ReactElement = {
     val (maybeSubMenu, setSubMenu) = useState[Option[(Int, Int)]](None)

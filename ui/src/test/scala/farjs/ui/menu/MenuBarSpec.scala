@@ -1,8 +1,7 @@
-package farjs.filelist.popups
+package farjs.ui.menu
 
-import farjs.filelist.popups.MenuBar._
 import farjs.ui.ButtonsPanelProps
-import farjs.ui.menu.{SubMenu, SubMenuProps}
+import farjs.ui.menu.MenuBar._
 import farjs.ui.popup.PopupProps
 import farjs.ui.theme.Theme
 import org.scalatest.{Assertion, Succeeded}

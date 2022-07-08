@@ -4,6 +4,7 @@ import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.MenuController._
 import farjs.filelist.stack.PanelStack
 import farjs.filelist.stack.WithPanelStacksSpec.withContext
+import farjs.ui.menu.MenuBarProps
 import farjs.ui.popup.PopupOverlay
 import scommons.nodejs._
 import scommons.react.blessed._
