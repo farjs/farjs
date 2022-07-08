@@ -81,7 +81,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     val buttonsProps = findComponentProps(renderer.root, buttonsPanel)
     buttonsProps.actions.head._2.apply()
     inside(findComponentProps(renderer.root, subMenuComp)) {
-      case SubMenuProps(selected, items, _, _) =>
+      case SubMenuProps(selected, items, _, _, _) =>
         selected shouldBe 0
         items shouldBe List(
           "Item 1",
@@ -226,6 +226,28 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     popupProps.onKeypress("other") shouldBe false
   }
   
+  it should "call onAction when onClick" in {
+    //given
+    val onAction = mockFunction[Int, Int, Unit]
+    val props = MenuBarProps(items, onAction, () => ())
+    val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
+    val buttonsProps = findComponentProps(renderer.root, buttonsPanel)
+    buttonsProps.actions.head._2.apply()
+    findComponentProps(renderer.root, subMenuComp).selected shouldBe 0
+
+    //then
+    var onActionCalled = false
+    onAction.expects(0, 2).onCall { (_, _) =>
+      onActionCalled = true
+    }
+
+    //when
+    findComponentProps(renderer.root, subMenuComp).onClick(2)
+
+    //then
+    eventually(onActionCalled shouldBe true)
+  }
+
   it should "render sub-menu" in {
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
@@ -237,7 +259,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
 
     //then
     inside(findComponentProps(renderer.root, subMenuComp)) {
-      case SubMenuProps(selected, items, top, left) =>
+      case SubMenuProps(selected, items, top, left, _) =>
         selected shouldBe 0
         items shouldBe List(
           "Item 1",

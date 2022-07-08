@@ -12,13 +12,36 @@ class SubMenuSpec extends TestSpec with TestRendererUtils {
   SubMenu.horizontalLineComp = mockUiComponent("HorizontalLine")
   SubMenu.buttonComp = mockUiComponent("Button")
 
+  it should "call onClick with item index when onClick" in {
+    //given
+    val onClick = mockFunction[Int, Unit]
+    val props = SubMenuProps(
+      selected = 0,
+      items = List("item 1", SubMenu.separator, "item 2"),
+      top = 1,
+      left = 2,
+      onClick = onClick
+    )
+    val comp = testRender(<(SubMenu())(^.wrapped := props)())
+    val textEl = inside(findComponents(comp, <.text.name)) {
+      case List(_, text) => text
+    }
+    
+    //then
+    onClick.expects(2)
+    
+    //when
+    textEl.props.onClick(null)
+  }
+
   it should "render component" in {
     //given
     val props = SubMenuProps(
       selected = 0,
       items = List("item 1", SubMenu.separator, "item 2"),
       top = 1,
-      left = 2
+      left = 2,
+      _ => ()
     )
     
     //when
@@ -70,6 +93,9 @@ class SubMenuSpec extends TestSpec with TestRendererUtils {
               ^.rbHeight := 1,
               ^.rbLeft := 1,
               ^.rbTop := 1 + index,
+              ^.rbClickable := true,
+              ^.rbMouse := true,
+              ^.rbAutoFocus := false,
               ^.rbStyle := {
                 if (props.selected == index) theme.focus.getOrElse(null)
                 else theme

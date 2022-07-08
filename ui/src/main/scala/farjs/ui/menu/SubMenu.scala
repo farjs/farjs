@@ -9,7 +9,8 @@ import scommons.react.blessed._
 case class SubMenuProps(selected: Int,
                         items: List[String],
                         top: Int,
-                        left: Int)
+                        left: Int,
+                        onClick: Int => Unit)
 
 object SubMenu extends FunctionComponent[SubMenuProps] {
 
@@ -59,9 +60,15 @@ object SubMenu extends FunctionComponent[SubMenuProps] {
             ^.rbHeight := 1,
             ^.rbLeft := 1,
             ^.rbTop := 1 + index,
+            ^.rbClickable := true,
+            ^.rbMouse := true,
+            ^.rbAutoFocus := false,
             ^.rbStyle := {
               if (props.selected == index) theme.focus.getOrElse(null)
               else theme
+            },
+            ^.rbOnClick := { _ =>
+              props.onClick(index)
             },
             ^.content := text
           )()

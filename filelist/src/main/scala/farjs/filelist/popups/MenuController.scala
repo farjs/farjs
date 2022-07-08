@@ -82,7 +82,8 @@ object MenuController extends FunctionComponent[FileListPopupsProps] {
       ("  Unselect group  -         ", None, "-")
     ),
     "Commands" -> List(
-      ("  Swap panels   Ctrl-U  ", None, "C-u")
+      ("  Swap panels   Ctrl-U  ", None, "C-u"),
+      ("  Quick search  Ctrl-S  ", None, "C-s")
     ),
     "Options" -> List(
       ("  DevTools    F12  ", None, "f12")

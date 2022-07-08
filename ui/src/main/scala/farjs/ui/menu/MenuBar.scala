@@ -43,6 +43,12 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
       leftPos
     }
     
+    def onAction(menuIndex: Int, subIndex: Int): Unit = {
+      Future { // call action on the next tick
+        props.onAction(menuIndex, subIndex)
+      }
+    }
+    
     def onKeypress(keyFull: String): Boolean = {
       var processed = true
       keyFull match {
@@ -94,10 +100,7 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
         case "enter" | "space" =>
           maybeSubMenu match {
             case None => processed = false
-            case Some((menuIndex, subIndex)) =>
-              Future { // call action on the next tick
-                props.onAction(menuIndex, subIndex)
-              }
+            case Some((menuIndex, subIndex)) => onAction(menuIndex, subIndex)
           }
         case _ => processed = false
       }
@@ -130,7 +133,10 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
           selected = subIndex,
           items = props.items(menuIndex)._2,
           top = 1,
-          left = getLeftPos(menuIndex)
+          left = getLeftPos(menuIndex),
+          onClick = { index =>
+            onAction(menuIndex, index)
+          }
         ))()
       }
     )
