@@ -10,7 +10,6 @@ class SubMenuSpec extends TestSpec with TestRendererUtils {
 
   SubMenu.doubleBorderComp = mockUiComponent("DoubleBorder")
   SubMenu.horizontalLineComp = mockUiComponent("HorizontalLine")
-  SubMenu.buttonComp = mockUiComponent("Button")
 
   it should "call onClick with item index when onClick" in {
     //given

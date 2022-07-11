@@ -1,6 +1,5 @@
 package farjs.ui.menu
 
-import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.theme.Theme
 import scommons.react._
@@ -16,7 +15,6 @@ object SubMenu extends FunctionComponent[SubMenuProps] {
 
   private[menu] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
   private[menu] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
-  private[menu] var buttonComp: UiComponent[ButtonProps] = Button
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped

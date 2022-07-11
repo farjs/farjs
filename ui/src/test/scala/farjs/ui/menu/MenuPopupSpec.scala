@@ -85,12 +85,13 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
       }, inside(_) { case lines =>
         lines.size shouldBe props.items.size
         lines.zipWithIndex.zip(props.items).foreach { case ((line, index), expected) =>
-          assertTestComponent(line, buttonComp) {
-            case ButtonProps(pos, label, resStyle, _) =>
-              pos shouldBe 1 -> (1 + index)
+          assertTestComponent(line, buttonComp)(inside(_) {
+            case ButtonProps(left, top, label, resStyle, _) =>
+              left shouldBe 1
+              top shouldBe (1 + index)
               label shouldBe expected
               resStyle shouldBe theme
-          }
+          })
         }
         Succeeded
       })

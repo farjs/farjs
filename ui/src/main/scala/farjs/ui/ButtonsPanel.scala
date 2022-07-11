@@ -30,7 +30,8 @@ object ButtonsPanel extends FunctionComponent[ButtonsPanelProps] {
     }.reverse.map {
       case (label, onAction, pos) =>
         (label.length, <(buttonComp())(^.key := label, ^.wrapped := ButtonProps(
-          pos = (pos, 0),
+          left = pos,
+          top = 0,
           label = label,
           style = props.style,
           onPress = { () =>

@@ -36,7 +36,8 @@ object MenuPopup extends FunctionComponent[MenuPopupProps] {
       ))(
         props.items.zipWithIndex.map { case (text, index) =>
           <(buttonComp())(^.key := s"$index", ^.wrapped := ButtonProps(
-            pos = (1, 1 + index),
+            left = 1,
+            top = 1 + index,
             label = text,
             style = theme,
             onPress = { () =>

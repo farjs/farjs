@@ -51,7 +51,8 @@ class ButtonSpec extends TestSpec with TestRendererUtils {
   }
   
   private def getButtonProps(onPress: () => Unit = () => ()): ButtonProps = ButtonProps(
-    pos = (1, 2),
+    left = 1,
+    top = 2,
     label = "test button",
     style = new BlessedStyle {
       override val fg = "white"
@@ -65,8 +66,6 @@ class ButtonSpec extends TestSpec with TestRendererUtils {
   )
 
   private def assertButton(result: TestInstance, props: ButtonProps, focused: Boolean): Unit = {
-    val (left, top) = props.pos
-
     inside(result.children.toList) { case List(button) =>
       assertNativeComponent(button,
         <.button(
@@ -75,8 +74,8 @@ class ButtonSpec extends TestSpec with TestRendererUtils {
           ^.rbWrap := false,
           ^.rbWidth := props.label.length,
           ^.rbHeight := 1,
-          ^.rbLeft := left,
-          ^.rbTop := top,
+          ^.rbLeft := props.left,
+          ^.rbTop := props.top,
           ^.content := {
             val style =
               if (focused) props.style.focus.orNull

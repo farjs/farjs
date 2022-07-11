@@ -19,7 +19,8 @@ object CheckBox extends FunctionComponent[CheckBoxProps] {
     
     <.>()(
       <(buttonComp())(^.wrapped := ButtonProps(
-        pos = props.pos,
+        left = left,
+        top = top,
         label = if (props.value) "[x]" else "[ ]",
         style = props.style,
         onPress = props.onChange

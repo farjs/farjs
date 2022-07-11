@@ -65,12 +65,13 @@ class CheckBoxSpec extends TestSpec with TestRendererUtils {
     val (left, top) = props.pos
     
     inside(result.children.toList) { case List(button, text) =>
-      assertTestComponent(button, buttonComp) {
-        case ButtonProps(resPos, label, resStyle, _) =>
-          resPos shouldBe props.pos
+      assertTestComponent(button, buttonComp)(inside(_) {
+        case ButtonProps(resLeft, resTop, label, resStyle, _) =>
+          resLeft shouldBe left
+          resTop shouldBe top
           label shouldBe (if (props.value) "[x]" else "[ ]")
           resStyle shouldBe props.style
-      }
+      })
 
       assertNativeComponent(text,
         <.text(

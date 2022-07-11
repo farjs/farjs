@@ -114,12 +114,13 @@ class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
       )(), { buttons: List[TestInstance] =>
         buttons.size shouldBe actions.size
         buttons.zip(actions).foreach { case (btn, (action, pos)) =>
-          assertTestComponent(btn, buttonComp) {
-            case ButtonProps(resPos, label, resStyle, _) =>
-              resPos shouldBe pos -> 0
+          assertTestComponent(btn, buttonComp)(inside(_) {
+            case ButtonProps(left, top, label, resStyle, _) =>
+              left shouldBe pos
+              top shouldBe 0
               label shouldBe action
               resStyle shouldBe props.style
-          }
+          })
         }
         Succeeded
       }
