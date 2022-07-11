@@ -78,10 +78,10 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
 
     //then
     dispatch.expects(FileListPopupMenuAction(show = false))
-    onKey.expects("q", "C-q", true, false, false)
+    onKey.expects("l", "M-l", false, true, false)
 
     //when
-    popup.onAction(0, 0)
+    popup.onAction(0, 4)
   }
 
   it should "emit keypress event for right panel when onAction" in {
@@ -112,10 +112,10 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
 
     //then
     dispatch.expects(FileListPopupMenuAction(show = false))
-    onKey.expects("q", "C-q", true, false, false)
+    onKey.expects("r", "M-r", false, true, false)
 
     //when
-    popup.onAction(4, 0)
+    popup.onAction(4, 4)
   }
 
   it should "dispatch FileListPopupMenuAction(show=false) when onClose" in {

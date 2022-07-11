@@ -63,7 +63,7 @@ object MenuController extends FunctionComponent[FileListPopupsProps] {
 
   private lazy val actions = List[(String, List[(String, Option[Boolean], String)])](
     "Left" -> List(
-      ("  Quick view    Ctrl-Q    ", Some(false), "C-q"),
+      ("  Quick view    Ctrl-Q    ", Some(true), "C-q"),
       (SubMenu.separator, None, ""),
       ("  Sort modes    Ctrl-F12  ", Some(false), "C-f12"),
       ("  Re-read       Ctrl-R    ", Some(false), "C-r"),
@@ -89,7 +89,7 @@ object MenuController extends FunctionComponent[FileListPopupsProps] {
       ("  DevTools    F12  ", None, "f12")
     ),
     "Right" -> List(
-      ("  Quick view    Ctrl-Q    ", Some(true), "C-q"),
+      ("  Quick view    Ctrl-Q    ", Some(false), "C-q"),
       (SubMenu.separator, None, ""),
       ("  Sort modes    Ctrl-F12  ", Some(true), "C-f12"),
       ("  Re-read       Ctrl-R    ", Some(true), "C-r"),

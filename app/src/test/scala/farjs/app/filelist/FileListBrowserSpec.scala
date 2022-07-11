@@ -653,12 +653,12 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   it should "trigger plugin when onKeypress(triggerKey)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val onTriggerMock = mockFunction[PanelStack, PanelStack, Unit]
+    val onTriggerMock = mockFunction[Boolean, PanelStack, PanelStack, Unit]
     val keyFull = "C-p"
     val plugin = new FileListPlugin {
       override val triggerKey: Option[String] = Some(keyFull)
-      override def onKeyTrigger(leftStack: PanelStack, rightStack: PanelStack): Unit = {
-        onTriggerMock(leftStack, rightStack)
+      override def onKeyTrigger(isRight: Boolean, leftStack: PanelStack, rightStack: PanelStack): Unit = {
+        onTriggerMock(isRight, leftStack, rightStack)
       }
     }
     val props = FileListBrowserProps(dispatch, plugins = List(plugin))
@@ -676,7 +676,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
     
     //then
-    onTriggerMock.expects(leftStack, rightStack)
+    onTriggerMock.expects(false, leftStack, rightStack)
 
     //when
     button.props.onKeypress(null, literal(full = keyFull).asInstanceOf[KeyboardKey])

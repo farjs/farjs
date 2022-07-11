@@ -10,7 +10,7 @@ object QuickViewPlugin extends FileListPlugin {
 
   private val component: ReactClass = QuickViewPanel()
 
-  override def onKeyTrigger(leftStack: PanelStack, rightStack: PanelStack): Unit = {
+  override def onKeyTrigger(isRight: Boolean, leftStack: PanelStack, rightStack: PanelStack): Unit = {
     val exists =
       if (leftStack.peek.component == component) {
         leftStack.pop()
@@ -24,7 +24,7 @@ object QuickViewPlugin extends FileListPlugin {
     
     if (!exists) {
       val stack =
-        if (!rightStack.isActive) rightStack
+        if (!isRight) rightStack
         else leftStack
 
       stack.push(PanelStackItem(

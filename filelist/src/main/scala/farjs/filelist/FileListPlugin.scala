@@ -8,7 +8,7 @@ trait FileListPlugin {
 
   val triggerKey: Option[String] = None
   
-  def onKeyTrigger(leftStack: PanelStack, rightStack: PanelStack): Unit = ()
+  def onKeyTrigger(isRight: Boolean, leftStack: PanelStack, rightStack: PanelStack): Unit = ()
 
   def onFileTrigger(filePath: String,
                     fileHeader: Uint8Array,
