@@ -93,6 +93,10 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
 
     //when & then
     findComponentProps(renderer.root, popupComp).onKeypress("up") shouldBe true
+    findComponentProps(renderer.root, subMenuComp).selected shouldBe 3
+
+    //when & then
+    findComponentProps(renderer.root, popupComp).onKeypress("down") shouldBe true
     findComponentProps(renderer.root, subMenuComp).selected shouldBe 0
 
     //when & then
@@ -113,11 +117,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
 
     //when & then
     findComponentProps(renderer.root, popupComp).onKeypress("down") shouldBe true
-    findComponentProps(renderer.root, subMenuComp).selected shouldBe 3
-
-    //when & then
-    findComponentProps(renderer.root, popupComp).onKeypress("up") shouldBe true
-    findComponentProps(renderer.root, subMenuComp).selected shouldBe 2
+    findComponentProps(renderer.root, subMenuComp).selected shouldBe 0
   }
 
   it should "emit keypress(enter) if no sub-menu when onKeypress(down)" in {

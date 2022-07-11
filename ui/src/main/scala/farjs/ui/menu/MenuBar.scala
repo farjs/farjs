@@ -60,13 +60,11 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
           maybeSubMenu match {
             case Some((menuIndex, subIndex)) =>
               val subItems = props.items(menuIndex)._2
-              val maxSubIndex = subItems.size - 1
-              if (subIndex < maxSubIndex) {
-                val newSubIndex =
-                  if (subItems(subIndex + 1) == SubMenu.separator) subIndex + 2
-                  else subIndex + 1
-                setSubMenu(Some((menuIndex, newSubIndex)))
-              }
+              val newSubIndex =
+                if (subIndex == subItems.size - 1) 0
+                else if (subItems(subIndex + 1) == SubMenu.separator) subIndex + 2
+                else subIndex + 1
+              setSubMenu(Some((menuIndex, newSubIndex)))
             case None =>
               process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
                 name = "enter",
@@ -77,21 +75,20 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
           }
         case "up" =>
           maybeSubMenu.foreach { case (menuIndex, subIndex) =>
-            if (subIndex > 0) {
-              val subItems = props.items(menuIndex)._2
-              val newSubIndex =
-                if (subItems(subIndex - 1) == SubMenu.separator) subIndex - 2
-                else subIndex - 1
-              setSubMenu(Some((menuIndex, newSubIndex)))
-            }
+            val subItems = props.items(menuIndex)._2
+            val newSubIndex =
+              if (subIndex == 0) subItems.size - 1
+              else if (subItems(subIndex - 1) == SubMenu.separator) subIndex - 2
+              else subIndex - 1
+            setSubMenu(Some((menuIndex, newSubIndex)))
           }
-        case "right" =>
+        case "tab" | "right" =>
           processed = false
           maybeSubMenu.foreach { case (menuIndex, _) =>
             val newIndex = if (menuIndex == actions.size - 1) 0 else menuIndex + 1
             setSubMenu(Some((newIndex, 0)))
           }
-        case "left" =>
+        case "S-tab" | "left" =>
           processed = false
           maybeSubMenu.foreach { case (menuIndex, _) =>
             val newIndex = if (menuIndex == 0) actions.size - 1 else menuIndex - 1
