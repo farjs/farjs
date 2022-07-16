@@ -2,8 +2,9 @@ package definitions
 
 import common.{Libs, TestLibs}
 import sbt._
+import scommons.sbtplugin.project.CommonNodeJsModule
 
-trait ScalaJsModule extends NodeJsModule {
+trait ScalaJsModule extends FarjsModule with CommonNodeJsModule {
 
   override def superRepoProjectsDependencies: Seq[(String, String, Option[String])] = {
     super.superRepoProjectsDependencies ++ Seq(
