@@ -19,7 +19,7 @@ class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
       "button2" -> onAction2
     ))
     val comp = testRender(<(ButtonsPanel())(^.wrapped := props)())
-    val (b1, _) = inside(findProps(comp, buttonComp)) {
+    val (b1, _) = inside(findProps(comp, buttonComp, plain = true)) {
       case List(b1, b2) => (b1, b2)
     }
 
@@ -48,7 +48,7 @@ class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
       "button2" -> onAction2
     ))
     val comp = testRender(<(ButtonsPanel())(^.wrapped := props)())
-    val (_, b2) = inside(findProps(comp, buttonComp)) {
+    val (_, b2) = inside(findProps(comp, buttonComp, plain = true)) {
       case List(b1, b2) => (b1, b2)
     }
 
@@ -114,7 +114,7 @@ class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
       )(), { buttons: List[TestInstance] =>
         buttons.size shouldBe actions.size
         buttons.zip(actions).foreach { case (btn, (action, pos)) =>
-          assertTestComponent(btn, buttonComp)(inside(_) {
+          assertTestComponent(btn, buttonComp, plain = true)(inside(_) {
             case ButtonProps(left, top, label, resStyle, _) =>
               left shouldBe pos
               top shouldBe 0

@@ -24,7 +24,7 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
       onClose = () => ()
     )
     val comp = testRender(<(MenuPopup())(^.wrapped := props)())
-    val button2 = inside(findProps(comp, buttonComp)) {
+    val button2 = inside(findProps(comp, buttonComp, plain = true)) {
       case List(_, b2) => b2
     }
     
@@ -85,7 +85,7 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
       }, inside(_) { case lines =>
         lines.size shouldBe props.items.size
         lines.zipWithIndex.zip(props.items).foreach { case ((line, index), expected) =>
-          assertTestComponent(line, buttonComp)(inside(_) {
+          assertTestComponent(line, buttonComp, plain = true)(inside(_) {
             case ButtonProps(left, top, label, resStyle, _) =>
               left shouldBe 1
               top shouldBe (1 + index)

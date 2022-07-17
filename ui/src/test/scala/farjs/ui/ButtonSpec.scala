@@ -9,7 +9,7 @@ class ButtonSpec extends TestSpec with TestRendererUtils {
     //given
     val onPress = mockFunction[Unit]
     val props = getButtonProps(onPress = onPress)
-    val comp = testRender(<(Button())(^.wrapped := props)())
+    val comp = testRender(<(Button())(^.plain := props)())
     val button = findComponents(comp, <.button.name).head
 
     //then
@@ -23,7 +23,7 @@ class ButtonSpec extends TestSpec with TestRendererUtils {
     //given
     val onPress = mockFunction[Unit]
     val props = getButtonProps(onPress = onPress)
-    val renderer = createTestRenderer(<(Button())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(Button())(^.plain := props)())
     val button = findComponents(renderer.root, <.button.name).head
     assertButton(renderer.root, props, focused = false)
 
@@ -44,7 +44,7 @@ class ButtonSpec extends TestSpec with TestRendererUtils {
     val props = getButtonProps()
 
     //when
-    val result = createTestRenderer(<(Button())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(Button())(^.plain := props)()).root
 
     //then
     assertButton(result, props, focused = false)

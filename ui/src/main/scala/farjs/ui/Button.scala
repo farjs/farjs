@@ -8,7 +8,7 @@ object Button extends FunctionComponent[ButtonProps] {
   
   protected def render(compProps: Props): ReactElement = {
     val (focused, setFocused) = useState(false)
-    val props = compProps.wrapped
+    val props = compProps.plain
     
     <.button(
       ^.rbMouse := true,

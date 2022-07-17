@@ -29,7 +29,7 @@ object ButtonsPanel extends FunctionComponent[ButtonsPanelProps] {
         (s"$padding$label$padding", onAction, nextPos) :: result
     }.reverse.map {
       case (label, onAction, pos) =>
-        (label.length, <(buttonComp())(^.key := label, ^.wrapped := ButtonProps(
+        (label.length, <(buttonComp())(^.key := label, ^.plain := ButtonProps(
           left = pos,
           top = 0,
           label = label,
