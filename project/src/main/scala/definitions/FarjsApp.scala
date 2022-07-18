@@ -57,20 +57,7 @@ object FarjsApp extends ScalaJsModule {
 
       Compile / npmDevDependencies ++= Seq(
         "webpack-merge" -> "4.1.0",
-        "webpack-node-externals" -> "1.7.2",
-
-        "@babel/cli" -> "^7.12.10",
-        "@babel/core" -> "^7.12.10",
-        "@babel/plugin-proposal-class-properties" -> "^7.12.1",
-        "@babel/plugin-proposal-object-rest-spread" -> "^7.12.1",
-        "@babel/plugin-transform-flow-strip-types" -> "^7.12.10",
-        "@babel/preset-env" -> "^7.12.11",
-        "@babel/preset-react" -> "^7.12.10",
-        "@babel/register" -> "^7.12.10",
-        "rollup" -> "^2.38.5",
-        "rollup-plugin-babel" -> "^4.4.0",
-        "rollup-plugin-commonjs" -> "^10.1.0",
-        "rollup-plugin-node-resolve" -> "^5.2.0"
+        "webpack-node-externals" -> "1.7.2"
       ),
 
       Compile / additionalNpmConfig := {

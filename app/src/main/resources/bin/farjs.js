@@ -3,5 +3,5 @@
 const versionChecker = require('../dist/versionChecker.js')
 versionChecker.check(() => {
 
-  require('../dist/far.js')
+  require('../farjs-app-opt-bundle.js')
 })

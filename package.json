@@ -9,8 +9,8 @@
   "description": "FAR.js - Cross-platform File and Archive Manager app in your terminal",
   "files": [
     "bin/farjs.js",
-    "dist/far.js",
     "dist/versionChecker.js",
+    "farjs-app-opt-bundle.js",
     "LICENSE.txt",
     "README.md"
   ],
@@ -48,9 +48,6 @@
     "farjs": "bin/farjs.js"
   },
   "preferGlobal": true,
-  "scripts": {
-    "build": "rollup -c"
-  },
   "browserslist": "maintained node versions",
   "dependencies": {
     "react-blessed": "0.7.2",
@@ -62,23 +59,7 @@
   },
   "devDependencies": {
     "webpack-node-externals": "1.7.2",
-    "source-map-loader": "0.2.3",
-    "@babel/plugin-proposal-object-rest-spread": "^7.12.1",
-    "@babel/register": "^7.12.10",
     "webpack-merge": "4.1.0",
-    "@babel/core": "^7.12.10",
-    "@babel/preset-react": "^7.12.10",
-    "@babel/preset-env": "^7.12.11",
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "webpack": "4.29.0",
-    "concat-with-sourcemaps": "1.0.7",
-    "@babel/cli": "^7.12.10",
-    "webpack-cli": "3.3.2",
-    "rollup-plugin-babel": "^4.4.0",
-    "@babel/plugin-transform-flow-strip-types": "^7.12.10",
-    "webpack-dev-server": "3.4.1",
-    "rollup": "^2.38.5"
+    "webpack": "4.29.0"
   }
 }
