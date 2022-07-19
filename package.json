@@ -1,19 +1,13 @@
 {
   "author": "viktor-podzigun",
   "name": "farjs-app",
+  "version": "0.0.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/farjs/farjs.git"
   },
   "private": false,
   "description": "FAR.js - Cross-platform File and Archive Manager app in your terminal",
-  "files": [
-    "bin/farjs.js",
-    "dist/versionChecker.js",
-    "farjs-app-opt-bundle.js",
-    "LICENSE.txt",
-    "README.md"
-  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/farjs/farjs/issues"
@@ -47,6 +41,15 @@
   "bin": {
     "farjs": "bin/farjs.js"
   },
+  "files": [
+    "bin/farjs.js",
+    "dist/versionChecker.js",
+    "farjs-app-opt-bundle.js",
+    "LICENSE.txt",
+    "README.md"
+  ],
+  "main": "./farjs-app-opt-bundle.js",
+  "exports": "./farjs-app-opt-bundle.js",
   "preferGlobal": true,
   "browserslist": "maintained node versions",
   "dependencies": {
