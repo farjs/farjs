@@ -23,7 +23,6 @@ object FarjsApp {
     val screen = Blessed.screen(new BlessedScreenConfig {
       override val autoPadding = true
       override val smartCSR = true
-      override val title = "FAR.js"
       override val cursorShape = "underline"
     })
 
