@@ -8,6 +8,8 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.hooks._
 
+import scala.scalajs.js
+
 case class AddToZipPopupProps(zipName: String,
                               action: AddToZipAction,
                               onAction: String => Unit,
@@ -29,15 +31,15 @@ object AddToZipPopup extends FunctionComponent[AddToZipPopupProps] {
     val contentLeft = 2
     val theme = Theme.current.popup.regular
 
-    val onAction = { () =>
+    val onAction: js.Function0[Unit] = { () =>
       if (zipName.nonEmpty) {
         props.onAction(zipName)
       }
     }
     
-    val actions = List(
-      s"[ ${props.action} ]" -> onAction,
-      "[ Cancel ]" -> props.onCancel
+    val actions = js.Array(
+      ButtonsPanelAction(s"[ ${props.action} ]", onAction),
+      ButtonsPanelAction("[ Cancel ]", props.onCancel)
     )
 
     <(modalComp())(^.wrapped := ModalProps(s"${props.action} files to archive", size, theme, props.onCancel))(
@@ -67,7 +69,7 @@ object AddToZipPopup extends FunctionComponent[AddToZipPopupProps] {
         startCh = Some(DoubleBorder.leftSingleCh),
         endCh = Some(DoubleBorder.rightSingleCh)
       ))(),
-      <(buttonsPanelComp())(^.wrapped := ButtonsPanelProps(
+      <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
         top = 4,
         actions = actions,
         style = theme,

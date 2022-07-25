@@ -2,7 +2,7 @@ package farjs.ui.menu
 
 import farjs.ui.popup.{Popup, PopupProps}
 import farjs.ui.theme.Theme
-import farjs.ui.{ButtonsPanel, ButtonsPanelProps}
+import farjs.ui.{ButtonsPanel, ButtonsPanelAction, ButtonsPanelProps}
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
@@ -32,13 +32,13 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
       res + item._1.length + padding * 2
     }
     val actions = props.items.zipWithIndex.map { case ((item, _), index) =>
-      (item, () => setSubMenu(Some(index -> 0)))
+      ButtonsPanelAction(item, () => setSubMenu(Some(index -> 0)))
     }
 
     def getLeftPos(menuIndex: Int): Int = {
       var leftPos = marginLeft
       for (i <- 0 until menuIndex) {
-        leftPos += actions(i)._1.length + padding * 2
+        leftPos += actions(i).label.length + padding * 2
       }
       leftPos
     }
@@ -115,9 +115,9 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
             ^.rbHeight := 1,
             ^.rbLeft := marginLeft
           )(
-            <(buttonsPanel())(^.wrapped := ButtonsPanelProps(
+            <(buttonsPanel())(^.plain := ButtonsPanelProps(
               top = 0,
-              actions = actions,
+              actions = js.Array(actions: _*),
               style = theme,
               padding = padding
             ))()

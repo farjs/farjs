@@ -10,6 +10,8 @@ import farjs.ui.theme.Theme
 import org.scalatest.Assertion
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
 
   CopyItemsPopup.modalComp = mockUiComponent("Modal")
@@ -56,14 +58,14 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = CopyItemsPopupProps(move = false, "test", Seq(FileListItem("file 1")), onAction, onCancel)
     val comp = testRender(<(CopyItemsPopup())(^.wrapped := props)())
-    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.head
+    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
 
     //then
     onAction.expects("test")
     onCancel.expects().never()
     
     //when
-    onPress()
+    action.onAction()
   }
   
   it should "not call onAction if path is empty" in {
@@ -72,14 +74,14 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = CopyItemsPopupProps(move = false, "", Seq(FileListItem("file 1")), onAction, onCancel)
     val comp = testRender(<(CopyItemsPopup())(^.wrapped := props)())
-    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.head
+    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
 
     //then
     onAction.expects(*).never()
     onCancel.expects().never()
     
     //when
-    onPress()
+    action.onAction()
   }
   
   it should "call onCancel when press Cancel button" in {
@@ -88,14 +90,14 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = CopyItemsPopupProps(move = false, "", Seq(FileListItem("file 1")), onAction, onCancel)
     val comp = testRender(<(CopyItemsPopup())(^.wrapped := props)())
-    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions(1)
+    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions(1)
 
     //then
     onAction.expects(*).never()
     onCancel.expects()
     
     //when
-    onPress()
+    action.onAction()
   }
   
   it should "render component when copy" in {
@@ -164,12 +166,12 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
           startCh shouldBe Some(DoubleBorder.leftSingleCh)
           endCh shouldBe Some(DoubleBorder.rightSingleCh)
       }
-      assertTestComponent(actionsBox, buttonsPanelComp) {
+      assertTestComponent(actionsBox, buttonsPanelComp, plain = true) {
         case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
           top shouldBe 4
-          resActions.map(_._1) shouldBe actions
+          resActions.map(_.label).toList shouldBe actions
           resStyle shouldBe style
-          padding shouldBe 0
+          padding shouldBe js.undefined
           margin shouldBe 2
       }
     }

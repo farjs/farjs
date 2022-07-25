@@ -8,6 +8,8 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.hooks._
 
+import scala.scalajs.js
+
 case class MakeFolderPopupProps(folderName: String,
                                 multiple: Boolean,
                                 onOk: (String, Boolean) => Unit,
@@ -31,15 +33,15 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
     val contentLeft = 2
     val theme = Theme.current.popup.regular
 
-    val onOk = { () =>
+    val onOk: js.Function0[Unit] = { () =>
       if (folderName.nonEmpty) {
         props.onOk(folderName, multiple)
       }
     }
     
-    val actions = List(
-      "[ OK ]" -> onOk,
-      "[ Cancel ]" -> props.onCancel
+    val actions = js.Array(
+      ButtonsPanelAction("[ OK ]", onOk),
+      ButtonsPanelAction("[ Cancel ]", props.onCancel)
     )
 
     <(modalComp())(^.wrapped := ModalProps("Make Folder", size, theme, props.onCancel))(
@@ -88,7 +90,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
         startCh = Some(DoubleBorder.leftSingleCh),
         endCh = Some(DoubleBorder.rightSingleCh)
       ))(),
-      <(buttonsPanelComp())(^.wrapped := ButtonsPanelProps(
+      <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
         top = 6,
         actions = actions,
         style = theme,

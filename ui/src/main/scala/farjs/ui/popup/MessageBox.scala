@@ -5,6 +5,8 @@ import farjs.ui.popup.ModalContent._
 import scommons.react._
 import scommons.react.blessed._
 
+import scala.scalajs.js
+
 case class MessageBoxProps(title: String,
                            message: String,
                            actions: List[MessageBoxAction],
@@ -26,7 +28,7 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
     val onClose = props.actions.find(_.triggeredOnClose).map(_.onAction)
 
     val actions = props.actions.map { action =>
-      (action.label, action.onAction)
+      ButtonsPanelAction(action.label, action.onAction)
     }
 
     <(popupComp())(^.wrapped := PopupProps(
@@ -49,9 +51,9 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
           ))()
         },
         
-        <(buttonsPanelComp())(^.wrapped := ButtonsPanelProps(
+        <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
           top = 1 + textLines.size,
-          actions = actions,
+          actions = js.Array(actions: _*),
           style = props.style,
           padding = 1
         ))()

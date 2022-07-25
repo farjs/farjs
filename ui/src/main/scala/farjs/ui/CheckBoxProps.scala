@@ -4,7 +4,7 @@ import scommons.react.blessed.BlessedStyle
 
 import scala.scalajs.js
 
-trait CheckBoxProps extends js.Object {
+sealed trait CheckBoxProps extends js.Object {
   val left: Int
   val top: Int
   val value: Boolean

@@ -52,8 +52,8 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
     val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
-    val buttonsProps = findComponentProps(renderer.root, buttonsPanel)
-    buttonsProps.actions.head._2.apply()
+    val buttonsProps = findComponentProps(renderer.root, buttonsPanel, plain = true)
+    buttonsProps.actions.head.onAction()
     findProps(renderer.root, subMenuComp) should not be empty
     val popupProps = findComponentProps(renderer.root, popupComp)
 
@@ -78,8 +78,8 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
     val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
-    val buttonsProps = findComponentProps(renderer.root, buttonsPanel)
-    buttonsProps.actions.head._2.apply()
+    val buttonsProps = findComponentProps(renderer.root, buttonsPanel, plain = true)
+    buttonsProps.actions.head.onAction()
     inside(findComponentProps(renderer.root, subMenuComp)) {
       case SubMenuProps(selected, items, _, _, _) =>
         selected shouldBe 0
@@ -162,8 +162,8 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
     val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
-    val buttonsProps = findComponentProps(renderer.root, buttonsPanel)
-    buttonsProps.actions.head._2.apply()
+    val buttonsProps = findComponentProps(renderer.root, buttonsPanel, plain = true)
+    buttonsProps.actions.head.onAction()
     findComponentProps(renderer.root, subMenuComp).left shouldBe 2
 
     //when & then
@@ -188,8 +188,8 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     val onAction = mockFunction[Int, Int, Unit]
     val props = MenuBarProps(items, onAction, () => ())
     val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
-    val buttonsProps = findComponentProps(renderer.root, buttonsPanel)
-    buttonsProps.actions.head._2.apply()
+    val buttonsProps = findComponentProps(renderer.root, buttonsPanel, plain = true)
+    buttonsProps.actions.head.onAction()
     findComponentProps(renderer.root, popupComp).onKeypress("down") shouldBe true
     findComponentProps(renderer.root, subMenuComp).selected shouldBe 2
 
@@ -231,8 +231,8 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     val onAction = mockFunction[Int, Int, Unit]
     val props = MenuBarProps(items, onAction, () => ())
     val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
-    val buttonsProps = findComponentProps(renderer.root, buttonsPanel)
-    buttonsProps.actions.head._2.apply()
+    val buttonsProps = findComponentProps(renderer.root, buttonsPanel, plain = true)
+    buttonsProps.actions.head.onAction()
     findComponentProps(renderer.root, subMenuComp).selected shouldBe 0
 
     //then
@@ -252,10 +252,10 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
     val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
-    val buttonsProps = findComponentProps(renderer.root, buttonsPanel)
+    val buttonsProps = findComponentProps(renderer.root, buttonsPanel, plain = true)
 
     //when
-    buttonsProps.actions.head._2.apply()
+    buttonsProps.actions.head.onAction()
 
     //then
     inside(findComponentProps(renderer.root, subMenuComp)) {
@@ -301,16 +301,16 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
             ^.rbHeight := 1,
             ^.rbLeft := 2
           )(
-            <(buttonsPanel())(^.assertWrapped(inside(_) {
+            <(buttonsPanel())(^.assertPlain[ButtonsPanelProps](inside(_) {
               case ButtonsPanelProps(top, actions, `theme`, padding, margin) =>
                 top shouldBe 0
-                actions.map(_._1) shouldBe List(
+                actions.map(_.label).toList shouldBe List(
                 "Menu 1",
                 "Menu 2",
                 "Menu 3"
               )
               padding shouldBe 2
-              margin shouldBe 0
+              margin shouldBe js.undefined
             }))()
           )
         )

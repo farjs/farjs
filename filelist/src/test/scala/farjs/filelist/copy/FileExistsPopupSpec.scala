@@ -10,6 +10,8 @@ import org.scalatest.Assertion
 import scommons.react.blessed._
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
 
   FileExistsPopup.modalComp = mockUiComponent("Modal")
@@ -23,14 +25,14 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
     val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
-    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.head
+    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
 
     //then
     onAction.expects(FileExistsAction.Overwrite)
     onCancel.expects().never()
     
     //when
-    onPress()
+    action.onAction()
   }
   
   it should "call onAction(All) when press All button" in {
@@ -39,14 +41,14 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
     val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
-    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions(1)
+    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions(1)
 
     //then
     onAction.expects(FileExistsAction.All)
     onCancel.expects().never()
     
     //when
-    onPress()
+    action.onAction()
   }
   
   it should "call onAction(Skip) when press Skip button" in {
@@ -55,14 +57,14 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
     val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
-    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions(2)
+    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions(2)
 
     //then
     onAction.expects(FileExistsAction.Skip)
     onCancel.expects().never()
     
     //when
-    onPress()
+    action.onAction()
   }
   
   it should "call onAction(SkipAll) when press Skip all button" in {
@@ -71,14 +73,14 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
     val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
-    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions(3)
+    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions(3)
 
     //then
     onAction.expects(FileExistsAction.SkipAll)
     onCancel.expects().never()
     
     //when
-    onPress()
+    action.onAction()
   }
   
   it should "call onAction(Append) when press Append button" in {
@@ -87,14 +89,14 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
     val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
-    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions(4)
+    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions(4)
 
     //then
     onAction.expects(FileExistsAction.Append)
     onCancel.expects().never()
     
     //when
-    onPress()
+    action.onAction()
   }
   
   it should "call onCancel when press Cancel button" in {
@@ -103,14 +105,14 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
     val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
-    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.last
+    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.last
 
     //then
     onAction.expects(*).never()
     onCancel.expects()
     
     //when
-    onPress()
+    action.onAction()
   }
   
   it should "render component" in {
@@ -219,13 +221,13 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
           startCh shouldBe Some(DoubleBorder.leftSingleCh)
           endCh shouldBe Some(DoubleBorder.rightSingleCh)
       }
-      assertTestComponent(actionsBox, buttonsPanelComp) {
+      assertTestComponent(actionsBox, buttonsPanelComp, plain = true) {
         case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
           top shouldBe 7
-          resActions.map(_._1) shouldBe actions
+          resActions.map(_.label).toList shouldBe actions
           resStyle shouldBe theme
           padding shouldBe 1
-          margin shouldBe 0
+          margin shouldBe js.undefined
       }
     }
     

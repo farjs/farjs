@@ -6,6 +6,8 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.blessed._
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   ButtonsPanel.buttonComp = mockUiComponent("Button")
@@ -18,7 +20,7 @@ class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
       "button1" -> onAction1,
       "button2" -> onAction2
     ))
-    val comp = testRender(<(ButtonsPanel())(^.wrapped := props)())
+    val comp = testRender(<(ButtonsPanel())(^.plain := props)())
     val (b1, _) = inside(findProps(comp, buttonComp, plain = true)) {
       case List(b1, b2) => (b1, b2)
     }
@@ -47,7 +49,7 @@ class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
       "button1" -> onAction1,
       "button2" -> onAction2
     ))
-    val comp = testRender(<(ButtonsPanel())(^.wrapped := props)())
+    val comp = testRender(<(ButtonsPanel())(^.plain := props)())
     val (_, b2) = inside(findProps(comp, buttonComp, plain = true)) {
       case List(b1, b2) => (b1, b2)
     }
@@ -77,7 +79,7 @@ class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     ))
 
     //when
-    val result = testRender(<(ButtonsPanel())(^.wrapped := props)())
+    val result = testRender(<(ButtonsPanel())(^.plain := props)())
 
     //then
     assertButtonsPanel(result, props, List("  test btn  " -> 0, "  test btn2  " -> 15))
@@ -85,7 +87,9 @@ class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
   
   private def getButtonsPanelProps(actions: List[(String, () => Unit)]): ButtonsPanelProps = ButtonsPanelProps(
     top = 1,
-    actions = actions,
+    actions = js.Array(actions.map { case (label, onAction) =>
+      ButtonsPanelAction(label, onAction)
+    }: _*),
     style = new BlessedStyle {
       override val fg = "white"
       override val bg = "blue"
@@ -102,7 +106,7 @@ class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
                                  props: ButtonsPanelProps,
                                  actions: List[(String, Int)]): Assertion = {
 
-    val buttonsWidth = actions.map(_._1.length).sum + (actions.size - 1) * props.margin
+    val buttonsWidth = actions.map(_._1.length).sum + (actions.size - 1) * props.margin.getOrElse(0)
     
     assertNativeComponent(result,
       <.box(

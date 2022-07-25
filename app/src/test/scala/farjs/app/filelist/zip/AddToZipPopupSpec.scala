@@ -7,6 +7,8 @@ import farjs.ui.popup.ModalProps
 import farjs.ui.theme.Theme
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
 
   AddToZipPopup.modalComp = mockUiComponent("Modal")
@@ -53,14 +55,14 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = AddToZipPopupProps("test", AddToZipAction.Add, onAction, onCancel)
     val comp = testRender(<(AddToZipPopup())(^.wrapped := props)())
-    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.head
+    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
 
     //then
     onAction.expects("test")
     onCancel.expects().never()
     
     //when
-    onPress()
+    action.onAction()
   }
   
   it should "not call onAction if zipName is empty" in {
@@ -69,14 +71,14 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = AddToZipPopupProps("", AddToZipAction.Add, onAction, onCancel)
     val comp = testRender(<(AddToZipPopup())(^.wrapped := props)())
-    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.head
+    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
 
     //then
     onAction.expects(*).never()
     onCancel.expects().never()
     
     //when
-    onPress()
+    action.onAction()
   }
   
   it should "call onCancel when press Cancel button" in {
@@ -85,14 +87,14 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = AddToZipPopupProps("", AddToZipAction.Add, onAction, onCancel)
     val comp = testRender(<(AddToZipPopup())(^.wrapped := props)())
-    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions(1)
+    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions(1)
 
     //then
     onAction.expects(*).never()
     onCancel.expects()
     
     //when
-    onPress()
+    action.onAction()
   }
   
   it should "render component" in {
@@ -146,12 +148,12 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
             startCh shouldBe Some(DoubleBorder.leftSingleCh)
             endCh shouldBe Some(DoubleBorder.rightSingleCh)
         }))(),
-        <(buttonsPanelComp())(^.assertWrapped(inside(_) {
+        <(buttonsPanelComp())(^.assertPlain[ButtonsPanelProps](inside(_) {
           case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
             top shouldBe 4
-            resActions.map(_._1) shouldBe actions
+            resActions.map(_.label).toList shouldBe actions
             resStyle shouldBe style
-            padding shouldBe 0
+            padding shouldBe js.undefined
             margin shouldBe 2
         }))()
       )

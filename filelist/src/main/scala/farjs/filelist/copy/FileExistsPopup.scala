@@ -30,17 +30,17 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
     val contentLeft = 2
     val theme = Theme.current.popup.error
 
-    def onButton(action: FileExistsAction) = { () =>
+    def onButton(action: FileExistsAction): js.Function0[Unit] = { () =>
       props.onAction(action)
     }
 
-    val actions = List(
-      "Overwrite" -> onButton(FileExistsAction.Overwrite),
-      "All" -> onButton(FileExistsAction.All),
-      "Skip" -> onButton(FileExistsAction.Skip),
-      "Skip all" -> onButton(FileExistsAction.SkipAll),
-      "Append" -> onButton(FileExistsAction.Append),
-      "Cancel" -> props.onCancel
+    val actions = js.Array(
+      ButtonsPanelAction("Overwrite", onButton(FileExistsAction.Overwrite)),
+      ButtonsPanelAction("All", onButton(FileExistsAction.All)),
+      ButtonsPanelAction("Skip", onButton(FileExistsAction.Skip)),
+      ButtonsPanelAction("Skip all", onButton(FileExistsAction.SkipAll)),
+      ButtonsPanelAction("Append", onButton(FileExistsAction.Append)),
+      ButtonsPanelAction("Cancel", props.onCancel)
     )
 
     <(modalComp())(^.wrapped := ModalProps("Warning", size, theme, props.onCancel))(
@@ -106,7 +106,7 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
         startCh = Some(DoubleBorder.leftSingleCh),
         endCh = Some(DoubleBorder.rightSingleCh)
       ))(),
-      <(buttonsPanelComp())(^.wrapped := ButtonsPanelProps(
+      <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
         top = 7,
         actions = actions,
         style = theme,

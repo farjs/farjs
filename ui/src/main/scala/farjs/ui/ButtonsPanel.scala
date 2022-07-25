@@ -5,28 +5,24 @@ import scommons.react.blessed._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
-case class ButtonsPanelProps(top: Int,
-                             actions: List[(String, () => Unit)],
-                             style: BlessedStyle,
-                             padding: Int = 0,
-                             margin: Int = 0)
+import scala.scalajs.js
 
 object ButtonsPanel extends FunctionComponent[ButtonsPanelProps] {
 
   private[ui] var buttonComp: UiComponent[ButtonProps] = Button
   
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
-    val padding = " " * props.padding
+    val props = compProps.plain
+    val padding = " " * props.padding.getOrElse(0)
+    val margin = props.margin.getOrElse(0)
 
-    val buttons = props.actions.foldLeft(List.empty[(String, () => Unit, Int)]) {
-      case (result, (label, onAction)) =>
+    val buttons = props.actions.foldLeft(List.empty[(String, js.Function0[Unit], Int)]) {
+      case (result, action) =>
         val nextPos = result match {
           case Nil => 0
-          case (content, _, pos) :: _ => pos + content.length + props.margin
+          case (content, _, pos) :: _ => pos + content.length + margin
         }
-        (s"$padding$label$padding", onAction, nextPos) :: result
+        (s"$padding${action.label}$padding", action.onAction, nextPos) :: result
     }.reverse.map {
       case (label, onAction, pos) =>
         (label.length, <(buttonComp())(^.key := label, ^.plain := ButtonProps(
@@ -41,7 +37,7 @@ object ButtonsPanel extends FunctionComponent[ButtonsPanelProps] {
     }
 
     <.box(
-      ^.rbWidth := buttons.map(_._1).sum + (buttons.size - 1) * props.margin,
+      ^.rbWidth := buttons.map(_._1).sum + (buttons.size - 1) * margin,
       ^.rbHeight := 1,
       ^.rbLeft := "center",
       ^.rbTop := props.top,

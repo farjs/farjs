@@ -9,6 +9,8 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.hooks._
 
+import scala.scalajs.js
+
 case class CopyItemsPopupProps(move: Boolean,
                                path: String,
                                items: Seq[FileListItem],
@@ -36,7 +38,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
       if (count > 1) s"$count items"
       else s"${props.items.headOption.map(i => s""""${i.name}"""").getOrElse("")}"
 
-    val onCopy = { () =>
+    val onCopy: js.Function0[Unit] = { () =>
       if (path.nonEmpty) {
         props.onAction(path)
       }
@@ -45,9 +47,9 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
     val title = if (props.move) "Rename/Move" else "Copy"
     val text = if (props.move) "Rename or move" else "Copy"
     val action = if (props.move) "Rename" else "Copy"
-    val actions = List(
-      s"[ $action ]" -> onCopy,
-      "[ Cancel ]" -> props.onCancel
+    val actions = js.Array(
+      ButtonsPanelAction(s"[ $action ]", onCopy),
+      ButtonsPanelAction("[ Cancel ]", props.onCancel)
     )
 
     <(modalComp())(^.wrapped := ModalProps(title, size, theme, props.onCancel))(
@@ -77,7 +79,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
         startCh = Some(DoubleBorder.leftSingleCh),
         endCh = Some(DoubleBorder.rightSingleCh)
       ))(),
-      <(buttonsPanelComp())(^.wrapped := ButtonsPanelProps(
+      <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
         top = 4,
         actions = actions,
         style = theme,

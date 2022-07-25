@@ -10,6 +10,9 @@ object Exports {
   @JSExport("Button")
   val button: ReactClass = Button()
 
+  @JSExport("ButtonsPanel")
+  val buttonsPanel: ReactClass = ButtonsPanel()
+
   @JSExport("CheckBox")
   val checkBox: ReactClass = CheckBox()
 }

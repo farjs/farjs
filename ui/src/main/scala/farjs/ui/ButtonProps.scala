@@ -4,7 +4,7 @@ import scommons.react.blessed.BlessedStyle
 
 import scala.scalajs.js
 
-trait ButtonProps extends js.Object {
+sealed trait ButtonProps extends js.Object {
   val left: Int
   val top: Int
   val label: String

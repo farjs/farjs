@@ -7,6 +7,8 @@ import farjs.ui.theme.Theme
 import org.scalatest.{Assertion, Succeeded}
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class MessageBoxSpec extends TestSpec with TestRendererUtils {
 
   MessageBox.popupComp = mockUiComponent("Popup")
@@ -37,13 +39,13 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       MessageBoxAction.OK(onAction)
     ), Theme.current.popup.regular)
     val comp = testRender(<(MessageBox())(^.wrapped := props)())
-    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.head
+    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
 
     //then
     onAction.expects()
     
     //when
-    onPress()
+    action.onAction()
   }
   
   it should "render component" in {
@@ -92,14 +94,14 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       MessageBoxAction.NO(onNoAction)
     ), Theme.current.popup.regular)
     val comp = testRender(<(MessageBox())(^.wrapped := props)())
-    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions.head
+    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
 
     //then
     onYesAction.expects()
     onNoAction.expects().never()
     
     //when
-    onPress()
+    action.onAction()
   }
   
   it should "call NO action when onPress NO button" in {
@@ -111,14 +113,14 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       MessageBoxAction.NO(onNoAction)
     ), Theme.current.popup.regular)
     val comp = testRender(<(MessageBox())(^.wrapped := props)())
-    val (_, onPress) = findComponentProps(comp, buttonsPanelComp).actions(1)
+    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions(1)
 
     //then
     onNoAction.expects()
     onYesAction.expects().never()
     
     //when
-    onPress()
+    action.onAction()
   }
   
   it should "render component" in {
@@ -196,13 +198,13 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
         }
       }
       
-      assertTestComponent(actionsBox, buttonsPanelComp) {
+      assertTestComponent(actionsBox, buttonsPanelComp, plain = true) {
         case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
           top shouldBe (1 + textLines.size)
-          resActions.map(_._1) shouldBe actions
+          resActions.map(_.label).toList shouldBe actions
           resStyle shouldBe props.style
           padding shouldBe 1
-          margin shouldBe 0
+          margin shouldBe js.undefined
       }
     }
     
