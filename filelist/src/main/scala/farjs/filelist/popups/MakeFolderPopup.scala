@@ -69,8 +69,9 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
         startCh = Some(DoubleBorder.leftSingleCh),
         endCh = Some(DoubleBorder.rightSingleCh)
       ))(),
-      <(checkBoxComp())(^.wrapped := CheckBoxProps(
-        pos = (contentLeft, 4),
+      <(checkBoxComp())(^.plain := CheckBoxProps(
+        left = contentLeft,
+        top = 4,
         value = multiple,
         label = "Process multiple names",
         style = theme,

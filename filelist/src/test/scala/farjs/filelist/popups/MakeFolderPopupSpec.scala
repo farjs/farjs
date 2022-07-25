@@ -36,14 +36,14 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val props = MakeFolderPopupProps("", multiple = false, (_, _) => (), () => ())
     val renderer = createTestRenderer(<(MakeFolderPopup())(^.wrapped := props)())
-    val checkbox = findComponentProps(renderer.root, checkBoxComp)
+    val checkbox = findComponentProps(renderer.root, checkBoxComp, plain = true)
     checkbox.value shouldBe false
 
     //when
     checkbox.onChange()
 
     //then
-    findComponentProps(renderer.root, checkBoxComp).value shouldBe true
+    findComponentProps(renderer.root, checkBoxComp, plain = true).value shouldBe true
   }
   
   it should "call onOk when onEnter in TextBox" in {
@@ -161,9 +161,10 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
             startCh shouldBe Some(DoubleBorder.leftSingleCh)
             endCh shouldBe Some(DoubleBorder.rightSingleCh)
         }))(),
-        <(checkBoxComp())(^.assertWrapped(inside(_) {
-          case CheckBoxProps(pos, resValue, resLabel, resStyle, _) =>
-            pos shouldBe 2 -> 4
+        <(checkBoxComp())(^.assertPlain[CheckBoxProps](inside(_) {
+          case CheckBoxProps(left, top, resValue, resLabel, resStyle, _) =>
+            left shouldBe 2
+            top shouldBe 4
             resValue shouldBe false
             resLabel shouldBe "Process multiple names"
             resStyle shouldBe style

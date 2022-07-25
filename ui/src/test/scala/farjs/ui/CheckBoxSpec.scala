@@ -12,7 +12,7 @@ class CheckBoxSpec extends TestSpec with TestRendererUtils {
     //given
     val onChange = mockFunction[Unit]
     val props = getCheckBoxProps(onChange = onChange)
-    val comp = testRender(<(CheckBox())(^.wrapped := props)())
+    val comp = testRender(<(CheckBox())(^.plain := props)())
     val button = findComponentProps(comp, buttonComp, plain = true)
 
     //then
@@ -27,7 +27,7 @@ class CheckBoxSpec extends TestSpec with TestRendererUtils {
     val props = getCheckBoxProps(value = true)
 
     //when
-    val result = createTestRenderer(<(CheckBox())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(CheckBox())(^.plain := props)()).root
 
     //then
     assertCheckBox(result, props)
@@ -38,7 +38,7 @@ class CheckBoxSpec extends TestSpec with TestRendererUtils {
     val props = getCheckBoxProps()
 
     //when
-    val result = createTestRenderer(<(CheckBox())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(CheckBox())(^.plain := props)()).root
 
     //then
     assertCheckBox(result, props)
@@ -47,7 +47,8 @@ class CheckBoxSpec extends TestSpec with TestRendererUtils {
   private def getCheckBoxProps(value: Boolean = false,
                                onChange: () => Unit = () => ()
                               ): CheckBoxProps = CheckBoxProps(
-    pos = (1, 2),
+    left = 1,
+    top = 2,
     value = value,
     label = "test item",
     style = new BlessedStyle {
@@ -62,13 +63,11 @@ class CheckBoxSpec extends TestSpec with TestRendererUtils {
   )
 
   private def assertCheckBox(result: TestInstance, props: CheckBoxProps): Unit = {
-    val (left, top) = props.pos
-    
     inside(result.children.toList) { case List(button, text) =>
       assertTestComponent(button, buttonComp, plain = true)(inside(_) {
         case ButtonProps(resLeft, resTop, label, resStyle, _) =>
-          resLeft shouldBe left
-          resTop shouldBe top
+          resLeft shouldBe props.left
+          resTop shouldBe props.top
           label shouldBe (if (props.value) "[x]" else "[ ]")
           resStyle shouldBe props.style
       })
@@ -76,8 +75,8 @@ class CheckBoxSpec extends TestSpec with TestRendererUtils {
       assertNativeComponent(text,
         <.text(
           ^.rbHeight := 1,
-          ^.rbLeft := left + 4,
-          ^.rbTop := top,
+          ^.rbLeft := props.left + 4,
+          ^.rbTop := props.top,
           ^.rbStyle := props.style,
           ^.content := props.label
         )()

@@ -3,24 +3,17 @@ package farjs.ui
 import scommons.react._
 import scommons.react.blessed._
 
-case class CheckBoxProps(pos: (Int, Int),
-                         value: Boolean,
-                         label: String,
-                         style: BlessedStyle,
-                         onChange: () => Unit)
-
 object CheckBox extends FunctionComponent[CheckBoxProps] {
 
   private[ui] var buttonComp: UiComponent[ButtonProps] = Button
   
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
-    val (left, top) = props.pos
+    val props = compProps.plain
     
     <.>()(
       <(buttonComp())(^.plain := ButtonProps(
-        left = left,
-        top = top,
+        left = props.left,
+        top = props.top,
         label = if (props.value) "[x]" else "[ ]",
         style = props.style,
         onPress = props.onChange
@@ -28,8 +21,8 @@ object CheckBox extends FunctionComponent[CheckBoxProps] {
       
       <.text(
         ^.rbHeight := 1,
-        ^.rbLeft := left + 4,
-        ^.rbTop := top,
+        ^.rbLeft := props.left + 4,
+        ^.rbTop := props.top,
         ^.rbStyle := props.style,
         ^.content := props.label
       )()
