@@ -13,7 +13,9 @@ object FarjsUi extends ScalaJsModule {
 
   override def definition: Project = super.definition
     .settings(
-      coverageExcludedPackages := "scommons.react.blessed.raw",
+      coverageExcludedPackages :=
+        "scommons.react.blessed.raw" +
+          ";farjs.ui.Exports",
 
       Compile / npmDependencies ++= Seq(
         //"blessed" -> "0.1.81",
