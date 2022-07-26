@@ -9,7 +9,8 @@ class ProgressBarSpec extends TestSpec with TestRendererUtils {
     //given
     val props = ProgressBarProps(
       percent = 15,
-      pos = (1, 2),
+      left = 1,
+      top = 2,
       length = 9,
       style = new BlessedStyle {
         override val fg = "white"
@@ -18,7 +19,7 @@ class ProgressBarSpec extends TestSpec with TestRendererUtils {
     )
 
     //when
-    val result = createTestRenderer(<(ProgressBar())(^.wrapped := props)()).root
+    val result = testRender(<(ProgressBar())(^.plain := props)())
 
     //then
     assertProgressBar(result, props)
@@ -34,18 +35,14 @@ class ProgressBarSpec extends TestSpec with TestRendererUtils {
   }
 
   private def assertProgressBar(result: TestInstance, props: ProgressBarProps): Unit = {
-    val (left, top) = props.pos
-    
-    inside(result.children.toList) { case List(text) =>
-      assertNativeComponent(text,
-        <.text(
-          ^.rbHeight := 1,
-          ^.rbLeft := left,
-          ^.rbTop := top,
-          ^.rbStyle := props.style,
-          ^.content := "█░░░░░░░░"
-        )()
-      )
-    }
+    assertNativeComponent(result,
+      <.text(
+        ^.rbHeight := 1,
+        ^.rbLeft := props.left,
+        ^.rbTop := props.top,
+        ^.rbStyle := props.style,
+        ^.content := "█░░░░░░░░"
+      )()
+    )
   }
 }

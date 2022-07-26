@@ -61,9 +61,10 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
         padding = 0
       ))(),
 
-      <(progressBarComp())(^.wrapped := ProgressBarProps(
+      <(progressBarComp())(^.plain := ProgressBarProps(
         percent = props.itemPercent,
-        pos = (contentLeft, 5),
+        left = contentLeft,
+        top = 5,
         length = contentWidth,
         style = theme
       ))(),
@@ -80,9 +81,10 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
         text = f"Total: ${props.total}%,.0f",
         style = theme
       ))(),
-      <(progressBarComp())(^.wrapped := ProgressBarProps(
+      <(progressBarComp())(^.plain := ProgressBarProps(
         percent = props.totalPercent,
-        pos = (contentLeft, 7),
+        left = contentLeft,
+        top = 7,
         length = contentWidth,
         style = theme
       ))(),

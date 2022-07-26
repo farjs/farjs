@@ -3,22 +3,16 @@ package farjs.ui
 import scommons.react._
 import scommons.react.blessed._
 
-case class ProgressBarProps(percent: Int,
-                            pos: (Int, Int),
-                            length: Int,
-                            style: BlessedStyle)
-
 object ProgressBar extends FunctionComponent[ProgressBarProps] {
   
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
-    val (left, top) = props.pos
+    val props = compProps.plain
 
     <.text(
       ^.rbWidth := props.length,
       ^.rbHeight := 1,
-      ^.rbLeft := left,
-      ^.rbTop := top,
+      ^.rbLeft := props.left,
+      ^.rbTop := props.top,
       ^.rbStyle := props.style,
       ^.content := {
         val filledLen = filledLength(props.percent, props.length)

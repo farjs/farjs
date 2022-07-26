@@ -134,10 +134,11 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           padding shouldBe 0
       }
 
-      assertTestComponent(itemPercent, progressBarComp) {
-        case ProgressBarProps(percent, pos, resLength, resStyle) =>
+      assertTestComponent(itemPercent, progressBarComp, plain = true) {
+        case ProgressBarProps(percent, left, top, resLength, resStyle) =>
           percent shouldBe props.itemPercent
-          pos shouldBe contentLeft -> 5
+          left shouldBe contentLeft
+          top shouldBe 5
           resLength shouldBe contentWidth
           resStyle shouldBe theme
       }
@@ -160,10 +161,11 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           focused shouldBe false
           padding shouldBe 1
       }
-      assertTestComponent(totalPercent, progressBarComp) {
-        case ProgressBarProps(percent, pos, resLength, resStyle) =>
+      assertTestComponent(totalPercent, progressBarComp, plain = true) {
+        case ProgressBarProps(percent, left, top, resLength, resStyle) =>
           percent shouldBe props.totalPercent
-          pos shouldBe contentLeft -> 7
+          left shouldBe contentLeft
+          top shouldBe 7
           resLength shouldBe contentWidth
           resStyle shouldBe theme
       }

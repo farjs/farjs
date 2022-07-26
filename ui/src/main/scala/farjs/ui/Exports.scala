@@ -15,4 +15,7 @@ object Exports {
 
   @JSExport("CheckBox")
   val checkBox: ReactClass = CheckBox()
+
+  @JSExport("ProgressBar")
+  val progressBar: ReactClass = ProgressBar()
 }
