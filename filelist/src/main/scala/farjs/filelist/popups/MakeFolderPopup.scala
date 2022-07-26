@@ -53,8 +53,9 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
         style = theme,
         padding = 0
       ))(),
-      <(textBoxComp())(^.wrapped := TextBoxProps(
-        pos = (contentLeft, 2),
+      <(textBoxComp())(^.plain := TextBoxProps(
+        left = contentLeft,
+        top = 2,
         width = contentWidth,
         value = folderName,
         onChange = { value =>

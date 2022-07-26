@@ -8,12 +8,6 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class TextBoxProps(pos: (Int, Int),
-                        width: Int,
-                        value: String,
-                        onChange: String => Unit,
-                        onEnter: () => Unit = () => ())
-
 object TextBox extends FunctionComponent[TextBoxProps] {
 
   def renderText(style: BlessedStyle, text: String): String = {
@@ -34,12 +28,11 @@ object TextBox extends FunctionComponent[TextBoxProps] {
   }
   
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val theme = Theme.current.textBox
     val elementRef = useRef[BlessedElement](null)
     val ((offset, cursorX), setOffsetAndPos) = useState(() => (0, -1))
     val ((selStart, selEnd), setSelStartAndEnd) = useState(() => (-1, -1))
-    val (left, top) = props.pos
 
     useLayoutEffect({ () =>
       move(elementRef.current, props.value, CursorMove.End, TextSelect.All)
@@ -154,7 +147,7 @@ object TextBox extends FunctionComponent[TextBoxProps] {
       var processed = true
       key.full match {
         case "return" =>
-          props.onEnter()
+          props.onEnter.foreach(_.apply())
           processed = true
         case "enter" => processed = true // either enter or return is handled, not both!
         case "escape" | "tab" => processed = false
@@ -199,8 +192,8 @@ object TextBox extends FunctionComponent[TextBoxProps] {
       ^.rbKeyable := true,
       ^.rbWidth := props.width,
       ^.rbHeight := 1,
-      ^.rbLeft := left,
-      ^.rbTop := top,
+      ^.rbLeft := props.left,
+      ^.rbTop := props.top,
       ^.rbStyle := theme.regular,
       ^.rbTags := true,
       ^.content := {

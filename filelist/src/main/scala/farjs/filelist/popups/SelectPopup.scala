@@ -8,6 +8,8 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.hooks._
 
+import scala.scalajs.js
+
 case class SelectPopupProps(pattern: String,
                             action: FileListPopupSelect,
                             onAction: String => Unit,
@@ -26,7 +28,7 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
     val contentLeft = 2
     val theme = Theme.current.popup.regular
 
-    val onAction = { () =>
+    val onAction: js.Function0[Unit] = { () =>
       if (pattern.nonEmpty) {
         props.onAction(pattern)
       }
@@ -40,8 +42,9 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
       style = theme,
       onCancel = props.onCancel
     ))(
-      <(textBoxComp())(^.wrapped := TextBoxProps(
-        pos = (contentLeft, 1),
+      <(textBoxComp())(^.plain := TextBoxProps(
+        left = contentLeft,
+        top = 1,
         width = contentWidth,
         value = pattern,
         onChange = { value =>

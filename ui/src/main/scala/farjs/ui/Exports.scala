@@ -18,4 +18,7 @@ object Exports {
 
   @JSExport("ProgressBar")
   val progressBar: ReactClass = ProgressBar()
+
+  @JSExport("TextBox")
+  val textBox: ReactClass = TextBox()
 }

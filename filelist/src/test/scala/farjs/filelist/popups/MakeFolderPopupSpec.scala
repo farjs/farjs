@@ -23,7 +23,7 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
     val folderName = "initial folder name"
     val props = MakeFolderPopupProps(folderName, multiple = false, (_, _) => (), () => ())
     val renderer = createTestRenderer(<(MakeFolderPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(renderer.root, textBoxComp)
+    val textBox = findComponentProps(renderer.root, textBoxComp, plain = true)
     textBox.value shouldBe folderName
     val newFolderName = "new folder name"
 
@@ -31,7 +31,7 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
     textBox.onChange(newFolderName)
 
     //then
-    findComponentProps(renderer.root, textBoxComp).value shouldBe newFolderName
+    findComponentProps(renderer.root, textBoxComp, plain = true).value shouldBe newFolderName
   }
   
   it should "set multiple flag when onChange in CheckBox" in {
@@ -54,14 +54,14 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = MakeFolderPopupProps("test", multiple = true, onOk, onCancel)
     val comp = testRender(<(MakeFolderPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(comp, textBoxComp)
+    val textBox = findComponentProps(comp, textBoxComp, plain = true)
 
     //then
     onOk.expects("test", true)
     onCancel.expects().never()
 
     //when
-    textBox.onEnter()
+    textBox.onEnter.get.apply()
   }
   
   it should "call onOk when press OK button" in {
@@ -147,9 +147,10 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
             focused shouldBe false
             padding shouldBe 0
         }))(),
-        <(textBoxComp())(^.assertWrapped(inside(_) {
-          case TextBoxProps(pos, resWidth, resValue, _, _) =>
-            pos shouldBe 2 -> 2
+        <(textBoxComp())(^.assertPlain[TextBoxProps](inside(_) {
+          case TextBoxProps(left, top, resWidth, resValue, _, _) =>
+            left shouldBe 2
+            top shouldBe 2
             resWidth shouldBe (width - 10)
             resValue shouldBe props.folderName
         }))(),

@@ -51,8 +51,9 @@ object AddToZipPopup extends FunctionComponent[AddToZipPopupProps] {
         style = theme,
         padding = 0
       ))(),
-      <(textBoxComp())(^.wrapped := TextBoxProps(
-        pos = (contentLeft, 2),
+      <(textBoxComp())(^.plain := TextBoxProps(
+        left = contentLeft,
+        top = 2,
         width = contentWidth,
         value = zipName,
         onChange = { value =>

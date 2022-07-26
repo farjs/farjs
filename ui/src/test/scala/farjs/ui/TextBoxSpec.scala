@@ -3,7 +3,6 @@ package farjs.ui
 import farjs.ui.theme.Theme
 import org.scalactic.source.Position
 import scommons.react.blessed._
-import scommons.react.blessed.raw._
 import scommons.react.test._
 
 import scala.scalajs.js
@@ -24,7 +23,7 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     inputMock.atop = 3
     omoveMock.expects(10, 3)
 
-    val root = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
+    val root = createTestRenderer(<(TextBox())(^.plain := props)(), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     }).root
@@ -53,7 +52,7 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     inputMock.atop = 2
     omoveMock.expects(5, 2)
     
-    val root = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
+    val root = createTestRenderer(<(TextBox())(^.plain := props)(), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     }).root
@@ -81,7 +80,7 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     inputMock.atop = 2
     omoveMock.expects(5, 2)
     
-    val root = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
+    val root = createTestRenderer(<(TextBox())(^.plain := props)(), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     }).root
@@ -112,7 +111,7 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     inputMock.atop = 2
     omoveMock.expects(10, 2)
 
-    val root = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
+    val root = createTestRenderer(<(TextBox())(^.plain := props)(), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     }).root
@@ -135,14 +134,13 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     val screenMock = literal("program" -> programMock)
     val inputMock = literal("screen" -> screenMock)
     val width = props.width
-    val (aleft, atop) = props.pos
     val cursorX = width - 1
     inputMock.width = width
-    inputMock.aleft = aleft
-    inputMock.atop = atop
-    omoveMock.expects(aleft + cursorX, atop)
+    inputMock.aleft = props.left
+    inputMock.atop = props.top
+    omoveMock.expects(props.left + cursorX, props.top)
 
-    val inputEl = testRender(<(TextBox())(^.wrapped := props)(), { el =>
+    val inputEl = testRender(<(TextBox())(^.plain := props)(), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
@@ -167,14 +165,13 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     val screenMock = literal("program" -> programMock)
     val inputMock = literal("screen" -> screenMock)
     val width = props.width
-    val (aleft, atop) = props.pos
     val cursorX = width - 1
     inputMock.width = width
-    inputMock.aleft = aleft
-    inputMock.atop = atop
-    omoveMock.expects(aleft + cursorX, atop)
+    inputMock.aleft = props.left
+    inputMock.atop = props.top
+    omoveMock.expects(props.left + cursorX, props.top)
 
-    val inputEl = testRender(<(TextBox())(^.wrapped := props)(), { el =>
+    val inputEl = testRender(<(TextBox())(^.plain := props)(), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
@@ -220,7 +217,7 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     inputMock.atop = atop
     omoveMock.expects(aleft + cursorX, atop)
 
-    val renderer = createTestRenderer(<(TextBox())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(<(TextBox())(^.plain := props)(), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
@@ -261,7 +258,14 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
         value = newVal
 
         TestRenderer.act { () =>
-          renderer.update(<(TextBox())(^.wrapped := props.copy(value = newVal))())
+          renderer.update(<(TextBox())(^.plain := TextBoxProps(
+            left = props.left,
+            top = props.top,
+            width = props.width,
+            value = newVal,
+            onChange = props.onChange,
+            onEnter = props.onEnter
+          ))())
         }
       }
       
@@ -349,7 +353,7 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     omoveMock.expects(10, 3)
 
     //when
-    val result = testRender(<(TextBox())(^.wrapped := props)(), { el =>
+    val result = testRender(<(TextBox())(^.plain := props)(), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
@@ -360,9 +364,10 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
 
   private def getTextBoxProps(value: String = "initial name",
                               onChange: String => Unit = _ => (),
-                              onEnter: () => Unit = () => ()
+                              onEnter: js.Function0[Unit] = () => ()
                              ): TextBoxProps = TextBoxProps(
-    pos = (1, 2),
+    left = 1,
+    top = 2,
     width = 10,
     value = value,
     onChange = onChange,
@@ -371,7 +376,6 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
 
   private def assertTextBox(result: TestInstance, props: TextBoxProps): Unit = {
     val theme = Theme.current.textBox
-    val (left, top) = props.pos
     val selectedText = props.value.drop(props.value.length - props.width + 1)
     
     assertNativeComponent(result,
@@ -381,8 +385,8 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
         ^.rbKeyable := true,
         ^.rbWidth := props.width,
         ^.rbHeight := 1,
-        ^.rbLeft := left,
-        ^.rbTop := top,
+        ^.rbLeft := props.left,
+        ^.rbTop := props.top,
         ^.rbStyle := theme.regular,
         ^.content := TextBox.renderText(theme.selected, selectedText)
       )()

@@ -17,7 +17,7 @@ class SelectPopupSpec extends TestSpec with TestRendererUtils {
     val pattern = "initial pattern"
     val props = SelectPopupProps(pattern, ShowSelect, _ => (), () => ())
     val renderer = createTestRenderer(<(SelectPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(renderer.root, textBoxComp)
+    val textBox = findComponentProps(renderer.root, textBoxComp, plain = true)
     textBox.value shouldBe pattern
     val newPattern = "new pattern"
 
@@ -25,7 +25,7 @@ class SelectPopupSpec extends TestSpec with TestRendererUtils {
     textBox.onChange(newPattern)
 
     //then
-    findComponentProps(renderer.root, textBoxComp).value shouldBe newPattern
+    findComponentProps(renderer.root, textBoxComp, plain = true).value shouldBe newPattern
   }
   
   it should "call onAction when onEnter in TextBox" in {
@@ -34,13 +34,13 @@ class SelectPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = SelectPopupProps("test", ShowSelect, onAction, onCancel)
     val comp = testRender(<(SelectPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(comp, textBoxComp)
+    val textBox = findComponentProps(comp, textBoxComp, plain = true)
 
     //then
     onAction.expects("test")
 
     //when
-    textBox.onEnter()
+    textBox.onEnter.get.apply()
   }
   
   it should "not call onAction if pattern is empty" in {
@@ -49,13 +49,13 @@ class SelectPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = SelectPopupProps("", ShowSelect, onAction, onCancel)
     val comp = testRender(<(SelectPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(comp, textBoxComp)
+    val textBox = findComponentProps(comp, textBoxComp, plain = true)
 
     //then
     onAction.expects(*).never()
     
     //when
-    textBox.onEnter()
+    textBox.onEnter.get.apply()
   }
   
   it should "render Select component" in {
@@ -95,9 +95,10 @@ class SelectPopupSpec extends TestSpec with TestRendererUtils {
           resStyle shouldBe style
           onCancel should be theSameInstanceAs props.onCancel
       }))(
-        <(textBoxComp())(^.assertWrapped(inside(_) {
-          case TextBoxProps(pos, resWidth, resValue, _, _) =>
-            pos shouldBe 2 -> 1
+        <(textBoxComp())(^.assertPlain[TextBoxProps](inside(_) {
+          case TextBoxProps(left, top, resWidth, resValue, _, _) =>
+            left shouldBe 2
+            top shouldBe 1
             resWidth shouldBe (width - 10)
             resValue shouldBe props.pattern
         }))()

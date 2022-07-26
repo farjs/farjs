@@ -25,7 +25,7 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     val path = "initial path"
     val props = CopyItemsPopupProps(move = false, path, Seq(FileListItem("file 1")), _ => (), () => ())
     val renderer = createTestRenderer(<(CopyItemsPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(renderer.root, textBoxComp)
+    val textBox = findComponentProps(renderer.root, textBoxComp, plain = true)
     textBox.value shouldBe path
     val newFolderName = "new path"
 
@@ -33,7 +33,7 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     textBox.onChange(newFolderName)
 
     //then
-    findComponentProps(renderer.root, textBoxComp).value shouldBe newFolderName
+    findComponentProps(renderer.root, textBoxComp, plain = true).value shouldBe newFolderName
   }
   
   it should "call onAction when onEnter in TextBox" in {
@@ -42,14 +42,14 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = CopyItemsPopupProps(move = false, "test", Seq(FileListItem("file 1")), onAction, onCancel)
     val comp = testRender(<(CopyItemsPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(comp, textBoxComp)
+    val textBox = findComponentProps(comp, textBoxComp, plain = true)
 
     //then
     onAction.expects("test")
     onCancel.expects().never()
 
     //when
-    textBox.onEnter()
+    textBox.onEnter.get.apply()
   }
   
   it should "call onAction when press action button" in {
@@ -150,9 +150,10 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
           focused shouldBe false
           padding shouldBe 0
       }
-      assertTestComponent(input, textBoxComp) {
-        case TextBoxProps(pos, resWidth, resValue, _, _) =>
-          pos shouldBe 2 -> 2
+      assertTestComponent(input, textBoxComp, plain = true) {
+        case TextBoxProps(left, top, resWidth, resValue, _, _) =>
+          left shouldBe 2
+          top shouldBe 2
           resWidth shouldBe (width - (paddingHorizontal + 2) * 2)
           resValue shouldBe props.path
       }

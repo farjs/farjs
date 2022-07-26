@@ -22,7 +22,7 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
     val zipName = "initial zip name"
     val props = AddToZipPopupProps(zipName, AddToZipAction.Add, _ => (), () => ())
     val renderer = createTestRenderer(<(AddToZipPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(renderer.root, textBoxComp)
+    val textBox = findComponentProps(renderer.root, textBoxComp, plain = true)
     textBox.value shouldBe zipName
     val newZipName = "new zip name"
 
@@ -30,7 +30,7 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
     textBox.onChange(newZipName)
 
     //then
-    findComponentProps(renderer.root, textBoxComp).value shouldBe newZipName
+    findComponentProps(renderer.root, textBoxComp, plain = true).value shouldBe newZipName
   }
   
   it should "call onAction when onEnter in TextBox" in {
@@ -39,14 +39,14 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = AddToZipPopupProps("test", AddToZipAction.Add, onAction, onCancel)
     val comp = testRender(<(AddToZipPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(comp, textBoxComp)
+    val textBox = findComponentProps(comp, textBoxComp, plain = true)
 
     //then
     onAction.expects("test")
     onCancel.expects().never()
 
     //when
-    textBox.onEnter()
+    textBox.onEnter.get.apply()
   }
   
   it should "call onAction when press Action button" in {
@@ -132,9 +132,10 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
             focused shouldBe false
             padding shouldBe 0
         }))(),
-        <(textBoxComp())(^.assertWrapped(inside(_) {
-          case TextBoxProps(pos, resWidth, resValue, _, _) =>
-            pos shouldBe 2 -> 2
+        <(textBoxComp())(^.assertPlain[TextBoxProps](inside(_) {
+          case TextBoxProps(left, top, resWidth, resValue, _, _) =>
+            left shouldBe 2
+            top shouldBe 2
             resWidth shouldBe (width - 10)
             resValue shouldBe props.zipName
         }))(),
