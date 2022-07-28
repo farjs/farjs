@@ -6,7 +6,7 @@ import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.quickview.QuickViewDir._
 import farjs.filelist.stack.{PanelStack, PanelStackItem}
 import farjs.ui.theme.Theme
-import farjs.ui.{TextLine, TextLineProps}
+import farjs.ui.{TextAlign, TextLineProps}
 import org.scalatest.Assertion
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
@@ -251,14 +251,15 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
             |Files size""".stripMargin
       )(),
 
-      <(textLineComp())(^.assertWrapped(inside(_) {
-        case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-          align shouldBe TextLine.Left
-          pos shouldBe 12 -> 2
+      <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+        case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
+          align shouldBe TextAlign.left
+          left shouldBe 12
+          top shouldBe 2
           resWidth shouldBe (props.width - 14)
           text shouldBe s""""${props.currItem.name}""""
           style shouldBe theme.regularItem
-          focused shouldBe false
+          focused shouldBe js.undefined
           padding shouldBe 0
       }))(),
 

@@ -8,15 +8,16 @@ class TextLineSpec extends TestSpec with TestRendererUtils {
   it should "render Left aligned text" in {
     //given
     val left = 1
-    val props = getTextLineProps.copy(
-      align = TextLine.Left,
-      pos = (left, 2),
+    val props = TextLineProps.copy(getTextLineProps)(
+      align = TextAlign.left,
+      left = left,
+      top = 2,
       width = 15,
       text = "test item"
     )
 
     //when
-    val result = createTestRenderer(<(TextLine())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(TextLine())(^.plain := props)()).root
 
     //then
     assertTextLine(result, props, left, " test item ")
@@ -25,15 +26,16 @@ class TextLineSpec extends TestSpec with TestRendererUtils {
   it should "render Center aligned text" in {
     //given
     val left = 1
-    val props = getTextLineProps.copy(
-      align = TextLine.Center,
-      pos = (left, 2),
+    val props = TextLineProps.copy(getTextLineProps)(
+      align = TextAlign.center,
+      left = left,
+      top = 2,
       width = 15,
       text = "test item"
     )
 
     //when
-    val result = createTestRenderer(<(TextLine())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(TextLine())(^.plain := props)()).root
 
     //then
     assertTextLine(result, props, left + 2, " test item ")
@@ -42,15 +44,16 @@ class TextLineSpec extends TestSpec with TestRendererUtils {
   it should "render Right aligned text" in {
     //given
     val left = 1
-    val props = getTextLineProps.copy(
-      align = TextLine.Right,
-      pos = (left, 2),
+    val props = TextLineProps.copy(getTextLineProps)(
+      align = TextAlign.right,
+      left = left,
+      top = 2,
       width = 15,
       text = "test item"
     )
 
     //when
-    inside(createTestRenderer(<(TextLine())(^.wrapped := props)()).root) { case result =>
+    inside(createTestRenderer(<(TextLine())(^.plain := props)()).root) { case result =>
       //then
       //       10|  15|
       //     test item 
@@ -58,7 +61,7 @@ class TextLineSpec extends TestSpec with TestRendererUtils {
     }
 
     //when empty
-    inside(createTestRenderer(<(TextLine())(^.wrapped := props.copy(text = ""))()).root) { case result =>
+    inside(createTestRenderer(<(TextLine())(^.plain := TextLineProps.copy(props)(text = ""))()).root) { case result =>
       //then
       //       10|  15|
       //               
@@ -66,7 +69,7 @@ class TextLineSpec extends TestSpec with TestRendererUtils {
     }
 
     //when without padding
-    inside(createTestRenderer(<(TextLine())(^.wrapped := props.copy(padding = 0))()).root) { case result =>
+    inside(createTestRenderer(<(TextLine())(^.plain := TextLineProps.copy(props)(padding = 0))()).root) { case result =>
       //then
       //       10|  15|
       //      test item
@@ -74,7 +77,7 @@ class TextLineSpec extends TestSpec with TestRendererUtils {
     }
     
     //when empty text without padding
-    inside(createTestRenderer(<(TextLine())(^.wrapped := props.copy(text = "", padding = 0))()).root) { case result =>
+    inside(createTestRenderer(<(TextLine())(^.plain := TextLineProps.copy(props)(text = "", padding = 0))()).root) { case result =>
       //then
       assertTextLine(result, props, 0, "")
     }
@@ -83,15 +86,16 @@ class TextLineSpec extends TestSpec with TestRendererUtils {
   it should "render focused text" in {
     //given
     val left = 1
-    val props = getTextLineProps.copy(
-      pos = (left, 2),
+    val props = TextLineProps.copy(getTextLineProps)(
+      left = left,
+      top = 2,
       width = 12,
       text = "test item",
       focused = true
     )
 
     //when
-    val result = createTestRenderer(<(TextLine())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(TextLine())(^.plain := props)()).root
 
     //then
     assertTextLine(result, props, left, " test item ")
@@ -100,8 +104,9 @@ class TextLineSpec extends TestSpec with TestRendererUtils {
   it should "render text without padding" in {
     //given
     val left = 1
-    val props = getTextLineProps.copy(
-      pos = (left, 2),
+    val props = TextLineProps.copy(getTextLineProps)(
+      left = left,
+      top = 2,
       width = 12,
       text = "test item",
       focused = false,
@@ -109,7 +114,7 @@ class TextLineSpec extends TestSpec with TestRendererUtils {
     )
 
     //when
-    val result = createTestRenderer(<(TextLine())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(TextLine())(^.plain := props)()).root
 
     //then
     assertTextLine(result, props, left, "test item")
@@ -118,22 +123,24 @@ class TextLineSpec extends TestSpec with TestRendererUtils {
   it should "render long text with ellipsis" in {
     //given
     val left = 1
-    val props = getTextLineProps.copy(
-      pos = (left, 2),
+    val props = TextLineProps.copy(getTextLineProps)(
+      left = left,
+      top = 2,
       width = 12,
       text = "test long item"
     )
 
     //when
-    val result = createTestRenderer(<(TextLine())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(TextLine())(^.plain := props)()).root
 
     //then
     assertTextLine(result, props, left, " tes...item ")
   }
   
   private def getTextLineProps: TextLineProps = TextLineProps(
-    align = TextLine.Left,
-    pos = (1, 2),
+    align = TextAlign.left,
+    left = 1,
+    top = 2,
     width = 10,
     text = "test item",
     style = new BlessedStyle {
@@ -147,29 +154,22 @@ class TextLineSpec extends TestSpec with TestRendererUtils {
                              props: TextLineProps,
                              left: Int,
                              text: String): Unit = {
-    val (_, top) = props.pos
     
-    val children = result.children.toList
     if (text.nonEmpty) {
-      val textEl = inside(children) {
-        case List(te) => te
-      }
-      assertNativeComponent(textEl,
+      assertComponents(result.children, List(
         <.text(
           ^.rbWidth := text.length,
           ^.rbHeight := 1,
           ^.rbLeft := left,
-          ^.rbTop := top,
+          ^.rbTop := props.top,
           ^.rbStyle := {
-            if (props.focused) props.style.focus.orNull
+            if (props.focused.getOrElse(false)) props.style.focus.orNull
             else props.style
           },
           ^.content := text
         )()
-      )
+      ))
     }
-    else {
-      children shouldBe Nil
-    }
+    else result.children.toList shouldBe Nil
   }
 }

@@ -50,9 +50,10 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
         ^.rbStyle := theme,
         ^.content := "File already exists"
       )(),
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Center,
-        pos = (contentLeft, 2),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.center,
+        left = contentLeft,
+        top = 2,
         width = contentWidth,
         text = props.newItem.name,
         style = theme,
@@ -75,9 +76,10 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
           """New
             |Existing""".stripMargin
       )(),
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Right,
-        pos = (contentLeft, 4),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.right,
+        left = contentLeft,
+        top = 4,
         width = contentWidth,
         text = {
           val date = new js.Date(props.newItem.mtimeMs)
@@ -86,9 +88,10 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
         style = theme,
         padding = 0
       ))(),
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Right,
-        pos = (contentLeft, 5),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.right,
+        left = contentLeft,
+        top = 5,
         width = contentWidth,
         text = {
           val date = new js.Date(props.existing.mtimeMs)

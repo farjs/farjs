@@ -10,6 +10,8 @@ import org.scalatest.Assertion
 import scommons.react.blessed._
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
 
   CopyProgressPopup.modalComp = mockUiComponent("Modal")
@@ -113,24 +115,26 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
                |""".stripMargin
         )()
       )
-      assertTestComponent(item, textLineComp) {
-        case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
-          align shouldBe TextLine.Left
-          pos shouldBe contentLeft -> 2
+      assertTestComponent(item, textLineComp, plain = true) {
+        case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
+          align shouldBe TextAlign.left
+          left shouldBe contentLeft
+          top shouldBe 2
           resWidth shouldBe contentWidth
           text shouldBe props.item
           resStyle shouldBe theme
-          focused shouldBe false
+          focused shouldBe js.undefined
           padding shouldBe 0
       }
-      assertTestComponent(to, textLineComp) {
-        case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
-          align shouldBe TextLine.Left
-          pos shouldBe contentLeft -> 4
+      assertTestComponent(to, textLineComp, plain = true) {
+        case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
+          align shouldBe TextAlign.left
+          left shouldBe contentLeft
+          top shouldBe 4
           resWidth shouldBe contentWidth
           text shouldBe props.to
           resStyle shouldBe theme
-          focused shouldBe false
+          focused shouldBe js.undefined
           padding shouldBe 0
       }
 
@@ -151,15 +155,16 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           startCh shouldBe None
           endCh shouldBe None
       }
-      assertTestComponent(total, textLineComp) {
-        case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
-          align shouldBe TextLine.Center
-          pos shouldBe contentLeft -> 6
+      assertTestComponent(total, textLineComp, plain = true) {
+        case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
+          align shouldBe TextAlign.center
+          left shouldBe contentLeft
+          top shouldBe 6
           resWidth shouldBe contentWidth
           text shouldBe f"Total: ${props.total}%,.0f"
           resStyle shouldBe theme
-          focused shouldBe false
-          padding shouldBe 1
+          focused shouldBe js.undefined
+          padding shouldBe js.undefined
       }
       assertTestComponent(totalPercent, progressBarComp, plain = true) {
         case ProgressBarProps(percent, left, top, resLength, resStyle) =>
@@ -188,14 +193,15 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           ^.content := s"Time: ${toTime(props.timeSeconds)} Left: ${toTime(props.leftSeconds)}"
         )()
       )
-      assertTestComponent(speed, textLineComp) {
-        case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
-          align shouldBe TextLine.Right
-          pos shouldBe (contentLeft + 30) -> 9
+      assertTestComponent(speed, textLineComp, plain = true) {
+        case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
+          align shouldBe TextAlign.right
+          left shouldBe (contentLeft + 30)
+          top shouldBe 9
           resWidth shouldBe (contentWidth - 30)
           text shouldBe s"${toSpeed(props.bytesPerSecond * 8)}/s"
           resStyle shouldBe theme
-          focused shouldBe false
+          focused shouldBe js.undefined
           padding shouldBe 0
       }
 

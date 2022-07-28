@@ -4,9 +4,9 @@ import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.quickview.QuickViewPanel._
 import farjs.filelist.stack._
-import farjs.ui.{TextLine, TextLineProps}
 import farjs.ui.border._
 import farjs.ui.theme.Theme
+import farjs.ui.{TextAlign, TextLineProps}
 import org.scalatest.Assertion
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
@@ -133,15 +133,16 @@ class QuickViewPanelSpec extends AsyncTestSpec with BaseTestSpec
           startCh shouldBe Some(DoubleBorder.leftSingleCh)
           endCh shouldBe Some(DoubleBorder.rightSingleCh)
       }
-      assertTestComponent(header, textLineComp) {
-        case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-          align shouldBe TextLine.Center
-          pos shouldBe 1 -> 0
+      assertTestComponent(header, textLineComp, plain = true) {
+        case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
+          align shouldBe TextAlign.center
+          left shouldBe 1
+          top shouldBe 0
           resWidth shouldBe (width - 2)
           text shouldBe "Quick view"
           style shouldBe theme.regularItem
           focused shouldBe !state.isActive
-          padding shouldBe 1
+          padding shouldBe js.undefined
       }
 
       if (currItem.isDir) {

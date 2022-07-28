@@ -112,9 +112,10 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
             |Files size""".stripMargin
       )(),
 
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Left,
-        pos = (12, 2),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.left,
+        left = 12,
+        top = 2,
         width = props.width - 14,
         text = s""""${props.currItem.name}"""",
         style = theme.regularItem,

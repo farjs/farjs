@@ -161,14 +161,15 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
           ^.content := "File already exists"
         )()
       )
-      assertTestComponent(item, textLineComp) {
-        case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
-          align shouldBe TextLine.Center
-          pos shouldBe 2 -> 2
+      assertTestComponent(item, textLineComp, plain = true) {
+        case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
+          align shouldBe TextAlign.center
+          left shouldBe 2
+          top shouldBe 2
           resWidth shouldBe (width - 10)
           text shouldBe props.newItem.name
           resStyle shouldBe theme
-          focused shouldBe false
+          focused shouldBe js.undefined
           padding shouldBe 0
       }
       assertTestComponent(sep1, horizontalLineComp) {
@@ -191,24 +192,26 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
               |Existing""".stripMargin
         )()
       )
-      assertTestComponent(newItem, textLineComp) {
-        case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
-          align shouldBe TextLine.Right
-          pos shouldBe 2 -> 4
+      assertTestComponent(newItem, textLineComp, plain = true) {
+        case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
+          align shouldBe TextAlign.right
+          left shouldBe 2
+          top shouldBe 4
           resWidth shouldBe (width - 10)
           text should startWith (props.newItem.size.toString)
           resStyle shouldBe theme
-          focused shouldBe false
+          focused shouldBe js.undefined
           padding shouldBe 0
       }
-      assertTestComponent(existing, textLineComp) {
-        case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
-          align shouldBe TextLine.Right
-          pos shouldBe 2 -> 5
+      assertTestComponent(existing, textLineComp, plain = true) {
+        case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
+          align shouldBe TextAlign.right
+          left shouldBe 2
+          top shouldBe 5
           resWidth shouldBe (width - 10)
           text should startWith (props.existing.size.toString)
           resStyle shouldBe theme
-          focused shouldBe false
+          focused shouldBe js.undefined
           padding shouldBe 0
       }
 

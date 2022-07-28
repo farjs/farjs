@@ -44,17 +44,19 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
              |to
              |""".stripMargin
       )(),
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Left,
-        pos = (contentLeft, 2),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.left,
+        left = contentLeft,
+        top = 2,
         width = contentWidth,
         text = props.item,
         style = theme,
         padding = 0
       ))(),
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Left,
-        pos = (contentLeft, 4),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.left,
+        left = contentLeft,
+        top = 4,
         width = contentWidth,
         text = props.to,
         style = theme,
@@ -74,9 +76,10 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
         lineCh = SingleBorder.horizontalCh,
         style = theme
       ))(),
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Center,
-        pos = (contentLeft, 6),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.center,
+        left = contentLeft,
+        top = 6,
         width = contentWidth,
         text = f"Total: ${props.total}%,.0f",
         style = theme
@@ -102,9 +105,10 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
         ^.rbStyle := theme,
         ^.content := s"Time: ${toTime(props.timeSeconds)} Left: ${toTime(props.leftSeconds)}"
       )(),
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Right,
-        pos = (contentLeft + 30, 9),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.right,
+        left = contentLeft + 30,
+        top = 9,
         width = contentWidth - 30,
         text = s"${toSpeed(props.bytesPerSecond * 8)}/s",
         style = theme,

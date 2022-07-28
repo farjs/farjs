@@ -46,9 +46,10 @@ object QuickViewPanel extends FunctionComponent[Unit] {
         startCh = Some(DoubleBorder.leftSingleCh),
         endCh = Some(DoubleBorder.rightSingleCh)
       ))(),
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Center,
-        pos = (1, 0),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.center,
+        left = 1,
+        top = 0,
         width = width - 2,
         text = "Quick view",
         style = theme.regularItem,

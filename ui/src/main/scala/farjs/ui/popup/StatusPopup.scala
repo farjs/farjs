@@ -47,9 +47,10 @@ object StatusPopup extends FunctionComponent[StatusPopupProps] {
           ^.rbStyle := style
         )(
           textLines.zipWithIndex.map { case (text, index) =>
-            <(textLineComp())(^.key := s"$index", ^.wrapped := TextLineProps(
-              align = TextLine.Center,
-              pos = (0, index),
+            <(textLineComp())(^.key := s"$index", ^.plain := TextLineProps(
+              align = TextAlign.center,
+              left = 0,
+              top = index,
               width = textWidth,
               text = text,
               style = style,

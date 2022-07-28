@@ -137,14 +137,15 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
           resStyle shouldBe style
           onCancel should be theSameInstanceAs props.onCancel
       }))(
-        <(textLineComp())(^.assertWrapped(inside(_) {
-          case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
-            align shouldBe TextLine.Left
-            pos shouldBe 2 -> 1
+        <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+          case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
+            align shouldBe TextAlign.left
+            left shouldBe 2
+            top shouldBe 1
             resWidth shouldBe (width - 10)
             text shouldBe "Create the folder"
             resStyle shouldBe style
-            focused shouldBe false
+            focused shouldBe js.undefined
             padding shouldBe 0
         }))(),
         <(textBoxComp())(^.assertPlain[TextBoxProps](inside(_) {

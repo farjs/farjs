@@ -45,9 +45,10 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
     )
 
     <(modalComp())(^.wrapped := ModalProps("Make Folder", size, theme, props.onCancel))(
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Left,
-        pos = (contentLeft, 1),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.left,
+        left = contentLeft,
+        top = 1,
         width = contentWidth,
         text = "Create the folder",
         style = theme,

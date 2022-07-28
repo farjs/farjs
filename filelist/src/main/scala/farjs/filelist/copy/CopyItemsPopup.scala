@@ -53,9 +53,10 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
     )
 
     <(modalComp())(^.wrapped := ModalProps(title, size, theme, props.onCancel))(
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Left,
-        pos = (contentLeft, 1),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.left,
+        left = contentLeft,
+        top = 1,
         width = contentWidth,
         text = s"$text $itemsText to:",
         style = theme,

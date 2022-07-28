@@ -9,6 +9,8 @@ import org.scalatest.Assertion
 import scommons.react.blessed._
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class FileListColumnSpec extends TestSpec with TestRendererUtils {
 
   FileListColumn.textLineComp = mockUiComponent("TextLine")
@@ -149,14 +151,15 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
     val theme = Theme.current.fileList
     
     def assertElements(header: TestInstance, itemsText: Option[TestInstance]): Assertion = {
-      assertTestComponent(header, textLineComp) {
-        case TextLineProps(align, pos, width, text, style, focused, padding) =>
-          align shouldBe TextLine.Center
-          pos shouldBe 0 -> 0
+      assertTestComponent(header, textLineComp, plain = true) {
+        case TextLineProps(align, left, top, width, text, style, focused, padding) =>
+          align shouldBe TextAlign.center
+          left shouldBe 0
+          top shouldBe 0
           width shouldBe props.size._1
           text shouldBe "Name"
           style shouldBe theme.header
-          focused shouldBe false
+          focused shouldBe js.undefined
           padding shouldBe 0
       }
 

@@ -1,6 +1,6 @@
 package farjs.ui.border
 
-import farjs.ui.{TextLine, TextLineProps}
+import farjs.ui.{TextAlign, TextLine, TextLineProps}
 import scommons.react._
 import scommons.react.blessed._
 
@@ -31,9 +31,10 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
       ))(),
       
       props.title.map { title =>
-        <(textLineComp())(^.wrapped := TextLineProps(
-          align = TextLine.Center,
-          pos = props.pos,
+        <(textLineComp())(^.plain := TextLineProps(
+          align = TextAlign.center,
+          left = left,
+          top = top,
           width = width,
           text = title,
           style = props.style

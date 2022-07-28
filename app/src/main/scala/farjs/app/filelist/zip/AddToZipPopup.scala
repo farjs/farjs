@@ -43,9 +43,10 @@ object AddToZipPopup extends FunctionComponent[AddToZipPopupProps] {
     )
 
     <(modalComp())(^.wrapped := ModalProps(s"${props.action} files to archive", size, theme, props.onCancel))(
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Left,
-        pos = (contentLeft, 1),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.left,
+        left = contentLeft,
+        top = 1,
         width = contentWidth,
         text = s"${props.action} to zip archive:",
         style = theme,

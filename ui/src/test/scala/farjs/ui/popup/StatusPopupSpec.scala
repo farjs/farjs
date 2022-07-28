@@ -9,6 +9,8 @@ import scommons.nodejs.test.TestSpec
 import scommons.react.blessed._
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils {
 
   StatusPopup.popupComp = mockUiComponent("Popup")
@@ -69,14 +71,15 @@ class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils 
           )(), { msgs =>
             msgs.size shouldBe textLines.size
             msgs.zip(textLines).zipWithIndex.foreach { case ((msg, textLine), index) =>
-              assertTestComponent(msg, textLineComp) {
-                case TextLineProps(align, pos, resWidth, text, resStyle, focused, padding) =>
-                  align shouldBe TextLine.Center
-                  pos shouldBe 0 -> index
+              assertTestComponent(msg, textLineComp, plain = true) {
+                case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
+                  align shouldBe TextAlign.center
+                  left shouldBe 0
+                  top shouldBe index
                   resWidth shouldBe textWidth
                   text shouldBe textLine
                   assertObject(resStyle, style)
-                  focused shouldBe false
+                  focused shouldBe js.undefined
                   padding shouldBe 0
               }
             }

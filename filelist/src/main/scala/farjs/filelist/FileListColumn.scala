@@ -72,9 +72,10 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
       ^.rbLeft := props.left,
       ^.rbStyle := theme.regularItem
     )(
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Center,
-        pos = (0, 0),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.center,
+        left = 0,
+        top = 0,
         width = width,
         text = "Name",
         style = theme.header,

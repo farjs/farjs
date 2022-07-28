@@ -186,14 +186,15 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
 
       msgs.size shouldBe textLines.size
       msgs.zip(textLines).zipWithIndex.foreach { case ((msg, textLine), index) =>
-        assertTestComponent(msg, textLineComp) {
-          case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-            align shouldBe TextLine.Center
-            pos shouldBe 2 -> (1 + index)
+        assertTestComponent(msg, textLineComp, plain = true) {
+          case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
+            align shouldBe TextAlign.center
+            left shouldBe 2
+            top shouldBe (1 + index)
             resWidth shouldBe (width - 10)
             text shouldBe textLine
             style shouldBe props.style
-            focused shouldBe false
+            focused shouldBe js.undefined
             padding shouldBe 0
         }
       }

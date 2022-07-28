@@ -41,9 +41,10 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
         style = props.style
       ))(
         textLines.zipWithIndex.map { case (text, index) =>
-          <(textLineComp())(^.key := s"$index", ^.wrapped := TextLineProps(
-            align = TextLine.Center,
-            pos = (2, 1 + index),
+          <(textLineComp())(^.key := s"$index", ^.plain := TextLineProps(
+            align = TextAlign.center,
+            left = 2,
+            top = 1 + index,
             width = textWidth,
             text = text,
             style = props.style,

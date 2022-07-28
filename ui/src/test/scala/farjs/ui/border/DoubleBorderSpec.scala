@@ -6,6 +6,8 @@ import org.scalatest.Assertion
 import scommons.react.blessed._
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class DoubleBorderSpec extends TestSpec with TestRendererUtils {
 
   DoubleBorder.horizontalLineComp = mockUiComponent("HorizontalLine")
@@ -64,15 +66,16 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
 
       title.isDefined shouldBe props.title.isDefined
       title.foreach { t =>
-        assertTestComponent(t, textLineComp) {
-          case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-            align shouldBe TextLine.Center
-            pos shouldBe props.pos
+        assertTestComponent(t, textLineComp, plain = true) {
+          case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
+            align shouldBe TextAlign.center
+            left shouldBe props.pos._1
+            top shouldBe props.pos._2
             resWidth shouldBe width
             text shouldBe props.title.get
             style shouldBe props.style
-            focused shouldBe false
-            padding shouldBe 1
+            focused shouldBe js.undefined
+            padding shouldBe js.undefined
         }
       }
 

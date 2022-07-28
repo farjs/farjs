@@ -11,6 +11,8 @@ import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
 
   FileListPanelView.doubleBorderComp = mockUiComponent("DoubleBorder")
@@ -213,15 +215,16 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           columns shouldBe 2
           onKeypress shouldBe props.onKeypress
       }))(),
-      <(textLineComp())(^.assertWrapped(inside(_) {
-        case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-          align shouldBe TextLine.Center
-          pos shouldBe 1 -> 0
+      <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+        case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
+          align shouldBe TextAlign.center
+          left shouldBe 1
+          top shouldBe 0
           resWidth shouldBe (width - 2)
           text shouldBe state.currDir.path
           style shouldBe theme.regularItem
           focused shouldBe props.state.isActive
-          padding shouldBe 1
+          padding shouldBe js.undefined
       }))(),
       <(sortIndicator())(^.assertWrapped(inside(_) {
         case SortIndicatorProps(mode, ascending) =>
@@ -230,81 +233,88 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
       }))(),
       
       selected.map { selectedText =>
-        <(textLineComp())(^.assertWrapped(inside(_) {
-          case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-            align shouldBe TextLine.Center
-            pos shouldBe 1 -> (height - 4)
+        <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+          case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
+            align shouldBe TextAlign.center
+            left shouldBe 1
+            top shouldBe (height - 4)
             resWidth shouldBe (width - 2)
             text shouldBe selectedText
             style shouldBe theme.selectedItem
-            focused shouldBe false
-            padding shouldBe 1
+            focused shouldBe js.undefined
+            padding shouldBe js.undefined
         }))()
       },
       
-      <(textLineComp())(^.assertWrapped(inside(_) {
-        case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-          align shouldBe TextLine.Left
-          pos shouldBe 1 -> (height - 3)
+      <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+        case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
+          align shouldBe TextAlign.left
+          left shouldBe 1
+          top shouldBe (height - 3)
           resWidth shouldBe (width - 2 - 12)
           text shouldBe expectedFile
           style shouldBe theme.regularItem
-          focused shouldBe false
+          focused shouldBe js.undefined
           padding shouldBe 0
       }))(),
-      <(textLineComp())(^.assertWrapped(inside(_) {
-        case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-          align shouldBe TextLine.Right
-          pos shouldBe (1 + width - 2 - 12) -> (height - 3)
+      <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+        case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
+          align shouldBe TextAlign.right
+          left shouldBe (1 + width - 2 - 12)
+          top shouldBe (height - 3)
           resWidth shouldBe 12
           text shouldBe expectedFileSize
           style shouldBe theme.regularItem
-          focused shouldBe false
+          focused shouldBe js.undefined
           padding shouldBe 0
       }))(),
       
-      <(textLineComp())(^.assertWrapped(inside(_) {
-        case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-          align shouldBe TextLine.Left
-          pos shouldBe 1 -> (height - 2)
+      <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+        case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
+          align shouldBe TextAlign.left
+          left shouldBe 1
+          top shouldBe (height - 2)
           resWidth shouldBe 10
           text shouldBe permissions
           style shouldBe theme.regularItem
-          focused shouldBe false
+          focused shouldBe js.undefined
           padding shouldBe 0
       }))(),
-      <(textLineComp())(^.assertWrapped(inside(_) {
-        case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-          align shouldBe TextLine.Right
-          pos shouldBe (1 + width - 2 - 25) -> (height - 2)
+      <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+        case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
+          align shouldBe TextAlign.right
+          left shouldBe (1 + width - 2 - 25)
+          top shouldBe (height - 2)
           resWidth shouldBe 25
           if (showDate) text should not be empty
           else text should be (empty)
           style shouldBe theme.regularItem
-          focused shouldBe false
+          focused shouldBe js.undefined
           padding shouldBe 0
       }))(),
       
-      <(textLineComp())(^.assertWrapped(inside(_) {
-        case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-          align shouldBe TextLine.Center
-          pos shouldBe 1 -> (height - 1)
+      <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+        case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
+          align shouldBe TextAlign.center
+          left shouldBe 1
+          top shouldBe (height - 1)
           resWidth shouldBe (if (diskSpace.isEmpty) width - 2 else (width - 2) / 2)
           text shouldBe dirSize
           style shouldBe theme.regularItem
-          focused shouldBe false
-          padding shouldBe 1
+          focused shouldBe js.undefined
+          padding shouldBe js.undefined
       }))(),
       diskSpace.map { bytes =>
-        <(textLineComp())(^.assertWrapped(inside(_) {
-          case TextLineProps(align, pos, resWidth, text, style, focused, padding) =>
-            align shouldBe TextLine.Center
-            pos shouldBe ((width - 2) / 2 + 1) -> (height - 1)
+        <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+          case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
+            align shouldBe TextAlign.center
+            left shouldBe ((width - 2) / 2 + 1)
+            top shouldBe (height - 1)
             resWidth shouldBe (width - 2) / 2
             text shouldBe f"$bytes%,.0f"
             style shouldBe theme.regularItem
-            focused shouldBe false
-            padding shouldBe 1
+            focused shouldBe js.undefined
+            padding shouldBe js.undefined
         }))()
       }
     ))

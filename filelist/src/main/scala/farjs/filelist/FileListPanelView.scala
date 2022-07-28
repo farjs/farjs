@@ -53,9 +53,10 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         columns = 2,
         onKeypress = props.onKeypress
       ))(),
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Center,
-        pos = (1, 0),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.center,
+        left = 1,
+        top = 0,
         width = width - 2,
         text = props.state.currDir.path,
         style = theme.regularItem,
@@ -67,9 +68,10 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
       ))(),
 
       if (selectedItems.nonEmpty) Some(
-        <(textLineComp())(^.wrapped := TextLineProps(
-          align = TextLine.Center,
-          pos = (1, height - 4),
+        <(textLineComp())(^.plain := TextLineProps(
+          align = TextAlign.center,
+          left = 1,
+          top = height - 4,
           width = width - 2,
           text = {
             val selectedSize = selectedItems.foldLeft(0.0)((res, f) => res + f.size)
@@ -82,17 +84,19 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
       )
       else None,
 
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Left,
-        pos = (1, height - 3),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.left,
+        left = 1,
+        top = height - 3,
         width = width - 2 - 12,
         text = currItem.map(_.name).getOrElse(""),
         style = theme.regularItem,
         padding = 0
       ))(),
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Right,
-        pos = (1 + width - 2 - 12, height - 3),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.right,
+        left = 1 + width - 2 - 12,
+        top = height - 3,
         width = 12,
         text = currItem.filter(i => i.size > 0.0 || !i.isDir).map { i =>
           if (i.size >= 1000000000) {
@@ -103,17 +107,19 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         padding = 0
       ))(),
 
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Left,
-        pos = (1, height - 2),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.left,
+        left = 1,
+        top = height - 2,
         width = 10,
         text = currItem.map(_.permissions).getOrElse(""),
         style = theme.regularItem,
         padding = 0
       ))(),
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Right,
-        pos = (1 + width - 2 - 25, height - 2),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.right,
+        left = 1 + width - 2 - 25,
+        top = height - 2,
         width = 25,
         text = currItem.filter(i => i.name != FileListItem.up.name).map { i =>
           val date = new js.Date(i.mtimeMs)
@@ -123,9 +129,10 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         padding = 0
       ))(),
 
-      <(textLineComp())(^.wrapped := TextLineProps(
-        align = TextLine.Center,
-        pos = (1, height - 1),
+      <(textLineComp())(^.plain := TextLineProps(
+        align = TextAlign.center,
+        left = 1,
+        top = height - 1,
         width = if (props.state.diskSpace.isEmpty) width - 2 else (width - 2) / 2,
         text = {
           val files = props.state.currDir.items.filter(!_.isDir)
@@ -135,9 +142,10 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         style = theme.regularItem
       ))(),
       props.state.diskSpace.map { bytes =>
-        <(textLineComp())(^.wrapped := TextLineProps(
-          align = TextLine.Center,
-          pos = ((width - 2) / 2 + 1, height - 1),
+        <(textLineComp())(^.plain := TextLineProps(
+          align = TextAlign.center,
+          left = (width - 2) / 2 + 1,
+          top = height - 1,
           width = (width - 2) / 2,
           text = f"$bytes%,.0f",
           style = theme.regularItem

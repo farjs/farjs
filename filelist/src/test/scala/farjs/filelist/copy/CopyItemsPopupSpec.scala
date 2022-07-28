@@ -140,14 +140,15 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
                          sep: TestInstance,
                          actionsBox: TestInstance): Assertion = {
 
-      assertTestComponent(label, textLineComp) {
-        case TextLineProps(align, pos, resWidth, resText, resStyle, focused, padding) =>
-          align shouldBe TextLine.Left
-          pos shouldBe 2 -> 1
+      assertTestComponent(label, textLineComp, plain = true) {
+        case TextLineProps(align, left, top, resWidth, resText, resStyle, focused, padding) =>
+          align shouldBe TextAlign.left
+          left shouldBe 2
+          top shouldBe 1
           resWidth shouldBe (width - (paddingHorizontal + 2) * 2)
           resText shouldBe s"$text $itemsText to:"
           resStyle shouldBe style
-          focused shouldBe false
+          focused shouldBe js.undefined
           padding shouldBe 0
       }
       assertTestComponent(input, textBoxComp, plain = true) {

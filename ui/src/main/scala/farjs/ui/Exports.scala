@@ -2,23 +2,23 @@ package farjs.ui
 
 import scommons.react.ReactClass
 
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 @JSExportTopLevel("ui")
+@JSExportAll
 object Exports {
 
-  @JSExport("Button")
-  val button: ReactClass = Button()
+  val Button: ReactClass = farjs.ui.Button()
 
-  @JSExport("ButtonsPanel")
-  val buttonsPanel: ReactClass = ButtonsPanel()
+  val ButtonsPanel: ReactClass = farjs.ui.ButtonsPanel()
 
-  @JSExport("CheckBox")
-  val checkBox: ReactClass = CheckBox()
+  val CheckBox: ReactClass = farjs.ui.CheckBox()
 
-  @JSExport("ProgressBar")
-  val progressBar: ReactClass = ProgressBar()
+  val ProgressBar: ReactClass = farjs.ui.ProgressBar()
 
-  @JSExport("TextBox")
-  val textBox: ReactClass = TextBox()
+  val TextBox: ReactClass = farjs.ui.TextBox()
+
+  val TextAlign: TextAlign = farjs.ui.TextAlign
+
+  val TextLine: ReactClass = farjs.ui.TextLine()
 }
