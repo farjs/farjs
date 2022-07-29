@@ -20,7 +20,7 @@ class BottomMenuSpec extends TestSpec with TestRendererUtils {
   private def assertBottomMenu(result: TestInstance): Unit = {
     val (width, height) = (80, 25)
 
-    assertTestComponent(result, withSizeComp) { case WithSizeProps(render) =>
+    assertTestComponent(result, withSizeComp, plain = true) { case WithSizeProps(render) =>
       val result = createTestRenderer(render(width, height)).root
 
       assertTestComponent(result, bottomMenuViewComp) { case BottomMenuViewProps(resWidth, resItems) =>

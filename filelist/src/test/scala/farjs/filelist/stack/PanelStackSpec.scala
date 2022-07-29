@@ -302,7 +302,7 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
   }
 
   private def renderWithSize(element: ReactElement): TestInstance = {
-    val withSizeProps = findComponentProps(testRender(element), withSizeComp)
+    val withSizeProps = findComponentProps(testRender(element), withSizeComp, plain = true)
     createTestRenderer(withSizeProps.render(width, height)).root
   }
   

@@ -74,7 +74,7 @@ object PanelStack extends FunctionComponent[PanelStackProps] {
     val props = compProps.wrapped
     val topComp = props.stack.peek.component
 
-    <(withSizeComp())(^.wrapped := WithSizeProps({ (width, height) =>
+    <(withSizeComp())(^.plain := WithSizeProps({ (width, height) =>
       <(PanelStack.Context.Provider)(^.contextValue := props.copy(width = width, height = height))(
         <(topComp)()(),
         compProps.children

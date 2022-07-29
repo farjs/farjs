@@ -16,7 +16,7 @@ class WithSizeSpec extends TestSpec with TestRendererUtils {
       <.text()(s"width: $width, height: $height")
     })
     val boxMock = literal("width" -> 1, "height" -> 2)
-    val comp = createTestRenderer(<(WithSize())(^.wrapped := props)(), { el =>
+    val comp = createTestRenderer(<(WithSize())(^.plain := props)(), { el =>
       if (el.`type` == "box".asInstanceOf[js.Any]) boxMock
       else null
     }).root
@@ -38,7 +38,7 @@ class WithSizeSpec extends TestSpec with TestRendererUtils {
     val props = WithSizeProps({ (width, height) =>
       <.text()(s"width: $width, height: $height")
     })
-    val comp = <(WithSize())(^.wrapped := props)()
+    val comp = <(WithSize())(^.plain := props)()
     val boxMock = literal("width" -> 1, "height" -> 2)
 
     //when

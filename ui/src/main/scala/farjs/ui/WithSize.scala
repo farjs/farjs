@@ -4,8 +4,6 @@ import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
 
-case class WithSizeProps(render: (Int, Int) => ReactElement)
-
 object WithSize extends FunctionComponent[WithSizeProps] {
 
   protected def render(props: Props): ReactElement = {
@@ -24,7 +22,7 @@ object WithSize extends FunctionComponent[WithSizeProps] {
         setSize((currBox.width, currBox.height))
       }
     )(
-      props.wrapped.render(width, height)
+      props.plain.render(width, height)
     )
   }
 }

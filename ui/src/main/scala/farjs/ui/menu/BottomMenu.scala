@@ -10,7 +10,7 @@ object BottomMenu extends FunctionComponent[Unit] {
   
   protected def render(compProps: Props): ReactElement = {
 
-    <(withSizeComp())(^.wrapped := WithSizeProps({ (width, _) =>
+    <(withSizeComp())(^.plain := WithSizeProps({ (width, _) =>
       
       <(bottomMenuViewComp())(^.wrapped := BottomMenuViewProps(
         width = width,
