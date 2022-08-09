@@ -76,6 +76,13 @@ jobs:
         npm pack
       if: ${{ !github.event.pull_request && env.TAG_NAME == '' }}
 
+    - name: Upload SNAPSHOT artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: farjs-app@0.1.0-SNAPSHOT
+        path: app/target/scala-2.13/scalajs-bundler/main/farjs-app-0.1.0-SNAPSHOT.tgz
+      if: ${{ !github.event.pull_request && env.TAG_NAME == '' }}
+
     - name: Publish RELEASE
       run: |
         VERSION="$(echo "$TAG_NAME" | cut -d'v' -f 2)"
