@@ -1,4 +1,4 @@
-#!/usr/bin/env node --title=FAR.js
+#!/usr/bin/env node
 
 const versionChecker = require('../dist/versionChecker.js')
 versionChecker.check(() => {
