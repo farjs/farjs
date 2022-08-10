@@ -79,7 +79,7 @@ jobs:
     - name: Upload SNAPSHOT artifact
       uses: actions/upload-artifact@v3
       with:
-        name: farjs-app@0.1.0-SNAPSHOT
+        name: farjs-app-0.1.0-SNAPSHOT.tgz
         path: app/target/scala-2.13/scalajs-bundler/main/farjs-app-0.1.0-SNAPSHOT.tgz
       if: ${{ env.TAG_NAME == '' }}
 
