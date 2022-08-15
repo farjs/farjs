@@ -91,6 +91,8 @@ object FSService {
     "/net",
     "/home",
     "/private/",
-    "/System/"
+    "/System/",
+    "/etc/",
+    "/sys/"
   )
 }

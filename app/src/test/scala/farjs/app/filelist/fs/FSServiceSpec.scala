@@ -212,6 +212,8 @@ class FSServiceSpec extends AsyncTestSpec {
         |map -hosts             0         0         0   100%    /net
         |map auto_home          0         0         0   100%    /home
         |/dev/disk2s1     1957408     14752   1942656     1%    /Volumes/FLASHDRIVE
+        |/dev/vda1        1957408     14752   1942656    45%    /etc/hosts
+        |tmpfs            1018208         0   1018208     0%    /sys/firmware
         |""".stripMargin
     val result: (js.Object, js.Object) = (output.asInstanceOf[js.Object], new js.Object)
 
