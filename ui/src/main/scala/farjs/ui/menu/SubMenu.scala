@@ -34,11 +34,10 @@ object SubMenu extends FunctionComponent[SubMenuProps] {
       ^.rbShadow := true,
       ^.rbStyle := theme
     )(
-      <(doubleBorderComp())(^.wrapped := DoubleBorderProps(
-        size = (width, height),
-        style = theme,
-        pos = (0, 0),
-        title = None
+      <(doubleBorderComp())(^.plain := DoubleBorderProps(
+        width = width,
+        height = height,
+        style = theme
       ))(),
 
       props.items.zipWithIndex.map { case (text, index) =>
@@ -48,8 +47,8 @@ object SubMenu extends FunctionComponent[SubMenuProps] {
             length = width,
             lineCh = SingleBorder.horizontalCh,
             style = theme,
-            startCh = Some(DoubleBorder.leftSingleCh),
-            endCh = Some(DoubleBorder.rightSingleCh)
+            startCh = Some(DoubleChars.leftSingle),
+            endCh = Some(DoubleChars.rightSingle)
           ))()
         }
         else {

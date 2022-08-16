@@ -190,12 +190,14 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val theme = Theme.current.fileList
     
     assertNativeComponent(result, <.box(^.rbStyle := theme.regularItem)(
-      <(doubleBorderComp())(^.assertWrapped(inside(_) {
-        case DoubleBorderProps(resSize, style, pos, title) =>
-          resSize shouldBe width -> height
+      <(doubleBorderComp())(^.assertPlain[DoubleBorderProps](inside(_) {
+        case DoubleBorderProps(resWidth, resHeight, style, resLeft, resTop, title) =>
+          resWidth shouldBe width
+          resHeight shouldBe height
           style shouldBe theme.regularItem
-          pos shouldBe 0 -> 0
-          title shouldBe None
+          resLeft shouldBe js.undefined
+          resTop shouldBe js.undefined
+          title shouldBe js.undefined
       }))(),
       <(horizontalLineComp())(^.assertWrapped(inside(_) {
         case HorizontalLineProps(pos, len, lineCh, style, startCh, endCh) =>
@@ -203,8 +205,8 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           len shouldBe width
           lineCh shouldBe SingleBorder.horizontalCh
           style shouldBe theme.regularItem
-          startCh shouldBe Some(DoubleBorder.leftSingleCh)
-          endCh shouldBe Some(DoubleBorder.rightSingleCh)
+          startCh shouldBe Some(DoubleChars.leftSingle)
+          endCh shouldBe Some(DoubleChars.rightSingle)
       }))(),
       <(fileListComp())(^.assertWrapped(inside(_) {
         case FileListProps(dispatch, actions, resState, resSize, columns, onKeypress) =>

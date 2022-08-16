@@ -68,11 +68,11 @@ object FileListQuickSearch extends FunctionComponent[FileListQuickSearchProps] {
         ^.rbLeft := 10,
         ^.rbStyle := boxStyle
       )(
-        <(doubleBorderComp())(^.wrapped := DoubleBorderProps(
-          size = (width, height),
+        <(doubleBorderComp())(^.plain := DoubleBorderProps(
+          width = width,
+          height = height,
           style = boxStyle,
-          pos = (0, 0),
-          title = Some("Search")
+          title = "Search"
         ))(),
   
         <.text(

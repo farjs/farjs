@@ -30,11 +30,11 @@ object ModalContent extends FunctionComponent[ModalContentProps] {
       ^.rbPadding := padding,
       ^.rbStyle := props.style
     )(
-      <(doubleBorderComp())(^.wrapped := DoubleBorderProps(
-        size = (width - padding.left - padding.right, height - padding.top - padding.bottom),
+      <(doubleBorderComp())(^.plain := DoubleBorderProps(
+        width = width - padding.left - padding.right,
+        height = height - padding.top - padding.bottom,
         style = props.style,
-        pos = (0, 0),
-        title = Some(props.title)
+        title = props.title
       ))(),
       
       compProps.children

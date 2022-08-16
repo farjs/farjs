@@ -8,6 +8,8 @@ import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class ModalContentSpec extends TestSpec with TestRendererUtils {
 
   ModalContent.doubleBorderComp = mockUiComponent("DoubleBorder")
@@ -49,12 +51,14 @@ class ModalContentSpec extends TestSpec with TestRendererUtils {
         },
         ^.rbStyle := props.style
       )(), inside(_) { case List(border, child)=>
-        assertTestComponent(border, doubleBorderComp) {
-          case DoubleBorderProps(resSize, style, pos, title) =>
-            resSize shouldBe (width - paddingHorizontal * 2) -> (height - paddingVertical * 2)
+        assertTestComponent(border, doubleBorderComp, plain = true) {
+          case DoubleBorderProps(resWidth, resHeight, style, resLeft, resTop, title) =>
+            resWidth shouldBe (width - paddingHorizontal * 2)
+            resHeight shouldBe (height - paddingVertical * 2)
             style shouldBe props.style
-            pos shouldBe 0 -> 0
-            title shouldBe Some(props.title)
+            resLeft shouldBe js.undefined
+            resTop shouldBe js.undefined
+            title shouldBe props.title
         }
 
         assertNativeComponent(child, children)

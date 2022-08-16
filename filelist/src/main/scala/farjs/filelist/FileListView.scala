@@ -113,7 +113,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
                   length = height + 2,
                   lineCh = SingleBorder.verticalCh,
                   style = Theme.current.fileList.regularItem,
-                  startCh = Some(DoubleBorder.topSingleCh),
+                  startCh = Some(DoubleChars.topSingle),
                   endCh = Some(SingleBorder.bottomCh)
                 ))()
               )
@@ -124,7 +124,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
                 left = colLeft,
                 borderCh =
                   if (colIndex != columns - 1) SingleBorder.verticalCh
-                  else DoubleBorder.verticalCh,
+                  else DoubleChars.vertical,
                 items = colItems,
                 focusedIndex = {
                   val firstIndex = columnSizeRef.current * colIndex

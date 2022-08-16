@@ -16,11 +16,11 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
 
   it should "render component" in {
     //given
-    val props = DoubleBorderProps((3, 4), style = new BlessedStyle {
+    val props = DoubleBorderProps(3, 4, style = new BlessedStyle {
       override val fg = "black"
       override val bg = "cyan"
-    }, pos = (1, 2))
-    val comp = <(DoubleBorder())(^.wrapped := props)()
+    }, left = 1, top = 2)
+    val comp = <(DoubleBorder())(^.plain := props)()
 
     //when
     val result = createTestRenderer(comp).root
@@ -31,11 +31,11 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
   
   it should "render component with title" in {
     //given
-    val props = DoubleBorderProps((15, 5), style = new BlessedStyle {
+    val props = DoubleBorderProps(15, 5, style = new BlessedStyle {
       override val fg = "black"
       override val bg = "cyan"
-    }, pos = (1, 2), title = Some("test title"))
-    val comp = <(DoubleBorder())(^.wrapped := props)()
+    }, left = 1, top = 2, title = "test title")
+    val comp = <(DoubleBorder())(^.plain := props)()
 
     //when
     val result = createTestRenderer(comp).root
@@ -45,8 +45,8 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
   }
   
   private def assertDoubleBorder(result: TestInstance, props: DoubleBorderProps): Unit = {
-    val (width, height) = props.size
-    val (left, top) = props.pos
+    val left = props.left.getOrElse(0)
+    val top = props.top.getOrElse(0)
 
     def assertComponents(line1: TestInstance,
                          title: Option[TestInstance],
@@ -56,22 +56,22 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
 
       assertTestComponent(line1, horizontalLineComp) {
         case HorizontalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
-          pos shouldBe props.pos
-          resLength shouldBe width
-          lineCh shouldBe DoubleBorder.horizontalCh
+          pos shouldBe left -> top
+          resLength shouldBe props.width
+          lineCh shouldBe DoubleChars.horizontal
           style shouldBe props.style
-          startCh shouldBe Some(DoubleBorder.topLeftCh)
-          endCh shouldBe Some(DoubleBorder.topRightCh)
+          startCh shouldBe Some(DoubleChars.topLeft)
+          endCh shouldBe Some(DoubleChars.topRight)
       }
 
       title.isDefined shouldBe props.title.isDefined
       title.foreach { t =>
         assertTestComponent(t, textLineComp, plain = true) {
-          case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
+          case TextLineProps(align, resLeft, resTop, resWidth, text, style, focused, padding) =>
             align shouldBe TextAlign.center
-            left shouldBe props.pos._1
-            top shouldBe props.pos._2
-            resWidth shouldBe width
+            resLeft shouldBe left
+            resTop shouldBe top
+            resWidth shouldBe props.width
             text shouldBe props.title.get
             style shouldBe props.style
             focused shouldBe js.undefined
@@ -82,29 +82,29 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
       assertTestComponent(line2, verticalLineComp) {
         case VerticalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
           pos shouldBe left -> (top + 1)
-          resLength shouldBe (height - 2)
-          lineCh shouldBe DoubleBorder.verticalCh
+          resLength shouldBe (props.height - 2)
+          lineCh shouldBe DoubleChars.vertical
           style shouldBe props.style
           startCh shouldBe None
           endCh shouldBe None
       }
       assertTestComponent(line3, verticalLineComp) {
         case VerticalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
-          pos shouldBe (left + width - 1) -> (top + 1)
-          resLength shouldBe (height - 2)
-          lineCh shouldBe DoubleBorder.verticalCh
+          pos shouldBe (left + props.width - 1) -> (top + 1)
+          resLength shouldBe (props.height - 2)
+          lineCh shouldBe DoubleChars.vertical
           style shouldBe props.style
           startCh shouldBe None
           endCh shouldBe None
       }
       assertTestComponent(line4, horizontalLineComp) {
         case HorizontalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
-          pos shouldBe left -> (top + height - 1)
-          resLength shouldBe width
-          lineCh shouldBe DoubleBorder.horizontalCh
+          pos shouldBe left -> (top + props.height - 1)
+          resLength shouldBe props.width
+          lineCh shouldBe DoubleChars.horizontal
           style shouldBe props.style
-          startCh shouldBe Some(DoubleBorder.bottomLeftCh)
-          endCh shouldBe Some(DoubleBorder.bottomRightCh)
+          startCh shouldBe Some(DoubleChars.bottomLeft)
+          endCh shouldBe Some(DoubleChars.bottomRight)
       }
     }
 

@@ -6,6 +6,8 @@ import farjs.ui.theme.Theme
 import scommons.react.blessed._
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class SubMenuSpec extends TestSpec with TestRendererUtils {
 
   SubMenu.doubleBorderComp = mockUiComponent("DoubleBorder")
@@ -67,12 +69,14 @@ class SubMenuSpec extends TestSpec with TestRendererUtils {
         ^.rbShadow := true,
         ^.rbStyle := theme
       )(
-        <(doubleBorderComp())(^.assertWrapped(inside(_) {
-          case DoubleBorderProps(size, style, pos, title) =>
-            size shouldBe (width -> height)
+        <(doubleBorderComp())(^.assertPlain[DoubleBorderProps](inside(_) {
+          case DoubleBorderProps(resWidth, resHeight, style, resLeft, resTop, title) =>
+            resWidth shouldBe width
+            resHeight shouldBe height
             style shouldBe theme
-            pos shouldBe (0 -> 0)
-            title shouldBe None
+            resLeft shouldBe js.undefined
+            resTop shouldBe js.undefined
+            title shouldBe js.undefined
         }))(),
 
         props.items.zipWithIndex.map { case (text, index) =>
@@ -83,8 +87,8 @@ class SubMenuSpec extends TestSpec with TestRendererUtils {
                 length shouldBe width
                 lineCh shouldBe SingleBorder.horizontalCh
                 style shouldBe theme
-                startCh shouldBe Some(DoubleBorder.leftSingleCh)
-                endCh shouldBe Some(DoubleBorder.rightSingleCh)
+                startCh shouldBe Some(DoubleChars.leftSingle)
+                endCh shouldBe Some(DoubleChars.rightSingle)
             }))()
           }
           else {

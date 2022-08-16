@@ -255,7 +255,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
           resLength shouldBe 4
           ch shouldBe SingleBorder.verticalCh
           style shouldBe Theme.current.fileList.regularItem
-          start shouldBe Some(DoubleBorder.topSingleCh)
+          start shouldBe Some(DoubleChars.topSingle)
           end shouldBe Some(SingleBorder.bottomCh)
       }
       assertTestComponent(col1, fileListColumnComp) {
@@ -269,7 +269,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
         case FileListColumnProps(resSize, left, borderCh, items, focusedPos, selectedNames) =>
           resSize shouldBe 4 -> 2
           left shouldBe 3
-          borderCh shouldBe DoubleBorder.verticalCh
+          borderCh shouldBe DoubleChars.vertical
           (items, focusedPos, selectedNames) shouldBe expectedData(1)
       }
     })

@@ -1,5 +1,6 @@
 package farjs.ui
 
+import farjs.ui.border.BorderExports
 import scommons.react.ReactClass
 
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
@@ -23,4 +24,6 @@ object Exports {
   val TextLine: ReactClass = farjs.ui.TextLine()
 
   val WithSize: ReactClass = farjs.ui.WithSize()
+
+  val border: BorderExports = farjs.ui.border.BorderExports
 }

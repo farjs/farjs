@@ -2,12 +2,6 @@ package farjs.ui.border
 
 import farjs.ui.{TextAlign, TextLine, TextLineProps}
 import scommons.react._
-import scommons.react.blessed._
-
-case class DoubleBorderProps(size: (Int, Int),
-                             style: BlessedStyle,
-                             pos: (Int, Int) = (0, 0),
-                             title: Option[String] = None)
 
 object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
 
@@ -16,26 +10,26 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
   private[border] var textLineComp: UiComponent[TextLineProps] = TextLine
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
-    val (width, height) = props.size
-    val (left, top) = props.pos
+    val props = compProps.plain
+    val left = props.left.getOrElse(0)
+    val top = props.top.getOrElse(0)
 
     <.>()(
       <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
-        pos = props.pos,
-        length = width,
-        lineCh = horizontalCh,
+        pos = (left, top),
+        length = props.width,
+        lineCh = DoubleChars.horizontal,
         style = props.style,
-        startCh = Some(topLeftCh),
-        endCh = Some(topRightCh)
+        startCh = Some(DoubleChars.topLeft),
+        endCh = Some(DoubleChars.topRight)
       ))(),
       
-      props.title.map { title =>
+      props.title.toOption.map { title =>
         <(textLineComp())(^.plain := TextLineProps(
           align = TextAlign.center,
           left = left,
           top = top,
-          width = width,
+          width = props.width,
           text = title,
           style = props.style
         ))()
@@ -43,53 +37,26 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
 
       <(verticalLineComp())(^.wrapped := VerticalLineProps(
         pos = (left, top + 1),
-        length = height - 2,
-        lineCh = verticalCh,
+        length = props.height - 2,
+        lineCh = DoubleChars.vertical,
         style = props.style
       ))(),
       
       <(verticalLineComp())(^.wrapped := VerticalLineProps(
-        pos = (left + width - 1, top + 1),
-        length = height - 2,
-        lineCh = verticalCh,
+        pos = (left + props.width - 1, top + 1),
+        length = props.height - 2,
+        lineCh = DoubleChars.vertical,
         style = props.style
       ))(),
 
       <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
-        pos = (left, top + height - 1),
-        length = width,
-        lineCh = horizontalCh,
+        pos = (left, top + props.height - 1),
+        length = props.width,
+        lineCh = DoubleChars.horizontal,
         style = props.style,
-        startCh = Some(bottomLeftCh),
-        endCh = Some(bottomRightCh)
+        startCh = Some(DoubleChars.bottomLeft),
+        endCh = Some(DoubleChars.bottomRight)
       ))()
     )
   }
-
-  // lines
-  val horizontalCh = "\u2550"
-  val verticalCh = "\u2551"
-
-  // corners
-  val topLeftCh = "\u2554"
-  val topRightCh = "\u2557"
-  val bottomLeftCh = "\u255a"
-  val bottomRightCh = "\u255d"
-  
-  // connectors
-  val topCh = "\u2566"
-  val bottomCh = "\u2569"
-  val leftCh = "\u2560"
-  val rightCh = "\u2563"
-  
-  // single connectors
-  val topSingleCh = "\u2564"
-  val bottomSingleCh = "\u2567"
-  val leftSingleCh = "\u255f"
-  val rightSingleCh = "\u2562"
-
-  // crosses
-  val crossCh = "\u256c"
-  val crossSingleVertCh = "\u256a"
-  val crossSingleHorizCh = "\u256b"
 }

@@ -36,14 +36,14 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
     val selectedItems = props.state.selectedItems
 
     <.box(^.rbStyle := theme.regularItem)(
-      <(doubleBorderComp())(^.wrapped := DoubleBorderProps((width, height), theme.regularItem))(),
+      <(doubleBorderComp())(^.plain := DoubleBorderProps(width, height, theme.regularItem))(),
       <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
         pos = (0, height - 4),
         length = width,
         lineCh = SingleBorder.horizontalCh,
         style = theme.regularItem,
-        startCh = Some(DoubleBorder.leftSingleCh),
-        endCh = Some(DoubleBorder.rightSingleCh)
+        startCh = Some(DoubleChars.leftSingle),
+        endCh = Some(DoubleChars.rightSingle)
       ))(),
       <(fileListComp())(^.wrapped := FileListProps(
         dispatch = props.dispatch,

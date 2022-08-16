@@ -68,8 +68,8 @@ object AddToZipPopup extends FunctionComponent[AddToZipPopupProps] {
         length = width - paddingHorizontal * 2,
         lineCh = SingleBorder.horizontalCh,
         style = theme,
-        startCh = Some(DoubleBorder.leftSingleCh),
-        endCh = Some(DoubleBorder.rightSingleCh)
+        startCh = Some(DoubleChars.leftSingle),
+        endCh = Some(DoubleChars.rightSingle)
       ))(),
       <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
         top = 4,

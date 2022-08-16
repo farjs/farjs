@@ -194,12 +194,14 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
         ^.rbLeft := 10,
         ^.rbStyle := boxStyle
       )(), inside(_) { case List(border, text) =>
-        assertTestComponent(border, doubleBorderComp) {
-          case DoubleBorderProps(resSize, style, pos, title) =>
-            resSize shouldBe (width -> height)
+        assertTestComponent(border, doubleBorderComp, plain = true) {
+          case DoubleBorderProps(resWidth, resHeight, style, resLeft, resTop, title) =>
+            resWidth shouldBe width
+            resHeight shouldBe height
             style shouldBe boxStyle
-            pos shouldBe (0 -> 0)
-            title shouldBe Some("Search")
+            resLeft shouldBe js.undefined
+            resTop shouldBe js.undefined
+            title shouldBe "Search"
         }
 
         assertNativeComponent(text,

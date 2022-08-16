@@ -147,8 +147,8 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
             resLength shouldBe (width - 6)
             lineCh shouldBe SingleBorder.horizontalCh
             resStyle shouldBe style
-            startCh shouldBe Some(DoubleBorder.leftSingleCh)
-            endCh shouldBe Some(DoubleBorder.rightSingleCh)
+            startCh shouldBe Some(DoubleChars.leftSingle)
+            endCh shouldBe Some(DoubleChars.rightSingle)
         }))(),
         <(buttonsPanelComp())(^.assertPlain[ButtonsPanelProps](inside(_) {
           case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
