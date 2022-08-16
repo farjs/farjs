@@ -81,14 +81,15 @@ class SubMenuSpec extends TestSpec with TestRendererUtils {
 
         props.items.zipWithIndex.map { case (text, index) =>
           if (text == separator) {
-            <(horizontalLineComp())(^.assertWrapped(inside(_) {
-              case HorizontalLineProps(pos, length, lineCh, style, startCh, endCh) =>
-                pos shouldBe (0 -> (1 + index))
+            <(horizontalLineComp())(^.assertPlain[HorizontalLineProps](inside(_) {
+              case HorizontalLineProps(resLeft, resTop, length, lineCh, style, startCh, endCh) =>
+                resLeft shouldBe 0
+                resTop shouldBe (1 + index)
                 length shouldBe width
                 lineCh shouldBe SingleBorder.horizontalCh
                 style shouldBe theme
-                startCh shouldBe Some(DoubleChars.leftSingle)
-                endCh shouldBe Some(DoubleChars.rightSingle)
+                startCh shouldBe DoubleChars.leftSingle
+                endCh shouldBe DoubleChars.rightSingle
             }))()
           }
           else {

@@ -63,13 +63,14 @@ object AddToZipPopup extends FunctionComponent[AddToZipPopupProps] {
         onEnter = onAction
       ))(),
       
-      <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
-        pos = (0, 3),
+      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+        left = 0,
+        top = 3,
         length = width - paddingHorizontal * 2,
         lineCh = SingleBorder.horizontalCh,
         style = theme,
-        startCh = Some(DoubleChars.leftSingle),
-        endCh = Some(DoubleChars.rightSingle)
+        startCh = DoubleChars.leftSingle,
+        endCh = DoubleChars.rightSingle
       ))(),
       <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
         top = 4,

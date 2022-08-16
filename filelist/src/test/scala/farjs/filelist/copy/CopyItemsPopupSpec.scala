@@ -159,14 +159,15 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
           resValue shouldBe props.path
       }
 
-      assertTestComponent(sep, horizontalLineComp) {
-        case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
-          pos shouldBe 0 -> 3
+      assertTestComponent(sep, horizontalLineComp, plain = true) {
+        case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
+          resLeft shouldBe 0
+          resTop shouldBe 3
           resLength shouldBe (width - paddingHorizontal * 2)
           lineCh shouldBe SingleBorder.horizontalCh
           resStyle shouldBe style
-          startCh shouldBe Some(DoubleChars.leftSingle)
-          endCh shouldBe Some(DoubleChars.rightSingle)
+          startCh shouldBe DoubleChars.leftSingle
+          endCh shouldBe DoubleChars.rightSingle
       }
       assertTestComponent(actionsBox, buttonsPanelComp, plain = true) {
         case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>

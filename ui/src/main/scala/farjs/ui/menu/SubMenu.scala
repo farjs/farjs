@@ -42,13 +42,14 @@ object SubMenu extends FunctionComponent[SubMenuProps] {
 
       props.items.zipWithIndex.map { case (text, index) =>
         if (text == separator) {
-          <(horizontalLineComp())(^.key := s"$index", ^.wrapped := HorizontalLineProps(
-            pos = (0, 1 + index),
+          <(horizontalLineComp())(^.key := s"$index", ^.plain := HorizontalLineProps(
+            left = 0,
+            top = 1 + index,
             length = width,
             lineCh = SingleBorder.horizontalCh,
             style = theme,
-            startCh = Some(DoubleChars.leftSingle),
-            endCh = Some(DoubleChars.rightSingle)
+            startCh = DoubleChars.leftSingle,
+            endCh = DoubleChars.rightSingle
           ))()
         }
         else {

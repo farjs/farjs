@@ -65,13 +65,14 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
         onEnter = onOk
       ))(),
       
-      <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
-        pos = (0, 3),
+      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+        left = 0,
+        top = 3,
         length = width - paddingHorizontal * 2,
         lineCh = SingleBorder.horizontalCh,
         style = theme,
-        startCh = Some(DoubleChars.leftSingle),
-        endCh = Some(DoubleChars.rightSingle)
+        startCh = DoubleChars.leftSingle,
+        endCh = DoubleChars.rightSingle
       ))(),
       <(checkBoxComp())(^.plain := CheckBoxProps(
         left = contentLeft,
@@ -84,13 +85,14 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
         }
       ))(),
       
-      <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
-        pos = (0, 5),
+      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+        left = 0,
+        top = 5,
         length = width - paddingHorizontal * 2,
         lineCh = SingleBorder.horizontalCh,
         style = theme,
-        startCh = Some(DoubleChars.leftSingle),
-        endCh = Some(DoubleChars.rightSingle)
+        startCh = DoubleChars.leftSingle,
+        endCh = DoubleChars.rightSingle
       ))(),
       <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
         top = 6,

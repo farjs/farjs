@@ -199,14 +199,15 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           resTop shouldBe js.undefined
           title shouldBe js.undefined
       }))(),
-      <(horizontalLineComp())(^.assertWrapped(inside(_) {
-        case HorizontalLineProps(pos, len, lineCh, style, startCh, endCh) =>
-          pos shouldBe 0 -> (height - 4)
+      <(horizontalLineComp())(^.assertPlain[HorizontalLineProps](inside(_) {
+        case HorizontalLineProps(resLeft, resTop, len, lineCh, style, startCh, endCh) =>
+          resLeft shouldBe 0
+          resTop shouldBe (height - 4)
           len shouldBe width
           lineCh shouldBe SingleBorder.horizontalCh
           style shouldBe theme.regularItem
-          startCh shouldBe Some(DoubleChars.leftSingle)
-          endCh shouldBe Some(DoubleChars.rightSingle)
+          startCh shouldBe DoubleChars.leftSingle
+          endCh shouldBe DoubleChars.rightSingle
       }))(),
       <(fileListComp())(^.assertWrapped(inside(_) {
         case FileListProps(dispatch, actions, resState, resSize, columns, onKeypress) =>

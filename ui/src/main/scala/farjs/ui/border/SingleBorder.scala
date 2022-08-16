@@ -16,36 +16,38 @@ object SingleBorder extends FunctionComponent[SingleBorderProps] {
     val (width, height) = props.size
 
     <.>()(
-      <(horizontalLineComp())(^.key := "0", ^.wrapped := HorizontalLineProps(
-        pos = (0, 0),
+      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+        left = 0,
+        top = 0,
         length = width,
         lineCh = horizontalCh,
         style = props.style,
-        startCh = Some(topLeftCh),
-        endCh = Some(topRightCh)
+        startCh = topLeftCh,
+        endCh = topRightCh
       ))(),
       
-      <(verticalLineComp())(^.key := "1", ^.wrapped := VerticalLineProps(
+      <(verticalLineComp())(^.wrapped := VerticalLineProps(
         pos = (0, 1),
         length = height - 2,
         lineCh = verticalCh,
         style = props.style
       ))(),
       
-      <(verticalLineComp())(^.key := "2", ^.wrapped := VerticalLineProps(
+      <(verticalLineComp())(^.wrapped := VerticalLineProps(
         pos = (width - 1, 1),
         length = height - 2,
         lineCh = verticalCh,
         style = props.style
       ))(),
 
-      <(horizontalLineComp())(^.key := "3", ^.wrapped := HorizontalLineProps(
-        pos = (0, height - 1),
+      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+        left = 0,
+        top = height - 1,
         length = width,
         lineCh = horizontalCh,
         style = props.style,
-        startCh = Some(bottomLeftCh),
-        endCh = Some(bottomRightCh)
+        startCh = bottomLeftCh,
+        endCh = bottomRightCh
       ))()
     )
   }

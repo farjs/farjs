@@ -54,14 +54,15 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
                          line3: TestInstance,
                          line4: TestInstance): Assertion = {
 
-      assertTestComponent(line1, horizontalLineComp) {
-        case HorizontalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
-          pos shouldBe left -> top
+      assertTestComponent(line1, horizontalLineComp, plain = true) {
+        case HorizontalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
+          resLeft shouldBe left
+          resTop shouldBe top
           resLength shouldBe props.width
           lineCh shouldBe DoubleChars.horizontal
           style shouldBe props.style
-          startCh shouldBe Some(DoubleChars.topLeft)
-          endCh shouldBe Some(DoubleChars.topRight)
+          startCh shouldBe DoubleChars.topLeft
+          endCh shouldBe DoubleChars.topRight
       }
 
       title.isDefined shouldBe props.title.isDefined
@@ -97,14 +98,15 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
           startCh shouldBe None
           endCh shouldBe None
       }
-      assertTestComponent(line4, horizontalLineComp) {
-        case HorizontalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
-          pos shouldBe left -> (top + props.height - 1)
+      assertTestComponent(line4, horizontalLineComp, plain = true) {
+        case HorizontalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
+          resLeft shouldBe left
+          resTop shouldBe (top + props.height - 1)
           resLength shouldBe props.width
           lineCh shouldBe DoubleChars.horizontal
           style shouldBe props.style
-          startCh shouldBe Some(DoubleChars.bottomLeft)
-          endCh shouldBe Some(DoubleChars.bottomRight)
+          startCh shouldBe DoubleChars.bottomLeft
+          endCh shouldBe DoubleChars.bottomRight
       }
     }
 

@@ -156,14 +156,15 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
             resValue shouldBe props.folderName
         }))(),
         
-        <(horizontalLineComp())(^.assertWrapped(inside(_) {
-          case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
-            pos shouldBe 0 -> 3
+        <(horizontalLineComp())(^.assertPlain[HorizontalLineProps](inside(_) {
+          case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
+            resLeft shouldBe 0
+            resTop shouldBe 3
             resLength shouldBe (width - 6)
             lineCh shouldBe SingleBorder.horizontalCh
             resStyle shouldBe style
-            startCh shouldBe Some(DoubleChars.leftSingle)
-            endCh shouldBe Some(DoubleChars.rightSingle)
+            startCh shouldBe DoubleChars.leftSingle
+            endCh shouldBe DoubleChars.rightSingle
         }))(),
         <(checkBoxComp())(^.assertPlain[CheckBoxProps](inside(_) {
           case CheckBoxProps(left, top, resValue, resLabel, resStyle, _) =>
@@ -174,14 +175,15 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
             resStyle shouldBe style
         }))(),
 
-        <(horizontalLineComp())(^.assertWrapped(inside(_) {
-          case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
-            pos shouldBe 0 -> 5
+        <(horizontalLineComp())(^.assertPlain[HorizontalLineProps](inside(_) {
+          case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
+            resLeft shouldBe 0
+            resTop shouldBe 5
             resLength shouldBe (width - 6)
             lineCh shouldBe SingleBorder.horizontalCh
             resStyle shouldBe style
-            startCh shouldBe Some(DoubleChars.leftSingle)
-            endCh shouldBe Some(DoubleChars.rightSingle)
+            startCh shouldBe DoubleChars.leftSingle
+            endCh shouldBe DoubleChars.rightSingle
         }))(),
         <(buttonsPanelComp())(^.assertPlain[ButtonsPanelProps](inside(_) {
           case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>

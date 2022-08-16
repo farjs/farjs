@@ -24,14 +24,15 @@ class SingleBorderSpec extends TestSpec with TestRendererUtils {
     val (line1, line2, line3, line4) = inside(result.children.toList) {
       case List(line1, line2, line3, line4) => (line1, line2, line3, line4)
     }
-    assertTestComponent(line1, horizontalLineComp) {
-      case HorizontalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
-        pos shouldBe 0 -> 0
+    assertTestComponent(line1, horizontalLineComp, plain = true) {
+      case HorizontalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
+        resLeft shouldBe 0
+        resTop shouldBe 0
         resLength shouldBe 3
         lineCh shouldBe SingleBorder.horizontalCh
         style shouldBe props.style
-        startCh shouldBe Some(SingleBorder.topLeftCh)
-        endCh shouldBe Some(SingleBorder.topRightCh)
+        startCh shouldBe SingleBorder.topLeftCh
+        endCh shouldBe SingleBorder.topRightCh
     }
     assertTestComponent(line2, verticalLineComp) {
       case VerticalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
@@ -51,14 +52,15 @@ class SingleBorderSpec extends TestSpec with TestRendererUtils {
         startCh shouldBe None
         endCh shouldBe None
     }
-    assertTestComponent(line4, horizontalLineComp) {
-      case HorizontalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
-        pos shouldBe 0 -> 3
+    assertTestComponent(line4, horizontalLineComp, plain = true) {
+      case HorizontalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
+        resLeft shouldBe 0
+        resTop shouldBe 3
         resLength shouldBe 3
         lineCh shouldBe SingleBorder.horizontalCh
         style shouldBe props.style
-        startCh shouldBe Some(SingleBorder.bottomLeftCh)
-        endCh shouldBe Some(SingleBorder.bottomRightCh)
+        startCh shouldBe SingleBorder.bottomLeftCh
+        endCh shouldBe SingleBorder.bottomRightCh
     }
   }
 }

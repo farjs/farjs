@@ -70,8 +70,9 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
         length = contentWidth,
         style = theme
       ))(),
-      <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
-        pos = (contentLeft, 6),
+      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+        left = contentLeft,
+        top = 6,
         length = contentWidth,
         lineCh = SingleBorder.horizontalCh,
         style = theme
@@ -92,8 +93,9 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
         style = theme
       ))(),
 
-      <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
-        pos = (contentLeft, 8),
+      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+        left = contentLeft,
+        top = 8,
         length = contentWidth,
         lineCh = SingleBorder.horizontalCh,
         style = theme

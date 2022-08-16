@@ -37,13 +37,14 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
 
     <.box(^.rbStyle := theme.regularItem)(
       <(doubleBorderComp())(^.plain := DoubleBorderProps(width, height, theme.regularItem))(),
-      <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
-        pos = (0, height - 4),
+      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+        left = 0,
+        top = height - 4,
         length = width,
         lineCh = SingleBorder.horizontalCh,
         style = theme.regularItem,
-        startCh = Some(DoubleChars.leftSingle),
-        endCh = Some(DoubleChars.rightSingle)
+        startCh = DoubleChars.leftSingle,
+        endCh = DoubleChars.rightSingle
       ))(),
       <(fileListComp())(^.wrapped := FileListProps(
         dispatch = props.dispatch,

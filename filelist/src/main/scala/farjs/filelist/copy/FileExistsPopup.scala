@@ -59,13 +59,14 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
         style = theme,
         padding = 0
       ))(),
-      <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
-        pos = (0, 3),
+      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+        left = 0,
+        top = 3,
         length = width - 6,
         lineCh = SingleBorder.horizontalCh,
         style = theme,
-        startCh = Some(DoubleChars.leftSingle),
-        endCh = Some(DoubleChars.rightSingle)
+        startCh = DoubleChars.leftSingle,
+        endCh = DoubleChars.rightSingle
       ))(),
       
       <.text(
@@ -101,13 +102,14 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
         padding = 0
       ))(),
       
-      <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
-        pos = (0, 6),
+      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+        left = 0,
+        top = 6,
         length = width - paddingHorizontal * 2,
         lineCh = SingleBorder.horizontalCh,
         style = theme,
-        startCh = Some(DoubleChars.leftSingle),
-        endCh = Some(DoubleChars.rightSingle)
+        startCh = DoubleChars.leftSingle,
+        endCh = DoubleChars.rightSingle
       ))(),
       <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
         top = 7,

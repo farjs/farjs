@@ -15,13 +15,14 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
     val top = props.top.getOrElse(0)
 
     <.>()(
-      <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
-        pos = (left, top),
+      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+        left = left,
+        top = top,
         length = props.width,
         lineCh = DoubleChars.horizontal,
         style = props.style,
-        startCh = Some(DoubleChars.topLeft),
-        endCh = Some(DoubleChars.topRight)
+        startCh = DoubleChars.topLeft,
+        endCh = DoubleChars.topRight
       ))(),
       
       props.title.toOption.map { title =>
@@ -49,13 +50,14 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
         style = props.style
       ))(),
 
-      <(horizontalLineComp())(^.wrapped := HorizontalLineProps(
-        pos = (left, top + props.height - 1),
+      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+        left = left,
+        top = top + props.height - 1,
         length = props.width,
         lineCh = DoubleChars.horizontal,
         style = props.style,
-        startCh = Some(DoubleChars.bottomLeft),
-        endCh = Some(DoubleChars.bottomRight)
+        startCh = DoubleChars.bottomLeft,
+        endCh = DoubleChars.bottomRight
       ))()
     )
   }

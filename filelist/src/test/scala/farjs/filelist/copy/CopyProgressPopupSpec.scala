@@ -146,14 +146,15 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           resLength shouldBe contentWidth
           resStyle shouldBe theme
       }
-      assertTestComponent(sep1, horizontalLineComp) {
-        case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
-          pos shouldBe contentLeft -> 6
+      assertTestComponent(sep1, horizontalLineComp, plain = true) {
+        case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
+          resLeft shouldBe contentLeft
+          resTop shouldBe 6
           resLength shouldBe contentWidth
           lineCh shouldBe SingleBorder.horizontalCh
           resStyle shouldBe theme
-          startCh shouldBe None
-          endCh shouldBe None
+          startCh shouldBe js.undefined
+          endCh shouldBe js.undefined
       }
       assertTestComponent(total, textLineComp, plain = true) {
         case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
@@ -175,14 +176,15 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           resStyle shouldBe theme
       }
 
-      assertTestComponent(sep2, horizontalLineComp) {
-        case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
-          pos shouldBe contentLeft -> 8
+      assertTestComponent(sep2, horizontalLineComp, plain = true) {
+        case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
+          resLeft shouldBe contentLeft
+          resTop shouldBe 8
           resLength shouldBe contentWidth
           lineCh shouldBe SingleBorder.horizontalCh
           resStyle shouldBe theme
-          startCh shouldBe None
-          endCh shouldBe None
+          startCh shouldBe js.undefined
+          endCh shouldBe js.undefined
       }
 
       assertNativeComponent(time,

@@ -172,14 +172,15 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
           focused shouldBe js.undefined
           padding shouldBe 0
       }
-      assertTestComponent(sep1, horizontalLineComp) {
-        case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
-          pos shouldBe 0 -> 3
+      assertTestComponent(sep1, horizontalLineComp, plain = true) {
+        case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
+          resLeft shouldBe 0
+          resTop shouldBe 3
           resLength shouldBe (width - 6)
           lineCh shouldBe SingleBorder.horizontalCh
           resStyle shouldBe theme
-          startCh shouldBe Some(DoubleChars.leftSingle)
-          endCh shouldBe Some(DoubleChars.rightSingle)
+          startCh shouldBe DoubleChars.leftSingle
+          endCh shouldBe DoubleChars.rightSingle
       }
       
       assertNativeComponent(label2,
@@ -215,14 +216,15 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
           padding shouldBe 0
       }
 
-      assertTestComponent(sep2, horizontalLineComp) {
-        case HorizontalLineProps(pos, resLength, lineCh, resStyle, startCh, endCh) =>
-          pos shouldBe 0 -> 6
+      assertTestComponent(sep2, horizontalLineComp, plain = true) {
+        case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
+          resLeft shouldBe 0
+          resTop shouldBe 6
           resLength shouldBe (width - 6)
           lineCh shouldBe SingleBorder.horizontalCh
           resStyle shouldBe theme
-          startCh shouldBe Some(DoubleChars.leftSingle)
-          endCh shouldBe Some(DoubleChars.rightSingle)
+          startCh shouldBe DoubleChars.leftSingle
+          endCh shouldBe DoubleChars.rightSingle
       }
       assertTestComponent(actionsBox, buttonsPanelComp, plain = true) {
         case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
