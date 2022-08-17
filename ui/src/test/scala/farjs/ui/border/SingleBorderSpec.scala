@@ -11,11 +11,11 @@ class SingleBorderSpec extends TestSpec with TestRendererUtils {
 
   it should "render component" in {
     //given
-    val props = SingleBorderProps((3, 4), style = new BlessedStyle {
+    val props = SingleBorderProps(3, 4, style = new BlessedStyle {
       override val fg = "black"
       override val bg = "cyan"
     })
-    val comp = <(SingleBorder())(^.wrapped := props)()
+    val comp = <(SingleBorder())(^.plain := props)()
 
     //when
     val result = createTestRenderer(comp).root
@@ -29,16 +29,16 @@ class SingleBorderSpec extends TestSpec with TestRendererUtils {
         resLeft shouldBe 0
         resTop shouldBe 0
         resLength shouldBe 3
-        lineCh shouldBe SingleBorder.horizontalCh
+        lineCh shouldBe SingleChars.horizontal
         style shouldBe props.style
-        startCh shouldBe SingleBorder.topLeftCh
-        endCh shouldBe SingleBorder.topRightCh
+        startCh shouldBe SingleChars.topLeft
+        endCh shouldBe SingleChars.topRight
     }
     assertTestComponent(line2, verticalLineComp) {
       case VerticalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
         pos shouldBe 0 -> 1
         resLength shouldBe 2
-        lineCh shouldBe SingleBorder.verticalCh
+        lineCh shouldBe SingleChars.vertical
         style shouldBe props.style
         startCh shouldBe None
         endCh shouldBe None
@@ -47,7 +47,7 @@ class SingleBorderSpec extends TestSpec with TestRendererUtils {
       case VerticalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
         pos shouldBe 2 -> 1
         resLength shouldBe 2
-        lineCh shouldBe SingleBorder.verticalCh
+        lineCh shouldBe SingleChars.vertical
         style shouldBe props.style
         startCh shouldBe None
         endCh shouldBe None
@@ -57,10 +57,10 @@ class SingleBorderSpec extends TestSpec with TestRendererUtils {
         resLeft shouldBe 0
         resTop shouldBe 3
         resLength shouldBe 3
-        lineCh shouldBe SingleBorder.horizontalCh
+        lineCh shouldBe SingleChars.horizontal
         style shouldBe props.style
-        startCh shouldBe SingleBorder.bottomLeftCh
-        endCh shouldBe SingleBorder.bottomRightCh
+        startCh shouldBe SingleChars.bottomLeft
+        endCh shouldBe SingleChars.bottomRight
     }
   }
 }

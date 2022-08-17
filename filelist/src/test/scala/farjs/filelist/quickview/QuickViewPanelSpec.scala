@@ -131,7 +131,7 @@ class QuickViewPanelSpec extends AsyncTestSpec with BaseTestSpec
           resLeft shouldBe 0
           resTop shouldBe (height - 4)
           len shouldBe width
-          lineCh shouldBe SingleBorder.horizontalCh
+          lineCh shouldBe SingleChars.horizontal
           style shouldBe theme.regularItem
           startCh shouldBe DoubleChars.leftSingle
           endCh shouldBe DoubleChars.rightSingle

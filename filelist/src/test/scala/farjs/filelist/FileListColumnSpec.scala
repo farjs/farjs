@@ -20,7 +20,7 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
     val props = FileListColumnProps(
       size = (14, 3),
       left = 2,
-      borderCh = SingleBorder.verticalCh,
+      borderCh = SingleChars.vertical,
       items = List(
         FileListItem("item 1"),
         FileListItem("item 2"),
@@ -55,7 +55,7 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
     val props = FileListColumnProps(
       size = (14, 3),
       left = 2,
-      borderCh = SingleBorder.verticalCh,
+      borderCh = SingleChars.vertical,
       items = List(
         FileListItem("item 1"),
         FileListItem("item 2"),
@@ -92,7 +92,7 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
     val props = FileListColumnProps(
       size = (14, 3),
       left = 2,
-      borderCh = SingleBorder.verticalCh,
+      borderCh = SingleChars.vertical,
       items = List(
         FileListItem.up,
         FileListItem("dir\t1 {bold}", isDir = true),
@@ -131,7 +131,7 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
     val props = FileListColumnProps(
       size = (6, 3),
       left = 2,
-      borderCh = SingleBorder.verticalCh,
+      borderCh = SingleChars.vertical,
       items = Nil,
       focusedIndex = -1,
       selectedNames = Set.empty

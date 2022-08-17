@@ -3,7 +3,7 @@ package farjs.app.filelist.fs
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.FileListState
 import farjs.filelist.stack.{PanelStack, WithPanelStacks}
-import farjs.ui.border.SingleBorder
+import farjs.ui.border.SingleChars
 import farjs.ui.menu.{MenuPopup, MenuPopupProps}
 import scommons.nodejs.Process.Platform
 import scommons.nodejs.process
@@ -96,7 +96,7 @@ object FSDrivePopup extends FunctionComponent[FSDrivePopupProps] {
       val maxNameWidth = 15
       val maxSizeWidth = items.maxBy(_._3.length)._3.length
       val maxFreeWidth = items.maxBy(_._4.length)._4.length
-      val sep = SingleBorder.verticalCh
+      val sep = SingleChars.vertical
 
       items.map { case (root, iName, iSize, iFree) =>
         val name = iName.take(maxNameWidth).padTo(maxNameWidth, ' ')

@@ -63,7 +63,7 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
         left = 0,
         top = 3,
         length = width - 6,
-        lineCh = SingleBorder.horizontalCh,
+        lineCh = SingleChars.horizontal,
         style = theme,
         startCh = DoubleChars.leftSingle,
         endCh = DoubleChars.rightSingle
@@ -106,7 +106,7 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
         left = 0,
         top = 6,
         length = width - paddingHorizontal * 2,
-        lineCh = SingleBorder.horizontalCh,
+        lineCh = SingleChars.horizontal,
         style = theme,
         startCh = DoubleChars.leftSingle,
         endCh = DoubleChars.rightSingle

@@ -111,10 +111,10 @@ object FileListView extends FunctionComponent[FileListViewProps] {
                 <(verticalLineComp())(^.wrapped := VerticalLineProps(
                   pos = (colLeft + colWidth, -1),
                   length = height + 2,
-                  lineCh = SingleBorder.verticalCh,
+                  lineCh = SingleChars.vertical,
                   style = Theme.current.fileList.regularItem,
                   startCh = Some(DoubleChars.topSingle),
-                  endCh = Some(SingleBorder.bottomCh)
+                  endCh = Some(SingleChars.bottom)
                 ))()
               )
               else None,
@@ -123,7 +123,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
                 size = (colWidth, height),
                 left = colLeft,
                 borderCh =
-                  if (colIndex != columns - 1) SingleBorder.verticalCh
+                  if (colIndex != columns - 1) SingleChars.vertical
                   else DoubleChars.vertical,
                 items = colItems,
                 focusedIndex = {

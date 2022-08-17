@@ -86,7 +86,7 @@ class SubMenuSpec extends TestSpec with TestRendererUtils {
                 resLeft shouldBe 0
                 resTop shouldBe (1 + index)
                 length shouldBe width
-                lineCh shouldBe SingleBorder.horizontalCh
+                lineCh shouldBe SingleChars.horizontal
                 style shouldBe theme
                 startCh shouldBe DoubleChars.leftSingle
                 endCh shouldBe DoubleChars.rightSingle

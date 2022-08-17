@@ -164,7 +164,7 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
           resLeft shouldBe 0
           resTop shouldBe 3
           resLength shouldBe (width - paddingHorizontal * 2)
-          lineCh shouldBe SingleBorder.horizontalCh
+          lineCh shouldBe SingleChars.horizontal
           resStyle shouldBe style
           startCh shouldBe DoubleChars.leftSingle
           endCh shouldBe DoubleChars.rightSingle

@@ -42,7 +42,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
         left = 0,
         top = height - 4,
         length = width,
-        lineCh = SingleBorder.horizontalCh,
+        lineCh = SingleChars.horizontal,
         style = theme.regularItem,
         startCh = DoubleChars.leftSingle,
         endCh = DoubleChars.rightSingle

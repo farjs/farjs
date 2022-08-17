@@ -151,7 +151,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           resLeft shouldBe contentLeft
           resTop shouldBe 6
           resLength shouldBe contentWidth
-          lineCh shouldBe SingleBorder.horizontalCh
+          lineCh shouldBe SingleChars.horizontal
           resStyle shouldBe theme
           startCh shouldBe js.undefined
           endCh shouldBe js.undefined
@@ -181,7 +181,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           resLeft shouldBe contentLeft
           resTop shouldBe 8
           resLength shouldBe contentWidth
-          lineCh shouldBe SingleBorder.horizontalCh
+          lineCh shouldBe SingleChars.horizontal
           resStyle shouldBe theme
           startCh shouldBe js.undefined
           endCh shouldBe js.undefined

@@ -161,7 +161,7 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
             resLeft shouldBe 0
             resTop shouldBe 3
             resLength shouldBe (width - 6)
-            lineCh shouldBe SingleBorder.horizontalCh
+            lineCh shouldBe SingleChars.horizontal
             resStyle shouldBe style
             startCh shouldBe DoubleChars.leftSingle
             endCh shouldBe DoubleChars.rightSingle
@@ -180,7 +180,7 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
             resLeft shouldBe 0
             resTop shouldBe 5
             resLength shouldBe (width - 6)
-            lineCh shouldBe SingleBorder.horizontalCh
+            lineCh shouldBe SingleChars.horizontal
             resStyle shouldBe style
             startCh shouldBe DoubleChars.leftSingle
             endCh shouldBe DoubleChars.rightSingle

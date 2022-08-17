@@ -46,7 +46,7 @@ object SubMenu extends FunctionComponent[SubMenuProps] {
             left = 0,
             top = 1 + index,
             length = width,
-            lineCh = SingleBorder.horizontalCh,
+            lineCh = SingleChars.horizontal,
             style = theme,
             startCh = DoubleChars.leftSingle,
             endCh = DoubleChars.rightSingle

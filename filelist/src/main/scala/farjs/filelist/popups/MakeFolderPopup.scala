@@ -69,7 +69,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
         left = 0,
         top = 3,
         length = width - paddingHorizontal * 2,
-        lineCh = SingleBorder.horizontalCh,
+        lineCh = SingleChars.horizontal,
         style = theme,
         startCh = DoubleChars.leftSingle,
         endCh = DoubleChars.rightSingle
@@ -89,7 +89,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
         left = 0,
         top = 5,
         length = width - paddingHorizontal * 2,
-        lineCh = SingleBorder.horizontalCh,
+        lineCh = SingleChars.horizontal,
         style = theme,
         startCh = DoubleChars.leftSingle,
         endCh = DoubleChars.rightSingle

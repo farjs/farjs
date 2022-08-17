@@ -77,7 +77,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
         left = 0,
         top = 3,
         length = width - paddingHorizontal * 2,
-        lineCh = SingleBorder.horizontalCh,
+        lineCh = SingleChars.horizontal,
         style = theme,
         startCh = DoubleChars.leftSingle,
         endCh = DoubleChars.rightSingle

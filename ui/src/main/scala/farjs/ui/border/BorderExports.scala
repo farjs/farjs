@@ -12,6 +12,10 @@ sealed trait BorderExports {
   val DoubleChars: DoubleChars = farjs.ui.border.DoubleChars
 
   val HorizontalLine: ReactClass = farjs.ui.border.HorizontalLine()
+
+  val SingleBorder: ReactClass = farjs.ui.border.SingleBorder()
+
+  val SingleChars: SingleChars = farjs.ui.border.SingleChars
 }
 
 object BorderExports extends BorderExports

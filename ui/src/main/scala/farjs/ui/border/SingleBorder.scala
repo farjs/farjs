@@ -1,10 +1,6 @@
 package farjs.ui.border
 
 import scommons.react._
-import scommons.react.blessed._
-
-case class SingleBorderProps(size: (Int, Int),
-                             style: BlessedStyle)
 
 object SingleBorder extends FunctionComponent[SingleBorderProps] {
 
@@ -12,70 +8,42 @@ object SingleBorder extends FunctionComponent[SingleBorderProps] {
   private[border] var verticalLineComp: UiComponent[VerticalLineProps] = VerticalLine
   
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
-    val (width, height) = props.size
+    val props = compProps.plain
 
     <.>()(
       <(horizontalLineComp())(^.plain := HorizontalLineProps(
         left = 0,
         top = 0,
-        length = width,
-        lineCh = horizontalCh,
+        length = props.width,
+        lineCh = SingleChars.horizontal,
         style = props.style,
-        startCh = topLeftCh,
-        endCh = topRightCh
+        startCh = SingleChars.topLeft,
+        endCh = SingleChars.topRight
       ))(),
       
       <(verticalLineComp())(^.wrapped := VerticalLineProps(
         pos = (0, 1),
-        length = height - 2,
-        lineCh = verticalCh,
+        length = props.height - 2,
+        lineCh = SingleChars.vertical,
         style = props.style
       ))(),
       
       <(verticalLineComp())(^.wrapped := VerticalLineProps(
-        pos = (width - 1, 1),
-        length = height - 2,
-        lineCh = verticalCh,
+        pos = (props.width - 1, 1),
+        length = props.height - 2,
+        lineCh = SingleChars.vertical,
         style = props.style
       ))(),
 
       <(horizontalLineComp())(^.plain := HorizontalLineProps(
         left = 0,
-        top = height - 1,
-        length = width,
-        lineCh = horizontalCh,
+        top = props.height - 1,
+        length = props.width,
+        lineCh = SingleChars.horizontal,
         style = props.style,
-        startCh = bottomLeftCh,
-        endCh = bottomRightCh
+        startCh = SingleChars.bottomLeft,
+        endCh = SingleChars.bottomRight
       ))()
     )
   }
-
-  // lines
-  val horizontalCh = "\u2500"
-  val verticalCh = "\u2502"
-  
-  // corners
-  val topLeftCh = "\u250c"
-  val topRightCh = "\u2510"
-  val bottomLeftCh = "\u2514"
-  val bottomRightCh = "\u2518"
-
-  // connectors
-  val topCh = "\u252c"
-  val bottomCh = "\u2534"
-  val leftCh = "\u251c"
-  val rightCh = "\u2524"
-
-  // double connectors
-  val topDoubleCh = "\u2565"
-  val bottomDoubleCh = "\u2568"
-  val leftDoubleCh = "\u255e"
-  val rightDoubleCh = "\u2561"
-
-  // crosses
-  val crossCh = "\u253c"
-  val crossDoubleVertCh = "\u256b"
-  val crossDoubleHorizCh = "\u256a"
 }
