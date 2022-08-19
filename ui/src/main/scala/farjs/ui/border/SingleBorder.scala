@@ -21,15 +21,17 @@ object SingleBorder extends FunctionComponent[SingleBorderProps] {
         endCh = SingleChars.topRight
       ))(),
       
-      <(verticalLineComp())(^.wrapped := VerticalLineProps(
-        pos = (0, 1),
+      <(verticalLineComp())(^.plain := VerticalLineProps(
+        left = 0,
+        top = 1,
         length = props.height - 2,
         lineCh = SingleChars.vertical,
         style = props.style
       ))(),
       
-      <(verticalLineComp())(^.wrapped := VerticalLineProps(
-        pos = (props.width - 1, 1),
+      <(verticalLineComp())(^.plain := VerticalLineProps(
+        left = props.width - 1,
+        top = 1,
         length = props.height - 2,
         lineCh = SingleChars.vertical,
         style = props.style

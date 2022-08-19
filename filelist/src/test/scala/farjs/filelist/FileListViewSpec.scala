@@ -249,14 +249,15 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
       ^.rbLeft := 1,
       ^.rbTop := 1
     )(), inside(_) { case List(sep, col1, col2) =>
-      assertTestComponent(sep, verticalLineComp) {
-        case VerticalLineProps(pos, resLength, ch, style, start, end) =>
-          pos shouldBe 2 -> -1
+      assertTestComponent(sep, verticalLineComp, plain = true) {
+        case VerticalLineProps(resLeft, resTop, resLength, ch, style, start, end) =>
+          resLeft shouldBe 2
+          resTop shouldBe -1
           resLength shouldBe 4
           ch shouldBe SingleChars.vertical
           style shouldBe Theme.current.fileList.regularItem
-          start shouldBe Some(DoubleChars.topSingle)
-          end shouldBe Some(SingleChars.bottom)
+          start shouldBe DoubleChars.topSingle
+          end shouldBe SingleChars.bottom
       }
       assertTestComponent(col1, fileListColumnComp) {
         case FileListColumnProps(resSize, left, borderCh, items, focusedPos, selectedNames) =>

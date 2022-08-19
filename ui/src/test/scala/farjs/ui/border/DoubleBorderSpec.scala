@@ -80,23 +80,25 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
         }
       }
 
-      assertTestComponent(line2, verticalLineComp) {
-        case VerticalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
-          pos shouldBe left -> (top + 1)
+      assertTestComponent(line2, verticalLineComp, plain = true) {
+        case VerticalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
+          resLeft shouldBe left
+          resTop shouldBe (top + 1)
           resLength shouldBe (props.height - 2)
           lineCh shouldBe DoubleChars.vertical
           style shouldBe props.style
-          startCh shouldBe None
-          endCh shouldBe None
+          startCh shouldBe js.undefined
+          endCh shouldBe js.undefined
       }
-      assertTestComponent(line3, verticalLineComp) {
-        case VerticalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
-          pos shouldBe (left + props.width - 1) -> (top + 1)
+      assertTestComponent(line3, verticalLineComp, plain = true) {
+        case VerticalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
+          resLeft shouldBe (left + props.width - 1)
+          resTop shouldBe (top + 1)
           resLength shouldBe (props.height - 2)
           lineCh shouldBe DoubleChars.vertical
           style shouldBe props.style
-          startCh shouldBe None
-          endCh shouldBe None
+          startCh shouldBe js.undefined
+          endCh shouldBe js.undefined
       }
       assertTestComponent(line4, horizontalLineComp, plain = true) {
         case HorizontalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>

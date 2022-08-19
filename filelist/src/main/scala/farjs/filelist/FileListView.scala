@@ -108,13 +108,14 @@ object FileListView extends FunctionComponent[FileListViewProps] {
           case (colItems, (colLeft, colWidth, colIndex)) =>
             <.>(^.key := s"$colIndex")(
               if (colIndex != columns - 1) Some(
-                <(verticalLineComp())(^.wrapped := VerticalLineProps(
-                  pos = (colLeft + colWidth, -1),
+                <(verticalLineComp())(^.plain := VerticalLineProps(
+                  left = colLeft + colWidth,
+                  top = -1,
                   length = height + 2,
                   lineCh = SingleChars.vertical,
                   style = Theme.current.fileList.regularItem,
-                  startCh = Some(DoubleChars.topSingle),
-                  endCh = Some(SingleChars.bottom)
+                  startCh = DoubleChars.topSingle,
+                  endCh = SingleChars.bottom
                 ))()
               )
               else None,

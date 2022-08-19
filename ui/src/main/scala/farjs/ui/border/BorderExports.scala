@@ -16,6 +16,8 @@ sealed trait BorderExports {
   val SingleBorder: ReactClass = farjs.ui.border.SingleBorder()
 
   val SingleChars: SingleChars = farjs.ui.border.SingleChars
+
+  val VerticalLine: ReactClass = farjs.ui.border.VerticalLine()
 }
 
 object BorderExports extends BorderExports

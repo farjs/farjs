@@ -3,15 +3,17 @@ package farjs.ui.border
 import scommons.react.blessed._
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class VerticalLineSpec extends TestSpec with TestRendererUtils {
 
   it should "render line without start and end chars" in {
     //given
-    val props = getVerticalLineProps.copy(
-      startCh = None,
-      endCh = None
+    val props = VerticalLineProps.copy(getVerticalLineProps)(
+      startCh = js.undefined,
+      endCh = js.undefined
     )
-    val comp = <(VerticalLine())(^.wrapped := props)()
+    val comp = <(VerticalLine())(^.plain := props)()
 
     //when
     val result = testRender(comp)
@@ -22,11 +24,11 @@ class VerticalLineSpec extends TestSpec with TestRendererUtils {
   
   it should "render line with start char" in {
     //given
-    val props = getVerticalLineProps.copy(
-      startCh = Some("+"),
-      endCh = None
+    val props = VerticalLineProps.copy(getVerticalLineProps)(
+      startCh = "+",
+      endCh = js.undefined
     )
-    val comp = <(VerticalLine())(^.wrapped := props)()
+    val comp = <(VerticalLine())(^.plain := props)()
 
     //when
     val result = testRender(comp)
@@ -37,11 +39,11 @@ class VerticalLineSpec extends TestSpec with TestRendererUtils {
   
   it should "render line with end char" in {
     //given
-    val props = getVerticalLineProps.copy(
-      startCh = None,
-      endCh = Some("-")
+    val props = VerticalLineProps.copy(getVerticalLineProps)(
+      startCh = js.undefined,
+      endCh = "-"
     )
-    val comp = <(VerticalLine())(^.wrapped := props)()
+    val comp = <(VerticalLine())(^.plain := props)()
 
     //when
     val result = testRender(comp)
@@ -52,11 +54,11 @@ class VerticalLineSpec extends TestSpec with TestRendererUtils {
 
   it should "render line with start and end chars" in {
     //given
-    val props = getVerticalLineProps.copy(
-      startCh = Some("+"),
-      endCh = Some("-")
+    val props = VerticalLineProps.copy(getVerticalLineProps)(
+      startCh = "+",
+      endCh = "-"
     )
-    val comp = <(VerticalLine())(^.wrapped := props)()
+    val comp = <(VerticalLine())(^.plain := props)()
 
     //when
     val result = testRender(comp)
@@ -66,26 +68,25 @@ class VerticalLineSpec extends TestSpec with TestRendererUtils {
   }
 
   private def getVerticalLineProps: VerticalLineProps = VerticalLineProps(
-    pos = (1, 2),
+    left = 1,
+    top = 2,
     length = 5,
     lineCh = "*",
     style = new BlessedStyle {
       override val fg = "white"
       override val bg = "blue"
     },
-    startCh = None,
-    endCh = None
+    startCh = js.undefined,
+    endCh = js.undefined
   )
 
   private def assertVerticalLine(result: TestInstance, props: VerticalLineProps): Unit = {
-    val (left, top) = props.pos
-    
     assertNativeComponent(result,
       <.text(
         ^.rbWidth := 1,
         ^.rbHeight := props.length,
-        ^.rbLeft := left,
-        ^.rbTop := top,
+        ^.rbLeft := props.left,
+        ^.rbTop := props.top,
         ^.rbStyle := props.style,
         ^.content := {
           val startCh = props.startCh.getOrElse("")

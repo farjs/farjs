@@ -36,15 +36,17 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
         ))()
       },
 
-      <(verticalLineComp())(^.wrapped := VerticalLineProps(
-        pos = (left, top + 1),
+      <(verticalLineComp())(^.plain := VerticalLineProps(
+        left = left,
+        top = top + 1,
         length = props.height - 2,
         lineCh = DoubleChars.vertical,
         style = props.style
       ))(),
       
-      <(verticalLineComp())(^.wrapped := VerticalLineProps(
-        pos = (left + props.width - 1, top + 1),
+      <(verticalLineComp())(^.plain := VerticalLineProps(
+        left = left + props.width - 1,
+        top = top + 1,
         length = props.height - 2,
         lineCh = DoubleChars.vertical,
         style = props.style

@@ -4,6 +4,8 @@ import farjs.ui.border.SingleBorder._
 import scommons.react.blessed._
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class SingleBorderSpec extends TestSpec with TestRendererUtils {
 
   SingleBorder.horizontalLineComp = mockUiComponent("HorizontalLine")
@@ -34,23 +36,25 @@ class SingleBorderSpec extends TestSpec with TestRendererUtils {
         startCh shouldBe SingleChars.topLeft
         endCh shouldBe SingleChars.topRight
     }
-    assertTestComponent(line2, verticalLineComp) {
-      case VerticalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
-        pos shouldBe 0 -> 1
+    assertTestComponent(line2, verticalLineComp, plain = true) {
+      case VerticalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
+        resLeft shouldBe 0
+        resTop shouldBe 1
         resLength shouldBe 2
         lineCh shouldBe SingleChars.vertical
         style shouldBe props.style
-        startCh shouldBe None
-        endCh shouldBe None
+        startCh shouldBe js.undefined
+        endCh shouldBe js.undefined
     }
-    assertTestComponent(line3, verticalLineComp) {
-      case VerticalLineProps(pos, resLength, lineCh, style, startCh, endCh) =>
-        pos shouldBe 2 -> 1
+    assertTestComponent(line3, verticalLineComp, plain = true) {
+      case VerticalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
+        resLeft shouldBe 2
+        resTop shouldBe 1
         resLength shouldBe 2
         lineCh shouldBe SingleChars.vertical
         style shouldBe props.style
-        startCh shouldBe None
-        endCh shouldBe None
+        startCh shouldBe js.undefined
+        endCh shouldBe js.undefined
     }
     assertTestComponent(line4, horizontalLineComp, plain = true) {
       case HorizontalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
