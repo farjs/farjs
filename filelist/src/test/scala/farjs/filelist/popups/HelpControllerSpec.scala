@@ -15,7 +15,7 @@ class HelpControllerSpec extends TestSpec with TestRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val props = FileListPopupsProps(dispatch, FileListPopupsState(showHelpPopup = true))
     val comp = testRender(<(HelpController())(^.wrapped := props)())
-    val msgBox = findComponentProps(comp, messageBoxComp)
+    val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
     val action = FileListPopupHelpAction(show = false)
 
     //then
@@ -34,11 +34,11 @@ class HelpControllerSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(HelpController())(^.wrapped := props)())
 
     //then
-    assertTestComponent(result, messageBoxComp) {
+    assertTestComponent(result, messageBoxComp, plain = true) {
       case MessageBoxProps(title, message, resActions, style) =>
         title shouldBe "Help"
         message shouldBe "//TODO: show help/about info"
-        inside(resActions) {
+        inside(resActions.toList) {
           case List(MessageBoxAction("OK", _, true)) =>
         }
         style shouldBe Theme.current.popup.regular

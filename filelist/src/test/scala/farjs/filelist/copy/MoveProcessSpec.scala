@@ -176,11 +176,11 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     eventually {
       inside(renderer.root.children.toList) { case List(_, existsMessage) =>
-        assertTestComponent(existsMessage, messageBoxComp) {
+        assertTestComponent(existsMessage, messageBoxComp, plain = true) {
           case MessageBoxProps(title, message, resActions, style) =>
             title shouldBe "Warning"
             message shouldBe s"File already exists.\nDo you want to overwrite it's content?\n\n$newPath"
-            inside(resActions) { case List(overwrite, all, skip, skipAll, cancel) =>
+            inside(resActions.toList) { case List(overwrite, all, skip, skipAll, cancel) =>
               overwrite.label shouldBe "Overwrite"
               all.label shouldBe "All"
               skip.label shouldBe "Skip"
@@ -199,10 +199,10 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       }
 
       //when
-      findComponentProps(renderer.root, messageBoxComp).actions.last.onAction()
+      findComponentProps(renderer.root, messageBoxComp, plain = true).actions.last.onAction()
 
       //then
-      findProps(renderer.root, messageBoxComp) should be (empty)
+      findProps(renderer.root, messageBoxComp, plain = true) should be (empty)
       eventually {
         done shouldBe true
       }
@@ -229,7 +229,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     eventually {
       inside(renderer.root.children.toList) { case List(_, existsMessage) =>
-        assertTestComponent(existsMessage, messageBoxComp) {
+        assertTestComponent(existsMessage, messageBoxComp, plain = true) {
           case MessageBoxProps(_, message, _, _) =>
             message shouldBe s"File already exists.\nDo you want to overwrite it's content?\n\n$newPath1"
         }
@@ -240,16 +240,16 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       onTopItem.expects(item1)
       
       //when
-      findComponentProps(renderer.root, messageBoxComp).actions.head.onAction()
+      findComponentProps(renderer.root, messageBoxComp, plain = true).actions.head.onAction()
       
       //then
-      findProps(renderer.root, messageBoxComp) should be (empty)
+      findProps(renderer.root, messageBoxComp, plain = true) should be (empty)
       val newPath2 = path.join(props.toPath, "file 2")
       fs.existsSync.expects(newPath2).returning(true)
 
       eventually {
         inside(renderer.root.children.toList) { case List(_, existsMessage) =>
-          assertTestComponent(existsMessage, messageBoxComp) {
+          assertTestComponent(existsMessage, messageBoxComp, plain = true) {
             case MessageBoxProps(_, message, _, _) =>
               message shouldBe s"File already exists.\nDo you want to overwrite it's content?\n\n$newPath2"
           }
@@ -265,10 +265,10 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         }
 
         //when
-        findComponentProps(renderer.root, messageBoxComp).actions.head.onAction()
+        findComponentProps(renderer.root, messageBoxComp, plain = true).actions.head.onAction()
 
         //then
-        findProps(renderer.root, messageBoxComp) should be (empty)
+        findProps(renderer.root, messageBoxComp, plain = true) should be (empty)
         eventually {
           done shouldBe true
         }
@@ -296,7 +296,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     eventually {
       inside(renderer.root.children.toList) { case List(_, existsMessage) =>
-        assertTestComponent(existsMessage, messageBoxComp) {
+        assertTestComponent(existsMessage, messageBoxComp, plain = true) {
           case MessageBoxProps(_, message, _, _) =>
             message shouldBe s"File already exists.\nDo you want to overwrite it's content?\n\n$newPath1"
         }
@@ -317,10 +317,10 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       }
       
       //when
-      findComponentProps(renderer.root, messageBoxComp).actions(1).onAction()
+      findComponentProps(renderer.root, messageBoxComp, plain = true).actions(1).onAction()
       
       //then
-      findProps(renderer.root, messageBoxComp) should be (empty)
+      findProps(renderer.root, messageBoxComp, plain = true) should be (empty)
       eventually {
         done shouldBe true
       }
@@ -347,23 +347,23 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     eventually {
       inside(renderer.root.children.toList) { case List(_, existsMessage) =>
-        assertTestComponent(existsMessage, messageBoxComp) {
+        assertTestComponent(existsMessage, messageBoxComp, plain = true) {
           case MessageBoxProps(_, message, _, _) =>
             message shouldBe s"File already exists.\nDo you want to overwrite it's content?\n\n$newPath1"
         }
       }
     }.flatMap { _ =>
       //when
-      findComponentProps(renderer.root, messageBoxComp).actions(2).onAction()
+      findComponentProps(renderer.root, messageBoxComp, plain = true).actions(2).onAction()
 
       //then
-      findProps(renderer.root, messageBoxComp) should be (empty)
+      findProps(renderer.root, messageBoxComp, plain = true) should be (empty)
       val newPath2 = path.join(props.toPath, "file 2")
       fs.existsSync.expects(newPath2).returning(true)
 
       eventually {
         inside(renderer.root.children.toList) { case List(_, existsMessage) =>
-          assertTestComponent(existsMessage, messageBoxComp) {
+          assertTestComponent(existsMessage, messageBoxComp, plain = true) {
             case MessageBoxProps(_, message, _, _) =>
               message shouldBe s"File already exists.\nDo you want to overwrite it's content?\n\n$newPath2"
           }
@@ -375,10 +375,10 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         }
 
         //when
-        findComponentProps(renderer.root, messageBoxComp).actions(2).onAction()
+        findComponentProps(renderer.root, messageBoxComp, plain = true).actions(2).onAction()
 
         //then
-        findProps(renderer.root, messageBoxComp) should be (empty)
+        findProps(renderer.root, messageBoxComp, plain = true) should be (empty)
         eventually {
           done shouldBe true
         }
@@ -408,7 +408,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     eventually {
       inside(renderer.root.children.toList) { case List(_, existsMessage) =>
-        assertTestComponent(existsMessage, messageBoxComp) {
+        assertTestComponent(existsMessage, messageBoxComp, plain = true) {
           case MessageBoxProps(_, message, _, _) =>
             message shouldBe s"File already exists.\nDo you want to overwrite it's content?\n\n$newPath1"
         }
@@ -426,10 +426,10 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       }
 
       //when
-      findComponentProps(renderer.root, messageBoxComp).actions(3).onAction()
+      findComponentProps(renderer.root, messageBoxComp, plain = true).actions(3).onAction()
 
       //then
-      findProps(renderer.root, messageBoxComp) should be (empty)
+      findProps(renderer.root, messageBoxComp, plain = true) should be (empty)
       eventually {
         done shouldBe true
       }

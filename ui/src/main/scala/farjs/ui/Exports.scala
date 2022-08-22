@@ -1,6 +1,7 @@
 package farjs.ui
 
 import farjs.ui.border.BorderExports
+import farjs.ui.popup.PopupExports
 import scommons.react.ReactClass
 
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
@@ -26,4 +27,6 @@ object Exports {
   val WithSize: ReactClass = farjs.ui.WithSize()
 
   val border: BorderExports = farjs.ui.border.BorderExports
+
+  val popup: PopupExports = farjs.ui.popup.PopupExports
 }

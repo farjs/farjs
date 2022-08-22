@@ -241,18 +241,18 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     }
 
     eventually {
-      assertTestComponent(renderer.root.children.head, messageBoxComp) {
+      assertTestComponent(renderer.root.children.head, messageBoxComp, plain = true) {
         case MessageBoxProps(title, message, resActions, style) =>
           title shouldBe "Error"
           message shouldBe s"Cannot copy the item\n${item.name}\nonto itself"
-          inside(resActions) { case List(ok) =>
+          inside(resActions.toList) { case List(ok) =>
             ok.label shouldBe "OK"
           }
           style shouldBe Theme.current.popup.error
       }
     }.map { _ =>
       //when & then
-      findComponentProps(renderer.root, messageBoxComp).actions.head.onAction()
+      findComponentProps(renderer.root, messageBoxComp, plain = true).actions.head.onAction()
       renderer.root.children.toList should be (empty)
     }
   }
@@ -301,18 +301,18 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     }
 
     eventually {
-      assertTestComponent(renderer.root.children.head, messageBoxComp) {
+      assertTestComponent(renderer.root.children.head, messageBoxComp, plain = true) {
         case MessageBoxProps(title, message, resActions, style) =>
           title shouldBe "Error"
           message shouldBe s"Cannot move the item\n${item.name}\ninto itself"
-          inside(resActions) { case List(ok) =>
+          inside(resActions.toList) { case List(ok) =>
             ok.label shouldBe "OK"
           }
           style shouldBe Theme.current.popup.error
       }
     }.map { _ =>
       //when & then
-      findComponentProps(renderer.root, messageBoxComp).actions.head.onAction()
+      findComponentProps(renderer.root, messageBoxComp, plain = true).actions.head.onAction()
       renderer.root.children.toList should be (empty)
     }
   }
@@ -359,18 +359,18 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     }
 
     eventually {
-      assertTestComponent(renderer.root.children.head, messageBoxComp) {
+      assertTestComponent(renderer.root.children.head, messageBoxComp, plain = true) {
         case MessageBoxProps(title, message, resActions, style) =>
           title shouldBe "Error"
           message shouldBe s"Cannot copy the item\n${item.name}\ninto itself"
-          inside(resActions) { case List(ok) =>
+          inside(resActions.toList) { case List(ok) =>
             ok.label shouldBe "OK"
           }
           style shouldBe Theme.current.popup.error
       }
     }.map { _ =>
       //when & then
-      findComponentProps(renderer.root, messageBoxComp).actions.head.onAction()
+      findComponentProps(renderer.root, messageBoxComp, plain = true).actions.head.onAction()
       renderer.root.children.toList should be (empty)
     }
   }

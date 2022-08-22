@@ -13,6 +13,7 @@ import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
+import scala.scalajs.js
 import scala.util.{Failure, Success}
 
 case class MoveProcessProps(dispatch: Dispatch,
@@ -73,7 +74,7 @@ object MoveProcess extends FunctionComponent[MoveProcessProps] {
 
     def onExistsAction(overwrite: Boolean,
                        all: Boolean = false,
-                       cancel: Boolean = false): () => Unit = { () =>
+                       cancel: Boolean = false): js.Function0[Unit] = { () =>
       
       setState(_.copy(existing = None))
       askWhenExists.current = !all
@@ -100,10 +101,10 @@ object MoveProcess extends FunctionComponent[MoveProcessProps] {
       ))(),
 
       state.existing.map { existing =>
-        <(messageBoxComp())(^.wrapped := MessageBoxProps(
+        <(messageBoxComp())(^.plain := MessageBoxProps(
           title = "Warning",
           message = s"File already exists.\nDo you want to overwrite it's content?\n\n$existing",
-          actions = List(
+          actions = js.Array(
             MessageBoxAction("Overwrite", onExistsAction(overwrite = true)),
             MessageBoxAction("All", onExistsAction(overwrite = true, all = true)),
             MessageBoxAction("Skip", onExistsAction(overwrite = false)),

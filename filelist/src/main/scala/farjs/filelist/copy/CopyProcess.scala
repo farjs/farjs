@@ -210,10 +210,10 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
       },
 
       if (state.cancel) Some {
-        <(messageBoxComp())(^.wrapped := MessageBoxProps(
+        <(messageBoxComp())(^.plain := MessageBoxProps(
           title = "Operation has been interrupted",
           message = "Do you really want to cancel it?",
-          actions = List(
+          actions = js.Array(
             MessageBoxAction.YES { () =>
               setState(_.copy(cancel = false))
               inProgress.current = false

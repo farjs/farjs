@@ -173,7 +173,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     }.flatMap { _ =>
       val progressProps = findComponentProps(renderer.root, copyProgressPopup)
       progressProps.onCancel()
-      val cancelProps = findComponentProps(renderer.root, messageBoxComp)
+      val cancelProps = findComponentProps(renderer.root, messageBoxComp, plain = true)
       val resultF = onProgressFn(123)
       
       //then
@@ -187,7 +187,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       cancelProps.actions.head.onAction()
 
       //then
-      findProps(renderer.root, messageBoxComp) shouldBe Nil
+      findProps(renderer.root, messageBoxComp, plain = true) shouldBe Nil
       resultF.flatMap { res =>
         res shouldBe false
 
@@ -211,13 +211,13 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
     val progressProps = findComponentProps(renderer.root, copyProgressPopup)
     progressProps.onCancel()
-    val cancelProps = findComponentProps(renderer.root, messageBoxComp)
+    val cancelProps = findComponentProps(renderer.root, messageBoxComp, plain = true)
     
     //when
     cancelProps.actions.last.onAction()
     
     //then
-    findProps(renderer.root, messageBoxComp) should be (empty)
+    findProps(renderer.root, messageBoxComp, plain = true) should be (empty)
   }
 
   it should "render cancel popup when onCancel" in {
@@ -238,11 +238,11 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     //then
     inside(renderer.root.children.toList) { case List(_, cancel) =>
-      assertTestComponent(cancel, messageBoxComp) {
+      assertTestComponent(cancel, messageBoxComp, plain = true) {
         case MessageBoxProps(title, message, resActions, style) =>
           title shouldBe "Operation has been interrupted"
           message shouldBe "Do you really want to cancel it?"
-          inside(resActions) { case List(yes, no) =>
+          inside(resActions.toList) { case List(yes, no) =>
             yes.label shouldBe "YES"
             no.label shouldBe "NO"
           }
@@ -699,7 +699,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       val resultF = eventually(progressF.isCompleted shouldBe true)
       resultF.failed.flatMap { _ =>
         //when
-        val cancelProps = findComponentProps(renderer.root, messageBoxComp)
+        val cancelProps = findComponentProps(renderer.root, messageBoxComp, plain = true)
         cancelProps.actions.last.onAction()
 
         //then

@@ -545,17 +545,17 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     //then
     findProps(renderer.root, addToZipController) should be (empty)
-    inside(findComponentProps(renderer.root, messageBoxComp)) {
+    inside(findComponentProps(renderer.root, messageBoxComp, plain = true)) {
       case MessageBoxProps(title, message, resActions, style) =>
         title shouldBe "Warning"
         message shouldBe "Items can only be added to zip root."
-        inside(resActions) {
+        inside(resActions.toList) {
           case List(MessageBoxAction("OK", onAction, true)) =>
             //when
             onAction()
 
             //then
-            findProps(renderer.root, messageBoxComp) should be (empty)
+            findProps(renderer.root, messageBoxComp, plain = true) should be (empty)
         }
         style shouldBe Theme.current.popup.regular
     }

@@ -19,7 +19,7 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val props = FileListPopupsProps(dispatch, FileListPopupsState(showExitPopup = true))
     val comp = testRender(<(ExitController())(^.wrapped := props)())
-    val msgBox = findComponentProps(comp, messageBoxComp)
+    val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
     val action = FileListPopupExitAction(show = false)
 
     val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
@@ -49,7 +49,7 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val props = FileListPopupsProps(dispatch, FileListPopupsState(showExitPopup = true))
     val comp = testRender(<(ExitController())(^.wrapped := props)())
-    val msgBox = findComponentProps(comp, messageBoxComp)
+    val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
     val action = FileListPopupExitAction(show = false)
 
     //then
@@ -68,11 +68,11 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(ExitController())(^.wrapped := props)())
 
     //then
-    assertTestComponent(result, messageBoxComp) {
+    assertTestComponent(result, messageBoxComp, plain = true) {
       case MessageBoxProps(title, message, resActions, style) =>
         title shouldBe "Exit"
         message shouldBe "Do you really want to exit FAR.js?"
-        inside(resActions) {
+        inside(resActions.toList) {
           case List(MessageBoxAction("YES", _, false), MessageBoxAction("NO", _, true)) =>
         }
         style shouldBe Theme.current.popup.regular

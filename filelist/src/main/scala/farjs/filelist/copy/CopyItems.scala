@@ -15,6 +15,7 @@ import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.scalajs.js
 import scala.util.Success
 
 object CopyItems extends FunctionComponent[FileListPopupsState] {
@@ -164,10 +165,10 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
           ))()
         }
         else if (maybeError.isDefined) maybeError.map { error =>
-          <(messageBoxComp())(^.wrapped := MessageBoxProps(
+          <(messageBoxComp())(^.plain := MessageBoxProps(
             title = "Error",
             message = error,
-            actions = List(MessageBoxAction.OK(onCancel(dispatchAction = false))),
+            actions = js.Array(MessageBoxAction.OK(onCancel(dispatchAction = false))),
             style = Theme.current.popup.error
           ))()
         }

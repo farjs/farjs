@@ -19,10 +19,10 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
   "OK popup" should "call OK action when onClose popup" in {
     //given
     val onAction = mockFunction[Unit]
-    val props = MessageBoxProps("test title", "test message", List(
+    val props = MessageBoxProps("test title", "test message", js.Array(
       MessageBoxAction.OK(onAction)
     ), Theme.current.popup.regular)
-    val comp = testRender(<(MessageBox())(^.wrapped := props)())
+    val comp = testRender(<(MessageBox())(^.plain := props)())
     val popup = findComponentProps(comp, popupComp)
 
     //then
@@ -35,10 +35,10 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
   it should "call OK action when onPress OK button" in {
     //given
     val onAction = mockFunction[Unit]
-    val props = MessageBoxProps("test title", "test message", List(
+    val props = MessageBoxProps("test title", "test message", js.Array(
       MessageBoxAction.OK(onAction)
     ), Theme.current.popup.regular)
-    val comp = testRender(<(MessageBox())(^.wrapped := props)())
+    val comp = testRender(<(MessageBox())(^.plain := props)())
     val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
 
     //then
@@ -53,12 +53,12 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     val props = MessageBoxProps(
       title = "test title",
       message = "Toooooooooooooooooooooooooooooo looooooooooooooooooooooooong test message",
-      actions = List(MessageBoxAction.OK(() => ())),
+      actions = js.Array(MessageBoxAction.OK(() => ())),
       style = Theme.current.popup.regular
     )
 
     //when
-    val result = testRender(<(MessageBox())(^.wrapped := props)())
+    val result = testRender(<(MessageBox())(^.plain := props)())
 
     //then
     assertMessageBox(result, props, List("OK"))
@@ -68,11 +68,11 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     //given
     val onYesAction = mockFunction[Unit]
     val onNoAction = mockFunction[Unit]
-    val props = MessageBoxProps("test title", "test message", List(
+    val props = MessageBoxProps("test title", "test message", js.Array(
       MessageBoxAction.YES(onYesAction),
       MessageBoxAction.NO(onNoAction)
     ), Theme.current.popup.regular)
-    val comp = testRender(<(MessageBox())(^.wrapped := props)())
+    val comp = testRender(<(MessageBox())(^.plain := props)())
     val popup = findComponentProps(comp, popupComp)
 
     //then
@@ -89,11 +89,11 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     //given
     val onYesAction = mockFunction[Unit]
     val onNoAction = mockFunction[Unit]
-    val props = MessageBoxProps("test title", "test message", List(
+    val props = MessageBoxProps("test title", "test message", js.Array(
       MessageBoxAction.YES(onYesAction),
       MessageBoxAction.NO(onNoAction)
     ), Theme.current.popup.regular)
-    val comp = testRender(<(MessageBox())(^.wrapped := props)())
+    val comp = testRender(<(MessageBox())(^.plain := props)())
     val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
 
     //then
@@ -108,11 +108,11 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     //given
     val onYesAction = mockFunction[Unit]
     val onNoAction = mockFunction[Unit]
-    val props = MessageBoxProps("test title", "test message", List(
+    val props = MessageBoxProps("test title", "test message", js.Array(
       MessageBoxAction.YES(onYesAction),
       MessageBoxAction.NO(onNoAction)
     ), Theme.current.popup.regular)
-    val comp = testRender(<(MessageBox())(^.wrapped := props)())
+    val comp = testRender(<(MessageBox())(^.plain := props)())
     val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions(1)
 
     //then
@@ -125,13 +125,13 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
   
   it should "render component" in {
     //given
-    val props = MessageBoxProps("test title", "test message", List(
+    val props = MessageBoxProps("test title", "test message", js.Array(
       MessageBoxAction.YES(() => ()),
       MessageBoxAction.NO(() => ())
     ), Theme.current.popup.regular)
 
     //when
-    val result = testRender(<(MessageBox())(^.wrapped := props)())
+    val result = testRender(<(MessageBox())(^.plain := props)())
 
     //then
     assertMessageBox(result, props, List("YES", "NO"))
@@ -141,11 +141,11 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     //given
     val onYesAction = mockFunction[Unit]
     val onNoAction = mockFunction[Unit]
-    val props = MessageBoxProps("test title", "test message", List(
+    val props = MessageBoxProps("test title", "test message", js.Array(
       MessageBoxAction.YES(onYesAction),
-      MessageBoxAction.NO(onNoAction).copy(triggeredOnClose = false)
+      MessageBoxAction.NO_NON_CLOSABLE(onNoAction)
     ), Theme.current.popup.regular)
-    val comp = testRender(<(MessageBox())(^.wrapped := props)())
+    val comp = testRender(<(MessageBox())(^.plain := props)())
     val popup = findComponentProps(comp, popupComp)
 
     //then
@@ -160,13 +160,13 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
 
   it should "render component" in {
     //given
-    val props = MessageBoxProps("test title", "test message", List(
+    val props = MessageBoxProps("test title", "test message", js.Array(
       MessageBoxAction.YES(() => ()),
-      MessageBoxAction.NO(() => ()).copy(triggeredOnClose = false)
+      MessageBoxAction.NO_NON_CLOSABLE(() => ())
     ), Theme.current.popup.regular)
 
     //when
-    val result = testRender(<(MessageBox())(^.wrapped := props)())
+    val result = testRender(<(MessageBox())(^.plain := props)())
 
     //then
     assertMessageBox(result, props, List("YES", "NO"), closable = false)

@@ -6,6 +6,7 @@ import scommons.react._
 import scommons.react.hooks._
 import scommons.react.redux.task.{TaskManager, TaskManagerUiProps}
 
+import scala.scalajs.js
 import scala.scalajs.js.JavaScriptException
 import scala.util.{Failure, Try}
 
@@ -48,11 +49,11 @@ object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
         <(statusPopupComp())(^.wrapped := StatusPopupProps(statusMessage))()
       }
       else if (errors.nonEmpty) Some(
-        <(messageBoxComp())(^.wrapped := MessageBoxProps(
+        <(messageBoxComp())(^.plain := MessageBoxProps(
           title = "Error",
           message = errors.head.stripPrefix("Error:").trim,
           //message = s"$errorMessage${props.errorDetails.map(d => s"\n\n$d").getOrElse("")}",
-          actions = List(MessageBoxAction.OK { () =>
+          actions = js.Array(MessageBoxAction.OK { () =>
             updateErrors(_.tail)
             props.onCloseErrorPopup()
           }),

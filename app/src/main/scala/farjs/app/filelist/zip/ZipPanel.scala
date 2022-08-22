@@ -15,6 +15,7 @@ import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.scalajs.js
 import scala.util.Failure
 
 class ZipPanel(zipPath: String,
@@ -110,10 +111,10 @@ class ZipPanel(zipPath: String,
       <(fileListPanelComp())(^.wrapped := props.copy(onKeypress = onKeypress))(),
 
       if (showWarning) Some(
-        <(messageBoxComp())(^.wrapped := MessageBoxProps(
+        <(messageBoxComp())(^.plain := MessageBoxProps(
           title = "Warning",
           message = "Items can only be added to zip root.",
-          actions = List(MessageBoxAction.OK { () =>
+          actions = js.Array(MessageBoxAction.OK { () =>
             setShowWarning(false)
           }),
           style = theme.regular

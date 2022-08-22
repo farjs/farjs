@@ -3,14 +3,8 @@ package farjs.ui.popup
 import farjs.ui._
 import farjs.ui.popup.ModalContent._
 import scommons.react._
-import scommons.react.blessed._
 
 import scala.scalajs.js
-
-case class MessageBoxProps(title: String,
-                           message: String,
-                           actions: List[MessageBoxAction],
-                           style: BlessedStyle)
 
 object MessageBox extends FunctionComponent[MessageBoxProps] {
 
@@ -20,7 +14,7 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
   private[popup] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val width = 60
     val textWidth = width - (paddingHorizontal + 2) * 2
     val textLines = UI.splitText(props.message, textWidth)
@@ -32,7 +26,9 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
     }
 
     <(popupComp())(^.wrapped := PopupProps(
-      onClose = onClose.getOrElse(() => ()),
+      onClose = { () =>
+        onClose.getOrElse(dummyOnClose).apply()
+      },
       closable = onClose.isDefined
     ))(
       <(modalContentComp())(^.wrapped := ModalContentProps(
@@ -54,11 +50,13 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
         
         <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
           top = 1 + textLines.size,
-          actions = js.Array(actions: _*),
+          actions = actions,
           style = props.style,
           padding = 1
         ))()
       )
     )
   }
+  
+  private val dummyOnClose: js.Function0[Unit] = () => ()
 }

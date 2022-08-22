@@ -5,6 +5,8 @@ import farjs.ui.popup._
 import farjs.ui.theme.Theme
 import scommons.react._
 
+import scala.scalajs.js
+
 object HelpController extends FunctionComponent[FileListPopupsProps] {
 
   private[popups] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
@@ -15,10 +17,10 @@ object HelpController extends FunctionComponent[FileListPopupsProps] {
     val theme = Theme.current.popup
 
     if (popups.showHelpPopup) {
-      <(messageBoxComp())(^.wrapped := MessageBoxProps(
+      <(messageBoxComp())(^.plain := MessageBoxProps(
         title = "Help",
         message = "//TODO: show help/about info",
-        actions = List(MessageBoxAction.OK { () =>
+        actions = js.Array(MessageBoxAction.OK { () =>
           props.dispatch(FileListPopupHelpAction(show = false))
         }),
         style = theme.regular

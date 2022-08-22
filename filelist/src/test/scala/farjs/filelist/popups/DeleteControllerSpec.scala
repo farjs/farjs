@@ -41,7 +41,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val props = PopupControllerProps(Some(FileListData(dispatch, actions.actions, state)),
       FileListPopupsState(showDeletePopup = true))
     val comp = testRender(<(DeleteController())(^.wrapped := props)())
-    val msgBox = findComponentProps(comp, messageBoxComp)
+    val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
     val deleteAction = FileListTaskAction(
       FutureTask("Deleting Items", Future.successful(()))
     )
@@ -70,7 +70,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val props = PopupControllerProps(Some(FileListData(dispatch, actions.actions, state)),
       FileListPopupsState(showDeletePopup = true))
     val comp = testRender(<(DeleteController())(^.wrapped := props)())
-    val msgBox = findComponentProps(comp, messageBoxComp)
+    val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
     val deleteAction = FileListTaskAction(
       FutureTask("Deleting Items", Future.successful(()))
     )
@@ -95,7 +95,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val props = PopupControllerProps(Some(FileListData(dispatch, actions.actions, state)),
       FileListPopupsState(showDeletePopup = true))
     val comp = testRender(<(DeleteController())(^.wrapped := props)())
-    val msgBox = findComponentProps(comp, messageBoxComp)
+    val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
     val action = FileListPopupDeleteAction(show = false)
 
     //then
@@ -119,11 +119,11 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val result = testRender(<(DeleteController())(^.wrapped := props)())
 
     //then
-    assertTestComponent(result, messageBoxComp) {
+    assertTestComponent(result, messageBoxComp, plain = true) {
       case MessageBoxProps(title, message, resActions, style) =>
         title shouldBe "Delete"
         message shouldBe "Do you really want to delete selected item(s)?"
-        inside(resActions) {
+        inside(resActions.toList) {
           case List(MessageBoxAction("YES", _, false), MessageBoxAction("NO", _, true)) =>
         }
         style shouldBe Theme.current.popup.error

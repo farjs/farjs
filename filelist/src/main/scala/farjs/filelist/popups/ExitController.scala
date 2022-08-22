@@ -18,10 +18,10 @@ object ExitController extends FunctionComponent[FileListPopupsProps] {
     val theme = Theme.current.popup
 
     if (popups.showExitPopup) {
-      <(messageBoxComp())(^.wrapped := MessageBoxProps(
+      <(messageBoxComp())(^.plain := MessageBoxProps(
         title = "Exit",
         message = "Do you really want to exit FAR.js?",
-        actions = List(
+        actions = js.Array(
           MessageBoxAction.YES { () =>
             props.dispatch(FileListPopupExitAction(show = false))
             process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
