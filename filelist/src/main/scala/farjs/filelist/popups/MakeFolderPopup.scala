@@ -19,7 +19,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
 
   private[popups] var modalComp: UiComponent[ModalProps] = Modal
   private[popups] var textLineComp: UiComponent[TextLineProps] = TextLine
-  private[popups] var textBoxComp: UiComponent[TextBoxProps] = TextBox
+  private[popups] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
   private[popups] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
   private[popups] var checkBoxComp: UiComponent[CheckBoxProps] = CheckBox
   private[popups] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
@@ -54,7 +54,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
         style = theme,
         padding = 0
       ))(),
-      <(textBoxComp())(^.plain := TextBoxProps(
+      <(comboBoxComp())(^.plain := ComboBoxProps(
         left = contentLeft,
         top = 2,
         width = contentWidth,

@@ -16,6 +16,8 @@ object Exports {
 
   val CheckBox: ReactClass = farjs.ui.CheckBox()
 
+  val ComboBox: ReactClass = farjs.ui.ComboBox()
+
   val ProgressBar: ReactClass = farjs.ui.ProgressBar()
 
   val TextBox: ReactClass = farjs.ui.TextBox()
