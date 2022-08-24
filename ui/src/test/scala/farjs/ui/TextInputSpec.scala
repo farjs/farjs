@@ -154,6 +154,41 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
     renderer.root.children(0).props.onBlur()
   }
 
+  it should "prevent default if return true from props.onKeypress" in {
+    //given
+    val onKeypress = mockFunction[String, Boolean]
+    val state = TextInputState()
+    val stateUpdater: js.Function1[js.Function1[TextInputState, TextInputState], Unit] = {
+      updater => updater(state)
+    }
+    val props = getTextInputProps(state, stateUpdater, onKeypress = onKeypress)
+    val omoveMock = mockFunction[Int, Int, Unit]
+    val programMock = literal("omove" -> omoveMock)
+    val screenMock = literal("program" -> programMock)
+    val inputMock = literal("screen" -> screenMock)
+    val width = props.width
+    val cursorX = width - 1
+    inputMock.width = width
+    inputMock.aleft = props.left
+    inputMock.atop = props.top
+    omoveMock.expects(props.left + cursorX, props.top)
+
+    val inputEl = testRender(<(TextInput())(^.wrapped := props)(), { el =>
+      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
+      else null
+    })
+    val key = literal("full" -> "C-down").asInstanceOf[KeyboardKey]
+
+    //then
+    onKeypress.expects("C-down").returning(true)
+
+    //when
+    inputEl.props.onKeypress(null, key)
+
+    //then
+    key.defaultPrevented.getOrElse(false) shouldBe true
+  }
+  
   it should "call onEnter and prevent default if return key when onKeypress" in {
     //given
     val onEnter = mockFunction[Unit]
@@ -424,7 +459,8 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
                                 stateUpdater: js.Function1[js.Function1[TextInputState, TextInputState], Unit],
                                 value: String = "initial name",
                                 onChange: String => Unit = _ => (),
-                                onEnter: js.Function0[Unit] = () => ()
+                                onEnter: js.Function0[Unit] = () => (),
+                                onKeypress: String => Boolean = _ => false
                                ): TextInputProps = TextInputProps(
     left = 1,
     top = 2,
@@ -433,7 +469,8 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
     state = state,
     stateUpdater = stateUpdater,
     onChange = onChange,
-    onEnter = onEnter
+    onEnter = onEnter,
+    onKeypress = onKeypress
   )
 
   private def assertTextInput(result: TestInstance, props: TextInputProps): Unit = {

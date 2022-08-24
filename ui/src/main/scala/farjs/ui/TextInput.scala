@@ -20,7 +20,8 @@ case class TextInputProps(left: Int,
                           state: TextInputState,
                           stateUpdater: js.Function1[js.Function1[TextInputState, TextInputState], Unit],
                           onChange: js.Function1[String, Unit],
-                          onEnter: js.UndefOr[js.Function0[Unit]])
+                          onEnter: js.UndefOr[js.Function0[Unit]],
+                          onKeypress: String => Boolean = _ => false)
 
 object TextInput extends FunctionComponent[TextInputProps] {
 
@@ -142,41 +143,43 @@ object TextInput extends FunctionComponent[TextInputProps] {
       val el = elementRef.current
 
       var processed = true
-      key.full match {
-        case "return" =>
-          props.onEnter.foreach(_.apply())
-          processed = true
-        case "enter" => processed = true // either enter or return is handled, not both!
-        case "escape" | "tab" => processed = false
-        case "right"   => move(el, props.value, CursorMove.Right, TextSelect.Reset)
-        case "S-right" => move(el, props.value, CursorMove.Right, TextSelect.ToTheRight)
-        case "left"    => move(el, props.value, CursorMove.Left, TextSelect.Reset)
-        case "S-left"  => move(el, props.value, CursorMove.Left, TextSelect.ToTheLeft)
-        case "home"    => move(el, props.value, CursorMove.Home, TextSelect.Reset)
-        case "S-home"  => move(el, props.value, CursorMove.Home, TextSelect.TillTheHome)
-        case "end"     => move(el, props.value, CursorMove.End, TextSelect.Reset)
-        case "S-end"   => move(el, props.value, CursorMove.End, TextSelect.TillTheEnd)
-        case "C-a"     => move(el, props.value, CursorMove.End, TextSelect.All)
-        case "C-c" =>
-          if (selEnd - selStart > 0) {
-            el.screen.copyToClipboard(props.value.slice(selStart, selEnd))
-          }
-        case "delete" =>
-          val (newVal, curMove) = edit(props.value, TextEdit.Delete)
-          if (props.value != newVal) {
-            move(el, newVal, curMove, TextSelect.Reset)
-          }
-        case "backspace" =>
-          val (newVal, curMove) = edit(props.value, TextEdit.Backspace)
-          if (props.value != newVal) {
-            move(el, newVal, curMove, TextSelect.Reset)
-          }
-        case _ =>
-          if (ch != null && !js.isUndefined(ch)) {
-            val (newVal, curMove) = edit(props.value, TextEdit.Insert(ch.toString))
-            move(el, newVal, curMove, TextSelect.Reset)
-          }
-          else processed = false
+      if (!props.onKeypress(key.full)) {
+        key.full match {
+          case "return" =>
+            props.onEnter.foreach(_.apply())
+            processed = true
+          case "enter" => processed = true // either enter or return is handled, not both!
+          case "escape" | "tab" => processed = false
+          case "right"   => move(el, props.value, CursorMove.Right, TextSelect.Reset)
+          case "S-right" => move(el, props.value, CursorMove.Right, TextSelect.ToTheRight)
+          case "left"    => move(el, props.value, CursorMove.Left, TextSelect.Reset)
+          case "S-left"  => move(el, props.value, CursorMove.Left, TextSelect.ToTheLeft)
+          case "home"    => move(el, props.value, CursorMove.Home, TextSelect.Reset)
+          case "S-home"  => move(el, props.value, CursorMove.Home, TextSelect.TillTheHome)
+          case "end"     => move(el, props.value, CursorMove.End, TextSelect.Reset)
+          case "S-end"   => move(el, props.value, CursorMove.End, TextSelect.TillTheEnd)
+          case "C-a"     => move(el, props.value, CursorMove.End, TextSelect.All)
+          case "C-c" =>
+            if (selEnd - selStart > 0) {
+              el.screen.copyToClipboard(props.value.slice(selStart, selEnd))
+            }
+          case "delete" =>
+            val (newVal, curMove) = edit(props.value, TextEdit.Delete)
+            if (props.value != newVal) {
+              move(el, newVal, curMove, TextSelect.Reset)
+            }
+          case "backspace" =>
+            val (newVal, curMove) = edit(props.value, TextEdit.Backspace)
+            if (props.value != newVal) {
+              move(el, newVal, curMove, TextSelect.Reset)
+            }
+          case _ =>
+            if (ch != null && !js.isUndefined(ch)) {
+              val (newVal, curMove) = edit(props.value, TextEdit.Insert(ch.toString))
+              move(el, newVal, curMove, TextSelect.Reset)
+            }
+            else processed = false
+        }
       }
       
       key.defaultPrevented = processed
