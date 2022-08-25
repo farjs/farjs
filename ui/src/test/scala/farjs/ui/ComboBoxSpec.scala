@@ -8,8 +8,134 @@ import scala.scalajs.js
 class ComboBoxSpec extends TestSpec with TestRendererUtils {
 
   ComboBox.textInputComp = mockUiComponent("TextInput")
+  ComboBox.comboBoxPopup = mockUiComponent("ComboBoxPopup")
 
-  it should "return false if unknown key when onKeypress" in {
+  it should "call onChange and hide popup when onClick" in {
+    //given
+    val onChange = mockFunction[String, Unit]
+    val props = getComboBoxProps(onChange = onChange)
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
+    val comboBox = findComponentProps(renderer.root, comboBoxPopup)
+
+    //then
+    onChange.expects("item 2")
+
+    //when
+    comboBox.onClick(1)
+
+    //then
+    findProps(renderer.root, comboBoxPopup) should be (empty)
+  }
+
+  it should "call onChange and hide popup when onKeypress(return)" in {
+    //given
+    val onChange = mockFunction[String, Unit]
+    val props = getComboBoxProps(onChange = onChange)
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
+    findProps(renderer.root, comboBoxPopup) should not be empty
+    val textInput = findComponentProps(renderer.root, textInputComp)
+
+    //then
+    onChange.expects("item 1")
+
+    //when
+    textInput.onKeypress("return") shouldBe true
+
+    //then
+    findProps(renderer.root, comboBoxPopup) should be (empty)
+  }
+
+  it should "hide popup when onKeypress(escape)" in {
+    //given
+    val props = getComboBoxProps()
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
+    findProps(renderer.root, comboBoxPopup) should not be empty
+    val textInput = findComponentProps(renderer.root, textInputComp)
+
+    //when
+    textInput.onKeypress("escape") shouldBe true
+
+    //then
+    findProps(renderer.root, comboBoxPopup) should be (empty)
+  }
+
+  it should "hide popup if shown when onKeypress(C-up)" in {
+    //given
+    val props = getComboBoxProps()
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    findComponentProps(renderer.root, textInputComp).onKeypress("C-up") shouldBe true
+    findProps(renderer.root, comboBoxPopup) should not be empty
+    val textInput = findComponentProps(renderer.root, textInputComp)
+
+    //when
+    textInput.onKeypress("C-up") shouldBe true
+
+    //then
+    findProps(renderer.root, comboBoxPopup) should be (empty)
+  }
+
+  it should "show popup when onKeypress(C-down)" in {
+    //given
+    val props = getComboBoxProps()
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    val textInput = findComponentProps(renderer.root, textInputComp)
+    findProps(renderer.root, comboBoxPopup) should be (empty)
+
+    //when
+    textInput.onKeypress("C-down") shouldBe true
+
+    //then
+    inside(findComponentProps(renderer.root, comboBoxPopup)) {
+      case ComboBoxPopupProps(selected, items, top, left, width, _) =>
+        selected shouldBe 0
+        items shouldBe List("item 1", "item 2")
+        top shouldBe props.top + 1
+        left shouldBe props.left
+        width shouldBe props.width
+    }
+  }
+
+  it should "select items in popup when onKeypress(down|up)" in {
+    //given
+    val props = getComboBoxProps()
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
+    findComponentProps(renderer.root, comboBoxPopup).selected shouldBe 0
+
+    //when & then
+    findComponentProps(renderer.root, textInputComp).onKeypress("up") shouldBe true
+    findComponentProps(renderer.root, comboBoxPopup).selected shouldBe 0
+
+    //when & then
+    findComponentProps(renderer.root, textInputComp).onKeypress("down") shouldBe true
+    findComponentProps(renderer.root, comboBoxPopup).selected shouldBe 1
+
+    //when & then
+    findComponentProps(renderer.root, textInputComp).onKeypress("down") shouldBe true
+    findComponentProps(renderer.root, comboBoxPopup).selected shouldBe 1
+
+    //when & then
+    findComponentProps(renderer.root, textInputComp).onKeypress("up") shouldBe true
+    findComponentProps(renderer.root, comboBoxPopup).selected shouldBe 0
+  }
+
+  it should "return false if popup not shown when onKeypress(escape|up|down|return)" in {
+    //given
+    val props = getComboBoxProps()
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    val textInput = findComponentProps(renderer.root, textInputComp)
+
+    //when & then
+    textInput.onKeypress("escape") shouldBe false
+    textInput.onKeypress("up") shouldBe false
+    textInput.onKeypress("down") shouldBe false
+    textInput.onKeypress("return") shouldBe false
+  }
+
+  it should "return false when onKeypress(unknown)" in {
     //given
     val props = getComboBoxProps()
     val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
@@ -19,17 +145,7 @@ class ComboBoxSpec extends TestSpec with TestRendererUtils {
     textInput.onKeypress("unknown") shouldBe false
   }
 
-  it should "return true if C-down key when onKeypress" in {
-    //given
-    val props = getComboBoxProps()
-    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
-    val textInput = findComponentProps(renderer.root, textInputComp)
-
-    //when & then
-    textInput.onKeypress("C-down") shouldBe true
-  }
-
-  it should "update state when stateUpdater" in {
+  it should "update input state when stateUpdater" in {
     //given
     val props = getComboBoxProps()
     val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
@@ -52,7 +168,7 @@ class ComboBoxSpec extends TestSpec with TestRendererUtils {
     )
   }
 
-  it should "render component" in {
+  it should "render initial component" in {
     //given
     val props = getComboBoxProps()
 
