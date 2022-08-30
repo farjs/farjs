@@ -7,8 +7,8 @@ import scommons.react.blessed._
 
 case class ComboBoxPopupProps(selected: Int,
                               items: List[String],
-                              top: Int,
                               left: Int,
+                              top: Int,
                               width: Int,
                               onClick: Int => Unit)
 
@@ -28,8 +28,8 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
       ^.rbAutoFocus := false,
       ^.rbWidth := width,
       ^.rbHeight := height,
-      ^.rbTop := props.top,
       ^.rbLeft := props.left,
+      ^.rbTop := props.top,
       ^.rbStyle := theme
     )(
       <(singleBorderComp())(^.plain := SingleBorderProps(

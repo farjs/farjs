@@ -16,8 +16,8 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     val props = ComboBoxPopupProps(
       selected = 0,
       items = List("item 1", "item 2"),
-      top = 1,
-      left = 2,
+      left = 1,
+      top = 2,
       width = 11,
       onClick = onClick
     )
@@ -38,8 +38,8 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     val props = ComboBoxPopupProps(
       selected = 0,
       items = List("item 1", "item 2"),
-      top = 1,
-      left = 2,
+      left = 1,
+      top = 2,
       width = 11,
       _ => ()
     )
@@ -63,8 +63,8 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
         ^.rbAutoFocus := false,
         ^.rbWidth := width,
         ^.rbHeight := height,
-        ^.rbTop := props.top,
         ^.rbLeft := props.left,
+        ^.rbTop := props.top,
         ^.rbStyle := theme
       )(
         <(singleBorderComp())(^.assertPlain[SingleBorderProps](inside(_) {
