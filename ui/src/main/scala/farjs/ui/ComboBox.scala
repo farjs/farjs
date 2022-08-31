@@ -1,10 +1,13 @@
 package farjs.ui
 
 import farjs.ui.popup.PopupOverlay
+import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.blessed.raw.BlessedProgram
 import scommons.react.hooks._
+
+import scala.scalajs.js
 
 object ComboBox extends FunctionComponent[ComboBoxProps] {
 
@@ -32,10 +35,15 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
     }
 
     def onAction(items: List[String], selected: Int): Unit = {
-      val value = items(selected)
-      props.onChange(value)
-      setState(_.copy(offset = 0, cursorX = value.length, selStart = -1, selEnd = -1))
+      props.onChange(items(selected))
       hidePopup()
+
+      process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
+        name = "end",
+        ctrl = false,
+        meta = false,
+        shift = false
+      ))
     }
     
     def onKeypress(keyFull: String): Boolean = {

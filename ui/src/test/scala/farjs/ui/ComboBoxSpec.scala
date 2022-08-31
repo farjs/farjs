@@ -2,6 +2,7 @@ package farjs.ui
 
 import farjs.ui.ComboBox._
 import farjs.ui.popup.PopupOverlay
+import scommons.nodejs._
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -13,9 +14,19 @@ class ComboBoxSpec extends TestSpec with TestRendererUtils {
   ComboBox.textInputComp = mockUiComponent("TextInput")
   ComboBox.comboBoxPopup = mockUiComponent("ComboBoxPopup")
 
-  it should "call onChange and hide popup when popup.onClick" in {
+  it should "call onChange, hide popup and emit keypress event when popup.onClick" in {
     //given
     val onChange = mockFunction[String, Unit]
+    val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
+    val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
+      onKey(
+        key.name,
+        key.ctrl.getOrElse(false),
+        key.meta.getOrElse(false),
+        key.shift.getOrElse(false)
+      )
+    }
+    process.stdin.on("keypress", listener)
     val props = getComboBoxProps(onChange = onChange)
     val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
     findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
@@ -23,22 +34,31 @@ class ComboBoxSpec extends TestSpec with TestRendererUtils {
 
     //then
     onChange.expects("item 2")
+    onKey.expects("end", false, false, false)
 
     //when
     comboBox.onClick(1)
 
     //then
     findProps(renderer.root, comboBoxPopup) should be (empty)
-    findComponentProps(renderer.root, textInputComp).state shouldBe TextInputState(
-      cursorX = 6,
-      selStart = -1,
-      selEnd = -1
-    )
+
+    //cleanup
+    process.stdin.removeListener("keypress", listener)
   }
 
-  it should "call onChange and hide popup when onKeypress(return)" in {
+  it should "call onChange, hide popup and emit keypress event when onKeypress(return)" in {
     //given
     val onChange = mockFunction[String, Unit]
+    val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
+    val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
+      onKey(
+        key.name,
+        key.ctrl.getOrElse(false),
+        key.meta.getOrElse(false),
+        key.shift.getOrElse(false)
+      )
+    }
+    process.stdin.on("keypress", listener)
     val props = getComboBoxProps(onChange = onChange)
     val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
     findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
@@ -47,17 +67,16 @@ class ComboBoxSpec extends TestSpec with TestRendererUtils {
 
     //then
     onChange.expects("item")
+    onKey.expects("end", false, false, false)
 
     //when
     textInput.onKeypress("return") shouldBe true
 
     //then
     findProps(renderer.root, comboBoxPopup) should be (empty)
-    findComponentProps(renderer.root, textInputComp).state shouldBe TextInputState(
-      cursorX = 4,
-      selStart = -1,
-      selEnd = -1
-    )
+
+    //cleanup
+    process.stdin.removeListener("keypress", listener)
   }
 
   it should "hide popup when onKeypress(escape)" in {
