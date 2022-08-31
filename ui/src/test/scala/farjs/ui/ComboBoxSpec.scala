@@ -79,6 +79,39 @@ class ComboBoxSpec extends TestSpec with TestRendererUtils {
     process.stdin.removeListener("keypress", listener)
   }
 
+  it should "do nothing if no items when onKeypress(return)" in {
+    //given
+    val onChange = mockFunction[String, Unit]
+    val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
+    val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
+      onKey(
+        key.name,
+        key.ctrl.getOrElse(false),
+        key.meta.getOrElse(false),
+        key.shift.getOrElse(false)
+      )
+    }
+    process.stdin.on("keypress", listener)
+    val props = getComboBoxProps(items = Nil, onChange = onChange)
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
+    findProps(renderer.root, comboBoxPopup) should not be empty
+    val textInput = findComponentProps(renderer.root, textInputComp)
+
+    //then
+    onChange.expects(*).never()
+    onKey.expects(*, *, *, *).never()
+
+    //when
+    textInput.onKeypress("return") shouldBe true
+
+    //then
+    findProps(renderer.root, comboBoxPopup) should not be empty
+
+    //cleanup
+    process.stdin.removeListener("keypress", listener)
+  }
+
   it should "hide popup when onKeypress(escape)" in {
     //given
     val props = getComboBoxProps()
@@ -278,13 +311,15 @@ class ComboBoxSpec extends TestSpec with TestRendererUtils {
     ))
   }
 
-  private def getComboBoxProps(value: String = "initial name",
+  private def getComboBoxProps(items: List[String] = List("item", "item 2"),
+                               value: String = "initial name",
                                onChange: String => Unit = _ => (),
                                onEnter: js.Function0[Unit] = () => ()
                               ): ComboBoxProps = ComboBoxProps(
     left = 1,
     top = 2,
     width = 10,
+    items = js.Array(items: _*),
     value = value,
     onChange = onChange,
     onEnter = onEnter

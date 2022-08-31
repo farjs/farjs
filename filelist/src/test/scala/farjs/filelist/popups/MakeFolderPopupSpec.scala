@@ -21,7 +21,7 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
   it should "set folderName when onChange in ComboBox" in {
     //given
     val folderName = "initial folder name"
-    val props = MakeFolderPopupProps(folderName, multiple = false, (_, _) => (), () => ())
+    val props = getMakeFolderPopupProps(folderName)
     val renderer = createTestRenderer(<(MakeFolderPopup())(^.wrapped := props)())
     val textBox = findComponentProps(renderer.root, comboBoxComp, plain = true)
     textBox.value shouldBe folderName
@@ -36,7 +36,7 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
   
   it should "set multiple flag when onChange in CheckBox" in {
     //given
-    val props = MakeFolderPopupProps("", multiple = false, (_, _) => (), () => ())
+    val props = getMakeFolderPopupProps("")
     val renderer = createTestRenderer(<(MakeFolderPopup())(^.wrapped := props)())
     val checkbox = findComponentProps(renderer.root, checkBoxComp, plain = true)
     checkbox.value shouldBe false
@@ -52,7 +52,7 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
-    val props = MakeFolderPopupProps("test", multiple = true, onOk, onCancel)
+    val props = getMakeFolderPopupProps("test", multiple = true, onOk, onCancel)
     val comp = testRender(<(MakeFolderPopup())(^.wrapped := props)())
     val textBox = findComponentProps(comp, comboBoxComp, plain = true)
 
@@ -68,7 +68,7 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
-    val props = MakeFolderPopupProps("test", multiple = true, onOk, onCancel)
+    val props = getMakeFolderPopupProps("test", multiple = true, onOk, onCancel)
     val comp = testRender(<(MakeFolderPopup())(^.wrapped := props)())
     val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
 
@@ -84,7 +84,7 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
-    val props = MakeFolderPopupProps("", multiple = true, onOk, onCancel)
+    val props = getMakeFolderPopupProps("", multiple = true, onOk, onCancel)
     val comp = testRender(<(MakeFolderPopup())(^.wrapped := props)())
     val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
 
@@ -100,7 +100,7 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
-    val props = MakeFolderPopupProps("", multiple = false, onOk = onOk, onCancel = onCancel)
+    val props = getMakeFolderPopupProps("", onOk = onOk, onCancel = onCancel)
     val comp = testRender(<(MakeFolderPopup())(^.wrapped := props)())
     val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions(1)
 
@@ -114,13 +114,26 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
   
   it should "render component" in {
     //given
-    val props = MakeFolderPopupProps("test folder", multiple = false, (_, _) => (), () => ())
+    val props = getMakeFolderPopupProps("test folder")
 
     //when
     val result = testRender(<(MakeFolderPopup())(^.wrapped := props)())
 
     //then
     assertMakeFolderPopup(result, props, List("[ OK ]", "[ Cancel ]"))
+  }
+
+  private def getMakeFolderPopupProps(folderName: String,
+                                      multiple: Boolean = false,
+                                      onOk: (String, Boolean) => Unit = (_, _) => (),
+                                      onCancel: () => Unit = () => ()): MakeFolderPopupProps = {
+    MakeFolderPopupProps(
+      folderItems = List("folder", "folder 2"),
+      folderName = folderName,
+      multiple = multiple,
+      onOk = onOk,
+      onCancel = onCancel
+    )
   }
 
   private def assertMakeFolderPopup(result: TestInstance,
@@ -149,9 +162,10 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
             padding shouldBe 0
         }))(),
         <(comboBoxComp())(^.assertPlain[ComboBoxProps](inside(_) {
-          case ComboBoxProps(left, top, resWidth, resValue, _, _) =>
+          case ComboBoxProps(left, top, resWidth, items, resValue, _, _) =>
             left shouldBe 2
             top shouldBe 2
+            items.toList shouldBe props.folderItems
             resWidth shouldBe (width - 10)
             resValue shouldBe props.folderName
         }))(),

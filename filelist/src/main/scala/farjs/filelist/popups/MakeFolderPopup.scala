@@ -10,7 +10,8 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class MakeFolderPopupProps(folderName: String,
+case class MakeFolderPopupProps(folderItems: List[String],
+                                folderName: String,
                                 multiple: Boolean,
                                 onOk: (String, Boolean) => Unit,
                                 onCancel: () => Unit)
@@ -58,6 +59,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
         left = contentLeft,
         top = 2,
         width = contentWidth,
+        items = js.Array(props.folderItems: _*),
         value = folderName,
         onChange = { value =>
           setFolderName(value)

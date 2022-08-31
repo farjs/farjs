@@ -36,27 +36,55 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val props = PopupControllerProps(Some(FileListData(dispatch, actions.actions, state)),
       FileListPopupsState(showMkFolderPopup = true))
     val renderer = createTestRenderer(<(MakeFolderController())(^.wrapped := props)())
-    val popup = findComponentProps(renderer.root, makeFolderPopup)
     val action = FileListDirCreateAction(
       FutureTask("Creating...", Future.successful(()))
     )
-    val dir = "test dir"
+    val dir1 = "test dir"
+    val dir2 = "test dir 2"
     val multiple = true
 
     //then
-    actions.createDir.expects(dispatch, currDir.path, dir, multiple).returning(action)
-    dispatch.expects(action)
-    dispatch.expects(FileListPopupMkFolderAction(show = false))
+    actions.createDir.expects(dispatch, currDir.path, dir1, multiple).returning(action).twice()
+    actions.createDir.expects(dispatch, currDir.path, dir2, multiple).returning(action)
+    dispatch.expects(action).repeated(3)
+    dispatch.expects(FileListPopupMkFolderAction(show = false)).repeated(3)
 
-    //when
-    popup.onOk(dir, multiple)
+    for {
+      _ <- Future.unit
 
-    action.task.future.map { _ =>
-      //then
-      val updated = findComponentProps(renderer.root, makeFolderPopup)
-      updated.folderName shouldBe dir
-      updated.multiple shouldBe multiple
-    }
+      //when & then
+      _ = findComponentProps(renderer.root, makeFolderPopup).onOk(dir1, multiple)
+      _ <- action.task.future.map { _ =>
+        inside(findComponentProps(renderer.root, makeFolderPopup)) {
+          case MakeFolderPopupProps(folderItems, folderName, multiple, _, _) =>
+            folderItems shouldBe List(dir1)
+            folderName shouldBe dir1
+            multiple shouldBe multiple
+        }
+      }
+
+      //when & then
+      _ = findComponentProps(renderer.root, makeFolderPopup).onOk(dir2, multiple)
+      _ <- action.task.future.map { _ =>
+        inside(findComponentProps(renderer.root, makeFolderPopup)) {
+          case MakeFolderPopupProps(folderItems, folderName, multiple, _, _) =>
+            folderItems shouldBe List(dir2, dir1)
+            folderName shouldBe dir2
+            multiple shouldBe multiple
+        }
+      }
+
+      //when & then
+      _ = findComponentProps(renderer.root, makeFolderPopup).onOk(dir1, multiple)
+      _ <- action.task.future.map { _ =>
+        inside(findComponentProps(renderer.root, makeFolderPopup)) {
+          case MakeFolderPopupProps(folderItems, folderName, multiple, _, _) =>
+            folderItems shouldBe List(dir1, dir2)
+            folderName shouldBe dir1
+            multiple shouldBe multiple
+        }
+      }
+    } yield Succeeded
   }
 
   it should "dispatch FileListPopupMkFolderAction when Cancel action" in {
@@ -91,7 +119,8 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
 
     //then
     assertTestComponent(result, makeFolderPopup) {
-      case MakeFolderPopupProps(folderName, multiple, _, _) =>
+      case MakeFolderPopupProps(folderItems, folderName, multiple, _, _) =>
+        folderItems shouldBe Nil
         folderName shouldBe ""
         multiple shouldBe false
     }

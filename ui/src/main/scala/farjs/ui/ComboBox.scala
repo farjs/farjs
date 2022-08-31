@@ -35,15 +35,17 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
     }
 
     def onAction(items: List[String], selected: Int): Unit = {
-      props.onChange(items(selected))
-      hidePopup()
+      if (items.nonEmpty) {
+        props.onChange(items(selected))
+        hidePopup()
 
-      process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
-        name = "end",
-        ctrl = false,
-        meta = false,
-        shift = false
-      ))
+        process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
+          name = "end",
+          ctrl = false,
+          meta = false,
+          shift = false
+        ))
+      }
     }
     
     def onKeypress(keyFull: String): Boolean = {
@@ -54,7 +56,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
           else processed = false
         case "C-up" | "C-down" =>
           if (maybePopup.isDefined) hidePopup()
-          else showPopup(List("item", "item 2"), 0)
+          else showPopup(props.items.toList, 0)
         case "down" =>
           maybePopup match {
             case None => processed = false
