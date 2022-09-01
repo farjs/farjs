@@ -2,14 +2,17 @@ package farjs.ui
 
 import farjs.ui.ComboBox._
 import farjs.ui.popup.PopupOverlay
+import org.scalatest.Succeeded
 import scommons.nodejs._
+import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.blessed._
 import scommons.react.test._
 
+import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
 
-class ComboBoxSpec extends TestSpec with TestRendererUtils {
+class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   ComboBox.textInputComp = mockUiComponent("TextInput")
   ComboBox.comboBoxPopup = mockUiComponent("ComboBoxPopup")
@@ -44,6 +47,7 @@ class ComboBoxSpec extends TestSpec with TestRendererUtils {
 
     //cleanup
     process.stdin.removeListener("keypress", listener)
+    Succeeded
   }
 
   it should "call onChange, hide popup and emit keypress event when onKeypress(return)" in {
@@ -77,6 +81,7 @@ class ComboBoxSpec extends TestSpec with TestRendererUtils {
 
     //cleanup
     process.stdin.removeListener("keypress", listener)
+    Succeeded
   }
 
   it should "do nothing if no items when onKeypress(return)" in {
@@ -110,6 +115,132 @@ class ComboBoxSpec extends TestSpec with TestRendererUtils {
 
     //cleanup
     process.stdin.removeListener("keypress", listener)
+    Succeeded
+  }
+
+  it should "do autocomplete if selected when single char" in {
+    //given
+    val onChange = mockFunction[String, Unit]
+    val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
+    val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
+      onKey(
+        key.name,
+        key.ctrl.getOrElse(false),
+        key.meta.getOrElse(false),
+        key.shift.getOrElse(false)
+      )
+    }
+    process.stdin.on("keypress", listener)
+    val props = getComboBoxProps(items = List("abc", "ac"), value = "ad", onChange = onChange)
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    val textInput = findComponentProps(renderer.root, textInputComp)
+    textInput.stateUpdater(_.copy(selStart = 1))
+
+    //then
+    onChange.expects("abc")
+    onKey.expects("end", false, false, true)
+
+    //when
+    findComponentProps(renderer.root, textInputComp).onKeypress("b") shouldBe false
+
+    //cleanup
+    Future.unit.map { _ =>
+      process.stdin.removeListener("keypress", listener)
+      Succeeded
+    }
+  }
+
+  it should "do autocomplete if not selected when single char" in {
+    //given
+    val onChange = mockFunction[String, Unit]
+    val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
+    val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
+      onKey(
+        key.name,
+        key.ctrl.getOrElse(false),
+        key.meta.getOrElse(false),
+        key.shift.getOrElse(false)
+      )
+    }
+    process.stdin.on("keypress", listener)
+    val props = getComboBoxProps(items = List("abc", "ac"), value = "", onChange = onChange)
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    val textInput = findComponentProps(renderer.root, textInputComp)
+
+    //then
+    onChange.expects("abc")
+    onKey.expects("end", false, false, true)
+
+    //when
+    textInput.onKeypress("a") shouldBe false
+
+    //cleanup
+    Future.unit.map { _ =>
+      process.stdin.removeListener("keypress", listener)
+      Succeeded
+    }
+  }
+
+  it should "do autocomplete when upper-case char" in {
+    //given
+    val onChange = mockFunction[String, Unit]
+    val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
+    val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
+      onKey(
+        key.name,
+        key.ctrl.getOrElse(false),
+        key.meta.getOrElse(false),
+        key.shift.getOrElse(false)
+      )
+    }
+    process.stdin.on("keypress", listener)
+    val props = getComboBoxProps(items = List("aBc", "ac"), value = "a", onChange = onChange)
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    val textInput = findComponentProps(renderer.root, textInputComp)
+
+    //then
+    onChange.expects("aBc")
+    onKey.expects("end", false, false, true)
+
+    //when
+    textInput.onKeypress("S-b") shouldBe false
+
+    //cleanup
+    Future.unit.map { _ =>
+      process.stdin.removeListener("keypress", listener)
+      Succeeded
+    }
+  }
+
+  it should "do autocomplete when space char" in {
+    //given
+    val onChange = mockFunction[String, Unit]
+    val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
+    val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
+      onKey(
+        key.name,
+        key.ctrl.getOrElse(false),
+        key.meta.getOrElse(false),
+        key.shift.getOrElse(false)
+      )
+    }
+    process.stdin.on("keypress", listener)
+    val props = getComboBoxProps(items = List("a c", " c"), value = "a", onChange = onChange)
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    val textInput = findComponentProps(renderer.root, textInputComp)
+
+    //then
+    onChange.expects("a c")
+    onKey.expects("end", false, false, true)
+
+    //when
+    textInput.onKeypress("space") shouldBe false
+
+    //cleanup
+    Future.unit.map { _ =>
+      process.stdin.removeListener("keypress", listener)
+      Succeeded
+    }
   }
 
   it should "hide popup when onKeypress(escape)" in {

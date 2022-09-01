@@ -7,6 +7,8 @@ import scommons.react.blessed._
 import scommons.react.blessed.raw.BlessedProgram
 import scommons.react.hooks._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.scalajs.js
 
 object ComboBox extends FunctionComponent[ComboBoxProps] {
@@ -34,7 +36,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
       }
     }
 
-    def onAction(items: List[String], selected: Int): Unit = {
+    def onSelectAction(items: List[String], selected: Int): Unit = {
       if (items.nonEmpty) {
         props.onChange(items(selected))
         hidePopup()
@@ -45,6 +47,33 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
           meta = false,
           shift = false
         ))
+      }
+    }
+
+    def onAutoCompleteAction(key: String): Unit = {
+      val value =
+        if (state.selStart != -1) props.value.take(state.selStart)
+        else props.value
+
+      val newValue =
+        if (key.length == 1) s"$value$key"
+        else if (key.startsWith("S-") && key.length == 3) s"""$value${key.drop(2).toUpperCase}"""
+        else if (key == "space") s"$value "
+        else value
+
+      if (newValue != value) {
+        props.items.find(_.startsWith(newValue)).foreach { existing =>
+          Future {
+            props.onChange(existing)
+
+            process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
+              name = "end",
+              ctrl = false,
+              meta = false,
+              shift = true
+            ))
+          }
+        }
       }
     }
     
@@ -76,8 +105,11 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
         case "return" =>
           maybePopup match {
             case None => processed = false
-            case Some((items, selected)) => onAction(items, selected)
+            case Some((items, selected)) => onSelectAction(items, selected)
           }
+        case key if maybePopup.isEmpty =>
+          onAutoCompleteAction(key)
+          processed = false
         case _ => processed = maybePopup.isDefined
       }
       processed
@@ -118,7 +150,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
             top = props.top + 1,
             width = props.width,
             onClick = { index =>
-              onAction(items, index)
+              onSelectAction(items, index)
             }
           ))()
         )
