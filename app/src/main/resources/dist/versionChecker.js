@@ -31,29 +31,24 @@ function green(text) {
 
 module.exports = {
 
-  check: function (callback) {
-    getNpmVersion((error, npmVersion) => {
-      if (error) {
-        callback()
-        return
-      }
+  getNpmVersion: getNpmVersion,
 
-      if (npmVersion != packageJson.version) {
-        console.log(green(
+  checkNpmVersion: function (npmVersion) {
+
+    if (npmVersion && npmVersion != packageJson.version) {
+      console.log(green(
 `
-  There is a new version of ${packageJson.name} available (${npmVersion}).
-  You are currently using ${packageJson.name} ${packageJson.version}
-  Install FAR.js globally using the package manager of your choice;
-  for example:
+  There is a newer version of ${packageJson.name} available: ${npmVersion}
+  (You are currently using version: ${packageJson.version})
 
-    npm install -g ${packageJson.name}
+  Install FAR.js globally using the package manager of your choice.
+  For example, to get the latest version:
 
-  to get the latest version. See the changelog here:
-    https://github.com/farjs/farjs/releases
+    npm i -g ${packageJson.name}
+
+  See the changelog here: https://github.com/farjs/farjs/releases
 `
-        ))
-      }
-      callback()
-    })
+      ))
+    }
   }
 }

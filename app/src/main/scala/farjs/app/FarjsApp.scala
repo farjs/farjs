@@ -6,7 +6,7 @@ import farjs.app.util.DevTool
 import farjs.ui.theme.{Theme, XTerm256Theme}
 import io.github.shogowada.scalajs.reactjs.redux.ReactRedux._
 import io.github.shogowada.scalajs.reactjs.redux.Redux
-import scommons.nodejs._
+import scommons.nodejs.{global, process}
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.blessed.portal.WithPortals
@@ -18,21 +18,40 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 @JSExportTopLevel(name = "FarjsApp")
 object FarjsApp {
 
+  private val g: js.Dynamic = global.asInstanceOf[js.Dynamic]
+
   @JSExport("start")
-  def start(showDevTools: Boolean = false): BlessedScreen = {
-    val screen = Blessed.screen(new BlessedScreenConfig {
-      override val autoPadding = true
-      override val smartCSR = true
-      override val cursorShape = "underline"
-    })
+  def start(showDevTools: Boolean = false,
+            currentScreen: js.UndefOr[BlessedScreen] = js.undefined,
+            onExit: js.UndefOr[js.Function0[Unit]] = js.undefined): BlessedScreen = {
+
+    val screen = currentScreen.getOrElse {
+      val screen = Blessed.screen(new BlessedScreenConfig {
+        override val autoPadding = true
+        override val smartCSR = true
+        override val cursorShape = "underline"
+      })
+      val screenObj = screen.asInstanceOf[js.Dynamic]
+      screenObj.savedConsoleLog = g.console.log
+      screenObj.savedConsoleError = g.console.error
+
+      screen.key(js.Array("C-e"), { (_, _) =>
+        // cleanup/unmount components
+        screen.destroy()
+
+        g.console.log = screenObj.savedConsoleLog
+        g.console.error = screenObj.savedConsoleError
+        onExit.toOption match {
+          case Some(onExit) => onExit()
+          case None => process.exit(0)
+        }
+      })
+      screen
+    }
 
     if (screen.terminal == TerminalName.`xterm-256color`) {
       Theme.current = XTerm256Theme
     }
-    
-    screen.key(js.Array("C-e"), { (_, _) =>
-      process.exit(0)
-    })
 
     val store = Redux.createStore(FarjsStateReducer.reduce)
     

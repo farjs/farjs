@@ -1,6 +1,7 @@
 const {FarjsApp} = require("./farjs-app-fastopt")
 
-var screen = FarjsApp.start(true)
+const showDevTools = true
+const screen = FarjsApp.start(showDevTools)
 
 if (module.hot) {
   // remove webpack Hot Module Replacement (HMR) logging
@@ -12,10 +13,8 @@ if (module.hot) {
   }
   
   module.hot.accept("./farjs-app-fastopt", function () {
-    const oldScreen = screen
-    oldScreen.destroy()
-    
     const {FarjsApp} = require("./farjs-app-fastopt")
-    screen = FarjsApp.start(true)
+
+    FarjsApp.start(showDevTools, screen)
   })
 }

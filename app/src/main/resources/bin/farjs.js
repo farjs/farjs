@@ -3,7 +3,18 @@
 process.title = "FAR.js"
 
 const versionChecker = require('../dist/versionChecker.js')
-versionChecker.check(() => {
 
-  require('../farjs-app-opt-bundle.js').FarjsApp.start()
+var npmVersion = undefined
+versionChecker.getNpmVersion((error, version) => {
+  if (!error) {
+    npmVersion = version
+  }
 })
+
+const onExit = () => {
+  versionChecker.checkNpmVersion(npmVersion)
+  process.exit(0)
+}
+
+const farjsApp = require('../farjs-app-opt-bundle.js').FarjsApp
+farjsApp.start(false, undefined, onExit)
