@@ -1,8 +1,9 @@
 package farjs.ui
 
 import farjs.ui.ComboBox._
+import farjs.ui.ComboBoxPopup.maxItems
 import farjs.ui.popup.PopupOverlay
-import org.scalatest.Succeeded
+import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs._
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.blessed._
@@ -343,31 +344,150 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     ))
   }
 
-  it should "select items in popup when onKeypress(down|up)" in {
+  it should "not select if empty items when onKeypress(page-/down/up|end|home)" in {
     //given
-    val props = getComboBoxProps()
+    val props = getComboBoxProps(items = Nil)
     val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
     findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
+    findComponentProps(renderer.root, comboBoxPopup).items shouldBe Nil
     findComponentProps(renderer.root, comboBoxPopup).selected shouldBe 0
 
-    //when & then
-    findComponentProps(renderer.root, textInputComp).onKeypress("up") shouldBe true
-    findComponentProps(renderer.root, comboBoxPopup).selected shouldBe 0
+    def check(keyFull: String, items: List[String], selected: Int): Assertion = {
+      findComponentProps(renderer.root, textInputComp).onKeypress(keyFull) shouldBe true
+      inside(findComponentProps(renderer.root, comboBoxPopup)) { case popupProps =>
+        popupProps.items shouldBe items
+        popupProps.selected shouldBe selected
+      }
+    }
 
     //when & then
-    findComponentProps(renderer.root, textInputComp).onKeypress("down") shouldBe true
-    findComponentProps(renderer.root, comboBoxPopup).selected shouldBe 1
-
-    //when & then
-    findComponentProps(renderer.root, textInputComp).onKeypress("down") shouldBe true
-    findComponentProps(renderer.root, comboBoxPopup).selected shouldBe 1
-
-    //when & then
-    findComponentProps(renderer.root, textInputComp).onKeypress("up") shouldBe true
-    findComponentProps(renderer.root, comboBoxPopup).selected shouldBe 0
+    check("up", Nil, 0)
+    check("down", Nil, 0)
+    check("pageup", Nil, 0)
+    check("pagedown", Nil, 0)
+    check("home", Nil, 0)
+    check("end", Nil, 0)
   }
 
-  it should "return false if popup not shown when onKeypress(escape|tab|up|down|return|unknown)" in {
+  it should "not select if single item when onKeypress(page-/down/up|end|home)" in {
+    //given
+    val items = List("one")
+    val props = getComboBoxProps(items = items)
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
+    findComponentProps(renderer.root, comboBoxPopup).items shouldBe items
+    findComponentProps(renderer.root, comboBoxPopup).selected shouldBe 0
+
+    def check(keyFull: String, items: List[String], selected: Int): Assertion = {
+      findComponentProps(renderer.root, textInputComp).onKeypress(keyFull) shouldBe true
+      inside(findComponentProps(renderer.root, comboBoxPopup)) { case popupProps =>
+        popupProps.items shouldBe items
+        popupProps.selected shouldBe selected
+      }
+    }
+
+    //when & then
+    check("up", items, 0)
+    check("down", items, 0)
+    check("pageup", items, 0)
+    check("pagedown", items, 0)
+    check("home", items, 0)
+    check("end", items, 0)
+  }
+
+  it should "select if items < maxItems when onKeypress(page-/down/up|end|home)" in {
+    //given
+    val items = List("1", "2", "3", "4", "5")
+    val props = getComboBoxProps(items = items)
+    props.items.length should be < maxItems
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
+    findComponentProps(renderer.root, comboBoxPopup).items shouldBe items
+    findComponentProps(renderer.root, comboBoxPopup).selected shouldBe 0
+
+    def check(keyFull: String, items: List[String], selected: Int): Assertion = {
+      findComponentProps(renderer.root, textInputComp).onKeypress(keyFull) shouldBe true
+      inside(findComponentProps(renderer.root, comboBoxPopup)) { case popupProps =>
+        popupProps.items shouldBe items
+        popupProps.selected shouldBe selected
+      }
+    }
+
+    //when & then
+    check("up", items, 0)
+    check("pageup", items, 0)
+    check("home", items, 0)
+    check("down", items, 1)
+    check("down", items, 2)
+    check("pagedown", items, 4)
+    check("pageup", items, 0)
+    check("end", items, 4)
+    check("down", items, 4)
+    check("pagedown", items, 4)
+    check("up", items, 3)
+    check("up", items, 2)
+    check("home", items, 0)
+  }
+
+  it should "select if items > maxItems when onKeypress(page-/down/up|end|home)" in {
+    //given
+    val items = List("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+    val page1 = List("1", "2", "3", "4", "5", "6", "7", "8")
+    val page2 = List("3", "4", "5", "6", "7", "8", "9", "10")
+    val props = getComboBoxProps(items = items)
+    props.items.length should be > maxItems
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
+    inside(findComponentProps(renderer.root, comboBoxPopup)) { case popupProps =>
+      popupProps.items shouldBe page1
+      popupProps.selected shouldBe 0
+    }
+    
+    def check(keyFull: String, items: List[String], selected: Int): Assertion = {
+      findComponentProps(renderer.root, textInputComp).onKeypress(keyFull) shouldBe true
+      inside(findComponentProps(renderer.root, comboBoxPopup)) { case popupProps =>
+        popupProps.items shouldBe items
+        popupProps.selected shouldBe selected
+      }
+    }
+
+    //when & then
+    check("up", page1, 0)
+    check("pageup", page1, 0)
+    check("home", page1, 0)
+    check("down", page1, 1)
+    check("down", page1, 2)
+    check("pagedown", page2, 2)
+    check("pagedown", page2, 7)
+    check("pageup", page1, 7)
+    check("pageup", page1, 0)
+    check("down", page1, 1)
+    check("down", page1, 2)
+    check("down", page1, 3)
+    check("down", page1, 4)
+    check("down", page1, 5)
+    check("down", page1, 6)
+    check("down", page1, 7)
+    check("down", List("2", "3", "4", "5", "6", "7", "8", "9"), 7)
+    check("down", page2, 7)
+    check("down", page2, 7)
+    check("end", page2, 7)
+    check("pagedown", page2, 7)
+    check("up", page2, 6)
+    check("up", page2, 5)
+    check("up", page2, 4)
+    check("up", page2, 3)
+    check("up", page2, 2)
+    check("up", page2, 1)
+    check("up", page2, 0)
+    check("up", List("2", "3", "4", "5", "6", "7", "8", "9"), 0)
+    check("up", page1, 0)
+    check("up", page1, 0)
+    check("end", page2, 7)
+    check("home", page1, 0)
+  }
+
+  it should "return false if popup not shown when onKeypress" in {
     //given
     val props = getComboBoxProps()
     val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
@@ -378,6 +498,10 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     textInput.onKeypress("tab") shouldBe false
     textInput.onKeypress("up") shouldBe false
     textInput.onKeypress("down") shouldBe false
+    textInput.onKeypress("pagedown") shouldBe false
+    textInput.onKeypress("pageup") shouldBe false
+    textInput.onKeypress("end") shouldBe false
+    textInput.onKeypress("home") shouldBe false
     textInput.onKeypress("return") shouldBe false
     textInput.onKeypress("unknown") shouldBe false
   }

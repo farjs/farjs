@@ -1,5 +1,6 @@
 package farjs.ui
 
+import farjs.ui.ComboBoxPopup.maxItems
 import farjs.ui.popup.PopupOverlay
 import scommons.nodejs._
 import scommons.react._
@@ -19,11 +20,11 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
     val programRef = useRef[BlessedProgram](null)
-    val (maybePopup, setPopup) = useState[Option[(List[String], Int)]](None)
+    val (maybePopup, setPopup) = useState[Option[(List[String], Int, Int)]](None)
     val (state, setState) = useStateUpdater(() => TextInputState())
     
-    def showPopup(items: List[String], selected: Int): Unit = {
-      setPopup(Some(items -> selected))
+    def showPopup(items: List[String], offset: Int, selected: Int): Unit = {
+      setPopup(Some((items, offset, selected)))
       if (programRef.current != null) {
         programRef.current.hideCursor()
       }
@@ -36,9 +37,9 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
       }
     }
 
-    def onSelectAction(items: List[String], selected: Int): Unit = {
+    def onSelectAction(items: List[String], offset: Int, selected: Int): Unit = {
       if (items.nonEmpty) {
-        props.onChange(items(selected))
+        props.onChange(items(offset + selected))
         hidePopup()
 
         process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
@@ -85,27 +86,69 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
           else processed = false
         case "C-up" | "C-down" =>
           if (maybePopup.isDefined) hidePopup()
-          else showPopup(props.items.toList, 0)
+          else showPopup(props.items.toList, 0, 0)
         case "down" =>
           maybePopup match {
             case None => processed = false
-            case Some((items, selected)) =>
-              if (selected < items.size - 1) {
-                setPopup(Some((items, selected + 1)))
+            case Some((items, offset, selected)) =>
+              val maxSelected = math.max(math.min(items.size - offset - 1, maxItems - 1), 0)
+              if (selected < maxSelected) {
+                setPopup(Some((items, offset, selected + 1)))
+              }
+              else if (offset < items.size - maxItems) {
+                setPopup(Some((items, offset + 1, selected)))
               }
           }
         case "up" =>
           maybePopup match {
             case None => processed = false
-            case Some((items, selected)) =>
+            case Some((items, offset, selected)) =>
               if (selected > 0) {
-                setPopup(Some((items, selected - 1)))
+                setPopup(Some((items, offset, selected - 1)))
               }
+              else if (offset > 0) {
+                setPopup(Some((items, offset - 1, selected)))
+              }
+          }
+        case "pagedown" =>
+          maybePopup match {
+            case None => processed = false
+            case Some((items, offset, selected)) =>
+              val newOffset = math.max(math.min(items.size - maxItems, offset + maxItems), 0)
+              val newSelected =
+                if (newOffset == offset) math.max(math.min(items.size - newOffset - 1, maxItems - 1), 0)
+                else math.max(math.min(items.size - newOffset - 1, selected), 0)
+              
+              setPopup(Some((items, newOffset, newSelected)))
+          }
+        case "pageup" =>
+          maybePopup match {
+            case None => processed = false
+            case Some((items, offset, selected)) =>
+              val newOffset = math.max(offset - maxItems, 0)
+              val newSelected =
+                if (newOffset == offset) 0
+                else selected
+              
+              setPopup(Some((items, newOffset, newSelected)))
+          }
+        case "end" =>
+          maybePopup match {
+            case None => processed = false
+            case Some((items, _, _)) =>
+              val newOffset = math.max(items.size - maxItems, 0)
+              val newSelected = math.max(math.min(items.size - newOffset - 1, maxItems - 1), 0)
+              setPopup(Some((items, newOffset, newSelected)))
+          }
+        case "home" =>
+          maybePopup match {
+            case None => processed = false
+            case Some((items, _, _)) => setPopup(Some((items, 0, 0)))
           }
         case "return" =>
           maybePopup match {
             case None => processed = false
-            case Some((items, selected)) => onSelectAction(items, selected)
+            case Some((items, offset, selected)) => onSelectAction(items, offset, selected)
           }
         case key if maybePopup.isEmpty =>
           onAutoCompleteAction(key)
@@ -128,7 +171,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
         onKeypress = onKeypress
       ))(),
 
-      maybePopup.map { case (items, selected) =>
+      maybePopup.map { case (items, offset, selected) =>
         <.form(
           ^.ref := { el: BlessedElement =>
             if (el != null) {
@@ -145,12 +188,12 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
         )(
           <(comboBoxPopup())(^.wrapped := ComboBoxPopupProps(
             selected = selected,
-            items = items,
+            items = items.slice(offset, offset + maxItems),
             left = props.left,
             top = props.top + 1,
             width = props.width,
             onClick = { index =>
-              onSelectAction(items, index)
+              onSelectAction(items, offset, index)
             }
           ))()
         )
