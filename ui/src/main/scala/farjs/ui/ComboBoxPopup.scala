@@ -10,7 +10,8 @@ case class ComboBoxPopupProps(selected: Int,
                               left: Int,
                               top: Int,
                               width: Int,
-                              onClick: Int => Unit)
+                              onClick: Int => Unit,
+                              onWheel: Boolean => Unit = _ => ())
 
 object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
   
@@ -54,6 +55,12 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
           },
           ^.rbOnClick := { _ =>
             props.onClick(index)
+          },
+          ^.rbOnWheelup := { _ =>
+            props.onWheel(true)
+          },
+          ^.rbOnWheeldown := { _ =>
+            props.onWheel(false)
           },
           ^.content := s"  ${text.take(textWidth - 4)}  "
         )()

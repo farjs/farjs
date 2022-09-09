@@ -333,7 +333,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         ^.rbStyle := PopupOverlay.style
       )(
         <(comboBoxPopup())(^.assertWrapped(inside(_) {
-          case ComboBoxPopupProps(selected, items, left, top, width, _) =>
+          case ComboBoxPopupProps(selected, items, left, top, width, _, _) =>
             selected shouldBe 0
             items shouldBe List("item", "item 2")
             left shouldBe props.left
@@ -342,6 +342,34 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         }))()
       )
     ))
+  }
+
+  it should "select items when onWheel(true/false)" in {
+    //given
+    val items = List("1", "2", "3")
+    val props = getComboBoxProps(items = items)
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
+    findComponentProps(renderer.root, comboBoxPopup).items shouldBe items
+    findComponentProps(renderer.root, comboBoxPopup).selected shouldBe 0
+
+    def check(up: Boolean, items: List[String], selected: Int): Assertion = {
+      findComponentProps(renderer.root, comboBoxPopup).onWheel(up)
+      inside(findComponentProps(renderer.root, comboBoxPopup)) { case popupProps =>
+        popupProps.items shouldBe items
+        popupProps.selected shouldBe selected
+      }
+    }
+
+    //when & then
+    check(up = true, items, 0)
+    check(up = true, items, 0)
+    check(up = false, items, 1)
+    check(up = false, items, 2)
+    check(up = false, items, 2)
+    check(up = true, items, 1)
+    check(up = true, items, 0)
+    check(up = true, items, 0)
   }
 
   it should "not select if empty items when onKeypress(page-/down/up|end|home)" in {

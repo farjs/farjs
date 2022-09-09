@@ -33,6 +33,54 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     textEl.props.onClick(null)
   }
 
+  it should "call onWheel(true) when onWheelup" in {
+    //given
+    val onWheel = mockFunction[Boolean, Unit]
+    val props = ComboBoxPopupProps(
+      selected = 0,
+      items = List("item 1", "item 2"),
+      left = 1,
+      top = 2,
+      width = 11,
+      onClick = _ => (),
+      onWheel = onWheel
+    )
+    val comp = testRender(<(ComboBoxPopup())(^.wrapped := props)())
+    val textEl = inside(findComponents(comp, <.text.name)) {
+      case List(_, text) => text
+    }
+    
+    //then
+    onWheel.expects(true)
+    
+    //when
+    textEl.props.onWheelup(null)
+  }
+
+  it should "call onWheel(false) when onWheeldown" in {
+    //given
+    val onWheel = mockFunction[Boolean, Unit]
+    val props = ComboBoxPopupProps(
+      selected = 0,
+      items = List("item 1", "item 2"),
+      left = 1,
+      top = 2,
+      width = 11,
+      onClick = _ => (),
+      onWheel = onWheel
+    )
+    val comp = testRender(<(ComboBoxPopup())(^.wrapped := props)())
+    val textEl = inside(findComponents(comp, <.text.name)) {
+      case List(_, text) => text
+    }
+    
+    //then
+    onWheel.expects(false)
+    
+    //when
+    textEl.props.onWheeldown(null)
+  }
+
   it should "render component" in {
     //given
     val props = ComboBoxPopupProps(

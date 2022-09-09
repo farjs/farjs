@@ -78,6 +78,25 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
       }
     }
     
+    def onDown(items: List[String], offset: Int, selected: Int): Unit = {
+      val maxSelected = math.max(math.min(items.size - offset - 1, maxItems - 1), 0)
+      if (selected < maxSelected) {
+        setPopup(Some((items, offset, selected + 1)))
+      }
+      else if (offset < items.size - maxItems) {
+        setPopup(Some((items, offset + 1, selected)))
+      }
+    }
+    
+    def onUp(items: List[String], offset: Int, selected: Int): Unit = {
+      if (selected > 0) {
+        setPopup(Some((items, offset, selected - 1)))
+      }
+      else if (offset > 0) {
+        setPopup(Some((items, offset - 1, selected)))
+      }
+    }
+    
     def onKeypress(keyFull: String): Boolean = {
       var processed = true
       keyFull match {
@@ -90,25 +109,12 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
         case "down" =>
           maybePopup match {
             case None => processed = false
-            case Some((items, offset, selected)) =>
-              val maxSelected = math.max(math.min(items.size - offset - 1, maxItems - 1), 0)
-              if (selected < maxSelected) {
-                setPopup(Some((items, offset, selected + 1)))
-              }
-              else if (offset < items.size - maxItems) {
-                setPopup(Some((items, offset + 1, selected)))
-              }
+            case Some((items, offset, selected)) => onDown(items, offset, selected)
           }
         case "up" =>
           maybePopup match {
             case None => processed = false
-            case Some((items, offset, selected)) =>
-              if (selected > 0) {
-                setPopup(Some((items, offset, selected - 1)))
-              }
-              else if (offset > 0) {
-                setPopup(Some((items, offset - 1, selected)))
-              }
+            case Some((items, offset, selected)) => onUp(items, offset, selected)
           }
         case "pagedown" =>
           maybePopup match {
@@ -194,6 +200,10 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
             width = props.width,
             onClick = { index =>
               onSelectAction(items, offset, index)
+            },
+            onWheel = {
+              case true => onUp(items, offset, selected)
+              case false => onDown(items, offset, selected)
             }
           ))()
         )
