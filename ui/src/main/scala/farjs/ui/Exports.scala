@@ -20,6 +20,8 @@ object Exports {
 
   val ProgressBar: ReactClass = farjs.ui.ProgressBar()
 
+  val ScrollBar: ReactClass = farjs.ui.ScrollBar()
+
   val TextBox: ReactClass = farjs.ui.TextBox()
 
   val TextAlign: TextAlign = farjs.ui.TextAlign
