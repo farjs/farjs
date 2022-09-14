@@ -2,6 +2,7 @@ package farjs.ui
 
 import farjs.ui.ComboBoxPopup.maxItems
 import farjs.ui.popup.PopupOverlay
+import farjs.ui.theme.Theme
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
@@ -16,12 +17,14 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
 
   private[ui] var textInputComp: UiComponent[TextInputProps] = TextInput
   private[ui] var comboBoxPopup: UiComponent[ComboBoxPopupProps] = ComboBoxPopup
+  private[ui] var scrollBarComp: UiComponent[ScrollBarProps] = ScrollBar
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
     val programRef = useRef[BlessedProgram](null)
     val (maybePopup, setPopup) = useState[Option[(List[String], Int, Int)]](None)
     val (state, setState) = useStateUpdater(() => TextInputState())
+    val theme = Theme.current.popup.menu
     
     def showPopup(items: List[String], offset: Int, selected: Int): Unit = {
       setPopup(Some((items, offset, selected)))
@@ -205,7 +208,24 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
               case true => onUp(items, offset, selected)
               case false => onDown(items, offset, selected)
             }
-          ))()
+          ))(),
+
+          if (items.size > maxItems) Some {
+            <(scrollBarComp())(^.plain := ScrollBarProps(
+              left = props.left + props.width - 1,
+              top = props.top + 2,
+              length = maxItems,
+              style = theme,
+              value = offset,
+              extent = maxItems,
+              min = 0,
+              max = items.size - maxItems,
+              onChange = { offset =>
+                setPopup(Some((items, offset, selected)))
+              }
+            ))()
+          }
+          else None
         )
       }
     )

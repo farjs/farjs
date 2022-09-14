@@ -3,6 +3,7 @@ package farjs.ui
 import farjs.ui.ComboBox._
 import farjs.ui.ComboBoxPopup.maxItems
 import farjs.ui.popup.PopupOverlay
+import farjs.ui.theme.DefaultTheme
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs._
 import scommons.nodejs.test.AsyncTestSpec
@@ -17,6 +18,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
   ComboBox.textInputComp = mockUiComponent("TextInput")
   ComboBox.comboBoxPopup = mockUiComponent("ComboBoxPopup")
+  ComboBox.scrollBarComp = mockUiComponent("ScrollBar")
 
   it should "call onChange, hide popup and emit keypress event when popup.onClick" in {
     //given
@@ -342,6 +344,91 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         }))()
       )
     ))
+  }
+
+  it should "show popup with ScrollBar when onKeypress(C-down)" in {
+    //given
+    val items = List("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+    val page1 = List("1", "2", "3", "4", "5", "6", "7", "8")
+    val props = getComboBoxProps(items = items)
+    props.items.length should be > maxItems
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    val textInput = findComponentProps(renderer.root, textInputComp)
+    findProps(renderer.root, comboBoxPopup) should be (empty)
+
+    //when
+    textInput.onKeypress("C-down") shouldBe true
+
+    //then
+    val theme = DefaultTheme.popup.menu
+    assertComponents(renderer.root.children, List(
+      <(textInputComp())(^.assertWrapped(inside(_) {
+        case TextInputProps(left, top, width, value, state, _, onChange, onEnter, _) =>
+          left shouldBe props.left
+          top shouldBe props.top
+          width shouldBe props.width
+          value shouldBe props.value
+          state shouldBe TextInputState()
+          onChange shouldBe props.onChange
+          onEnter shouldBe props.onEnter
+      }))(),
+
+      <.form(
+        ^.rbClickable := true,
+        ^.rbMouse := true,
+        ^.rbAutoFocus := false,
+        ^.rbStyle := PopupOverlay.style
+      )(
+        <(comboBoxPopup())(^.assertWrapped(inside(_) {
+          case ComboBoxPopupProps(selected, items, left, top, width, _, _) =>
+            selected shouldBe 0
+            items shouldBe page1
+            left shouldBe props.left
+            top shouldBe props.top + 1
+            width shouldBe props.width
+        }))(),
+
+        <(scrollBarComp())(^.assertPlain[ScrollBarProps](inside(_) {
+          case ScrollBarProps(left, top, length, style, value, extent, min, max, _) =>
+            left shouldBe (props.left + props.width - 1)
+            top shouldBe (props.top + 2)
+            length shouldBe maxItems
+            style shouldBe theme
+            value shouldBe 0
+            extent shouldBe maxItems
+            min shouldBe 0
+            max shouldBe (items.size - maxItems)
+        }))()
+      )
+    ))
+  }
+
+  it should "scroll when onChange in ScrollBar" in {
+    //given
+    val items = List("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+    val page1 = List("1", "2", "3", "4", "5", "6", "7", "8")
+    val page2 = List("2", "3", "4", "5", "6", "7", "8", "9")
+    val props = getComboBoxProps(items = items)
+    props.items.length should be > maxItems
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
+    inside(findComponentProps(renderer.root, comboBoxPopup)) { case popupProps =>
+      popupProps.items shouldBe page1
+      popupProps.selected shouldBe 0
+    }
+    val scrollBarProps = findComponentProps(renderer.root, scrollBarComp, plain = true)
+
+    //when
+    scrollBarProps.onChange(1)
+
+    //then
+    inside(findComponentProps(renderer.root, comboBoxPopup)) { case popupProps =>
+      popupProps.items shouldBe page2
+      popupProps.selected shouldBe 0
+    }
+    inside(findComponentProps(renderer.root, scrollBarComp, plain = true)) { case scrollBarProps =>
+      scrollBarProps.value shouldBe 1
+    }
   }
 
   it should "select items when onWheel(true/false)" in {
