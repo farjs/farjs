@@ -41,7 +41,7 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
 
     //then
     assertTestComponent(result, textInputComp) {
-      case TextInputProps(left, top, width, value, state, _, onChange, onEnter, _) =>
+      case TextInputProps(_, left, top, width, value, state, _, onChange, onEnter, _) =>
         left shouldBe props.left
         top shouldBe props.top
         width shouldBe props.width

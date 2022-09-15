@@ -13,7 +13,8 @@ case class TextInputState(offset: Int = 0,
                           selStart: Int = -1,
                           selEnd: Int = -1)
 
-case class TextInputProps(left: Int,
+case class TextInputProps(inputRef: ReactRef[BlessedElement],
+                          left: Int,
                           top: Int,
                           width: Int,
                           value: String,
@@ -28,7 +29,7 @@ object TextInput extends FunctionComponent[TextInputProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val theme = Theme.current.textBox
-    val elementRef = useRef[BlessedElement](null)
+    val elementRef = props.inputRef
     val (offset, cursorX) = (props.state.offset, props.state.cursorX)
     val (selStart, selEnd) = (props.state.selStart, props.state.selEnd)
 

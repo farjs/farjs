@@ -21,10 +21,17 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
+    val inputRef = useRef[BlessedElement](null)
     val programRef = useRef[BlessedProgram](null)
     val (maybePopup, setPopup) = useState[Option[(List[String], Int, Int)]](None)
     val (state, setState) = useStateUpdater(() => TextInputState())
     val theme = Theme.current.popup.menu
+    val arrowStyle = Theme.current.popup.regular
+    
+    def showOrHidePopup(): Unit = {
+      if (maybePopup.isDefined) hidePopup()
+      else showPopup(props.items.toList, 0, 0)
+    }
     
     def showPopup(items: List[String], offset: Int, selected: Int): Unit = {
       setPopup(Some((items, offset, selected)))
@@ -106,9 +113,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
         case "escape" | "tab" =>
           if (maybePopup.isDefined) hidePopup()
           else processed = false
-        case "C-up" | "C-down" =>
-          if (maybePopup.isDefined) hidePopup()
-          else showPopup(props.items.toList, 0, 0)
+        case "C-up" | "C-down" => showOrHidePopup()
         case "down" =>
           maybePopup match {
             case None => processed = false
@@ -169,6 +174,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
     
     <.>()(
       <(textInputComp())(^.wrapped := TextInputProps(
+        inputRef = inputRef,
         left = props.left,
         top = props.top,
         width = props.width,
@@ -179,6 +185,25 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
         onEnter = props.onEnter,
         onKeypress = onKeypress
       ))(),
+
+      <.text(
+        ^.rbWidth := 1,
+        ^.rbHeight := 1,
+        ^.rbLeft := props.left + props.width,
+        ^.rbTop := props.top,
+        ^.rbClickable := true,
+        ^.rbMouse := true,
+        ^.rbAutoFocus := false,
+        ^.rbStyle := arrowStyle,
+        ^.rbOnClick := { _ =>
+          val el = inputRef.current
+          if (el != null && el.screen.focused != el) {
+            el.focus()
+          }
+          showOrHidePopup()
+        },
+        ^.content := arrowDownCh
+      )(),
 
       maybePopup.map { case (items, offset, selected) =>
         <.form(
@@ -230,4 +255,6 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
       }
     )
   }
+
+  private[ui] val arrowDownCh = "\u2193" // ↓
 }

@@ -2,6 +2,7 @@ package farjs.ui
 
 import farjs.ui.theme.Theme
 import org.scalactic.source.Position
+import scommons.react.ReactRef
 import scommons.react.blessed._
 import scommons.react.test._
 import scommons.react.test.raw.TestRenderer
@@ -462,6 +463,7 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
                                 onEnter: js.Function0[Unit] = () => (),
                                 onKeypress: String => Boolean = _ => false
                                ): TextInputProps = TextInputProps(
+    inputRef = ReactRef.create[BlessedElement],
     left = 1,
     top = 2,
     width = 10,

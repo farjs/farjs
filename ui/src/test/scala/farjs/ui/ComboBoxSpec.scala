@@ -305,6 +305,84 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     findProps(renderer.root, comboBoxPopup) should be (empty)
   }
 
+  it should "hide popup and show cursor when arrow.onClick" in {
+    //given
+    val props = getComboBoxProps()
+    val hideCursorMock = mockFunction[Unit]
+    val showCursorMock = mockFunction[Unit]
+    val programMock = literal(hideCursor = hideCursorMock, showCursor = showCursorMock)
+    val screenMock = literal(program = programMock)
+    val formMock = literal(screen = screenMock)
+    hideCursorMock.expects()
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)(), { el =>
+      if (el.`type` == <.form.name.asInstanceOf[js.Any]) formMock
+      else null
+    })
+    findComponentProps(renderer.root, textInputComp).onKeypress("C-up") shouldBe true
+    findProps(renderer.root, comboBoxPopup) should not be empty
+    val arrow = inside(findComponents(renderer.root, <.text.name)) {
+      case List(arrow) => arrow
+    }
+
+    //then
+    showCursorMock.expects()
+
+    //when
+    arrow.props.onClick(null)
+
+    //then
+    findProps(renderer.root, comboBoxPopup) should be (empty)
+  }
+
+  it should "show popup and not focus input when arrow.onClick" in {
+    //given
+    val props = getComboBoxProps()
+    val focusMock = mockFunction[Unit]
+    val screenMock = literal()
+    val textMock = literal(screen = screenMock, focus = focusMock)
+    screenMock.focused = textMock
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    findComponentProps(renderer.root, textInputComp).inputRef.current =
+      textMock.asInstanceOf[BlessedElement]
+    findProps(renderer.root, comboBoxPopup) should be (empty)
+    val arrow = inside(findComponents(renderer.root, <.text.name)) {
+      case List(arrow) => arrow
+    }
+
+    //then
+    focusMock.expects().never()
+
+    //when
+    arrow.props.onClick(null)
+
+    //then
+    findProps(renderer.root, comboBoxPopup) should not be empty
+  }
+
+  it should "show popup and focus input when arrow.onClick" in {
+    //given
+    val props = getComboBoxProps()
+    val focusMock = mockFunction[Unit]
+    val screenMock = literal()
+    val textMock = literal(screen = screenMock, focus = focusMock)
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+    findComponentProps(renderer.root, textInputComp).inputRef.current =
+      textMock.asInstanceOf[BlessedElement]
+    findProps(renderer.root, comboBoxPopup) should be (empty)
+    val arrow = inside(findComponents(renderer.root, <.text.name)) {
+      case List(arrow) => arrow
+    }
+
+    //then
+    focusMock.expects()
+
+    //when
+    arrow.props.onClick(null)
+
+    //then
+    findProps(renderer.root, comboBoxPopup) should not be empty
+  }
+
   it should "show popup when onKeypress(C-down)" in {
     //given
     val props = getComboBoxProps()
@@ -316,9 +394,10 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     textInput.onKeypress("C-down") shouldBe true
 
     //then
+    val arrowStyle = DefaultTheme.popup.regular
     assertComponents(renderer.root.children, List(
       <(textInputComp())(^.assertWrapped(inside(_) {
-        case TextInputProps(left, top, width, value, state, _, onChange, onEnter, _) =>
+        case TextInputProps(_, left, top, width, value, state, _, onChange, onEnter, _) =>
           left shouldBe props.left
           top shouldBe props.top
           width shouldBe props.width
@@ -328,6 +407,18 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
           onEnter shouldBe props.onEnter
       }))(),
 
+      <.text(
+        ^.rbWidth := 1,
+        ^.rbHeight := 1,
+        ^.rbLeft := props.left + props.width,
+        ^.rbTop := props.top,
+        ^.rbClickable := true,
+        ^.rbMouse := true,
+        ^.rbAutoFocus := false,
+        ^.rbStyle := arrowStyle,
+        ^.content := arrowDownCh
+      )(),
+      
       <.form(
         ^.rbClickable := true,
         ^.rbMouse := true,
@@ -361,9 +452,10 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     //then
     val theme = DefaultTheme.popup.menu
+    val arrowStyle = DefaultTheme.popup.regular
     assertComponents(renderer.root.children, List(
       <(textInputComp())(^.assertWrapped(inside(_) {
-        case TextInputProps(left, top, width, value, state, _, onChange, onEnter, _) =>
+        case TextInputProps(_, left, top, width, value, state, _, onChange, onEnter, _) =>
           left shouldBe props.left
           top shouldBe props.top
           width shouldBe props.width
@@ -373,6 +465,18 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
           onEnter shouldBe props.onEnter
       }))(),
 
+      <.text(
+        ^.rbWidth := 1,
+        ^.rbHeight := 1,
+        ^.rbLeft := props.left + props.width,
+        ^.rbTop := props.top,
+        ^.rbClickable := true,
+        ^.rbMouse := true,
+        ^.rbAutoFocus := false,
+        ^.rbStyle := arrowStyle,
+        ^.content := arrowDownCh
+      )(),
+      
       <.form(
         ^.rbClickable := true,
         ^.rbMouse := true,
@@ -667,9 +771,10 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
 
     //then
+    val arrowStyle = DefaultTheme.popup.regular
     assertComponents(renderer.root.children, List(
       <(textInputComp())(^.assertWrapped(inside(_) {
-        case TextInputProps(left, top, width, value, state, _, onChange, onEnter, _) =>
+        case TextInputProps(_, left, top, width, value, state, _, onChange, onEnter, _) =>
           left shouldBe props.left
           top shouldBe props.top
           width shouldBe props.width
@@ -677,7 +782,19 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
           state shouldBe TextInputState()
           onChange shouldBe props.onChange
           onEnter shouldBe props.onEnter
-      }))()
+      }))(),
+
+      <.text(
+        ^.rbWidth := 1,
+        ^.rbHeight := 1,
+        ^.rbLeft := props.left + props.width,
+        ^.rbTop := props.top,
+        ^.rbClickable := true,
+        ^.rbMouse := true,
+        ^.rbAutoFocus := false,
+        ^.rbStyle := arrowStyle,
+        ^.content := arrowDownCh
+      )()
     ))
   }
 

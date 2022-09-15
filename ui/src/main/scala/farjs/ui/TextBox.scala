@@ -29,8 +29,10 @@ object TextBox extends FunctionComponent[TextBoxProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
     val (state, setState) = useStateUpdater(() => TextInputState())
+    val inputRef = useRef[BlessedElement](null)
     
     <(textInputComp())(^.wrapped := TextInputProps(
+      inputRef = inputRef,
       left = props.left,
       top = props.top,
       width = props.width,
