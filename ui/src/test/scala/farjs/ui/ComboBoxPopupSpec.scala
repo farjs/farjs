@@ -33,7 +33,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     textEl.props.onClick(null)
   }
 
-  it should "call onWheel(true) when onWheelup" in {
+  it should "call onWheel(true) when text.onWheelup" in {
     //given
     val onWheel = mockFunction[Boolean, Unit]
     val props = ComboBoxPopupProps(
@@ -57,7 +57,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     textEl.props.onWheelup(null)
   }
 
-  it should "call onWheel(false) when onWheeldown" in {
+  it should "call onWheel(false) when text.onWheeldown" in {
     //given
     val onWheel = mockFunction[Boolean, Unit]
     val props = ComboBoxPopupProps(
@@ -79,6 +79,54 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     
     //when
     textEl.props.onWheeldown(null)
+  }
+
+  it should "call onWheel(true) when box.onWheelup" in {
+    //given
+    val onWheel = mockFunction[Boolean, Unit]
+    val props = ComboBoxPopupProps(
+      selected = 0,
+      items = List("item 1", "item 2"),
+      left = 1,
+      top = 2,
+      width = 11,
+      onClick = _ => (),
+      onWheel = onWheel
+    )
+    val comp = testRender(<(ComboBoxPopup())(^.wrapped := props)())
+    val boxEl = inside(findComponents(comp, <.box.name)) {
+      case List(box) => box
+    }
+    
+    //then
+    onWheel.expects(true)
+    
+    //when
+    boxEl.props.onWheelup(null)
+  }
+
+  it should "call onWheel(false) when box.onWheeldown" in {
+    //given
+    val onWheel = mockFunction[Boolean, Unit]
+    val props = ComboBoxPopupProps(
+      selected = 0,
+      items = List("item 1", "item 2"),
+      left = 1,
+      top = 2,
+      width = 11,
+      onClick = _ => (),
+      onWheel = onWheel
+    )
+    val comp = testRender(<(ComboBoxPopup())(^.wrapped := props)())
+    val boxEl = inside(findComponents(comp, <.box.name)) {
+      case List(box) => box
+    }
+    
+    //then
+    onWheel.expects(false)
+    
+    //when
+    boxEl.props.onWheeldown(null)
   }
 
   it should "render component" in {

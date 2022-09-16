@@ -5,6 +5,8 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 
+import scala.scalajs.js
+
 case class ComboBoxPopupProps(selected: Int,
                               items: List[String],
                               left: Int,
@@ -24,6 +26,14 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
     val textWidth = width - 2
     val theme = Theme.current.popup.menu
 
+    val onWheelup: js.Function1[MouseData, Unit] = { _ =>
+      props.onWheel(true)
+    }
+    
+    val onWheeldown: js.Function1[MouseData, Unit] = { _ =>
+      props.onWheel(false)
+    }
+    
     <.box(
       ^.rbClickable := true,
       ^.rbAutoFocus := false,
@@ -31,6 +41,8 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
       ^.rbHeight := height,
       ^.rbLeft := props.left,
       ^.rbTop := props.top,
+      ^.rbOnWheelup := onWheelup,
+      ^.rbOnWheeldown := onWheeldown,
       ^.rbStyle := theme
     )(
       <(singleBorderComp())(^.plain := SingleBorderProps(
@@ -56,12 +68,8 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
           ^.rbOnClick := { _ =>
             props.onClick(index)
           },
-          ^.rbOnWheelup := { _ =>
-            props.onWheel(true)
-          },
-          ^.rbOnWheeldown := { _ =>
-            props.onWheel(false)
-          },
+          ^.rbOnWheelup := onWheelup,
+          ^.rbOnWheeldown := onWheeldown,
           ^.content := s"  ${text.take(textWidth - 4)}  "
         )()
       }
