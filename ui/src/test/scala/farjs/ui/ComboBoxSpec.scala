@@ -394,6 +394,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     textInput.onKeypress("C-down") shouldBe true
 
     //then
+    val theme = DefaultTheme.popup.menu
     val arrowStyle = DefaultTheme.popup.regular
     assertComponents(renderer.root.children, List(
       <(textInputComp())(^.assertWrapped(inside(_) {
@@ -426,12 +427,13 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         ^.rbStyle := PopupOverlay.style
       )(
         <(comboBoxPopup())(^.assertWrapped(inside(_) {
-          case ComboBoxPopupProps(selected, items, left, top, width, _, _) =>
+          case ComboBoxPopupProps(selected, items, left, top, width, style, _, _) =>
             selected shouldBe 0
             items shouldBe List("item", "item 2")
             left shouldBe props.left
             top shouldBe props.top + 1
             width shouldBe props.width
+            style shouldBe theme
         }))()
       )
     ))
@@ -484,12 +486,13 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         ^.rbStyle := PopupOverlay.style
       )(
         <(comboBoxPopup())(^.assertWrapped(inside(_) {
-          case ComboBoxPopupProps(selected, items, left, top, width, _, _) =>
+          case ComboBoxPopupProps(selected, items, left, top, width, style, _, _) =>
             selected shouldBe 0
             items shouldBe page1
             left shouldBe props.left
             top shouldBe props.top + 1
             width shouldBe props.width
+            style shouldBe theme
         }))(),
 
         <(scrollBarComp())(^.assertPlain[ScrollBarProps](inside(_) {

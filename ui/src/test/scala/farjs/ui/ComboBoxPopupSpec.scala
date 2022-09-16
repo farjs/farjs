@@ -2,7 +2,7 @@ package farjs.ui
 
 import farjs.ui.ComboBoxPopup._
 import farjs.ui.border._
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -19,6 +19,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
       left = 1,
       top = 2,
       width = 11,
+      style = DefaultTheme.popup.menu,
       onClick = onClick
     )
     val comp = testRender(<(ComboBoxPopup())(^.wrapped := props)())
@@ -42,6 +43,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
       left = 1,
       top = 2,
       width = 11,
+      style = DefaultTheme.popup.menu,
       onClick = _ => (),
       onWheel = onWheel
     )
@@ -66,6 +68,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
       left = 1,
       top = 2,
       width = 11,
+      style = DefaultTheme.popup.menu,
       onClick = _ => (),
       onWheel = onWheel
     )
@@ -90,6 +93,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
       left = 1,
       top = 2,
       width = 11,
+      style = DefaultTheme.popup.menu,
       onClick = _ => (),
       onWheel = onWheel
     )
@@ -114,6 +118,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
       left = 1,
       top = 2,
       width = 11,
+      style = DefaultTheme.popup.menu,
       onClick = _ => (),
       onWheel = onWheel
     )
@@ -137,6 +142,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
       left = 1,
       top = 2,
       width = 11,
+      style = DefaultTheme.popup.menu,
       _ => ()
     )
     
@@ -151,7 +157,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     val width = props.width
     val height = 10
     val textWidth = width - 2
-    val theme = Theme.current.popup.menu
+    val theme = props.style
 
     assertNativeComponent(result,
       <.box(

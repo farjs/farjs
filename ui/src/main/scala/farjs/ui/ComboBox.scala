@@ -226,6 +226,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
             left = props.left,
             top = props.top + 1,
             width = props.width,
+            style = theme,
             onClick = { index =>
               onSelectAction(items, offset, index)
             },

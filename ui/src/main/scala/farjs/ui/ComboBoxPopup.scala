@@ -1,7 +1,6 @@
 package farjs.ui
 
 import farjs.ui.border._
-import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 
@@ -12,6 +11,7 @@ case class ComboBoxPopupProps(selected: Int,
                               left: Int,
                               top: Int,
                               width: Int,
+                              style: BlessedStyle,
                               onClick: Int => Unit,
                               onWheel: Boolean => Unit = _ => ())
 
@@ -24,7 +24,7 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
     val width = props.width
     val height = maxItems + 2
     val textWidth = width - 2
-    val theme = Theme.current.popup.menu
+    val theme = props.style
 
     val onWheelup: js.Function1[MouseData, Unit] = { _ =>
       props.onWheel(true)
