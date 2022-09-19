@@ -25,23 +25,37 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
     val props = PopupControllerProps(Some(FileListData(dispatch, actions, state)),
       FileListPopupsState(showSelectPopup = ShowSelect))
     val renderer = createTestRenderer(<(SelectController())(^.wrapped := props)())
-    val popup = findComponentProps(renderer.root, selectPopupComp)
-    val pattern = "*.test"
+    val pattern1 = "*.test"
+    val pattern2 = "*.test3"
 
     //then
-    dispatch.expects(FileListParamsChangedAction(
-      offset = state.offset,
-      index = state.index,
-      selectedNames = Set("file1.test", "file2.test", "file.test3")
-    ))
-    dispatch.expects(FileListPopupSelectAction(SelectHidden))
+    dispatch.expects(FileListParamsChangedAction(state.offset, state.index,
+      Set("file1.test", "file2.test", "file.test3"))).twice()
+    dispatch.expects(FileListPopupSelectAction(SelectHidden)).repeated(3)
 
-    //when
-    popup.onAction(pattern)
+    //when & then
+    findComponentProps(renderer.root, selectPopupComp).onAction(pattern1)
+    inside(findComponentProps(renderer.root, selectPopupComp)) {
+      case SelectPopupProps(selectPatterns, resPattern, _, _, _) =>
+        selectPatterns shouldBe List(pattern1)
+        resPattern shouldBe pattern1
+    }
 
-    //then
-    val updated = findComponentProps(renderer.root, selectPopupComp)
-    updated.pattern shouldBe pattern
+    //when & then
+    findComponentProps(renderer.root, selectPopupComp).onAction(pattern2)
+    inside(findComponentProps(renderer.root, selectPopupComp)) {
+      case SelectPopupProps(selectPatterns, resPattern, _, _, _) =>
+        selectPatterns shouldBe List(pattern2, pattern1)
+        resPattern shouldBe pattern2
+    }
+
+    //when & then
+    findComponentProps(renderer.root, selectPopupComp).onAction(pattern1)
+    inside(findComponentProps(renderer.root, selectPopupComp)) {
+      case SelectPopupProps(selectPatterns, resPattern, _, _, _) =>
+        selectPatterns shouldBe List(pattern1, pattern2)
+        resPattern shouldBe pattern1
+    }
   }
 
   it should "dispatch actions and update state when Deselect" in {
@@ -72,8 +86,11 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
     popup.onAction(pattern)
 
     //then
-    val updated = findComponentProps(renderer.root, selectPopupComp)
-    updated.pattern shouldBe pattern
+    inside(findComponentProps(renderer.root, selectPopupComp)) {
+      case SelectPopupProps(selectPatterns, resPattern, _, _, _) =>
+        selectPatterns shouldBe List(pattern)
+        resPattern shouldBe pattern
+    }
   }
 
   it should "dispatch FileListPopupSelectAction(SelectHidden) when Cancel" in {
@@ -109,7 +126,8 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
     //then
     assertTestComponent(result, selectPopupComp) {
-      case SelectPopupProps(pattern, action, _, _) =>
+      case SelectPopupProps(selectPatterns, pattern, action, _, _) =>
+        selectPatterns shouldBe Nil
         pattern shouldBe ""
         action shouldBe ShowSelect
     }

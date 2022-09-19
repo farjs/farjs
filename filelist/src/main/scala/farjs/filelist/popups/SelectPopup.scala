@@ -10,7 +10,8 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class SelectPopupProps(pattern: String,
+case class SelectPopupProps(selectPatterns: List[String],
+                            pattern: String,
                             action: FileListPopupSelect,
                             onAction: String => Unit,
                             onCancel: () => Unit)
@@ -18,7 +19,7 @@ case class SelectPopupProps(pattern: String,
 object SelectPopup extends FunctionComponent[SelectPopupProps] {
 
   private[popups] var modalComp: UiComponent[ModalProps] = Modal
-  private[popups] var textBoxComp: UiComponent[TextBoxProps] = TextBox
+  private[popups] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -42,10 +43,11 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
       style = theme,
       onCancel = props.onCancel
     ))(
-      <(textBoxComp())(^.plain := TextBoxProps(
+      <(comboBoxComp())(^.plain := ComboBoxProps(
         left = contentLeft,
         top = 1,
         width = contentWidth,
+        items = js.Array(props.selectPatterns: _*),
         value = pattern,
         onChange = { value =>
           setPattern(value)

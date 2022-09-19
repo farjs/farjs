@@ -10,31 +10,31 @@ import scommons.react.test._
 class SelectPopupSpec extends TestSpec with TestRendererUtils {
 
   SelectPopup.modalComp = mockUiComponent("Modal")
-  SelectPopup.textBoxComp = mockUiComponent("TextBox")
+  SelectPopup.comboBoxComp = mockUiComponent("ComboBox")
 
   it should "set pattern when onChange in TextBox" in {
     //given
     val pattern = "initial pattern"
-    val props = SelectPopupProps(pattern, ShowSelect, _ => (), () => ())
+    val props = getSelectPopupProps(pattern, ShowSelect)
     val renderer = createTestRenderer(<(SelectPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(renderer.root, textBoxComp, plain = true)
-    textBox.value shouldBe pattern
+    val comboBox = findComponentProps(renderer.root, comboBoxComp, plain = true)
+    comboBox.value shouldBe pattern
     val newPattern = "new pattern"
 
     //when
-    textBox.onChange(newPattern)
+    comboBox.onChange(newPattern)
 
     //then
-    findComponentProps(renderer.root, textBoxComp, plain = true).value shouldBe newPattern
+    findComponentProps(renderer.root, comboBoxComp, plain = true).value shouldBe newPattern
   }
   
   it should "call onAction when onEnter in TextBox" in {
     //given
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = SelectPopupProps("test", ShowSelect, onAction, onCancel)
+    val props = getSelectPopupProps("test", ShowSelect, onAction, onCancel)
     val comp = testRender(<(SelectPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(comp, textBoxComp, plain = true)
+    val textBox = findComponentProps(comp, comboBoxComp, plain = true)
 
     //then
     onAction.expects("test")
@@ -47,9 +47,9 @@ class SelectPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = SelectPopupProps("", ShowSelect, onAction, onCancel)
+    val props = getSelectPopupProps("", ShowSelect, onAction, onCancel)
     val comp = testRender(<(SelectPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(comp, textBoxComp, plain = true)
+    val textBox = findComponentProps(comp, comboBoxComp, plain = true)
 
     //then
     onAction.expects(*).never()
@@ -60,7 +60,7 @@ class SelectPopupSpec extends TestSpec with TestRendererUtils {
   
   it should "render Select component" in {
     //given
-    val props = SelectPopupProps("test folder", ShowSelect, _ => (), () => ())
+    val props = getSelectPopupProps("test folder", ShowSelect)
 
     //when
     val result = testRender(<(SelectPopup())(^.wrapped := props)())
@@ -71,13 +71,26 @@ class SelectPopupSpec extends TestSpec with TestRendererUtils {
 
   it should "render Deselect component" in {
     //given
-    val props = SelectPopupProps("test folder", ShowDeselect, _ => (), () => ())
+    val props = getSelectPopupProps("test folder", ShowDeselect)
 
     //when
     val result = testRender(<(SelectPopup())(^.wrapped := props)())
 
     //then
     assertSelectPopup(result, props, "Deselect")
+  }
+  
+  private def getSelectPopupProps(pattern: String,
+                                  action: FileListPopupSelect,
+                                  onAction: String => Unit = _ => (),
+                                  onCancel: () => Unit = () => ()): SelectPopupProps = {
+    SelectPopupProps(
+      selectPatterns = List("pattern", "pattern 2"),
+      pattern = pattern,
+      action = action,
+      onAction = onAction,
+      onCancel = onCancel
+    )
   }
 
   private def assertSelectPopup(result: TestInstance,
@@ -95,11 +108,12 @@ class SelectPopupSpec extends TestSpec with TestRendererUtils {
           resStyle shouldBe style
           onCancel should be theSameInstanceAs props.onCancel
       }))(
-        <(textBoxComp())(^.assertPlain[TextBoxProps](inside(_) {
-          case TextBoxProps(left, top, resWidth, resValue, _, _) =>
+        <(comboBoxComp())(^.assertPlain[ComboBoxProps](inside(_) {
+          case ComboBoxProps(left, top, resWidth, items, resValue, _, _) =>
             left shouldBe 2
             top shouldBe 1
             resWidth shouldBe (width - 10)
+            items.toList shouldBe props.selectPatterns
             resValue shouldBe props.pattern
         }))()
       )

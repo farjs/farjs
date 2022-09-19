@@ -12,6 +12,7 @@ object SelectController extends FunctionComponent[PopupControllerProps] {
   private[popups] var selectPopupComp: UiComponent[SelectPopupProps] = SelectPopup
 
   protected def render(compProps: Props): ReactElement = {
+    val (selectPatterns, setSelectPatterns) = useState[List[String]](Nil)
     val (selectPattern, setSelectPattern) = useState("")
     val props = compProps.wrapped
     val popups = props.popups
@@ -19,9 +20,11 @@ object SelectController extends FunctionComponent[PopupControllerProps] {
     props.data match {
       case Some(data) if popups.showSelectPopup != SelectHidden =>
         <(selectPopupComp())(^.wrapped := SelectPopupProps(
+          selectPatterns = selectPatterns,
           pattern = selectPattern,
           action = popups.showSelectPopup,
           onAction = { pattern =>
+            setSelectPatterns((pattern :: selectPatterns).distinct)
             setSelectPattern(pattern)
 
             val regexes = pattern.split(';')
