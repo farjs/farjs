@@ -19,11 +19,15 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 object FarjsApp {
 
   private val g: js.Dynamic = global.asInstanceOf[js.Dynamic]
+  
+  private type BlessedRenderer = js.Function2[ReactElement, BlessedScreen, Unit]
 
   @JSExport("start")
   def start(showDevTools: Boolean = false,
             currentScreen: js.UndefOr[BlessedScreen] = js.undefined,
             onExit: js.UndefOr[js.Function0[Unit]] = js.undefined): BlessedScreen = {
+
+    def createRenderer(): BlessedRenderer = ReactBlessed.createBlessedRenderer(Blessed)
 
     val screen = currentScreen.getOrElse {
       val screen = Blessed.screen(new BlessedScreenConfig {
@@ -32,6 +36,7 @@ object FarjsApp {
         override val cursorShape = "underline"
       })
       val screenObj = screen.asInstanceOf[js.Dynamic]
+      screenObj.savedRenderer = createRenderer()
       screenObj.savedConsoleLog = g.console.log
       screenObj.savedConsoleError = g.console.error
 
@@ -62,7 +67,11 @@ object FarjsApp {
       initialDevTool = if (showDevTools) DevTool.Logs else DevTool.Hidden
     )
     
-    ReactBlessed.createBlessedRenderer(Blessed)(
+    val screenObj = screen.asInstanceOf[js.Dynamic]
+    val renderer = screenObj.savedRenderer.asInstanceOf[js.UndefOr[BlessedRenderer]]
+      .getOrElse(createRenderer())
+
+    renderer(
       <.Provider(^.store := store)(
         <(root()).empty
       ),
