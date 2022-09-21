@@ -1,7 +1,8 @@
 package farjs.ui
 
+import farjs.ui.popup.PopupOverlay
 import scommons.react.blessed._
-import scommons.react.test.TestSpec
+import scommons.react.test.{TestInstance, TestSpec}
 import scommons.react.test.raw.TestRenderer
 import scommons.react.test.util.TestRendererUtils
 
@@ -20,7 +21,7 @@ class WithSizeSpec extends TestSpec with TestRendererUtils {
       if (el.`type` == "box".asInstanceOf[js.Any]) boxMock
       else null
     }).root
-    assertNativeComponent(comp.children(0), <.box()(<.text()("width: 1, height: 2")))
+    assertWithSize(comp.children(0), width = 1, height = 2)
     boxMock.width = 2
     boxMock.height = 3
 
@@ -30,7 +31,7 @@ class WithSizeSpec extends TestSpec with TestRendererUtils {
     }
 
     //then
-    assertNativeComponent(comp.children(0), <.box()(<.text()("width: 2, height: 3")))
+    assertWithSize(comp.children(0), width = 2, height = 3)
   }
   
   it should "render component with size" in {
@@ -48,9 +49,15 @@ class WithSizeSpec extends TestSpec with TestRendererUtils {
     })
 
     //then
+    assertWithSize(result, width = 1, height = 2)
+  }
+  
+  private def assertWithSize(result: TestInstance, width: Int, height: Int): Unit = {
     assertNativeComponent(result,
-      <.box()(
-        <.text()("width: 1, height: 2")
+      <.box(
+        ^.rbStyle := PopupOverlay.style
+      )(
+        <.text()(s"width: $width, height: $height")
       )
     )
   }

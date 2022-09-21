@@ -16,15 +16,18 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
   private[fs] var fileListPanelComp: UiComponent[FileListPanelProps] = FileListPanel
   private[fs] var fsFreeSpaceComp: UiComponent[FSFreeSpaceProps] = FSFreeSpace
   private[fs] var fsService: FSService = FSService.instance
+  private[fs] var fsFoldersHistory: UiComponent[FSFoldersHistoryProps] = FSFoldersHistory
   private[fs] var addToZipController: UiComponent[AddToZipControllerProps] = AddToZipController
   
   protected def render(compProps: Props): ReactElement = {
+    val (showFoldersHistory, setShowFoldersHistory) = useState(false)
     val (zipData, setZipData) = useState(Option.empty[(String, Seq[FileListItem])])
     val props = compProps.wrapped
 
     def onKeypress(screen: BlessedScreen, key: String): Boolean = {
       var processed = true
       key match {
+        case "M-h" => setShowFoldersHistory(true)
         case "M-o" =>
           props.state.currentItem.foreach { item =>
             props.dispatch(openInDefaultApp(props.state.currDir.path, item.name))
@@ -52,6 +55,13 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
       <(fsFreeSpaceComp())(^.wrapped := FSFreeSpaceProps(
         dispatch = props.dispatch,
         currDir = props.state.currDir
+      ))(),
+
+      <(fsFoldersHistory())(^.wrapped := FSFoldersHistoryProps(
+        showPopup = showFoldersHistory,
+        onHidePopup = { () =>
+          setShowFoldersHistory(false)
+        }
       ))(),
 
       zipData.map { case (zipName, items) =>

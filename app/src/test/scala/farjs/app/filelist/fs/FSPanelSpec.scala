@@ -20,6 +20,7 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
   FSPanel.fileListPanelComp = mockUiComponent("FileListPanel")
   FSPanel.fsFreeSpaceComp = mockUiComponent("FSFreeSpace")
   FSPanel.fsService = new FsService().fsService
+  FSPanel.fsFoldersHistory = mockUiComponent("FSFoldersHistory")
   FSPanel.addToZipController = mockUiComponent("AddToZipController")
 
   //noinspection TypeAnnotation
@@ -51,6 +52,35 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
 
     //when & then
     panelProps.onKeypress(null, "unknown") shouldBe false
+  }
+
+  it should "show folders history popup and handle onHidePopup when onKeypress(M-h)" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = new MockFileListActions
+    val props = FileListPanelProps(dispatch, actions, FileListState(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+        FileListItem.up,
+        FileListItem("item 1")
+      ))
+    ))
+    val renderer = createTestRenderer(<(FSPanel())(^.wrapped := props)())
+    val panelProps = findComponentProps(renderer.root, fileListPanelComp)
+
+    //when & then
+    panelProps.onKeypress(null, "M-h") shouldBe true
+
+    //then
+    inside(findComponentProps(renderer.root, fsFoldersHistory)) {
+      case FSFoldersHistoryProps(showPopup, onHidePopup) =>
+        showPopup shouldBe true
+        
+        //when
+        onHidePopup()
+        
+        //then
+        findComponentProps(renderer.root, fsFoldersHistory).showPopup shouldBe false
+    }
   }
 
   it should "dispatch action when onKeypress(M-o)" in {
@@ -209,6 +239,11 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
           resDispatch shouldBe dispatch
           currDir shouldBe props.state.currDir
       }))(),
+
+      <(fsFoldersHistory())(^.assertWrapped(inside(_) {
+        case FSFoldersHistoryProps(showPopup, _) =>
+          showPopup shouldBe false
+      }))()
     ))
   }
 }

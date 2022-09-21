@@ -1,5 +1,6 @@
 package farjs.ui
 
+import farjs.ui.popup.PopupOverlay
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
@@ -17,6 +18,7 @@ object WithSize extends FunctionComponent[WithSizeProps] {
     
     <.box(
       ^.reactRef := boxRef,
+      ^.rbStyle := PopupOverlay.style,
       ^.rbOnResize := { () =>
         val currBox = boxRef.current
         setSize((currBox.width, currBox.height))
