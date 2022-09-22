@@ -23,18 +23,21 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
     val props = compProps.plain
     val inputRef = useRef[BlessedElement](null)
     val programRef = useRef[BlessedProgram](null)
-    val (maybePopup, setPopup) = useState[Option[(List[String], Int, Int)]](None)
+    val (maybePopup, setPopup) = useState[Option[ListViewport]](None)
     val (state, setState) = useStateUpdater(() => TextInputState())
     val theme = Theme.current.popup.menu
     val arrowStyle = Theme.current.popup.regular
     
     def showOrHidePopup(): Unit = {
       if (maybePopup.isDefined) hidePopup()
-      else showPopup(props.items.toList, 0, 0)
+      else {
+        showPopup(ListViewport(0, 0, props.items.length, maxItems))
+      }
     }
     
-    def showPopup(items: List[String], offset: Int, selected: Int): Unit = {
-      setPopup(Some((items, offset, selected)))
+    def showPopup(viewport: ListViewport): Unit = {
+      setPopup(Some(viewport))
+
       if (programRef.current != null) {
         programRef.current.hideCursor()
       }
@@ -42,14 +45,15 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
 
     def hidePopup(): Unit = {
       setPopup(None)
+
       if (programRef.current != null) {
         programRef.current.showCursor()
       }
     }
 
-    def onSelectAction(items: List[String], offset: Int, selected: Int): Unit = {
-      if (items.nonEmpty) {
-        props.onChange(items(offset + selected))
+    def onSelectAction(offset: Int, index: Int): Unit = {
+      if (props.items.length > 0) {
+        props.onChange(props.items(offset + index))
         hidePopup()
 
         process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
@@ -88,86 +92,25 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
       }
     }
     
-    def onDown(items: List[String], offset: Int, selected: Int): Unit = {
-      val maxSelected = math.max(math.min(items.size - offset - 1, maxItems - 1), 0)
-      if (selected < maxSelected) {
-        setPopup(Some((items, offset, selected + 1)))
-      }
-      else if (offset < items.size - maxItems) {
-        setPopup(Some((items, offset + 1, selected)))
-      }
-    }
-    
-    def onUp(items: List[String], offset: Int, selected: Int): Unit = {
-      if (selected > 0) {
-        setPopup(Some((items, offset, selected - 1)))
-      }
-      else if (offset > 0) {
-        setPopup(Some((items, offset - 1, selected)))
-      }
-    }
-    
     def onKeypress(keyFull: String): Boolean = {
-      var processed = true
+      var processed = maybePopup.isDefined
       keyFull match {
-        case "escape" | "tab" =>
-          if (maybePopup.isDefined) hidePopup()
-          else processed = false
-        case "C-up" | "C-down" => showOrHidePopup()
-        case "down" =>
-          maybePopup match {
-            case None => processed = false
-            case Some((items, offset, selected)) => onDown(items, offset, selected)
-          }
-        case "up" =>
-          maybePopup match {
-            case None => processed = false
-            case Some((items, offset, selected)) => onUp(items, offset, selected)
-          }
-        case "pagedown" =>
-          maybePopup match {
-            case None => processed = false
-            case Some((items, offset, selected)) =>
-              val newOffset = math.max(math.min(items.size - maxItems, offset + maxItems), 0)
-              val newSelected =
-                if (newOffset == offset) math.max(math.min(items.size - newOffset - 1, maxItems - 1), 0)
-                else math.max(math.min(items.size - newOffset - 1, selected), 0)
-              
-              setPopup(Some((items, newOffset, newSelected)))
-          }
-        case "pageup" =>
-          maybePopup match {
-            case None => processed = false
-            case Some((items, offset, selected)) =>
-              val newOffset = math.max(offset - maxItems, 0)
-              val newSelected =
-                if (newOffset == offset) 0
-                else selected
-              
-              setPopup(Some((items, newOffset, newSelected)))
-          }
-        case "end" =>
-          maybePopup match {
-            case None => processed = false
-            case Some((items, _, _)) =>
-              val newOffset = math.max(items.size - maxItems, 0)
-              val newSelected = math.max(math.min(items.size - newOffset - 1, maxItems - 1), 0)
-              setPopup(Some((items, newOffset, newSelected)))
-          }
-        case "home" =>
-          maybePopup match {
-            case None => processed = false
-            case Some((items, _, _)) => setPopup(Some((items, 0, 0)))
-          }
+        case "escape" | "tab" => hidePopup()
+        case "C-up" | "C-down" =>
+          showOrHidePopup()
+          processed = true
         case "return" =>
-          maybePopup match {
-            case None => processed = false
-            case Some((items, offset, selected)) => onSelectAction(items, offset, selected)
+          maybePopup.foreach { viewport =>
+            onSelectAction(viewport.offset, viewport.focused)
           }
-        case key if maybePopup.isEmpty =>
-          onAutoCompleteAction(key)
-          processed = false
-        case _ => processed = maybePopup.isDefined
+        case key =>
+          maybePopup match {
+            case None => onAutoCompleteAction(key)
+            case Some(viewport) =>
+              viewport.onKeypress(key).foreach { newViewport =>
+                setPopup(Some(newViewport))
+              }
+          }
       }
       processed
     }
@@ -205,7 +148,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
         ^.content := arrowDownCh
       )(),
 
-      maybePopup.map { case (items, offset, selected) =>
+      maybePopup.map { viewport =>
         <.form(
           ^.ref := { el: BlessedElement =>
             if (el != null) {
@@ -221,33 +164,36 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
           }
         )(
           <(comboBoxPopup())(^.wrapped := ComboBoxPopupProps(
-            selected = selected,
-            items = items.slice(offset, offset + maxItems),
+            selected = viewport.focused,
+            items = props.items.toList.slice(
+              viewport.offset,
+              viewport.offset + viewport.viewLength
+            ),
             left = props.left,
             top = props.top + 1,
             width = props.width,
             style = theme,
             onClick = { index =>
-              onSelectAction(items, offset, index)
+              onSelectAction(viewport.offset, index)
             },
             onWheel = {
-              case true => onUp(items, offset, selected)
-              case false => onDown(items, offset, selected)
+              case true => setPopup(Some(viewport.up))
+              case false => setPopup(Some(viewport.down))
             }
           ))(),
 
-          if (items.size > maxItems) Some {
+          if (viewport.length > viewport.viewLength) Some {
             <(scrollBarComp())(^.plain := ScrollBarProps(
               left = props.left + props.width - 1,
               top = props.top + 2,
-              length = maxItems,
+              length = viewport.viewLength,
               style = theme,
-              value = offset,
-              extent = maxItems,
+              value = viewport.offset,
+              extent = viewport.viewLength,
               min = 0,
-              max = items.size - maxItems,
+              max = viewport.length - viewport.viewLength,
               onChange = { offset =>
-                setPopup(Some((items, offset, selected)))
+                setPopup(Some(viewport.copy(offset = offset)))
               }
             ))()
           }
