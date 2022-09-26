@@ -16,6 +16,7 @@ object FSFoldersPopup extends FunctionComponent[FSFoldersPopupProps] {
   private[fs] var popupComp: UiComponent[PopupProps] = Popup
   private[fs] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
   private[fs] var withSizeComp: UiComponent[WithSizeProps] = WithSize
+  private[fs] var fsFoldersViewComp: UiComponent[FSFoldersViewProps] = FSFoldersView
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -33,20 +34,19 @@ object FSFoldersPopup extends FunctionComponent[FSFoldersPopupProps] {
           style = theme,
           padding = padding
         ))(
-          <.button(
-            ^.rbMouse := true,
-            ^.rbLeft := 1,
-            ^.rbTop := 1,
-            ^.rbWidth := contentWidth,
-            ^.rbHeight := contentHeight
-          )(
-            <.text(
-              ^.rbWidth := contentWidth,
-              ^.rbHeight := contentHeight,
-              ^.rbStyle := theme,
-              ^.content := "test"
-            )()
-          )
+          <(fsFoldersViewComp())(
+            ^.key := s"$width-$height",
+            ^.wrapped := FSFoldersViewProps(
+              left = 1,
+              top = 1,
+              width = contentWidth,
+              height = contentHeight,
+              selected = props.selected,
+              items = props.items,
+              style = theme,
+              onAction = props.onAction
+            )
+          )()
         )
       })()
     )
