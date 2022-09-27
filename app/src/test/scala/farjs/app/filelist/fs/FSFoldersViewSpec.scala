@@ -8,6 +8,27 @@ import scala.scalajs.js.Dynamic.literal
 
 class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
 
+  it should "update viewport state when height change" in {
+    //given
+    val props = getFSFoldersViewProps(selected = 1)
+    val renderer = createTestRenderer(<(FSFoldersView())(^.wrapped := props)())
+    assertFSFoldersView(renderer.root, props,
+      """{bold}{white-fg}{cyan-bg}  item 1            {/}
+        |{bold}{white-fg}{black-bg}  item 2            {/}""".stripMargin
+    )
+    val updatedProps = props.copy(height = 1)
+    
+    //when
+    TestRenderer.act { () =>
+      renderer.update(<(FSFoldersView())(^.wrapped := updatedProps)())
+    }
+    
+    //then
+    assertFSFoldersView(renderer.root, updatedProps,
+      """{bold}{white-fg}{black-bg}  item 2            {/}""".stripMargin
+    )
+  }
+
   it should "update viewport state when onKeypress" in {
     //given
     val props = getFSFoldersViewProps()

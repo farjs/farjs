@@ -59,6 +59,10 @@ object FSFoldersView extends FunctionComponent[FSFoldersViewProps] {
         case key => viewport.onKeypress(key).foreach(setViewport)
       }
     }
+    
+    useLayoutEffect({ () =>
+      setViewport(viewport.resize(props.height))
+    }, List(props.height))
 
     <.button(
       ^.rbMouse := true,

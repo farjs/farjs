@@ -13,37 +13,71 @@ class FSFoldersPopupSpec extends TestSpec with TestRendererUtils {
   FSFoldersPopup.withSizeComp = mockUiComponent("WithSize")
   FSFoldersPopup.fsFoldersViewComp = mockUiComponent("FSFoldersView")
 
-  it should "render component" in {
+  it should "render component with empty list" in {
     //given
-    val props = getFSFoldersPopupProps()
+    val props = getFSFoldersPopupProps(items = Nil)
     
     //when
     val result = createTestRenderer(<(FSFoldersPopup())(^.wrapped := props)()).root
 
     //then
-    assertFSFoldersPopup(result, props)
+    assertFSFoldersPopup(result, props, (60, 20), (56, 14))
   }
   
-  private def getFSFoldersPopupProps(selected: Int = 0,
-                                     items: List[String] = List(
-                                       "item 1",
-                                       "item 2"
-                                     )): FSFoldersPopupProps = {
+  it should "render component with min size" in {
+    //given
+    val props = getFSFoldersPopupProps(items = List.fill(20)("item"))
+    
+    //when
+    val result = createTestRenderer(<(FSFoldersPopup())(^.wrapped := props)()).root
+
+    //then
+    assertFSFoldersPopup(result, props, (55, 13), (56, 14))
+  }
+  
+  it should "render component with max height" in {
+    //given
+    val props = getFSFoldersPopupProps(items = List.fill(20)("item"))
+    
+    //when
+    val result = createTestRenderer(<(FSFoldersPopup())(^.wrapped := props)()).root
+
+    //then
+    assertFSFoldersPopup(result, props, (60, 20), (56, 16))
+  }
+  
+  it should "render component with max width" in {
+    //given
+    val props = getFSFoldersPopupProps(items = List.fill(20)(
+      "iteeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeem"
+    ))
+    
+    //when
+    val result = createTestRenderer(<(FSFoldersPopup())(^.wrapped := props)()).root
+
+    //then
+    assertFSFoldersPopup(result, props, (60, 20), (60, 16))
+  }
+  
+  private def getFSFoldersPopupProps(items: List[String]): FSFoldersPopupProps = {
     FSFoldersPopupProps(
-      selected = selected,
+      selected = 1,
       items = items,
       onAction = _ => (),
       onClose = () => ()
     )
   }
   
-  private def assertFSFoldersPopup(result: TestInstance, props: FSFoldersPopupProps): Unit = {
+  private def assertFSFoldersPopup(result: TestInstance,
+                                   props: FSFoldersPopupProps,
+                                   screenSize: (Int, Int),
+                                   expectedSize: (Int, Int)): Unit = {
+
     val theme = DefaultTheme.popup.menu
-    val width = 75
-    val height = 35
-    val modalHeight = height - 4
-    val contentWidth = width - paddingHorizontal * 2 - 2
-    val contentHeight = modalHeight - paddingVertical * 2 - 2
+    val (width, height) = screenSize
+    val (expectedWidth, expectedHeight) = expectedSize
+    val contentWidth = expectedWidth - 2 * (paddingHorizontal + 1)
+    val contentHeight = expectedHeight - 2 * (paddingVertical + 1)
     
     assertComponents(result.children, List(
       <(popupComp())(^.assertWrapped(inside(_) {
@@ -59,7 +93,7 @@ class FSFoldersPopupSpec extends TestSpec with TestRendererUtils {
             assertTestComponent(content, modalContentComp)({
               case ModalContentProps(title, size, style, padding, left) =>
                 title shouldBe "Folders history"
-                size shouldBe (width -> modalHeight)
+                size shouldBe (expectedWidth -> expectedHeight)
                 style shouldBe theme
                 padding shouldBe FSFoldersPopup.padding
                 left shouldBe "center"

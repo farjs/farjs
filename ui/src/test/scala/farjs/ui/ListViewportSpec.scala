@@ -130,4 +130,44 @@ class ListViewportSpec extends TestSpec {
     check("end", 2, 7)
     check("home", 0, 0)
   }
+
+  it should "return same instance if newViewLength = viewLength when resize" in {
+    //given
+    val viewport = ListViewport(0, 0, length = 0, viewLength)
+
+    //when & then
+    viewport.resize(viewport.viewLength) should be theSameInstanceAs viewport
+  }
+
+  it should "return updated instance when resize" in {
+    //given
+    var viewport = ListViewport(2, 7, length = 10, 8)
+
+    def check(offset: Int, focused: Int, newViewLength: Int)(implicit pos: Position): Unit = {
+      val result = viewport.resize(newViewLength)
+      result shouldBe viewport.copy(
+        offset = offset,
+        focused = focused,
+        viewLength = newViewLength
+      )
+      viewport = result
+    }
+
+    //when & then
+    check(offset = 1, focused = 8, newViewLength = 9)
+    check(offset = 0, focused = 9, newViewLength = 10)
+    check(offset = 0, focused = 9, newViewLength = 11)
+    check(offset = 0, focused = 9, newViewLength = 10)
+    check(offset = 1, focused = 8, newViewLength = 9)
+    check(offset = 2, focused = 7, newViewLength = 8)
+    check(offset = 3, focused = 6, newViewLength = 7)
+    check(offset = 4, focused = 5, newViewLength = 6)
+    check(offset = 5, focused = 4, newViewLength = 5)
+    check(offset = 6, focused = 3, newViewLength = 4)
+    check(offset = 7, focused = 2, newViewLength = 3)
+    check(offset = 8, focused = 1, newViewLength = 2)
+    check(offset = 9, focused = 0, newViewLength = 1)
+    check(offset = 8, focused = 1, newViewLength = 2)
+    check(offset = 7, focused = 2, newViewLength = 3)
+  }
 }

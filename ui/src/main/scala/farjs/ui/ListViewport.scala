@@ -70,4 +70,19 @@ case class ListViewport(offset: Int,
       case _ => None
     }
   }
+
+  def resize(newViewLength: Int): ListViewport = {
+    if (newViewLength != viewLength) {
+      val index = offset + focused
+      val dx =
+        if (focused >= newViewLength) focused - newViewLength + 1
+        else 0
+
+      val newOffset = math.max(math.min(length - newViewLength, offset + dx), 0)
+      val newFocused = math.max(math.min(length - newOffset - 1, index - newOffset), 0)
+  
+      copy(offset = newOffset, focused = newFocused, viewLength = newViewLength)
+    }
+    else this
+  }
 }

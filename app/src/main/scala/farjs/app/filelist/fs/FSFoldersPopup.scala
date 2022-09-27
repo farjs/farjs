@@ -24,29 +24,34 @@ object FSFoldersPopup extends FunctionComponent[FSFoldersPopupProps] {
 
     <(popupComp())(^.wrapped := PopupProps(onClose = props.onClose))(
       <(withSizeComp())(^.plain := WithSizeProps { (width, height) =>
-        val modalHeight = height - 4
-        val contentWidth = width - paddingHorizontal * 2 - 2
-        val contentHeight = modalHeight - paddingVertical * 2 - 2
+        val maxContentWidth = {
+          if (props.items.isEmpty) 2 * (paddingHorizontal + 1)
+          else props.items.maxBy(_.length).length + 2 * (paddingHorizontal + 1)
+        }
+        val maxContentHeight = props.items.size + 2 * (paddingVertical + 1)
+
+        val modalWidth = math.min(math.max(minWidth, maxContentWidth + 2), math.max(minWidth, width))
+        val modalHeight = math.min(math.max(minHeight, maxContentHeight), math.max(minHeight, height - 4))
+
+        val contentWidth = modalWidth - 2 * (paddingHorizontal + 1) // padding + border
+        val contentHeight = modalHeight - 2 * (paddingVertical + 1)
 
         <(modalContentComp())(^.wrapped := ModalContentProps(
           title = "Folders history",
-          size = (width, modalHeight),
+          size = (modalWidth, modalHeight),
           style = theme,
           padding = padding
         ))(
-          <(fsFoldersViewComp())(
-            ^.key := s"$width-$height",
-            ^.wrapped := FSFoldersViewProps(
-              left = 1,
-              top = 1,
-              width = contentWidth,
-              height = contentHeight,
-              selected = props.selected,
-              items = props.items,
-              style = theme,
-              onAction = props.onAction
-            )
-          )()
+          <(fsFoldersViewComp())(^.wrapped := FSFoldersViewProps(
+            left = 1,
+            top = 1,
+            width = contentWidth,
+            height = contentHeight,
+            selected = props.selected,
+            items = props.items,
+            style = theme,
+            onAction = props.onAction
+          ))()
         )
       })()
     )
@@ -54,6 +59,9 @@ object FSFoldersPopup extends FunctionComponent[FSFoldersPopupProps] {
 
   private[fs] val paddingHorizontal = 2
   private[fs] val paddingVertical = 1
+
+  private val minWidth = 50 + 2 * (paddingHorizontal + 1) // padding + border
+  private val minHeight = 10 + 2 * (paddingVertical + 1)
 
   private[fs] val padding: BlessedPadding = new BlessedPadding {
     val left: Int = paddingHorizontal
