@@ -5,19 +5,24 @@ import scommons.react.blessed._
 
 object TextLine extends FunctionComponent[TextLineProps] {
   
+  def wrapText(text: String, width: Int): String = {
+    val dx = text.length - width
+    if (dx > 0) {
+      val prefix = text.take(3)
+      val sufix = text.drop(dx + 6) // prefix + ...
+      s"$prefix...$sufix"
+    }
+    else text
+  }
+  
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
     val paddingSize = props.padding.getOrElse(1)
     val padding = " " * paddingSize
     val text = {
       val paddingLen = paddingSize * 2
-      val dx = props.text.length - (props.width - paddingLen)
-      if (dx > 0) {
-        val prefix = props.text.take(3)
-        val sufix = props.text.drop(dx + 6)
-        s"$padding$prefix...$sufix$padding"
-      }
-      else s"$padding${props.text}$padding"
+      val wrapped = wrapText(props.text, props.width - paddingLen)
+      s"$padding$wrapped$padding"
     }
     
     if (text.nonEmpty) {

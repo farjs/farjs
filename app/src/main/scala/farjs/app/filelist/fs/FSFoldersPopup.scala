@@ -30,7 +30,8 @@ object FSFoldersPopup extends FunctionComponent[FSFoldersPopupProps] {
         }
         val maxContentHeight = props.items.size + 2 * (paddingVertical + 1)
 
-        val modalWidth = math.min(math.max(minWidth, maxContentWidth + 2), math.max(minWidth, width))
+        val paddingLen = 2
+        val modalWidth = math.min(math.max(minWidth, maxContentWidth + paddingLen), math.max(minWidth, width))
         val modalHeight = math.min(math.max(minHeight, maxContentHeight), math.max(minHeight, height - 4))
 
         val contentWidth = modalWidth - 2 * (paddingHorizontal + 1) // padding + border
@@ -48,7 +49,7 @@ object FSFoldersPopup extends FunctionComponent[FSFoldersPopupProps] {
             width = contentWidth,
             height = contentHeight,
             selected = props.selected,
-            items = props.items,
+            items = props.items.map(TextLine.wrapText(_, contentWidth - paddingLen)),
             style = theme,
             onAction = props.onAction
           ))()

@@ -56,7 +56,9 @@ class FSFoldersPopupSpec extends TestSpec with TestRendererUtils {
     val result = createTestRenderer(<(FSFoldersPopup())(^.wrapped := props)()).root
 
     //then
-    assertFSFoldersPopup(result, props, (60, 20), (60, 16))
+    assertFSFoldersPopup(result, props.copy(items = List.fill(20)(
+      "ite...eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeem"
+    )), (60, 20), (60, 16))
   }
   
   private def getFSFoldersPopupProps(items: List[String]): FSFoldersPopupProps = {
