@@ -8,7 +8,7 @@ import scommons.react.blessed._
 
 case class FSFoldersPopupProps(selected: Int,
                                items: List[String],
-                               onAction: String => Unit,
+                               onAction: Int => Unit,
                                onClose: () => Unit)
 
 object FSFoldersPopup extends FunctionComponent[FSFoldersPopupProps] {
@@ -21,6 +21,8 @@ object FSFoldersPopup extends FunctionComponent[FSFoldersPopupProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val theme = Theme.current.popup.menu
+    val textPadding = 2
+    val textPaddingLeft = " " * textPadding
 
     <(popupComp())(^.wrapped := PopupProps(onClose = props.onClose))(
       <(withSizeComp())(^.plain := WithSizeProps { (width, height) =>
@@ -30,8 +32,7 @@ object FSFoldersPopup extends FunctionComponent[FSFoldersPopupProps] {
         }
         val maxContentHeight = props.items.size + 2 * (paddingVertical + 1)
 
-        val paddingLen = 2
-        val modalWidth = math.min(math.max(minWidth, maxContentWidth + paddingLen), math.max(minWidth, width))
+        val modalWidth = math.min(math.max(minWidth, maxContentWidth + textPadding), math.max(minWidth, width))
         val modalHeight = math.min(math.max(minHeight, maxContentHeight), math.max(minHeight, height - 4))
 
         val contentWidth = modalWidth - 2 * (paddingHorizontal + 1) // padding + border
@@ -49,7 +50,9 @@ object FSFoldersPopup extends FunctionComponent[FSFoldersPopupProps] {
             width = contentWidth,
             height = contentHeight,
             selected = props.selected,
-            items = props.items.map(TextLine.wrapText(_, contentWidth - paddingLen)),
+            items = props.items.map { item =>
+              textPaddingLeft + TextLine.wrapText(item, contentWidth - textPadding)
+            },
             style = theme,
             onAction = props.onAction
           ))()

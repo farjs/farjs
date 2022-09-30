@@ -14,7 +14,7 @@ case class FSFoldersViewProps(left: Int,
                               selected: Int,
                               items: List[String],
                               style: BlessedStyle,
-                              onAction: String => Unit)
+                              onAction: Int => Unit)
 
 object FSFoldersView extends FunctionComponent[FSFoldersViewProps] {
 
@@ -22,8 +22,6 @@ object FSFoldersView extends FunctionComponent[FSFoldersViewProps] {
                           items: List[String],
                           width: Int,
                           theme: BlessedStyle): List[String] = {
-    val paddingLeft = "  "
-    val textWidth = width - paddingLeft.length
 
     items.zipWithIndex.map {
       case (item, index) =>
@@ -40,14 +38,15 @@ object FSFoldersView extends FunctionComponent[FSFoldersViewProps] {
           isBold = style.bold.getOrElse(false),
           fgColor = style.fg.orNull,
           bgColor = style.bg.orNull,
-          text = paddingLeft + text.take(textWidth).padTo(textWidth, ' ')
+          text = text.take(width).padTo(width, ' ')
         )
     }
   }
 
   protected def render(compProps: Props): ReactElement = {
+    val elementRef = useRef[BlessedElement](null)
     val props = compProps.wrapped
-    val (viewport@ListViewport(offset, focused, _, viewLength), setViewport) = useState(
+    val (viewport@ListViewport(offset, focused, length, viewLength), setViewport) = useState(
       ListViewport(offset = 0, props.selected, props.items.size, props.height)
     )
     val itemsContent =
@@ -56,6 +55,7 @@ object FSFoldersView extends FunctionComponent[FSFoldersViewProps] {
 
     val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (_, key) =>
       key.full match {
+        case "return" => props.onAction(offset + focused)
         case key => viewport.onKeypress(key).foreach(setViewport)
       }
     }
@@ -65,7 +65,6 @@ object FSFoldersView extends FunctionComponent[FSFoldersViewProps] {
     }, List(props.height))
 
     <.button(
-      ^.rbMouse := true,
       ^.rbLeft := props.left,
       ^.rbTop := props.top,
       ^.rbWidth := props.width,
@@ -73,8 +72,26 @@ object FSFoldersView extends FunctionComponent[FSFoldersViewProps] {
       ^.rbOnKeypress := onKeypress
     )(
       <.text(
+        ^.reactRef := elementRef,
+        ^.rbClickable := true,
+        ^.rbMouse := true,
+        ^.rbAutoFocus := false,
         ^.rbWidth := props.width,
         ^.rbHeight := props.height,
+        ^.rbOnWheelup := { _ =>
+          setViewport(viewport.up)
+        },
+        ^.rbOnWheeldown := { _ =>
+          setViewport(viewport.down)
+        },
+        ^.rbOnClick := { data =>
+          val curr = elementRef.current
+          val y = data.y - curr.atop
+          val index = offset + y
+          if (index < length) {
+            props.onAction(index)
+          }
+        },
         ^.rbStyle := props.style,
         ^.rbTags := true,
         ^.content := itemsContent

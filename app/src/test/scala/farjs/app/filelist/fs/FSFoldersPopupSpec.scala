@@ -32,7 +32,9 @@ class FSFoldersPopupSpec extends TestSpec with TestRendererUtils {
     val result = createTestRenderer(<(FSFoldersPopup())(^.wrapped := props)()).root
 
     //then
-    assertFSFoldersPopup(result, props, (55, 13), (56, 14))
+    assertFSFoldersPopup(result, props.copy(items = List.fill(20)(
+      "  item"
+    )), (55, 13), (56, 14))
   }
   
   it should "render component with max height" in {
@@ -43,7 +45,9 @@ class FSFoldersPopupSpec extends TestSpec with TestRendererUtils {
     val result = createTestRenderer(<(FSFoldersPopup())(^.wrapped := props)()).root
 
     //then
-    assertFSFoldersPopup(result, props, (60, 20), (56, 16))
+    assertFSFoldersPopup(result, props.copy(items = List.fill(20)(
+      "  item"
+    )), (60, 20), (56, 16))
   }
   
   it should "render component with max width" in {
@@ -57,7 +61,7 @@ class FSFoldersPopupSpec extends TestSpec with TestRendererUtils {
 
     //then
     assertFSFoldersPopup(result, props.copy(items = List.fill(20)(
-      "ite...eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeem"
+      "  ite...eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeem"
     )), (60, 20), (60, 16))
   }
   
