@@ -1,5 +1,7 @@
 package farjs.app.filelist.fs
 
+import farjs.app.filelist.fs.FSFoldersView._
+import farjs.ui.ScrollBarProps
 import farjs.ui.theme.DefaultTheme
 import scommons.react.blessed._
 import scommons.react.test._
@@ -9,11 +11,31 @@ import scala.scalajs.js.Dynamic.literal
 
 class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
 
+  FSFoldersView.scrollBarComp = mockUiComponent("ScrollBar")
+
+  it should "scroll when onChange in ScrollBar" in {
+    //given
+    val props = getFSFoldersViewProps(height = 1)
+    val renderer = createTestRenderer(<(FSFoldersView())(^.wrapped := props)())
+    assertFSFoldersView(renderer.root, props, showScrollBar = true,
+      """{bold}{white-fg}{black-bg}  item 1            {/}"""
+    )
+    val scrollBarProps = findComponentProps(renderer.root, scrollBarComp, plain = true)
+    
+    //when
+    scrollBarProps.onChange(1)
+    
+    //then
+    assertFSFoldersView(renderer.root, props.copy(selected = 1), showScrollBar = true,
+      """{bold}{white-fg}{black-bg}  item 2            {/}"""
+    )
+  }
+
   it should "update viewport state when props.height changes" in {
     //given
     val props = getFSFoldersViewProps(selected = 1)
     val renderer = createTestRenderer(<(FSFoldersView())(^.wrapped := props)())
-    assertFSFoldersView(renderer.root, props,
+    assertFSFoldersView(renderer.root, props, showScrollBar = false,
       """{bold}{white-fg}{cyan-bg}  item 1            {/}
         |{bold}{white-fg}{black-bg}  item 2            {/}""".stripMargin
     )
@@ -25,7 +47,7 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
     }
     
     //then
-    assertFSFoldersView(renderer.root, updatedProps,
+    assertFSFoldersView(renderer.root, updatedProps, showScrollBar = true,
       """{bold}{white-fg}{black-bg}  item 2            {/}""".stripMargin
     )
   }
@@ -34,7 +56,7 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
     //given
     val props = getFSFoldersViewProps()
     val renderer = createTestRenderer(<(FSFoldersView())(^.wrapped := props)())
-    assertFSFoldersView(renderer.root, props,
+    assertFSFoldersView(renderer.root, props, showScrollBar = false,
       """{bold}{white-fg}{black-bg}  item 1            {/}
         |{bold}{white-fg}{cyan-bg}  item 2            {/}""".stripMargin
     )
@@ -46,7 +68,7 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
     button.props.onKeypress(null, literal(full = "down"))
     
     //then
-    assertFSFoldersView(renderer.root, props,
+    assertFSFoldersView(renderer.root, props, showScrollBar = false,
       """{bold}{white-fg}{cyan-bg}  item 1            {/}
         |{bold}{white-fg}{black-bg}  item 2            {/}""".stripMargin
     )
@@ -117,7 +139,7 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
     //given
     val props = getFSFoldersViewProps(selected = 1)
     val renderer = createTestRenderer(<(FSFoldersView())(^.wrapped := props)())
-    assertFSFoldersView(renderer.root, props,
+    assertFSFoldersView(renderer.root, props, showScrollBar = false,
       """{bold}{white-fg}{cyan-bg}  item 1            {/}
         |{bold}{white-fg}{black-bg}  item 2            {/}""".stripMargin
     )
@@ -129,7 +151,7 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
     text.props.onWheelup(null)
     
     //then
-    assertFSFoldersView(renderer.root, props,
+    assertFSFoldersView(renderer.root, props, showScrollBar = false,
       """{bold}{white-fg}{black-bg}  item 1            {/}
         |{bold}{white-fg}{cyan-bg}  item 2            {/}""".stripMargin
     )
@@ -139,7 +161,7 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
     //given
     val props = getFSFoldersViewProps()
     val renderer = createTestRenderer(<(FSFoldersView())(^.wrapped := props)())
-    assertFSFoldersView(renderer.root, props,
+    assertFSFoldersView(renderer.root, props, showScrollBar = false,
       """{bold}{white-fg}{black-bg}  item 1            {/}
         |{bold}{white-fg}{cyan-bg}  item 2            {/}""".stripMargin
     )
@@ -151,13 +173,13 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
     text.props.onWheeldown(null)
     
     //then
-    assertFSFoldersView(renderer.root, props,
+    assertFSFoldersView(renderer.root, props, showScrollBar = false,
       """{bold}{white-fg}{cyan-bg}  item 1            {/}
         |{bold}{white-fg}{black-bg}  item 2            {/}""".stripMargin
     )
   }
 
-  it should "render component" in {
+  it should "render without ScrollBar" in {
     //given
     val props = getFSFoldersViewProps(width = 10, items = List(
       "  dir\t1 {bold}",
@@ -171,12 +193,27 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
     val result = createTestRenderer(<(FSFoldersView())(^.wrapped := props)()).root
 
     //then
-    assertFSFoldersView(result, props,
+    assertFSFoldersView(result, props, showScrollBar = false,
       """{bold}{white-fg}{black-bg}  dir 1 {open}b{/}
         |{bold}{white-fg}{cyan-bg}  .dir 2 l{/}
         |{bold}{white-fg}{cyan-bg}  .dir 4  {/}
         |{bold}{white-fg}{cyan-bg}  .file 5 {/}
         |{bold}{white-fg}{cyan-bg}  item    {/}""".stripMargin
+    )
+  }
+
+  it should "render with ScrollBar" in {
+    //given
+    val props = getFSFoldersViewProps(width = 5, height = 20, items = List.fill(25)("item"))
+    
+    //when
+    val result = createTestRenderer(<(FSFoldersView())(^.wrapped := props)()).root
+
+    //then
+    assertFSFoldersView(result, props, showScrollBar = true,
+      ("{bold}{white-fg}{black-bg}item {/}" :: List.fill(19)(
+        "{bold}{white-fg}{cyan-bg}item {/}"
+      )).mkString("\n")
     )
   }
 
@@ -202,6 +239,7 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
   
   private def assertFSFoldersView(result: TestInstance,
                                   props: FSFoldersViewProps,
+                                  showScrollBar: Boolean,
                                   expectedContent: String): Unit = {
     assertComponents(result.children, List(
       <.button(
@@ -219,7 +257,22 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
           ^.rbStyle := props.style,
           ^.rbTags := true,
           ^.content := expectedContent
-        )()
+        )(),
+
+        if (showScrollBar) Some {
+          <(scrollBarComp())(^.assertPlain[ScrollBarProps](inside(_) {
+            case ScrollBarProps(left, top, length, style, value, extent, min, max, _) =>
+              left shouldBe (props.left + props.width - 1)
+              top shouldBe (props.top - 1)
+              length shouldBe props.height
+              style shouldBe props.style
+              value shouldBe props.selected
+              extent shouldBe props.height
+              min shouldBe 0
+              max shouldBe (props.items.size - props.height)
+          }))()
+        }
+        else None
       )
     ))
   }

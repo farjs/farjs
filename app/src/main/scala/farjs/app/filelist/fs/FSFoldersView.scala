@@ -18,6 +18,8 @@ case class FSFoldersViewProps(left: Int,
 
 object FSFoldersView extends FunctionComponent[FSFoldersViewProps] {
 
+  private[fs] var scrollBarComp: UiComponent[ScrollBarProps] = ScrollBar
+
   private def renderItems(selected: Int,
                           items: List[String],
                           width: Int,
@@ -95,7 +97,24 @@ object FSFoldersView extends FunctionComponent[FSFoldersViewProps] {
         ^.rbStyle := props.style,
         ^.rbTags := true,
         ^.content := itemsContent
-      )()
+      )(),
+
+      if (viewport.length > viewport.viewLength) Some {
+        <(scrollBarComp())(^.plain := ScrollBarProps(
+          left = props.left + props.width - 1,
+          top = props.top - 1,
+          length = viewport.viewLength,
+          style = props.style,
+          value = viewport.offset,
+          extent = viewport.viewLength,
+          min = 0,
+          max = viewport.length - viewport.viewLength,
+          onChange = { offset =>
+            setViewport(viewport.copy(offset = offset))
+          }
+        ))()
+      }
+      else None
     )
   }
 }
