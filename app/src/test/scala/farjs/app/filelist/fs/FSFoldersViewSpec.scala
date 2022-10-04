@@ -1,7 +1,7 @@
 package farjs.app.filelist.fs
 
 import farjs.app.filelist.fs.FSFoldersView._
-import farjs.ui.ScrollBarProps
+import farjs.ui.{ScrollBarProps, UI}
 import farjs.ui.theme.DefaultTheme
 import scommons.react.blessed._
 import scommons.react.test._
@@ -213,7 +213,7 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
     assertFSFoldersView(result, props, showScrollBar = true,
       ("{bold}{white-fg}{black-bg}item {/}" :: List.fill(19)(
         "{bold}{white-fg}{cyan-bg}item {/}"
-      )).mkString("\n")
+      )).mkString(UI.newLine)
     )
   }
 
