@@ -59,6 +59,18 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
 
       <(fsFoldersHistory())(^.wrapped := FSFoldersHistoryProps(
         showPopup = showFoldersHistory,
+        currDirPath = props.state.currDir.path,
+        onChangeDir = { dir =>
+          setShowFoldersHistory(false)
+
+          if (dir != props.state.currDir.path) {
+            props.dispatch(props.actions.changeDir(
+              dispatch = props.dispatch,
+              parent = None,
+              dir = dir
+            ))
+          }
+        },
         onHidePopup = { () =>
           setShowFoldersHistory(false)
         }
