@@ -16,10 +16,12 @@ lazy val `farjs` = (project in file("."))
   )
   .aggregate(
     `farjs-ui`,
+    `farjs-dao`,
     `farjs-filelist`,
     `farjs-app`
   )
 
 lazy val `farjs-ui` = FarjsUi.definition
+lazy val `farjs-dao` = FarjsDao.definition
 lazy val `farjs-filelist` = FarjsFileList.definition
 lazy val `farjs-app` = FarjsApp.definition

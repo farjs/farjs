@@ -58,7 +58,8 @@
     "blessed": "0.1.81",
     "@farjs/blessed": "0.2.3",
     "react-redux": "^7.2.4",
-    "redux": "^3.6.0"
+    "redux": "^3.6.0",
+    "websql": "2.0.3"
   },
   "devDependencies": {
     "webpack-node-externals": "1.7.2",

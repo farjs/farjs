@@ -21,6 +21,8 @@ object FarjsApp extends ScalaJsModule {
       publishLocal := ((): Unit),
       publishM2 := ((): Unit),
 
+      scommonsBundlesFileFilter := "*.sql",
+
       coverageExcludedPackages := "farjs.app.FarjsApp",
 
       //TODO: temporarily disabled
@@ -97,6 +99,7 @@ object FarjsApp extends ScalaJsModule {
     )
 
   override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Seq(
-    FarjsFileList.definition
+    FarjsFileList.definition,
+    FarjsDao.definition
   )
 }
