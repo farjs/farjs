@@ -49,7 +49,7 @@ object FSFoldersView extends FunctionComponent[FSFoldersViewProps] {
     val elementRef = useRef[BlessedElement](null)
     val props = compProps.wrapped
     val (viewport@ListViewport(offset, focused, length, viewLength), setViewport) = useState(
-      ListViewport(offset = 0, props.selected, props.items.size, props.height)
+      ListViewport(props.selected, props.items.size, props.height)
     )
     val itemsContent =
       renderItems(focused, props.items.slice(offset, offset + viewLength), props.width, props.style)

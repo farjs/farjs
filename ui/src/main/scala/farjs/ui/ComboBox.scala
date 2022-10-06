@@ -31,7 +31,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
     def showOrHidePopup(): Unit = {
       if (maybePopup.isDefined) hidePopup()
       else {
-        showPopup(ListViewport(0, 0, props.items.length, maxItems))
+        showPopup(ListViewport(0, props.items.length, maxItems))
       }
     }
     

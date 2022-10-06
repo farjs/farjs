@@ -1,13 +1,13 @@
 package farjs.ui
 
-case class ListViewport(offset: Int,
-                        focused: Int,
-                        length: Int,
-                        viewLength: Int) {
+case class ListViewport private(offset: Int,
+                                focused: Int,
+                                length: Int,
+                                viewLength: Int) {
 
   def down: ListViewport = {
-    val maxSelected = math.max(math.min(length - offset - 1, viewLength - 1), 0)
-    if (focused < maxSelected) copy(focused = focused + 1)
+    val maxFocused = math.max(math.min(length - offset - 1, viewLength - 1), 0)
+    if (focused < maxFocused) copy(focused = focused + 1)
     else if (offset < length - viewLength) copy(offset = offset + 1)
     else this
   }
@@ -84,5 +84,21 @@ case class ListViewport(offset: Int,
       copy(offset = newOffset, focused = newFocused, viewLength = newViewLength)
     }
     else this
+  }
+}
+
+object ListViewport {
+
+  def apply(index: Int, length: Int, viewLength: Int): ListViewport = {
+    val (offset, focused) =
+      if (index >= viewLength && viewLength > 0) {
+        val rawOffset = (index / viewLength) * viewLength
+        val offset = math.max(math.min(length - viewLength, rawOffset), 0)
+        val focused = math.max(math.min(length - offset - 1, index - offset), 0)
+        (offset, focused)
+      }
+      else (0, index)
+
+    new ListViewport(offset, focused, length, viewLength)
   }
 }

@@ -9,7 +9,7 @@ class ListViewportSpec extends TestSpec {
   
   it should "return None when onKeypress(unknown)" in {
     //given
-    val viewport = ListViewport(0, 0, length = 5, viewLength)
+    val viewport = ListViewport(0, length = 5, viewLength)
     
     //when & then
     viewport.onKeypress("unknown") shouldBe None
@@ -17,7 +17,7 @@ class ListViewportSpec extends TestSpec {
 
   it should "return same instance if length = 0 when onKeypress" in {
     //given
-    val viewport = ListViewport(0, 0, length = 0, viewLength)
+    val viewport = ListViewport(0, length = 0, viewLength)
     
     def check(keyFull: String)(implicit pos: Position): Unit = {
       inside(viewport.onKeypress(keyFull)) {
@@ -36,7 +36,7 @@ class ListViewportSpec extends TestSpec {
 
   it should "return same instance if length = 1 when onKeypress" in {
     //given
-    val viewport = ListViewport(0, 0, length = 1, viewLength)
+    val viewport = ListViewport(0, length = 1, viewLength)
     
     def check(keyFull: String)(implicit pos: Position): Unit = {
       inside(viewport.onKeypress(keyFull)) {
@@ -55,7 +55,7 @@ class ListViewportSpec extends TestSpec {
 
   it should "return updated instance if length < viewLength when onKeypress" in {
     //given
-    var viewport = ListViewport(0, 0, length = 5, viewLength)
+    var viewport = ListViewport(0, length = 5, viewLength)
     viewport.length should be < viewport.viewLength
     
     def check(keyFull: String, focused: Int)(implicit pos: Position): Unit = {
@@ -84,7 +84,7 @@ class ListViewportSpec extends TestSpec {
 
   it should "return updated instance if length > viewLength when onKeypress" in {
     //given
-    var viewport = ListViewport(0, 0, length = 10, viewLength)
+    var viewport = ListViewport(0, length = 10, viewLength)
     viewport.length should be > viewport.viewLength
     
     def check(keyFull: String, offset: Int, focused: Int)(implicit pos: Position): Unit = {
@@ -133,7 +133,7 @@ class ListViewportSpec extends TestSpec {
 
   it should "return same instance if newViewLength = viewLength when resize" in {
     //given
-    val viewport = ListViewport(0, 0, length = 0, viewLength)
+    val viewport = ListViewport(0, length = 0, viewLength)
 
     //when & then
     viewport.resize(viewport.viewLength) should be theSameInstanceAs viewport
@@ -141,7 +141,7 @@ class ListViewportSpec extends TestSpec {
 
   it should "return updated instance when resize" in {
     //given
-    var viewport = ListViewport(2, 7, length = 10, 8)
+    var viewport = ListViewport(9, length = 10, 8)
 
     def check(offset: Int, focused: Int, newViewLength: Int)(implicit pos: Position): Unit = {
       val result = viewport.resize(newViewLength)
@@ -169,5 +169,35 @@ class ListViewportSpec extends TestSpec {
     check(offset = 9, focused = 0, newViewLength = 1)
     check(offset = 8, focused = 1, newViewLength = 2)
     check(offset = 7, focused = 2, newViewLength = 3)
+  }
+
+  it should "return new instance with normalized offset and focused when apply" in {
+
+    def check(result: ListViewport, offset: Int, focused: Int)(implicit pos: Position): Unit = {
+      inside(result) { case ListViewport(resOffset, resFocused, _, _) =>
+        resOffset shouldBe offset
+        resFocused shouldBe focused
+      }
+    }
+
+    //when & then
+    check(ListViewport(9, length = 10, 0), offset = 0, focused = 9)
+    check(ListViewport(0, length = 10, 8), offset = 0, focused = 0)
+    check(ListViewport(1, length = 10, 8), offset = 0, focused = 1)
+    check(ListViewport(2, length = 10, 8), offset = 0, focused = 2)
+    check(ListViewport(7, length = 10, 8), offset = 0, focused = 7)
+    check(ListViewport(8, length = 10, 8), offset = 2, focused = 6)
+    check(ListViewport(9, length = 10, 8), offset = 2, focused = 7)
+    check(ListViewport(0, length = 20, 8), offset = 0, focused = 0)
+    check(ListViewport(1, length = 20, 8), offset = 0, focused = 1)
+    check(ListViewport(7, length = 20, 8), offset = 0, focused = 7)
+    check(ListViewport(8, length = 20, 8), offset = 8, focused = 0)
+    check(ListViewport(9, length = 20, 8), offset = 8, focused = 1)
+    check(ListViewport(10, length = 20, 8), offset = 8, focused = 2)
+    check(ListViewport(11, length = 20, 8), offset = 8, focused = 3)
+    check(ListViewport(15, length = 20, 8), offset = 8, focused = 7)
+    check(ListViewport(16, length = 20, 8), offset = 12, focused = 4)
+    check(ListViewport(17, length = 20, 8), offset = 12, focused = 5)
+    check(ListViewport(19, length = 20, 8), offset = 12, focused = 7)
   }
 }
