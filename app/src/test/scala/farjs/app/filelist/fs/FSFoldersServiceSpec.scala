@@ -41,8 +41,9 @@ class FSFoldersServiceSpec extends BaseDBContextSpec {
     //when
     val resultF = beforeF.flatMap { existing =>
       existing.map(_.path) shouldBe List(path)
-      service.save(path).map { _ =>
-        existing.head
+      val entity = existing.head
+      dao.save(HistoryFolder(path, entity.updatedAt + 1), keepFirst = 5).map { _ =>
+        entity
       }
     }
 
