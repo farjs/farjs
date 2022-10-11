@@ -24,13 +24,13 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val root = new FarjsRoot(withPortalsComp, fileListComp, taskController, DevTool.Hidden)
     val emitMock = mockFunction[String, Unit]
     val program = literal("emit" -> emitMock)
-    val keyMock = mockFunction[js.Array[String], js.Function2[js.Object, KeyboardKey, Unit], Unit]
-    val screen = literal("program" -> program, "key" -> keyMock)
+    val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
+    val offMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
+    val screen = literal("program" -> program, "on" -> onMock, "off" -> offMock)
     val boxMock = literal("screen" -> screen)
     var keyListener: js.Function2[js.Object, KeyboardKey, Unit] = null
 
-    keyMock.expects(*, *).onCall { (keys, listener) =>
-      keys.toList shouldBe List("f12")
+    onMock.expects("keypress", *).onCall { (_, listener) =>
       keyListener = listener
     }
     var emitCalled = false
@@ -46,7 +46,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     
     //when
     TestRenderer.act { () =>
-      keyListener(null, null)
+      keyListener(null, literal(full = "f12").asInstanceOf[KeyboardKey])
     }
 
     //then
@@ -55,7 +55,10 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     eventually {
       emitCalled shouldBe true
     }.map { _ =>
-      //cleanup
+      //then
+      offMock.expects("keypress", keyListener)
+
+      //when
       TestRenderer.act { () =>
         renderer.unmount()
       }
@@ -66,10 +69,10 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   it should "set devTool when onActivate" in {
     //given
     val root = new FarjsRoot(withPortalsComp, fileListComp, taskController, DevTool.Colors)
-    val keyMock = mockFunction[js.Array[String], js.Function2[js.Object, KeyboardKey, Unit], Unit]
-    val screen = literal("key" -> keyMock)
+    val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
+    val screen = literal("on" -> onMock)
     val boxMock = literal("screen" -> screen)
-    keyMock.expects(*, *)
+    onMock.expects("keypress", *)
 
     val renderer = createTestRenderer(<(root())()(), { el =>
       if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock
@@ -97,10 +100,10 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   it should "render component without DevTools" in {
     //given
     val root = new FarjsRoot(withPortalsComp, fileListComp, taskController, DevTool.Hidden)
-    val keyMock = mockFunction[js.Array[String], js.Function2[js.Object, KeyboardKey, Unit], Unit]
-    val screen = literal("key" -> keyMock)
+    val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
+    val screen = literal("on" -> onMock)
     val boxMock = literal("screen" -> screen)
-    keyMock.expects(*, *)
+    onMock.expects("keypress", *)
 
     //when
     val result = createTestRenderer(<(root())()(), { el =>
@@ -126,10 +129,10 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   it should "render component with LogPanel" in {
     //given
     val root = new FarjsRoot(withPortalsComp, fileListComp, taskController, DevTool.Logs)
-    val keyMock = mockFunction[js.Array[String], js.Function2[js.Object, KeyboardKey, Unit], Unit]
-    val screen = literal("key" -> keyMock)
+    val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
+    val screen = literal("on" -> onMock)
     val boxMock = literal("screen" -> screen)
-    keyMock.expects(*, *)
+    onMock.expects("keypress", *)
 
     //when
     val result = createTestRenderer(<(root())()(), { el =>
@@ -168,10 +171,10 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   it should "render component with ColorPanel" in {
     //given
     val root = new FarjsRoot(withPortalsComp, fileListComp, taskController, DevTool.Colors)
-    val keyMock = mockFunction[js.Array[String], js.Function2[js.Object, KeyboardKey, Unit], Unit]
-    val screen = literal("key" -> keyMock)
+    val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
+    val screen = literal("on" -> onMock)
     val boxMock = literal("screen" -> screen)
-    keyMock.expects(*, *)
+    onMock.expects("keypress", *)
 
     //when
     val result = createTestRenderer(<(root())()(), { el =>

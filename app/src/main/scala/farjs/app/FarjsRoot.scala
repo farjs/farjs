@@ -22,16 +22,23 @@ class FarjsRoot(withPortalsComp: UiComponent[Unit],
 
     useLayoutEffect({ () =>
       val screen = elementRef.current.screen
-      screen.key(js.Array("f12"), { (_, _) =>
-        setDevTool { from =>
-          val to = from.getNext
-          if (DevTool.shouldResize(from, to)) Future[Unit] { //exec on the next tick
-            screen.program.emit("resize")
+      val keyListener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
+        if (key.full == "f12") {
+          setDevTool { from =>
+            val to = from.getNext
+            if (DevTool.shouldResize(from, to)) Future[Unit] { //exec on the next tick
+              screen.program.emit("resize")
+            }
+            to
           }
-          to
         }
-      })
-      ()
+      }
+      screen.on("keypress", keyListener)
+
+      val cleanup: js.Function0[Unit] = { () =>
+        screen.off("keypress", keyListener)
+      }
+      cleanup
     }, Nil)
 
     <.>()(
