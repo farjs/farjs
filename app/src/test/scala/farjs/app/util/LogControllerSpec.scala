@@ -14,10 +14,13 @@ class LogControllerSpec extends TestSpec with TestRendererUtils {
     //given
     val oldLog = g.console.log
     val oldError = g.console.error
+    val onReady = mockFunction[Unit]
     val render = mockFunction[String, ReactElement]
-    val props = LogControllerProps(render)
+    val props = LogControllerProps(onReady, render)
     val rendered: ReactElement = <.>()("some nested comp")
 
+    //then
+    onReady.expects()
     render.expects("").returning(rendered)
 
     //when & then

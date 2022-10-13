@@ -1,24 +1,30 @@
 package farjs.app
 
 import farjs.app.filelist.FileListBrowserController
+import farjs.app.filelist.fs.FSFileListActions
 import farjs.app.task.FarjsTaskController
 import farjs.app.util.DevTool
+import farjs.domain.FarjsDBMigrations
 import farjs.ui.theme.{Theme, XTerm256Theme}
 import io.github.shogowada.scalajs.reactjs.redux.ReactRedux._
 import io.github.shogowada.scalajs.reactjs.redux.Redux
-import scommons.nodejs.{global, process}
+import scommons.nodejs.{process, global => nodeGlobal}
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.blessed.portal.WithPortals
 import scommons.react.blessed.raw.{Blessed, ReactBlessed}
+import scommons.websql.migrations.WebSqlMigrations
+import scommons.websql.{Database, WebSQL}
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 @JSExportTopLevel(name = "FarjsApp")
 object FarjsApp {
 
-  private val g: js.Dynamic = global.asInstanceOf[js.Dynamic]
+  private val g: js.Dynamic = nodeGlobal.asInstanceOf[js.Dynamic]
   
   private type BlessedRenderer = js.Function2[ReactElement, BlessedScreen, Unit]
 
@@ -62,7 +68,11 @@ object FarjsApp {
     
     val root = new FarjsRoot(
       withPortalsComp = new WithPortals(screen),
-      fileListComp = FileListBrowserController(),
+      loadFileListUi = {
+        prepareDB().map { _ =>
+          FileListBrowserController()
+        }
+      },
       taskController = FarjsTaskController(),
       initialDevTool = if (showDevTools) DevTool.Logs else DevTool.Hidden
     )
@@ -78,5 +88,20 @@ object FarjsApp {
       screen
     )
     screen
+  }
+
+  private def prepareDB(): Future[Database] = {
+    val dbF = for {
+      _ <- FSFileListActions.mkDirs(FarjsData.getDataDir)
+      db = WebSQL.openDatabase(FarjsData.getDBFilePath)
+      migrations = new WebSqlMigrations(db)
+      _ <- migrations.runBundle(FarjsDBMigrations)
+    } yield db
+
+    dbF.recover {
+      case error =>
+        Console.err.println(s"Failed to prepare DB, error: $error")
+        throw error
+    }
   }
 }

@@ -11,12 +11,13 @@ import scala.concurrent.Future
 import scala.scalajs.js
 
 class FarjsRoot(withPortalsComp: UiComponent[Unit],
-                fileListComp: ReactClass,
+                loadFileListUi: => Future[ReactClass],
                 taskController: ReactClass,
                 initialDevTool: DevTool
                ) extends FunctionComponent[Unit] {
 
   protected def render(compProps: Props): ReactElement = {
+    val (maybeFileListUi, setFileListUi) = useState(Option.empty[ReactClass])
     val elementRef = useRef[BlessedElement](null)
     val (devTool, setDevTool) = useStateUpdater(initialDevTool)
 
@@ -50,12 +51,19 @@ class FarjsRoot(withPortalsComp: UiComponent[Unit],
         }
       )(
         <(withPortalsComp())()(
-          <(fileListComp).empty,
+          maybeFileListUi match {
+            case None => <.text()("Loading...")
+            case Some(fileListComp) => <(fileListComp).empty
+          },
           <(taskController).empty
         )
       ),
       
-      <(logControllerComp())(^.wrapped := LogControllerProps { content =>
+      <(logControllerComp())(^.wrapped := LogControllerProps(onReady = { () =>
+        loadFileListUi.map { fileListUi =>
+          setFileListUi(Some(fileListUi))
+        }
+      }, { content =>
         if (devTool != DevTool.Hidden) {
           <.box(
             ^.rbWidth := "30%",
@@ -70,7 +78,7 @@ class FarjsRoot(withPortalsComp: UiComponent[Unit],
           ))())
         }
         else null
-      })()
+      }))()
     )
   }
 }

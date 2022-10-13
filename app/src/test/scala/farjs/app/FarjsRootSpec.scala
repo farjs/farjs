@@ -7,6 +7,7 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.blessed._
 import scommons.react.test._
 
+import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
 
@@ -21,7 +22,8 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
   it should "set devTool and emit resize event when on F12" in {
     //given
-    val root = new FarjsRoot(withPortalsComp, fileListComp, taskController, DevTool.Hidden)
+    val fileListUiF = Future.successful(fileListComp)
+    val root = new FarjsRoot(withPortalsComp, fileListUiF, taskController, DevTool.Hidden)
     val emitMock = mockFunction[String, Unit]
     val program = literal("emit" -> emitMock)
     val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
@@ -68,7 +70,8 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
   it should "set devTool when onActivate" in {
     //given
-    val root = new FarjsRoot(withPortalsComp, fileListComp, taskController, DevTool.Colors)
+    val fileListUiF = Future.successful(fileListComp)
+    val root = new FarjsRoot(withPortalsComp, fileListUiF, taskController, DevTool.Colors)
     val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
     val screen = literal("on" -> onMock)
     val boxMock = literal("screen" -> screen)
@@ -97,9 +100,54 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     updatedProps.devTool shouldBe DevTool.Logs
   }
 
+  it should "render fileListUi when onReady" in {
+    //given
+    val fileListUiF = Future.successful(fileListComp)
+    val root = new FarjsRoot(withPortalsComp, fileListUiF, taskController, DevTool.Hidden)
+    val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
+    val screen = literal("on" -> onMock)
+    val boxMock = literal("screen" -> screen)
+    onMock.expects("keypress", *)
+
+    val renderer = createTestRenderer(<(root())()(), { el =>
+      if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock
+      else null
+    })
+
+    assertComponents(renderer.root.children, List(
+      <.box(^.rbWidth := "100%")(
+        <(withPortalsComp())()(
+          <.text()("Loading..."),
+          <(taskController).empty
+        )
+      ),
+      <(logControllerComp())(^.assertWrapped(inside(_) {
+        case LogControllerProps(onReady, render) =>
+          render("test log content") shouldBe null
+
+          //when
+          onReady()
+      }))()
+    ))
+
+    //then
+    fileListUiF.map { _ =>
+      assertComponents(renderer.root.children, List(
+        <.box(^.rbWidth := "100%")(
+          <(withPortalsComp())()(
+            <(fileListComp).empty,
+            <(taskController).empty
+          )
+        ),
+        <(logControllerComp()).empty
+      ))
+    }
+  }
+  
   it should "render component without DevTools" in {
     //given
-    val root = new FarjsRoot(withPortalsComp, fileListComp, taskController, DevTool.Hidden)
+    val fileListUiF = Future.successful(fileListComp)
+    val root = new FarjsRoot(withPortalsComp, fileListUiF, taskController, DevTool.Hidden)
     val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
     val screen = literal("on" -> onMock)
     val boxMock = literal("screen" -> screen)
@@ -112,23 +160,24 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     }).root
 
     //then
-    inside(result.children.toList) { case List(main, log) =>
-      assertNativeComponent(main, <.box(^.rbWidth := "100%")(
+    assertComponents(result.children, List(
+      <.box(^.rbWidth := "100%")(
         <(withPortalsComp())()(
-          <(fileListComp).empty,
+          <.text()("Loading..."),
           <(taskController).empty
         )
-      ))
-
-      assertTestComponent(log, logControllerComp) { case LogControllerProps(render) =>
-        render("test log content") shouldBe null
-      }
-    }
+      ),
+      <(logControllerComp())(^.assertWrapped(inside(_) {
+        case LogControllerProps(_, render) =>
+          render("test log content") shouldBe null
+      }))()
+    ))
   }
   
-  it should "render component with LogPanel" in {
+  it should "render component with DevTools" in {
     //given
-    val root = new FarjsRoot(withPortalsComp, fileListComp, taskController, DevTool.Logs)
+    val fileListUiF = Future.successful(fileListComp)
+    val root = new FarjsRoot(withPortalsComp, fileListUiF, taskController, DevTool.Logs)
     val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
     val screen = literal("on" -> onMock)
     val boxMock = literal("screen" -> screen)
@@ -141,72 +190,31 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     }).root
 
     //then
-    inside(result.children.toList) { case List(main, log) =>
-      assertNativeComponent(main, <.box(^.rbWidth := "70%")(
+    assertComponents(result.children, List(
+      <.box(^.rbWidth := "70%")(
         <(withPortalsComp())()(
-          <(fileListComp).empty,
+          <.text()("Loading..."),
           <(taskController).empty
         )
-      ))
+      ),
+      <(logControllerComp())(^.assertWrapped(inside(_) {
+        case LogControllerProps(_, render) =>
+          val content = "test log content"
 
-      assertTestComponent(log, logControllerComp) { case LogControllerProps(render) =>
-        val content = "test log content"
-        
-        assertNativeComponent(createTestRenderer(render(content)).root,
-          <.box(
-            ^.rbWidth := "30%",
-            ^.rbHeight := "100%",
-            ^.rbLeft := "70%"
-          )(), inside(_) { case List(comp) =>
-            assertTestComponent(comp, devToolPanelComp) { case DevToolPanelProps(devTool, logContent, _) =>
-              devTool shouldBe DevTool.Logs
-              logContent shouldBe content
+          assertNativeComponent(createTestRenderer(render(content)).root,
+            <.box(
+              ^.rbWidth := "30%",
+              ^.rbHeight := "100%",
+              ^.rbLeft := "70%"
+            )(), inside(_) { case List(comp) =>
+              assertTestComponent(comp, devToolPanelComp) {
+                case DevToolPanelProps(devTool, logContent, _) =>
+                  devTool shouldBe DevTool.Logs
+                  logContent shouldBe content
+              }
             }
-          }
-        )
-      }
-    }
-  }
-  
-  it should "render component with ColorPanel" in {
-    //given
-    val root = new FarjsRoot(withPortalsComp, fileListComp, taskController, DevTool.Colors)
-    val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
-    val screen = literal("on" -> onMock)
-    val boxMock = literal("screen" -> screen)
-    onMock.expects("keypress", *)
-
-    //when
-    val result = createTestRenderer(<(root())()(), { el =>
-      if (el.`type` == <.box.name.asInstanceOf[js.Any]) boxMock
-      else null
-    }).root
-
-    //then
-    inside(result.children.toList) { case List(main, log) =>
-      assertNativeComponent(main, <.box(^.rbWidth := "70%")(
-        <(withPortalsComp())()(
-          <(fileListComp).empty,
-          <(taskController).empty
-        )
-      ))
-
-      assertTestComponent(log, logControllerComp) { case LogControllerProps(render) =>
-        val content = "test log content"
-        
-        assertNativeComponent(createTestRenderer(render(content)).root,
-          <.box(
-            ^.rbWidth := "30%",
-            ^.rbHeight := "100%",
-            ^.rbLeft := "70%"
-          )(), inside(_) { case List(comp) =>
-            assertTestComponent(comp, devToolPanelComp) { case DevToolPanelProps(devTool, logContent, _) =>
-              devTool shouldBe DevTool.Colors
-              logContent shouldBe content
-            }
-          }
-        )
-      }
-    }
+          )
+      }))()
+    ))
   }
 }
