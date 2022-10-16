@@ -1,6 +1,5 @@
 package farjs.app.filelist.zip
 
-import farjs.app.filelist.MockFileListActions
 import farjs.app.filelist.zip.ZipPanel._
 import farjs.app.filelist.zip.ZipPanelSpec.withContext
 import farjs.filelist.FileListActions._

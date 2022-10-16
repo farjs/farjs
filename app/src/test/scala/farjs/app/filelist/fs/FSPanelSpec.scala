@@ -1,6 +1,5 @@
 package farjs.app.filelist.fs
 
-import farjs.app.filelist.MockFileListActions
 import farjs.app.filelist.fs.FSPanel._
 import farjs.app.filelist.zip.{AddToZipAction, AddToZipControllerProps}
 import farjs.filelist.FileListActions._

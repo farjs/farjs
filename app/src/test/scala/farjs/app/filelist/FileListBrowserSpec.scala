@@ -1,7 +1,7 @@
 package farjs.app.filelist
 
 import farjs.app.filelist.FileListBrowser._
-import farjs.app.filelist.fs.{FSDrivePopupProps, FSPlugin, MockFileSource}
+import farjs.app.filelist.fs.{FSDrivePopupProps, FSPlugin}
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api._
