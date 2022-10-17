@@ -1,84 +1,55 @@
 package farjs.app.filelist.fs
 
 import farjs.app.filelist.fs.FSFoldersHistory._
+import farjs.filelist.FileListServicesSpec.withServicesContext
+import farjs.filelist.history.MockFileListHistoryService
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
+
+import scala.concurrent.Future
 
 class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   FSFoldersHistory.fsFoldersPopup = mockUiComponent("FSFoldersPopup")
 
-  it should "call onChangeDir when onAction" in {
-    //given
-    val onChangeDir = mockFunction[String, Unit]
-    val props = getFSFoldersHistoryProps(showPopup = true, onChangeDir = onChangeDir)
-    val result = createTestRenderer(<(FSFoldersHistory())(^.wrapped := props)()).root
+  //noinspection TypeAnnotation
+  class HistoryService {
+    val save = mockFunction[String, Future[Unit]]
 
-    //then
-    onChangeDir.expects(props.currDirPath)
-
-    assertComponents(result.children, List(
-      <(fsFoldersPopup())(^.assertWrapped(inside(_) {
-        case FSFoldersPopupProps(selected, items, onAction, _) =>
-          selected shouldBe 0
-          items shouldBe List(props.currDirPath)
-
-          //when
-          onAction(0)
-      }))()
-    ))
+    val service = new MockFileListHistoryService(
+      saveMock = save
+    )
   }
 
   it should "render popup component" in {
     //given
     val props = getFSFoldersHistoryProps(showPopup = true, "")
+    val historyService = new HistoryService
+    historyService.save.expects(props.currDirPath).never()
     
     //when & then
-    val renderer = createTestRenderer(<(FSFoldersHistory())(^.wrapped := props)())
+    val renderer = createTestRenderer(withServicesContext(
+      <(FSFoldersHistory())(^.wrapped := props)(), historyService.service
+    ))
     assertComponents(renderer.root.children, List(
       <(fsFoldersPopup())(^.assertWrapped(inside(_) {
-        case FSFoldersPopupProps(selected, items, _, onClose) =>
-          selected shouldBe 0
-          items shouldBe Nil
+        case FSFoldersPopupProps(onChangeDir, onClose) =>
+          onChangeDir should be theSameInstanceAs props.onChangeDir
           onClose should be theSameInstanceAs props.onHidePopup
       }))()
     ))
 
     //when & then
+    historyService.save.expects("dir 1").returning(Future.unit)
     TestRenderer.act { () =>
-      renderer.update(<(FSFoldersHistory())(^.wrapped := props.copy(currDirPath = "dir 1"))())
+      renderer.update(withServicesContext(
+        <(FSFoldersHistory())(^.wrapped := props.copy(currDirPath = "dir 1"))(), historyService.service
+      ))
     }
     assertComponents(renderer.root.children, List(
       <(fsFoldersPopup())(^.assertWrapped(inside(_) {
-        case FSFoldersPopupProps(selected, items, _, onClose) =>
-          selected shouldBe 0
-          items shouldBe List("dir 1")
-          onClose should be theSameInstanceAs props.onHidePopup
-      }))()
-    ))
-
-    //when & then
-    TestRenderer.act { () =>
-      renderer.update(<(FSFoldersHistory())(^.wrapped := props.copy(currDirPath = "dir 2"))())
-    }
-    assertComponents(renderer.root.children, List(
-      <(fsFoldersPopup())(^.assertWrapped(inside(_) {
-        case FSFoldersPopupProps(selected, items, _, onClose) =>
-          selected shouldBe 1
-          items shouldBe List("dir 1", "dir 2")
-          onClose should be theSameInstanceAs props.onHidePopup
-      }))()
-    ))
-
-    //when & then
-    TestRenderer.act { () =>
-      renderer.update(<(FSFoldersHistory())(^.wrapped := props.copy(currDirPath = "dir 1"))())
-    }
-    assertComponents(renderer.root.children, List(
-      <(fsFoldersPopup())(^.assertWrapped(inside(_) {
-        case FSFoldersPopupProps(selected, items, _, onClose) =>
-          selected shouldBe 1
-          items shouldBe List("dir 2", "dir 1")
+        case FSFoldersPopupProps(onChangeDir, onClose) =>
+          onChangeDir should be theSameInstanceAs props.onChangeDir
           onClose should be theSameInstanceAs props.onHidePopup
       }))()
     ))
@@ -87,9 +58,13 @@ class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec with TestRend
   it should "render empty component" in {
     //given
     val props = getFSFoldersHistoryProps(showPopup = false)
+    val historyService = new HistoryService
+    historyService.save.expects(props.currDirPath).returning(Future.unit)
     
     //when
-    val result = createTestRenderer(<(FSFoldersHistory())(^.wrapped := props)()).root
+    val result = createTestRenderer(withServicesContext(
+      <(FSFoldersHistory())(^.wrapped := props)(), historyService.service
+    )).root
 
     //then
     result.children.toList should be (empty)

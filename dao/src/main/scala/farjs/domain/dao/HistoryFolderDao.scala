@@ -15,7 +15,7 @@ class HistoryFolderDao(val ctx: FarjsDBContext) {
     ))
   }
 
-  def save(entity: HistoryFolder, keepFirst: Int): Future[Unit] = {
+  def save(entity: HistoryFolder, keepLast: Int): Future[Unit] = {
     val q = for {
       _ <- ctx.runAction(
         sql = "INSERT INTO history_folders (path, updated_at) VALUES (?, ?)" +
@@ -27,7 +27,7 @@ class HistoryFolderDao(val ctx: FarjsDBContext) {
           "(SELECT min(updated_at) FROM (" +
           "SELECT updated_at FROM history_folders ORDER BY updated_at DESC LIMIT ?" +
           "))",
-        args = keepFirst
+        args = keepLast
       )
     } yield ()
 

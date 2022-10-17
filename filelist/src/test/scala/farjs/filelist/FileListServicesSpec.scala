@@ -1,5 +1,6 @@
 package farjs.filelist
 
+import farjs.filelist.history.FileListHistoryService
 import scommons.react._
 import scommons.react.test._
 
@@ -35,6 +36,19 @@ class FileListServicesSpec extends TestSpec with TestRendererUtils {
         "Error: FileListServices.Context is not found." +
           "\nPlease, make sure you use FileListServices.Context.Provider in parent components"
       )
+    )
+  }
+}
+
+object FileListServicesSpec {
+
+  def withServicesContext(element: ReactElement,
+                          foldersHistory: FileListHistoryService): ReactElement = {
+
+    <(FileListServices.Context.Provider)(^.contextValue := FileListServices(
+      foldersHistory = foldersHistory
+    ))(
+      element
     )
   }
 }

@@ -1,5 +1,6 @@
 package farjs.app.filelist.fs
 
+import farjs.filelist.FileListServices
 import scommons.react._
 import scommons.react.hooks._
 
@@ -13,33 +14,20 @@ object FSFoldersHistory extends FunctionComponent[FSFoldersHistoryProps] {
   private[fs] var fsFoldersPopup: UiComponent[FSFoldersPopupProps] = FSFoldersPopup
   
   protected def render(compProps: Props): ReactElement = {
-    val (dirs, setDirs) = useState(List.empty[String])
+    val services = FileListServices.useServices
     val props = compProps.wrapped
     val currDirPath = props.currDirPath
 
     useLayoutEffect({ () =>
       if (currDirPath.nonEmpty) {
-        val index = dirs.indexOf(currDirPath)
-        val (prefix, suffix) =
-          if (index >= 0) (dirs.take(index), dirs.drop(index + 1))
-          else (dirs, Nil)
-
-        setDirs(prefix ++: suffix :+ currDirPath)
+        services.foldersHistory.save(currDirPath)
       }
       ()
     }, List(currDirPath))
 
     if (props.showPopup) {
       <(fsFoldersPopup())(^.wrapped := FSFoldersPopupProps(
-        selected =
-          if (dirs.isEmpty) 0
-          else dirs.length - 1,
-        items = dirs,
-        onAction = { index =>
-          if (dirs.nonEmpty) {
-            props.onChangeDir(dirs(index))
-          }
-        },
+        onChangeDir = props.onChangeDir,
         onClose = props.onHidePopup
       ))()
     }
