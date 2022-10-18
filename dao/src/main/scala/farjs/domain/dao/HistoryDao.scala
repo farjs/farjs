@@ -12,7 +12,7 @@ abstract class HistoryDao(val ctx: FarjsDBContext,
 
   def getAll: Future[Seq[HistoryEntity]] = {
     ctx.performIO(ctx.runQuery(
-      sql = s"SELECT path, updated_at FROM $tableName ORDER BY updated_at",
+      sql = s"SELECT item, updated_at FROM $tableName ORDER BY updated_at",
       extractor = HistoryEntity.tupled
     ))
   }
@@ -20,9 +20,9 @@ abstract class HistoryDao(val ctx: FarjsDBContext,
   def save(entity: HistoryEntity): Future[Unit] = {
     val q = for {
       _ <- ctx.runAction(
-        sql = s"INSERT INTO $tableName (path, updated_at) VALUES (?, ?)" +
-          "ON CONFLICT (path) DO UPDATE SET updated_at = excluded.updated_at",
-        args = (entity.path, entity.updatedAt)
+        sql = s"INSERT INTO $tableName (item, updated_at) VALUES (?, ?)" +
+          "ON CONFLICT (item) DO UPDATE SET updated_at = excluded.updated_at",
+        args = (entity.item, entity.updatedAt)
       )
       _ <- ctx.runAction(
         sql = s"DELETE FROM $tableName WHERE updated_at < " +

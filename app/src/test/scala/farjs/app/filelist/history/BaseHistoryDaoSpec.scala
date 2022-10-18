@@ -10,12 +10,12 @@ abstract class BaseHistoryDaoSpec extends BaseDBContextSpec {
 
   protected def createDao(ctx: FarjsDBContext, maxItemsCount: Int = 10): HistoryDao
 
-  private val testItemPath = "test/path"
+  private val testItem = "test/item"
   
   it should "create new record when save" in withCtx { ctx =>
     //given
     val dao = createDao(ctx)
-    val entity = HistoryEntity(testItemPath, System.currentTimeMillis())
+    val entity = HistoryEntity(testItem, System.currentTimeMillis())
     val beforeF = dao.deleteAll()
     
     //when
@@ -39,9 +39,9 @@ abstract class BaseHistoryDaoSpec extends BaseDBContextSpec {
     
     //when
     val resultF = beforeF.flatMap { existing =>
-      existing.map(_.path) shouldBe List(testItemPath)
+      existing.map(_.item) shouldBe List(testItem)
       val entity = existing.head
-      val updated = HistoryEntity(testItemPath, entity.updatedAt + 1)
+      val updated = HistoryEntity(testItem, entity.updatedAt + 1)
       dao.save(updated).map { _ =>
         updated
       }
@@ -63,11 +63,11 @@ abstract class BaseHistoryDaoSpec extends BaseDBContextSpec {
     
     //when
     val resultF = beforeF.flatMap { existing =>
-      existing.map(_.path) shouldBe List(testItemPath)
+      existing.map(_.item) shouldBe List(testItem)
 
       val entity = existing.head
       Future.sequence((1 to 5).toList.map { i =>
-        dao.save(HistoryEntity(s"$testItemPath$i", entity.updatedAt + i))
+        dao.save(HistoryEntity(s"$testItem$i", entity.updatedAt + i))
       })
     }
 
@@ -76,10 +76,10 @@ abstract class BaseHistoryDaoSpec extends BaseDBContextSpec {
       _ <- resultF
       results <- dao.getAll
     } yield {
-      results.map(_.path) shouldBe List(
-        "test/path3",
-        "test/path4",
-        "test/path5"
+      results.map(_.item) shouldBe List(
+        "test/item3",
+        "test/item4",
+        "test/item5"
       )
     }
   }

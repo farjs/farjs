@@ -12,7 +12,7 @@ class FileListHistoryServiceImpl(dao: HistoryDao)
   extends FileListHistoryService {
 
   def getAll: Future[Seq[String]] = {
-    dao.getAll.map(_.map(_.path)).recover {
+    dao.getAll.map(_.map(_.item)).recover {
       case NonFatal(ex) =>
         Console.err.println(s"Failed to read history items, error: $ex")
         Nil
