@@ -1,15 +1,15 @@
-package farjs.app.filelist.fs
+package farjs.app.filelist
 
-import farjs.app.filelist.fs.FSFoldersService._
-import farjs.domain.HistoryFolder
-import farjs.domain.dao.HistoryFolderDao
+import farjs.domain.HistoryEntity
+import farjs.domain.dao.HistoryDao
 import farjs.filelist.history.FileListHistoryService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
-class FSFoldersService(dao: HistoryFolderDao) extends FileListHistoryService {
+class FileListHistoryServiceImpl(dao: HistoryDao)
+  extends FileListHistoryService {
 
   def getAll: Future[Seq[String]] = {
     dao.getAll.map(_.map(_.path)).recover {
@@ -20,15 +20,10 @@ class FSFoldersService(dao: HistoryFolderDao) extends FileListHistoryService {
   }
 
   def save(path: String): Future[Unit] = {
-    val entity = HistoryFolder(path, System.currentTimeMillis())
-    dao.save(entity, maxHistoryItemsCount).recover {
+    val entity = HistoryEntity(path, System.currentTimeMillis())
+    dao.save(entity).recover {
       case NonFatal(ex) =>
         Console.err.println(s"Failed to save history item, error: $ex")
     }
   }
-}
-
-object FSFoldersService {
-  
-  private val maxHistoryItemsCount = 100
 }

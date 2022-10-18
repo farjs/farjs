@@ -1,12 +1,10 @@
 package farjs.app
 
-import farjs.app.filelist.FileListRoot
-import farjs.app.filelist.fs.{FSFileListActions, FSFoldersService}
+import farjs.app.filelist.fs.FSFileListActions
+import farjs.app.filelist.{FileListModule, FileListRoot}
 import farjs.app.task.FarjsTaskController
 import farjs.app.util.DevTool
-import farjs.domain.dao.HistoryFolderDao
 import farjs.domain.{FarjsDBContext, FarjsDBMigrations}
-import farjs.filelist.FileListServices
 import farjs.ui.theme.{Theme, XTerm256Theme}
 import io.github.shogowada.scalajs.reactjs.redux.ReactRedux._
 import io.github.shogowada.scalajs.reactjs.redux.Redux
@@ -73,9 +71,8 @@ object FarjsApp {
       loadFileListUi = {
         prepareDB().map { db =>
           val ctx = new FarjsDBContext(db)
-          val folderDao = new HistoryFolderDao(ctx)
-          val foldersService = new FSFoldersService(folderDao)
-          new FileListRoot(new FileListServices(foldersService)).apply()
+          val fileListModule = new FileListModule(ctx)
+          new FileListRoot(fileListModule.services).apply()
         }
       },
       taskController = FarjsTaskController(),
