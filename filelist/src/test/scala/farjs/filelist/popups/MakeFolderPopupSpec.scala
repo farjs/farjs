@@ -1,15 +1,20 @@
 package farjs.filelist.popups
 
+import farjs.filelist.FileListServicesSpec.withServicesContext
+import farjs.filelist.history.MockFileListHistoryService
 import farjs.filelist.popups.MakeFolderPopup._
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.ModalProps
 import farjs.ui.theme.Theme
+import org.scalatest.{Assertion, Succeeded}
+import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
 
+import scala.concurrent.Future
 import scala.scalajs.js
 
-class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
+class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   MakeFolderPopup.modalComp = mockUiComponent("Modal")
   MakeFolderPopup.textLineComp = mockUiComponent("TextLine")
@@ -18,118 +23,189 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
   MakeFolderPopup.checkBoxComp = mockUiComponent("CheckBox")
   MakeFolderPopup.buttonsPanelComp = mockUiComponent("ButtonsPanel")
 
+  //noinspection TypeAnnotation
+  class HistoryService {
+    val getAll = mockFunction[Future[Seq[String]]]
+
+    val service = new MockFileListHistoryService(
+      getAllMock = getAll
+    )
+  }
+
   it should "set folderName when onChange in ComboBox" in {
     //given
     val folderName = "initial folder name"
-    val props = getMakeFolderPopupProps(folderName)
-    val renderer = createTestRenderer(<(MakeFolderPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(renderer.root, comboBoxComp, plain = true)
-    textBox.value shouldBe folderName
-    val newFolderName = "new folder name"
+    val props = getMakeFolderPopupProps()
+    val historyService = new HistoryService
+    val itemsF = Future.successful(List("folder", folderName))
+    historyService.getAll.expects().returning(itemsF)
 
-    //when
-    textBox.onChange(newFolderName)
+    val renderer = createTestRenderer(withServicesContext(
+      <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
+    ))
+    itemsF.flatMap { _ =>
+      val textBox = findComponentProps(renderer.root, comboBoxComp, plain = true)
+      textBox.value shouldBe folderName
+      val newFolderName = "new folder name"
 
-    //then
-    findComponentProps(renderer.root, comboBoxComp, plain = true).value shouldBe newFolderName
+      //when
+      textBox.onChange(newFolderName)
+
+      //then
+      findComponentProps(renderer.root, comboBoxComp, plain = true).value shouldBe newFolderName
+    }
   }
   
   it should "set multiple flag when onChange in CheckBox" in {
     //given
-    val props = getMakeFolderPopupProps("")
-    val renderer = createTestRenderer(<(MakeFolderPopup())(^.wrapped := props)())
-    val checkbox = findComponentProps(renderer.root, checkBoxComp, plain = true)
-    checkbox.value shouldBe false
+    val props = getMakeFolderPopupProps()
+    val historyService = new HistoryService
+    val itemsF = Future.successful(List("folder", "folder 2"))
+    historyService.getAll.expects().returning(itemsF)
 
-    //when
-    checkbox.onChange()
+    val renderer = createTestRenderer(withServicesContext(
+      <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
+    ))
+    itemsF.flatMap { _ =>
+      val checkbox = findComponentProps(renderer.root, checkBoxComp, plain = true)
+      checkbox.value shouldBe false
 
-    //then
-    findComponentProps(renderer.root, checkBoxComp, plain = true).value shouldBe true
+      //when
+      checkbox.onChange()
+
+      //then
+      findComponentProps(renderer.root, checkBoxComp, plain = true).value shouldBe true
+    }
   }
   
   it should "call onOk when onEnter in ComboBox" in {
     //given
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
-    val props = getMakeFolderPopupProps("test", multiple = true, onOk, onCancel)
-    val comp = testRender(<(MakeFolderPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(comp, comboBoxComp, plain = true)
+    val props = getMakeFolderPopupProps(multiple = true, onOk, onCancel)
+    val historyService = new HistoryService
+    val itemsF = Future.successful(List("folder", "test"))
+    historyService.getAll.expects().returning(itemsF)
 
-    //then
-    onOk.expects("test", true)
-    onCancel.expects().never()
+    val comp = createTestRenderer(withServicesContext(
+      <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
+    )).root
+    itemsF.flatMap { _ =>
+      val textBox = findComponentProps(comp, comboBoxComp, plain = true)
 
-    //when
-    textBox.onEnter.get.apply()
+      //then
+      onOk.expects("test", true)
+      onCancel.expects().never()
+
+      //when
+      textBox.onEnter.get.apply()
+
+      Succeeded
+    }
   }
   
   it should "call onOk when press OK button" in {
     //given
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
-    val props = getMakeFolderPopupProps("test", multiple = true, onOk, onCancel)
-    val comp = testRender(<(MakeFolderPopup())(^.wrapped := props)())
-    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
+    val props = getMakeFolderPopupProps(multiple = true, onOk, onCancel)
+    val historyService = new HistoryService
+    val itemsF = Future.successful(List("folder", "test"))
+    historyService.getAll.expects().returning(itemsF)
 
-    //then
-    onOk.expects("test", true)
-    onCancel.expects().never()
-    
-    //when
-    action.onAction()
+    val comp = createTestRenderer(withServicesContext(
+      <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
+    )).root
+    itemsF.flatMap { _ =>
+      val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
+
+      //then
+      onOk.expects("test", true)
+      onCancel.expects().never()
+
+      //when
+      action.onAction()
+
+      Succeeded
+    }
   }
   
   it should "not call onOk if folderName is empty" in {
     //given
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
-    val props = getMakeFolderPopupProps("", multiple = true, onOk, onCancel)
-    val comp = testRender(<(MakeFolderPopup())(^.wrapped := props)())
-    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
+    val props = getMakeFolderPopupProps(multiple = true, onOk, onCancel)
+    val historyService = new HistoryService
+    val itemsF = Future.successful(Nil)
+    historyService.getAll.expects().returning(itemsF)
 
-    //then
-    onOk.expects(*, *).never()
-    onCancel.expects().never()
-    
-    //when
-    action.onAction()
+    val comp = createTestRenderer(withServicesContext(
+      <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
+    )).root
+    itemsF.flatMap { _ =>
+      val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
+
+      //then
+      onOk.expects(*, *).never()
+      onCancel.expects().never()
+
+      //when
+      action.onAction()
+
+      Succeeded
+    }
   }
   
   it should "call onCancel when press Cancel button" in {
     //given
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
-    val props = getMakeFolderPopupProps("", onOk = onOk, onCancel = onCancel)
-    val comp = testRender(<(MakeFolderPopup())(^.wrapped := props)())
-    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions(1)
+    val props = getMakeFolderPopupProps(onOk = onOk, onCancel = onCancel)
+    val historyService = new HistoryService
+    val itemsF = Future.successful(Nil)
+    historyService.getAll.expects().returning(itemsF)
 
-    //then
-    onOk.expects(*, *).never()
-    onCancel.expects()
-    
-    //when
-    action.onAction()
+    val comp = createTestRenderer(withServicesContext(
+      <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
+    )).root
+    itemsF.flatMap { _ =>
+      val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions(1)
+
+      //then
+      onOk.expects(*, *).never()
+      onCancel.expects()
+
+      //when
+      action.onAction()
+
+      Succeeded
+    }
   }
   
   it should "render component" in {
     //given
-    val props = getMakeFolderPopupProps("test folder")
+    val props = getMakeFolderPopupProps()
+    val historyService = new HistoryService
+    val itemsF = Future.successful(List("folder", "folder 2"))
+    historyService.getAll.expects().returning(itemsF)
 
     //when
-    val result = testRender(<(MakeFolderPopup())(^.wrapped := props)())
+    val result = createTestRenderer(withServicesContext(
+      <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
+    )).root
 
     //then
-    assertMakeFolderPopup(result, props, List("[ OK ]", "[ Cancel ]"))
+    result.children.toList should be (empty)
+    itemsF.flatMap { items =>
+      result.children.toList should not be empty
+      assertMakeFolderPopup(result.children(0), props, items, List("[ OK ]", "[ Cancel ]"))
+    }
   }
 
-  private def getMakeFolderPopupProps(folderName: String,
-                                      multiple: Boolean = false,
+  private def getMakeFolderPopupProps(multiple: Boolean = false,
                                       onOk: (String, Boolean) => Unit = (_, _) => (),
                                       onCancel: () => Unit = () => ()): MakeFolderPopupProps = {
     MakeFolderPopupProps(
-      folderItems = List("folder", "folder 2"),
-      folderName = folderName,
       multiple = multiple,
       onOk = onOk,
       onCancel = onCancel
@@ -138,7 +214,8 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
 
   private def assertMakeFolderPopup(result: TestInstance,
                                     props: MakeFolderPopupProps,
-                                    actions: List[String]): Unit = {
+                                    items: List[String],
+                                    actions: List[String]): Assertion = {
     val (width, height) = (75, 10)
     val style = Theme.current.popup.regular
     
@@ -162,12 +239,12 @@ class MakeFolderPopupSpec extends TestSpec with TestRendererUtils {
             padding shouldBe 0
         }))(),
         <(comboBoxComp())(^.assertPlain[ComboBoxProps](inside(_) {
-          case ComboBoxProps(left, top, resWidth, items, resValue, _, _) =>
+          case ComboBoxProps(left, top, resWidth, resItems, resValue, _, _) =>
             left shouldBe 2
             top shouldBe 2
-            items.toList shouldBe props.folderItems
+            resItems.toList shouldBe items.reverse
             resWidth shouldBe (width - 10)
-            resValue shouldBe props.folderName
+            resValue shouldBe items.lastOption.getOrElse("")
         }))(),
         
         <(horizontalLineComp())(^.assertPlain[HorizontalLineProps](inside(_) {

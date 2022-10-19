@@ -1,8 +1,10 @@
 package farjs.filelist.popups
 
 import farjs.filelist.FileListActions._
+import farjs.filelist.FileListServicesSpec.withServicesContext
 import farjs.filelist._
 import farjs.filelist.api.FileListDir
+import farjs.filelist.history.MockFileListHistoryService
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.MakeFolderController._
 import org.scalatest.Succeeded
@@ -27,6 +29,15 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     )
   }
 
+  //noinspection TypeAnnotation
+  class HistoryService {
+    val save = mockFunction[String, Future[Unit]]
+
+    val service = new MockFileListHistoryService(
+      saveMock = save
+    )
+  }
+
   it should "call api and update state when OK action" in {
     //given
     val dispatch = mockFunction[Any, Any]
@@ -35,56 +46,36 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val state = FileListState(isActive = true, currDir = currDir)
     val props = PopupControllerProps(Some(FileListData(dispatch, actions.actions, state)),
       FileListPopupsState(showMkFolderPopup = true))
-    val renderer = createTestRenderer(<(MakeFolderController())(^.wrapped := props)())
+    val historyService = new HistoryService
+    val renderer = createTestRenderer(withServicesContext(
+      <(MakeFolderController())(^.wrapped := props)(), mkDirsHistory = historyService.service
+    ))
     val action = FileListDirCreateAction(
       FutureTask("Creating...", Future.successful(()))
     )
-    val dir1 = "test dir"
-    val dir2 = "test dir 2"
+    val saveF = Future.unit
+    val dir = "test dir"
     val multiple = true
 
     //then
-    actions.createDir.expects(dispatch, currDir.path, dir1, multiple).returning(action).twice()
-    actions.createDir.expects(dispatch, currDir.path, dir2, multiple).returning(action)
-    dispatch.expects(action).repeated(3)
-    dispatch.expects(FileListPopupMkFolderAction(show = false)).repeated(3)
+    actions.createDir.expects(dispatch, currDir.path, dir, multiple).returning(action)
+    historyService.save.expects(dir).returning(saveF)
+    dispatch.expects(action)
+    dispatch.expects(FileListPopupMkFolderAction(show = false))
 
+    //when
+    findComponentProps(renderer.root, makeFolderPopup).onOk(dir, multiple)
+    
+    //then
     for {
-      _ <- Future.unit
-
-      //when & then
-      _ = findComponentProps(renderer.root, makeFolderPopup).onOk(dir1, multiple)
-      _ <- action.task.future.map { _ =>
-        inside(findComponentProps(renderer.root, makeFolderPopup)) {
-          case MakeFolderPopupProps(folderItems, folderName, multiple, _, _) =>
-            folderItems shouldBe List(dir1)
-            folderName shouldBe dir1
-            multiple shouldBe multiple
-        }
+      _ <- action.task.future
+      _ <- saveF
+    } yield {
+      inside(findComponentProps(renderer.root, makeFolderPopup)) {
+        case MakeFolderPopupProps(resMultiple, _, _) =>
+          resMultiple shouldBe multiple
       }
-
-      //when & then
-      _ = findComponentProps(renderer.root, makeFolderPopup).onOk(dir2, multiple)
-      _ <- action.task.future.map { _ =>
-        inside(findComponentProps(renderer.root, makeFolderPopup)) {
-          case MakeFolderPopupProps(folderItems, folderName, multiple, _, _) =>
-            folderItems shouldBe List(dir2, dir1)
-            folderName shouldBe dir2
-            multiple shouldBe multiple
-        }
-      }
-
-      //when & then
-      _ = findComponentProps(renderer.root, makeFolderPopup).onOk(dir1, multiple)
-      _ <- action.task.future.map { _ =>
-        inside(findComponentProps(renderer.root, makeFolderPopup)) {
-          case MakeFolderPopupProps(folderItems, folderName, multiple, _, _) =>
-            folderItems shouldBe List(dir1, dir2)
-            folderName shouldBe dir1
-            multiple shouldBe multiple
-        }
-      }
-    } yield Succeeded
+    }
   }
 
   it should "dispatch FileListPopupMkFolderAction when Cancel action" in {
@@ -94,7 +85,10 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val state = FileListState()
     val props = PopupControllerProps(Some(FileListData(dispatch, actions.actions, state)),
       FileListPopupsState(showMkFolderPopup = true))
-    val comp = testRender(<(MakeFolderController())(^.wrapped := props)())
+    val historyService = new MockFileListHistoryService
+    val comp = testRender(withServicesContext(
+      <(MakeFolderController())(^.wrapped := props)(), mkDirsHistory = historyService
+    ))
     val popup = findComponentProps(comp, makeFolderPopup)
 
     //then
@@ -113,15 +107,16 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val state = FileListState()
     val props = PopupControllerProps(Some(FileListData(dispatch, actions.actions, state)),
       FileListPopupsState(showMkFolderPopup = true))
+    val historyService = new MockFileListHistoryService
 
     //when
-    val result = testRender(<(MakeFolderController())(^.wrapped := props)())
+    val result = testRender(withServicesContext(
+      <(MakeFolderController())(^.wrapped := props)(), mkDirsHistory = historyService
+    ))
 
     //then
     assertTestComponent(result, makeFolderPopup) {
-      case MakeFolderPopupProps(folderItems, folderName, multiple, _, _) =>
-        folderItems shouldBe Nil
-        folderName shouldBe ""
+      case MakeFolderPopupProps(multiple, _, _) =>
         multiple shouldBe false
     }
   }
@@ -133,9 +128,12 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val state = FileListState()
     val props = PopupControllerProps(Some(FileListData(dispatch, actions, state)),
       FileListPopupsState())
+    val historyService = new MockFileListHistoryService
 
     //when
-    val renderer = createTestRenderer(<(MakeFolderController())(^.wrapped := props)())
+    val renderer = createTestRenderer(withServicesContext(
+      <(MakeFolderController())(^.wrapped := props)(), mkDirsHistory = historyService
+    ))
 
     //then
     renderer.root.children.toList should be (empty)

@@ -1,5 +1,6 @@
 package farjs.filelist.popups
 
+import farjs.filelist.FileListServices
 import farjs.filelist.popups.FileListPopupsActions._
 import scommons.react._
 import scommons.react.hooks._
@@ -11,8 +12,7 @@ object MakeFolderController extends FunctionComponent[PopupControllerProps] {
   private[popups] var makeFolderPopup: UiComponent[MakeFolderPopupProps] = MakeFolderPopup
 
   protected def render(compProps: Props): ReactElement = {
-    val (folderItems, setFolderItems) = useState[List[String]](Nil)
-    val (folderName, setFolderName) = useState("")
+    val services = FileListServices.useServices
     val (multiple, setMultiple) = useState(false)
     val props = compProps.wrapped
     val popups = props.popups
@@ -20,8 +20,6 @@ object MakeFolderController extends FunctionComponent[PopupControllerProps] {
     props.data match {
       case Some(data) if popups.showMkFolderPopup =>
         <(makeFolderPopup())(^.wrapped := MakeFolderPopupProps(
-          folderItems = folderItems,
-          folderName = folderName,
           multiple = multiple,
           onOk = { (dir, multiple) =>
             val action = data.actions.createDir(
@@ -30,10 +28,12 @@ object MakeFolderController extends FunctionComponent[PopupControllerProps] {
               dir = dir,
               multiple = multiple
             )
-            action.task.future.foreach { _ =>
-              setFolderItems((dir :: folderItems).distinct)
-              setFolderName(dir)
+            for {
+              _ <- action.task.future
+              _ <- services.mkDirsHistory.save(dir)
+            } yield {
               setMultiple(multiple)
+
               data.dispatch(FileListPopupMkFolderAction(show = false))
             }
             data.dispatch(action)

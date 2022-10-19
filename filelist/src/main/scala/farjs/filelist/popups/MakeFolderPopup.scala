@@ -1,5 +1,6 @@
 package farjs.filelist.popups
 
+import farjs.filelist.FileListServices
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.ModalContent._
@@ -8,11 +9,10 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.hooks._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 
-case class MakeFolderPopupProps(folderItems: List[String],
-                                folderName: String,
-                                multiple: Boolean,
+case class MakeFolderPopupProps(multiple: Boolean,
                                 onOk: (String, Boolean) => Unit,
                                 onCancel: () => Unit)
 
@@ -26,8 +26,10 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
   private[popups] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
+    val services = FileListServices.useServices
+    val (maybeItems, setItems) = useState(Option.empty[List[String]])
     val props = compProps.wrapped
-    val (folderName, setFolderName) = useState(props.folderName)
+    val (folderName, setFolderName) = useState("")
     val (multiple, setMultiple) = useState(props.multiple)
     val size@(width, _) = (75, 10)
     val contentWidth = width - (paddingHorizontal + 2) * 2
@@ -45,63 +47,76 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
       ButtonsPanelAction("[ Cancel ]", props.onCancel)
     )
 
-    <(modalComp())(^.wrapped := ModalProps("Make Folder", size, theme, props.onCancel))(
-      <(textLineComp())(^.plain := TextLineProps(
-        align = TextAlign.left,
-        left = contentLeft,
-        top = 1,
-        width = contentWidth,
-        text = "Create the folder",
-        style = theme,
-        padding = 0
-      ))(),
-      <(comboBoxComp())(^.plain := ComboBoxProps(
-        left = contentLeft,
-        top = 2,
-        width = contentWidth,
-        items = js.Array(props.folderItems: _*),
-        value = folderName,
-        onChange = { value =>
-          setFolderName(value)
-        },
-        onEnter = onOk
-      ))(),
-      
-      <(horizontalLineComp())(^.plain := HorizontalLineProps(
-        left = 0,
-        top = 3,
-        length = width - paddingHorizontal * 2,
-        lineCh = SingleChars.horizontal,
-        style = theme,
-        startCh = DoubleChars.leftSingle,
-        endCh = DoubleChars.rightSingle
-      ))(),
-      <(checkBoxComp())(^.plain := CheckBoxProps(
-        left = contentLeft,
-        top = 4,
-        value = multiple,
-        label = "Process multiple names",
-        style = theme,
-        onChange = { () =>
-          setMultiple(!multiple)
+    useLayoutEffect({ () =>
+      services.mkDirsHistory.getAll.map { items =>
+        val itemsReversed = items.toList.reverse
+        itemsReversed.headOption.foreach { last =>
+          setFolderName(last)
         }
-      ))(),
-      
-      <(horizontalLineComp())(^.plain := HorizontalLineProps(
-        left = 0,
-        top = 5,
-        length = width - paddingHorizontal * 2,
-        lineCh = SingleChars.horizontal,
-        style = theme,
-        startCh = DoubleChars.leftSingle,
-        endCh = DoubleChars.rightSingle
-      ))(),
-      <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
-        top = 6,
-        actions = actions,
-        style = theme,
-        margin = 2
-      ))()
-    )
+        setItems(Some(itemsReversed))
+      }
+      ()
+    }, Nil)
+
+    maybeItems.map { items =>
+      <(modalComp())(^.wrapped := ModalProps("Make Folder", size, theme, props.onCancel))(
+        <(textLineComp())(^.plain := TextLineProps(
+          align = TextAlign.left,
+          left = contentLeft,
+          top = 1,
+          width = contentWidth,
+          text = "Create the folder",
+          style = theme,
+          padding = 0
+        ))(),
+        <(comboBoxComp())(^.plain := ComboBoxProps(
+          left = contentLeft,
+          top = 2,
+          width = contentWidth,
+          items = js.Array(items: _*),
+          value = folderName,
+          onChange = { value =>
+            setFolderName(value)
+          },
+          onEnter = onOk
+        ))(),
+        
+        <(horizontalLineComp())(^.plain := HorizontalLineProps(
+          left = 0,
+          top = 3,
+          length = width - paddingHorizontal * 2,
+          lineCh = SingleChars.horizontal,
+          style = theme,
+          startCh = DoubleChars.leftSingle,
+          endCh = DoubleChars.rightSingle
+        ))(),
+        <(checkBoxComp())(^.plain := CheckBoxProps(
+          left = contentLeft,
+          top = 4,
+          value = multiple,
+          label = "Process multiple names",
+          style = theme,
+          onChange = { () =>
+            setMultiple(!multiple)
+          }
+        ))(),
+        
+        <(horizontalLineComp())(^.plain := HorizontalLineProps(
+          left = 0,
+          top = 5,
+          length = width - paddingHorizontal * 2,
+          lineCh = SingleChars.horizontal,
+          style = theme,
+          startCh = DoubleChars.leftSingle,
+          endCh = DoubleChars.rightSingle
+        ))(),
+        <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
+          top = 6,
+          actions = actions,
+          style = theme,
+          margin = 2
+        ))()
+      )
+    }.orNull
   }
 }

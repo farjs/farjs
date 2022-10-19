@@ -1,6 +1,6 @@
 package farjs.filelist
 
-import farjs.filelist.history.FileListHistoryService
+import farjs.filelist.history._
 import scommons.react._
 import scommons.react.test._
 
@@ -43,10 +43,13 @@ class FileListServicesSpec extends TestSpec with TestRendererUtils {
 object FileListServicesSpec {
 
   def withServicesContext(element: ReactElement,
-                          foldersHistory: FileListHistoryService): ReactElement = {
+                          foldersHistory: FileListHistoryService = new MockFileListHistoryService,
+                          mkDirsHistory: FileListHistoryService = new MockFileListHistoryService
+                         ): ReactElement = {
 
     <(FileListServices.Context.Provider)(^.contextValue := FileListServices(
-      foldersHistory = foldersHistory
+      foldersHistory = foldersHistory,
+      mkDirsHistory = mkDirsHistory
     ))(
       element
     )
