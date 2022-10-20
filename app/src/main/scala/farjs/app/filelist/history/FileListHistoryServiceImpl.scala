@@ -1,4 +1,4 @@
-package farjs.app.filelist
+package farjs.app.filelist.history
 
 import farjs.domain.HistoryEntity
 import farjs.domain.dao.HistoryDao

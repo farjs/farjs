@@ -7,7 +7,8 @@ import scommons.react.hooks._
 import scala.scalajs.js
 
 case class FileListServices(foldersHistory: FileListHistoryService,
-                            mkDirsHistory: FileListHistoryService)
+                            mkDirsHistory: FileListHistoryService,
+                            selectPatternsHistory: FileListHistoryService)
 
 object FileListServices {
 

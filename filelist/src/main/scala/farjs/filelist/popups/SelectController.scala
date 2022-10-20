@@ -1,9 +1,9 @@
 package farjs.filelist.popups
 
 import farjs.filelist.FileListActions.FileListParamsChangedAction
+import farjs.filelist.FileListServices
 import farjs.filelist.popups.FileListPopupsActions._
 import scommons.react._
-import scommons.react.hooks._
 
 import java.util.regex.Pattern
 
@@ -12,20 +12,16 @@ object SelectController extends FunctionComponent[PopupControllerProps] {
   private[popups] var selectPopupComp: UiComponent[SelectPopupProps] = SelectPopup
 
   protected def render(compProps: Props): ReactElement = {
-    val (selectPatterns, setSelectPatterns) = useState[List[String]](Nil)
-    val (selectPattern, setSelectPattern) = useState("")
+    val services = FileListServices.useServices
     val props = compProps.wrapped
     val popups = props.popups
 
     props.data match {
       case Some(data) if popups.showSelectPopup != SelectHidden =>
         <(selectPopupComp())(^.wrapped := SelectPopupProps(
-          selectPatterns = selectPatterns,
-          pattern = selectPattern,
           action = popups.showSelectPopup,
           onAction = { pattern =>
-            setSelectPatterns((pattern :: selectPatterns).distinct)
-            setSelectPattern(pattern)
+            services.selectPatternsHistory.save(pattern)
 
             val regexes = pattern.split(';')
               .map(mask => Pattern.compile(fileMaskToRegex(mask)))

@@ -1,6 +1,7 @@
-package farjs.app.filelist
+package farjs.app.filelist.history
 
 import farjs.app.BaseDBContextSpec
+import farjs.app.filelist.FileListModule
 import farjs.domain.dao.HistoryDao
 import org.scalatest.Succeeded
 
