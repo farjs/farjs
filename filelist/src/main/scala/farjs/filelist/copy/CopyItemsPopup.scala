@@ -21,7 +21,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
 
   private[copy] var modalComp: UiComponent[ModalProps] = Modal
   private[copy] var textLineComp: UiComponent[TextLineProps] = TextLine
-  private[copy] var textBoxComp: UiComponent[TextBoxProps] = TextBox
+  private[copy] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
   private[copy] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
   private[copy] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
 
@@ -62,10 +62,11 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
         style = theme,
         padding = 0
       ))(),
-      <(textBoxComp())(^.plain := TextBoxProps(
+      <(comboBoxComp())(^.plain := ComboBoxProps(
         left = contentLeft,
         top = 2,
         width = contentWidth,
+        items = js.Array[String](),
         value = path,
         onChange = { value =>
           setPath(value)

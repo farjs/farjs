@@ -16,7 +16,7 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
 
   CopyItemsPopup.modalComp = mockUiComponent("Modal")
   CopyItemsPopup.textLineComp = mockUiComponent("TextLine")
-  CopyItemsPopup.textBoxComp = mockUiComponent("TextBox")
+  CopyItemsPopup.comboBoxComp = mockUiComponent("ComboBox")
   CopyItemsPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
   CopyItemsPopup.buttonsPanelComp = mockUiComponent("ButtonsPanel")
 
@@ -25,7 +25,7 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     val path = "initial path"
     val props = CopyItemsPopupProps(move = false, path, Seq(FileListItem("file 1")), _ => (), () => ())
     val renderer = createTestRenderer(<(CopyItemsPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(renderer.root, textBoxComp, plain = true)
+    val textBox = findComponentProps(renderer.root, comboBoxComp, plain = true)
     textBox.value shouldBe path
     val newFolderName = "new path"
 
@@ -33,7 +33,7 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     textBox.onChange(newFolderName)
 
     //then
-    findComponentProps(renderer.root, textBoxComp, plain = true).value shouldBe newFolderName
+    findComponentProps(renderer.root, comboBoxComp, plain = true).value shouldBe newFolderName
   }
   
   it should "call onAction when onEnter in TextBox" in {
@@ -42,7 +42,7 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = CopyItemsPopupProps(move = false, "test", Seq(FileListItem("file 1")), onAction, onCancel)
     val comp = testRender(<(CopyItemsPopup())(^.wrapped := props)())
-    val textBox = findComponentProps(comp, textBoxComp, plain = true)
+    val textBox = findComponentProps(comp, comboBoxComp, plain = true)
 
     //then
     onAction.expects("test")
@@ -151,11 +151,12 @@ class CopyItemsPopupSpec extends TestSpec with TestRendererUtils {
           focused shouldBe js.undefined
           padding shouldBe 0
       }
-      assertTestComponent(input, textBoxComp, plain = true) {
-        case TextBoxProps(left, top, resWidth, resValue, _, _) =>
+      assertTestComponent(input, comboBoxComp, plain = true) {
+        case ComboBoxProps(left, top, resWidth, resItems, resValue, _, _) =>
           left shouldBe 2
           top shouldBe 2
           resWidth shouldBe (width - (paddingHorizontal + 2) * 2)
+          resItems.toList shouldBe Nil
           resValue shouldBe props.path
       }
 
