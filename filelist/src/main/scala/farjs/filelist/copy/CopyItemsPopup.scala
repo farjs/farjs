@@ -1,5 +1,6 @@
 package farjs.filelist.copy
 
+import farjs.filelist.FileListServices
 import farjs.filelist.api.FileListItem
 import farjs.ui._
 import farjs.ui.border._
@@ -9,6 +10,7 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.hooks._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 
 case class CopyItemsPopupProps(move: Boolean,
@@ -26,6 +28,8 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
   private[copy] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
+    val services = FileListServices.useServices
+    val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
     val props = compProps.wrapped
     val (path, setPath) = useState(props.path)
     val size@(width, _) = (75, 8)
@@ -52,43 +56,53 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
       ButtonsPanelAction("[ Cancel ]", props.onCancel)
     )
 
-    <(modalComp())(^.wrapped := ModalProps(title, size, theme, props.onCancel))(
-      <(textLineComp())(^.plain := TextLineProps(
-        align = TextAlign.left,
-        left = contentLeft,
-        top = 1,
-        width = contentWidth,
-        text = s"$text $itemsText to:",
-        style = theme,
-        padding = 0
-      ))(),
-      <(comboBoxComp())(^.plain := ComboBoxProps(
-        left = contentLeft,
-        top = 2,
-        width = contentWidth,
-        items = js.Array[String](),
-        value = path,
-        onChange = { value =>
-          setPath(value)
-        },
-        onEnter = onCopy
-      ))(),
-      
-      <(horizontalLineComp())(^.plain := HorizontalLineProps(
-        left = 0,
-        top = 3,
-        length = width - paddingHorizontal * 2,
-        lineCh = SingleChars.horizontal,
-        style = theme,
-        startCh = DoubleChars.leftSingle,
-        endCh = DoubleChars.rightSingle
-      ))(),
-      <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
-        top = 4,
-        actions = actions,
-        style = theme,
-        margin = 2
-      ))()
-    )
+    useLayoutEffect({ () =>
+      services.copyItemsHistory.getAll.map { items =>
+        val itemsReversed = items.reverse
+        setItems(Some(js.Array(itemsReversed: _*)))
+      }
+      ()
+    }, Nil)
+
+    maybeItems.map { items =>
+      <(modalComp())(^.wrapped := ModalProps(title, size, theme, props.onCancel))(
+        <(textLineComp())(^.plain := TextLineProps(
+          align = TextAlign.left,
+          left = contentLeft,
+          top = 1,
+          width = contentWidth,
+          text = s"$text $itemsText to:",
+          style = theme,
+          padding = 0
+        ))(),
+        <(comboBoxComp())(^.plain := ComboBoxProps(
+          left = contentLeft,
+          top = 2,
+          width = contentWidth,
+          items = items,
+          value = path,
+          onChange = { value =>
+            setPath(value)
+          },
+          onEnter = onCopy
+        ))(),
+        
+        <(horizontalLineComp())(^.plain := HorizontalLineProps(
+          left = 0,
+          top = 3,
+          length = width - paddingHorizontal * 2,
+          lineCh = SingleChars.horizontal,
+          style = theme,
+          startCh = DoubleChars.leftSingle,
+          endCh = DoubleChars.rightSingle
+        ))(),
+        <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
+          top = 4,
+          actions = actions,
+          style = theme,
+          margin = 2
+        ))()
+      )
+    }.orNull
   }
 }

@@ -8,7 +8,8 @@ import scala.scalajs.js
 
 case class FileListServices(foldersHistory: FileListHistoryService,
                             mkDirsHistory: FileListHistoryService,
-                            selectPatternsHistory: FileListHistoryService)
+                            selectPatternsHistory: FileListHistoryService,
+                            copyItemsHistory: FileListHistoryService)
 
 object FileListServices {
 

@@ -1,13 +1,15 @@
 package farjs.filelist.copy
 
 import farjs.filelist.FileListActions._
+import farjs.filelist.FileListServicesSpec.withServicesContext
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.copy.CopyItems._
+import farjs.filelist.copy.CopyItemsSpec._
+import farjs.filelist.history.{FileListHistoryService, MockFileListHistoryService}
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.FileListPopupsState
-import farjs.filelist.stack.WithPanelStacksSpec.withContext
-import farjs.filelist.stack.{PanelStack, PanelStackItem}
+import farjs.filelist.stack.{PanelStack, PanelStackItem, WithPanelStacksSpec}
 import farjs.ui.popup.MessageBoxProps
 import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
@@ -16,6 +18,7 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 import scommons.react.redux.Dispatch
 import scommons.react.redux.task.FutureTask
+import scommons.react._
 import scommons.react.test._
 
 import scala.concurrent.Future
@@ -39,6 +42,15 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       getDriveRootMock = getDriveRoot,
       updateDirMock = updateDir,
       readDirMock = readDir
+    )
+  }
+
+  //noinspection TypeAnnotation
+  class HistoryService {
+    val save = mockFunction[String, Future[Unit]]
+
+    val service = new MockFileListHistoryService(
+      saveMock = save
     )
   }
 
@@ -705,8 +717,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val rightStack = new PanelStack(isActive = false, List(
       PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions.actions), Some(toState))
     ), null)
+    val historyService = new HistoryService
     val renderer = createTestRenderer(
-      withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack, historyService.service)
     )
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
 
@@ -721,7 +734,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     
     TestRenderer.act { () =>
       renderer.update(
-        withContext(<(CopyItems())(^.wrapped := FileListPopupsState())(), leftStack, rightStack)
+        withContext(<(CopyItems())(^.wrapped := FileListPopupsState())(), leftStack, rightStack, historyService.service)
       )
     }
 
@@ -746,6 +759,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
         index = 1,
         selectedNames = Set("file 1")
       ))
+      historyService.save.expects(to).returning(Future.unit)
       fromActions.updateDir.expects(fromDispatch, leftDir.path).returning(leftAction)
       toActions.updateDir.expects(toDispatch, rightDir.path).returning(rightAction)
       fromDispatch.expects(leftAction)
@@ -786,8 +800,9 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val rightStack = new PanelStack(isActive = false, List(
       PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(toDispatch), Some(toActions.actions), Some(toState))
     ), null)
+    val historyService = new HistoryService
     val renderer = createTestRenderer(
-      withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(CopyItems())(^.wrapped := props)(), leftStack, rightStack, historyService.service)
     )
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
     val to = "test to path"
@@ -796,7 +811,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     TestRenderer.act { () =>
       renderer.update(
-        withContext(<(CopyItems())(^.wrapped := FileListPopupsState())(), leftStack, rightStack)
+        withContext(<(CopyItems())(^.wrapped := FileListPopupsState())(), leftStack, rightStack, historyService.service)
       )
     }
 
@@ -815,6 +830,7 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       val leftAction = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
 
       //then
+      historyService.save.expects(to).returning(Future.unit)
       fromActions.updateDir.expects(fromDispatch, leftDir.path).returning(leftAction)
       fromDispatch.expects(leftAction)
       fromDispatch.expects(FileListItemCreatedAction(to, updatedDir))
@@ -1040,5 +1056,20 @@ class CopyItemsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
           resItems shouldBe List(item)
       }
     }
+  }
+}
+
+object CopyItemsSpec {
+
+  def withContext(element: ReactElement,
+                  leftStack: PanelStack,
+                  rightStack: PanelStack,
+                  copyItemsHistory: FileListHistoryService = new MockFileListHistoryService
+                 ): ReactElement = {
+
+    withServicesContext(
+      WithPanelStacksSpec.withContext(element, leftStack, rightStack),
+      copyItemsHistory = copyItemsHistory
+    )
   }
 }

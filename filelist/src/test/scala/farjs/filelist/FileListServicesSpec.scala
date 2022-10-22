@@ -45,13 +45,15 @@ object FileListServicesSpec {
   def withServicesContext(element: ReactElement,
                           foldersHistory: FileListHistoryService = new MockFileListHistoryService,
                           mkDirsHistory: FileListHistoryService = new MockFileListHistoryService,
-                          selectPatternsHistory: FileListHistoryService = new MockFileListHistoryService
+                          selectPatternsHistory: FileListHistoryService = new MockFileListHistoryService,
+                          copyItemsHistory: FileListHistoryService = new MockFileListHistoryService
                          ): ReactElement = {
 
     <(FileListServices.Context.Provider)(^.contextValue := FileListServices(
       foldersHistory = foldersHistory,
       mkDirsHistory = mkDirsHistory,
-      selectPatternsHistory = selectPatternsHistory
+      selectPatternsHistory = selectPatternsHistory,
+      copyItemsHistory = copyItemsHistory
     ))(
       element
     )

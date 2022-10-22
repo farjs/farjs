@@ -5,7 +5,7 @@ import farjs.filelist.api.FileListItem
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.FileListPopupsState
 import farjs.filelist.stack.{PanelStack, WithPanelStacks}
-import farjs.filelist.{FileListData, FileListState}
+import farjs.filelist.{FileListData, FileListServices, FileListState}
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
 import scommons.nodejs.path
@@ -27,9 +27,10 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
   private[copy] var moveProcessComp: UiComponent[MoveProcessProps] = MoveProcess
 
   protected def render(compProps: Props): ReactElement = {
+    val services = FileListServices.useServices
     val stacks = WithPanelStacks.usePanelStacks
     val (maybeTotal, setTotal) = useState[Option[Double]](None)
-    val (maybeToPath, setToPath) = useState[Option[String]](None)
+    val (maybeToPath, setToPath) = useState[Option[(String, String)]](None)
     val (inplace, setInplace) = useState(false)
     val (move, setMove) = useState(false)
     val (showStats, setShowStats) = useState(false)
@@ -66,7 +67,7 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
 
       def onTopItem(item: FileListItem): Unit = copied.current += item.name
 
-      def onDone(toPath: String): () => Unit = { () =>
+      def onDone(path: String, toPath: String): () => Unit = { () =>
         val updatedSelection = from.state.selectedNames -- copied.current
         if (updatedSelection != from.state.selectedNames) {
           from.dispatch(FileListParamsChangedAction(
@@ -78,6 +79,8 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
 
         val isInplace = inplace
         onCancel(dispatchAction = false)()
+
+        services.copyItemsHistory.save(path)
 
         val updateAction = from.actions.updateDir(from.dispatch, from.path)
         from.dispatch(updateAction)
@@ -117,7 +120,7 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
           setMove(move)
           from.dispatch(FileListPopupCopyMoveAction(CopyMoveHidden))
 
-          setToPath(Some(toPath))
+          setToPath(Some(path -> toPath))
           if (move && sameDrive) setShowMove(true)
           else setShowStats(true)
         }
@@ -137,7 +140,7 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
         dirF
       }
 
-      val maybeError = maybeToPath.filter(_ => !inplace).flatMap { toPath =>
+      val maybeError = maybeToPath.filter(_ => !inplace).flatMap { case (_, toPath) =>
         val op = if (move) "move" else "copy"
         if (from.path == toPath) Some {
           s"Cannot $op the item\n${items.head.name}\nonto itself"
@@ -186,7 +189,7 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
             onCancel = onCancel(dispatchAction = false)
           ))()
         }
-        else if (showMove) maybeToPath.map { toPath =>
+        else if (showMove) maybeToPath.map { case (path, toPath) =>
           <(moveProcessComp())(^.wrapped := MoveProcessProps(
             dispatch = from.dispatch,
             actions = from.actions,
@@ -198,12 +201,12 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
               if (!inplace) toPath
               else from.path,
             onTopItem = onTopItem,
-            onDone = onDone(toPath)
+            onDone = onDone(path, toPath)
           ))()
         }
         else {
           for {
-            toPath <- maybeToPath
+            (path, toPath) <- maybeToPath
             total <- maybeTotal
           } yield {
             <(copyProcessComp())(^.wrapped := CopyProcessProps(
@@ -221,7 +224,7 @@ object CopyItems extends FunctionComponent[FileListPopupsState] {
                 else from.path,
               total = total,
               onTopItem = onTopItem,
-              onDone = onDone(toPath)
+              onDone = onDone(path, toPath)
             ))()
           }
         }

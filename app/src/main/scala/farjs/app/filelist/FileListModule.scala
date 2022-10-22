@@ -16,9 +16,13 @@ class FileListModule(ctx: FarjsDBContext) {
   val selectPatternDao = new HistorySelectPatternDao(ctx)
   val selectPatternService = new FileListHistoryServiceImpl(selectPatternDao)
 
+  val copyItemDao = new HistoryCopyItemDao(ctx)
+  val copyItemService = new FileListHistoryServiceImpl(copyItemDao)
+
   val services = new FileListServices(
     foldersHistory = folderService,
     mkDirsHistory = mkDirService,
-    selectPatternsHistory = selectPatternService
+    selectPatternsHistory = selectPatternService,
+    copyItemsHistory = copyItemService
   )
 }
