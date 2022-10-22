@@ -27,7 +27,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val services = FileListServices.useServices
-    val (maybeItems, setItems) = useState(Option.empty[List[String]])
+    val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
     val props = compProps.wrapped
     val (folderName, setFolderName) = useState("")
     val (multiple, setMultiple) = useState(props.multiple)
@@ -49,11 +49,11 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
 
     useLayoutEffect({ () =>
       services.mkDirsHistory.getAll.map { items =>
-        val itemsReversed = items.toList.reverse
+        val itemsReversed = items.reverse
         itemsReversed.headOption.foreach { last =>
           setFolderName(last)
         }
-        setItems(Some(itemsReversed))
+        setItems(Some(js.Array(itemsReversed: _*)))
       }
       ()
     }, Nil)
@@ -73,7 +73,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           left = contentLeft,
           top = 2,
           width = contentWidth,
-          items = js.Array(items: _*),
+          items = items,
           value = folderName,
           onChange = { value =>
             setFolderName(value)

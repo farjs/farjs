@@ -23,7 +23,7 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val services = FileListServices.useServices
-    val (maybeItems, setItems) = useState(Option.empty[List[String]])
+    val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
     val props = compProps.wrapped
     val (pattern, setPattern) = useState("")
     val size@(width, _) = (55, 5)
@@ -39,11 +39,11 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
     
     useLayoutEffect({ () =>
       services.selectPatternsHistory.getAll.map { items =>
-        val itemsReversed = items.toList.reverse
+        val itemsReversed = items.reverse
         itemsReversed.headOption.foreach { last =>
           setPattern(last)
         }
-        setItems(Some(itemsReversed))
+        setItems(Some(js.Array(itemsReversed: _*)))
       }
       ()
     }, Nil)
@@ -61,7 +61,7 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
           left = contentLeft,
           top = 1,
           width = contentWidth,
-          items = js.Array(items: _*),
+          items = items,
           value = pattern,
           onChange = { value =>
             setPattern(value)
