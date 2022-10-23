@@ -34,10 +34,9 @@ class FSFileListApi extends FileListApi {
         toFileListItem(targetDir, name)
       }
 
-      val pathObj = path.parse(targetDir)
       FileListDir(
         path = targetDir,
-        isRoot = pathObj.root == pathObj.dir && pathObj.base.getOrElse("").isEmpty,
+        isRoot = isRoot(targetDir),
         items = items
       )
     }
@@ -79,11 +78,13 @@ class FSFileListApi extends FileListApi {
           if (name.isEmpty) parent
           else {
             val dir = path.join(parent, name)
-            try {
-              fs.mkdirSync(dir)
-            }
-            catch {
-              case JavaScriptException(error: raw.Error) if error.code == "EEXIST" => //skip
+            if (parent.nonEmpty || !isRoot(dir)) {
+              try {
+                fs.mkdirSync(dir)
+              }
+              catch {
+                case JavaScriptException(error: raw.Error) if error.code == "EEXIST" => //skip
+              }
             }
             dir
           }
@@ -166,6 +167,13 @@ class FSFileListApi extends FileListApi {
         }
       }
     }
+  }
+  
+  private def isRoot(dir: String): Boolean = {
+    val pathObj = path.parse(dir)
+
+    pathObj.root == pathObj.dir &&
+      pathObj.base.getOrElse("").isEmpty
   }
 
   private def toFileListItem(targetDir: String, name: String): FileListItem = {

@@ -249,6 +249,33 @@ class FSFileListApiSpec extends AsyncTestSpec {
     }
   }
   
+  it should "skip root directory creation when mkDirs" in {
+    //given
+    val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"))
+    fs.existsSync(tmpDir) shouldBe true
+    val tmpDirObj = path.parse(tmpDir)
+    val tmpRoot = tmpDirObj.root.getOrElse("")
+    tmpRoot should not be empty
+    val tmpRest = tmpDir.stripPrefix(tmpRoot).stripPrefix(path.sep)
+    val dir = "skip_root_dir_creation_test"
+    fs.existsSync(path.join(tmpRoot, tmpRest, dir)) shouldBe false
+
+    //when
+    val resultF = apiImp.mkDirs(List(tmpRoot, tmpRest, dir))
+
+    //then
+    val resCheckF = resultF.map { _ =>
+      fs.existsSync(path.join(tmpRoot, tmpRest, dir)) shouldBe true
+    }
+
+    //cleanup
+    resCheckF.map { _ =>
+      del(path.join(tmpRoot, tmpRest, dir), isDir = true)
+      del(tmpDir, isDir = true)
+      fs.existsSync(path.join(tmpRoot, tmpRest, dir)) shouldBe false
+    }
+  }
+  
   it should "copy new file when readFile/writeFile" in {
     //given
     val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"))
