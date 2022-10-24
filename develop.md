@@ -26,7 +26,7 @@ sbt -mem 2048
 
 #console 2:
 cd ./app/target/scala-2.13/scalajs-bundler/main/
-./node_modules/webpack/bin/webpack.js --watch --config ./reload.webpack.config.js
+node ./node_modules/webpack/bin/webpack.js --watch --config ./reload.webpack.config.js
 
 #console 3:
 node ./app/target/scala-2.13/scalajs-bundler/main/dist/bundle.js
