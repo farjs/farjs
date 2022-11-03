@@ -4,7 +4,7 @@
 
 To build and run all the tests use the following command:
 ```bash
-sbt -mem 2048 test
+sbt test
 ```
 
 ### How to Run
@@ -20,7 +20,7 @@ node ./app/target/scala-2.13/scalajs-bundler/main/farjs-app-fastopt-bundle.js
 
 ```bash
 #console 1:
-sbt -mem 2048
+sbt
 >project farjs-app
 >~fastOptJS
 

@@ -3,8 +3,8 @@ package definitions
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
 import sbt._
-import scalajsbundler.BundlingMode
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
+import scalajsbundler.{BundlingMode, NpmPackage, Webpack}
 import scommons.sbtplugin.ScommonsPlugin.autoImport._
 import scoverage.ScoverageKeys.coverageExcludedPackages
 
@@ -33,7 +33,6 @@ object FarjsApp extends ScalaJsModule {
 
       scalaJSUseMainModuleInitializer := false,
       webpackBundlingMode := BundlingMode.Application,
-      webpack / version := "4.29.0",
 
       webpackResources := {
         baseDirectory.value / ".." / "LICENSE.txt" +++
@@ -49,7 +48,44 @@ object FarjsApp extends ScalaJsModule {
         baseDirectory.value / "src" / "main" / "resources" / "prod.webpack.config.js"
       ),
       //tests
-      scommonsRequireWebpackInTest := true,
+      scommonsRequireWebpackInTest := false,
+      Test / fastOptJS := {
+        val logger = streams.value.log
+        val bundleOutput = (Test / fastOptJS).value
+        val targetDir = bundleOutput.data.getParentFile
+
+        val customWebpackConfigFile = (Test / webpackConfigFile).value
+        val nodeArgs = (Test / webpackNodeArgs).value
+        val bundleName = bundleOutput.data.name.stripSuffix(".js")
+        val webpackOutput = targetDir / s"$bundleName-webpack-out.js"
+        val webpackVersion = (webpack / version).value
+
+        logger.info("Executing webpack...")
+        val loader = bundleOutput.data
+        val configArgs = customWebpackConfigFile match {
+          case Some(configFile) =>
+            val customConfigFileCopy = Webpack.copyCustomWebpackConfigFiles(targetDir, webpackResources.value.get)(configFile)
+            Seq("--config", customConfigFileCopy.getAbsolutePath)
+          case None =>
+            Seq.empty
+        }
+
+        val allArgs = Seq(
+          "--entry", loader.absolutePath,
+          "--output-path", targetDir.absolutePath,
+          "--output-filename", webpackOutput.name
+        ) ++ configArgs
+
+        NpmPackage(webpackVersion).major match {
+          case Some(5) =>
+            Webpack.run(nodeArgs: _*)(allArgs: _*)(targetDir, logger)
+          case Some(x) =>
+            sys.error(s"Unsupported webpack major version $x")
+          case None =>
+            sys.error("No webpack version defined")
+        }
+        Attributed(webpackOutput)(bundleOutput.metadata)
+      },
       Test / webpackConfigFile := Some(
         baseDirectory.value / "src" / "main" / "resources" / "test.webpack.config.js"
       ),
@@ -58,8 +94,8 @@ object FarjsApp extends ScalaJsModule {
       //yarnExtraArgs := Seq("--frozen-lockfile"),
 
       Compile / npmDevDependencies ++= Seq(
-        "webpack-merge" -> "4.1.0",
-        "webpack-node-externals" -> "1.7.2"
+        "webpack-merge" -> "5.8.0",
+        "webpack-node-externals" -> "3.0.0"
       ),
 
       Compile / additionalNpmConfig := {

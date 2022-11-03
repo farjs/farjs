@@ -1,10 +1,17 @@
 package definitions
 
 import common.{Libs, TestLibs}
+import sbt.Keys._
 import sbt._
+import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
 import scommons.sbtplugin.project.CommonNodeJsModule
 
 trait ScalaJsModule extends FarjsModule with CommonNodeJsModule {
+
+  override def definition: Project = {
+    super.definition
+      .settings(ScalaJsModule.settings: _*)
+  }
 
   override def superRepoProjectsDependencies: Seq[(String, String, Option[String])] = {
     super.superRepoProjectsDependencies ++ Seq(
@@ -27,4 +34,11 @@ trait ScalaJsModule extends FarjsModule with CommonNodeJsModule {
       TestLibs.scommonsReactTest.value
     ).map(_ % "test")
   }
+}
+
+object ScalaJsModule {
+
+  val settings: Seq[Setting[_]] = Seq(
+    webpack / version := "5.74.0"
+  )
 }
