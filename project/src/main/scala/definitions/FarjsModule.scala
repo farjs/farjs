@@ -1,6 +1,7 @@
 package definitions
 
 import common.Libs
+import org.scoverage.coveralls.Imports.CoverallsKeys._
 import sbt.Keys._
 import sbt._
 import scommons.sbtplugin.project.CommonModule
@@ -22,6 +23,9 @@ object FarjsModule {
 
   val settings: Seq[Setting[_]] = Seq(
     organization := "org.scommons.farjs",
+
+    coverallsFailBuildOnError := true,
+    coverallsService := None,
     
     //
     // publish/release related settings:

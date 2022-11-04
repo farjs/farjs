@@ -62,8 +62,8 @@
     "websql": "2.0.3"
   },
   "devDependencies": {
-    "webpack-node-externals": "1.7.2",
-    "webpack-merge": "4.1.0",
-    "webpack": "4.29.0"
+    "webpack-node-externals": "3.0.0",
+    "webpack-merge": "5.8.0",
+    "webpack": "5.74.0"
   }
 }

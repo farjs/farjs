@@ -20,7 +20,7 @@ module.exports = {
   
   externals: [
     nodeExternals({ // in order to ignore modules in node_modules folder from bundling
-      whitelist: ['webpack/hot/poll?1000', 'react-redux']
+      allowlist: ['webpack/hot/poll?1000', 'react-redux']
     }),
     { "react-redux": "commonjs react-redux/lib/alternate-renderers" }
   ],

@@ -6,7 +6,7 @@ module.exports = {
 
   externals: [
     nodeExternals({ // in order to ignore all modules in node_modules folder from bundling
-      whitelist: ['react-redux']
+      allowlist: ['react-redux']
     }),
     { "react-redux": "commonjs react-redux/lib/alternate-renderers" }
   ]
