@@ -174,7 +174,7 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
 
   it should "escape special chars when fileMaskToRegex" in {
     //when & then
-    fileMaskToRegex("()[]{}+-!*?") shouldBe "^\\(\\)\\[\\]\\{\\}\\+-!.*?.$"
+    fileMaskToRegex("aa()[]{}+-^$!*?bb") shouldBe "^aa\\(\\)\\[\\]\\{\\}\\+\\-\\^\\$!.*?.bb$"
   }
 
   it should "match against simple file mask" in {
@@ -185,6 +185,7 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     "file.ssame".matches(fileMaskToRegex("file.??ame")) shouldBe true
     "file.same".matches(fileMaskToRegex("file.?ame")) shouldBe true
     "file.name".matches(fileMaskToRegex("file.name")) shouldBe true
+    "^file$.name".matches(fileMaskToRegex("^file$.name")) shouldBe true
     "file()[]{}+-!.name".matches(fileMaskToRegex("file()[]{}+-!.name")) shouldBe true
     ".name".matches(fileMaskToRegex("*.name")) shouldBe true
     "file.name".matches(fileMaskToRegex("*.name")) shouldBe true

@@ -5,6 +5,7 @@ import sbt.Keys._
 import sbt._
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
 import scommons.sbtplugin.project.CommonNodeJsModule
+import scoverage.ScoverageKeys.{coverageEnabled, coverageScalacPluginVersion}
 
 trait ScalaJsModule extends FarjsModule with CommonNodeJsModule {
 
@@ -14,12 +15,13 @@ trait ScalaJsModule extends FarjsModule with CommonNodeJsModule {
   }
 
   override def superRepoProjectsDependencies: Seq[(String, String, Option[String])] = {
-    super.superRepoProjectsDependencies ++ Seq(
-      ("scommons-react", "scommons-react-core", None),
-      ("scommons-react", "scommons-react-redux", None),
-
-      ("scommons-react", "scommons-react-test", Some("test"))
-    )
+    Nil
+//    super.superRepoProjectsDependencies ++ Seq(
+//      ("scommons-react", "scommons-react-core", None),
+//      ("scommons-react", "scommons-react-redux", None),
+//
+//      ("scommons-react", "scommons-react-test", Some("test"))
+//    )
   }
 
   override def runtimeDependencies: Def.Initialize[Seq[ModuleID]] = Def.setting {
@@ -39,6 +41,32 @@ trait ScalaJsModule extends FarjsModule with CommonNodeJsModule {
 object ScalaJsModule {
 
   val settings: Seq[Setting[_]] = Seq(
-    webpack / version := "5.74.0"
+    webpack / version := "5.74.0",
+
+    scalaVersion := "2.13.6",
+    scalacOptions ++= Seq(
+      //see:
+      //  http://www.scala-js.org/news/2021/12/10/announcing-scalajs-1.8.0/
+      "-P:scalajs:nowarnGlobalExecutionContext"
+    ),
+
+    //NOTE:
+    // we explicitly set scoverage runtime/plugin version that supports scalaVersion
+    // instead of upgrading sbt-scoverage plugin since its newer versions are 10x slower!!!
+    //
+    coverageScalacPluginVersion := "1.4.11",
+    libraryDependencies ~= { modules =>
+      modules.filter(_.organization != "org.scoverage")
+    },
+    libraryDependencies ++= {
+      if (coverageEnabled.value) {
+        val scalaVer = scalaVersion.value
+        Seq(
+          "org.scoverage" %% "scalac-scoverage-runtime_sjs1" % coverageScalacPluginVersion.value,
+          "org.scoverage" % s"scalac-scoverage-plugin_$scalaVer" % coverageScalacPluginVersion.value % "scoveragePlugin"
+        )
+      }
+      else Nil
+    }
   )
 }

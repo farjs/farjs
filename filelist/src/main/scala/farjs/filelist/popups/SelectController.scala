@@ -56,9 +56,21 @@ object SelectController extends FunctionComponent[PopupControllerProps] {
   //
   private[popups] def fileMaskToRegex(mask: String): String = {
     "^" +
-      Pattern.quote(mask)
+      escapeSpecials(mask)
+        .replace("$", "\\$")
         .replace("\\*", ".*?")
         .replace("\\?", ".") +
       "$"
+  }
+  
+  private val escapeRegex = """[.*+\-?^{}()|\[\]\\]""".r
+  
+  // got from:
+  //   https://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript/63838890#63838890
+  //
+  private def escapeSpecials(regex: String): String = {
+    escapeRegex.replaceAllIn(regex, { group =>
+      s"\\\\${group.matched}"
+    })
   }
 }

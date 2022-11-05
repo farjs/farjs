@@ -27,10 +27,11 @@ object FarjsDao extends FarjsModule with CommonNodeJsModule {
   override def internalDependencies: Seq[ClasspathDep[ProjectReference]] = Nil
 
   override def superRepoProjectsDependencies: Seq[(String, String, Option[String])] = {
-    super.superRepoProjectsDependencies ++ Seq(
-      ("scommons-websql", "scommons-websql-migrations", None),
-      ("scommons-websql", "scommons-websql-io", None)
-    )
+    Nil
+//    super.superRepoProjectsDependencies ++ Seq(
+//      ("scommons-websql", "scommons-websql-migrations", None),
+//      ("scommons-websql", "scommons-websql-io", None)
+//    )
   }
   
   override def runtimeDependencies: Def.Initialize[Seq[ModuleID]] = Def.setting {
