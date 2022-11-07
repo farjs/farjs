@@ -23,7 +23,9 @@ object FarjsApp extends ScalaJsModule {
 
       scommonsBundlesFileFilter := "*.sql",
 
-      coverageExcludedPackages := "farjs.app.FarjsApp",
+      coverageExcludedPackages :=
+        "farjs.app.FarjsApp" +
+          ";farjs.app.filelist.zip.ZipApi", // avoid "Found a dangling UndefinedParam" during test with coverage
 
       //TODO: temporarily disabled
       //  @see: https://github.com/scalameta/metabrowse/issues/271

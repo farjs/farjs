@@ -33,7 +33,8 @@ trait ScalaJsModule extends FarjsModule with CommonNodeJsModule {
 
   override def testDependencies: Def.Initialize[Seq[ModuleID]] = Def.setting {
     super.testDependencies.value ++ Seq(
-      TestLibs.scommonsReactTest.value
+      TestLibs.scommonsReactTest.value,
+      TestLibs.scalaJsJavaSecureRandom.value
     ).map(_ % "test")
   }
 }
@@ -43,7 +44,7 @@ object ScalaJsModule {
   val settings: Seq[Setting[_]] = Seq(
     webpack / version := "5.74.0",
 
-    scalaVersion := "2.13.6",
+    scalaVersion := "2.13.8",
     scalacOptions ++= Seq(
       //see:
       //  http://www.scala-js.org/news/2021/12/10/announcing-scalajs-1.8.0/
@@ -52,7 +53,7 @@ object ScalaJsModule {
 
     //NOTE:
     // we explicitly set scoverage runtime/plugin version that supports scalaVersion
-    // instead of upgrading sbt-scoverage plugin since its newer versions are 10x slower!!!
+    // instead of upgrading sbt-scoverage plugin since its newer versions (1.8+) are 10x slower!!!
     //
     coverageScalacPluginVersion := "1.4.11",
     libraryDependencies ~= { modules =>
