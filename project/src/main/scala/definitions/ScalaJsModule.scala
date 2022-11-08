@@ -5,7 +5,6 @@ import sbt.Keys._
 import sbt._
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
 import scommons.sbtplugin.project.CommonNodeJsModule
-import scoverage.ScoverageKeys.{coverageEnabled, coverageScalacPluginVersion}
 
 trait ScalaJsModule extends FarjsModule with CommonNodeJsModule {
 
@@ -50,24 +49,9 @@ object ScalaJsModule {
       //  http://www.scala-js.org/news/2021/12/10/announcing-scalajs-1.8.0/
       "-P:scalajs:nowarnGlobalExecutionContext"
     ),
-
-    //NOTE:
-    // we explicitly set scoverage runtime/plugin version that supports scalaVersion
-    // instead of upgrading sbt-scoverage plugin since its newer versions (1.8+) are 10x slower!!!
-    //
-    coverageScalacPluginVersion := "1.4.11",
-    libraryDependencies ~= { modules =>
-      modules.filter(_.organization != "org.scoverage")
-    },
-    libraryDependencies ++= {
-      if (coverageEnabled.value) {
-        val scalaVer = scalaVersion.value
-        Seq(
-          "org.scoverage" %% "scalac-scoverage-runtime_sjs1" % coverageScalacPluginVersion.value,
-          "org.scoverage" % s"scalac-scoverage-plugin_$scalaVer" % coverageScalacPluginVersion.value % "scoveragePlugin"
-        )
-      }
-      else Nil
-    }
+    
+    //improving performance by disabling this feature that was introduced in:
+    //  https://github.com/scoverage/sbt-scoverage/releases/tag/v1.8.0
+    Compile / compile / scalacOptions -= "-P:scoverage:reportTestName"
   )
 }
