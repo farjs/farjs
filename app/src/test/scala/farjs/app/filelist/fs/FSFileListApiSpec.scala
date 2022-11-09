@@ -489,7 +489,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     }
     
     def expected(s: String): String = {
-      if (process.platform == Platform.win32) s"${s.head}---------"
+      if (process.platform == Platform.win32) s"${s.take(3)}-------"
       else s
     }
     
