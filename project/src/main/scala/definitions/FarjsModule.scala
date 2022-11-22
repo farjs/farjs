@@ -49,7 +49,6 @@ object FarjsModule {
   val settings: Seq[Setting[_]] = Seq(
     organization := "org.scommons.farjs",
 
-    coverallsFailBuildOnError := true,
     coverallsService := GitHubActionsCI.jobId.map(_ => GitHubActionsCI),
     
     //
