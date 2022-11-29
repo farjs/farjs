@@ -4,7 +4,7 @@ import farjs.app.filelist.fs.FSFileListActions
 import farjs.app.filelist.{FileListModule, FileListRoot}
 import farjs.app.task.FarjsTaskController
 import farjs.app.util.DevTool
-import farjs.domain.{FarjsDBContext, FarjsDBMigrations}
+import farjs.domain.FarjsDBContext
 import farjs.ui.theme.{Theme, XTerm256Theme}
 import io.github.shogowada.scalajs.reactjs.redux.ReactRedux._
 import io.github.shogowada.scalajs.reactjs.redux.Redux
@@ -13,7 +13,6 @@ import scommons.react._
 import scommons.react.blessed._
 import scommons.react.blessed.portal.WithPortals
 import scommons.react.blessed.raw.{Blessed, ReactBlessed}
-import scommons.websql.migrations.WebSqlMigrations
 import scommons.websql.{Database, WebSQL}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -96,8 +95,7 @@ object FarjsApp {
     val dbF = for {
       _ <- FSFileListActions.mkDirs(FarjsData.getDataDir)
       db = WebSQL.openDatabase(FarjsData.getDBFilePath)
-      migrations = new WebSqlMigrations(db)
-      _ <- migrations.runBundle(FarjsDBMigrations)
+      _ <- FarjsDBMigrations.apply(db)
     } yield db
 
     dbF.recover {

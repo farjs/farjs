@@ -25,6 +25,7 @@ object FarjsApp extends ScalaJsModule {
 
       coverageExcludedPackages :=
         "farjs.app.FarjsApp" +
+          ";farjs.app.raw" +
           ";farjs.app.filelist.zip.ZipApi", // avoid "Found a dangling UndefinedParam" during test with coverage
 
       //TODO: temporarily disabled

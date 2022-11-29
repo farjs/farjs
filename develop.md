@@ -29,7 +29,7 @@ cd ./app/target/scala-2.13/scalajs-bundler/main/
 node ./node_modules/webpack/bin/webpack.js --watch --config ./reload.webpack.config.js
 
 #console 3:
-node ./app/target/scala-2.13/scalajs-bundler/main/dist/bundle.js
+node ./app/target/scala-2.13/scalajs-bundler/main/farjs-app-fastopt-hotreload.js
 ```
 
 ## Resources
