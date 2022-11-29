@@ -1,5 +1,6 @@
 const nodeExternals = require('webpack-node-externals');
 const webpack = require('webpack');
+const path = require('path');
 
 // Setup webpack Hot Module Replacement (HMR)
 // see: https://github.com/webpack/docs/issues/45
@@ -13,7 +14,8 @@ module.exports = {
     './reload.loader.js'
   ],
   output: {
-    filename: './bundle.js'
+    path: path.resolve(__dirname, '.'),
+    filename: 'farjs-app-fastopt-hotreload.js'
   },
   
   target: 'node', // important in order not to bundle built-in modules like path, fs, etc.  

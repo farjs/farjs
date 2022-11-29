@@ -4,7 +4,6 @@ import farjs.domain._
 import org.scalatest.Assertion
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.websql.WebSQL
-import scommons.websql.migrations.WebSqlMigrations
 
 import scala.concurrent.Future
 
@@ -22,9 +21,7 @@ object BaseDBContextSpec {
   private lazy val contextF: Future[FarjsDBContext] = {
     val db = WebSQL.openDatabase(":memory:")
     
-    val migrations = new WebSqlMigrations(db)
-    
-    migrations.runBundle(FarjsDBMigrations).map { _ =>
+    FarjsDBMigrations.apply(db).map { _ =>
       new FarjsDBContext(db)
     }
   }

@@ -44,6 +44,7 @@
   "files": [
     "bin/farjs.js",
     "dist/versionChecker.js",
+    "farjs/domain/bundle.json",
     "farjs-app-opt-bundle.js",
     "LICENSE.txt",
     "README.md"
