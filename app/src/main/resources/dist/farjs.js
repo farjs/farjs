@@ -2,7 +2,7 @@
 
 process.title = "FAR.js"
 
-const versionChecker = require('../dist/versionChecker.js')
+const versionChecker = require('./versionChecker.js')
 
 var npmVersion = undefined
 versionChecker.getNpmVersion((error, version) => {

@@ -39,10 +39,10 @@
     "text-ui"
   ],
   "bin": {
-    "farjs": "bin/farjs.js"
+    "farjs": "dist/farjs.js"
   },
   "files": [
-    "bin/farjs.js",
+    "dist/farjs.js",
     "dist/versionChecker.js",
     "farjs/domain/bundle.json",
     "farjs-app-opt-bundle.js",
