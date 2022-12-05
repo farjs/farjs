@@ -88,7 +88,7 @@ class FSFoldersPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     //then
     result.children.toList should be (empty)
     itemsF.map { _ =>
-      assertFSFoldersPopup(result, props, List.fill(20)("  item"), (55, 13), (56, 14))
+      assertFSFoldersPopup(result, props, List.fill(20)("  item "), (55, 13), (56, 14))
     }
   }
   
@@ -107,7 +107,7 @@ class FSFoldersPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     //then
     result.children.toList should be (empty)
     itemsF.map { _ =>
-      assertFSFoldersPopup(result, props, List.fill(20)("  item"), (60, 20), (56, 16))
+      assertFSFoldersPopup(result, props, List.fill(20)("  item "), (60, 20), (56, 16))
     }
   }
   
@@ -129,7 +129,7 @@ class FSFoldersPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     result.children.toList should be (empty)
     itemsF.map { _ =>
       assertFSFoldersPopup(result, props, List.fill(20)(
-        "  ite...eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeem"
+        "  ite...eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeem "
       ), (60, 20), (60, 16))
     }
   }

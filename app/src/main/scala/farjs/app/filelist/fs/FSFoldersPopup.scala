@@ -25,8 +25,11 @@ object FSFoldersPopup extends FunctionComponent[FSFoldersPopupProps] {
     val (maybeItems, setItems) = useState(Option.empty[List[String]])
     val props = compProps.wrapped
     val theme = Theme.current.popup.menu
-    val textPadding = 2
-    val textPaddingLeft = " " * textPadding
+    val textPaddingLeft = 2
+    val textPaddingRight = 1
+    val textPadding = textPaddingLeft + textPaddingRight
+    val textPaddingLeftStr = " " * textPaddingLeft
+    val textPaddingRightStr = " " * textPaddingRight
 
     useLayoutEffect({ () =>
       services.foldersHistory.getAll.map { items =>
@@ -65,7 +68,7 @@ object FSFoldersPopup extends FunctionComponent[FSFoldersPopupProps] {
                 if (items.isEmpty) 0
                 else items.length - 1,
               items = items.map { item =>
-                textPaddingLeft + TextLine.wrapText(item, contentWidth - textPadding)
+                textPaddingLeftStr + TextLine.wrapText(item, contentWidth - textPadding) + textPaddingRightStr
               },
               style = theme,
               onAction = { index =>
