@@ -1,7 +1,6 @@
-package farjs.app.filelist.fs
+package farjs.ui
 
-import farjs.app.filelist.fs.FSFoldersView._
-import farjs.ui.{ScrollBarProps, UI}
+import farjs.ui.ListBox._
 import farjs.ui.theme.DefaultTheme
 import scommons.react.blessed._
 import scommons.react.test._
@@ -9,15 +8,15 @@ import scommons.react.test._
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
 
-class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
+class ListBoxSpec extends TestSpec with TestRendererUtils {
 
-  FSFoldersView.scrollBarComp = mockUiComponent("ScrollBar")
+  ListBox.scrollBarComp = mockUiComponent("ScrollBar")
 
   it should "scroll when onChange in ScrollBar" in {
     //given
-    val props = getFSFoldersViewProps(height = 1)
-    val renderer = createTestRenderer(<(FSFoldersView())(^.wrapped := props)())
-    assertFSFoldersView(renderer.root, props, showScrollBar = true,
+    val props = getListBoxProps(height = 1)
+    val renderer = createTestRenderer(<(ListBox())(^.wrapped := props)())
+    assertListBox(renderer.root, props, showScrollBar = true,
       """{bold}{white-fg}{black-bg}  item 1            {/}"""
     )
     val scrollBarProps = findComponentProps(renderer.root, scrollBarComp, plain = true)
@@ -26,16 +25,16 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
     scrollBarProps.onChange(1)
     
     //then
-    assertFSFoldersView(renderer.root, props.copy(selected = 1), showScrollBar = true,
+    assertListBox(renderer.root, props.copy(selected = 1), showScrollBar = true,
       """{bold}{white-fg}{black-bg}  item 2            {/}"""
     )
   }
 
   it should "update viewport state when props.height changes" in {
     //given
-    val props = getFSFoldersViewProps(selected = 1)
-    val renderer = createTestRenderer(<(FSFoldersView())(^.wrapped := props)())
-    assertFSFoldersView(renderer.root, props, showScrollBar = false,
+    val props = getListBoxProps(selected = 1)
+    val renderer = createTestRenderer(<(ListBox())(^.wrapped := props)())
+    assertListBox(renderer.root, props, showScrollBar = false,
       """{bold}{white-fg}{cyan-bg}  item 1            {/}
         |{bold}{white-fg}{black-bg}  item 2            {/}""".stripMargin
     )
@@ -43,20 +42,20 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
     
     //when
     TestRenderer.act { () =>
-      renderer.update(<(FSFoldersView())(^.wrapped := updatedProps)())
+      renderer.update(<(ListBox())(^.wrapped := updatedProps)())
     }
     
     //then
-    assertFSFoldersView(renderer.root, updatedProps, showScrollBar = true,
+    assertListBox(renderer.root, updatedProps, showScrollBar = true,
       """{bold}{white-fg}{black-bg}  item 2            {/}""".stripMargin
     )
   }
 
   it should "update viewport state when onKeypress(down)" in {
     //given
-    val props = getFSFoldersViewProps()
-    val renderer = createTestRenderer(<(FSFoldersView())(^.wrapped := props)())
-    assertFSFoldersView(renderer.root, props, showScrollBar = false,
+    val props = getListBoxProps()
+    val renderer = createTestRenderer(<(ListBox())(^.wrapped := props)())
+    assertListBox(renderer.root, props, showScrollBar = false,
       """{bold}{white-fg}{black-bg}  item 1            {/}
         |{bold}{white-fg}{cyan-bg}  item 2            {/}""".stripMargin
     )
@@ -68,7 +67,7 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
     button.props.onKeypress(null, literal(full = "down"))
     
     //then
-    assertFSFoldersView(renderer.root, props, showScrollBar = false,
+    assertListBox(renderer.root, props, showScrollBar = false,
       """{bold}{white-fg}{cyan-bg}  item 1            {/}
         |{bold}{white-fg}{black-bg}  item 2            {/}""".stripMargin
     )
@@ -77,8 +76,8 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
   it should "call onAction when onKeypress(return)" in {
     //given
     val onAction = mockFunction[Int, Unit]
-    val props = getFSFoldersViewProps(selected = 1, onAction = onAction)
-    val renderer = createTestRenderer(<(FSFoldersView())(^.wrapped := props)())
+    val props = getListBoxProps(selected = 1, onAction = onAction)
+    val renderer = createTestRenderer(<(ListBox())(^.wrapped := props)())
     val button = inside(findComponents(renderer.root, <.button.name)) {
       case List(button) => button
     }
@@ -93,10 +92,10 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
   it should "call onAction when onClick" in {
     //given
     val onAction = mockFunction[Int, Unit]
-    val props = getFSFoldersViewProps(onAction = onAction)
+    val props = getListBoxProps(onAction = onAction)
     val mouseData = js.Dynamic.literal(y = 2)
     val textMock = js.Dynamic.literal(atop = 1)
-    val renderer = createTestRenderer(<(FSFoldersView())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(<(ListBox())(^.wrapped := props)(), { el =>
       if (el.`type` == <.text.name.asInstanceOf[js.Any]) textMock
       else null
     })
@@ -114,13 +113,13 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
   it should "not call onAction if index >= length when onClick" in {
     //given
     val onAction = mockFunction[Int, Unit]
-    val props = getFSFoldersViewProps(onAction = onAction)
+    val props = getListBoxProps(onAction = onAction)
     val mouseData = js.Dynamic.literal(y = 3)
     val textMock = js.Dynamic.literal(atop = 1)
     val index = (mouseData.y - textMock.atop).asInstanceOf[Int]
     index should be >= props.items.length
 
-    val renderer = createTestRenderer(<(FSFoldersView())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(<(ListBox())(^.wrapped := props)(), { el =>
       if (el.`type` == <.text.name.asInstanceOf[js.Any]) textMock
       else null
     })
@@ -137,9 +136,9 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
 
   it should "update viewport state when onWheelup" in {
     //given
-    val props = getFSFoldersViewProps(selected = 1)
-    val renderer = createTestRenderer(<(FSFoldersView())(^.wrapped := props)())
-    assertFSFoldersView(renderer.root, props, showScrollBar = false,
+    val props = getListBoxProps(selected = 1)
+    val renderer = createTestRenderer(<(ListBox())(^.wrapped := props)())
+    assertListBox(renderer.root, props, showScrollBar = false,
       """{bold}{white-fg}{cyan-bg}  item 1            {/}
         |{bold}{white-fg}{black-bg}  item 2            {/}""".stripMargin
     )
@@ -151,7 +150,7 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
     text.props.onWheelup(null)
     
     //then
-    assertFSFoldersView(renderer.root, props, showScrollBar = false,
+    assertListBox(renderer.root, props, showScrollBar = false,
       """{bold}{white-fg}{black-bg}  item 1            {/}
         |{bold}{white-fg}{cyan-bg}  item 2            {/}""".stripMargin
     )
@@ -159,9 +158,9 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
 
   it should "update viewport state when onWheeldown" in {
     //given
-    val props = getFSFoldersViewProps()
-    val renderer = createTestRenderer(<(FSFoldersView())(^.wrapped := props)())
-    assertFSFoldersView(renderer.root, props, showScrollBar = false,
+    val props = getListBoxProps()
+    val renderer = createTestRenderer(<(ListBox())(^.wrapped := props)())
+    assertListBox(renderer.root, props, showScrollBar = false,
       """{bold}{white-fg}{black-bg}  item 1            {/}
         |{bold}{white-fg}{cyan-bg}  item 2            {/}""".stripMargin
     )
@@ -173,7 +172,7 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
     text.props.onWheeldown(null)
     
     //then
-    assertFSFoldersView(renderer.root, props, showScrollBar = false,
+    assertListBox(renderer.root, props, showScrollBar = false,
       """{bold}{white-fg}{cyan-bg}  item 1            {/}
         |{bold}{white-fg}{black-bg}  item 2            {/}""".stripMargin
     )
@@ -181,7 +180,7 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
 
   it should "render without ScrollBar" in {
     //given
-    val props = getFSFoldersViewProps(width = 10, items = List(
+    val props = getListBoxProps(width = 10, items = List(
       "  dir\t1 {bold}",
       "  .dir 2 looooooong",
       "  .dir \r4",
@@ -190,10 +189,10 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
     ))
     
     //when
-    val result = createTestRenderer(<(FSFoldersView())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(ListBox())(^.wrapped := props)()).root
 
     //then
-    assertFSFoldersView(result, props, showScrollBar = false,
+    assertListBox(result, props, showScrollBar = false,
       """{bold}{white-fg}{black-bg}  dir 1 {open}b{/}
         |{bold}{white-fg}{cyan-bg}  .dir 2 l{/}
         |{bold}{white-fg}{cyan-bg}  .dir 4  {/}
@@ -204,28 +203,28 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
 
   it should "render with ScrollBar" in {
     //given
-    val props = getFSFoldersViewProps(width = 5, height = 20, items = List.fill(25)("item"))
+    val props = getListBoxProps(width = 5, height = 20, items = List.fill(25)("item"))
     
     //when
-    val result = createTestRenderer(<(FSFoldersView())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(ListBox())(^.wrapped := props)()).root
 
     //then
-    assertFSFoldersView(result, props, showScrollBar = true,
+    assertListBox(result, props, showScrollBar = true,
       ("{bold}{white-fg}{black-bg}item {/}" :: List.fill(19)(
         "{bold}{white-fg}{cyan-bg}item {/}"
       )).mkString(UI.newLine)
     )
   }
 
-  private def getFSFoldersViewProps(width: Int = 20,
-                                    height: Int = 30,
-                                    selected: Int = 0,
-                                    items: List[String] = List(
-                                      "  item 1",
-                                      "  item 2"
-                                    ),
-                                    onAction: Int => Unit = _ => ()): FSFoldersViewProps = {
-    FSFoldersViewProps(
+  private def getListBoxProps(width: Int = 20,
+                              height: Int = 30,
+                              selected: Int = 0,
+                              items: List[String] = List(
+                                "  item 1",
+                                "  item 2"
+                              ),
+                              onAction: Int => Unit = _ => ()): ListBoxProps = {
+    ListBoxProps(
       left = 1,
       top = 1,
       width = width,
@@ -236,11 +235,12 @@ class FSFoldersViewSpec extends TestSpec with TestRendererUtils {
       onAction = onAction
     )
   }
-  
-  private def assertFSFoldersView(result: TestInstance,
-                                  props: FSFoldersViewProps,
-                                  showScrollBar: Boolean,
-                                  expectedContent: String): Unit = {
+
+  private def assertListBox(result: TestInstance,
+                            props: ListBoxProps,
+                            showScrollBar: Boolean,
+                            expectedContent: String): Unit = {
+
     assertComponents(result.children, List(
       <.button(
         ^.rbLeft := props.left,

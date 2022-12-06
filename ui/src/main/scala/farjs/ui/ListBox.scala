@@ -1,24 +1,23 @@
-package farjs.app.filelist.fs
+package farjs.ui
 
-import farjs.ui._
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class FSFoldersViewProps(left: Int,
-                              top: Int,
-                              width: Int,
-                              height: Int,
-                              selected: Int,
-                              items: List[String],
-                              style: BlessedStyle,
-                              onAction: Int => Unit)
+case class ListBoxProps(left: Int,
+                        top: Int,
+                        width: Int,
+                        height: Int,
+                        selected: Int,
+                        items: List[String],
+                        style: BlessedStyle,
+                        onAction: Int => Unit)
 
-object FSFoldersView extends FunctionComponent[FSFoldersViewProps] {
+object ListBox extends FunctionComponent[ListBoxProps] {
 
-  private[fs] var scrollBarComp: UiComponent[ScrollBarProps] = ScrollBar
+  private[ui] var scrollBarComp: UiComponent[ScrollBarProps] = ScrollBar
 
   private def renderItems(selected: Int,
                           items: List[String],

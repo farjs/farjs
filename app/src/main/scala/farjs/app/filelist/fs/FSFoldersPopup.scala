@@ -18,7 +18,7 @@ object FSFoldersPopup extends FunctionComponent[FSFoldersPopupProps] {
   private[fs] var popupComp: UiComponent[PopupProps] = Popup
   private[fs] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
   private[fs] var withSizeComp: UiComponent[WithSizeProps] = WithSize
-  private[fs] var fsFoldersViewComp: UiComponent[FSFoldersViewProps] = FSFoldersView
+  private[fs] var listBoxComp: UiComponent[ListBoxProps] = ListBox
   
   protected def render(compProps: Props): ReactElement = {
     val services = FileListServices.useServices
@@ -59,7 +59,7 @@ object FSFoldersPopup extends FunctionComponent[FSFoldersPopupProps] {
             style = theme,
             padding = padding
           ))(
-            <(fsFoldersViewComp())(^.wrapped := FSFoldersViewProps(
+            <(listBoxComp())(^.wrapped := ListBoxProps(
               left = 1,
               top = 1,
               width = contentWidth,

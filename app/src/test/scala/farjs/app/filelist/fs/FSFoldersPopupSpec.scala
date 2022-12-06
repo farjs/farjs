@@ -3,9 +3,9 @@ package farjs.app.filelist.fs
 import farjs.app.filelist.fs.FSFoldersPopup._
 import farjs.filelist.FileListServicesSpec.withServicesContext
 import farjs.filelist.history.MockFileListHistoryService
-import farjs.ui.WithSizeProps
 import farjs.ui.popup.{ModalContentProps, PopupProps}
 import farjs.ui.theme.DefaultTheme
+import farjs.ui.{ListBoxProps, WithSizeProps}
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
@@ -17,7 +17,7 @@ class FSFoldersPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
   FSFoldersPopup.popupComp = mockUiComponent("Popup")
   FSFoldersPopup.modalContentComp = mockUiComponent("ModalContent")
   FSFoldersPopup.withSizeComp = mockUiComponent("WithSize")
-  FSFoldersPopup.fsFoldersViewComp = mockUiComponent("FSFoldersView")
+  FSFoldersPopup.listBoxComp = mockUiComponent("ListBox")
 
   //noinspection TypeAnnotation
   class HistoryService {
@@ -48,7 +48,7 @@ class FSFoldersPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       onChangeDir.expects("item 2")
       
       //when
-      findComponentProps(resultContent, fsFoldersViewComp).onAction(1)
+      findComponentProps(resultContent, listBoxComp).onAction(1)
 
       Succeeded
     }
@@ -172,8 +172,8 @@ class FSFoldersPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
                 padding shouldBe FSFoldersPopup.padding
                 left shouldBe "center"
             }, inside(_) { case List(view) =>
-              assertTestComponent(view, fsFoldersViewComp) {
-                case FSFoldersViewProps(left, top, width, height, selected, resItems, style, _) =>
+              assertTestComponent(view, listBoxComp) {
+                case ListBoxProps(left, top, width, height, selected, resItems, style, _) =>
                   left shouldBe 1
                   top shouldBe 1
                   width shouldBe contentWidth
