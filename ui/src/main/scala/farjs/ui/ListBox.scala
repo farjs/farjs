@@ -17,54 +17,21 @@ case class ListBoxProps(left: Int,
 
 object ListBox extends FunctionComponent[ListBoxProps] {
 
+  private[ui] var listViewComp: UiComponent[ListViewProps] = ListView
   private[ui] var scrollBarComp: UiComponent[ScrollBarProps] = ScrollBar
 
-  private def renderItems(selected: Int,
-                          items: List[String],
-                          width: Int,
-                          theme: BlessedStyle): List[String] = {
-
-    items.zipWithIndex.map {
-      case (item, index) =>
-        val style =
-          if (selected == index) theme.focus.getOrElse(null)
-          else theme
-
-        val text = item
-          .replace("\n", "")
-          .replace("\r", "")
-          .replace('\t', ' ')
-
-        TextBox.renderText(
-          isBold = style.bold.getOrElse(false),
-          fgColor = style.fg.orNull,
-          bgColor = style.bg.orNull,
-          text = text.take(width).padTo(width, ' ')
-        )
-    }
-  }
-
   protected def render(compProps: Props): ReactElement = {
-    val elementRef = useRef[BlessedElement](null)
     val props = compProps.wrapped
-    val (viewport@ListViewport(offset, focused, length, viewLength), setViewport) = useState(
-      ListViewport(props.selected, props.items.size, props.height)
-    )
-    val itemsContent =
-      renderItems(focused, props.items.slice(offset, offset + viewLength), props.width, props.style)
-        .mkString(UI.newLine)
+    val (viewport, setViewport) =
+      useState(ListViewport(props.selected, props.items.size, props.height))
 
     val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (_, key) =>
       key.full match {
-        case "return" => props.onAction(offset + focused)
+        case "return" => props.onAction(viewport.offset + viewport.focused)
         case key => viewport.onKeypress(key).foreach(setViewport)
       }
     }
     
-    useLayoutEffect({ () =>
-      setViewport(viewport.resize(props.height))
-    }, List(props.height))
-
     <.button(
       ^.rbLeft := props.left,
       ^.rbTop := props.top,
@@ -72,36 +39,22 @@ object ListBox extends FunctionComponent[ListBoxProps] {
       ^.rbHeight := props.height,
       ^.rbOnKeypress := onKeypress
     )(
-      <.text(
-        ^.reactRef := elementRef,
-        ^.rbClickable := true,
-        ^.rbMouse := true,
-        ^.rbAutoFocus := false,
-        ^.rbWidth := props.width,
-        ^.rbHeight := props.height,
-        ^.rbOnWheelup := { _ =>
-          setViewport(viewport.up)
-        },
-        ^.rbOnWheeldown := { _ =>
-          setViewport(viewport.down)
-        },
-        ^.rbOnClick := { data =>
-          val curr = elementRef.current
-          val y = data.y - curr.atop
-          val index = offset + y
-          if (index < length) {
-            props.onAction(index)
-          }
-        },
-        ^.rbStyle := props.style,
-        ^.rbTags := true,
-        ^.content := itemsContent
-      )(),
+      <(listViewComp())(^.wrapped := ListViewProps(
+        left = 0,
+        top = 0,
+        width = props.width,
+        height = props.height,
+        items = props.items,
+        viewport = viewport,
+        setViewport = setViewport,
+        style = props.style,
+        onClick = props.onAction
+      ))(),
 
       if (viewport.length > viewport.viewLength) Some {
         <(scrollBarComp())(^.plain := ScrollBarProps(
-          left = props.left + props.width - 1,
-          top = props.top - 1,
+          left = props.width,
+          top = 0,
           length = viewport.viewLength,
           style = props.style,
           value = viewport.offset,

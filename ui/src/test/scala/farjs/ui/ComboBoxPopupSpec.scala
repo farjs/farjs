@@ -6,129 +6,42 @@ import farjs.ui.theme.DefaultTheme
 import scommons.react.blessed._
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
 
   ComboBoxPopup.singleBorderComp = mockUiComponent("SingleBorder")
-
-  it should "call onClick with item index when onClick" in {
+  ComboBoxPopup.listViewComp = mockUiComponent("ListView")
+  
+  it should "call setViewport when box.onWheelup" in {
     //given
-    val onClick = mockFunction[Int, Unit]
-    val props = ComboBoxPopupProps(
-      selected = 0,
-      items = List("item 1", "item 2"),
-      left = 1,
-      top = 2,
-      width = 11,
-      style = DefaultTheme.popup.menu,
-      onClick = onClick
-    )
-    val comp = testRender(<(ComboBoxPopup())(^.wrapped := props)())
-    val textEl = inside(findComponents(comp, <.text.name)) {
-      case List(_, text) => text
-    }
-    
-    //then
-    onClick.expects(1)
-    
-    //when
-    textEl.props.onClick(null)
-  }
-
-  it should "call onWheel(true) when text.onWheelup" in {
-    //given
-    val onWheel = mockFunction[Boolean, Unit]
-    val props = ComboBoxPopupProps(
-      selected = 0,
-      items = List("item 1", "item 2"),
-      left = 1,
-      top = 2,
-      width = 11,
-      style = DefaultTheme.popup.menu,
-      onClick = _ => (),
-      onWheel = onWheel
-    )
-    val comp = testRender(<(ComboBoxPopup())(^.wrapped := props)())
-    val textEl = inside(findComponents(comp, <.text.name)) {
-      case List(_, text) => text
-    }
-    
-    //then
-    onWheel.expects(true)
-    
-    //when
-    textEl.props.onWheelup(null)
-  }
-
-  it should "call onWheel(false) when text.onWheeldown" in {
-    //given
-    val onWheel = mockFunction[Boolean, Unit]
-    val props = ComboBoxPopupProps(
-      selected = 0,
-      items = List("item 1", "item 2"),
-      left = 1,
-      top = 2,
-      width = 11,
-      style = DefaultTheme.popup.menu,
-      onClick = _ => (),
-      onWheel = onWheel
-    )
-    val comp = testRender(<(ComboBoxPopup())(^.wrapped := props)())
-    val textEl = inside(findComponents(comp, <.text.name)) {
-      case List(_, text) => text
-    }
-    
-    //then
-    onWheel.expects(false)
-    
-    //when
-    textEl.props.onWheeldown(null)
-  }
-
-  it should "call onWheel(true) when box.onWheelup" in {
-    //given
-    val onWheel = mockFunction[Boolean, Unit]
-    val props = ComboBoxPopupProps(
-      selected = 0,
-      items = List("item 1", "item 2"),
-      left = 1,
-      top = 2,
-      width = 11,
-      style = DefaultTheme.popup.menu,
-      onClick = _ => (),
-      onWheel = onWheel
-    )
+    val setViewport = mockFunction[ListViewport, Unit]
+    val props = getComboBoxPopupProps(index = 1, setViewport = setViewport)
     val comp = testRender(<(ComboBoxPopup())(^.wrapped := props)())
     val boxEl = inside(findComponents(comp, <.box.name)) {
       case List(box) => box
     }
+    val expectedViewport = props.viewport.copy(focused = 0)
     
     //then
-    onWheel.expects(true)
+    setViewport.expects(expectedViewport)
     
     //when
     boxEl.props.onWheelup(null)
   }
 
-  it should "call onWheel(false) when box.onWheeldown" in {
+  it should "call setViewport when box.onWheeldown" in {
     //given
-    val onWheel = mockFunction[Boolean, Unit]
-    val props = ComboBoxPopupProps(
-      selected = 0,
-      items = List("item 1", "item 2"),
-      left = 1,
-      top = 2,
-      width = 11,
-      style = DefaultTheme.popup.menu,
-      onClick = _ => (),
-      onWheel = onWheel
-    )
+    val setViewport = mockFunction[ListViewport, Unit]
+    val props = getComboBoxPopupProps(setViewport = setViewport)
     val comp = testRender(<(ComboBoxPopup())(^.wrapped := props)())
     val boxEl = inside(findComponents(comp, <.box.name)) {
       case List(box) => box
     }
+    val expectedViewport = props.viewport.copy(focused = 1)
     
     //then
-    onWheel.expects(false)
+    setViewport.expects(expectedViewport)
     
     //when
     boxEl.props.onWheeldown(null)
@@ -136,15 +49,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
 
   it should "render component" in {
     //given
-    val props = ComboBoxPopupProps(
-      selected = 0,
-      items = List("item 1", "item 2"),
-      left = 1,
-      top = 2,
-      width = 11,
-      style = DefaultTheme.popup.menu,
-      _ => ()
-    )
+    val props = getComboBoxPopupProps()
     
     //when
     val result = testRender(<(ComboBoxPopup())(^.wrapped := props)())
@@ -152,11 +57,29 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     //then
     assertComboBoxPopupPopup(result, props)
   }
+  
+  private def getComboBoxPopupProps(index: Int = 0,
+                                    setViewport: js.Function1[ListViewport, Unit] = _ => (),
+                                    onClick: Int => Unit = _ => ()): ComboBoxPopupProps = {
+
+    val items = List("item 1", "item 2")
+    val viewport = ListViewport(index, items.size, maxItems)
+    ComboBoxPopupProps(
+      items = items,
+      left = 1,
+      top = 2,
+      width = 11,
+      viewport = viewport,
+      setViewport = setViewport,
+      style = DefaultTheme.popup.menu,
+      onClick = onClick
+    )
+  }
 
   private def assertComboBoxPopupPopup(result: TestInstance, props: ComboBoxPopupProps): Unit = {
     val width = props.width
-    val height = 10
-    val textWidth = width - 2
+    val height = maxItems + 2
+    val viewWidth = width - 2
     val theme = props.style
 
     assertNativeComponent(result,
@@ -176,22 +99,18 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
             style shouldBe theme
         }))(),
 
-        props.items.zipWithIndex.map { case (text, index) =>
-          <.text(
-            ^.rbHeight := 1,
-            ^.rbWidth := textWidth,
-            ^.rbLeft := 1,
-            ^.rbTop := 1 + index,
-            ^.rbClickable := true,
-            ^.rbMouse := true,
-            ^.rbAutoFocus := false,
-            ^.rbStyle := {
-              if (props.selected == index) theme.focus.getOrElse(null)
-              else theme
-            },
-            ^.content := s"  ${text.take(textWidth - 4)}  "
-          )()
-        }
+        <(listViewComp())(^.assertWrapped(inside(_) {
+          case ListViewProps(left, top, resWidth, resHeight, items, viewport, setViewport, style, onClick) =>
+            left shouldBe 1
+            top shouldBe 1
+            resWidth shouldBe viewWidth
+            resHeight shouldBe (height - 2)
+            items shouldBe props.items.map(i => s"  ${i.take(viewWidth - 4)}  ")
+            viewport should be theSameInstanceAs props.viewport
+            setViewport should be theSameInstanceAs props.setViewport
+            style shouldBe theme
+            onClick should be theSameInstanceAs props.onClick
+        }))()
       )
     )
   }

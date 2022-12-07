@@ -4,7 +4,7 @@ import farjs.ui.ComboBox._
 import farjs.ui.ComboBoxPopup.maxItems
 import farjs.ui.popup.PopupOverlay
 import farjs.ui.theme.DefaultTheme
-import org.scalatest.{Assertion, Succeeded}
+import org.scalatest.Succeeded
 import scommons.nodejs._
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.blessed._
@@ -427,12 +427,12 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         ^.rbStyle := PopupOverlay.style
       )(
         <(comboBoxPopup())(^.assertWrapped(inside(_) {
-          case ComboBoxPopupProps(selected, items, left, top, width, style, _, _) =>
-            selected shouldBe 0
-            items shouldBe List("item", "item 2")
+          case ComboBoxPopupProps(left, top, width, items, viewport, _, style, _) =>
             left shouldBe props.left
             top shouldBe props.top + 1
             width shouldBe props.width
+            items shouldBe List("item", "item 2")
+            viewport.focused shouldBe 0
             style shouldBe theme
         }))()
       )
@@ -442,7 +442,6 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
   it should "show popup with ScrollBar when onKeypress(C-down)" in {
     //given
     val items = List("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
-    val page1 = List("1", "2", "3", "4", "5", "6", "7", "8")
     val props = getComboBoxProps(items = items)
     props.items.length should be > maxItems
     val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
@@ -486,12 +485,12 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         ^.rbStyle := PopupOverlay.style
       )(
         <(comboBoxPopup())(^.assertWrapped(inside(_) {
-          case ComboBoxPopupProps(selected, items, left, top, width, style, _, _) =>
-            selected shouldBe 0
-            items shouldBe page1
+          case ComboBoxPopupProps(left, top, width, resItems, viewport, _, style, _) =>
             left shouldBe props.left
             top shouldBe props.top + 1
             width shouldBe props.width
+            resItems shouldBe items
+            viewport.focused shouldBe 0
             style shouldBe theme
         }))(),
 
@@ -513,15 +512,14 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
   it should "scroll when onChange in ScrollBar" in {
     //given
     val items = List("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
-    val page1 = List("1", "2", "3", "4", "5", "6", "7", "8")
-    val page2 = List("2", "3", "4", "5", "6", "7", "8", "9")
     val props = getComboBoxProps(items = items)
     props.items.length should be > maxItems
     val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
     findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
     inside(findComponentProps(renderer.root, comboBoxPopup)) { case popupProps =>
-      popupProps.items shouldBe page1
-      popupProps.selected shouldBe 0
+      popupProps.items shouldBe items
+      popupProps.viewport.offset shouldBe 0
+      popupProps.viewport.focused shouldBe 0
     }
     val scrollBarProps = findComponentProps(renderer.root, scrollBarComp, plain = true)
 
@@ -530,40 +528,31 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     //then
     inside(findComponentProps(renderer.root, comboBoxPopup)) { case popupProps =>
-      popupProps.items shouldBe page2
-      popupProps.selected shouldBe 0
+      popupProps.items shouldBe items
+      popupProps.viewport.offset shouldBe 1
+      popupProps.viewport.focused shouldBe 0
     }
     inside(findComponentProps(renderer.root, scrollBarComp, plain = true)) { case scrollBarProps =>
       scrollBarProps.value shouldBe 1
     }
   }
 
-  it should "select items when onWheel(true/false)" in {
+  it should "update viewport when setViewport" in {
     //given
     val items = List("1", "2", "3")
     val props = getComboBoxProps(items = items)
     val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
     findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
-    findComponentProps(renderer.root, comboBoxPopup).items shouldBe items
-    findComponentProps(renderer.root, comboBoxPopup).selected shouldBe 0
+    val popup = findComponentProps(renderer.root, comboBoxPopup)
+    popup.items shouldBe items
+    popup.viewport.focused shouldBe 0
+    val viewport = popup.viewport.copy(focused = 1)
 
-    def check(up: Boolean, items: List[String], selected: Int): Assertion = {
-      findComponentProps(renderer.root, comboBoxPopup).onWheel(up)
-      inside(findComponentProps(renderer.root, comboBoxPopup)) { case popupProps =>
-        popupProps.items shouldBe items
-        popupProps.selected shouldBe selected
-      }
-    }
+    //when
+    popup.setViewport(viewport)
 
-    //when & then
-    check(up = true, items, 0)
-    check(up = true, items, 0)
-    check(up = false, items, 1)
-    check(up = false, items, 2)
-    check(up = false, items, 2)
-    check(up = true, items, 1)
-    check(up = true, items, 0)
-    check(up = true, items, 0)
+    //then
+    findComponentProps(renderer.root, comboBoxPopup).viewport should be theSameInstanceAs viewport
   }
 
   it should "return false if popup not shown when onKeypress" in {

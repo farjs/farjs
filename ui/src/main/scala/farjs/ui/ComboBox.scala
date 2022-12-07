@@ -164,21 +164,17 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
           }
         )(
           <(comboBoxPopup())(^.wrapped := ComboBoxPopupProps(
-            selected = viewport.focused,
-            items = props.items.toList.slice(
-              viewport.offset,
-              viewport.offset + viewport.viewLength
-            ),
             left = props.left,
             top = props.top + 1,
             width = props.width,
+            items = props.items.toList,
+            viewport = viewport,
+            setViewport = { viewport =>
+              setPopup(Some(viewport))
+            },
             style = theme,
             onClick = { index =>
-              onSelectAction(viewport.offset, index)
-            },
-            onWheel = {
-              case true => setPopup(Some(viewport.up))
-              case false => setPopup(Some(viewport.down))
+              onSelectAction(offset = 0, index)
             }
           ))(),
 
