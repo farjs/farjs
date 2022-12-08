@@ -17,7 +17,6 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
 
   private[ui] var textInputComp: UiComponent[TextInputProps] = TextInput
   private[ui] var comboBoxPopup: UiComponent[ComboBoxPopupProps] = ComboBoxPopup
-  private[ui] var scrollBarComp: UiComponent[ScrollBarProps] = ScrollBar
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
@@ -176,24 +175,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
             onClick = { index =>
               onSelectAction(offset = 0, index)
             }
-          ))(),
-
-          if (viewport.length > viewport.viewLength) Some {
-            <(scrollBarComp())(^.plain := ScrollBarProps(
-              left = props.left + props.width - 1,
-              top = props.top + 2,
-              length = viewport.viewLength,
-              style = theme,
-              value = viewport.offset,
-              extent = viewport.viewLength,
-              min = 0,
-              max = viewport.length - viewport.viewLength,
-              onChange = { offset =>
-                setPopup(Some(viewport.copy(offset = offset)))
-              }
-            ))()
-          }
-          else None
+          ))()
         )
       }
     )

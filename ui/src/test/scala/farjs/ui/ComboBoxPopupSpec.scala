@@ -12,6 +12,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
 
   ComboBoxPopup.singleBorderComp = mockUiComponent("SingleBorder")
   ComboBoxPopup.listViewComp = mockUiComponent("ListView")
+  ComboBoxPopup.scrollBarComp = mockUiComponent("ScrollBar")
   
   it should "call setViewport when box.onWheelup" in {
     //given
@@ -47,7 +48,24 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     boxEl.props.onWheeldown(null)
   }
 
-  it should "render component" in {
+  it should "call setViewport when onChange in ScrollBar" in {
+    //given
+    val setViewport = mockFunction[ListViewport, Unit]
+    val props = getComboBoxPopupProps(items = List.fill(15)("item"), setViewport = setViewport)
+    props.items.length should be > maxItems
+    val comp = testRender(<(ComboBoxPopup())(^.wrapped := props)())
+    val scrollBarProps = findComponentProps(comp, scrollBarComp, plain = true)
+    val offset = 1
+    val expectedViewport = props.viewport.copy(offset = offset)
+    
+    //then
+    setViewport.expects(expectedViewport)
+    
+    //when
+    scrollBarProps.onChange(offset)
+  }
+
+  it should "render without ScrollBar" in {
     //given
     val props = getComboBoxPopupProps()
     
@@ -55,28 +73,39 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(ComboBoxPopup())(^.wrapped := props)())
     
     //then
-    assertComboBoxPopupPopup(result, props)
+    assertComboBoxPopupPopup(result, props, showScrollBar = false)
+  }
+
+  it should "render with ScrollBar" in {
+    //given
+    val props = getComboBoxPopupProps(items = List.fill(15)("item"))
+    
+    //when
+    val result = testRender(<(ComboBoxPopup())(^.wrapped := props)())
+    
+    //then
+    assertComboBoxPopupPopup(result, props, showScrollBar = true)
   }
   
   private def getComboBoxPopupProps(index: Int = 0,
+                                    items: List[String] = List("item 1", "item 2"),
                                     setViewport: js.Function1[ListViewport, Unit] = _ => (),
                                     onClick: Int => Unit = _ => ()): ComboBoxPopupProps = {
-
-    val items = List("item 1", "item 2")
-    val viewport = ListViewport(index, items.size, maxItems)
     ComboBoxPopupProps(
       items = items,
       left = 1,
       top = 2,
       width = 11,
-      viewport = viewport,
+      viewport = ListViewport(index, items.size, maxItems),
       setViewport = setViewport,
       style = DefaultTheme.popup.menu,
       onClick = onClick
     )
   }
 
-  private def assertComboBoxPopupPopup(result: TestInstance, props: ComboBoxPopupProps): Unit = {
+  private def assertComboBoxPopupPopup(result: TestInstance,
+                                       props: ComboBoxPopupProps,
+                                       showScrollBar: Boolean): Unit = {
     val width = props.width
     val height = maxItems + 2
     val viewWidth = width - 2
@@ -110,7 +139,22 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
             setViewport should be theSameInstanceAs props.setViewport
             style shouldBe theme
             onClick should be theSameInstanceAs props.onClick
-        }))()
+        }))(),
+
+        if (showScrollBar) Some {
+          <(scrollBarComp())(^.assertPlain[ScrollBarProps](inside(_) {
+            case ScrollBarProps(left, top, length, style, value, extent, min, max, _) =>
+              left shouldBe (width - 1)
+              top shouldBe 1
+              length shouldBe maxItems
+              style shouldBe theme
+              value shouldBe 0
+              extent shouldBe maxItems
+              min shouldBe 0
+              max shouldBe (props.items.size - maxItems)
+          }))()
+        }
+        else None
       )
     )
   }

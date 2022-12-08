@@ -19,6 +19,9 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
   
   private[ui] var singleBorderComp: UiComponent[SingleBorderProps] = SingleBorder
   private[ui] var listViewComp: UiComponent[ListViewProps] = ListView
+  private[ui] var scrollBarComp: UiComponent[ScrollBarProps] = ScrollBar
+
+  private[ui] val maxItems = 8
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -26,6 +29,7 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
     val height = maxItems + 2
     val viewWidth = width - 2
     val theme = props.style
+    val viewport = props.viewport
 
     <.box(
       ^.rbClickable := true,
@@ -35,10 +39,10 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
       ^.rbLeft := props.left,
       ^.rbTop := props.top,
       ^.rbOnWheelup := { _ =>
-        props.setViewport(props.viewport.up)
+        props.setViewport(viewport.up)
       },
       ^.rbOnWheeldown := { _ =>
-        props.setViewport(props.viewport.down)
+        props.setViewport(viewport.down)
       },
       ^.rbStyle := theme
     )(
@@ -54,13 +58,28 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
         width = viewWidth,
         height = height - 2,
         items = props.items.map(i => s"  ${i.take(viewWidth - 4)}  "),
-        viewport = props.viewport,
+        viewport = viewport,
         setViewport = props.setViewport,
         style = theme,
         onClick = props.onClick
-      ))()
+      ))(),
+
+      if (viewport.length > viewport.viewLength) Some {
+        <(scrollBarComp())(^.plain := ScrollBarProps(
+          left = width - 1,
+          top = 1,
+          length = viewport.viewLength,
+          style = theme,
+          value = viewport.offset,
+          extent = viewport.viewLength,
+          min = 0,
+          max = viewport.length - viewport.viewLength,
+          onChange = { offset =>
+            props.setViewport(viewport.copy(offset = offset))
+          }
+        ))()
+      }
+      else None
     )
   }
-
-  private[ui] val maxItems = 8
 }
