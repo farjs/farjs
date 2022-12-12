@@ -9,19 +9,10 @@ sealed trait ButtonsPanelAction extends js.Object {
 
 object ButtonsPanelAction {
 
-  def apply(label: String,
-            onAction: js.Function0[Unit]): ButtonsPanelAction = {
-
+  def apply(label: String, onAction: js.Function0[Unit]): ButtonsPanelAction = {
     js.Dynamic.literal(
       label = label,
       onAction = onAction
     ).asInstanceOf[ButtonsPanelAction]
-  }
-
-  def unapply(arg: ButtonsPanelAction): Option[(String, js.Function0[Unit])] = {
-    Some((
-      arg.label,
-      arg.onAction
-    ))
   }
 }
