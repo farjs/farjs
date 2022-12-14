@@ -1,6 +1,7 @@
 package farjs.app.filelist.fs
 
 import farjs.app.filelist.fs.FSFoldersHistory._
+import farjs.app.filelist.fs.popups.FoldersHistoryPopupProps
 import farjs.filelist.FileListServicesSpec.withServicesContext
 import farjs.filelist.history.MockFileListHistoryService
 import scommons.nodejs.test.AsyncTestSpec
@@ -10,7 +11,7 @@ import scala.concurrent.Future
 
 class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  FSFoldersHistory.fsFoldersPopup = mockUiComponent("FSFoldersPopup")
+  FSFoldersHistory.foldersHistoryPopup = mockUiComponent("FoldersHistoryPopup")
 
   //noinspection TypeAnnotation
   class HistoryService {
@@ -32,8 +33,8 @@ class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec with TestRend
       <(FSFoldersHistory())(^.wrapped := props)(), historyService.service
     ))
     assertComponents(renderer.root.children, List(
-      <(fsFoldersPopup())(^.assertWrapped(inside(_) {
-        case FSFoldersPopupProps(onChangeDir, onClose) =>
+      <(foldersHistoryPopup())(^.assertWrapped(inside(_) {
+        case FoldersHistoryPopupProps(onChangeDir, onClose) =>
           onChangeDir should be theSameInstanceAs props.onChangeDir
           onClose should be theSameInstanceAs props.onHidePopup
       }))()
@@ -47,8 +48,8 @@ class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec with TestRend
       ))
     }
     assertComponents(renderer.root.children, List(
-      <(fsFoldersPopup())(^.assertWrapped(inside(_) {
-        case FSFoldersPopupProps(onChangeDir, onClose) =>
+      <(foldersHistoryPopup())(^.assertWrapped(inside(_) {
+        case FoldersHistoryPopupProps(onChangeDir, onClose) =>
           onChangeDir should be theSameInstanceAs props.onChangeDir
           onClose should be theSameInstanceAs props.onHidePopup
       }))()

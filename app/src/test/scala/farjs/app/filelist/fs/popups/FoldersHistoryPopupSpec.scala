@@ -1,6 +1,6 @@
-package farjs.app.filelist.fs
+package farjs.app.filelist.fs.popups
 
-import farjs.app.filelist.fs.FSFoldersPopup._
+import farjs.app.filelist.fs.popups.FoldersHistoryPopup._
 import farjs.filelist.FileListServicesSpec.withServicesContext
 import farjs.filelist.history.MockFileListHistoryService
 import farjs.ui.popup.ListPopupProps
@@ -10,9 +10,9 @@ import scommons.react.test._
 
 import scala.concurrent.Future
 
-class FSFoldersPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
+class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  FSFoldersPopup.listPopup = mockUiComponent("ListPopup")
+  FoldersHistoryPopup.listPopup = mockUiComponent("ListPopup")
 
   //noinspection TypeAnnotation
   class HistoryService {
@@ -26,13 +26,13 @@ class FSFoldersPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
   it should "call onChangeDir when onAction" in {
     //given
     val onChangeDir = mockFunction[String, Unit]
-    val props = getFSFoldersPopupProps(onChangeDir = onChangeDir)
+    val props = getFoldersHistoryPopupProps(onChangeDir = onChangeDir)
     val historyService = new HistoryService
     val itemsF = Future.successful(List("item 1", "item 2"))
     historyService.getAll.expects().returning(itemsF)
     
     val result = createTestRenderer(withServicesContext(
-      <(FSFoldersPopup())(^.wrapped := props)(), historyService.service
+      <(FoldersHistoryPopup())(^.wrapped := props)(), historyService.service
     )).root
 
     itemsF.flatMap { _ =>
@@ -50,7 +50,7 @@ class FSFoldersPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
   
   it should "render popup" in {
     //given
-    val props = getFSFoldersPopupProps()
+    val props = getFoldersHistoryPopupProps()
     val historyService = new HistoryService
     val items = List.fill(20)("item")
     val itemsF = Future.successful(items)
@@ -58,26 +58,26 @@ class FSFoldersPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     
     //when
     val result = createTestRenderer(withServicesContext(
-      <(FSFoldersPopup())(^.wrapped := props)(), historyService.service
+      <(FoldersHistoryPopup())(^.wrapped := props)(), historyService.service
     )).root
 
     //then
     result.children.toList should be (empty)
     itemsF.map { _ =>
-      assertFSFoldersPopup(result, props, items)
+      assertFoldersHistoryPopup(result, props, items)
     }
   }
   
-  private def getFSFoldersPopupProps(onChangeDir: String => Unit = _ => ()): FSFoldersPopupProps = {
-    FSFoldersPopupProps(
+  private def getFoldersHistoryPopupProps(onChangeDir: String => Unit = _ => ()): FoldersHistoryPopupProps = {
+    FoldersHistoryPopupProps(
       onChangeDir = onChangeDir,
       onClose = () => ()
     )
   }
-  
-  private def assertFSFoldersPopup(result: TestInstance,
-                                   props: FSFoldersPopupProps,
-                                   items: List[String]): Assertion = {
+
+  private def assertFoldersHistoryPopup(result: TestInstance,
+                                        props: FoldersHistoryPopupProps,
+                                        items: List[String]): Assertion = {
     
     assertComponents(result.children, List(
       <(listPopup())(^.assertWrapped(inside(_) {

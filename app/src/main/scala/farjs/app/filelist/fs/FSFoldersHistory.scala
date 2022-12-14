@@ -1,5 +1,6 @@
 package farjs.app.filelist.fs
 
+import farjs.app.filelist.fs.popups.{FoldersHistoryPopup, FoldersHistoryPopupProps}
 import farjs.filelist.FileListServices
 import scommons.react._
 import scommons.react.hooks._
@@ -11,7 +12,7 @@ case class FSFoldersHistoryProps(showPopup: Boolean,
 
 object FSFoldersHistory extends FunctionComponent[FSFoldersHistoryProps] {
 
-  private[fs] var fsFoldersPopup: UiComponent[FSFoldersPopupProps] = FSFoldersPopup
+  private[fs] var foldersHistoryPopup: UiComponent[FoldersHistoryPopupProps] = FoldersHistoryPopup
   
   protected def render(compProps: Props): ReactElement = {
     val services = FileListServices.useServices
@@ -26,7 +27,7 @@ object FSFoldersHistory extends FunctionComponent[FSFoldersHistoryProps] {
     }, List(currDirPath))
 
     if (props.showPopup) {
-      <(fsFoldersPopup())(^.wrapped := FSFoldersPopupProps(
+      <(foldersHistoryPopup())(^.wrapped := FoldersHistoryPopupProps(
         onChangeDir = props.onChangeDir,
         onClose = props.onHidePopup
       ))()

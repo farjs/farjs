@@ -1,4 +1,4 @@
-package farjs.app.filelist.fs
+package farjs.app.filelist.fs.popups
 
 import farjs.filelist.FileListServices
 import farjs.ui.popup._
@@ -7,12 +7,12 @@ import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-case class FSFoldersPopupProps(onChangeDir: String => Unit,
-                               onClose: () => Unit)
+case class FoldersHistoryPopupProps(onChangeDir: String => Unit,
+                                    onClose: () => Unit)
 
-object FSFoldersPopup extends FunctionComponent[FSFoldersPopupProps] {
+object FoldersHistoryPopup extends FunctionComponent[FoldersHistoryPopupProps] {
 
-  private[fs] var listPopup: UiComponent[ListPopupProps] = ListPopup
+  private[popups] var listPopup: UiComponent[ListPopupProps] = ListPopup
   
   protected def render(compProps: Props): ReactElement = {
     val services = FileListServices.useServices
