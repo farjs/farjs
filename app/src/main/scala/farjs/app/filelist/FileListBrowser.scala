@@ -1,5 +1,7 @@
 package farjs.app.filelist
 
+import farjs.app.filelist.fs.popups.FSPopupsActions._
+import farjs.app.filelist.fs.popups.FSPopupsController
 import farjs.app.filelist.fs.{FSDrivePopup, FSDrivePopupProps, FSPlugin}
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
@@ -30,6 +32,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
   private[filelist] var bottomMenuComp: UiComponent[Unit] = BottomMenu
   private[filelist] var fsPlugin: FSPlugin = FSPlugin
   private[filelist] var fileListPopups: ReactClass = FileListPopupsController()
+  private[filelist] var fsPopups: ReactClass = FSPopupsController()
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -85,6 +88,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         case "M-r" => setShowRightDrive(true)
         case k@("f5" | "f6") =>
           onCopyMove(k == "f6", getStack(isRightActive), getStack(!isRightActive), getInput(!isRightActive))
+        case "C-d" => props.dispatch(FolderShortcutsPopupAction(show = true))
         case "f9" => props.dispatch(FileListPopupMenuAction(show = true))
         case "f10" => props.dispatch(FileListPopupExitAction(show = true))
         case "tab" | "S-tab" => screen.focusNext()
@@ -170,7 +174,8 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         <(bottomMenuComp())()()
       ),
 
-      <(fileListPopups).empty
+      <(fileListPopups).empty,
+      <(fsPopups).empty
     )
   }
 

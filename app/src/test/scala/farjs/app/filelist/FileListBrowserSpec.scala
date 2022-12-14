@@ -1,6 +1,7 @@
 package farjs.app.filelist
 
 import farjs.app.filelist.FileListBrowser._
+import farjs.app.filelist.fs.popups.FSPopupsActions._
 import farjs.app.filelist.fs.{FSDrivePopupProps, FSPlugin}
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
@@ -26,7 +27,8 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   FileListBrowser.fsDrivePopup = mockUiComponent("FSDrivePopup")
   FileListBrowser.bottomMenuComp = mockUiComponent("BottomMenu")
   FileListBrowser.fsPlugin = new FSPlugin((s, _) => s)
-  FileListBrowser.fileListPopups = "test_popups".asInstanceOf[ReactClass]
+  FileListBrowser.fileListPopups = "test_filelist_popups".asInstanceOf[ReactClass]
+  FileListBrowser.fsPopups = "test_fs_popups".asInstanceOf[ReactClass]
   
   //noinspection TypeAnnotation
   class Actions(capabilities: Set[String] = Set.empty) {
@@ -166,7 +168,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
   }
 
-  it should "dispatch FileListPopupMenuAction when onKeypress(F9)" in {
+  it should "dispatch actions when onKeypress(Ctrl+D/F9/F10)" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val props = FileListBrowserProps(dispatch)
@@ -181,39 +183,19 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val button = inside(findComponents(comp, <.button.name)) {
       case List(button, _) => button
     }
-    val keyFull = "f9"
 
-    //then
-    dispatch.expects(FileListPopupMenuAction(show = true))
-
-    //when
-    button.props.onKeypress(null, literal(full = keyFull).asInstanceOf[KeyboardKey])
-
-    Succeeded
-  }
-
-  it should "dispatch FileListPopupExitAction when onKeypress(F10)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListBrowserProps(dispatch)
-    val focusMock = mockFunction[Unit]
-    val buttonMock = literal("focus" -> focusMock)
-    focusMock.expects()
-
-    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
-      if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
-      else null
-    })
-    val button = inside(findComponents(comp, <.button.name)) {
-      case List(button, _) => button
+    def check(fullKey: String, action: Any): Unit = {
+      //then
+      dispatch.expects(action)
+  
+      //when
+      button.props.onKeypress(null, literal(full = fullKey).asInstanceOf[KeyboardKey])
     }
-    val keyFull = "f10"
 
-    //then
-    dispatch.expects(FileListPopupExitAction(show = true))
-
-    //when
-    button.props.onKeypress(null, literal(full = keyFull).asInstanceOf[KeyboardKey])
+    //when & then
+    check("C-d", FolderShortcutsPopupAction(show = true))
+    check("f9", FileListPopupMenuAction(show = true))
+    check("f10", FileListPopupExitAction(show = true))
 
     Succeeded
   }
@@ -818,7 +800,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       <.box(^.rbTop := "100%-1")(
         <(bottomMenuComp())()()
       ),
-      <(fileListPopups).empty
+
+      <(fileListPopups).empty,
+      <(fsPopups).empty
     ))
   }
 }
