@@ -20,14 +20,12 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
   private[fs] var addToZipController: UiComponent[AddToZipControllerProps] = AddToZipController
   
   protected def render(compProps: Props): ReactElement = {
-    val (showFoldersHistory, setShowFoldersHistory) = useState(false)
     val (zipData, setZipData) = useState(Option.empty[(String, Seq[FileListItem])])
     val props = compProps.wrapped
 
     def onKeypress(screen: BlessedScreen, key: String): Boolean = {
       var processed = true
       key match {
-        case "M-h" => setShowFoldersHistory(true)
         case "M-o" =>
           props.state.currentItem.foreach { item =>
             props.dispatch(openInDefaultApp(props.state.currDir.path, item.name))
@@ -58,22 +56,7 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
       ))(),
 
       <(fsFoldersHistory())(^.wrapped := FSFoldersHistoryProps(
-        showPopup = showFoldersHistory,
-        currDirPath = props.state.currDir.path,
-        onChangeDir = { dir =>
-          setShowFoldersHistory(false)
-
-          if (dir != props.state.currDir.path) {
-            props.dispatch(props.actions.changeDir(
-              dispatch = props.dispatch,
-              parent = None,
-              dir = dir
-            ))
-          }
-        },
-        onHidePopup = { () =>
-          setShowFoldersHistory(false)
-        }
+        currDirPath = props.state.currDir.path
       ))(),
 
       zipData.map { case (zipName, items) =>

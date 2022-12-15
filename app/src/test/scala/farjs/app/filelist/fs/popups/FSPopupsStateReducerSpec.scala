@@ -12,6 +12,17 @@ class FSPopupsStateReducerSpec extends TestSpec {
     reduce(None, "") shouldBe FSPopupsState()
   }
   
+  it should "set showFoldersHistoryPopup when FoldersHistoryPopupAction" in {
+    //given
+    val state = FSPopupsState()
+    val action = FoldersHistoryPopupAction(show = true)
+    
+    //when & then
+    reduce(Some(state), action) shouldBe {
+      state.copy(showFoldersHistoryPopup = true)
+    }
+  }
+
   it should "set showFolderShortcutsPopup when FolderShortcutsPopupAction" in {
     //given
     val state = FSPopupsState()

@@ -168,7 +168,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
   }
 
-  it should "dispatch actions when onKeypress(Ctrl+D/F9/F10)" in {
+  it should "dispatch actions when onKeypress(Alt+F12/Ctrl+D/F9/F10)" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val props = FileListBrowserProps(dispatch)
@@ -193,6 +193,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
 
     //when & then
+    check("M-h", FoldersHistoryPopupAction(show = true))
     check("C-d", FolderShortcutsPopupAction(show = true))
     check("f9", FileListPopupMenuAction(show = true))
     check("f10", FileListPopupExitAction(show = true))

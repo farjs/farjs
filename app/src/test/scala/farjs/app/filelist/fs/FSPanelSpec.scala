@@ -24,11 +24,9 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
 
   //noinspection TypeAnnotation
   class Actions {
-    val changeDir = mockFunction[Dispatch, Option[String], String, FileListDirChangeAction]
     val updateDir = mockFunction[Dispatch, String, FileListDirUpdateAction]
 
     val actions = new MockFileListActions(
-      changeDirMock = changeDir,
       updateDirMock = updateDir
     )
   }
@@ -53,95 +51,6 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
 
     //when & then
     panelProps.onKeypress(null, "unknown") shouldBe false
-  }
-
-  it should "show folders history popup and handle onHidePopup when onKeypress(M-h)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions
-    val props = FileListPanelProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
-        FileListItem.up,
-        FileListItem("item 1")
-      ))
-    ))
-    val renderer = createTestRenderer(<(FSPanel())(^.wrapped := props)())
-    val panelProps = findComponentProps(renderer.root, fileListPanelComp)
-
-    //when & then
-    panelProps.onKeypress(null, "M-h") shouldBe true
-
-    //then
-    inside(findComponentProps(renderer.root, fsFoldersHistory)) {
-      case FSFoldersHistoryProps(showPopup, currDirPath, _, onHidePopup) =>
-        showPopup shouldBe true
-        currDirPath shouldBe props.state.currDir.path
-        
-        //when
-        onHidePopup()
-        
-        //then
-        findComponentProps(renderer.root, fsFoldersHistory).showPopup shouldBe false
-    }
-  }
-
-  it should "dispatch FileListDirChangeAction(dir from history) when onChangeDir" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = new Actions
-    val props = FileListPanelProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
-        FileListItem.up,
-        FileListItem("item 1")
-      ))
-    ))
-    val renderer = createTestRenderer(<(FSPanel())(^.wrapped := props)())
-    val panelProps = findComponentProps(renderer.root, fileListPanelComp)
-    panelProps.onKeypress(null, "M-h") shouldBe true
-    val historyProps = findComponentProps(renderer.root, fsFoldersHistory)
-    historyProps.showPopup shouldBe true
-    val action = FileListDirChangeAction(FutureTask("Changing Dir",
-      Future.successful(FileListDir("/", isRoot = true, items = Nil))
-    ))
-    val dir = "dir/from/history"
-
-    //then
-    actions.changeDir.expects(dispatch, None, dir).returning(action)
-    dispatch.expects(action)
-
-    //when
-    historyProps.onChangeDir(dir)
-
-    //then
-    findComponentProps(renderer.root, fsFoldersHistory).showPopup shouldBe false
-  }
-
-  it should "not dispatch FileListDirChangeAction if same dir when onChangeDir" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = new Actions
-    val props = FileListPanelProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
-        FileListItem.up,
-        FileListItem("item 1")
-      ))
-    ))
-    val renderer = createTestRenderer(<(FSPanel())(^.wrapped := props)())
-    val panelProps = findComponentProps(renderer.root, fileListPanelComp)
-    panelProps.onKeypress(null, "M-h") shouldBe true
-    val historyProps = findComponentProps(renderer.root, fsFoldersHistory)
-    historyProps.showPopup shouldBe true
-    val dir = props.state.currDir.path
-
-    //then
-    actions.changeDir.expects(*, *, *).never()
-    dispatch.expects(*).never()
-
-    //when
-    historyProps.onChangeDir(dir)
-
-    //then
-    findComponentProps(renderer.root, fsFoldersHistory).showPopup shouldBe false
   }
 
   it should "dispatch action when onKeypress(M-o)" in {
@@ -302,8 +211,7 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
       }))(),
 
       <(fsFoldersHistory())(^.assertWrapped(inside(_) {
-        case FSFoldersHistoryProps(showPopup, currDirPath, _, _) =>
-          showPopup shouldBe false
+        case FSFoldersHistoryProps(currDirPath) =>
           currDirPath shouldBe props.state.currDir.path
       }))()
     ))

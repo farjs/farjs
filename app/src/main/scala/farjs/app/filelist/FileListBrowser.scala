@@ -88,6 +88,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         case "M-r" => setShowRightDrive(true)
         case k@("f5" | "f6") =>
           onCopyMove(k == "f6", getStack(isRightActive), getStack(!isRightActive), getInput(!isRightActive))
+        case "M-h" => props.dispatch(FoldersHistoryPopupAction(show = true))
         case "C-d" => props.dispatch(FolderShortcutsPopupAction(show = true))
         case "f9" => props.dispatch(FileListPopupMenuAction(show = true))
         case "f10" => props.dispatch(FileListPopupExitAction(show = true))
