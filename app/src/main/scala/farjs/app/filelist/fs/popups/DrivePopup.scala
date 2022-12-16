@@ -1,5 +1,6 @@
-package farjs.app.filelist.fs
+package farjs.app.filelist.fs.popups
 
+import farjs.app.filelist.fs.{FSDisk, FSService}
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.FileListState
 import farjs.filelist.stack.{PanelStack, WithPanelStacks}
@@ -14,15 +15,15 @@ import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-case class FSDrivePopupProps(dispatch: Dispatch,
-                             onClose: () => Unit,
-                             showOnLeft: Boolean)
+case class DrivePopupProps(dispatch: Dispatch,
+                           onClose: () => Unit,
+                           showOnLeft: Boolean)
 
-object FSDrivePopup extends FunctionComponent[FSDrivePopupProps] {
+object DrivePopup extends FunctionComponent[DrivePopupProps] {
 
-  private[fs] var platform: Platform = process.platform
-  private[fs] var fsService: FSService = FSService.instance
-  private[fs] var menuPopup: UiComponent[MenuPopupProps] = MenuPopup
+  private[popups] var platform: Platform = process.platform
+  private[popups] var fsService: FSService = FSService.instance
+  private[popups] var menuPopup: UiComponent[MenuPopupProps] = MenuPopup
 
   protected def render(compProps: Props): ReactElement = {
     val (disks, setDisks) = useState(List.empty[FSDisk])
@@ -87,7 +88,7 @@ object FSDrivePopup extends FunctionComponent[FSDrivePopupProps] {
   private val mBytes = 1024d * kBytes
   private val gBytes = 1024d * mBytes
 
-  private[fs] def getData(platform: Platform, disks: List[FSDisk]): List[(String, String)] = {
+  private[popups] def getData(platform: Platform, disks: List[FSDisk]): List[(String, String)] = {
     if (disks.isEmpty) Nil
     else {
       val items = disks.map { d =>
@@ -109,7 +110,7 @@ object FSDrivePopup extends FunctionComponent[FSDrivePopupProps] {
     }
   }
   
-  private[fs] def toCompact(bytes: Double): String = {
+  private[popups] def toCompact(bytes: Double): String = {
     if (bytes == 0.0) ""
     else {
       val (size, mod) =

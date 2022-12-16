@@ -1,10 +1,11 @@
-package farjs.app.filelist.fs
+package farjs.app.filelist.fs.popups
 
-import farjs.app.filelist.fs.FSDrivePopup._
+import farjs.app.filelist.fs.popups.DrivePopup._
+import farjs.app.filelist.fs.{FSDisk, MockFSService}
 import farjs.filelist.FileListActions.{FileListDirChangeAction, FileListTaskAction}
-import farjs.filelist.{FileListState, MockFileListActions}
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack._
+import farjs.filelist.{FileListState, MockFileListActions}
 import farjs.ui.menu.MenuPopupProps
 import org.scalatest.Assertion
 import scommons.nodejs.Process.Platform
@@ -18,9 +19,9 @@ import scommons.react.test._
 import scala.concurrent.Future
 import scala.scalajs.js
 
-class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
+class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  FSDrivePopup.menuPopup = mockUiComponent("MenuPopup")
+  DrivePopup.menuPopup = mockUiComponent("MenuPopup")
 
   //noinspection TypeAnnotation
   class Actions {
@@ -46,9 +47,9 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     val actions = new Actions
     val onClose = mockFunction[Unit]
     val fsService = new FsService
-    FSDrivePopup.platform = Platform.win32
-    FSDrivePopup.fsService = fsService.fsService
-    val props = FSDrivePopupProps(dispatch, onClose, showOnLeft = true)
+    DrivePopup.platform = Platform.win32
+    DrivePopup.fsService = fsService.fsService
+    val props = DrivePopupProps(dispatch, onClose, showOnLeft = true)
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
@@ -79,7 +80,7 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
 
     //when & then
     val renderer = createTestRenderer(
-      withContext(<(FSDrivePopup())(^.wrapped := props)(), leftStack = currStack, rightStack = otherStack)
+      withContext(<(DrivePopup())(^.wrapped := props)(), leftStack = currStack, rightStack = otherStack)
     )
     renderer.root.children.isEmpty shouldBe true
     
@@ -111,9 +112,9 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     val actions = new Actions
     val onClose = mockFunction[Unit]
     val fsService = new FsService
-    FSDrivePopup.platform = Platform.win32
-    FSDrivePopup.fsService = fsService.fsService
-    val props = FSDrivePopupProps(dispatch, onClose, showOnLeft = true)
+    DrivePopup.platform = Platform.win32
+    DrivePopup.fsService = fsService.fsService
+    val props = DrivePopupProps(dispatch, onClose, showOnLeft = true)
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
@@ -144,7 +145,7 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
 
     //when & then
     val renderer = createTestRenderer(
-      withContext(<(FSDrivePopup())(^.wrapped := props)(), leftStack = otherStack, rightStack = currStack)
+      withContext(<(DrivePopup())(^.wrapped := props)(), leftStack = otherStack, rightStack = currStack)
     )
     renderer.root.children.isEmpty shouldBe true
     
@@ -176,9 +177,9 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     val actions = new Actions
     val onClose = mockFunction[Unit]
     val fsService = new FsService
-    FSDrivePopup.platform = Platform.win32
-    FSDrivePopup.fsService = fsService.fsService
-    val props = FSDrivePopupProps(dispatch, onClose, showOnLeft = true)
+    DrivePopup.platform = Platform.win32
+    DrivePopup.fsService = fsService.fsService
+    val props = DrivePopupProps(dispatch, onClose, showOnLeft = true)
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
@@ -210,7 +211,7 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
 
     //when & then
     val renderer = createTestRenderer(
-      withContext(<(FSDrivePopup())(^.wrapped := props)(), leftStack = currStack, rightStack = otherStack)
+      withContext(<(DrivePopup())(^.wrapped := props)(), leftStack = currStack, rightStack = otherStack)
     )
     renderer.root.children.isEmpty shouldBe true
     
@@ -240,9 +241,9 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     //given
     val dispatch = mockFunction[Any, Any]
     val fsService = new FsService
-    FSDrivePopup.platform = Platform.win32
-    FSDrivePopup.fsService = fsService.fsService
-    val props = FSDrivePopupProps(dispatch, onClose = () => (), showOnLeft = true)
+    DrivePopup.platform = Platform.win32
+    DrivePopup.fsService = fsService.fsService
+    val props = DrivePopupProps(dispatch, onClose = () => (), showOnLeft = true)
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
@@ -255,7 +256,7 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     )))
 
     //when
-    val renderer = createTestRenderer(withContext(<(FSDrivePopup())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withContext(<(DrivePopup())(^.wrapped := props)()))
 
     //then
     renderer.root.children.isEmpty shouldBe true
@@ -264,7 +265,7 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
       disksF should not be null
     }.flatMap(_ => disksF).map { _ =>
       //then
-      assertFSDrivePopup(renderer.root.children.head, props, List(
+      assertDrivePopup(renderer.root.children.head, props, List(
         "  C: │SYSTEM         │149341 M│ 77912 M ",
         "  D: │DATA           │803867 M│336615 M ",
         "  E: │               │        │         "
@@ -276,9 +277,9 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     //given
     val dispatch = mockFunction[Any, Any]
     val fsService = new FsService
-    FSDrivePopup.platform = Platform.darwin
-    FSDrivePopup.fsService = fsService.fsService
-    val props = FSDrivePopupProps(dispatch, onClose = () => (), showOnLeft = true)
+    DrivePopup.platform = Platform.darwin
+    DrivePopup.fsService = fsService.fsService
+    val props = DrivePopupProps(dispatch, onClose = () => (), showOnLeft = true)
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
@@ -290,7 +291,7 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     )))
 
     //when
-    val renderer = createTestRenderer(withContext(<(FSDrivePopup())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withContext(<(DrivePopup())(^.wrapped := props)()))
 
     //then
     renderer.root.children.isEmpty shouldBe true
@@ -299,7 +300,7 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
       disksF should not be null
     }.flatMap(_ => disksF).map { _ =>
       //then
-      assertFSDrivePopup(renderer.root.children.head, props, List(
+      assertDrivePopup(renderer.root.children.head, props, List(
         " /              │149341 M│ 77912 M ",
         " TestDrive      │803867 M│336615 M "
       ))
@@ -339,9 +340,9 @@ class FSDrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     )
   }
 
-  private def assertFSDrivePopup(result: TestInstance,
-                                 props: FSDrivePopupProps,
-                                 expectedItems: List[String]): Assertion = {
+  private def assertDrivePopup(result: TestInstance,
+                               props: DrivePopupProps,
+                               expectedItems: List[String]): Assertion = {
     
     val textWidth = expectedItems.maxBy(_.length).length
     val width = textWidth + 3 * 2

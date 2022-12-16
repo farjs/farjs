@@ -1,8 +1,8 @@
 package farjs.app.filelist
 
+import farjs.app.filelist.fs.FSPlugin
 import farjs.app.filelist.fs.popups.FSPopupsActions._
-import farjs.app.filelist.fs.popups.FSPopupsController
-import farjs.app.filelist.fs.{FSDrivePopup, FSDrivePopupProps, FSPlugin}
+import farjs.app.filelist.fs.popups.{DrivePopup, DrivePopupProps, FSPopupsController}
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListCapability, FileListItem}
@@ -28,7 +28,7 @@ case class FileListBrowserProps(dispatch: Dispatch,
 object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
 
   private[filelist] var panelStackComp: UiComponent[PanelStackProps] = PanelStack
-  private[filelist] var fsDrivePopup: UiComponent[FSDrivePopupProps] = FSDrivePopup
+  private[filelist] var drivePopup: UiComponent[DrivePopupProps] = DrivePopup
   private[filelist] var bottomMenuComp: UiComponent[Unit] = BottomMenu
   private[filelist] var fsPlugin: FSPlugin = FSPlugin
   private[filelist] var fileListPopups: ReactClass = FileListPopupsController()
@@ -132,7 +132,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           stack = getStack(isRight)
         ))(
           if (showLeftDrive) Some {
-            <(fsDrivePopup())(^.wrapped := FSDrivePopupProps(
+            <(drivePopup())(^.wrapped := DrivePopupProps(
               dispatch = props.dispatch,
               onClose = { () =>
                 setShowLeftDrive(false)
@@ -159,7 +159,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           stack = getStack(!isRight)
         ))(
           if (showRightDrive) Some {
-            <(fsDrivePopup())(^.wrapped := FSDrivePopupProps(
+            <(drivePopup())(^.wrapped := DrivePopupProps(
               dispatch = props.dispatch,
               onClose = { () =>
                 setShowRightDrive(false)

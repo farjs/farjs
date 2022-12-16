@@ -1,8 +1,9 @@
 package farjs.app.filelist
 
 import farjs.app.filelist.FileListBrowser._
+import farjs.app.filelist.fs.FSPlugin
+import farjs.app.filelist.fs.popups.DrivePopupProps
 import farjs.app.filelist.fs.popups.FSPopupsActions._
-import farjs.app.filelist.fs.{FSDrivePopupProps, FSPlugin}
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api._
@@ -24,7 +25,7 @@ import scala.scalajs.js.typedarray.Uint8Array
 class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
   
   FileListBrowser.panelStackComp = mockUiComponent("PanelStack")
-  FileListBrowser.fsDrivePopup = mockUiComponent("FSDrivePopup")
+  FileListBrowser.drivePopup = mockUiComponent("DrivePopup")
   FileListBrowser.bottomMenuComp = mockUiComponent("BottomMenu")
   FileListBrowser.fsPlugin = new FSPlugin((s, _) => s)
   FileListBrowser.fileListPopups = "test_filelist_popups".asInstanceOf[ReactClass]
@@ -693,8 +694,8 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
 
     //then
-    inside(findComponentProps(renderer.root, fsDrivePopup)) {
-      case FSDrivePopupProps(resDispatch, onClose, showOnLeft) =>
+    inside(findComponentProps(renderer.root, drivePopup)) {
+      case DrivePopupProps(resDispatch, onClose, showOnLeft) =>
         resDispatch shouldBe dispatch
         showOnLeft shouldBe true
         
@@ -702,7 +703,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         onClose()
         
         //then
-        findProps(renderer.root, fsDrivePopup) should be (empty)
+        findProps(renderer.root, drivePopup) should be (empty)
     }
   }
   
@@ -732,8 +733,8 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
 
     //then
-    inside(findComponentProps(renderer.root, fsDrivePopup)) {
-      case FSDrivePopupProps(resDispatch, onClose, showOnLeft) =>
+    inside(findComponentProps(renderer.root, drivePopup)) {
+      case DrivePopupProps(resDispatch, onClose, showOnLeft) =>
         resDispatch shouldBe dispatch
         showOnLeft shouldBe false
         
@@ -741,7 +742,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         onClose()
         
         //then
-        findProps(renderer.root, fsDrivePopup) should be (empty)
+        findProps(renderer.root, drivePopup) should be (empty)
     }
   }
   
