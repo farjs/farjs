@@ -6,6 +6,7 @@ import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.FileListState
 import farjs.filelist.api.FileListDir
 import farjs.filelist.stack._
+import farjs.ui.WithSizeProps
 import farjs.ui.menu.MenuPopupProps
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.Process.Platform
@@ -19,6 +20,7 @@ import scala.scalajs.js
 
 class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
+  DrivePopup.withSizeComp = mockUiComponent("WithSize")
   DrivePopup.menuPopup = mockUiComponent("MenuPopup")
 
   //noinspection TypeAnnotation
@@ -70,7 +72,9 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       disksF should not be null
     }.flatMap(_ => disksF).map { _ =>
       //given
-      val menuProps = findComponentProps(renderer.root, menuPopup)
+      val renderContent = findComponentProps(renderer.root, withSizeComp, plain = true).render(60, 20)
+      val resultContent = createTestRenderer(renderContent).root
+      val menuProps = findComponentProps(resultContent, menuPopup)
 
       //then
       onChangeDir.expects("C:/test")
@@ -122,7 +126,9 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       disksF should not be null
     }.flatMap(_ => disksF).map { _ =>
       //given
-      val menuProps = findComponentProps(renderer.root, menuPopup)
+      val renderContent = findComponentProps(renderer.root, withSizeComp, plain = true).render(60, 20)
+      val resultContent = createTestRenderer(renderContent).root
+      val menuProps = findComponentProps(resultContent, menuPopup)
 
       //then
       onChangeDir.expects("C:/test")
@@ -174,7 +180,9 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       disksF should not be null
     }.flatMap(_ => disksF).map { _ =>
       //given
-      val menuProps = findComponentProps(renderer.root, menuPopup)
+      val renderContent = findComponentProps(renderer.root, withSizeComp, plain = true).render(60, 20)
+      val resultContent = createTestRenderer(renderContent).root
+      val menuProps = findComponentProps(resultContent, menuPopup)
 
       //then
       onChangeDir.expects("C:")
@@ -214,7 +222,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       disksF should not be null
     }.flatMap(_ => disksF).map { _ =>
       //then
-      assertDrivePopup(renderer.root.children.head, props, List(
+      assertDrivePopup(renderer.root, props, List(
         "  C: │SYSTEM         │149341 M│ 77912 M ",
         "  D: │DATA           │803867 M│336615 M ",
         "  E: │               │        │         "
@@ -254,7 +262,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       disksF should not be null
     }.flatMap(_ => disksF).map { _ =>
       //then
-      assertDrivePopup(renderer.root.children.head, props, List(
+      assertDrivePopup(renderer.root, props, List(
         " /              │149341 M│ 77912 M ",
         " TestDrive      │803867 M│336615 M "
       ), expectedLeft = "0%+4")
@@ -289,12 +297,19 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val textWidth = expectedItems.maxBy(_.length).length
     val width = textWidth + 3 * 2
 
-    assertTestComponent(result, menuPopup) {
-      case MenuPopupProps(title, items, getLeft, _, onClose) =>
-        title shouldBe "Drive"
-        items shouldBe expectedItems
-        getLeft(width) shouldBe expectedLeft
-        onClose should be theSameInstanceAs props.onClose
-    }
+    assertComponents(result.children, List(
+      <(withSizeComp())(^.assertPlain[WithSizeProps](inside(_) {
+        case WithSizeProps(render) =>
+          val content = createTestRenderer(render(60, 20)).root
+
+          assertTestComponent(content, menuPopup) {
+            case MenuPopupProps(title, items, getLeft, _, onClose) =>
+              title shouldBe "Drive"
+              items shouldBe expectedItems
+              getLeft(width) shouldBe expectedLeft
+              onClose should be theSameInstanceAs props.onClose
+          }
+      }))()
+    ))
   }
 }

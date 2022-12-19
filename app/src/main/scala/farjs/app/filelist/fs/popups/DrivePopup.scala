@@ -4,6 +4,7 @@ import farjs.app.filelist.fs.{FSDisk, FSService}
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.FileListState
 import farjs.filelist.stack.WithPanelStacks
+import farjs.ui.{WithSize, WithSizeProps}
 import farjs.ui.border.SingleChars
 import farjs.ui.menu.{MenuPopup, MenuPopupProps}
 import scommons.nodejs.Process.Platform
@@ -24,6 +25,7 @@ object DrivePopup extends FunctionComponent[DrivePopupProps] {
 
   private[popups] var platform: Platform = process.platform
   private[popups] var fsService: FSService = FSService.instance
+  private[popups] var withSizeComp: UiComponent[WithSizeProps] = WithSize
   private[popups] var menuPopup: UiComponent[MenuPopupProps] = MenuPopup
 
   protected def render(compProps: Props): ReactElement = {
@@ -59,21 +61,23 @@ object DrivePopup extends FunctionComponent[DrivePopupProps] {
 
     if (data.isEmpty) null
     else {
-      <(menuPopup())(^.wrapped := MenuPopupProps(
-        title = "Drive",
-        items = data.map(_._2),
-        getLeft = { width =>
-          val panelWidth =
-            if (panelInput != null) panelInput.width
-            else 0
-
-          MenuPopup.getLeftPos(panelWidth, props.showOnLeft, width)
-        },
-        onSelect = { index =>
-          onAction(data(index)._1)
-        },
-        onClose = props.onClose
-      ))()
+      <(withSizeComp())(^.plain := WithSizeProps { (_, _) =>
+        <(menuPopup())(^.wrapped := MenuPopupProps(
+          title = "Drive",
+          items = data.map(_._2),
+          getLeft = { width =>
+            val panelWidth =
+              if (panelInput != null) panelInput.width
+              else 0
+  
+            MenuPopup.getLeftPos(panelWidth, props.showOnLeft, width)
+          },
+          onSelect = { index =>
+            onAction(data(index)._1)
+          },
+          onClose = props.onClose
+        ))()
+      })()
     }
   }
 
