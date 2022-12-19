@@ -1,6 +1,7 @@
 package farjs.app.filelist.fs.popups
 
 import farjs.app.filelist.fs.popups.FSPopups._
+import farjs.app.filelist.fs.popups.FSPopupsActions.DrivePopupHidden
 import farjs.filelist.FileListActions.FileListDirChangeAction
 import farjs.filelist.api.FileListDir
 import farjs.filelist.stack.WithPanelStacksSpec.withContext
@@ -16,6 +17,7 @@ import scala.scalajs.js
 
 class FSPopupsSpec extends TestSpec with TestRendererUtils {
 
+  FSPopups.drive = mockUiComponent("DriveController")
   FSPopups.foldersHistory = mockUiComponent("FoldersHistoryController")
   FSPopups.folderShortcuts = mockUiComponent("FolderShortcutsController")
 
@@ -28,7 +30,7 @@ class FSPopupsSpec extends TestSpec with TestRendererUtils {
     )
   }
 
-  it should "dispatch FileListDirChangeAction when onChangeDir" in {
+  it should "dispatch FileListDirChangeAction when onChangeDir in active panel" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
@@ -65,9 +67,12 @@ class FSPopupsSpec extends TestSpec with TestRendererUtils {
 
     //when
     foldersHistoryProps.onChangeDir(dir)
+
+    //then
+    currStackState shouldBe List(currFsItem)
   }
 
-  it should "not dispatch FileListDirChangeAction if same dir when onChangeDir" in {
+  it should "dispatch FileListDirChangeAction when onChangeDir in Drive popup" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
@@ -82,7 +87,46 @@ class FSPopupsSpec extends TestSpec with TestRendererUtils {
     ), updater = null)
 
     val renderer = createTestRenderer(
-      withContext(<(FSPopups())(^.wrapped := props)(), leftStack = currStack, rightStack = otherStack)
+      withContext(<(FSPopups())(^.wrapped := props)(), leftStack = otherStack, rightStack = currStack)
+    )
+    val driveProps = findComponentProps(renderer.root, drive)
+    val action = FileListDirChangeAction(FutureTask("Changing Dir",
+      Future.successful(FileListDir("/", isRoot = true, items = Nil))
+    ))
+    val dir = "test/dir"
+
+    //then
+    actions.changeDir.expects(dispatch, None, dir).returning(action)
+    dispatch.expects(action)
+
+    //when
+    driveProps.onChangeDir(dir, false)
+  }
+
+  it should "not dispatch FileListDirChangeAction if same dir when onChangeDir" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = new Actions
+    val props = FSPopupsProps(dispatch, FSPopupsState())
+    val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, Nil))
+    val currFsItem = PanelStackItem(
+      "fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(currState)
+    )
+    var currStackState: List[PanelStackItem[_]] = List(
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None),
+      currFsItem
+    )
+    val currStack = new PanelStack(isActive = true, currStackState, { f =>
+      currStackState = f(currStackState)
+    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
+
+    val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, Nil))
+    val otherStack = new PanelStack(isActive = false, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(otherState))
+    ), updater = null)
+
+    val renderer = createTestRenderer(
+      withContext(<(FSPopups())(^.wrapped := props)(), leftStack = otherStack, rightStack = currStack)
     )
     val foldersHistoryProps = findComponentProps(renderer.root, foldersHistory)
     val dir = currState.currDir.path
@@ -93,6 +137,9 @@ class FSPopupsSpec extends TestSpec with TestRendererUtils {
 
     //when
     foldersHistoryProps.onChangeDir(dir)
+
+    //then
+    currStackState shouldBe List(currFsItem)
   }
 
   it should "render component" in {
@@ -113,6 +160,12 @@ class FSPopupsSpec extends TestSpec with TestRendererUtils {
 
     //then
     assertComponents(result.children, List(
+      <(drive())(^.assertWrapped(inside(_) {
+        case DriveControllerProps(dispatch, show, _) =>
+          dispatch shouldBe props.dispatch
+          show shouldBe DrivePopupHidden
+      }))(),
+
       <(foldersHistory())(^.assertWrapped(inside(_) {
         case FoldersHistoryControllerProps(dispatch, showFoldersHistoryPopup, _) =>
           dispatch shouldBe props.dispatch

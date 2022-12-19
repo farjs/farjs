@@ -2,7 +2,7 @@ package farjs.app.filelist
 
 import farjs.app.filelist.fs.FSPlugin
 import farjs.app.filelist.fs.popups.FSPopupsActions._
-import farjs.app.filelist.fs.popups.{DrivePopup, DrivePopupProps, FSPopupsController}
+import farjs.app.filelist.fs.popups.FSPopupsController
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListCapability, FileListItem}
@@ -28,7 +28,6 @@ case class FileListBrowserProps(dispatch: Dispatch,
 object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
 
   private[filelist] var panelStackComp: UiComponent[PanelStackProps] = PanelStack
-  private[filelist] var drivePopup: UiComponent[DrivePopupProps] = DrivePopup
   private[filelist] var bottomMenuComp: UiComponent[Unit] = BottomMenu
   private[filelist] var fsPlugin: FSPlugin = FSPlugin
   private[filelist] var fileListPopups: ReactClass = FileListPopupsController()
@@ -40,8 +39,6 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     val rightButtonRef = useRef[BlessedElement](null)
     val (isRight, setIsRight) = useStateUpdater(false)
     val (isRightActive, setIsRightActive) = useState(props.isRightInitiallyActive)
-    val (showLeftDrive, setShowLeftDrive) = useState(false)
-    val (showRightDrive, setShowRightDrive) = useState(false)
     
     val (leftStackData, setLeftStackData) = useStateUpdater(() => List[PanelStackItem[_]](
       PanelStackItem[FileListState](fsPlugin.component, None, None, None)
@@ -84,8 +81,8 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     def onKeypress(onRight: Boolean): js.Function2[js.Dynamic, KeyboardKey, Unit] = { (_, key) =>
       def screen = leftButtonRef.current.screen
       key.full match {
-        case "M-l" => setShowLeftDrive(true)
-        case "M-r" => setShowRightDrive(true)
+        case "M-l" => props.dispatch(DrivePopupAction(show = ShowDriveOnLeft))
+        case "M-r" => props.dispatch(DrivePopupAction(show = ShowDriveOnRight))
         case k@("f5" | "f6") =>
           onCopyMove(k == "f6", getStack(isRightActive), getStack(!isRightActive), getInput(!isRightActive))
         case "M-h" => props.dispatch(FoldersHistoryPopupAction(show = true))
@@ -130,18 +127,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           isRight = false,
           panelInput = leftButtonRef.current,
           stack = getStack(isRight)
-        ))(
-          if (showLeftDrive) Some {
-            <(drivePopup())(^.wrapped := DrivePopupProps(
-              dispatch = props.dispatch,
-              onClose = { () =>
-                setShowLeftDrive(false)
-              },
-              showOnLeft = true
-            ))()
-          }
-          else None
-        )
+        ))()
       ),
       <.button(
         ^("isRight") := true,
@@ -157,18 +143,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           isRight = true,
           panelInput = rightButtonRef.current,
           stack = getStack(!isRight)
-        ))(
-          if (showRightDrive) Some {
-            <(drivePopup())(^.wrapped := DrivePopupProps(
-              dispatch = props.dispatch,
-              onClose = { () =>
-                setShowRightDrive(false)
-              },
-              showOnLeft = false
-            ))()
-          }
-          else None
-        )
+        ))()
       ),
 
       <.box(^.rbTop := "100%-1")(

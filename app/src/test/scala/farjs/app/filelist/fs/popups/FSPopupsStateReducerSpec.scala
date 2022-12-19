@@ -12,6 +12,17 @@ class FSPopupsStateReducerSpec extends TestSpec {
     reduce(None, "") shouldBe FSPopupsState()
   }
   
+  it should "set showDrivePopup when DrivePopupAction" in {
+    //given
+    val state = FSPopupsState()
+    val action = DrivePopupAction(show = ShowDriveOnLeft)
+    
+    //when & then
+    reduce(Some(state), action) shouldBe {
+      state.copy(showDrivePopup = ShowDriveOnLeft)
+    }
+  }
+
   it should "set showFoldersHistoryPopup when FoldersHistoryPopupAction" in {
     //given
     val state = FSPopupsState()

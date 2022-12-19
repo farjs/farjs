@@ -3,7 +3,7 @@ package farjs.app.filelist.fs.popups
 import farjs.app.filelist.fs.{FSDisk, FSService}
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.FileListState
-import farjs.filelist.stack.{PanelStack, WithPanelStacks}
+import farjs.filelist.stack.WithPanelStacks
 import farjs.ui.border.SingleChars
 import farjs.ui.menu.{MenuPopup, MenuPopupProps}
 import scommons.nodejs.Process.Platform
@@ -16,6 +16,7 @@ import scommons.react.redux.task.FutureTask
 import scala.concurrent.ExecutionContext.Implicits.global
 
 case class DrivePopupProps(dispatch: Dispatch,
+                           onChangeDir: String => Unit,
                            onClose: () => Unit,
                            showOnLeft: Boolean)
 
@@ -29,19 +30,13 @@ object DrivePopup extends FunctionComponent[DrivePopupProps] {
     val (disks, setDisks) = useState(List.empty[FSDisk])
     val props = compProps.wrapped
     val stacks = WithPanelStacks.usePanelStacks
-    val stackProps = PanelStack.usePanelStack
     val data = getData(platform, disks)
 
+    val (panelInput, currStack, otherStack) =
+      if (props.showOnLeft) (stacks.leftInput, stacks.leftStack, stacks.rightStack)
+      else (stacks.rightInput, stacks.rightStack, stacks.leftStack)
+    
     def onAction(dir: String): Unit = {
-      props.onClose()
-      
-      val (currStack, otherStack) =
-        if (stackProps.stack == stacks.leftStack) (stackProps.stack, stacks.rightStack)
-        else (stackProps.stack, stacks.leftStack)
-      
-      if (currStack.peek != currStack.peekLast) {
-        currStack.clear()
-      }
       val targetDir =
         otherStack.peekLast[FileListState].state.collect {
           case s if s.currDir.path.startsWith(dir) => s.currDir.path
@@ -51,13 +46,7 @@ object DrivePopup extends FunctionComponent[DrivePopupProps] {
           }
         ).getOrElse(dir)
       
-      currStack.peekLast[FileListState].getActions.foreach { case (dispatch, actions) =>
-        dispatch(actions.changeDir(
-          dispatch = dispatch,
-          parent = None,
-          dir = targetDir
-        ))
-      }
+      props.onChangeDir(targetDir)
     }
 
     useLayoutEffect({ () =>
@@ -74,7 +63,11 @@ object DrivePopup extends FunctionComponent[DrivePopupProps] {
         title = "Drive",
         items = data.map(_._2),
         getLeft = { width =>
-          MenuPopup.getLeftPos(stackProps.width, props.showOnLeft, width)
+          val panelWidth =
+            if (panelInput != null) panelInput.width
+            else 0
+
+          MenuPopup.getLeftPos(panelWidth, props.showOnLeft, width)
         },
         onSelect = { index =>
           onAction(data(index)._1)

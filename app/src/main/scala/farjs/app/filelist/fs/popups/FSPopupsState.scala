@@ -2,7 +2,8 @@ package farjs.app.filelist.fs.popups
 
 import farjs.app.filelist.fs.popups.FSPopupsActions._
 
-case class FSPopupsState(showFoldersHistoryPopup: Boolean = false,
+case class FSPopupsState(showDrivePopup: DrivePopupShow = DrivePopupHidden,
+                         showFoldersHistoryPopup: Boolean = false,
                          showFolderShortcutsPopup: Boolean = false)
 
 object FSPopupsStateReducer {
@@ -12,6 +13,7 @@ object FSPopupsStateReducer {
   }
 
   private def reduce(state: FSPopupsState, action: Any): FSPopupsState = action match {
+    case DrivePopupAction(show) => state.copy(showDrivePopup = show)
     case FoldersHistoryPopupAction(show) => state.copy(showFoldersHistoryPopup = show)
     case FolderShortcutsPopupAction(show) => state.copy(showFolderShortcutsPopup = show)
     case _ => state

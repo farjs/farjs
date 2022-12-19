@@ -2,7 +2,6 @@ package farjs.app.filelist
 
 import farjs.app.filelist.FileListBrowser._
 import farjs.app.filelist.fs.FSPlugin
-import farjs.app.filelist.fs.popups.DrivePopupProps
 import farjs.app.filelist.fs.popups.FSPopupsActions._
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
@@ -25,7 +24,6 @@ import scala.scalajs.js.typedarray.Uint8Array
 class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
   
   FileListBrowser.panelStackComp = mockUiComponent("PanelStack")
-  FileListBrowser.drivePopup = mockUiComponent("DrivePopup")
   FileListBrowser.bottomMenuComp = mockUiComponent("BottomMenu")
   FileListBrowser.fsPlugin = new FSPlugin((s, _) => s)
   FileListBrowser.fileListPopups = "test_filelist_popups".asInstanceOf[ReactClass]
@@ -169,7 +167,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
   }
 
-  it should "dispatch actions when onKeypress(Alt+F12/Ctrl+D/F9/F10)" in {
+  it should "dispatch actions when onKeypress(Alt+L/Alt+R/Alt+H/Ctrl+D/F9/F10)" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val props = FileListBrowserProps(dispatch)
@@ -194,6 +192,8 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
 
     //when & then
+    check("M-l", DrivePopupAction(show = ShowDriveOnLeft))
+    check("M-r", DrivePopupAction(show = ShowDriveOnRight))
     check("M-h", FoldersHistoryPopupAction(show = true))
     check("C-d", FolderShortcutsPopupAction(show = true))
     check("f9", FileListPopupMenuAction(show = true))
@@ -668,84 +668,6 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     Succeeded
   }
 
-  it should "show Drive popup on the left when onKeypress(Alt+L)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val keyFull = "M-l"
-    val props = FileListBrowserProps(dispatch)
-    val focusMock = mockFunction[Unit]
-    val leftButtonMock = literal("focus" -> focusMock)
-    val rightButtonMock = literal()
-    focusMock.expects()
-
-    val renderer = createTestRenderer(<(FileListBrowser())(^.wrapped := props)(), { el =>
-      val isRight = el.props.isRight.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false)
-      if (isRight && el.`type` == <.button.name.asInstanceOf[js.Any]) rightButtonMock
-      else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock
-      else null
-    })
-    val leftButton = inside(findComponents(renderer.root, <.button.name)) {
-      case List(leftButton, _) => leftButton
-    }
-
-    //when
-    TestRenderer.act { () =>
-      leftButton.props.onKeypress(null, literal(full = keyFull).asInstanceOf[KeyboardKey])
-    }
-
-    //then
-    inside(findComponentProps(renderer.root, drivePopup)) {
-      case DrivePopupProps(resDispatch, onClose, showOnLeft) =>
-        resDispatch shouldBe dispatch
-        showOnLeft shouldBe true
-        
-        //when
-        onClose()
-        
-        //then
-        findProps(renderer.root, drivePopup) should be (empty)
-    }
-  }
-  
-  it should "show Drive popup on the right when onKeypress(Alt+R)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val keyFull = "M-r"
-    val props = FileListBrowserProps(dispatch)
-    val focusMock = mockFunction[Unit]
-    val leftButtonMock = literal("focus" -> focusMock)
-    val rightButtonMock = literal()
-    focusMock.expects()
-
-    val renderer = createTestRenderer(<(FileListBrowser())(^.wrapped := props)(), { el =>
-      val isRight = el.props.isRight.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false)
-      if (isRight && el.`type` == <.button.name.asInstanceOf[js.Any]) rightButtonMock
-      else if (el.`type` == <.button.name.asInstanceOf[js.Any]) leftButtonMock
-      else null
-    })
-    val leftButton = inside(findComponents(renderer.root, <.button.name)) {
-      case List(leftButton, _) => leftButton
-    }
-
-    //when
-    TestRenderer.act { () =>
-      leftButton.props.onKeypress(null, literal(full = keyFull).asInstanceOf[KeyboardKey])
-    }
-
-    //then
-    inside(findComponentProps(renderer.root, drivePopup)) {
-      case DrivePopupProps(resDispatch, onClose, showOnLeft) =>
-        resDispatch shouldBe dispatch
-        showOnLeft shouldBe false
-        
-        //when
-        onClose()
-        
-        //then
-        findProps(renderer.root, drivePopup) should be (empty)
-    }
-  }
-  
   it should "render initial component and focus active panel" in {
     //given
     val dispatch = mockFunction[Any, Any]

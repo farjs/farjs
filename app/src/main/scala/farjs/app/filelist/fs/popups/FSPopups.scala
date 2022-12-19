@@ -10,6 +10,7 @@ case class FSPopupsProps(dispatch: Dispatch,
 
 object FSPopups extends FunctionComponent[FSPopupsProps] {
 
+  private[popups] var drive: UiComponent[DriveControllerProps] = DriveController
   private[popups] var foldersHistory: UiComponent[FoldersHistoryControllerProps] = FoldersHistoryController
   private[popups] var folderShortcuts: UiComponent[FSPopupsProps] = FolderShortcutsController
 
@@ -17,8 +18,11 @@ object FSPopups extends FunctionComponent[FSPopupsProps] {
     val stacks = WithPanelStacks.usePanelStacks
     val props = compProps.wrapped
 
-    def onChangeDir(dir: String): Unit = {
-      val currStack = stacks.activeStack
+    def onChangeDir(isLeft: Boolean)(dir: String): Unit = {
+      val currStack =
+        if (isLeft) stacks.leftStack
+        else stacks.rightStack
+
       if (currStack.peek != currStack.peekLast) {
         currStack.clear()
       }
@@ -34,12 +38,23 @@ object FSPopups extends FunctionComponent[FSPopupsProps] {
         }
       }
     }
+    
+    val onChangeDirInActivePanel: String => Unit =
+      onChangeDir(stacks.leftStack.isActive)
 
     <.>()(
+      <(drive())(^.wrapped := DriveControllerProps(
+        dispatch = props.dispatch,
+        show = props.popups.showDrivePopup,
+        onChangeDir = { (dir, isLeft) =>
+          onChangeDir(isLeft)(dir)
+        }
+      ))(),
+      
       <(foldersHistory())(^.wrapped := FoldersHistoryControllerProps(
         dispatch = props.dispatch,
         showPopup = props.popups.showFoldersHistoryPopup,
-        onChangeDir = onChangeDir
+        onChangeDir = onChangeDirInActivePanel
       ))(),
       
       <(folderShortcuts())(^.wrapped := props)()
