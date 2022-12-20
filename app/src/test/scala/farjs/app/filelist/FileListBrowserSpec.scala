@@ -634,7 +634,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
   }
 
-  it should "trigger plugin when onKeypress(triggerKey)" in {
+  it should "trigger and render plugin ui when onKeypress(triggerKey)" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val onTriggerMock = mockFunction[WithPanelStacksProps, Option[ReactClass]]
@@ -650,22 +650,37 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val buttonMock = literal("focus" -> focusMock)
     focusMock.expects()
 
-    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(<(FileListBrowser())(^.wrapped := props)(), { el =>
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
-    val stacks = findComponentProps(comp, WithPanelStacks)
-    val button = inside(findComponents(comp, <.button.name)) {
+    val stacks = findComponentProps(renderer.root, WithPanelStacks)
+    val button = inside(findComponents(renderer.root, <.button.name)) {
       case List(button, _) => button
     }
+    val pluginUi = "test_plugin_ui".asInstanceOf[ReactClass]
     
     //then
-    onTriggerMock.expects(stacks).returning(None)
+    onTriggerMock.expects(stacks).returning(Some(pluginUi))
 
     //when
     button.props.onKeypress(null, literal(full = keyFull).asInstanceOf[KeyboardKey])
 
-    Succeeded
+    //then
+    inside(findComponents(renderer.root, pluginUi)) {
+      case List(uiComp) =>
+        var resOnClose: js.Function0[Unit] = null
+        assertNativeComponent(uiComp, <(pluginUi)(^.assertPlain[FileListPluginUiProps](inside(_) {
+          case FileListPluginUiProps(onClose) =>
+            resOnClose = onClose
+        }))())
+
+        //when
+        resOnClose()
+        
+        //then
+        findComponents(renderer.root, pluginUi) should be (empty)
+    }
   }
 
   it should "render initial component and focus active panel" in {

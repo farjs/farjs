@@ -39,6 +39,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     val rightButtonRef = useRef[BlessedElement](null)
     val (isRight, setIsRight) = useStateUpdater(false)
     val (isRightActive, setIsRightActive) = useState(props.isRightInitiallyActive)
+    val (currPluginUi, setCurrPluginUi) = useState(Option.empty[ReactClass])
     
     val (leftStackData, setLeftStackData) = useStateUpdater(() => List[PanelStackItem[_]](
       PanelStackItem[FileListState](fsPlugin.component, None, None, None)
@@ -101,7 +102,10 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           }
         case keyFull =>
           props.plugins.find(_.triggerKey.contains(keyFull)).foreach { plugin =>
-            plugin.onKeyTrigger(stacks)
+            val maybePluginUi = plugin.onKeyTrigger(stacks)
+            maybePluginUi.foreach { pluginUi =>
+              setCurrPluginUi(Some(pluginUi))
+            }
           }
       }
     }
@@ -152,7 +156,15 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       ),
 
       <(fileListPopups).empty,
-      <(fsPopups).empty
+      <(fsPopups).empty,
+
+      currPluginUi.map { pluginUi =>
+        <(pluginUi)(^.plain := FileListPluginUiProps(
+          onClose = { () =>
+            setCurrPluginUi(None)
+          }
+        ))()
+      }
     )
   }
 
