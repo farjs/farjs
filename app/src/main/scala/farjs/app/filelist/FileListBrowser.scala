@@ -58,14 +58,6 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       else leftEl
     }
 
-    useLayoutEffect({ () =>
-      fsPlugin.init(props.dispatch, leftStack)
-      fsPlugin.init(props.dispatch, rightStack)
-
-      getInput(isRightActive).focus()
-      ()
-    }, Nil)
-    
     def getStack(isRight: Boolean): PanelStack = {
       if (isRight) rightStack
       else leftStack
@@ -78,7 +70,13 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       }
     }
     
-    def onKeypress(onRight: Boolean): js.Function2[js.Dynamic, KeyboardKey, Unit] = { (_, key) =>
+    val stacks = WithPanelStacksProps(
+      leftStack = getStack(isRight),
+      leftInput = leftButtonRef.current,
+      rightStack = getStack(!isRight),
+      rightInput = rightButtonRef.current
+    )
+    val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (_, key) =>
       def screen = leftButtonRef.current.screen
       key.full match {
         case "M-l" => props.dispatch(DrivePopupAction(show = ShowDriveOnLeft))
@@ -103,17 +101,20 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           }
         case keyFull =>
           props.plugins.find(_.triggerKey.contains(keyFull)).foreach { plugin =>
-            plugin.onKeyTrigger(onRight, getStack(isRight), getStack(!isRight))
+            plugin.onKeyTrigger(stacks)
           }
       }
     }
     
-    <(WithPanelStacks())(^.wrapped := WithPanelStacksProps(
-      leftStack = getStack(isRight),
-      leftInput = leftButtonRef.current,
-      rightStack = getStack(!isRight),
-      rightInput = rightButtonRef.current
-    ))(
+    useLayoutEffect({ () =>
+      fsPlugin.init(props.dispatch, leftStack)
+      fsPlugin.init(props.dispatch, rightStack)
+
+      getInput(isRightActive).focus()
+      ()
+    }, Nil)
+
+    <(WithPanelStacks())(^.wrapped := stacks)(
       <.button(
         ^("isRight") := false,
         ^.reactRef := leftButtonRef,
@@ -121,7 +122,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         ^.rbWidth := "50%",
         ^.rbHeight := "100%-1",
         ^.rbOnFocus := onActivate(isRight),
-        ^.rbOnKeypress := onKeypress(false)
+        ^.rbOnKeypress := onKeypress
       )(
         <(panelStackComp())(^.wrapped := PanelStackProps(
           isRight = false,
@@ -137,7 +138,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         ^.rbHeight := "100%-1",
         ^.rbLeft := "50%",
         ^.rbOnFocus := onActivate(!isRight),
-        ^.rbOnKeypress := onKeypress(true)
+        ^.rbOnKeypress := onKeypress
       )(
         <(panelStackComp())(^.wrapped := PanelStackProps(
           isRight = true,
