@@ -1,6 +1,6 @@
 package farjs.filelist.quickview
 
-import farjs.filelist.stack.{MockPanelStack, PanelStackItem, WithPanelStacksProps}
+import farjs.filelist.stack._
 import scommons.react.ReactClass
 import scommons.react.test.TestSpec
 
@@ -9,18 +9,14 @@ class QuickViewPluginSpec extends TestSpec {
   //noinspection TypeAnnotation
   class Stack(isActive: Boolean = false) {
     val push = mockFunction[PanelStackItem[QuickViewParams], Unit]
-    val update = mockFunction[PanelStackItem[QuickViewParams] => PanelStackItem[QuickViewParams], Unit]
     val pop = mockFunction[Unit]
     val peek = mockFunction[PanelStackItem[QuickViewParams]]
-    val params = mockFunction[QuickViewParams]
 
     val stack = new MockPanelStack[QuickViewParams](
       isActive = isActive,
       pushMock = push,
-      updateMock = update,
       popMock = pop,
-      peekMock = peek,
-      paramsMock = params
+      peekMock = peek
     )
   }
 
@@ -29,7 +25,7 @@ class QuickViewPluginSpec extends TestSpec {
     QuickViewPlugin.triggerKey shouldBe Some("C-q")
   }
   
-  it should "remove plugin from left panel when onTrigger" in {
+  it should "remove plugin from left panel when onKeyTrigger" in {
     //given
     val leftStack = new Stack(isActive = true)
     val rightStack = new Stack
@@ -43,7 +39,7 @@ class QuickViewPluginSpec extends TestSpec {
     QuickViewPlugin.onKeyTrigger(stacks) shouldBe None
   }
   
-  it should "remove plugin from right panel when onTrigger" in {
+  it should "remove plugin from right panel when onKeyTrigger" in {
     //given
     val leftStack = new Stack(isActive = true)
     val rightStack = new Stack
@@ -58,7 +54,7 @@ class QuickViewPluginSpec extends TestSpec {
     QuickViewPlugin.onKeyTrigger(stacks) shouldBe None
   }
   
-  it should "add plugin to left panel when onTrigger" in {
+  it should "add plugin to left panel when onKeyTrigger" in {
     //given
     val leftStack = new Stack
     val rightStack = new Stack(isActive = true)
@@ -73,7 +69,7 @@ class QuickViewPluginSpec extends TestSpec {
     QuickViewPlugin.onKeyTrigger(stacks) shouldBe None
   }
   
-  it should "add plugin to right panel when onTrigger" in {
+  it should "add plugin to right panel when onKeyTrigger" in {
     //given
     val leftStack = new Stack(isActive = true)
     val rightStack = new Stack

@@ -1,35 +1,20 @@
 package farjs.app.filelist.fs
 
 import farjs.app.filelist.fs.FSPanel._
-import farjs.app.filelist.zip.{AddToZipAction, AddToZipControllerProps}
 import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import org.scalatest.Succeeded
-import scommons.nodejs.test.AsyncTestSpec
-import scommons.react.redux.Dispatch
 import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
-import scala.collection.immutable.ListSet
 import scala.concurrent.Future
 
-class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
+class FSPanelSpec extends TestSpec with TestRendererUtils {
 
   FSPanel.fileListPanelComp = mockUiComponent("FileListPanel")
   FSPanel.fsFreeSpaceComp = mockUiComponent("FSFreeSpace")
   FSPanel.fsService = new FsService().fsService
   FSPanel.fsFoldersHistory = mockUiComponent("FSFoldersHistory")
-  FSPanel.addToZipController = mockUiComponent("AddToZipController")
-
-  //noinspection TypeAnnotation
-  class Actions {
-    val updateDir = mockFunction[Dispatch, String, FileListDirUpdateAction]
-
-    val actions = new MockFileListActions(
-      updateDirMock = updateDir
-    )
-  }
 
   //noinspection TypeAnnotation
   class FsService {
@@ -64,9 +49,10 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     ))
     val comp = testRender(<(FSPanel())(^.wrapped := props)())
     val panelProps = findComponentProps(comp, fileListPanelComp)
+    val taskFuture = Future.unit
 
     //then
-    fsService.openItem.expects("/sub-dir", "item 1").returning(Future.unit)
+    fsService.openItem.expects("/sub-dir", "item 1").returning(taskFuture)
     var resultAction: Any = null
     dispatch.expects(*).onCall { action: Any =>
       resultAction = action
@@ -75,113 +61,8 @@ class FSPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     //when & then
     panelProps.onKeypress(null, "M-o") shouldBe true
 
-    inside(resultAction) { case FileListTaskAction(FutureTask("Opening default app", future)) =>
-      future.map(_ => Succeeded)
-    }
-  }
-
-  it should "not render AddToZipController if .. when onKeypress(S-f7)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions
-    val props = FileListPanelProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
-        FileListItem.up,
-        FileListItem("item 1")
-      ))
-    ))
-    val renderer = createTestRenderer(<(FSPanel())(^.wrapped := props)())
-    val panelProps = findComponentProps(renderer.root, fileListPanelComp)
-    
-    //when & then
-    panelProps.onKeypress(null, "S-f7") shouldBe true
-
-    //then
-    findComponents(renderer.root, addToZipController()) should be (empty)
-  }
-
-  it should "render AddToZipController and handle onCancel when onKeypress(S-f7)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions
-    val items = List(FileListItem("item 1"))
-    val props = FileListPanelProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = items)
-    ))
-    val renderer = createTestRenderer(<(FSPanel())(^.wrapped := props)())
-    val panelProps = findComponentProps(renderer.root, fileListPanelComp)
-    
-    //when & then
-    panelProps.onKeypress(null, "S-f7") shouldBe true
-
-    //then
-    inside(findComponentProps(renderer.root, addToZipController)) {
-      case AddToZipControllerProps(resDispatch, resActions, state, zipName, resItems, action, _, onCancel) =>
-        resDispatch shouldBe dispatch
-        resActions shouldBe actions
-        state shouldBe props.state
-        zipName shouldBe "item 1.zip"
-        resItems shouldBe items
-        action shouldBe AddToZipAction.Add
-        
-        //when
-        onCancel()
-        
-        //then
-        findComponents(renderer.root, addToZipController()) should be (empty)
-    }
-  }
-
-  it should "render AddToZipController and handle onComplete when onKeypress(S-f7)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = new Actions
-    val items = List(
-      FileListItem("item 2"),
-      FileListItem("item 3")
-    )
-    val props = FileListPanelProps(dispatch, actions.actions, FileListState(
-      index = 1,
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
-        FileListItem.up,
-        FileListItem("item 1")
-      ) ++ items),
-      selectedNames = ListSet("item 3", "item 2")
-    ))
-    val renderer = createTestRenderer(<(FSPanel())(^.wrapped := props)())
-    val panelProps = findComponentProps(renderer.root, fileListPanelComp)
-    
-    //when & then
-    panelProps.onKeypress(null, "S-f7") shouldBe true
-
-    //then
-    inside(findComponentProps(renderer.root, addToZipController)) {
-      case AddToZipControllerProps(resDispatch, resActions, state, zipName, resItems, action, onComplete, _) =>
-        resDispatch shouldBe dispatch
-        resActions shouldBe actions.actions
-        state shouldBe props.state
-        zipName shouldBe "item 2.zip"
-        resItems shouldBe items
-        action shouldBe AddToZipAction.Add
-
-        //given
-        val zipFile = "test.zip"
-        val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
-          FileListItem("file 1")
-        ))
-        val updateAction = FileListDirUpdateAction(FutureTask("Updating...", Future.successful(updatedDir)))
-        
-        //then
-        actions.updateDir.expects(dispatch, props.state.currDir.path).returning(updateAction)
-        dispatch.expects(FileListItemCreatedAction(zipFile, updatedDir))
-        dispatch.expects(updateAction)
-        
-        //when
-        onComplete(zipFile)
-        
-        //then
-        findComponents(renderer.root, addToZipController()) should be (empty)
-        updateAction.task.future.map(_ => Succeeded)
+    inside(resultAction) { case FileListTaskAction(FutureTask("Opening default app", resFuture)) =>
+      resFuture shouldBe taskFuture
     }
   }
 
