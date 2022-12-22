@@ -2,7 +2,7 @@ package farjs.ui.border
 
 import farjs.ui._
 import farjs.ui.border.DoubleBorder._
-import org.scalatest.Assertion
+import org.scalatest.{Assertion, Succeeded}
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -44,6 +44,21 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
     assertDoubleBorder(result, props)
   }
   
+  it should "render component with title and footer" in {
+    //given
+    val props = DoubleBorderProps(15, 5, style = new BlessedStyle {
+      override val fg = "black"
+      override val bg = "cyan"
+    }, left = 1, top = 2, title = "test title", footer = "test footer")
+    val comp = <(DoubleBorder())(^.plain := props)()
+
+    //when
+    val result = createTestRenderer(comp).root
+
+    //then
+    assertDoubleBorder(result, props)
+  }
+  
   private def assertDoubleBorder(result: TestInstance, props: DoubleBorderProps): Unit = {
     val left = props.left.getOrElse(0)
     val top = props.top.getOrElse(0)
@@ -52,7 +67,8 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
                          title: Option[TestInstance],
                          line2: TestInstance,
                          line3: TestInstance,
-                         line4: TestInstance): Assertion = {
+                         line4: TestInstance,
+                         footer: Option[TestInstance]): Assertion = {
 
       assertTestComponent(line1, horizontalLineComp, plain = true) {
         case HorizontalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
@@ -110,13 +126,31 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
           startCh shouldBe DoubleChars.bottomLeft
           endCh shouldBe DoubleChars.bottomRight
       }
+
+      footer.isDefined shouldBe props.footer.isDefined
+      footer.foreach { t =>
+        assertTestComponent(t, textLineComp, plain = true) {
+          case TextLineProps(align, resLeft, resTop, resWidth, text, style, focused, padding) =>
+            align shouldBe TextAlign.center
+            resLeft shouldBe left
+            resTop shouldBe (top + props.height - 1)
+            resWidth shouldBe props.width
+            text shouldBe props.footer.get
+            style shouldBe props.style
+            focused shouldBe js.undefined
+            padding shouldBe js.undefined
+        }
+      }
+      Succeeded
     }
 
     inside(result.children.toList) {
       case List(line1, line2, line3, line4) =>
-        assertComponents(line1, None, line2, line3, line4)
+        assertComponents(line1, None, line2, line3, line4, None)
       case List(line1, title, line2, line3, line4) =>
-        assertComponents(line1, Some(title), line2, line3, line4)
+        assertComponents(line1, Some(title), line2, line3, line4, None)
+      case List(line1, title, line2, line3, line4, footer) =>
+        assertComponents(line1, Some(title), line2, line3, line4, Some(footer))
     }
   }
 }

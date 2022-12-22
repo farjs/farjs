@@ -8,7 +8,8 @@ case class ModalContentProps(title: String,
                              size: (Int, Int),
                              style: BlessedStyle,
                              padding: BlessedPadding = ModalContent.padding,
-                             left: String = "center")
+                             left: String = "center",
+                             footer: Option[String] = None)
 
 object ModalContent extends FunctionComponent[ModalContentProps] {
 
@@ -34,7 +35,11 @@ object ModalContent extends FunctionComponent[ModalContentProps] {
         width = width - padding.left - padding.right,
         height = height - padding.top - padding.bottom,
         style = props.style,
-        title = props.title
+        title = props.title,
+        footer = props.footer match {
+          case None => ()
+          case Some(footer) => footer
+        }
       ))(),
       
       compProps.children

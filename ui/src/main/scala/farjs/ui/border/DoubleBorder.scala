@@ -60,7 +60,18 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
         style = props.style,
         startCh = DoubleChars.bottomLeft,
         endCh = DoubleChars.bottomRight
-      ))()
+      ))(),
+
+      props.footer.toOption.map { footer =>
+        <(textLineComp())(^.plain := TextLineProps(
+          align = TextAlign.center,
+          left = left,
+          top = top + props.height - 1,
+          width = props.width,
+          text = footer,
+          style = props.style
+        ))()
+      }
     )
   }
 }

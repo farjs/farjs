@@ -11,6 +11,7 @@ sealed trait DoubleBorderProps extends js.Object {
   val left: js.UndefOr[Int]
   val top: js.UndefOr[Int]
   val title: js.UndefOr[String]
+  val footer: js.UndefOr[String]
 }
 
 object DoubleBorderProps {
@@ -20,7 +21,8 @@ object DoubleBorderProps {
             style: BlessedStyle,
             left: js.UndefOr[Int] = js.undefined,
             top: js.UndefOr[Int] = js.undefined,
-            title: js.UndefOr[String] = js.undefined): DoubleBorderProps = {
+            title: js.UndefOr[String] = js.undefined,
+            footer: js.UndefOr[String] = js.undefined): DoubleBorderProps = {
 
     js.Dynamic.literal(
       width = width,
@@ -28,18 +30,22 @@ object DoubleBorderProps {
       style = style,
       left = left,
       top = top,
-      title = title
+      title = title,
+      footer = footer
     ).asInstanceOf[DoubleBorderProps]
   }
 
-  def unapply(arg: DoubleBorderProps): Option[(Int, Int, BlessedStyle, js.UndefOr[Int], js.UndefOr[Int], js.UndefOr[String])] = {
+  def unapply(arg: DoubleBorderProps): Option[
+    (Int, Int, BlessedStyle, js.UndefOr[Int], js.UndefOr[Int], js.UndefOr[String], js.UndefOr[String])
+  ] = {
     Some((
       arg.width,
       arg.height,
       arg.style,
       arg.left,
       arg.top,
-      arg.title
+      arg.title,
+      arg.footer
     ))
   }
 }

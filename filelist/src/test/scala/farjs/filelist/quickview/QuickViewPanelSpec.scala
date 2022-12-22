@@ -118,13 +118,14 @@ class QuickViewPanelSpec extends AsyncTestSpec with BaseTestSpec
                          item: TestInstance): Assertion = {
 
       assertTestComponent(border, doubleBorderComp, plain = true) {
-        case DoubleBorderProps(resWidth, resHeight, style, resLeft, resTop, title) =>
+        case DoubleBorderProps(resWidth, resHeight, style, resLeft, resTop, title, footer) =>
           resWidth shouldBe width
           resHeight shouldBe height
           style shouldBe theme.regularItem
           resLeft shouldBe js.undefined
           resTop shouldBe js.undefined
           title shouldBe js.undefined
+          footer shouldBe js.undefined
       }
       assertTestComponent(line, horizontalLineComp, plain = true) {
         case HorizontalLineProps(resLeft, resTop, len, lineCh, style, startCh, endCh) =>

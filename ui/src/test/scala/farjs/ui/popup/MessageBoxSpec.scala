@@ -214,12 +214,13 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       focusable shouldBe true
     }, inside(_) { case List(content) =>
       assertTestComponent(content, modalContentComp)({
-        case ModalContentProps(title, size, style, padding, left) =>
+        case ModalContentProps(title, size, style, padding, left, footer) =>
           title shouldBe props.title
           size shouldBe width -> height
           style shouldBe props.style
           padding shouldBe ModalContent.padding
           left shouldBe "center"
+          footer shouldBe None
       }, inside(_) {
           case List(msg, actionsBox) if textLines.size == 1 =>
             assertComponents(List(msg), actionsBox)

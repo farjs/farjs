@@ -191,13 +191,14 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     
     assertNativeComponent(result, <.box(^.rbStyle := theme.regularItem)(
       <(doubleBorderComp())(^.assertPlain[DoubleBorderProps](inside(_) {
-        case DoubleBorderProps(resWidth, resHeight, style, resLeft, resTop, title) =>
+        case DoubleBorderProps(resWidth, resHeight, style, resLeft, resTop, title, footer) =>
           resWidth shouldBe width
           resHeight shouldBe height
           style shouldBe theme.regularItem
           resLeft shouldBe js.undefined
           resTop shouldBe js.undefined
           title shouldBe js.undefined
+          footer shouldBe js.undefined
       }))(),
       <(horizontalLineComp())(^.assertPlain[HorizontalLineProps](inside(_) {
         case HorizontalLineProps(resLeft, resTop, len, lineCh, style, startCh, endCh) =>

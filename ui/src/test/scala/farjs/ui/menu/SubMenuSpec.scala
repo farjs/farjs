@@ -70,13 +70,14 @@ class SubMenuSpec extends TestSpec with TestRendererUtils {
         ^.rbStyle := theme
       )(
         <(doubleBorderComp())(^.assertPlain[DoubleBorderProps](inside(_) {
-          case DoubleBorderProps(resWidth, resHeight, style, resLeft, resTop, title) =>
+          case DoubleBorderProps(resWidth, resHeight, style, resLeft, resTop, title, footer) =>
             resWidth shouldBe width
             resHeight shouldBe height
             style shouldBe theme
             resLeft shouldBe js.undefined
             resTop shouldBe js.undefined
             title shouldBe js.undefined
+            footer shouldBe js.undefined
         }))(),
 
         props.items.zipWithIndex.map { case (text, index) =>
