@@ -159,6 +159,7 @@ class FSPopupsSpec extends TestSpec with TestRendererUtils {
     ).root
 
     //then
+    val onChangeDirInActivePanel = findComponentProps(result, foldersHistory).onChangeDir
     assertComponents(result.children, List(
       <(drive())(^.assertWrapped(inside(_) {
         case DriveControllerProps(dispatch, show, _) =>
@@ -167,12 +168,18 @@ class FSPopupsSpec extends TestSpec with TestRendererUtils {
       }))(),
 
       <(foldersHistory())(^.assertWrapped(inside(_) {
-        case FoldersHistoryControllerProps(dispatch, showFoldersHistoryPopup, _) =>
+        case FoldersHistoryControllerProps(dispatch, showPopup, onChangeDir) =>
           dispatch shouldBe props.dispatch
-          showFoldersHistoryPopup shouldBe false
+          showPopup shouldBe false
+          onChangeDir shouldBe onChangeDirInActivePanel
       }))(),
 
-      <(folderShortcuts())(^.wrapped := props)()
+      <(folderShortcuts())(^.assertWrapped(inside(_) {
+        case FolderShortcutsControllerProps(dispatch, showPopup, onChangeDir) =>
+          dispatch shouldBe props.dispatch
+          showPopup shouldBe false
+          onChangeDir shouldBe onChangeDirInActivePanel
+      }))()
     ))
   }
 }

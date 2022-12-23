@@ -9,15 +9,17 @@ class FolderShortcutsControllerSpec extends TestSpec with TestRendererUtils {
 
   FolderShortcutsController.folderShortcutsPopup = mockUiComponent("FolderShortcutsPopup")
 
-  it should "change dir when onChangeDir" in {
+  it should "call onChangeDir when onChangeDir" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FSPopupsProps(dispatch, FSPopupsState(showFolderShortcutsPopup = true))
+    val onChangeDir = mockFunction[String, Unit]
+    val props = FolderShortcutsControllerProps(dispatch, showPopup = true, onChangeDir)
     val renderer = createTestRenderer(<(FolderShortcutsController())(^.wrapped := props)())
     val dir = "test dir"
 
     //then
     dispatch.expects(FolderShortcutsPopupAction(show = false))
+    onChangeDir.expects(dir)
 
     //when
     findComponentProps(renderer.root, folderShortcutsPopup).onChangeDir(dir)
@@ -26,12 +28,14 @@ class FolderShortcutsControllerSpec extends TestSpec with TestRendererUtils {
   it should "dispatch FolderShortcutsPopupAction when onClose" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FSPopupsProps(dispatch, FSPopupsState(showFolderShortcutsPopup = true))
+    val onChangeDir = mockFunction[String, Unit]
+    val props = FolderShortcutsControllerProps(dispatch, showPopup = true, onChangeDir)
     val comp = testRender(<(FolderShortcutsController())(^.wrapped := props)())
     val popup = findComponentProps(comp, folderShortcutsPopup)
 
     //then
     dispatch.expects(FolderShortcutsPopupAction(show = false))
+    onChangeDir.expects(*).never()
 
     //when
     popup.onClose()
@@ -40,7 +44,7 @@ class FolderShortcutsControllerSpec extends TestSpec with TestRendererUtils {
   it should "render popup component" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FSPopupsProps(dispatch, FSPopupsState(showFolderShortcutsPopup = true))
+    val props = FolderShortcutsControllerProps(dispatch, showPopup = true, _ => ())
 
     //when
     val result = testRender(<(FolderShortcutsController())(^.wrapped := props)())
@@ -54,7 +58,7 @@ class FolderShortcutsControllerSpec extends TestSpec with TestRendererUtils {
   it should "render empty component" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FSPopupsProps(dispatch, FSPopupsState())
+    val props = FolderShortcutsControllerProps(dispatch, showPopup = false, _ => ())
 
     //when
     val renderer = createTestRenderer(<(FolderShortcutsController())(^.wrapped := props)())

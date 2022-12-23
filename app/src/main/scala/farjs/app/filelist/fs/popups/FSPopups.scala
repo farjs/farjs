@@ -12,7 +12,7 @@ object FSPopups extends FunctionComponent[FSPopupsProps] {
 
   private[popups] var drive: UiComponent[DriveControllerProps] = DriveController
   private[popups] var foldersHistory: UiComponent[FoldersHistoryControllerProps] = FoldersHistoryController
-  private[popups] var folderShortcuts: UiComponent[FSPopupsProps] = FolderShortcutsController
+  private[popups] var folderShortcuts: UiComponent[FolderShortcutsControllerProps] = FolderShortcutsController
 
   protected def render(compProps: Props): ReactElement = {
     val stacks = WithPanelStacks.usePanelStacks
@@ -57,7 +57,11 @@ object FSPopups extends FunctionComponent[FSPopupsProps] {
         onChangeDir = onChangeDirInActivePanel
       ))(),
       
-      <(folderShortcuts())(^.wrapped := props)()
+      <(folderShortcuts())(^.wrapped := FolderShortcutsControllerProps(
+        dispatch = props.dispatch,
+        showPopup = props.popups.showFolderShortcutsPopup,
+        onChangeDir = onChangeDirInActivePanel
+      ))()
     )
   }
 }
