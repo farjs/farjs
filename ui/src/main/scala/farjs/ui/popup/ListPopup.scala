@@ -11,6 +11,9 @@ case class ListPopupProps(title: String,
                           items: List[String],
                           onAction: Int => Unit,
                           onClose: () => Unit,
+                          onSelect: Int => Unit = _ => (),
+                          onKeypress: String => Boolean = _ => false,
+                          footer: Option[String] = None,
                           focusLast: Boolean = false,
                           textPaddingLeft: Int = 2,
                           textPaddingRight: Int = 1)
@@ -30,7 +33,7 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
     val textPaddingLeftStr = " " * props.textPaddingLeft
     val textPaddingRightStr = " " * props.textPaddingRight
 
-    <(popupComp())(^.wrapped := PopupProps(onClose = props.onClose))(
+    <(popupComp())(^.wrapped := PopupProps(onClose = props.onClose, onKeypress = props.onKeypress))(
       <(withSizeComp())(^.plain := WithSizeProps { (width, height) =>
         val maxContentWidth = {
           if (items.isEmpty) 2 * (paddingHorizontal + 1)
@@ -48,7 +51,8 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
           title = props.title,
           size = (modalWidth, modalHeight),
           style = theme,
-          padding = padding
+          padding = padding,
+          footer = props.footer
         ))(
           <(listBoxComp())(^.wrapped := ListBoxProps(
             left = 1,
@@ -68,7 +72,8 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
               if (items.nonEmpty) {
                 props.onAction(index)
               }
-            }
+            },
+            onSelect = props.onSelect
           ))()
         )
       })()

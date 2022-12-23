@@ -13,7 +13,8 @@ case class ListBoxProps(left: Int,
                         selected: Int,
                         items: List[String],
                         style: BlessedStyle,
-                        onAction: Int => Unit)
+                        onAction: Int => Unit,
+                        onSelect: Int => Unit = _ => ())
 
 object ListBox extends FunctionComponent[ListBoxProps] {
 
@@ -25,12 +26,18 @@ object ListBox extends FunctionComponent[ListBoxProps] {
     val (viewport, setViewport) =
       useState(ListViewport(props.selected, props.items.size, props.height))
 
+    val selected = viewport.offset + viewport.focused
     val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (_, key) =>
       key.full match {
-        case "return" => props.onAction(viewport.offset + viewport.focused)
+        case "return" => props.onAction(selected)
         case key => viewport.onKeypress(key).foreach(setViewport)
       }
     }
+    
+    useLayoutEffect({ () =>
+      props.onSelect(selected)
+      ()
+    }, List(selected))
     
     <.button(
       ^.rbLeft := props.left,

@@ -98,7 +98,8 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
       items = items,
       onAction = onAction,
       onClose = () => (),
-      focusLast = focusLast
+      focusLast = focusLast,
+      footer = Some("test footer")
     )
   }
 
@@ -116,10 +117,11 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
     
     assertComponents(result.children, List(
       <(popupComp())(^.assertWrapped(inside(_) {
-        case PopupProps(onClose, closable, focusable, _, _) =>
+        case PopupProps(onClose, closable, focusable, _, onKeypress) =>
           onClose should be theSameInstanceAs props.onClose
           closable shouldBe true
           focusable shouldBe true
+          onKeypress should be theSameInstanceAs props.onKeypress
       }))(
         <(withSizeComp())(^.assertPlain[WithSizeProps](inside(_) {
           case WithSizeProps(render) =>
@@ -132,10 +134,10 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
                 style shouldBe theme
                 padding shouldBe ListPopup.padding
                 left shouldBe "center"
-                footer shouldBe None
+                footer shouldBe props.footer
             }, inside(_) { case List(view) =>
               assertTestComponent(view, listBoxComp) {
-                case ListBoxProps(left, top, width, height, selected, resItems, style, _) =>
+                case ListBoxProps(left, top, width, height, selected, resItems, style, _, onSelect) =>
                   left shouldBe 1
                   top shouldBe 1
                   width shouldBe contentWidth
@@ -146,6 +148,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
                   }
                   resItems shouldBe items
                   style shouldBe theme
+                  onSelect should be theSameInstanceAs props.onSelect
               }
             })
         }))()

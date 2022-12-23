@@ -27,14 +27,58 @@ class ListBoxSpec extends TestSpec with TestRendererUtils {
     assertListBox(renderer.root, props, showScrollBar = true, offset)
   }
 
-  it should "update viewport state when onKeypress(down)" in {
+  it should "call onSelect if new index when update" in {
     //given
-    val props = getListBoxProps()
+    val onSelect = mockFunction[Int, Unit]
+    val props = getListBoxProps(selected = 1, onSelect = onSelect)
+    onSelect.expects(1)
+
+    val renderer = createTestRenderer(<(ListBox())(^.wrapped := props)())
+    val listView = findComponentProps(renderer.root, listViewComp)
+    listView.viewport.offset shouldBe 0
+    listView.viewport.focused shouldBe 1
+    val viewport = listView.viewport.copy(focused = 0)
+
+    //then
+    onSelect.expects(0)
+
+    //when
+    listView.setViewport(viewport)
+  }
+
+  it should "not call onSelect if same index when update" in {
+    //given
+    val onSelect = mockFunction[Int, Unit]
+    val props = getListBoxProps(selected = 1, onSelect = onSelect)
+    onSelect.expects(1)
+
+    val renderer = createTestRenderer(<(ListBox())(^.wrapped := props)())
+    val listView = findComponentProps(renderer.root, listViewComp)
+    listView.viewport.offset shouldBe 0
+    listView.viewport.focused shouldBe 1
+    val viewport = listView.viewport.copy(offset = 1, focused = 0)
+
+    //then
+    onSelect.expects(1).never()
+
+    //when
+    listView.setViewport(viewport)
+  }
+
+  it should "update viewport and call onSelect when onKeypress(down)" in {
+    //given
+    val onSelect = mockFunction[Int, Unit]
+    val props = getListBoxProps(onSelect = onSelect)
+    onSelect.expects(0)
+
     val renderer = createTestRenderer(<(ListBox())(^.wrapped := props)())
     assertListBox(renderer.root, props, showScrollBar = false)
     val button = inside(findComponents(renderer.root, <.button.name)) {
       case List(button) => button
     }
+
+    //then
+    onSelect.expects(1)
     
     //when
     button.props.onKeypress(null, literal(full = "down"))
@@ -88,7 +132,8 @@ class ListBoxSpec extends TestSpec with TestRendererUtils {
                                 "  item 1",
                                 "  item 2"
                               ),
-                              onAction: Int => Unit = _ => ()): ListBoxProps = {
+                              onAction: Int => Unit = _ => (),
+                              onSelect: Int => Unit = _ => ()): ListBoxProps = {
     ListBoxProps(
       left = 2,
       top = 2,
@@ -97,7 +142,8 @@ class ListBoxSpec extends TestSpec with TestRendererUtils {
       selected = selected,
       items = items,
       style = DefaultTheme.popup.menu,
-      onAction = onAction
+      onAction = onAction,
+      onSelect = onSelect
     )
   }
 
