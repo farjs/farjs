@@ -1,4 +1,4 @@
-package farjs.app.filelist.history
+package farjs.app.filelist.service
 
 import farjs.domain.FarjsDBContext
 import farjs.domain.dao.{HistoryCopyItemDao, HistoryDao}

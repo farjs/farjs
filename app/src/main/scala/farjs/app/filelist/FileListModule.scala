@@ -1,6 +1,6 @@
 package farjs.app.filelist
 
-import farjs.app.filelist.history.FileListHistoryServiceImpl
+import farjs.app.filelist.service.FileListHistoryServiceImpl
 import farjs.domain.FarjsDBContext
 import farjs.domain.dao._
 import farjs.filelist.FileListServices

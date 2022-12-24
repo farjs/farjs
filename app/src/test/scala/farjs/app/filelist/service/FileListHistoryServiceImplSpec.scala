@@ -1,4 +1,4 @@
-package farjs.app.filelist.history
+package farjs.app.filelist.service
 
 import farjs.app.BaseDBContextSpec
 import farjs.app.filelist.FileListModule
