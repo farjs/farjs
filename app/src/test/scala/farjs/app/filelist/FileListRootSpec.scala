@@ -1,5 +1,6 @@
 package farjs.app.filelist
 
+import farjs.app.filelist.fs.FSServices
 import farjs.filelist.FileListServices
 import scommons.react._
 import scommons.react.hooks._
@@ -9,29 +10,34 @@ import java.util.concurrent.atomic.AtomicReference
 
 class FileListRootSpec extends TestSpec with TestRendererUtils {
 
-  it should "render component with context provider" in {
+  it should "render component with contexts" in {
     //given
-    val (servicesCtx, servicesComp) = getServicesCtxHook
+    val (fileListCtx, fsCtx, servicesComp) = getServicesCtxHook
     FileListRoot.fileListComp = servicesComp
-    val services = mock[FileListServices]
-    val rootComp = new FileListRoot(services)
+    val module = mock[FileListModule]
+    val rootComp = new FileListRoot(module)
     
     //when
     val result = createTestRenderer(<(rootComp()).empty).root
     
     //then
-    servicesCtx.get() shouldBe services
+    fileListCtx.get() shouldBe module.fileListServices
+    fsCtx.get() shouldBe module.fsServices
     assertComponents(result.children, List(
       <(servicesComp).empty
     ))
   }
 
-  private def getServicesCtxHook: (AtomicReference[FileListServices], ReactClass) = {
-    val ref = new AtomicReference[FileListServices](null)
-    (ref, new FunctionComponent[Unit] {
+  private def getServicesCtxHook: (
+    AtomicReference[FileListServices], AtomicReference[FSServices], ReactClass
+    ) = {
+
+    val fileListRef = new AtomicReference[FileListServices](null)
+    val fsRef = new AtomicReference[FSServices](null)
+    (fileListRef, fsRef, new FunctionComponent[Unit] {
       protected def render(props: Props): ReactElement = {
-        val ctx = useContext(FileListServices.Context)
-        ref.set(ctx)
+        fileListRef.set(useContext(FileListServices.Context))
+        fsRef.set(useContext(FSServices.Context))
         <.>()()
       }
     }.apply())

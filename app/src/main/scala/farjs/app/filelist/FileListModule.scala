@@ -1,6 +1,7 @@
 package farjs.app.filelist
 
-import farjs.app.filelist.service.FileListHistoryServiceImpl
+import farjs.app.filelist.fs.FSServices
+import farjs.app.filelist.service._
 import farjs.domain.FarjsDBContext
 import farjs.domain.dao._
 import farjs.filelist.FileListServices
@@ -19,10 +20,17 @@ class FileListModule(ctx: FarjsDBContext) {
   val copyItemDao = new HistoryCopyItemDao(ctx)
   val copyItemService = new FileListHistoryServiceImpl(copyItemDao)
 
-  val services = new FileListServices(
+  val fileListServices = new FileListServices(
     foldersHistory = folderService,
     mkDirsHistory = mkDirService,
     selectPatternsHistory = selectPatternService,
     copyItemsHistory = copyItemService
+  )
+
+  val folderShortcutDao = new FolderShortcutDao(ctx)
+  val folderShortcutsService = new FolderShortcutsServiceImpl(folderShortcutDao)
+
+  val fsServices = new FSServices(
+    folderShortcuts = folderShortcutsService
   )
 }

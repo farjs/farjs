@@ -71,7 +71,7 @@ object FarjsApp {
         prepareDB().map { db =>
           val ctx = new FarjsDBContext(db)
           val fileListModule = new FileListModule(ctx)
-          new FileListRoot(fileListModule.services).apply()
+          new FileListRoot(fileListModule).apply()
         }
       },
       taskController = FarjsTaskController(),

@@ -1,14 +1,17 @@
 package farjs.app.filelist
 
 import farjs.app.filelist.FileListRoot._
+import farjs.app.filelist.fs.FSServices
 import farjs.filelist.FileListServices
 import scommons.react._
 
-class FileListRoot(services: FileListServices) extends FunctionComponent[Unit] {
+class FileListRoot(module: FileListModule) extends FunctionComponent[Unit] {
 
   protected def render(compProps: Props): ReactElement = {
-    <(FileListServices.Context.Provider)(^.contextValue := services)(
-      <(fileListComp).empty
+    <(FileListServices.Context.Provider)(^.contextValue := module.fileListServices)(
+      <(FSServices.Context.Provider)(^.contextValue := module.fsServices)(
+        <(fileListComp).empty
+      )
     )
   }
 }
