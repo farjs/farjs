@@ -10,7 +10,7 @@ import scala.scalajs.js
 
 class FolderShortcutsServiceImplSpec extends BaseDBContextSpec {
 
-  it should "store folder shortcut when save" in withCtx { ctx =>
+  it should "store new folder shortcut when save" in withCtx { ctx =>
     //given
     val module = new FileListModule(ctx)
     val dao = module.folderShortcutDao
@@ -31,6 +31,34 @@ class FolderShortcutsServiceImplSpec extends BaseDBContextSpec {
       //then
       results shouldBe {
         List.fill(10)(Option.empty[String]).updated(1, Some(path))
+      }
+    }
+  }
+  
+  it should "update existing folder shortcut when save" in withCtx { ctx =>
+    //given
+    val module = new FileListModule(ctx)
+    val dao = module.folderShortcutDao
+    val service = module.folderShortcutsService
+    val path = "test/path"
+    
+    for {
+      _ <- dao.deleteAll()
+      _ <- service.save(1, path)
+      _ <- service.getAll.map { shortcuts =>
+        shortcuts shouldBe {
+          List.fill(10)(Option.empty[String]).updated(1, Some(path))
+        }
+      }
+
+      //when
+      _ <- service.save(1, s"$path-updated")
+
+      results <- service.getAll
+    } yield {
+      //then
+      results shouldBe {
+        List.fill(10)(Option.empty[String]).updated(1, Some(s"$path-updated"))
       }
     }
   }

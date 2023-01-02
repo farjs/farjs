@@ -85,7 +85,9 @@ object MenuController extends FunctionComponent[FileListPopupsProps] {
       ("  Folders history   Alt-F12  ", None, "M-h"),
       (SubMenu.separator, None, ""),
       ("  Swap panels       Ctrl-U   ", None, "C-u"),
-      ("  Quick search      Ctrl-S   ", None, "C-s")
+      ("  Quick search      Ctrl-S   ", None, "C-s"),
+      (SubMenu.separator, None, ""),
+      ("  Folder shortcuts  Ctrl-D   ", None, "C-d")
     ),
     "Options" -> List(
       ("  DevTools    F12  ", None, "f12")

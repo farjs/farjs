@@ -1,7 +1,8 @@
 package farjs.app.filelist.fs.popups
 
+import farjs.app.filelist.fs.FSServices
+import farjs.filelist.FileListState
 import farjs.filelist.stack.WithPanelStacks
-import farjs.filelist.{FileListServices, FileListState}
 import farjs.ui.popup._
 import scommons.react._
 import scommons.react.hooks._
@@ -17,7 +18,7 @@ object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps]
   
   protected def render(compProps: Props): ReactElement = {
     val stacks = WithPanelStacks.usePanelStacks
-    val services = FileListServices.useServices
+    val services = FSServices.useServices
     val (maybeItems, setItems) = useState(Option.empty[List[Option[String]]])
     val (selected, setSelected) = useState(0)
     val props = compProps.wrapped
@@ -36,12 +37,16 @@ object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps]
         case "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" =>
           onAction(key.toInt)
         case "-" =>
-          setItems(maybeItems.map(items => items.updated(selected, None)))
+          services.folderShortcuts.delete(selected).foreach { _ =>
+            setItems(maybeItems.map(items => items.updated(selected, None)))
+          }
         case "+" =>
           val stackItem = stacks.activeStack.peekLast[FileListState]
           stackItem.state.foreach { state =>
             val dir = state.currDir.path
-            setItems(maybeItems.map(items => items.updated(selected, Some(dir))))
+            services.folderShortcuts.save(selected, dir).foreach { _ =>
+              setItems(maybeItems.map(items => items.updated(selected, Some(dir))))
+            }
           }
         case _ =>
           processed = false
@@ -51,13 +56,8 @@ object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps]
     }
 
     useLayoutEffect({ () =>
-      //TODO: load shortcuts
-      services.foldersHistory.getAll.map { items =>
-        val initItems = List.fill(10)(Option.empty[String])
-        val resItems = items.takeRight(10).zipWithIndex.foldLeft(initItems) {
-          case (res, (dir, i)) => res.updated(i, Some(dir))
-        }
-        setItems(Some(resItems))
+      services.folderShortcuts.getAll.map { shortcuts =>
+        setItems(Some(shortcuts.toList))
       }
       ()
     }, Nil)

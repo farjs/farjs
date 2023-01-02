@@ -1,10 +1,9 @@
 package farjs.app.filelist.fs.popups
 
+import farjs.app.filelist.fs.FSServicesSpec.withServicesContext
 import farjs.app.filelist.fs.popups.FolderShortcutsPopup._
-import farjs.filelist.FileListServicesSpec.withServicesContext
 import farjs.filelist.FileListState
 import farjs.filelist.api.FileListDir
-import farjs.filelist.history.MockFileListHistoryService
 import farjs.filelist.stack.WithPanelStacksSpec.withContext
 import farjs.filelist.stack.{PanelStack, PanelStackItem}
 import farjs.ui.popup.ListPopupProps
@@ -20,11 +19,15 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
   FolderShortcutsPopup.listPopup = mockUiComponent("ListPopup")
 
   //noinspection TypeAnnotation
-  class HistoryService {
-    val getAll = mockFunction[Future[Seq[String]]]
+  class ShortcutsService {
+    val getAll = mockFunction[Future[Seq[Option[String]]]]
+    val save = mockFunction[Int, String, Future[Unit]]
+    val delete = mockFunction[Int, Future[Unit]]
 
-    val service = new MockFileListHistoryService(
-      getAllMock = getAll
+    val service = new MockFolderShortcutsService(
+      getAllMock = getAll,
+      saveMock = save,
+      deleteMock = delete
     )
   }
 
@@ -38,12 +41,12 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     val rightStack = new PanelStack(isActive = false, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
     ), null)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("item"))
-    historyService.getAll.expects().returning(itemsF)
+    val shortcutsService = new ShortcutsService
+    val itemsF = Future.successful(List.fill(10)(Option("item")))
+    shortcutsService.getAll.expects().returning(itemsF)
     
     val result = createTestRenderer(withContext(withServicesContext(
-      <(FolderShortcutsPopup())(^.wrapped := props)(), historyService.service
+      <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
@@ -69,12 +72,12 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     val rightStack = new PanelStack(isActive = false, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
     ), null)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("item"))
-    historyService.getAll.expects().returning(itemsF)
+    val shortcutsService = new ShortcutsService
+    val itemsF = Future.successful(List.fill(10)(None))
+    shortcutsService.getAll.expects().returning(itemsF)
     
     val result = createTestRenderer(withContext(withServicesContext(
-      <(FolderShortcutsPopup())(^.wrapped := props)(), historyService.service
+      <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
@@ -100,23 +103,23 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     val rightStack = new PanelStack(isActive = false, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
     ), null)
-    val historyService = new HistoryService
+    val shortcutsService = new ShortcutsService
     val itemsF = Future.successful(List(
-      "item 1",
-      "item 2",
-      "item 3",
-      "item 4",
-      "item 5",
-      "item 6",
-      "item 7",
-      "item 8",
-      "item 9",
-      "item 10"
+      Option("item 1"),
+      Option("item 2"),
+      Option("item 3"),
+      Option("item 4"),
+      Option("item 5"),
+      Option("item 6"),
+      Option("item 7"),
+      Option("item 8"),
+      Option("item 9"),
+      Option("item 10")
     ))
-    historyService.getAll.expects().returning(itemsF)
+    shortcutsService.getAll.expects().returning(itemsF)
 
     val result = createTestRenderer(withContext(withServicesContext(
-      <(FolderShortcutsPopup())(^.wrapped := props)(), historyService.service
+      <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
@@ -157,12 +160,14 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     val rightStack = new PanelStack(isActive = false, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
     ), null)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("item"))
-    historyService.getAll.expects().returning(itemsF)
+    val shortcutsService = new ShortcutsService
+    val itemsF = Future.successful(List(Option("item")))
+    val deleteF = Future.unit
+    shortcutsService.getAll.expects().returning(itemsF)
+    shortcutsService.delete.expects(0).returning(deleteF)
     
     val result = createTestRenderer(withContext(withServicesContext(
-      <(FolderShortcutsPopup())(^.wrapped := props)(), historyService.service
+      <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
@@ -173,7 +178,9 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
       popup.onKeypress("-") shouldBe true
 
       //then
-      findComponentProps(result, listPopup).items.head shouldBe "0: <none>"
+      deleteF.map { _ =>
+        findComponentProps(result, listPopup).items.head shouldBe "0: <none>"
+      }
     }
   }
   
@@ -188,12 +195,14 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     val rightStack = new PanelStack(isActive = false, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
     ), null)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(Nil)
-    historyService.getAll.expects().returning(itemsF)
+    val shortcutsService = new ShortcutsService
+    val itemsF = Future.successful(List.fill(10)(None))
+    val saveF = Future.unit
+    shortcutsService.getAll.expects().returning(itemsF)
+    shortcutsService.save.expects(1, "/test").returning(saveF)
     
     val result = createTestRenderer(withContext(withServicesContext(
-      <(FolderShortcutsPopup())(^.wrapped := props)(), historyService.service
+      <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
@@ -205,7 +214,9 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
       popup.onKeypress("+") shouldBe true
 
       //then
-      findComponentProps(result, listPopup).items(1) shouldBe "1: /test"
+      saveF.map { _ =>
+        findComponentProps(result, listPopup).items(1) shouldBe "1: /test"
+      }
     }
   }
   
@@ -218,12 +229,12 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     val rightStack = new PanelStack(isActive = false, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
     ), null)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("item"))
-    historyService.getAll.expects().returning(itemsF)
+    val shortcutsService = new ShortcutsService
+    val itemsF = Future.successful(List(Option("item")))
+    shortcutsService.getAll.expects().returning(itemsF)
     
     val result = createTestRenderer(withContext(withServicesContext(
-      <(FolderShortcutsPopup())(^.wrapped := props)(), historyService.service
+      <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
@@ -243,13 +254,13 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     val rightStack = new PanelStack(isActive = false, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
     ), null)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("item"))
-    historyService.getAll.expects().returning(itemsF)
+    val shortcutsService = new ShortcutsService
+    val itemsF = Future.successful(Option("item") :: List.fill(9)(None))
+    shortcutsService.getAll.expects().returning(itemsF)
     
     //when
     val result = createTestRenderer(withContext(withServicesContext(
-      <(FolderShortcutsPopup())(^.wrapped := props)(), historyService.service
+      <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
     ), leftStack, rightStack)).root
 
     //then
