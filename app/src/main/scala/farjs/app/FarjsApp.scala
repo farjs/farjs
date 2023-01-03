@@ -1,10 +1,10 @@
 package farjs.app
 
-import farjs.app.filelist.fs.FSFileListActions
 import farjs.app.filelist.{FileListModule, FileListRoot}
 import farjs.app.task.FarjsTaskController
 import farjs.app.util.DevTool
 import farjs.domain.FarjsDBContext
+import farjs.fs.FSFileListActions
 import farjs.ui.theme.{Theme, XTerm256Theme}
 import io.github.shogowada.scalajs.reactjs.redux.ReactRedux._
 import io.github.shogowada.scalajs.reactjs.redux.Redux

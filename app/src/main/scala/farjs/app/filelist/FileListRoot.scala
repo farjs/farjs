@@ -1,8 +1,8 @@
 package farjs.app.filelist
 
 import farjs.app.filelist.FileListRoot._
-import farjs.app.filelist.fs.FSServices
 import farjs.filelist.FileListServices
+import farjs.fs.FSServices
 import scommons.react._
 
 class FileListRoot(module: FileListModule) extends FunctionComponent[Unit] {

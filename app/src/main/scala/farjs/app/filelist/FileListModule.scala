@@ -1,10 +1,10 @@
 package farjs.app.filelist
 
-import farjs.app.filelist.fs.FSServices
 import farjs.app.filelist.service._
 import farjs.domain.FarjsDBContext
 import farjs.domain.dao._
 import farjs.filelist.FileListServices
+import farjs.fs.FSServices
 
 class FileListModule(ctx: FarjsDBContext) {
 

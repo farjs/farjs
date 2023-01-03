@@ -1,9 +1,9 @@
 package farjs.app
 
-import farjs.app.filelist.fs.popups.FSPopupsState
 import farjs.filelist.FileListActions._
 import farjs.filelist.FileListsState
 import farjs.filelist.api.FileListDir
+import farjs.fs.popups.FSPopupsState
 import scommons.react.redux.task.{AbstractTask, FutureTask}
 import scommons.react.test.TestSpec
 
