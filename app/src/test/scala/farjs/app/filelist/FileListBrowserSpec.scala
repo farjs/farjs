@@ -1,13 +1,13 @@
 package farjs.app.filelist
 
 import farjs.app.filelist.FileListBrowser._
-import farjs.app.filelist.fs.FSPlugin
-import farjs.app.filelist.fs.popups.FSPopupsActions._
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api._
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.stack._
+import farjs.fs.FSPlugin
+import farjs.fs.popups.FSPopupsActions._
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec

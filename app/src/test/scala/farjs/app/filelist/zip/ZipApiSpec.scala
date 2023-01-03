@@ -1,6 +1,6 @@
 package farjs.app.filelist.zip
 
-import farjs.app.filelist.fs.MockChildProcess
+import farjs.filelist.MockChildProcess
 import farjs.filelist.api._
 import org.scalatest.Succeeded
 import scommons.nodejs.ChildProcess.ChildProcessOptions

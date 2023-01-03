@@ -1,8 +1,8 @@
 package farjs.app.filelist.service
 
-import farjs.app.filelist.fs.popups.FolderShortcutsService
 import farjs.domain.FolderShortcut
 import farjs.domain.dao.FolderShortcutDao
+import farjs.fs.popups.FolderShortcutsService
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global

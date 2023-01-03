@@ -1,7 +1,7 @@
 package farjs.app
 
-import farjs.app.filelist.fs.popups.{FSPopupsState, FSPopupsStateReducer}
 import farjs.filelist.{FileListsGlobalState, FileListsState, FileListsStateReducer}
+import farjs.fs.popups.{FSPopupsState, FSPopupsStateReducer}
 import scommons.react.redux.task.{AbstractTask, TaskReducer}
 
 trait FarjsStateDef extends FileListsGlobalState {

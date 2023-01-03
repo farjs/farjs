@@ -1,7 +1,7 @@
 package farjs.app
 
-import farjs.app.filelist.fs.popups.FSPopupsState
 import farjs.filelist.FileListsState
+import farjs.fs.popups.FSPopupsState
 import scommons.react.redux.task.AbstractTask
 
 //noinspection NotImplementedCode

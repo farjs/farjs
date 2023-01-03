@@ -1,13 +1,12 @@
 package farjs.app.filelist
 
-import farjs.app.filelist.fs.FSPlugin
-import farjs.app.filelist.fs.popups.FSPopupsActions._
-import farjs.app.filelist.fs.popups.FSPopupsController
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListCapability, FileListItem}
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.stack._
+import farjs.fs.FSPlugin
+import farjs.fs.popups.FSPopupsActions._
 import farjs.ui.menu.BottomMenu
 import scommons.nodejs.path
 import scommons.react._

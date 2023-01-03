@@ -1,7 +1,7 @@
 package farjs.app.filelist
 
-import farjs.app.filelist.fs.FSServices
 import farjs.filelist.FileListServices
+import farjs.fs.FSServices
 import scommons.react._
 import scommons.react.hooks._
 import scommons.react.test._
