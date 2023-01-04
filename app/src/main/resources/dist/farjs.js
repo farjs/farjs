@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+const moduleAlias = require('module-alias')
+moduleAlias.addAliases({
+  'react-redux': 'react-redux/lib/alternate-renderers'
+})
+
 process.title = "FAR.js"
 
 const versionChecker = require('./versionChecker.js')
@@ -16,5 +21,5 @@ const onExit = () => {
   process.exit(0)
 }
 
-const farjsApp = require('../farjs-app-opt-bundle.js').FarjsApp
+const farjsApp = require('../farjs-app-opt.js').FarjsApp
 farjsApp.start(false, undefined, onExit)
