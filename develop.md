@@ -11,9 +11,9 @@ sbt test
 
 To run the app use the following commands:
 ```bash
-sbt "project farjs-app" fastOptJS::webpack
+sbt "project farjs-app" npmUpdate fastOptJS
 
-node ./app/target/scala-2.13/scalajs-bundler/main/farjs-app-fastopt-bundle.js
+node ./app/target/scala-2.13/scalajs-bundler/main/dev.loader.js
 ```
 
 ### How to Run with Reload Workflow
@@ -25,11 +25,7 @@ sbt
 >~fastOptJS
 
 #console 2:
-cd ./app/target/scala-2.13/scalajs-bundler/main/
-node ./node_modules/webpack/bin/webpack.js --watch --config ./reload.webpack.config.js
-
-#console 3:
-node ./app/target/scala-2.13/scalajs-bundler/main/farjs-app-fastopt-hotreload.js
+node --watch ./app/target/scala-2.13/scalajs-bundler/main/dev.loader.js
 ```
 
 ## Resources

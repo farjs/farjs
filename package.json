@@ -45,12 +45,12 @@
     "dist/farjs.js",
     "dist/versionChecker.js",
     "farjs/domain/bundle.json",
-    "farjs-app-opt-bundle.js",
+    "farjs-app-opt.js",
     "LICENSE.txt",
     "README.md"
   ],
-  "main": "./farjs-app-opt-bundle.js",
-  "exports": "./farjs-app-opt-bundle.js",
+  "main": "./farjs-app-opt.js",
+  "exports": "./farjs-app-opt.js",
   "preferGlobal": true,
   "browserslist": "maintained node versions",
   "dependencies": {
@@ -60,11 +60,9 @@
     "@farjs/blessed": "0.2.3",
     "react-redux": "^7.2.4",
     "redux": "^3.6.0",
-    "websql": "2.0.3"
+    "websql": "2.0.3",
+    "module-alias": "2.2.2"
   },
   "devDependencies": {
-    "webpack-node-externals": "3.0.0",
-    "webpack-merge": "5.8.0",
-    "webpack": "5.74.0"
   }
 }

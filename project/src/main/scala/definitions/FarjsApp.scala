@@ -3,7 +3,6 @@ package definitions
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
 import sbt._
-import scalajsbundler.BundlingMode
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
 import scommons.sbtplugin.ScommonsPlugin.autoImport._
 import scoverage.ScoverageKeys.coverageExcludedPackages
@@ -35,33 +34,28 @@ object FarjsApp extends ScalaJsModule {
       },
 
       scalaJSUseMainModuleInitializer := false,
-      webpackBundlingMode := BundlingMode.Application,
 
-      webpackResources := {
-        baseDirectory.value / ".." / "LICENSE.txt" +++
-          baseDirectory.value / ".." / "README.md"
-      },
+      // our custom mocks during test
+      scommonsNodeJsTestLibs := Seq("test.aliases.js"),
+
+      Compile / npmUpdate := {
+        def copyToWorkingDir(targetDir: File)(file: File): File = {
+          val copy = targetDir / file.name
+          IO.copyFile(file, copy)
+          copy
+        }
       
-      //dev
-      fastOptJS / webpackConfigFile := Some(
-        baseDirectory.value / "src" / "main" / "resources" / "dev.webpack.config.js"
-      ),
-      //prod
-      fullOptJS / webpackConfigFile := Some(
-        baseDirectory.value / "src" / "main" / "resources" / "prod.webpack.config.js"
-      ),
-      //tests
-      scommonsRequireWebpackInTest := true,
-      Test / webpackConfigFile := Some(
-        baseDirectory.value / "src" / "main" / "resources" / "test.webpack.config.js"
-      ),
+        val targetDir = (Compile / npmUpdate).value
+        copyToWorkingDir(targetDir)(baseDirectory.value / ".." / "LICENSE.txt")
+        copyToWorkingDir(targetDir)(baseDirectory.value / ".." / "README.md")
+        targetDir
+      },
 
       //useYarn := true,
       //yarnExtraArgs := Seq("--frozen-lockfile"),
 
-      Compile / npmDevDependencies ++= Seq(
-        "webpack-merge" -> "5.8.0",
-        "webpack-node-externals" -> "3.0.0"
+      Compile / npmDependencies ++= Seq(
+        "module-alias" -> "2.2.2"
       ),
 
       Compile / additionalNpmConfig := {

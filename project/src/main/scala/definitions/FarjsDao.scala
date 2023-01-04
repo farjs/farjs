@@ -14,6 +14,7 @@ object FarjsDao extends FarjsModule with CommonNodeJsModule {
 
   override def definition: Project = {
     super.definition
+      .settings(ScalaJsModule.settings: _*)
       .settings(
         description := "Data access object (DAO) module for FAR.js app",
 
