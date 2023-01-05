@@ -6,7 +6,7 @@ import scommons.react.ReactClass
 
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
-@JSExportTopLevel("ui")
+@JSExportTopLevel("default", "ui")
 @JSExportAll
 object Exports {
 
