@@ -1,4 +1,4 @@
-package farjs.app.filelist.zip
+package farjs.archiver
 
 import farjs.ui._
 import farjs.ui.border._
@@ -10,18 +10,18 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class AddToZipPopupProps(zipName: String,
-                              action: AddToZipAction,
-                              onAction: String => Unit,
-                              onCancel: () => Unit)
+case class AddToArchPopupProps(zipName: String,
+                               action: AddToArchAction,
+                               onAction: String => Unit,
+                               onCancel: () => Unit)
 
-object AddToZipPopup extends FunctionComponent[AddToZipPopupProps] {
+object AddToArchPopup extends FunctionComponent[AddToArchPopupProps] {
 
-  private[zip] var modalComp: UiComponent[ModalProps] = Modal
-  private[zip] var textLineComp: UiComponent[TextLineProps] = TextLine
-  private[zip] var textBoxComp: UiComponent[TextBoxProps] = TextBox
-  private[zip] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
-  private[zip] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
+  private[archiver] var modalComp: UiComponent[ModalProps] = Modal
+  private[archiver] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[archiver] var textBoxComp: UiComponent[TextBoxProps] = TextBox
+  private[archiver] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[archiver] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped

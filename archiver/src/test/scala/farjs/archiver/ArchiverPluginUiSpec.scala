@@ -1,6 +1,6 @@
-package farjs.app.filelist.zip
+package farjs.archiver
 
-import farjs.app.filelist.zip.ZipPluginUi._
+import farjs.archiver.ArchiverPluginUi._
 import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
@@ -13,9 +13,9 @@ import scommons.react.test._
 import scala.collection.immutable.ListSet
 import scala.concurrent.Future
 
-class ZipPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
+class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  ZipPluginUi.addToZipController = mockUiComponent("AddToZipController")
+  ArchiverPluginUi.addToArchController = mockUiComponent("AddToArchController")
 
   //noinspection TypeAnnotation
   class Actions {
@@ -35,10 +35,10 @@ class ZipPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val data = FileListData(dispatch, actions, FileListState(
       currDir = FileListDir("/sub-dir", isRoot = false, items = items)
     ))
-    val pluginUi = new ZipPluginUi(data, "item 1.zip", items)
+    val pluginUi = new ArchiverPluginUi(data, "item 1.zip", items)
     val props = FileListPluginUiProps(onClose = onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
-    val controller = findComponentProps(comp, addToZipController)
+    val controller = findComponentProps(comp, addToArchController)
     
     //then
     onClose.expects()
@@ -66,10 +66,10 @@ class ZipPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       ) ++ items),
       selectedNames = ListSet("item 3", "item 2")
     ))
-    val pluginUi = new ZipPluginUi(data, "item 1.zip", items)
+    val pluginUi = new ArchiverPluginUi(data, "item 1.zip", items)
     val props = FileListPluginUiProps(onClose = onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
-    val controller = findComponentProps(comp, addToZipController)
+    val controller = findComponentProps(comp, addToArchController)
     
     val zipFile = "test.zip"
     val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
@@ -100,7 +100,7 @@ class ZipPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val state = FileListState()
     val data = FileListData(dispatch, actions, state)
     val items = List(FileListItem("item 1"))
-    val pluginUi = new ZipPluginUi(data, "item 1.zip", items)
+    val pluginUi = new ArchiverPluginUi(data, "item 1.zip", items)
     val props = FileListPluginUiProps(onClose = onClose)
     
     //when
@@ -108,14 +108,14 @@ class ZipPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     //then
     assertComponents(result.children, List(
-      <(addToZipController())(^.assertWrapped(inside(_) {
-        case AddToZipControllerProps(resDispatch, resActions, state, zipName, resItems, action, _, _) =>
+      <(addToArchController())(^.assertWrapped(inside(_) {
+        case AddToArchControllerProps(resDispatch, resActions, state, zipName, resItems, action, _, _) =>
           resDispatch shouldBe dispatch
           resActions shouldBe actions
           state shouldBe data.state
           zipName shouldBe "item 1.zip"
           resItems shouldBe items
-          action shouldBe AddToZipAction.Add
+          action shouldBe AddToArchAction.Add
       }))()
     ))
   }

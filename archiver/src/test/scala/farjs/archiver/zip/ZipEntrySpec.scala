@@ -1,6 +1,6 @@
-package farjs.app.filelist.zip
+package farjs.archiver.zip
 
-import farjs.app.filelist.zip.ZipEntry._
+import farjs.archiver.zip.ZipEntry._
 import scommons.nodejs.test.TestSpec
 
 import scala.scalajs.js.Date.{parse => dt}

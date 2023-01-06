@@ -1,5 +1,6 @@
-package farjs.app.filelist.zip
+package farjs.archiver
 
+import farjs.archiver.zip.ZipApi
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack._
 import farjs.filelist.{FileListState, MockFileListActions}
@@ -10,13 +11,14 @@ import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 
-class ZipPluginSpec extends TestSpec {
+class ArchiverPluginSpec extends TestSpec {
 
-  ZipPlugin.readZip = _ => Future.successful(Map.empty)
+  ArchiverPlugin.readZip = _ => Future.successful(Map.empty)
+  ArchiverPlugin.createApi = ZipApi.apply
 
   it should "define triggerKey" in {
     //when & then
-    ZipPlugin.triggerKey shouldBe Some("S-f7")
+    ArchiverPlugin.triggerKey shouldBe Some("S-f7")
   }
 
   it should "return None if .. when onKeyTrigger" in {
@@ -37,7 +39,7 @@ class ZipPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ZipPlugin.onKeyTrigger(stacks) shouldBe None
+    ArchiverPlugin.onKeyTrigger(stacks) shouldBe None
   }
 
   it should "return None if non-local fs when onKeyTrigger" in {
@@ -57,7 +59,7 @@ class ZipPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ZipPlugin.onKeyTrigger(stacks) shouldBe None
+    ArchiverPlugin.onKeyTrigger(stacks) shouldBe None
   }
 
   it should "return Some(ui) if not .. when onKeyTrigger" in {
@@ -77,7 +79,7 @@ class ZipPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ZipPlugin.onKeyTrigger(stacks) should not be None
+    ArchiverPlugin.onKeyTrigger(stacks) should not be None
   }
 
   it should "return Some(ui) if selected items when onKeyTrigger" in {
@@ -98,7 +100,7 @@ class ZipPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ZipPlugin.onKeyTrigger(stacks) should not be None
+    ArchiverPlugin.onKeyTrigger(stacks) should not be None
   }
 
   it should "trigger plugin on .zip and .jar file extensions" in {
@@ -106,11 +108,11 @@ class ZipPluginSpec extends TestSpec {
     val header = new Uint8Array(5)
     
     //when & then
-    ZipPlugin.onFileTrigger("filePath.txt", header, () => ()) shouldBe None
-    ZipPlugin.onFileTrigger("filePath.zip", header, () => ()) should not be None
-    ZipPlugin.onFileTrigger("filePath.ZIP", header, () => ()) should not be None
-    ZipPlugin.onFileTrigger("filePath.jar", header, () => ()) should not be None
-    ZipPlugin.onFileTrigger("filePath.Jar", header, () => ()) should not be None
+    ArchiverPlugin.onFileTrigger("filePath.txt", header, () => ()) shouldBe None
+    ArchiverPlugin.onFileTrigger("filePath.zip", header, () => ()) should not be None
+    ArchiverPlugin.onFileTrigger("filePath.ZIP", header, () => ()) should not be None
+    ArchiverPlugin.onFileTrigger("filePath.jar", header, () => ()) should not be None
+    ArchiverPlugin.onFileTrigger("filePath.Jar", header, () => ()) should not be None
   }
 
   it should "trigger plugin on PK34 file header" in {
@@ -118,7 +120,7 @@ class ZipPluginSpec extends TestSpec {
     val header = new Uint8Array(js.Array[Short]('P', 'K', 0x03, 0x04, 0x01))
     
     //when & then
-    ZipPlugin.onFileTrigger("filePath.txt", new Uint8Array(2), () => ()) shouldBe None
-    ZipPlugin.onFileTrigger("filePath.txt", header, () => ()) should not be None
+    ArchiverPlugin.onFileTrigger("filePath.txt", new Uint8Array(2), () => ()) shouldBe None
+    ArchiverPlugin.onFileTrigger("filePath.txt", header, () => ()) should not be None
   }
 }

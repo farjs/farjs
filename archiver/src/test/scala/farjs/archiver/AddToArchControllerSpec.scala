@@ -1,6 +1,6 @@
-package farjs.app.filelist.zip
+package farjs.archiver
 
-import farjs.app.filelist.zip.AddToZipController._
+import farjs.archiver.AddToArchController._
 import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
@@ -12,10 +12,10 @@ import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
 
-class AddToZipControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
+class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  AddToZipController.addToZipPopup = mockUiComponent("AddToZipPopup")
-  AddToZipController.statusPopupComp = mockUiComponent("StatusPopup")
+  AddToArchController.addToArchPopup = mockUiComponent("AddToArchPopup")
+  AddToArchController.statusPopupComp = mockUiComponent("StatusPopup")
 
   //noinspection TypeAnnotation
   class Actions {
@@ -33,7 +33,7 @@ class AddToZipControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRe
     val items = List(FileListItem("dir 3", isDir = true))
     val onComplete = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = AddToZipControllerProps(dispatch, actions.actions, FileListState(
+    val props = AddToArchControllerProps(dispatch, actions.actions, FileListState(
       index = 1,
       currDir = FileListDir("/sub-dir", isRoot = false, items = List(
         FileListItem.up,
@@ -41,19 +41,19 @@ class AddToZipControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRe
         FileListItem("item 2")
       ) ++ items),
       selectedNames = Set("dir 3")
-    ), zipName = "new.zip", items, AddToZipAction.Add, onComplete, onCancel)
-    val addToZipApi = mockFunction[String, String, Set[String], () => Unit, Future[Unit]]
-    AddToZipController.addToZipApi = addToZipApi
+    ), zipName = "new.zip", items, AddToArchAction.Add, onComplete, onCancel)
+    val addToArchApi = mockFunction[String, String, Set[String], () => Unit, Future[Unit]]
+    AddToArchController.addToArchApi = addToArchApi
 
     //when
-    val renderer = createTestRenderer(<(AddToZipController())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(AddToArchController())(^.wrapped := props)())
 
     //then
     findComponents(renderer.root, statusPopupComp()) should be (empty)
-    inside(findComponentProps(renderer.root, addToZipPopup)) {
-      case AddToZipPopupProps(zipName, action, onAction, onCancel) =>
+    inside(findComponentProps(renderer.root, addToArchPopup)) {
+      case AddToArchPopupProps(zipName, action, onAction, onCancel) =>
         zipName shouldBe "new.zip"
-        action shouldBe AddToZipAction.Add
+        action shouldBe AddToArchAction.Add
         onCancel shouldBe props.onCancel
 
         //given
@@ -69,7 +69,7 @@ class AddToZipControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRe
           p.future
         }
         val addToZipF = Future.failed(new Exception("test error"))
-        addToZipApi.expects(zipFile, props.state.currDir.path, Set("dir 3"), *).returning(addToZipF)
+        addToArchApi.expects(zipFile, props.state.currDir.path, Set("dir 3"), *).returning(addToZipF)
         onComplete.expects(*).never()
         var resultAction: Any = null
         dispatch.expects(*).onCall { action: Any =>
@@ -80,7 +80,7 @@ class AddToZipControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRe
         onAction(zipFile)
 
         //then
-        findComponents(renderer.root, addToZipPopup()) should be (empty)
+        findComponents(renderer.root, addToArchPopup()) should be (empty)
         p.success(true)
         eventually {
           findComponents(renderer.root, statusPopupComp()) should be (empty)
@@ -100,7 +100,7 @@ class AddToZipControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRe
     val items = List(FileListItem("dir 3", isDir = true))
     val onComplete = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = AddToZipControllerProps(dispatch, actions.actions, FileListState(
+    val props = AddToArchControllerProps(dispatch, actions.actions, FileListState(
       index = 1,
       currDir = FileListDir("/sub-dir", isRoot = false, items = List(
         FileListItem.up,
@@ -108,19 +108,19 @@ class AddToZipControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRe
         FileListItem("item 2")
       ) ++ items),
       selectedNames = Set("dir 3")
-    ), zipName = "new.zip", items, AddToZipAction.Add, onComplete, onCancel)
-    val addToZipApi = mockFunction[String, String, Set[String], () => Unit, Future[Unit]]
-    AddToZipController.addToZipApi = addToZipApi
+    ), zipName = "new.zip", items, AddToArchAction.Add, onComplete, onCancel)
+    val addToArchApi = mockFunction[String, String, Set[String], () => Unit, Future[Unit]]
+    AddToArchController.addToArchApi = addToArchApi
 
     //when
-    val renderer = createTestRenderer(<(AddToZipController())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(AddToArchController())(^.wrapped := props)())
 
     //then
     findComponents(renderer.root, statusPopupComp()) should be (empty)
-    inside(findComponentProps(renderer.root, addToZipPopup)) {
-      case AddToZipPopupProps(zipName, action, onAction, onCancel) =>
+    inside(findComponentProps(renderer.root, addToArchPopup)) {
+      case AddToArchPopupProps(zipName, action, onAction, onCancel) =>
         zipName shouldBe "new.zip"
-        action shouldBe AddToZipAction.Add
+        action shouldBe AddToArchAction.Add
         onCancel shouldBe props.onCancel
 
         //given
@@ -136,7 +136,7 @@ class AddToZipControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRe
         }
         val p = Promise[Unit]()
         var onNextItemFunc: () => Unit = null
-        addToZipApi.expects(zipFile, props.state.currDir.path, Set("dir 3"), *).onCall { (_, _, _, onNextItem) =>
+        addToArchApi.expects(zipFile, props.state.currDir.path, Set("dir 3"), *).onCall { (_, _, _, onNextItem) =>
           onNextItemFunc = onNextItem
           p.future
         }
@@ -151,7 +151,7 @@ class AddToZipControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRe
         onAction(zipFile)
 
         //then
-        findComponents(renderer.root, addToZipPopup()) should be (empty)
+        findComponents(renderer.root, addToArchPopup()) should be (empty)
         inside(findComponentProps(renderer.root, statusPopupComp)) {
           case StatusPopupProps(text, title, closable, _) =>
             text shouldBe "Add item(s) to zip archive\n0%"

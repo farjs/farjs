@@ -1,4 +1,4 @@
-package farjs.app.util
+package farjs.archiver
 
 import scala.scalajs.js
 
