@@ -1,6 +1,6 @@
-package farjs.app.util
+package farjs.archiver
 
-import farjs.app.util.DateTimeUtil.parseDateTime
+import farjs.archiver.DateTimeUtil.parseDateTime
 import scommons.nodejs.test.TestSpec
 
 import scala.scalajs.js

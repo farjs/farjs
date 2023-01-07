@@ -24,8 +24,7 @@ object FarjsApp extends ScalaJsModule {
 
       coverageExcludedPackages :=
         "farjs.app.FarjsApp" +
-          ";farjs.app.raw" +
-          ";farjs.app.filelist.zip.ZipApi", // avoid "Found a dangling UndefinedParam" during test with coverage
+          ";farjs.app.raw",
 
       //TODO: temporarily disabled
       //  @see: https://github.com/scalameta/metabrowse/issues/271
@@ -97,6 +96,7 @@ object FarjsApp extends ScalaJsModule {
   override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Seq(
     FarjsFileList.definition % "compile->compile;test->test",
     FarjsFs.definition,
+    FarjsArchiver.definition,
     FarjsDao.definition
   )
 }

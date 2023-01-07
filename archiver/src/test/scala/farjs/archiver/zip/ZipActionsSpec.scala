@@ -1,5 +1,6 @@
-package farjs.app.filelist.zip
+package farjs.archiver.zip
 
+import farjs.archiver.ArchiverPlugin
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import org.scalatest.Succeeded
@@ -28,8 +29,8 @@ class ZipActionsSpec extends AsyncTestSpec {
     //given
     val readZip = mockFunction[String, Future[Map[String, List[ZipEntry]]]]
     val createApi = mockFunction[String, String, Future[Map[String, List[ZipEntry]]], ZipApi]
-    ZipPlugin.readZip = readZip
-    ZipPlugin.createApi = createApi
+    ArchiverPlugin.readZip = readZip
+    ArchiverPlugin.createApi = createApi
     val actions = new ZipActions(ZipApi("file.zip", "root.path", Future.successful(Map.empty)))
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))

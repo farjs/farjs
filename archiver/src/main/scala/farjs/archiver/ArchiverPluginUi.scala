@@ -1,6 +1,6 @@
-package farjs.app.filelist.zip
+package farjs.archiver
 
-import farjs.app.filelist.zip.ZipPluginUi._
+import farjs.archiver.ArchiverPluginUi._
 import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.FileListItem
@@ -8,19 +8,19 @@ import scommons.react._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ZipPluginUi(data: FileListData, zipName: String, items: Seq[FileListItem])
+class ArchiverPluginUi(data: FileListData, zipName: String, items: Seq[FileListItem])
     extends FunctionComponent[FileListPluginUiProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
     
-    <(addToZipController())(^.wrapped := AddToZipControllerProps(
+    <(addToArchController())(^.wrapped := AddToArchControllerProps(
       dispatch = data.dispatch,
       actions = data.actions,
       state = data.state,
       zipName = zipName,
       items = items,
-      action = AddToZipAction.Add,
+      action = AddToArchAction.Add,
       onComplete = { zipFile =>
         props.onClose()
 
@@ -35,7 +35,7 @@ class ZipPluginUi(data: FileListData, zipName: String, items: Seq[FileListItem])
   }
 }
 
-object ZipPluginUi {
+object ArchiverPluginUi {
 
-  private[zip] var addToZipController: UiComponent[AddToZipControllerProps] = AddToZipController
+  private[archiver] var addToArchController: UiComponent[AddToArchControllerProps] = AddToArchController
 }

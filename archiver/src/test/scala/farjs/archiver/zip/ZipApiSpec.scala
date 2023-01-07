@@ -1,4 +1,4 @@
-package farjs.app.filelist.zip
+package farjs.archiver.zip
 
 import farjs.filelist.MockChildProcess
 import farjs.filelist.api._

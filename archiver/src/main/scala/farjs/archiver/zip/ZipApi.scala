@@ -1,4 +1,4 @@
-package farjs.app.filelist.zip
+package farjs.archiver.zip
 
 import farjs.filelist.api._
 import scommons.nodejs.util.{StreamReader, SubProcess}

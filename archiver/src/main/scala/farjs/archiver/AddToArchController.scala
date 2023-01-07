@@ -1,5 +1,6 @@
-package farjs.app.filelist.zip
+package farjs.archiver
 
+import farjs.archiver.zip.ZipApi
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.FileListItem
 import farjs.filelist.{FileListActions, FileListState}
@@ -13,21 +14,21 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-case class AddToZipControllerProps(dispatch: Dispatch,
-                                   actions: FileListActions,
-                                   state: FileListState,
-                                   zipName: String,
-                                   items: Seq[FileListItem],
-                                   action: AddToZipAction,
-                                   onComplete: String => Unit,
-                                   onCancel: () => Unit)
+case class AddToArchControllerProps(dispatch: Dispatch,
+                                    actions: FileListActions,
+                                    state: FileListState,
+                                    zipName: String,
+                                    items: Seq[FileListItem],
+                                    action: AddToArchAction,
+                                    onComplete: String => Unit,
+                                    onCancel: () => Unit)
 
-object AddToZipController extends FunctionComponent[AddToZipControllerProps] {
+object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
 
-  private[zip] var addToZipPopup: UiComponent[AddToZipPopupProps] = AddToZipPopup
-  private[zip] var addToZipApi: (String, String, Set[String], () => Unit) => Future[Unit] =
+  private[archiver] var addToArchPopup: UiComponent[AddToArchPopupProps] = AddToArchPopup
+  private[archiver] var addToArchApi: (String, String, Set[String], () => Unit) => Future[Unit] =
     ZipApi.addToZip
-  private[zip] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
+  private[archiver] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
 
   protected def render(compProps: Props): ReactElement = {
     val (showAddPopup, setShowAddPopup) = useState(true)
@@ -48,7 +49,7 @@ object AddToZipController extends FunctionComponent[AddToZipControllerProps] {
           totalItems += items.size
           true
         })
-        _ <- addToZipApi(zipFile, parent, currItems.map(_.name).toSet, { () =>
+        _ <- addToArchApi(zipFile, parent, currItems.map(_.name).toSet, { () =>
           addedItems += 1
           setProgress(math.min((addedItems / totalItems) * 100, 100).toInt)
         })
@@ -76,7 +77,7 @@ object AddToZipController extends FunctionComponent[AddToZipControllerProps] {
     
     <.>()(
       if (showAddPopup) Some(
-        <(addToZipPopup())(^.wrapped := AddToZipPopupProps(
+        <(addToArchPopup())(^.wrapped := AddToArchPopupProps(
           zipName = props.zipName,
           action = props.action,
           onAction = onAction,

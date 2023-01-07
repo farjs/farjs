@@ -1,6 +1,6 @@
-package farjs.app.filelist.zip
+package farjs.archiver
 
-import farjs.app.filelist.zip.AddToZipPopup._
+import farjs.archiver.AddToArchPopup._
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.ModalProps
@@ -9,19 +9,19 @@ import scommons.react.test._
 
 import scala.scalajs.js
 
-class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
+class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
 
-  AddToZipPopup.modalComp = mockUiComponent("Modal")
-  AddToZipPopup.textLineComp = mockUiComponent("TextLine")
-  AddToZipPopup.textBoxComp = mockUiComponent("TextBox")
-  AddToZipPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
-  AddToZipPopup.buttonsPanelComp = mockUiComponent("ButtonsPanel")
+  AddToArchPopup.modalComp = mockUiComponent("Modal")
+  AddToArchPopup.textLineComp = mockUiComponent("TextLine")
+  AddToArchPopup.textBoxComp = mockUiComponent("TextBox")
+  AddToArchPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
+  AddToArchPopup.buttonsPanelComp = mockUiComponent("ButtonsPanel")
 
   it should "set zipName when onChange in TextBox" in {
     //given
     val zipName = "initial zip name"
-    val props = AddToZipPopupProps(zipName, AddToZipAction.Add, _ => (), () => ())
-    val renderer = createTestRenderer(<(AddToZipPopup())(^.wrapped := props)())
+    val props = AddToArchPopupProps(zipName, AddToArchAction.Add, _ => (), () => ())
+    val renderer = createTestRenderer(<(AddToArchPopup())(^.wrapped := props)())
     val textBox = findComponentProps(renderer.root, textBoxComp, plain = true)
     textBox.value shouldBe zipName
     val newZipName = "new zip name"
@@ -37,8 +37,8 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = AddToZipPopupProps("test", AddToZipAction.Add, onAction, onCancel)
-    val comp = testRender(<(AddToZipPopup())(^.wrapped := props)())
+    val props = AddToArchPopupProps("test", AddToArchAction.Add, onAction, onCancel)
+    val comp = testRender(<(AddToArchPopup())(^.wrapped := props)())
     val textBox = findComponentProps(comp, textBoxComp, plain = true)
 
     //then
@@ -53,8 +53,8 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = AddToZipPopupProps("test", AddToZipAction.Add, onAction, onCancel)
-    val comp = testRender(<(AddToZipPopup())(^.wrapped := props)())
+    val props = AddToArchPopupProps("test", AddToArchAction.Add, onAction, onCancel)
+    val comp = testRender(<(AddToArchPopup())(^.wrapped := props)())
     val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
 
     //then
@@ -69,8 +69,8 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = AddToZipPopupProps("", AddToZipAction.Add, onAction, onCancel)
-    val comp = testRender(<(AddToZipPopup())(^.wrapped := props)())
+    val props = AddToArchPopupProps("", AddToArchAction.Add, onAction, onCancel)
+    val comp = testRender(<(AddToArchPopup())(^.wrapped := props)())
     val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
 
     //then
@@ -85,8 +85,8 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = AddToZipPopupProps("", AddToZipAction.Add, onAction, onCancel)
-    val comp = testRender(<(AddToZipPopup())(^.wrapped := props)())
+    val props = AddToArchPopupProps("", AddToArchAction.Add, onAction, onCancel)
+    val comp = testRender(<(AddToArchPopup())(^.wrapped := props)())
     val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions(1)
 
     //then
@@ -99,18 +99,18 @@ class AddToZipPopupSpec extends TestSpec with TestRendererUtils {
   
   it should "render component" in {
     //given
-    val props = AddToZipPopupProps("test zip", AddToZipAction.Add, _ => (), () => ())
+    val props = AddToArchPopupProps("test zip", AddToArchAction.Add, _ => (), () => ())
 
     //when
-    val result = testRender(<(AddToZipPopup())(^.wrapped := props)())
+    val result = testRender(<(AddToArchPopup())(^.wrapped := props)())
 
     //then
-    assertAddToZipPopup(result, props, List("[ Add ]", "[ Cancel ]"))
+    assertAddToArchPopup(result, props, List("[ Add ]", "[ Cancel ]"))
   }
 
-  private def assertAddToZipPopup(result: TestInstance,
-                                  props: AddToZipPopupProps,
-                                  actions: List[String]): Unit = {
+  private def assertAddToArchPopup(result: TestInstance,
+                                   props: AddToArchPopupProps,
+                                   actions: List[String]): Unit = {
     val (width, height) = (75, 8)
     val style = Theme.current.popup.regular
 

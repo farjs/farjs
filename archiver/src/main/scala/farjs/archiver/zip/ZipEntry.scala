@@ -1,6 +1,6 @@
-package farjs.app.filelist.zip
+package farjs.archiver.zip
 
-import farjs.app.util.DateTimeUtil
+import farjs.archiver.DateTimeUtil
 
 case class ZipEntry(
   parent: String,

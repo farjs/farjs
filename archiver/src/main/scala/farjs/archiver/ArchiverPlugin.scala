@@ -1,5 +1,6 @@
-package farjs.app.filelist.zip
+package farjs.archiver
 
+import farjs.archiver.zip._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack.{PanelStackItem, WithPanelStacksProps}
@@ -9,10 +10,10 @@ import scommons.react.ReactClass
 import scala.concurrent.Future
 import scala.scalajs.js.typedarray.Uint8Array
 
-object ZipPlugin extends FileListPlugin {
+object ArchiverPlugin extends FileListPlugin {
 
-  private[zip] var readZip: String => Future[Map[String, List[ZipEntry]]] = ZipApi.readZip
-  private[zip] var createApi: (String, String, Future[Map[String, List[ZipEntry]]]) => ZipApi = ZipApi.apply
+  private[archiver] var readZip: String => Future[Map[String, List[ZipEntry]]] = ZipApi.readZip
+  private[archiver] var createApi: (String, String, Future[Map[String, List[ZipEntry]]]) => ZipApi = ZipApi.apply
 
   override val triggerKey: Option[String] = Some("S-f7")
 
@@ -25,7 +26,7 @@ object ZipPlugin extends FileListPlugin {
       
       if (actions.isLocalFS && items.nonEmpty) {
         val zipName = s"${items.head.name}.zip"
-        val ui = new ZipPluginUi(FileListData(dispatch, actions, state), zipName, items)
+        val ui = new ArchiverPluginUi(FileListData(dispatch, actions, state), zipName, items)
         Some(ui.apply())
       }
       else None

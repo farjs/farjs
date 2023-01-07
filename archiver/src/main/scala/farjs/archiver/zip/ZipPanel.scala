@@ -1,6 +1,7 @@
-package farjs.app.filelist.zip
+package farjs.archiver.zip
 
-import farjs.app.filelist.zip.ZipPanel._
+import farjs.archiver._
+import farjs.archiver.zip.ZipPanel._
 import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
@@ -122,15 +123,15 @@ class ZipPanel(zipPath: String,
       ) else None,
 
       zipData.map { case (dispatch, actions, state, items, move) =>
-        <(addToZipController())(^.wrapped := AddToZipControllerProps(
+        <(addToArchController())(^.wrapped := AddToArchControllerProps(
           dispatch = dispatch,
           actions = actions,
           state = state,
           zipName = zipPath,
           items = items,
           action =
-            if (move) AddToZipAction.Move
-            else AddToZipAction.Copy,
+            if (move) AddToArchAction.Move
+            else AddToArchAction.Copy,
           onComplete = { _ =>
             setZipData(None)
 
@@ -154,6 +155,6 @@ class ZipPanel(zipPath: String,
 object ZipPanel {
 
   private[zip] var fileListPanelComp: UiComponent[FileListPanelProps] = FileListPanel
-  private[zip] var addToZipController: UiComponent[AddToZipControllerProps] = AddToZipController
+  private[zip] var addToArchController: UiComponent[AddToArchControllerProps] = AddToArchController
   private[zip] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
 }
