@@ -28,14 +28,39 @@ object FarjsApp extends ScalaJsModule {
 
       //TODO: temporarily disabled
       //  @see: https://github.com/scalameta/metabrowse/issues/271
-      fullOptJS / scalaJSLinkerConfig ~= {
-        _.withOptimizer(false)
+//      fullOptJS / scalaJSLinkerConfig ~= {
+//        _.withOptimizer(false)
+//      },
+
+      //TODO: temporarily disabled to avoid "Cannot use multiple modules with the Closure Compiler"
+      //  @see: https://github.com/scala-js/scala-js/issues/3893
+      Compile / fullLinkJS / scalaJSLinkerConfig ~= {
+        _.withClosureCompiler(false)
       },
 
       scalaJSUseMainModuleInitializer := false,
 
       // our custom mocks during test
       scommonsNodeJsTestLibs := Seq("test.aliases.js"),
+
+      Compile / fullLinkJS := {
+        val (modules, report) = ScalaJsModule.moveModules(
+          linkerDir = (Compile / fullLinkJS / scalaJSLinkerOutputDirectory).value,
+          targetDir = (Compile / npmUpdate / crossTarget).value,
+          report = (Compile / fullLinkJS).value
+        )
+        val packageJson = (Compile / ScalaJsModule.scalaJSBundlerPackageJson).value
+        ScalaJsModule.addFilesToPackageJson(packageJson.file, modules)
+        report
+      },
+      Compile / fastLinkJS := {
+        val (_, report) = ScalaJsModule.moveModules(
+          linkerDir = (Compile / fastLinkJS / scalaJSLinkerOutputDirectory).value,
+          targetDir = (Compile / npmUpdate / crossTarget).value,
+          report = (Compile / fastLinkJS).value
+        )
+        report
+      },
 
       Compile / npmUpdate := {
         def copyToWorkingDir(targetDir: File)(file: File): File = {
@@ -55,6 +80,14 @@ object FarjsApp extends ScalaJsModule {
 
       Compile / npmDependencies ++= Seq(
         "module-alias" -> "2.2.2"
+      ),
+
+      Compile / npmDevDependencies ++= Seq(
+        "rollup" -> "^3.9.1",
+        "@rollup/plugin-commonjs" -> "^24.0.0",
+        "@rollup/plugin-node-resolve" -> "^15.0.1",
+        "@rollup/plugin-replace" -> "^5.0.2",
+        "@ampproject/rollup-plugin-closure-compiler" -> "^0.27.0"
       ),
 
       Compile / additionalNpmConfig := {

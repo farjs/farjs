@@ -52,6 +52,9 @@
   "main": "./farjs-app-opt.js",
   "exports": "./farjs-app-opt.js",
   "preferGlobal": true,
+  "scripts": {
+    "build": "rollup -c"
+  },
   "browserslist": "maintained node versions",
   "dependencies": {
     "react-blessed": "0.7.2",
@@ -64,5 +67,10 @@
     "module-alias": "2.2.2"
   },
   "devDependencies": {
+    "rollup": "^3.9.1",
+    "@rollup/plugin-commonjs": "^24.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-replace": "^5.0.2",
+    "@ampproject/rollup-plugin-closure-compiler": "^0.27.0"
   }
 }
