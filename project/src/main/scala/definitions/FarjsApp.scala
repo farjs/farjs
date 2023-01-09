@@ -82,6 +82,14 @@ object FarjsApp extends ScalaJsModule {
         "module-alias" -> "2.2.2"
       ),
 
+      Compile / npmDevDependencies ++= Seq(
+        "rollup" -> "^3.9.1",
+        "@rollup/plugin-commonjs" -> "^24.0.0",
+        "@rollup/plugin-node-resolve" -> "^15.0.1",
+        "@rollup/plugin-replace" -> "^5.0.2",
+        "@ampproject/rollup-plugin-closure-compiler" -> "^0.27.0"
+      ),
+
       Compile / additionalNpmConfig := {
         import com.fasterxml.jackson.databind.node._
         import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}

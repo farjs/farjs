@@ -83,6 +83,7 @@ jobs:
       run: |
         sbt clean "project farjs-app" npmUpdate fullOptJS
         cd app/target/scala-2.13/scalajs-bundler/main
+        NODE_OPTIONS=--max_old_space_size=8192 npm run build
         npm pack
       if: ${{ env.TAG_NAME == '' }}
 
@@ -99,6 +100,7 @@ jobs:
         echo "Publish a release version=$VERSION for tag $TAG_NAME"
         version=$VERSION sbt clean "project farjs-app" npmUpdate fullOptJS
         cd app/target/scala-2.13/scalajs-bundler/main
+        NODE_OPTIONS=--max_old_space_size=8192 npm run build
         npm pack
         echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
         npm publish farjs-app-${VERSION}.tgz
