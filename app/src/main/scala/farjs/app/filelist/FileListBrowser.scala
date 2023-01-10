@@ -7,7 +7,7 @@ import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.stack._
 import farjs.fs.FSPlugin
 import farjs.fs.popups.FSPopupsActions._
-import farjs.ui.menu.BottomMenu
+import farjs.ui.menu.{BottomMenu, BottomMenuProps}
 import scommons.nodejs.path
 import scommons.react._
 import scommons.react.blessed._
@@ -27,7 +27,7 @@ case class FileListBrowserProps(dispatch: Dispatch,
 object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
 
   private[filelist] var panelStackComp: UiComponent[PanelStackProps] = PanelStack
-  private[filelist] var bottomMenuComp: UiComponent[Unit] = BottomMenu
+  private[filelist] var bottomMenuComp: UiComponent[BottomMenuProps] = BottomMenu
   private[filelist] var fsPlugin: FSPlugin = FSPlugin
   private[filelist] var fileListPopups: ReactClass = FileListPopupsController()
   private[filelist] var fsPopups: ReactClass = FSPopupsController()
@@ -151,7 +151,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       ),
 
       <.box(^.rbTop := "100%-1")(
-        <(bottomMenuComp())()()
+        <(bottomMenuComp())(^.wrapped := BottomMenuProps(menuItems))()
       ),
 
       <(fileListPopups).empty,
@@ -166,6 +166,21 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       }
     )
   }
+
+  private[filelist] val menuItems = List(
+    /*  F1 */ "",
+    /*  F2 */ "",
+    /*  F3 */ "View",
+    /*  F4 */ "",
+    /*  F5 */ "Copy",
+    /*  F6 */ "RenMov",
+    /*  F7 */ "MkFolder",
+    /*  F8 */ "Delete",
+    /*  F9 */ "Menu",
+    /* F10 */ "Exit",
+    /* F11 */ "",
+    /* F12 */ "DevTools"
+  )
 
   private def openCurrItem(plugins: Seq[FileListPlugin],
                            dispatch: Dispatch,

@@ -8,6 +8,7 @@ import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.stack._
 import farjs.fs.FSPlugin
 import farjs.fs.popups.FSPopupsActions._
+import farjs.ui.menu.BottomMenuProps
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec
@@ -737,7 +738,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       ),
 
       <.box(^.rbTop := "100%-1")(
-        <(bottomMenuComp())()()
+        <(bottomMenuComp())(^.wrapped := BottomMenuProps(menuItems))()
       ),
 
       <(fileListPopups).empty,

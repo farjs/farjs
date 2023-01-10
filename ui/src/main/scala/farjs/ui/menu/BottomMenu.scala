@@ -3,34 +3,22 @@ package farjs.ui.menu
 import farjs.ui._
 import scommons.react._
 
-object BottomMenu extends FunctionComponent[Unit] {
+case class BottomMenuProps(items: List[String])
+
+object BottomMenu extends FunctionComponent[BottomMenuProps] {
 
   private[menu] var withSizeComp: UiComponent[WithSizeProps] = WithSize
   private[menu] var bottomMenuViewComp: UiComponent[BottomMenuViewProps] = BottomMenuView
   
   protected def render(compProps: Props): ReactElement = {
+    val props = compProps.wrapped
 
     <(withSizeComp())(^.plain := WithSizeProps({ (width, _) =>
       
       <(bottomMenuViewComp())(^.wrapped := BottomMenuViewProps(
         width = width,
-        items = items
+        items = props.items
       ))()
     }))()
   }
-
-  private[ui] val items = List(
-    /*  F1 */ "",
-    /*  F2 */ "",
-    /*  F3 */ "View",
-    /*  F4 */ "",
-    /*  F5 */ "Copy",
-    /*  F6 */ "RenMov",
-    /*  F7 */ "MkFolder",
-    /*  F8 */ "Delete",
-    /*  F9 */ "Menu",
-    /* F10 */ "Exit",
-    /* F11 */ "",
-    /* F12 */ "DevTools"
-  )
 }

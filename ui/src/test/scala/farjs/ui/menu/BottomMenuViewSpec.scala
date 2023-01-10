@@ -22,7 +22,7 @@ class BottomMenuViewSpec extends TestSpec with TestRendererUtils {
     }
     process.stdin.on("keypress", listener)
     
-    val props = BottomMenuViewProps(width = 80, items = BottomMenu.items)
+    val props = BottomMenuViewProps(width = 80, items = List.fill(12)("item"))
     val clickables = createTestRenderer(<(BottomMenuView())(^.wrapped := props)())
       .root.children.head.children
 
@@ -62,14 +62,15 @@ class BottomMenuViewSpec extends TestSpec with TestRendererUtils {
 
   it should "not re-render component if the same props" in {
     //given
-    val props = BottomMenuViewProps(width = 98, items = BottomMenu.items)
+    val items = List.fill(12)("item")
+    val props = BottomMenuViewProps(width = 98, items = items)
     val renderer = createTestRenderer(<(BottomMenuView())(^.wrapped := props)(
       <.text(^.content := "initial")()
     ))
     val testEl = renderer.root.children.head.children(12)
     testEl.`type` shouldBe "text"
     testEl.props.content shouldBe "initial"
-    val props2 = props.copy(items = BottomMenu.items)
+    val props2 = props.copy(items = items)
     props2 shouldBe props
     props2 should not be theSameInstanceAs(props)
 
@@ -86,7 +87,7 @@ class BottomMenuViewSpec extends TestSpec with TestRendererUtils {
   
   it should "re-render component if different props" in {
     //given
-    val props = BottomMenuViewProps(width = 98, items = BottomMenu.items)
+    val props = BottomMenuViewProps(width = 98, items = List.fill(12)("item"))
     val renderer = createTestRenderer(<(BottomMenuView())(^.wrapped := props)(
       <.text(^.content := "initial")()
     ))
@@ -110,25 +111,25 @@ class BottomMenuViewSpec extends TestSpec with TestRendererUtils {
     val savedTheme = Theme.current
     Theme.current = XTerm256Theme
     val theme = Theme.current.menu
-    val props = BottomMenuViewProps(width = 98, items = BottomMenu.items)
+    val props = BottomMenuViewProps(width = 98, items = List.fill(12)("item").updated(5, "longitem"))
 
     //when
     val result = testRender(<(BottomMenuView())(^.wrapped := props)())
 
     //then
     val itemsWithPos = List(
-      (1, "      ", 0, 8),
-      (2, "      ", 8, 8),
-      (3, " View ", 16, 8),
-      (4, "      ", 24, 8),
-      (5, " Copy ", 32, 8),
-      (6, "RenMov", 40, 8),
-      (7, "MkFold", 48, 8),
-      (8, "Delete", 56, 8),
-      (9, " Menu ", 64, 8),
-      (10, " Exit ", 72, 8),
-      (11, "      ", 80, 8),
-      (12, "DevToo", 88, 8)
+      (1, " item ", 0, 8),
+      (2, " item ", 8, 8),
+      (3, " item ", 16, 8),
+      (4, " item ", 24, 8),
+      (5, " item ", 32, 8),
+      (6, "longit", 40, 8),
+      (7, " item ", 48, 8),
+      (8, " item ", 56, 8),
+      (9, " item ", 64, 8),
+      (10, " item ", 72, 8),
+      (11, " item ", 80, 8),
+      (12, " item ", 88, 8)
     )
     val keyFg = theme.key.fg
     val keyBg = theme.key.bg

@@ -11,13 +11,14 @@ class BottomMenuSpec extends TestSpec with TestRendererUtils {
 
   it should "render component" in {
     //when
-    val result = testRender(<(BottomMenu())()())
+    val props = BottomMenuProps(List.fill(12)("item"))
+    val result = testRender(<(BottomMenu())(^.wrapped := props)())
 
     //then
-    assertBottomMenu(result)
+    assertBottomMenu(result, props)
   }
   
-  private def assertBottomMenu(result: TestInstance): Unit = {
+  private def assertBottomMenu(result: TestInstance, props: BottomMenuProps): Unit = {
     val (width, height) = (80, 25)
 
     assertTestComponent(result, withSizeComp, plain = true) { case WithSizeProps(render) =>
@@ -25,7 +26,7 @@ class BottomMenuSpec extends TestSpec with TestRendererUtils {
 
       assertTestComponent(result, bottomMenuViewComp) { case BottomMenuViewProps(resWidth, resItems) =>
         resWidth shouldBe width
-        resItems shouldBe BottomMenu.items
+        resItems shouldBe props.items
       }
     }
   }
