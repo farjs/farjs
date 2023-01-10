@@ -20,6 +20,7 @@ lazy val `farjs` = (project in file("."))
     `farjs-filelist`,
     `farjs-fs`,
     `farjs-archiver`,
+    `farjs-viewer`,
     `farjs-app`
   )
 
@@ -28,4 +29,5 @@ lazy val `farjs-dao` = FarjsDao.definition
 lazy val `farjs-filelist` = FarjsFileList.definition
 lazy val `farjs-fs` = FarjsFs.definition
 lazy val `farjs-archiver` = FarjsArchiver.definition
+lazy val `farjs-viewer` = FarjsViewer.definition
 lazy val `farjs-app` = FarjsApp.definition
