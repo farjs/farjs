@@ -24,7 +24,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
     onAction.expects(1).never()
     
     //when
-    findComponentProps(resultContent, listBoxComp).onAction(1)
+    findComponentProps(resultContent, listBoxComp, plain = true).onAction(1)
   }
   
   it should "call onAction when onAction" in {
@@ -39,7 +39,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
     onAction.expects(1)
     
     //when
-    findComponentProps(resultContent, listBoxComp).onAction(1)
+    findComponentProps(resultContent, listBoxComp, plain = true).onAction(1)
   }
   
   it should "render popup with empty list" in {
@@ -136,7 +136,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
                 left shouldBe "center"
                 footer shouldBe props.footer
             }, inside(_) { case List(view) =>
-              assertTestComponent(view, listBoxComp) {
+              assertTestComponent(view, listBoxComp, plain = true) {
                 case ListBoxProps(left, top, width, height, selected, resItems, style, _, onSelect) =>
                   left shouldBe 1
                   top shouldBe 1
@@ -146,7 +146,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
                     if (items.isEmpty || !props.focusLast) 0
                     else items.length - 1
                   }
-                  resItems shouldBe items
+                  resItems.toList shouldBe items
                   style shouldBe theme
                   onSelect should be theSameInstanceAs props.onSelect
               }

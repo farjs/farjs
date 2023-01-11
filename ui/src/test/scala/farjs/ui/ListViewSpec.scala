@@ -154,13 +154,13 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
                                  "  item 2"
                                ),
                                setViewport: js.Function1[ListViewport, Unit] = _ => (),
-                               onClick: Int => Unit = _ => ()): ListViewProps = {
+                               onClick: js.Function1[Int, Unit] = _ => ()): ListViewProps = {
     ListViewProps(
       left = 1,
       top = 1,
       width = width,
       height = height,
-      items = items,
+      items = js.Array(items: _*),
       viewport = ListViewport(index, items.size, height),
       setViewport = setViewport,
       style = DefaultTheme.popup.menu,

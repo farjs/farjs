@@ -90,9 +90,9 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
   private def getComboBoxPopupProps(index: Int = 0,
                                     items: List[String] = List("item 1", "item 2"),
                                     setViewport: js.Function1[ListViewport, Unit] = _ => (),
-                                    onClick: Int => Unit = _ => ()): ComboBoxPopupProps = {
+                                    onClick: js.Function1[Int, Unit] = _ => ()): ComboBoxPopupProps = {
     ComboBoxPopupProps(
-      items = items,
+      items = js.Array(items: _*),
       left = 1,
       top = 2,
       width = 11,
@@ -134,7 +134,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
             top shouldBe 1
             resWidth shouldBe viewWidth
             resHeight shouldBe (height - 2)
-            items shouldBe props.items.map(i => s"  ${i.take(viewWidth - 4)}  ")
+            items.toList shouldBe props.items.map(i => s"  ${i.take(viewWidth - 4)}  ").toList
             viewport should be theSameInstanceAs props.viewport
             setViewport should be theSameInstanceAs props.setViewport
             style shouldBe theme

@@ -166,7 +166,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
             left = props.left,
             top = props.top + 1,
             width = props.width,
-            items = props.items.toList,
+            items = props.items,
             viewport = viewport,
             setViewport = { viewport =>
               setPopup(Some(viewport))

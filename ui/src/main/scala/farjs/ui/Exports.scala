@@ -18,6 +18,8 @@ object Exports {
 
   val ComboBox: ReactClass = farjs.ui.ComboBox()
 
+  val ListBox: ReactClass = farjs.ui.ListBox()
+
   val ProgressBar: ReactClass = farjs.ui.ProgressBar()
 
   val ScrollBar: ReactClass = farjs.ui.ScrollBar()

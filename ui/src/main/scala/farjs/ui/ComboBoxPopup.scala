@@ -9,11 +9,11 @@ import scala.scalajs.js
 case class ComboBoxPopupProps(left: Int,
                               top: Int,
                               width: Int,
-                              items: List[String],
+                              items: js.Array[String],
                               viewport: ListViewport,
                               setViewport: js.Function1[ListViewport, Unit],
                               style: BlessedStyle,
-                              onClick: Int => Unit)
+                              onClick: js.Function1[Int, Unit])
 
 object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
   

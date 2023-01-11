@@ -206,7 +206,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
-      findComponentProps(result, listPopup).onSelect(1)
+      findComponentProps(result, listPopup).onSelect.foreach(f => f(1))
       val popup = findComponentProps(result, listPopup)
       popup.items(1) shouldBe "1: <none>"
 

@@ -6,25 +6,15 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class ListBoxProps(left: Int,
-                        top: Int,
-                        width: Int,
-                        height: Int,
-                        selected: Int,
-                        items: List[String],
-                        style: BlessedStyle,
-                        onAction: Int => Unit,
-                        onSelect: Int => Unit = _ => ())
-
 object ListBox extends FunctionComponent[ListBoxProps] {
 
   private[ui] var listViewComp: UiComponent[ListViewProps] = ListView
   private[ui] var scrollBarComp: UiComponent[ScrollBarProps] = ScrollBar
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val (viewport, setViewport) =
-      useState(ListViewport(props.selected, props.items.size, props.height))
+      useState(ListViewport(props.selected, props.items.length, props.height))
 
     val selected = viewport.offset + viewport.focused
     val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (_, key) =>
@@ -35,7 +25,7 @@ object ListBox extends FunctionComponent[ListBoxProps] {
     }
     
     useLayoutEffect({ () =>
-      props.onSelect(selected)
+      props.onSelect.foreach(f => f(selected))
       ()
     }, List(selected))
     

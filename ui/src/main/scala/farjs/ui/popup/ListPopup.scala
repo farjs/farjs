@@ -6,12 +6,13 @@ import scommons.react._
 import scommons.react.blessed._
 
 import scala.math.{max, min}
+import scala.scalajs.js
 
 case class ListPopupProps(title: String,
                           items: List[String],
                           onAction: Int => Unit,
                           onClose: () => Unit,
-                          onSelect: Int => Unit = _ => (),
+                          onSelect: js.UndefOr[js.Function1[Int, Unit]] = js.undefined,
                           onKeypress: String => Boolean = _ => false,
                           footer: Option[String] = None,
                           focusLast: Boolean = false,
@@ -54,7 +55,7 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
           padding = padding,
           footer = props.footer
         ))(
-          <(listBoxComp())(^.wrapped := ListBoxProps(
+          <(listBoxComp())(^.plain := ListBoxProps(
             left = 1,
             top = 1,
             width = contentWidth,
@@ -62,11 +63,11 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
             selected =
               if (items.isEmpty || !props.focusLast) 0
               else items.length - 1,
-            items = items.map { item =>
+            items = js.Array(items.map { item =>
               textPaddingLeftStr +
                 TextLine.wrapText(item, contentWidth - textPadding) +
                 textPaddingRightStr
-            },
+            }: _*),
             style = theme,
             onAction = { index =>
               if (items.nonEmpty) {

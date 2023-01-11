@@ -429,7 +429,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
             left shouldBe props.left
             top shouldBe props.top + 1
             width shouldBe props.width
-            items shouldBe List("item", "item 2")
+            items.toList shouldBe List("item", "item 2")
             viewport.focused shouldBe 0
             style shouldBe theme
         }))()
@@ -444,7 +444,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
     findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
     val popup = findComponentProps(renderer.root, comboBoxPopup)
-    popup.items shouldBe items
+    popup.items.toList shouldBe items
     popup.viewport.focused shouldBe 0
     val viewport = popup.viewport.copy(focused = 1)
 

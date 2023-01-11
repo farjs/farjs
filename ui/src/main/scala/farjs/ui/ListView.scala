@@ -10,18 +10,18 @@ case class ListViewProps(left: Int,
                          top: Int,
                          width: Int,
                          height: Int,
-                         items: List[String],
+                         items: js.Array[String],
                          viewport: ListViewport,
                          setViewport: js.Function1[ListViewport, Unit],
                          style: BlessedStyle,
-                         onClick: Int => Unit)
+                         onClick: js.Function1[Int, Unit])
 
 object ListView extends FunctionComponent[ListViewProps] {
 
   private def renderItems(selected: Int,
-                          items: List[String],
+                          items: js.Array[String],
                           width: Int,
-                          theme: BlessedStyle): List[String] = {
+                          theme: BlessedStyle): js.Array[String] = {
 
     items.zipWithIndex.map {
       case (item, index) =>
