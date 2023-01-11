@@ -8,7 +8,7 @@ import farjs.viewer.ViewerPluginUi._
 import scommons.react._
 import scommons.react.blessed._
 
-class ViewerPluginUi(filePath: String)
+class ViewerPluginUi(filePath: String, size: Double)
   extends FunctionComponent[FileListPluginUiProps] {
 
   protected def render(compProps: Props): ReactElement = {
@@ -28,12 +28,12 @@ class ViewerPluginUi(filePath: String)
         ^.rbClickable := true,
         ^.rbAutoFocus := false
       )(
-        <.text(
-          ^.rbWidth := "100%",
-          ^.rbHeight := 1,
-          ^.rbStyle := headerStyle,
-          ^.content := filePath
-        )(),
+        <(viewerHeader())(^.wrapped := ViewerHeaderProps(
+          filePath = filePath,
+          encoding = "utf-8",
+          size = size,
+          percent = 100
+        ))(),
   
         <.button(
           ^.rbTop := 1,
@@ -54,6 +54,7 @@ class ViewerPluginUi(filePath: String)
 object ViewerPluginUi {
 
   private[viewer] var popupComp: UiComponent[PopupProps] = Popup
+  private[viewer] var viewerHeader: UiComponent[ViewerHeaderProps] = ViewerHeader
   private[viewer] var bottomMenuComp: UiComponent[BottomMenuProps] = BottomMenu
 
   private[viewer] val menuItems = List(
@@ -70,15 +71,6 @@ object ViewerPluginUi {
     /* F11 */ "",
     /* F12 */ "DevTools"
   )
-
-  private[viewer] lazy val headerStyle: BlessedStyle = {
-    val style = Theme.current.menu.item
-    new BlessedStyle {
-      override val bold = style.bold
-      override val bg = style.bg
-      override val fg = style.fg
-    }
-  }
 
   private[viewer] lazy val contentStyle: BlessedStyle = {
     val style = Theme.current.fileList.regularItem

@@ -10,12 +10,13 @@ import scommons.react.test._
 class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
   ViewerPluginUi.popupComp = mockUiComponent("Popup")
+  ViewerPluginUi.viewerHeader = mockUiComponent("ViewerHeader")
   ViewerPluginUi.bottomMenuComp = mockUiComponent("BottomMenu")
 
   it should "call onClose when onClose" in {
     //given
     val onClose = mockFunction[Unit]
-    val pluginUi = new ViewerPluginUi("item 1")
+    val pluginUi = new ViewerPluginUi("item 1", 0)
     val props = FileListPluginUiProps(onClose = onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
     val popupProps = findComponentProps(comp, popupComp)
@@ -30,7 +31,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
   it should "call onClose when onKeypress(F10)" in {
     //given
     val onClose = mockFunction[Unit]
-    val pluginUi = new ViewerPluginUi("item 1")
+    val pluginUi = new ViewerPluginUi("item 1", 0)
     val props = FileListPluginUiProps(onClose = onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
     val popupProps = findComponentProps(comp, popupComp)
@@ -45,7 +46,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
   it should "do nothing when onKeypress(unknown)" in {
     //given
     val onClose = mockFunction[Unit]
-    val pluginUi = new ViewerPluginUi("item 1")
+    val pluginUi = new ViewerPluginUi("item 1", 0)
     val props = FileListPluginUiProps(onClose = onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
     val popupProps = findComponentProps(comp, popupComp)
@@ -61,7 +62,8 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     //given
     val onClose = mockFunction[Unit]
     val filePath = "item 1"
-    val pluginUi = new ViewerPluginUi(filePath)
+    val size = 123
+    val pluginUi = new ViewerPluginUi(filePath, size)
     val props = FileListPluginUiProps(onClose = onClose)
     
     //when
@@ -78,12 +80,13 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
           ^.rbClickable := true,
           ^.rbAutoFocus := false
         )(
-          <.text(
-            ^.rbWidth := "100%",
-            ^.rbHeight := 1,
-            ^.rbStyle := headerStyle,
-            ^.content := filePath
-          )(),
+          <(viewerHeader())(^.assertWrapped(inside(_) {
+            case ViewerHeaderProps(resFilePath, resEncoding, resSize, resPercent) =>
+              resFilePath shouldBe filePath
+              resEncoding shouldBe "utf-8"
+              resSize shouldBe size
+              resPercent shouldBe 100
+          }))(),
   
           <.button(
             ^.rbTop := 1,
@@ -94,7 +97,10 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
           )(),
   
           <.box(^.rbTop := "100%-1")(
-            <(bottomMenuComp())(^.wrapped := BottomMenuProps(menuItems))()
+            <(bottomMenuComp())(^.assertWrapped(inside(_) {
+              case BottomMenuProps(resMenuItems) =>
+                resMenuItems shouldBe menuItems
+            }))()
           )
         )
       )

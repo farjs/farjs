@@ -16,7 +16,7 @@ object ViewerPlugin extends FileListPlugin {
       state.currentItem.filter(_ != FileListItem.up) match {
         case Some(item) if actions.isLocalFS && !item.isDir =>
           val filePath = path.join(state.currDir.path, item.name)
-          val ui = new ViewerPluginUi(filePath)
+          val ui = new ViewerPluginUi(filePath, item.size)
           Some(ui.apply())
         case _ => None
       }
