@@ -1,12 +1,12 @@
-package farjs.filelist.quickview
+package farjs.viewer.quickview
 
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.quickview.QuickViewPanel._
 import farjs.filelist.stack._
 import farjs.ui.border._
 import farjs.ui.theme.Theme
 import farjs.ui.{TextAlign, TextLineProps}
+import farjs.viewer.quickview.QuickViewPanel._
 import org.scalatest.Assertion
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._

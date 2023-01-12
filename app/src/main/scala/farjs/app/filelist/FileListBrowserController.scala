@@ -3,8 +3,8 @@ package farjs.app.filelist
 import farjs.app.FarjsStateDef
 import farjs.archiver.ArchiverPlugin
 import farjs.filelist._
-import farjs.filelist.quickview.QuickViewPlugin
 import farjs.viewer.ViewerPlugin
+import farjs.viewer.quickview.QuickViewPlugin
 import io.github.shogowada.scalajs.reactjs.React.Props
 import scommons.react.UiComponent
 import scommons.react.redux._

@@ -1,4 +1,4 @@
-package farjs.filelist.quickview
+package farjs.viewer.quickview
 
 import farjs.filelist.FileListPlugin
 import farjs.filelist.stack.{PanelStackItem, WithPanelStacksProps}

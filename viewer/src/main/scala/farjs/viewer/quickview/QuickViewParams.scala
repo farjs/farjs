@@ -1,4 +1,4 @@
-package farjs.filelist.quickview
+package farjs.viewer.quickview
 
 case class QuickViewParams(name: String = "",
                            parent: String = "",

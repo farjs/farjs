@@ -1,4 +1,4 @@
-package farjs.filelist.quickview
+package farjs.viewer.quickview
 
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.api.FileListItem
