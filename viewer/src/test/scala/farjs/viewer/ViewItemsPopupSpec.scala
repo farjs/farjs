@@ -1,13 +1,12 @@
-package farjs.filelist.popups
+package farjs.viewer
 
-import farjs.filelist.FileListActions.{FileListItemsViewedAction, FileListTaskAction}
+import farjs.filelist.FileListActions.{FileListDirUpdatedAction, FileListTaskAction}
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.popups.FileListPopupsActions.FileListPopupViewItemsAction
-import farjs.filelist.popups.ViewItemsPopup._
 import farjs.filelist.stack.WithPanelStacksSpec.withContext
 import farjs.filelist.stack._
 import farjs.ui.popup.StatusPopupProps
+import farjs.viewer.ViewItemsPopup._
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
@@ -33,19 +32,22 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val currDir = FileListDir("/folder", isRoot = false, List(
-      FileListItem("dir 1", isDir = true),
-      FileListItem("file 1", size = 10)
-    ))
+    val dir1 = FileListItem("dir 1", isDir = true)
+    val file1 = FileListItem("file 1", size = 10)
+    val currDir = FileListDir("/folder", isRoot = false, List(dir1, file1))
     val state = FileListState(currDir = currDir, isActive = true, selectedNames = Set("dir 1", "file 1"))
-    val props = FileListPopupsState(showViewItemsPopup = true)
+    val onClose = mockFunction[Unit]
+    val props = FileListPluginUiProps(onClose = onClose)
     val p = Promise[Boolean]()
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
-      onNextDir("/path", List(
-        FileListItem("dir 2", isDir = true),
-        FileListItem("file 2", size = 123)
-      ))
-      p.future
+      p.future.map { res =>
+        res shouldBe true
+        onNextDir("/path", List(
+          FileListItem("dir 2", isDir = true),
+          FileListItem("file 2", size = 123)
+        )) shouldBe true
+        res
+      }
     }
     val leftStack = new PanelStack(isActive = false, List(
       PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
@@ -54,21 +56,19 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
     val renderer = createTestRenderer(
-      withContext(<(ViewItemsPopup())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(ViewItemsPopup())(^.plain := props)(), leftStack, rightStack)
     )
     
     eventually {
-      TestRenderer.act { () =>
-        renderer.update(withContext(<(ViewItemsPopup())(^.wrapped := props)(), leftStack, rightStack))
-      }
       val popup = findComponentProps(renderer.root, statusPopupComp)
       popup.text shouldBe "Scanning the folder\ndir 1"
     }.flatMap { _ =>
-      var resAction: FileListItemsViewedAction = null
+      var resAction: FileListDirUpdatedAction = null
 
       //then
+      onClose.expects()
       dispatch.expects(*).onCall { action: Any =>
-        inside(action) { case action: FileListItemsViewedAction =>
+        inside(action) { case action: FileListDirUpdatedAction =>
           resAction = action
         }
       }
@@ -79,15 +79,15 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
       //then
       eventually {
         resAction should not be null
-        resAction shouldBe FileListItemsViewedAction(Map(
-          "dir 1" -> 123,
-          "file 1" -> 10
-        ))
+        resAction shouldBe FileListDirUpdatedAction(currDir.copy(items = List(
+          dir1.copy(size = 123),
+          file1.copy(size = 10)
+        )))
       }
     }
   }
 
-  it should "handle cancel action and hide StatusPopup when onClose" in {
+  it should "handle cancel action when onClose" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
@@ -95,9 +95,19 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("dir 1", isDir = true)
     ))
     val state = FileListState(currDir = currDir, isActive = true)
-    val props = FileListPopupsState(showViewItemsPopup = true)
+    val onClose = mockFunction[Unit]
+    val props = FileListPluginUiProps(onClose = onClose)
     val p = Promise[Boolean]()
-    actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).returning(p.future)
+    actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
+      p.future.map { res =>
+        res shouldBe false
+        onNextDir("/path", List(
+          FileListItem("dir 2", isDir = true),
+          FileListItem("file 2", size = 123)
+        )) shouldBe false
+        res
+      }
+    }
     
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
@@ -106,28 +116,24 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
       PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
     ), null)
     val renderer = createTestRenderer(
-      withContext(<(ViewItemsPopup())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(ViewItemsPopup())(^.plain := props)(), leftStack, rightStack)
     )
-    val popup = findComponentProps(renderer.root, statusPopupComp)
-    val action = FileListPopupViewItemsAction(show = false)
 
-    //then
-    dispatch.expects(action)
+    eventually {
+      val popup = findComponentProps(renderer.root, statusPopupComp)
+      popup.text shouldBe "Scanning the folder\ndir 1"
+    }.flatMap { _ =>
+      val popup = findComponentProps(renderer.root, statusPopupComp)
 
-    //when
-    popup.onClose()
-    
-    //then
-    TestRenderer.act { () =>
-      renderer.update(
-        withContext(<(ViewItemsPopup())(^.wrapped := FileListPopupsState())(), leftStack, rightStack)
-      )
+      //when
+      popup.onClose()
+
+      //then
+      onClose.expects()
+      dispatch.expects(*).never()
+      p.success(false)
+      p.future.map(_ => Succeeded)
     }
-
-    renderer.root.children.toList should be (empty)
-    
-    p.success(false)
-    Succeeded
   }
 
   it should "dispatch actions when failure" in {
@@ -138,7 +144,8 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("dir 1", isDir = true)
     ))
     val state = FileListState(currDir = currDir, isActive = true)
-    val props = FileListPopupsState(showViewItemsPopup = true)
+    val onClose = mockFunction[Unit]
+    val props = FileListPluginUiProps(onClose = onClose)
     val p = Promise[Boolean]()
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).returning(p.future)
     
@@ -149,14 +156,14 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
       PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
     ), null)
     val renderer = createTestRenderer(
-      withContext(<(ViewItemsPopup())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(ViewItemsPopup())(^.plain := props)(), leftStack, rightStack)
     )
     findComponentProps(renderer.root, statusPopupComp)
-    val action = FileListPopupViewItemsAction(show = false)
     var resultF: Future[_] = null
+    val error = new Exception("test error")
 
     //then
-    dispatch.expects(action)
+    onClose.expects()
     dispatch.expects(*).onCall { action: Any =>
       inside(action) { case action: FileListTaskAction =>
         resultF = action.task.future
@@ -164,45 +171,24 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     }
 
     //when
-    p.failure(new Exception("test error"))
+    p.failure(error)
     
     //then
     eventually {
       resultF should not be null
-    }.flatMap(_ => resultF.failed).map { _ =>
-      Succeeded
+    }.flatMap(_ => resultF.failed).map { ex =>
+      ex shouldBe error
     }
   }
 
-  it should "render empty component" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val actions = new Actions
-    val state = FileListState()
-    val props = FileListPopupsState()
-    val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
-    ), null)
-    val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
-    ), null)
-
-    //when
-    val result = createTestRenderer(
-      withContext(<(ViewItemsPopup())(^.wrapped := props)(), leftStack, rightStack)
-    ).root
-
-    //then
-    result.children.toList should be (empty)
-  }
-  
   it should "render StatusPopup component" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val state = FileListState()
-    val props = FileListPopupsState(showViewItemsPopup = true)
-    val action = FileListItemsViewedAction(Map.empty)
+    val onClose = mockFunction[Unit]
+    val props = FileListPluginUiProps(onClose = onClose)
+    val action = FileListDirUpdatedAction(state.currDir)
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(state))
     ), null)
@@ -211,11 +197,12 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     ), null)
 
     //then
+    onClose.expects()
     dispatch.expects(action)
 
     //when
     val result = testRender(
-      withContext(<(ViewItemsPopup())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(ViewItemsPopup())(^.plain := props)(), leftStack, rightStack)
     )
 
     //then

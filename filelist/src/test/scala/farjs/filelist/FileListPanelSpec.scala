@@ -85,12 +85,6 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     check("f1", FileListPopupHelpAction(show = true))
 
     //when & then
-    check("f3", FileListPopupViewItemsAction(show = true), never = true)
-    check("f3", FileListPopupViewItemsAction(show = true), index = 1, never = true)
-    check("f3", FileListPopupViewItemsAction(show = true), index = 1, selectedNames = Set("file 1"))
-    check("f3", FileListPopupViewItemsAction(show = true), index = 2)
-
-    //when & then
     check("S-f5", FileListPopupCopyMoveAction(ShowCopyInplace), never = true)
     check("S-f5", FileListPopupCopyMoveAction(ShowCopyInplace), index = 1)
     check("S-f5", FileListPopupCopyMoveAction(ShowCopyInplace), index = 2)

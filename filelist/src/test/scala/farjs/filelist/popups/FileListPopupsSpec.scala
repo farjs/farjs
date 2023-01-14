@@ -15,7 +15,6 @@ class FileListPopupsSpec extends TestSpec with TestRendererUtils {
   FileListPopups.deleteController = mockUiComponent("DeleteController")
   FileListPopups.makeFolderController = mockUiComponent("MakeFolderController")
   FileListPopups.selectController = mockUiComponent("SelectController")
-  FileListPopups.viewItemsPopupComp = mockUiComponent("ViewItemsPopup")
   FileListPopups.copyItemsComp = mockUiComponent("CopyItems")
 
   it should "render component" in {
@@ -52,7 +51,6 @@ class FileListPopupsSpec extends TestSpec with TestRendererUtils {
         case PopupControllerProps(Some(FileListData(`dispatch`, `actions`, `state`)), props.popups) =>
       }))(),
 
-      <(viewItemsPopupComp())(^.wrapped := props.popups)(),
       <(copyItemsComp())(^.wrapped := props.popups)()
     ))
   }

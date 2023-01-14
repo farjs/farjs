@@ -48,10 +48,6 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
         val currItem = props.state.currentItem.filter(_ != FileListItem.up)
         key match {
           case "f1" => props.dispatch(FileListPopupHelpAction(show = true))
-          case "f3" =>
-            if (props.state.selectedNames.nonEmpty || currItem.exists(_.isDir)) {
-              props.dispatch(FileListPopupViewItemsAction(show = true))
-            }
           case "S-f5" if props.actions.capabilities.contains(FileListCapability.copyInplace) =>
             if (currItem.nonEmpty) {
               props.dispatch(FileListPopupCopyMoveAction(ShowCopyInplace))

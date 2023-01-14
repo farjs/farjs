@@ -17,7 +17,6 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
   private[popups] var deleteController: UiComponent[PopupControllerProps] = DeleteController
   private[popups] var makeFolderController: UiComponent[PopupControllerProps] = MakeFolderController
   private[popups] var selectController: UiComponent[PopupControllerProps] = SelectController
-  private[popups] var viewItemsPopupComp: UiComponent[FileListPopupsState] = ViewItemsPopup
   private[popups] var copyItemsComp: UiComponent[FileListPopupsState] = CopyItems
 
   protected def render(compProps: Props): ReactElement = {
@@ -40,7 +39,6 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
       <(makeFolderController())(^.wrapped := controllerProps)(),
       <(selectController())(^.wrapped := controllerProps)(),
 
-      <(viewItemsPopupComp())(^.wrapped := props.popups)(),
       <(copyItemsComp())(^.wrapped := props.popups)()
     )
   }
