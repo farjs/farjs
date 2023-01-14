@@ -168,8 +168,6 @@ object FileListActions {
 
   case class FileListItemCreatedAction(name: String, currDir: FileListDir) extends Action
   
-  case class FileListItemsViewedAction(sizes: Map[String, Double]) extends Action
-  
   case class FileListDiskSpaceUpdatedAction(diskSpace: Double) extends Action
   case class FileListSortByAction(mode: SortMode) extends Action
 }

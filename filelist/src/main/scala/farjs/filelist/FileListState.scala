@@ -111,16 +111,6 @@ object FileListStateReducer {
         sortMode = mode,
         sortAscending = ascending
       )
-    case FileListItemsViewedAction(sizes) =>
-      val updatedItems = state.currDir.items.map { item =>
-        sizes.get(item.name) match {
-          case Some(size) => item.copy(size = size)
-          case None => item
-        }
-      }
-      state.copy(
-        currDir = state.currDir.copy(items = updatedItems)
-      )
     case FileListDiskSpaceUpdatedAction(diskSpace) =>
       state.copy(
         diskSpace = Some(diskSpace)

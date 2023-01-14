@@ -1,9 +1,9 @@
 package farjs.viewer
 
 import farjs.filelist.FileListActions.{FileListDirUpdatedAction, FileListTaskAction}
-import farjs.filelist.stack.WithPanelStacks
-import farjs.filelist.{FileListActions, FileListPluginUiProps, FileListState}
+import farjs.filelist._
 import farjs.ui.popup._
+import farjs.viewer.ViewItemsPopup._
 import scommons.react._
 import scommons.react.hooks._
 import scommons.react.redux.Dispatch
@@ -13,19 +13,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-object ViewItemsPopup extends FunctionComponent[FileListPluginUiProps] {
+object ViewItemsPopup {
 
   private[viewer] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
+}
+
+class ViewItemsPopup(data: FileListData) extends FunctionComponent[FileListPluginUiProps] {
 
   protected def render(compProps: Props): ReactElement = {
-    val stacks = WithPanelStacks.usePanelStacks
     val (currDir, setCurrDir) = useState("")
-    val inProgress = useRef(false)
+    val inProgress = useRef(true)
     val props = compProps.plain
-    val maybeCurrData = {
-      val stackItem = stacks.activeStack.peek[FileListState]
-      stackItem.getActions.zip(stackItem.state)
-    }
 
     def viewItems(dispatch: Dispatch, actions: FileListActions, state: FileListState): Unit = {
       val parent = state.currDir.path
@@ -60,12 +58,13 @@ object ViewItemsPopup extends FunctionComponent[FileListPluginUiProps] {
         res match {
           case Success(false) => // already cancelled
           case Success(true) =>
-            dispatch(FileListDirUpdatedAction(state.currDir.copy(items = state.currDir.items.map { item =>
+            val updatedItems = state.currDir.items.map { item =>
               sizes.get(item.name) match {
                 case Some(size) => item.copy(size = size)
                 case None => item
               }
-            })))
+            }
+            dispatch(FileListDirUpdatedAction(state.currDir.copy(items = updatedItems)))
           case Failure(_) =>
             dispatch(FileListTaskAction(FutureTask("Viewing Items", resultF)))
         }
@@ -74,24 +73,18 @@ object ViewItemsPopup extends FunctionComponent[FileListPluginUiProps] {
 
     useLayoutEffect({ () =>
       // start scan
-      maybeCurrData.foreach { case ((dispatch, actions), state) =>
-        inProgress.current = true
-        setCurrDir("")
-        viewItems(dispatch, actions, state)
-      }
+      viewItems(data.dispatch, data.actions, data.state)
       ()
     }, Nil)
     
-    maybeCurrData.map { case ((_, _), _) =>
-      <(statusPopupComp())(^.wrapped := StatusPopupProps(
-        text = s"Scanning the folder\n$currDir",
-        title = "View",
-        closable = true,
-        onClose = { () =>
-          // stop scan
-          inProgress.current = false
-        }
-      ))()
-    }.orNull
+    <(statusPopupComp())(^.wrapped := StatusPopupProps(
+      text = s"Scanning the folder\n$currDir",
+      title = "View",
+      closable = true,
+      onClose = { () =>
+        // stop scan
+        inProgress.current = false
+      }
+    ))()
   }
 }
