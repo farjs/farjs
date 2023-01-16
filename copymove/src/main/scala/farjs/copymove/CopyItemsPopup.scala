@@ -1,4 +1,4 @@
-package farjs.filelist.copy
+package farjs.copymove
 
 import farjs.filelist.FileListServices
 import farjs.filelist.api.FileListItem
@@ -21,11 +21,11 @@ case class CopyItemsPopupProps(move: Boolean,
 
 object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
 
-  private[copy] var modalComp: UiComponent[ModalProps] = Modal
-  private[copy] var textLineComp: UiComponent[TextLineProps] = TextLine
-  private[copy] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
-  private[copy] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
-  private[copy] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
+  private[copymove] var modalComp: UiComponent[ModalProps] = Modal
+  private[copymove] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[copymove] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
+  private[copymove] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[copymove] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
     val services = FileListServices.useServices

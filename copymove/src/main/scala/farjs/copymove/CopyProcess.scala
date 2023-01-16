@@ -1,4 +1,4 @@
-package farjs.filelist.copy
+package farjs.copymove
 
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.FileListData
@@ -28,11 +28,11 @@ case class CopyProcessProps(from: FileListData,
 
 object CopyProcess extends FunctionComponent[CopyProcessProps] {
 
-  private[copy] var copyProgressPopup: UiComponent[CopyProgressPopupProps] = CopyProgressPopup
-  private[copy] var fileExistsPopup: UiComponent[FileExistsPopupProps] = FileExistsPopup
-  private[copy] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
+  private[copymove] var copyProgressPopup: UiComponent[CopyProgressPopupProps] = CopyProgressPopup
+  private[copymove] var fileExistsPopup: UiComponent[FileExistsPopupProps] = FileExistsPopup
+  private[copymove] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
   
-  private[copy] var timers: Timers = nodejs.global
+  private[copymove] var timers: Timers = nodejs.global
   
   private case class CopyState(time100ms: Int = 0,
                                cancel: Boolean = false,

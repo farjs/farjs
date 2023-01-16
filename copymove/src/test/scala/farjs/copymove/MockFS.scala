@@ -1,4 +1,4 @@
-package farjs.filelist.copy
+package farjs.copymove
 
 import scommons.nodejs.{FS, Stats}
 

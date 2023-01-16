@@ -1,6 +1,8 @@
 package farjs.app.filelist
 
 import farjs.app.filelist.FileListBrowser._
+import farjs.copymove.CopyMoveUiAction
+import farjs.copymove.CopyMoveUiAction.{ShowCopyToTarget, ShowMoveToTarget}
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api._
@@ -203,23 +205,11 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     Succeeded
   }
 
-  it should "dispatch actions when onKeypress(F5/F6)" in {
+  it should "dispatch actions when onCopyMove" in {
     //given
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListBrowserProps(dispatch)
-    val focusMock = mockFunction[Unit]
     val emitMock = mockFunction[String, js.Any, js.Dynamic, Boolean]
-    val leftButtonMock = literal("focus" -> focusMock)
     val rightButtonMock = literal("emit" -> emitMock)
-    focusMock.expects()
 
-    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
-      if (el.`type` == <.button.name.asInstanceOf[js.Any]) {
-        if (el.props.isRight.asInstanceOf[Boolean]) rightButtonMock
-        else leftButtonMock
-      }
-      else null
-    })
     val currState = FileListState(
       currDir = FileListDir("/sub-dir", isRoot = false, items = List(
         FileListItem.up,
@@ -236,7 +226,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     )
 
     def check(fullKey: String,
-              action: Any,
+              action: CopyMoveUiAction,
               index: Int = 0,
               selectedNames: Set[String] = Set.empty,
               never: Boolean = false,
@@ -246,30 +236,18 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       //given
       val leftActions = new Actions(leftCapabilities)
       val rightActions = new Actions(rightCapabilities)
-      inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _, rightStack, _) =>
-        leftStack.isActive shouldBe true
-        leftStack.update[FileListState](_.copy(
-          dispatch = Some(leftDispatch),
-          actions = Some(leftActions.actions),
-          state = Some(currState.copy(
-            index = index,
-            selectedNames = selectedNames
-          ))
-        ))
-        rightStack.isActive shouldBe false
-        rightStack.update[FileListState](_.copy(
-          dispatch = Some(rightDispatch),
-          actions = Some(rightActions.actions)
-        ))
-      }
-      val button = inside(findComponents(comp, <.button.name)) {
-        case List(button, _) => button
-      }
+      val leftStack = new PanelStack(isActive = true, List(
+        PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(leftDispatch), Some(leftActions.actions), Some(currState.copy(
+          index = index,
+          selectedNames = selectedNames
+        )))
+      ), updater = null)
+
+      val rightStack = new PanelStack(isActive = false, List(
+        PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(rightDispatch), Some(rightActions.actions), Some(currState))
+      ), updater = null)
 
       //then
-      if (never) leftDispatch.expects(action).never()
-      else leftDispatch.expects(action)
-
       emit.foreach { event =>
         emitMock.expects("keypress", *, *).onCall { (_, _, key) =>
           key.name shouldBe ""
@@ -279,30 +257,35 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       }
 
       //when
-      button.props.onKeypress(null, literal(full = fullKey).asInstanceOf[KeyboardKey])
+      val res = FileListBrowser.onCopyMove(fullKey == "f6", leftStack, rightStack, rightButtonMock.asInstanceOf[BlessedElement])
+
+      //then
+      if (!never) {
+        res shouldBe Some(action)
+      }
     }
 
     //when & then
-    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), never = true)
-    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), index = 1, never = true, leftCapabilities = Set.empty)
-    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), index = 1, never = true, rightCapabilities = Set.empty,
+    check("f5", ShowCopyToTarget, never = true)
+    check("f5", ShowCopyToTarget, index = 1, never = true, leftCapabilities = Set.empty)
+    check("f5", ShowCopyToTarget, index = 1, never = true, rightCapabilities = Set.empty,
       emit = Some(FileListEvent.onFileListCopy))
-    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), index = 1, leftCapabilities = Set(
+    check("f5", ShowCopyToTarget, index = 1, leftCapabilities = Set(
       FileListCapability.read
     ))
-    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), index = 2)
-    check("f5", FileListPopupCopyMoveAction(ShowCopyToTarget), selectedNames = Set("file 1"))
+    check("f5", ShowCopyToTarget, index = 2)
+    check("f5", ShowCopyToTarget, selectedNames = Set("file 1"))
 
     //when & then
-    check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), never = true)
-    check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), index = 1, never = true, leftCapabilities = Set(
+    check("f6", ShowMoveToTarget, never = true)
+    check("f6", ShowMoveToTarget, index = 1, never = true, leftCapabilities = Set(
       FileListCapability.read
     ))
-    check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), index = 1, never = true, rightCapabilities = Set.empty,
+    check("f6", ShowMoveToTarget, index = 1, never = true, rightCapabilities = Set.empty,
       emit = Some(FileListEvent.onFileListMove))
-    check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), index = 1)
-    check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), index = 2)
-    check("f6", FileListPopupCopyMoveAction(ShowMoveToTarget), selectedNames = Set("file 1"))
+    check("f6", ShowMoveToTarget, index = 1)
+    check("f6", ShowMoveToTarget, index = 2)
+    check("f6", ShowMoveToTarget, selectedNames = Set("file 1"))
 
     Succeeded
   }

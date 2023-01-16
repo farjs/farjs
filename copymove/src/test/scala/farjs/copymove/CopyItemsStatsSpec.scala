@@ -1,9 +1,9 @@
-package farjs.filelist.copy
+package farjs.copymove
 
+import farjs.copymove.CopyItemsStats._
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.FileListItem
-import farjs.filelist.copy.CopyItemsStats._
 import farjs.ui.popup.StatusPopupProps
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec

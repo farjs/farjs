@@ -1,6 +1,5 @@
 package farjs.filelist.popups
 
-import farjs.filelist.copy.CopyItems
 import farjs.filelist.stack.WithPanelStacks
 import farjs.filelist.{FileListData, FileListState}
 import scommons.react._
@@ -17,7 +16,6 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
   private[popups] var deleteController: UiComponent[PopupControllerProps] = DeleteController
   private[popups] var makeFolderController: UiComponent[PopupControllerProps] = MakeFolderController
   private[popups] var selectController: UiComponent[PopupControllerProps] = SelectController
-  private[popups] var copyItemsComp: UiComponent[FileListPopupsState] = CopyItems
 
   protected def render(compProps: Props): ReactElement = {
     val stacks = WithPanelStacks.usePanelStacks
@@ -37,9 +35,7 @@ object FileListPopups extends FunctionComponent[FileListPopupsProps] {
       
       <(deleteController())(^.wrapped := controllerProps)(),
       <(makeFolderController())(^.wrapped := controllerProps)(),
-      <(selectController())(^.wrapped := controllerProps)(),
-
-      <(copyItemsComp())(^.wrapped := props.popups)()
+      <(selectController())(^.wrapped := controllerProps)()
     )
   }
 }

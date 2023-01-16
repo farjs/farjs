@@ -1,9 +1,9 @@
-package farjs.filelist.copy
+package farjs.copymove
 
+import farjs.copymove.CopyProcess._
 import farjs.filelist.FileListActions.{FileListDirUpdateAction, FileListTaskAction}
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem, FileTarget}
-import farjs.filelist.copy.CopyProcess._
 import farjs.ui.popup.MessageBoxProps
 import farjs.ui.theme.Theme
 import org.scalatest.time.{Millis, Seconds, Span}

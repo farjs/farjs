@@ -1,7 +1,7 @@
-package farjs.filelist.copy
+package farjs.copymove
 
+import farjs.copymove.FileExistsPopup._
 import farjs.filelist.api.FileListItem
-import farjs.filelist.copy.FileExistsPopup._
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.ModalProps

@@ -1,9 +1,9 @@
-package farjs.filelist.copy
+package farjs.copymove
 
+import farjs.copymove.MoveProcess._
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.FileListItem
-import farjs.filelist.copy.MoveProcess._
 import farjs.ui.popup.{MessageBoxProps, StatusPopupProps}
 import farjs.ui.theme.Theme
 import org.scalatest.Succeeded

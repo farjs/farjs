@@ -1,4 +1,4 @@
-package farjs.filelist.copy
+package farjs.copymove
 
 import farjs.ui._
 import farjs.ui.border._
@@ -21,10 +21,10 @@ case class CopyProgressPopupProps(move: Boolean,
 
 object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
 
-  private[copy] var modalComp: UiComponent[ModalProps] = Modal
-  private[copy] var textLineComp: UiComponent[TextLineProps] = TextLine
-  private[copy] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
-  private[copy] var progressBarComp: UiComponent[ProgressBarProps] = ProgressBar
+  private[copymove] var modalComp: UiComponent[ModalProps] = Modal
+  private[copymove] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[copymove] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[copymove] var progressBarComp: UiComponent[ProgressBarProps] = ProgressBar
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -122,7 +122,7 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
     )
   }
   
-  private[copy] def toTime(seconds: Int): String = {
+  private[copymove] def toTime(seconds: Int): String = {
     val hrs = seconds / 3600
     val min = (seconds - hrs * 3600) / 60
     val sec = seconds - hrs * 3600 - min * 60
@@ -130,7 +130,7 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
     f"$hrs%02d:$min%02d:$sec%02d"
   }
   
-  private[copy] def toSpeed(bits: Double): String = {
+  private[copymove] def toSpeed(bits: Double): String = {
     val (speed, mod) =
       if (bits >= 100000000000d) (bits / 1000000000, "Gb")
       else if (bits >= 100000000) (bits / 1000000, "Mb")

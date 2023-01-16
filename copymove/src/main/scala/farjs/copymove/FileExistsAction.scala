@@ -1,4 +1,4 @@
-package farjs.filelist.copy
+package farjs.copymove
 
 sealed trait FileExistsAction
 

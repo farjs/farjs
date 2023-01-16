@@ -1,4 +1,4 @@
-package farjs.filelist.copy
+package farjs.copymove
 
 import farjs.filelist.FileListActions
 import farjs.filelist.FileListActions.FileListTaskAction
@@ -24,7 +24,7 @@ case class CopyItemsStatsProps(dispatch: Dispatch,
 
 object CopyItemsStats extends FunctionComponent[CopyItemsStatsProps] {
 
-  private[copy] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
+  private[copymove] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
 
   protected def render(compProps: Props): ReactElement = {
     val (currDir, setCurrDir) = useState("")

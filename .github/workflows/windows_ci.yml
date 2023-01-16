@@ -53,6 +53,8 @@ jobs:
           D:/a/farjs/farjs/archiver/target/scala-2.13/scalajs-bundler/test/package-lock.json
           D:/a/farjs/farjs/viewer/target/scala-2.13/scalajs-bundler/test/node_modules
           D:/a/farjs/farjs/viewer/target/scala-2.13/scalajs-bundler/test/package-lock.json
+          D:/a/farjs/farjs/copymove/target/scala-2.13/scalajs-bundler/test/node_modules
+          D:/a/farjs/farjs/copymove/target/scala-2.13/scalajs-bundler/test/package-lock.json
         key: ${{ runner.os }}-node_modules-cache-v3-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.os }}-node_modules-cache-v3-

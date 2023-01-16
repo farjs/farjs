@@ -1,8 +1,8 @@
-package farjs.filelist.copy
+package farjs.copymove
 
+import farjs.copymove.CopyItemsPopup._
 import farjs.filelist.FileListServicesSpec.withServicesContext
 import farjs.filelist.api.FileListItem
-import farjs.filelist.copy.CopyItemsPopup._
 import farjs.filelist.history.MockFileListHistoryService
 import farjs.ui._
 import farjs.ui.border._

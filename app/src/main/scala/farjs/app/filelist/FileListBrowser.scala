@@ -1,5 +1,7 @@
 package farjs.app.filelist
 
+import farjs.copymove.CopyMoveUiAction._
+import farjs.copymove.{CopyMoveUi, CopyMoveUiAction}
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListCapability, FileListItem}
@@ -82,7 +84,28 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         case "M-l" => props.dispatch(DrivePopupAction(show = ShowDriveOnLeft))
         case "M-r" => props.dispatch(DrivePopupAction(show = ShowDriveOnRight))
         case k@("f5" | "f6") =>
-          onCopyMove(k == "f6", getStack(isRightActive), getStack(!isRightActive), getInput(!isRightActive))
+          val maybeUi = onCopyMove(k == "f6", getStack(isRightActive), getStack(!isRightActive), getInput(!isRightActive))
+          maybeUi.foreach { ui =>
+            setCurrPluginUi(Some(new CopyMoveUi(ui).apply()))
+          }
+        case k@("S-f5" | "S-f6") =>
+          val stack = getStack(isRightActive)
+          val stackItem = stack.peek[js.Any]
+          stackItem.getActions.zip(stackItem.state).collect {
+            case ((_, actions), state: FileListState) => (actions, state)
+          }.foreach { case (actions, state) =>
+            val currItem = state.currentItem.filter(_ != FileListItem.up)
+            if (k == "S-f5") {
+              if (currItem.nonEmpty && actions.capabilities.contains(FileListCapability.copyInplace)) {
+                setCurrPluginUi(Some(new CopyMoveUi(ShowCopyInplace).apply()))
+              }
+            }
+            else {
+              if (currItem.nonEmpty && actions.capabilities.contains(FileListCapability.moveInplace)) {
+                setCurrPluginUi(Some(new CopyMoveUi(ShowMoveInplace).apply()))
+              }
+            }
+          }
         case "M-h" => props.dispatch(FoldersHistoryPopupAction(show = true))
         case "C-d" => props.dispatch(FolderShortcutsPopupAction(show = true))
         case "f9" => props.dispatch(FileListPopupMenuAction(show = true))
@@ -218,25 +241,25 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     }
   }
 
-  private def onCopyMove(move: Boolean,
-                         stack: PanelStack,
-                         nonActiveStack: PanelStack,
-                         nonActiveInput: BlessedElement): Unit = {
+  private[filelist] def onCopyMove(move: Boolean,
+                                   stack: PanelStack,
+                                   nonActiveStack: PanelStack,
+                                   nonActiveInput: BlessedElement): Option[CopyMoveUiAction] = {
 
     val nonActiveItem = nonActiveStack.peek[js.Any]
     val stackItem = stack.peek[js.Any]
     stackItem.getActions.zip(stackItem.state).zip(nonActiveItem.getActions).collect {
-      case (((dispatch, actions), state: FileListState), (_, nonActiveActions)) =>
+      case (((_, actions), state: FileListState), (_, nonActiveActions)) =>
+        (actions, state, nonActiveActions)
+    }.flatMap { case (actions, state, nonActiveActions) =>
         val currItem = state.currentItem.filter(_ != FileListItem.up)
         if ((state.selectedNames.nonEmpty || currItem.nonEmpty) &&
           actions.capabilities.contains(FileListCapability.read) &&
           (!move || actions.capabilities.contains(FileListCapability.delete))) {
 
           if (nonActiveActions.capabilities.contains(FileListCapability.write)) {
-            dispatch(
-              if (move) FileListPopupCopyMoveAction(ShowMoveToTarget)
-              else FileListPopupCopyMoveAction(ShowCopyToTarget)
-            )
+            if (move) Some(ShowMoveToTarget)
+            else Some(ShowCopyToTarget)
           }
           else {
             nonActiveInput.emit("keypress", js.undefined, js.Dynamic.literal(
@@ -245,8 +268,10 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
                 if (move) FileListEvent.onFileListMove
                 else FileListEvent.onFileListCopy
             ))
+            None
           }
         }
+        else None
     }
   }
 }

@@ -1,6 +1,6 @@
-package farjs.filelist.copy
+package farjs.copymove
 
-import farjs.filelist.copy.CopyProgressPopup._
+import farjs.copymove.CopyProgressPopup._
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.ModalContent._

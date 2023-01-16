@@ -98,6 +98,7 @@ object FarjsApp extends ScalaJsModule {
     FarjsFs.definition,
     FarjsArchiver.definition,
     FarjsViewer.definition,
+    FarjsCopyMove.definition,
     FarjsDao.definition
   )
 }

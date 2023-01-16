@@ -1,4 +1,4 @@
-package farjs.filelist.copy
+package farjs.copymove
 
 import farjs.filelist.FileListActions
 import farjs.filelist.FileListActions.FileListTaskAction
@@ -26,9 +26,9 @@ case class MoveProcessProps(dispatch: Dispatch,
 
 object MoveProcess extends FunctionComponent[MoveProcessProps] {
 
-  private[copy] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
-  private[copy] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
-  private[copy] var fs: FS = scommons.nodejs.fs
+  private[copymove] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
+  private[copymove] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
+  private[copymove] var fs: FS = scommons.nodejs.fs
 
   private case class MoveState(currItem: String = "",
                                existing: Option[String] = None)
