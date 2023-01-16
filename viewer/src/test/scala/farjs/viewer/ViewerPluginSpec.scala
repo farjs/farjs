@@ -8,9 +8,9 @@ import scommons.react.ReactClass
 
 class ViewerPluginSpec extends TestSpec {
 
-  it should "define triggerKey" in {
+  it should "define triggerKeys" in {
     //when & then
-    ViewerPlugin.triggerKey shouldBe Some("f3")
+    ViewerPlugin.triggerKeys.toList shouldBe List("f3")
   }
 
   it should "return None if .. when onKeyTrigger" in {
@@ -31,7 +31,7 @@ class ViewerPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ViewerPlugin.onKeyTrigger(stacks) shouldBe None
+    ViewerPlugin.onKeyTrigger("", stacks) shouldBe None
   }
 
   it should "return None if non-local fs when onKeyTrigger" in {
@@ -51,7 +51,7 @@ class ViewerPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ViewerPlugin.onKeyTrigger(stacks) shouldBe None
+    ViewerPlugin.onKeyTrigger("", stacks) shouldBe None
   }
 
   it should "return Some(ViewerPluginUi) if file when onKeyTrigger" in {
@@ -71,7 +71,7 @@ class ViewerPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ViewerPlugin.onKeyTrigger(stacks) should not be None
+    ViewerPlugin.onKeyTrigger("", stacks) should not be None
   }
 
   it should "return Some(ViewItemsPopup) if dir when onKeyTrigger" in {
@@ -91,6 +91,6 @@ class ViewerPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ViewerPlugin.onKeyTrigger(stacks) should not be None
+    ViewerPlugin.onKeyTrigger("", stacks) should not be None
   }
 }

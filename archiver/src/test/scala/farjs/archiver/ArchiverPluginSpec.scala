@@ -16,9 +16,9 @@ class ArchiverPluginSpec extends TestSpec {
   ArchiverPlugin.readZip = _ => Future.successful(Map.empty)
   ArchiverPlugin.createApi = ZipApi.apply
 
-  it should "define triggerKey" in {
+  it should "define triggerKeys" in {
     //when & then
-    ArchiverPlugin.triggerKey shouldBe Some("S-f7")
+    ArchiverPlugin.triggerKeys.toList shouldBe List("S-f7")
   }
 
   it should "return None if .. when onKeyTrigger" in {
@@ -39,7 +39,7 @@ class ArchiverPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ArchiverPlugin.onKeyTrigger(stacks) shouldBe None
+    ArchiverPlugin.onKeyTrigger("", stacks) shouldBe None
   }
 
   it should "return None if non-local fs when onKeyTrigger" in {
@@ -59,7 +59,7 @@ class ArchiverPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ArchiverPlugin.onKeyTrigger(stacks) shouldBe None
+    ArchiverPlugin.onKeyTrigger("", stacks) shouldBe None
   }
 
   it should "return Some(ui) if not .. when onKeyTrigger" in {
@@ -79,7 +79,7 @@ class ArchiverPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ArchiverPlugin.onKeyTrigger(stacks) should not be None
+    ArchiverPlugin.onKeyTrigger("", stacks) should not be None
   }
 
   it should "return Some(ui) if selected items when onKeyTrigger" in {
@@ -100,7 +100,7 @@ class ArchiverPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ArchiverPlugin.onKeyTrigger(stacks) should not be None
+    ArchiverPlugin.onKeyTrigger("", stacks) should not be None
   }
 
   it should "trigger plugin on .zip and .jar file extensions" in {

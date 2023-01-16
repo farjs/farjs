@@ -20,9 +20,9 @@ class QuickViewPluginSpec extends TestSpec {
     )
   }
 
-  it should "define triggerKey" in {
+  it should "define triggerKeys" in {
     //when & then
-    QuickViewPlugin.triggerKey shouldBe Some("C-q")
+    QuickViewPlugin.triggerKeys.toList shouldBe List("C-q")
   }
   
   it should "remove plugin from left panel when onKeyTrigger" in {
@@ -36,7 +36,7 @@ class QuickViewPluginSpec extends TestSpec {
     leftStack.pop.expects()
 
     //when
-    QuickViewPlugin.onKeyTrigger(stacks) shouldBe None
+    QuickViewPlugin.onKeyTrigger("", stacks) shouldBe None
   }
   
   it should "remove plugin from right panel when onKeyTrigger" in {
@@ -51,7 +51,7 @@ class QuickViewPluginSpec extends TestSpec {
     rightStack.pop.expects()
 
     //when
-    QuickViewPlugin.onKeyTrigger(stacks) shouldBe None
+    QuickViewPlugin.onKeyTrigger("", stacks) shouldBe None
   }
   
   it should "add plugin to left panel when onKeyTrigger" in {
@@ -66,7 +66,7 @@ class QuickViewPluginSpec extends TestSpec {
     leftStack.push.expects(PanelStackItem(QuickViewPanel(), None, None, Some(QuickViewParams())))
 
     //when
-    QuickViewPlugin.onKeyTrigger(stacks) shouldBe None
+    QuickViewPlugin.onKeyTrigger("", stacks) shouldBe None
   }
   
   it should "add plugin to right panel when onKeyTrigger" in {
@@ -81,6 +81,6 @@ class QuickViewPluginSpec extends TestSpec {
     rightStack.push.expects(PanelStackItem(QuickViewPanel(), None, None, Some(QuickViewParams())))
 
     //when
-    QuickViewPlugin.onKeyTrigger(stacks) shouldBe None
+    QuickViewPlugin.onKeyTrigger("", stacks) shouldBe None
   }
 }

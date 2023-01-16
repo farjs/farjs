@@ -8,6 +8,7 @@ import scommons.nodejs.path
 import scommons.react.ReactClass
 
 import scala.concurrent.Future
+import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 
 object ArchiverPlugin extends FileListPlugin {
@@ -15,9 +16,9 @@ object ArchiverPlugin extends FileListPlugin {
   private[archiver] var readZip: String => Future[Map[String, List[ZipEntry]]] = ZipApi.readZip
   private[archiver] var createApi: (String, String, Future[Map[String, List[ZipEntry]]]) => ZipApi = ZipApi.apply
 
-  override val triggerKey: Option[String] = Some("S-f7")
+  override val triggerKeys: js.Array[String] = js.Array("S-f7")
 
-  override def onKeyTrigger(stacks: WithPanelStacksProps): Option[ReactClass] = {
+  override def onKeyTrigger(key: String, stacks: WithPanelStacksProps): Option[ReactClass] = {
     val stackItem = stacks.activeStack.peek[FileListState]
     stackItem.getActions.zip(stackItem.state).flatMap { case ((dispatch, actions), state) =>
       val items =

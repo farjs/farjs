@@ -123,8 +123,8 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
               openCurrItem(props.plugins, props.dispatch, stack, actions, state)
           }
         case keyFull =>
-          props.plugins.find(_.triggerKey.contains(keyFull)).foreach { plugin =>
-            val maybePluginUi = plugin.onKeyTrigger(stacks)
+          props.plugins.find(_.triggerKeys.contains(keyFull)).foreach { plugin =>
+            val maybePluginUi = plugin.onKeyTrigger(keyFull, stacks)
             maybePluginUi.foreach { pluginUi =>
               setCurrPluginUi(Some(pluginUi))
             }
