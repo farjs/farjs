@@ -1,8 +1,6 @@
 package farjs.app.filelist
 
 import farjs.app.filelist.FileListBrowser._
-import farjs.copymove.CopyMoveUiAction
-import farjs.copymove.CopyMoveUiAction.{ShowCopyToTarget, ShowMoveToTarget}
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api._
@@ -33,11 +31,10 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   FileListBrowser.fsPopups = "test_fs_popups".asInstanceOf[ReactClass]
   
   //noinspection TypeAnnotation
-  class Actions(capabilities: Set[String] = Set.empty) {
+  class Actions {
     val readFile = mockFunction[List[String], FileListItem, Double, Future[FileSource]]
 
     val actions = new MockFileListActions(
-      capabilitiesMock = capabilities,
       readFileMock = readFile
     )
   }
@@ -201,91 +198,6 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     check("C-d", FolderShortcutsPopupAction(show = true))
     check("f9", FileListPopupMenuAction(show = true))
     check("f10", FileListPopupExitAction(show = true))
-
-    Succeeded
-  }
-
-  it should "dispatch actions when onCopyMove" in {
-    //given
-    val emitMock = mockFunction[String, js.Any, js.Dynamic, Boolean]
-    val rightButtonMock = literal("emit" -> emitMock)
-
-    val currState = FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
-        FileListItem.up,
-        FileListItem("file 1"),
-        FileListItem("dir 1", isDir = true)
-      ))
-    )
-    val leftDispatch = mockFunction[Any, Any]
-    val rightDispatch = mockFunction[Any, Any]
-    val capabilities = Set(
-      FileListCapability.read,
-      FileListCapability.write,
-      FileListCapability.delete
-    )
-
-    def check(fullKey: String,
-              action: CopyMoveUiAction,
-              index: Int = 0,
-              selectedNames: Set[String] = Set.empty,
-              never: Boolean = false,
-              leftCapabilities: Set[String] = capabilities,
-              rightCapabilities: Set[String] = capabilities,
-              emit: Option[String] = None): Unit = {
-      //given
-      val leftActions = new Actions(leftCapabilities)
-      val rightActions = new Actions(rightCapabilities)
-      val leftStack = new PanelStack(isActive = true, List(
-        PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(leftDispatch), Some(leftActions.actions), Some(currState.copy(
-          index = index,
-          selectedNames = selectedNames
-        )))
-      ), updater = null)
-
-      val rightStack = new PanelStack(isActive = false, List(
-        PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(rightDispatch), Some(rightActions.actions), Some(currState))
-      ), updater = null)
-
-      //then
-      emit.foreach { event =>
-        emitMock.expects("keypress", *, *).onCall { (_, _, key) =>
-          key.name shouldBe ""
-          key.full shouldBe event
-          false
-        }
-      }
-
-      //when
-      val res = FileListBrowser.onCopyMove(fullKey == "f6", leftStack, rightStack, rightButtonMock.asInstanceOf[BlessedElement])
-
-      //then
-      if (!never) {
-        res shouldBe Some(action)
-      }
-    }
-
-    //when & then
-    check("f5", ShowCopyToTarget, never = true)
-    check("f5", ShowCopyToTarget, index = 1, never = true, leftCapabilities = Set.empty)
-    check("f5", ShowCopyToTarget, index = 1, never = true, rightCapabilities = Set.empty,
-      emit = Some(FileListEvent.onFileListCopy))
-    check("f5", ShowCopyToTarget, index = 1, leftCapabilities = Set(
-      FileListCapability.read
-    ))
-    check("f5", ShowCopyToTarget, index = 2)
-    check("f5", ShowCopyToTarget, selectedNames = Set("file 1"))
-
-    //when & then
-    check("f6", ShowMoveToTarget, never = true)
-    check("f6", ShowMoveToTarget, index = 1, never = true, leftCapabilities = Set(
-      FileListCapability.read
-    ))
-    check("f6", ShowMoveToTarget, index = 1, never = true, rightCapabilities = Set.empty,
-      emit = Some(FileListEvent.onFileListMove))
-    check("f6", ShowMoveToTarget, index = 1)
-    check("f6", ShowMoveToTarget, index = 2)
-    check("f6", ShowMoveToTarget, selectedNames = Set("file 1"))
 
     Succeeded
   }

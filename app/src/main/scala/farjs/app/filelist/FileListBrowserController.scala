@@ -2,6 +2,7 @@ package farjs.app.filelist
 
 import farjs.app.FarjsStateDef
 import farjs.archiver.ArchiverPlugin
+import farjs.copymove.CopyMovePlugin
 import farjs.filelist._
 import farjs.viewer.ViewerPlugin
 import farjs.viewer.quickview.QuickViewPlugin
@@ -16,7 +17,8 @@ object FileListBrowserController extends BaseStateController[FarjsStateDef, File
   private lazy val plugins: Seq[FileListPlugin] = List(
     QuickViewPlugin,
     ArchiverPlugin,
-    ViewerPlugin
+    ViewerPlugin,
+    CopyMovePlugin
   )
 
   def mapStateToProps(dispatch: Dispatch, state: FarjsStateDef, props: Props[Unit]): FileListBrowserProps = {
