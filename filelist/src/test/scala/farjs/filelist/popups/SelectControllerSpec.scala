@@ -7,13 +7,11 @@ import farjs.filelist.history.MockFileListHistoryService
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.SelectController._
 import farjs.filelist.{FileListData, FileListState, MockFileListActions}
-import org.scalatest.Succeeded
-import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
 
 import scala.concurrent.Future
 
-class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
+class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
   SelectController.selectPopupComp = mockUiComponent("SelectPopup")
 
@@ -24,6 +22,34 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val service = new MockFileListHistoryService(
       saveMock = save
     )
+  }
+
+  it should "not select .. when onAction" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = new MockFileListActions
+    val state = FileListState(offset = 1, index = 2, FileListDir("/sub-dir", isRoot = false, items = List(
+      FileListItem.up,
+      FileListItem("file1.test"),
+      FileListItem("file2.test"),
+      FileListItem("file.test3")
+    )), selectedNames = Set("file.test3"), isActive = true)
+    val props = PopupControllerProps(Some(FileListData(dispatch, actions, state)),
+      FileListPopupsState(showSelectPopup = ShowSelect))
+    val historyService = new HistoryService
+    val renderer = createTestRenderer(withServicesContext(
+      <(SelectController())(^.wrapped := props)(), selectPatternsHistory = historyService.service
+    ))
+    val pattern = "*"
+
+    //then
+    historyService.save.expects(pattern).returning(Future.unit)
+    dispatch.expects(FileListParamsChangedAction(state.offset, state.index,
+      Set("file1.test", "file2.test", "file.test3")))
+    dispatch.expects(FileListPopupSelectAction(SelectHidden))
+
+    //when
+    findComponentProps(renderer.root, selectPopupComp).onAction(pattern)
   }
 
   it should "dispatch actions and update state when Select" in {
@@ -52,8 +78,6 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
 
     //when
     findComponentProps(renderer.root, selectPopupComp).onAction(pattern)
-
-    Succeeded
   }
 
   it should "dispatch actions and update state when Deselect" in {
@@ -85,8 +109,6 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
 
     //when
     findComponentProps(renderer.root, selectPopupComp).onAction(pattern)
-
-    Succeeded
   }
 
   it should "dispatch FileListPopupSelectAction(SelectHidden) when Cancel" in {
@@ -108,8 +130,6 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
 
     //when
     popup.onCancel()
-
-    Succeeded
   }
 
   it should "render Select popup" in {

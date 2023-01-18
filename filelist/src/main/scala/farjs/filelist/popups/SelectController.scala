@@ -2,6 +2,7 @@ package farjs.filelist.popups
 
 import farjs.filelist.FileListActions.FileListParamsChangedAction
 import farjs.filelist.FileListServices
+import farjs.filelist.api.FileListItem
 import farjs.filelist.popups.FileListPopupsActions._
 import scommons.react._
 
@@ -26,8 +27,8 @@ object SelectController extends FunctionComponent[PopupControllerProps] {
             val regexes = pattern.split(';')
               .map(mask => Pattern.compile(fileMaskToRegex(mask)))
             val matchedNames = data.state.currDir.items
+              .filter(i => i != FileListItem.up && regexes.exists(_.matcher(i.name).matches()))
               .map(_.name)
-              .filter(n => regexes.exists(_.matcher(n).matches()))
             val updatedSelection =
               if (popups.showSelectPopup == ShowSelect) {
                 data.state.selectedNames ++ matchedNames
