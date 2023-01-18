@@ -5,7 +5,6 @@ import farjs.copymove.CopyMoveUiAction._
 import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.FileListItem
-import farjs.filelist.stack.{PanelStack, WithPanelStacks}
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
 import scommons.nodejs.path
@@ -27,11 +26,12 @@ object CopyMoveUi {
   private[copymove] var moveProcessComp: UiComponent[MoveProcessProps] = MoveProcess
 }
 
-class CopyMoveUi(copyMoveAction: CopyMoveUiAction) extends FunctionComponent[FileListPluginUiProps] {
+class CopyMoveUi(show: CopyMoveUiAction,
+                 from: FileListData,
+                 maybeTo: Option[FileListData]) extends FunctionComponent[FileListPluginUiProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val services = FileListServices.useServices
-    val stacks = WithPanelStacks.usePanelStacks
     val (maybeTotal, setTotal) = useState[Option[Double]](None)
     val (maybeToPath, setToPath) = useState[Option[(String, String)]](None)
     val (inplace, setInplace) = useState(false)
@@ -43,147 +43,156 @@ class CopyMoveUi(copyMoveAction: CopyMoveUiAction) extends FunctionComponent[Fil
 
     val props = compProps.plain
     
-    def getData(stack: PanelStack): Option[FileListData] = {
-      val item = stack.peek[FileListState]
-      item.getActions.zip(item.state).map { case ((dispatch, actions), state) =>
-        FileListData(dispatch, actions, state)
+    def onTopItem(item: FileListItem): Unit = copied.current += item.name
+
+    def onDone(path: String, toPath: String): () => Unit = { () =>
+      val updatedSelection = from.state.selectedNames -- copied.current
+      if (updatedSelection != from.state.selectedNames) {
+        from.dispatch(FileListParamsChangedAction(
+          offset = from.state.offset,
+          index = from.state.index,
+          selectedNames = updatedSelection
+        ))
+      }
+
+      val isInplace = inplace
+      props.onClose()
+
+      services.copyItemsHistory.save(path)
+
+      val updateAction = from.actions.updateDir(from.dispatch, from.path)
+      from.dispatch(updateAction)
+      updateAction.task.future.andThen {
+        case Success(updatedDir) =>
+          if (isInplace) from.dispatch(FileListItemCreatedAction(toPath, updatedDir))
+          else maybeTo.foreach(to => to.dispatch(to.actions.updateDir(to.dispatch, to.path)))
       }
     }
-    
-    val (maybeFrom, maybeTo) =
-      if (stacks.leftStack.isActive) (getData(stacks.leftStack), getData(stacks.rightStack))
-      else (getData(stacks.rightStack), getData(stacks.leftStack))
 
-    maybeFrom.map { from =>
+    def isMove: Boolean =
+      move ||
+        show == ShowMoveToTarget ||
+        show == ShowMoveInplace
 
-      def onTopItem(item: FileListItem): Unit = copied.current += item.name
+    def isInplace: Boolean = {
+      inplace ||
+        show == ShowCopyInplace ||
+        show == ShowMoveInplace ||
+        maybeTo.forall(_.path == from.path) && from.state.selectedItems.isEmpty
+    }
 
-      def onDone(path: String, toPath: String): () => Unit = { () =>
-        val updatedSelection = from.state.selectedNames -- copied.current
-        if (updatedSelection != from.state.selectedNames) {
-          from.dispatch(FileListParamsChangedAction(
-            offset = from.state.offset,
-            index = from.state.index,
-            selectedNames = updatedSelection
-          ))
-        }
+    val items =
+      if (!isInplace && from.state.selectedItems.nonEmpty) from.state.selectedItems
+      else from.state.currentItem.toList
 
-        val isInplace = inplace
-        props.onClose()
+    def onAction(path: String): Unit = {
+      val move = isMove
+      val inplace = isInplace
+      val resolveF =
+        if (!from.actions.isLocalFS) Future.successful((path, false))
+        else if (!inplace) resolveTargetDir(move, path)
+        else Future.successful((path, true))
 
-        services.copyItemsHistory.save(path)
+      resolveF.map { case (toPath, sameDrive) =>
+        setInplace(inplace)
+        setMove(move)
+        setShowPopup(false)
 
-        val updateAction = from.actions.updateDir(from.dispatch, from.path)
-        from.dispatch(updateAction)
-        updateAction.task.future.andThen {
-          case Success(updatedDir) =>
-            if (isInplace) from.dispatch(FileListItemCreatedAction(toPath, updatedDir))
-            else maybeTo.foreach(to => to.dispatch(to.actions.updateDir(to.dispatch, to.path)))
-        }
+        setToPath(Some(path -> toPath))
+        if (move && sameDrive) setShowMove(true)
+        else setShowStats(true)
+      }
+    }
+
+    def resolveTargetDir(move: Boolean, path: String): Future[(String, Boolean)] = {
+      val dirF = for {
+        dir <- from.actions.readDir(Some(from.path), path)
+        sameDrive <-
+          if (move) checkSameDrive(from, dir.path)
+          else Future.successful(false)
+      } yield {
+        (dir.path, sameDrive)
       }
 
-      def isMove: Boolean =
-        move ||
-          copyMoveAction == ShowMoveToTarget ||
-          copyMoveAction == ShowMoveInplace
+      from.dispatch(FileListTaskAction(FutureTask("Resolving target dir", dirF)))
+      dirF
+    }
 
-      def isInplace: Boolean = {
-        inplace ||
-          copyMoveAction == ShowCopyInplace ||
-          copyMoveAction == ShowMoveInplace ||
-          maybeTo.forall(_.path == from.path) && from.state.selectedItems.isEmpty
+    val maybeError = maybeToPath.filter(_ => !inplace).flatMap { case (_, toPath) =>
+      val op = if (move) "move" else "copy"
+      if (from.path == toPath) Some {
+        s"Cannot $op the item\n${items.head.name}\nonto itself"
       }
-
-      val items =
-        if (!isInplace && from.state.selectedItems.nonEmpty) from.state.selectedItems
-        else from.state.currentItem.toList
-
-      def onAction(path: String): Unit = {
-        val move = isMove
-        val inplace = isInplace
-        val resolveF =
-          if (!from.actions.isLocalFS) Future.successful((path, false))
-          else if (!inplace) resolveTargetDir(move, path)
-          else Future.successful((path, true))
-
-        resolveF.map { case (toPath, sameDrive) =>
-          setInplace(inplace)
-          setMove(move)
-          setShowPopup(false)
-
-          setToPath(Some(path -> toPath))
-          if (move && sameDrive) setShowMove(true)
-          else setShowStats(true)
+      else if (toPath.startsWith(from.path + path.sep)) {
+        val toSuffix = toPath.stripPrefix(from.path + path.sep)
+        val maybeSelf = items.find(i => toSuffix == i.name || toSuffix.startsWith(i.name + path.sep))
+        maybeSelf.map { self =>
+          s"Cannot $op the item\n${self.name}\ninto itself"
         }
       }
+      else None
+    }
 
-      def resolveTargetDir(move: Boolean, path: String): Future[(String, Boolean)] = {
-        val dirF = for {
-          dir <- from.actions.readDir(Some(from.path), path)
-          sameDrive <-
-            if (move) checkSameDrive(from, dir.path)
-            else Future.successful(false)
+    <.>()(
+      if (showPopup) Some {
+        <(copyItemsPopup())(^.wrapped := CopyItemsPopupProps(
+          move = isMove,
+          path =
+            if (!isInplace) maybeTo.map(_.path).getOrElse("")
+            else from.state.currentItem.map(_.name).getOrElse(""),
+          items = items,
+          onAction = onAction,
+          onCancel = props.onClose
+        ))()
+      }
+      else if (maybeError.isDefined) maybeError.map { error =>
+        <(messageBoxComp())(^.plain := MessageBoxProps(
+          title = "Error",
+          message = error,
+          actions = js.Array(MessageBoxAction.OK(props.onClose)),
+          style = Theme.current.popup.error
+        ))()
+      }
+      else if (showStats) Some {
+        <(copyItemsStats())(^.wrapped := CopyItemsStatsProps(
+          dispatch = from.dispatch,
+          actions = from.actions,
+          fromPath = from.path,
+          items = items,
+          title = if (move) "Move" else "Copy",
+          onDone = { total =>
+            setTotal(Some(total))
+            setShowStats(false)
+          },
+          onCancel = props.onClose
+        ))()
+      }
+      else if (showMove) maybeToPath.map { case (path, toPath) =>
+        <(moveProcessComp())(^.wrapped := MoveProcessProps(
+          dispatch = from.dispatch,
+          actions = from.actions,
+          fromPath = from.path,
+          items =
+            if (!inplace) items.map(i => (i, i.name))
+            else items.map(i => (i, toPath)),
+          toPath =
+            if (!inplace) toPath
+            else from.path,
+          onTopItem = onTopItem,
+          onDone = onDone(path, toPath)
+        ))()
+      }
+      else {
+        for {
+          (path, toPath) <- maybeToPath
+          total <- maybeTotal
         } yield {
-          (dir.path, sameDrive)
-        }
-
-        from.dispatch(FileListTaskAction(FutureTask("Resolving target dir", dirF)))
-        dirF
-      }
-
-      val maybeError = maybeToPath.filter(_ => !inplace).flatMap { case (_, toPath) =>
-        val op = if (move) "move" else "copy"
-        if (from.path == toPath) Some {
-          s"Cannot $op the item\n${items.head.name}\nonto itself"
-        }
-        else if (toPath.startsWith(from.path + path.sep)) {
-          val toSuffix = toPath.stripPrefix(from.path + path.sep)
-          val maybeSelf = items.find(i => toSuffix == i.name || toSuffix.startsWith(i.name + path.sep))
-          maybeSelf.map { self =>
-            s"Cannot $op the item\n${self.name}\ninto itself"
-          }
-        }
-        else None
-      }
-
-      <.>()(
-        if (showPopup) Some {
-          <(copyItemsPopup())(^.wrapped := CopyItemsPopupProps(
-            move = isMove,
-            path =
-              if (!isInplace) maybeTo.map(_.path).getOrElse("")
-              else from.state.currentItem.map(_.name).getOrElse(""),
-            items = items,
-            onAction = onAction,
-            onCancel = props.onClose
-          ))()
-        }
-        else if (maybeError.isDefined) maybeError.map { error =>
-          <(messageBoxComp())(^.plain := MessageBoxProps(
-            title = "Error",
-            message = error,
-            actions = js.Array(MessageBoxAction.OK(props.onClose)),
-            style = Theme.current.popup.error
-          ))()
-        }
-        else if (showStats) Some {
-          <(copyItemsStats())(^.wrapped := CopyItemsStatsProps(
-            dispatch = from.dispatch,
-            actions = from.actions,
-            fromPath = from.path,
-            items = items,
-            title = if (move) "Move" else "Copy",
-            onDone = { total =>
-              setTotal(Some(total))
-              setShowStats(false)
-            },
-            onCancel = props.onClose
-          ))()
-        }
-        else if (showMove) maybeToPath.map { case (path, toPath) =>
-          <(moveProcessComp())(^.wrapped := MoveProcessProps(
-            dispatch = from.dispatch,
-            actions = from.actions,
+          <(copyProcessComp())(^.wrapped := CopyProcessProps(
+            from = from,
+            to =
+              if (!inplace) maybeTo.getOrElse(from)
+              else from,
+            move = move,
             fromPath = from.path,
             items =
               if (!inplace) items.map(i => (i, i.name))
@@ -191,36 +200,13 @@ class CopyMoveUi(copyMoveAction: CopyMoveUiAction) extends FunctionComponent[Fil
             toPath =
               if (!inplace) toPath
               else from.path,
+            total = total,
             onTopItem = onTopItem,
             onDone = onDone(path, toPath)
           ))()
         }
-        else {
-          for {
-            (path, toPath) <- maybeToPath
-            total <- maybeTotal
-          } yield {
-            <(copyProcessComp())(^.wrapped := CopyProcessProps(
-              from = from,
-              to =
-                if (!inplace) maybeTo.getOrElse(from)
-                else from,
-              move = move,
-              fromPath = from.path,
-              items =
-                if (!inplace) items.map(i => (i, i.name))
-                else items.map(i => (i, toPath)),
-              toPath =
-                if (!inplace) toPath
-                else from.path,
-              total = total,
-              onTopItem = onTopItem,
-              onDone = onDone(path, toPath)
-            ))()
-          }
-        }
-      )
-    }.orNull
+      }
+    )
   }
   
   private def checkSameDrive(from: FileListData, toPath: String): Future[Boolean] = {
