@@ -23,6 +23,7 @@ object FileList extends FunctionComponent[FileListProps] {
     
     val (_, height) = props.size
     val items = props.state.currDir.items
+    val itemsLength = items.length
     val columnSize = height - 1 // excluding column header
     val viewSize = columnSize * props.columns
     
@@ -32,13 +33,16 @@ object FileList extends FunctionComponent[FileListProps] {
       
       if (viewSize <= 0 || index < viewSize) (offset, index)
       else {
-        val viewIndex = index % viewSize
-        (index - viewIndex, viewIndex)
+        val currIndex = offset + index
+        val rawOffset = (currIndex / viewSize) * viewSize
+        val newOffset = math.max(math.min(itemsLength - viewSize, rawOffset), 0)
+        val focused = math.max(math.min(itemsLength - newOffset - 1, currIndex - newOffset), 0)
+        (newOffset, focused)
       }
     }
     
     val viewItems = items.slice(viewOffset, viewOffset + viewSize)
-    val maxOffset = items.size - viewItems.size
+    val maxOffset = itemsLength - viewItems.size
     val maxIndex = math.max(viewItems.size - 1, 0)
 
     useLayoutEffect({ () =>
@@ -77,7 +81,7 @@ object FileList extends FunctionComponent[FileListProps] {
           val selectIndex = newOffset + newIndex
           
           val isFirst = selectIndex == 0
-          val isLast = selectIndex == items.size - 1
+          val isLast = selectIndex == itemsLength - 1
           val selection = {
             if (isFirst && (selectIndex == currIndex || selectIndex + 1 < currIndex)) {
               items.view.slice(selectIndex, currIndex + 1)

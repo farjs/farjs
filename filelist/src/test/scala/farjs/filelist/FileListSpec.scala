@@ -322,7 +322,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     }
   }
   
-  it should "render non-empty component" in {
+  it should "render non-empty component and focus first item" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
@@ -342,6 +342,31 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     assertFileList(result, props,
       viewItems = List(FileListItem("item 1"), FileListItem("item 2")),
       focusedIndex = 0,
+      selectedNames = Set.empty
+    )
+  }
+  
+  it should "render non-empty component and focus last item" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = new Actions
+    val props = FileListProps(dispatch, actions.actions, FileListState(
+      index = 2,
+      currDir = FileListDir("/", isRoot = true, items = List(
+        FileListItem("item 1"),
+        FileListItem("item 2"),
+        FileListItem("item 3")
+      )),
+      isActive = true
+    ), (7, 2), columns = 2)
+
+    //when
+    val result = testRender(<(FileList())(^.wrapped := props)())
+
+    //then
+    assertFileList(result, props,
+      viewItems = List(FileListItem("item 2"), FileListItem("item 3")),
+      focusedIndex = 1,
       selectedNames = Set.empty
     )
   }
