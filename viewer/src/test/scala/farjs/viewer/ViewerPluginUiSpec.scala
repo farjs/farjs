@@ -11,12 +11,14 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
   ViewerPluginUi.popupComp = mockUiComponent("Popup")
   ViewerPluginUi.viewerHeader = mockUiComponent("ViewerHeader")
+  ViewerPluginUi.viewerContent = mockUiComponent("ViewerContent")
   ViewerPluginUi.bottomMenuComp = mockUiComponent("BottomMenu")
 
   it should "call onClose when onClose" in {
     //given
+    val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
-    val pluginUi = new ViewerPluginUi("item 1", 0)
+    val pluginUi = new ViewerPluginUi(dispatch, "item 1", 0)
     val props = FileListPluginUiProps(onClose = onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
     val popupProps = findComponentProps(comp, popupComp)
@@ -30,8 +32,9 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
   it should "call onClose when onKeypress(F10)" in {
     //given
+    val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
-    val pluginUi = new ViewerPluginUi("item 1", 0)
+    val pluginUi = new ViewerPluginUi(dispatch, "item 1", 0)
     val props = FileListPluginUiProps(onClose = onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
     val popupProps = findComponentProps(comp, popupComp)
@@ -45,8 +48,9 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
   it should "do nothing when onKeypress(unknown)" in {
     //given
+    val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
-    val pluginUi = new ViewerPluginUi("item 1", 0)
+    val pluginUi = new ViewerPluginUi(dispatch, "item 1", 0)
     val props = FileListPluginUiProps(onClose = onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
     val popupProps = findComponentProps(comp, popupComp)
@@ -60,10 +64,11 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
   it should "render component" in {
     //given
+    val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
     val filePath = "item 1"
     val size = 123
-    val pluginUi = new ViewerPluginUi(filePath, size)
+    val pluginUi = new ViewerPluginUi(dispatch, filePath, size)
     val props = FileListPluginUiProps(onClose = onClose)
     
     //when
@@ -91,10 +96,15 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
           <.button(
             ^.rbTop := 1,
             ^.rbWidth := "100%",
-            ^.rbHeight := "100%-2",
-            ^.rbStyle := contentStyle,
-            ^.content := ""
-          )(),
+            ^.rbHeight := "100%-2"
+          )(
+            <(viewerContent())(^.assertWrapped(inside(_) {
+              case ViewerContentProps(resDispatch, resFilePath, resEncoding) =>
+                resDispatch shouldBe dispatch
+                resFilePath shouldBe filePath
+                resEncoding shouldBe "utf-8"
+            }))()
+          ),
   
           <.box(^.rbTop := "100%-1")(
             <(bottomMenuComp())(^.assertWrapped(inside(_) {

@@ -3,16 +3,17 @@ package farjs.viewer
 import farjs.filelist._
 import farjs.ui.menu.{BottomMenu, BottomMenuProps}
 import farjs.ui.popup.{Popup, PopupProps}
-import farjs.ui.theme.Theme
 import farjs.viewer.ViewerPluginUi._
 import scommons.react._
 import scommons.react.blessed._
+import scommons.react.redux.Dispatch
 
-class ViewerPluginUi(filePath: String, size: Double)
+class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
   extends FunctionComponent[FileListPluginUiProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
+    val encoding = "utf-8"
 
     def onKeypress(keyFull: String): Boolean = {
       var processed = true
@@ -30,7 +31,7 @@ class ViewerPluginUi(filePath: String, size: Double)
       )(
         <(viewerHeader())(^.wrapped := ViewerHeaderProps(
           filePath = filePath,
-          encoding = "utf-8",
+          encoding = encoding,
           size = size,
           percent = 100
         ))(),
@@ -38,10 +39,14 @@ class ViewerPluginUi(filePath: String, size: Double)
         <.button(
           ^.rbTop := 1,
           ^.rbWidth := "100%",
-          ^.rbHeight := "100%-2",
-          ^.rbStyle := contentStyle,
-          ^.content := ""
-        )(),
+          ^.rbHeight := "100%-2"
+        )(
+          <(viewerContent())(^.wrapped := ViewerContentProps(
+            dispatch = dispatch,
+            filePath = filePath,
+            encoding = encoding
+          ))()
+        ),
   
         <.box(^.rbTop := "100%-1")(
           <(bottomMenuComp())(^.wrapped := BottomMenuProps(menuItems))()
@@ -55,6 +60,7 @@ object ViewerPluginUi {
 
   private[viewer] var popupComp: UiComponent[PopupProps] = Popup
   private[viewer] var viewerHeader: UiComponent[ViewerHeaderProps] = ViewerHeader
+  private[viewer] var viewerContent: UiComponent[ViewerContentProps] = ViewerContent
   private[viewer] var bottomMenuComp: UiComponent[BottomMenuProps] = BottomMenu
 
   private[viewer] val menuItems = List(
@@ -71,13 +77,4 @@ object ViewerPluginUi {
     /* F11 */ "",
     /* F12 */ "DevTools"
   )
-
-  private[viewer] lazy val contentStyle: BlessedStyle = {
-    val style = Theme.current.fileList.regularItem
-    new BlessedStyle {
-      override val bold = style.bold
-      override val bg = style.bg
-      override val fg = style.fg
-    }
-  }
 }
