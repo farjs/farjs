@@ -41,7 +41,7 @@ class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
           ^.rbWidth := "100%",
           ^.rbHeight := "100%-2"
         )(
-          <(viewerContent())(^.wrapped := ViewerContentProps(
+          <(viewerController())(^.wrapped := ViewerControllerProps(
             dispatch = dispatch,
             filePath = filePath,
             encoding = encoding
@@ -60,7 +60,7 @@ object ViewerPluginUi {
 
   private[viewer] var popupComp: UiComponent[PopupProps] = Popup
   private[viewer] var viewerHeader: UiComponent[ViewerHeaderProps] = ViewerHeader
-  private[viewer] var viewerContent: UiComponent[ViewerContentProps] = ViewerContent
+  private[viewer] var viewerController: UiComponent[ViewerControllerProps] = ViewerController
   private[viewer] var bottomMenuComp: UiComponent[BottomMenuProps] = BottomMenu
 
   private[viewer] val menuItems = List(

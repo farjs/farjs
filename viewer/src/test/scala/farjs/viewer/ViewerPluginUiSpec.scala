@@ -11,7 +11,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
   ViewerPluginUi.popupComp = mockUiComponent("Popup")
   ViewerPluginUi.viewerHeader = mockUiComponent("ViewerHeader")
-  ViewerPluginUi.viewerContent = mockUiComponent("ViewerContent")
+  ViewerPluginUi.viewerController = mockUiComponent("ViewerController")
   ViewerPluginUi.bottomMenuComp = mockUiComponent("BottomMenu")
 
   it should "call onClose when onClose" in {
@@ -98,8 +98,8 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
             ^.rbWidth := "100%",
             ^.rbHeight := "100%-2"
           )(
-            <(viewerContent())(^.assertWrapped(inside(_) {
-              case ViewerContentProps(resDispatch, resFilePath, resEncoding) =>
+            <(viewerController())(^.assertWrapped(inside(_) {
+              case ViewerControllerProps(resDispatch, resFilePath, resEncoding) =>
                 resDispatch shouldBe dispatch
                 resFilePath shouldBe filePath
                 resEncoding shouldBe "utf-8"
