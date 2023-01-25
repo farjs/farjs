@@ -7,6 +7,8 @@ import farjs.viewer.ViewerPluginUi._
 import scommons.react.blessed._
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
   ViewerPluginUi.popupComp = mockUiComponent("Popup")
@@ -70,9 +72,13 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     val size = 123
     val pluginUi = new ViewerPluginUi(dispatch, filePath, size)
     val props = FileListPluginUiProps(onClose = onClose)
+    val inputMock = js.Dynamic.literal()
     
     //when
-    val result = createTestRenderer(<(pluginUi())(^.plain := props)()).root
+    val result = createTestRenderer(<(pluginUi())(^.plain := props)(), { el =>
+      if (el.`type` == <.button.name.asInstanceOf[js.Any]) inputMock
+      else null
+    }).root
 
     //then
     assertComponents(result.children, List(
@@ -99,7 +105,8 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
             ^.rbHeight := "100%-2"
           )(
             <(viewerController())(^.assertWrapped(inside(_) {
-              case ViewerControllerProps(resDispatch, resFilePath, resEncoding) =>
+              case ViewerControllerProps(inputRef, resDispatch, resFilePath, resEncoding) =>
+                inputRef.current shouldBe inputMock
                 resDispatch shouldBe dispatch
                 resFilePath shouldBe filePath
                 resEncoding shouldBe "utf-8"

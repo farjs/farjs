@@ -6,12 +6,14 @@ import farjs.ui.popup.{Popup, PopupProps}
 import farjs.viewer.ViewerPluginUi._
 import scommons.react._
 import scommons.react.blessed._
+import scommons.react.hooks._
 import scommons.react.redux.Dispatch
 
 class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
   extends FunctionComponent[FileListPluginUiProps] {
 
   protected def render(compProps: Props): ReactElement = {
+    val inputRef = useRef[BlessedElement](null)
     val props = compProps.plain
     val encoding = "utf-8"
 
@@ -37,11 +39,13 @@ class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
         ))(),
   
         <.button(
+          ^.reactRef := inputRef,
           ^.rbTop := 1,
           ^.rbWidth := "100%",
           ^.rbHeight := "100%-2"
         )(
           <(viewerController())(^.wrapped := ViewerControllerProps(
+            inputRef = inputRef,
             dispatch = dispatch,
             filePath = filePath,
             encoding = encoding

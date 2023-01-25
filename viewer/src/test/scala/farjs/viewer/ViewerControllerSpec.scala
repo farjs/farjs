@@ -8,6 +8,7 @@ import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.FS
 import scommons.nodejs.raw.FSConstants
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactRef
 import scommons.react.blessed._
 import scommons.react.redux.task.FutureTask
 import scommons.react.test._
@@ -34,8 +35,9 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     //given
     val fs = new FSMocks
     ViewerFileReader.fs = fs.fs
+    val inputRef = ReactRef.create[BlessedElement]
     val dispatch = mockFunction[Any, Any]
-    val props = ViewerControllerProps(dispatch, "test/file", "utf-8")
+    val props = ViewerControllerProps(inputRef, dispatch, "test/file", "utf-8")
     val expectedError = new Exception("test error")
 
     //then
@@ -64,8 +66,9 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     //given
     val fs = new FSMocks
     ViewerFileReader.fs = fs.fs
+    val inputRef = ReactRef.create[BlessedElement]
     val dispatch = mockFunction[Any, Any]
-    val props = ViewerControllerProps(dispatch, "test/file", "utf-8")
+    val props = ViewerControllerProps(inputRef, dispatch, "test/file", "utf-8")
     val fd = 123
 
     //then
@@ -94,8 +97,9 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     //given
     val fs = new FSMocks
     ViewerFileReader.fs = fs.fs
+    val inputRef = ReactRef.create[BlessedElement]
     val dispatch = mockFunction[Any, Any]
-    val props = ViewerControllerProps(dispatch, "test/file", "utf-8")
+    val props = ViewerControllerProps(inputRef, dispatch, "test/file", "utf-8")
     fs.openSyncMock.expects(props.filePath, FSConstants.O_RDONLY).returning(123)
 
     //when
@@ -131,7 +135,8 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
             )(
               if (hasContent) Some {
                 <(viewerContent())(^.assertWrapped(inside(_) {
-                  case ViewerContentProps(fileReader, encoding, resWidth, resHeight) =>
+                  case ViewerContentProps(inputRef, fileReader, encoding, resWidth, resHeight) =>
+                    inputRef shouldBe props.inputRef
                     fileReader should not be null
                     encoding shouldBe props.encoding
                     resWidth shouldBe width

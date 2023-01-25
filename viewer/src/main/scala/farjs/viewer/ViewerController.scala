@@ -14,7 +14,8 @@ import scala.scalajs.js
 import scala.util.Failure
 import scala.util.control.NonFatal
 
-case class ViewerControllerProps(dispatch: Dispatch,
+case class ViewerControllerProps(inputRef: ReactRef[BlessedElement],
+                                 dispatch: Dispatch,
                                  filePath: String,
                                  encoding: String)
 
@@ -48,6 +49,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
       )(
         maybeFileReader.filter(_ => width != 0 && height != 0).map { fileReader =>
           <(viewerContent())(^.wrapped := ViewerContentProps(
+            inputRef = props.inputRef,
             fileReader = fileReader,
             encoding = props.encoding,
             width = width,

@@ -1,13 +1,17 @@
 package farjs.viewer
 
+import farjs.viewer.ViewerContent._
 import org.scalatest.Assertion
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactRef
 import scommons.react.blessed._
 import scommons.react.test._
 
 import scala.concurrent.Future
 
 class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
+
+  ViewerContent.viewerInput = mockUiComponent("ViewerInput")
 
   //noinspection TypeAnnotation
   class ViewerFileReaderMock {
@@ -22,8 +26,9 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   it should "re-read current page if encoding has changed" in {
     //given
+    val inputRef = ReactRef.create[BlessedElement]
     val fileReader = new ViewerFileReaderMock
-    val props = ViewerContentProps(fileReader.fileReader, "utf-8", width = 60, height = 20)
+    val props = ViewerContentProps(inputRef, fileReader.fileReader, "utf-8", width = 60, height = 20)
     val content1 = "test \nfile content\n"
     val read1F = Future.successful((content1, content1.length))
     fileReader.readPageAtMock.expects(0.0, props.encoding).returning(read1F)
@@ -53,8 +58,9 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
   
   it should "not re-read current page if encoding hasn't changed" in {
     //given
+    val inputRef = ReactRef.create[BlessedElement]
     val fileReader = new ViewerFileReaderMock
-    val props = ViewerContentProps(fileReader.fileReader, "utf-8", width = 60, height = 20)
+    val props = ViewerContentProps(inputRef, fileReader.fileReader, "utf-8", width = 60, height = 20)
     val content = "test \nfile content\n"
     val readF = Future.successful((content, content.length))
 
@@ -82,8 +88,9 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
   
   it should "render initial component" in {
     //given
+    val inputRef = ReactRef.create[BlessedElement]
     val fileReader = new ViewerFileReaderMock
-    val props = ViewerContentProps(fileReader.fileReader, "utf-8", width = 60, height = 20)
+    val props = ViewerContentProps(inputRef, fileReader.fileReader, "utf-8", width = 60, height = 20)
     val content = "test \nfile content\n"
     val readF = Future.successful((content, content.length))
     fileReader.readPageAtMock.expects(0.0, props.encoding).returning(readF)
@@ -102,12 +109,16 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
                                   props: ViewerContentProps,
                                   content: String): Assertion = {
 
-
     assertComponents(result.children, List(
-      <.text(
-        ^.rbStyle := ViewerController.contentStyle,
-        ^.content := content
-      )()
+      <(viewerInput())(^.assertWrapped(inside(_) {
+        case ViewerInputProps(inputRef, _, _) =>
+          inputRef shouldBe props.inputRef
+      }))(
+        <.text(
+          ^.rbStyle := ViewerController.contentStyle,
+          ^.content := content
+        )()
+      )
     ))
   }
 }

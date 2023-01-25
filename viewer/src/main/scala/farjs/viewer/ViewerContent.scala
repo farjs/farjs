@@ -6,12 +6,15 @@ import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-case class ViewerContentProps(fileReader: ViewerFileReader,
+case class ViewerContentProps(inputRef: ReactRef[BlessedElement],
+                              fileReader: ViewerFileReader,
                               encoding: String,
                               width: Int,
                               height: Int)
 
 object ViewerContent extends FunctionComponent[ViewerContentProps] {
+  
+  private[viewer] var viewerInput: UiComponent[ViewerInputProps] = ViewerInput
 
   protected def render(compProps: Props): ReactElement = {
     val (position, setPosition) = useState(0.0)
@@ -27,9 +30,19 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       ()
     }, List(props.encoding))
 
-    <.text(
-      ^.rbStyle := ViewerController.contentStyle,
-      ^.content := content
-    )()
+    <(viewerInput())(^.wrapped := ViewerInputProps(
+      inputRef = props.inputRef,
+      onWheel = { up =>
+        //TODO:
+      },
+      onKeypress = { keyFull =>
+        //TODO:
+      }
+    ))(
+      <.text(
+        ^.rbStyle := ViewerController.contentStyle,
+        ^.content := content
+      )()
+    )
   }
 }
