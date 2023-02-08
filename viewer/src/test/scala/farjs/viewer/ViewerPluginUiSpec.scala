@@ -105,11 +105,12 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
             ^.rbHeight := "100%-2"
           )(
             <(viewerController())(^.assertWrapped(inside(_) {
-              case ViewerControllerProps(inputRef, resDispatch, resFilePath, resEncoding) =>
+              case ViewerControllerProps(inputRef, resDispatch, resFilePath, resEncoding, resSize) =>
                 inputRef.current shouldBe inputMock
                 resDispatch shouldBe dispatch
                 resFilePath shouldBe filePath
                 resEncoding shouldBe "utf-8"
+                resSize shouldBe size
             }))()
           ),
   

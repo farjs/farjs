@@ -1,7 +1,8 @@
 package farjs.viewer
 
 import farjs.viewer.ViewerContent._
-import org.scalatest.Assertion
+import org.scalactic.source.Position
+import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactRef
 import scommons.react.blessed._
@@ -15,73 +16,263 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   //noinspection TypeAnnotation
   class ViewerFileReaderMock {
-    val readPageAtMock = mockFunction[Double, String, Future[(String, Int)]]
+    val readPrevLinesMock = mockFunction[Int, Double, String, Future[List[(String, Int)]]]
+    val readNextLinesMock = mockFunction[Int, Double, String, Future[List[(String, Int)]]]
 
-    val fileReader = new ViewerFileReader {
-      override def readPageAt(position: Double, encoding: String): Future[(String, Int)] = {
-        readPageAtMock(position, encoding)
+    val fileReader = new ViewerFileReader(bufferSize = 15, maxLineLength = 10) {
+      override def readPrevLines(lines: Int, position: Double, encoding: String): Future[List[(String, Int)]] = {
+        readPrevLinesMock(lines, position, encoding)
+      }
+      override def readNextLines(lines: Int, position: Double, encoding: String): Future[List[(String, Int)]] = {
+        readNextLinesMock(lines, position, encoding)
       }
     }
   }
 
-  it should "re-read current page if encoding has changed" in {
-    //given
+  //noinspection TypeAnnotation
+  class TestContext(implicit pos: Position) {
+    
     val inputRef = ReactRef.create[BlessedElement]
     val fileReader = new ViewerFileReaderMock
-    val props = ViewerContentProps(inputRef, fileReader.fileReader, "utf-8", width = 60, height = 20)
-    val content1 = "test \nfile content\n"
-    val read1F = Future.successful((content1, content1.length))
-    fileReader.readPageAtMock.expects(0.0, props.encoding).returning(read1F)
+    val props = getViewerContentProps(inputRef, fileReader)
+    val readF = Future.successful("test \nfile content".split('\n').map(c => (c, c.length)).toList)
+    fileReader.readNextLinesMock.expects(props.height, 0.0, props.encoding).returning(readF)
     val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
+  
+    assertViewerContent(renderer.root, props, content = "")
+  }
 
-    read1F.flatMap { _ =>
-      assertViewerContent(renderer.root, props, content1)
+  it should "move viewport when onWheel" in {
+    //given
+    val ctx = new TestContext
+    import ctx._
 
-      val updatedProps = props.copy(encoding = "utf-16")
-      updatedProps.encoding should not be props.encoding
-      val content2 = "test file content2"
-      val read2F = Future.successful((content2, content2.length))
+    def check(up: Boolean, lines: Int, position: Double, content: String, expected: String)
+             (implicit pos: Position): () => Future[Unit] = { () =>
+
+      val readF = Future.successful(content.split('\n').map(c => (c, c.length)).toList)
 
       //then
-      fileReader.readPageAtMock.expects(0.0, updatedProps.encoding).returning(read2F)
+      if (up) fileReader.readPrevLinesMock.expects(lines, position, props.encoding).returning(readF)
+      else fileReader.readNextLinesMock.expects(lines, position, props.encoding).returning(readF)
+
+      //when
+      findComponentProps(renderer.root, viewerInput).onWheel(up)
+
+      //then
+      eventually(assertViewerContent(renderer.root, props, expected))
+    }
+
+    eventually {
+      assertViewerContent(renderer.root, props,
+        """test 
+          |file content
+          |""".stripMargin)
+    }.flatMap { _ =>
+      List(
+        //when & then
+        check(up = false, lines = 1, position = 17.0, "end",
+          """file content
+            |end
+            |""".stripMargin
+        ),
+        check(up = true, lines = 1, position = 5.0, "begin",
+          """begin
+            |file content
+            |end
+            |""".stripMargin
+        )
+      ).foldLeft(Future.unit)((res, f) => res.flatMap(_ => f())).map(_ => Succeeded)
+    }
+  }
+
+  it should "move viewport when onKeypress" in {
+    //given
+    val ctx = new TestContext
+    import ctx._
+
+    def check(key: String, lines: Int, position: Double, content: String, expected: String)
+             (implicit pos: Position): () => Future[Unit] = { () =>
+
+      val readF =
+        if (content.isEmpty) Future.successful(Nil)
+        else Future.successful(content.split('\n').map(c => (c, c.length)).toList)
+
+      //then
+      if (Set("end", "up", "pageup").contains(key)) {
+        if (position > 0.0) {
+          fileReader.readPrevLinesMock.expects(lines, position, props.encoding).returning(readF)
+        }
+      }
+      else if (position < props.size) {
+        fileReader.readNextLinesMock.expects(lines, position, props.encoding).returning(readF)
+      }
+
+      //when
+      findComponentProps(renderer.root, viewerInput).onKeypress(key)
+
+      //then
+      eventually(assertViewerContent(renderer.root, props, expected))
+    }
+
+    eventually {
+      assertViewerContent(renderer.root, props,
+        """test 
+          |file content
+          |""".stripMargin)
+    }.flatMap { _ =>
+      List(
+        //when & then
+        check(key = "C-r", lines = props.height, position = 0.0, "new content",
+          """new content
+            |""".stripMargin
+        ),
+        check(key = "end", lines = props.height, position = props.size, "ending",
+          """ending
+            |""".stripMargin
+        ),
+        check(key = "home", lines = props.height, position = 0.0, "beginning",
+          """beginning
+            |""".stripMargin
+        ),
+        check(key = "up", lines = 1, position = 0.0, "already at the beginning", //noop
+          """beginning
+            |""".stripMargin
+        ),
+        check(key = "down", lines = 1, position = 9, "next line 1",
+          """next line 1
+            |""".stripMargin
+        ),
+        check(key = "down", lines = 1, position = 20, "", //noop
+          """next line 1
+            |""".stripMargin
+        ),
+        check(key = "down", lines = 1, position = 20, "line2",
+          """line2
+            |""".stripMargin
+        ),
+        check(key = "down", lines = 1, position = 25, "out of file size", //noop
+          """line2
+            |""".stripMargin
+        ),
+        check(key = "up", lines = 1, position = 20, "prev line",
+          """prev line
+            |line2
+            |""".stripMargin
+        ),
+        check(key = "up", lines = 1, position = 11, "", //noop
+          """prev line
+            |line2
+            |""".stripMargin
+        ),
+        check(key = "pageup", lines = props.height, position = 11, "1\n2\n3\n4",
+          """1
+            |2
+            |3
+            |4
+            |prev line
+            |""".stripMargin
+        ),
+        check(key = "pagedown", lines = props.height, position = 20, "next page",
+          """next page
+            |""".stripMargin
+        )
+      ).foldLeft(Future.unit)((res, f) => res.flatMap(_ => f())).map(_ => Succeeded)
+    }
+  }
+
+  it should "do nothing when onKeypress(unknown)" in {
+    //given
+    val ctx = new TestContext
+    import ctx._
+    eventually {
+      assertViewerContent(renderer.root, props,
+        """test 
+          |file content
+          |""".stripMargin)
+    }.flatMap { _ =>
+      //when
+      findComponentProps(renderer.root, viewerInput).onKeypress("unknown")
+  
+      //then
+      eventually {
+        assertViewerContent(renderer.root, props,
+          """test 
+            |file content
+            |""".stripMargin)
+      }
+    }
+  }
+
+  it should "reload current page if props has changed" in {
+    //given
+    val ctx = new TestContext
+    import ctx._
+    eventually {
+      assertViewerContent(renderer.root, props,
+        """test 
+          |file content
+          |""".stripMargin)
+    }.flatMap { _ =>
+      val updatedProps = props.copy(
+        encoding = "utf-16",
+        size = 11,
+        width = 61,
+        height = 21
+      )
+      updatedProps.encoding should not be props.encoding
+      updatedProps.size should not be props.size
+      updatedProps.width should not be props.width
+      updatedProps.height should not be props.height
+      val content2 = "test file content2"
+      val read2F = Future.successful(List((content2, content2.length)))
+
+      //then
+      fileReader.readNextLinesMock.expects(updatedProps.height, 0.0, updatedProps.encoding)
+        .returning(read2F)
 
       //when
       TestRenderer.act { () =>
         renderer.update(<(ViewerContent())(^.wrapped := updatedProps)())
       }
 
-      read2F.map { _ =>
-        assertViewerContent(renderer.root, updatedProps, content2)
+      //then
+      eventually {
+        assertViewerContent(renderer.root, updatedProps,
+          """test file content2
+            |""".stripMargin)
       }
     }
   }
   
-  it should "not re-read current page if encoding hasn't changed" in {
+  it should "not reload current page if props hasn't changed" in {
     //given
-    val inputRef = ReactRef.create[BlessedElement]
-    val fileReader = new ViewerFileReaderMock
-    val props = ViewerContentProps(inputRef, fileReader.fileReader, "utf-8", width = 60, height = 20)
-    val content = "test \nfile content\n"
-    val readF = Future.successful((content, content.length))
-
-    //then
-    fileReader.readPageAtMock.expects(0.0, props.encoding).returning(readF)
-
-    val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
-    readF.flatMap { _ =>
-      assertViewerContent(renderer.root, props, content)
-
+    val ctx = new TestContext
+    import ctx._
+    eventually {
+      assertViewerContent(renderer.root, props,
+        """test 
+          |file content
+          |""".stripMargin)
+    }.flatMap { _ =>
       val updatedProps = props.copy()
       updatedProps should not be theSameInstanceAs (props)
       updatedProps.encoding shouldBe props.encoding
+      updatedProps.size shouldBe props.size
+      updatedProps.width shouldBe props.width
+      updatedProps.height shouldBe props.height
 
       //when
       TestRenderer.act { () =>
         renderer.update(<(ViewerContent())(^.wrapped := updatedProps)())
       }
 
-      readF.map { _ =>
-        assertViewerContent(renderer.root, updatedProps, content)
+      //then
+      eventually {
+        assertViewerContent(renderer.root, updatedProps,
+          """test 
+            |file content
+            |""".stripMargin)
       }
     }
   }
@@ -90,24 +281,38 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     //given
     val inputRef = ReactRef.create[BlessedElement]
     val fileReader = new ViewerFileReaderMock
-    val props = ViewerContentProps(inputRef, fileReader.fileReader, "utf-8", width = 60, height = 20)
-    val content = "test \nfile content\n"
-    val readF = Future.successful((content, content.length))
-    fileReader.readPageAtMock.expects(0.0, props.encoding).returning(readF)
+    val props = getViewerContentProps(inputRef, fileReader)
+    val readF = Future.successful("test \nfile content".split('\n').map(c => (c, c.length)).toList)
+    fileReader.readNextLinesMock.expects(props.height, 0.0, props.encoding).returning(readF)
 
     //when
     val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
 
     //then
     assertViewerContent(renderer.root, props, content = "")
-    readF.map { _ =>
-      assertViewerContent(renderer.root, props, content)
+    eventually {
+      assertViewerContent(renderer.root, props,
+        """test 
+          |file content
+          |""".stripMargin)
     }
   }
   
+  private def getViewerContentProps(inputRef: ReactRef[BlessedElement],
+                                    fileReader: ViewerFileReaderMock) = {
+    ViewerContentProps(
+      inputRef = inputRef,
+      fileReader = fileReader.fileReader,
+      encoding = "utf-8",
+      size = 25,
+      width = 60,
+      height = 5
+    )
+  }
+
   private def assertViewerContent(result: TestInstance,
                                   props: ViewerContentProps,
-                                  content: String): Assertion = {
+                                  content: String)(implicit pos: Position): Assertion = {
 
     assertComponents(result.children, List(
       <(viewerInput())(^.assertWrapped(inside(_) {

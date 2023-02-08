@@ -5,8 +5,10 @@ import scommons.nodejs
 import scommons.nodejs.raw.FSConstants
 import scommons.nodejs.{Buffer, FS}
 
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.scalajs.js
 import scala.util.Failure
 import scala.util.control.NonFatal
 
@@ -15,7 +17,8 @@ object ViewerFileReader {
   private[viewer] var fs: FS = nodejs.fs
 }
 
-class ViewerFileReader {
+class ViewerFileReader(bufferSize: Int = 64 * 1024,
+                       maxLineLength: Int = 1024) {
   
   private var fd: Int = 0
 
@@ -30,12 +33,150 @@ class ViewerFileReader {
     }
   }
 
-  def readPageAt(position: Double, encoding: String): Future[(String, Int)] = {
-    val buff = Buffer.allocUnsafe(64 * 1024)
-    fs.read(fd, buff, offset = 0, length = buff.length, position).map { bytesRead =>
-      val page = buff.toString(encoding, start = 0, end = bytesRead)
-      (page, bytesRead)
-    }.andThen {
+  def readPrevLines(lines: Int, position: Double, encoding: String): Future[List[(String, Int)]] = {
+    val res = new mutable.ArrayBuffer[(String, Int)](lines)
+    var leftBuf: Buffer = null
+    val bufSize =
+      if (lines > 1) bufferSize
+      else maxLineLength
+
+    @annotation.tailrec
+    def loopOverBuffer(buf: Buffer): Unit = {
+      val suffix =
+        if (buf.length > maxLineLength) buf.subarray(buf.length - maxLineLength)
+        else buf
+
+      val rightNewLineIdx = suffix.lastIndexOf('\n'.toInt)
+      if (rightNewLineIdx < 0 && buf.length < maxLineLength) leftBuf = buf
+      else {
+        val (line, bytes) =
+          if (rightNewLineIdx < 0) {
+            val line = suffix.toString(encoding)
+            val bytes = suffix.length
+            (line, bytes)
+          }
+          else {
+            val leftNewLineIdx = suffix.lastIndexOf('\n'.toInt, rightNewLineIdx - 1)
+            if (leftNewLineIdx < 0 || suffix.length == 1) {
+              val line = suffix.toString(encoding, start = 0, end = rightNewLineIdx)
+              val bytes = suffix.length
+              (line, bytes)
+            }
+            else {
+              val line = suffix.toString(encoding, start = leftNewLineIdx + 1, end = rightNewLineIdx)
+              val bytes = suffix.length - leftNewLineIdx - 1
+              (line, bytes)
+            }
+          }
+        res.prepend((line, bytes))
+
+        if (res.length < lines && bytes < buf.length) {
+          loopOverBuffer(buf.subarray(0, buf.length - bytes))
+        }
+      }
+    }
+
+    def loop(position: Double): Future[List[(String, Int)]] = {
+      val (from, size) =
+        if (position > bufSize) (position - bufSize, bufSize)
+        else (0.0, position.toInt)
+      
+      readBytes(from, size).flatMap { buf =>
+        loopOverBuffer(
+          if (leftBuf != null) {
+            val resBuf = Buffer.concat(js.Array(buf, leftBuf))
+            leftBuf = null
+            resBuf
+          }
+          else buf
+        )
+        
+        if (res.length < lines && from > 0) loop(from)
+        else {
+          if (res.length < lines && leftBuf != null) {
+            val line = leftBuf.toString(encoding)
+            val bytes = leftBuf.length
+            res.prepend((line, bytes))
+          }
+          Future.successful(res.toList)
+        }
+      }
+    }
+
+    if (position == 0.0) Future.successful(Nil)
+    else logError(loop(position))
+  }
+  
+  def readNextLines(lines: Int, position: Double, encoding: String): Future[List[(String, Int)]] = {
+    val res = new mutable.ArrayBuffer[(String, Int)](lines)
+    var leftBuf: Buffer = null
+    val bufSize =
+      if (lines > 1) bufferSize
+      else maxLineLength
+
+    @annotation.tailrec
+    def loopOverBuffer(buf: Buffer): Unit = {
+      val prefix = buf.subarray(0, maxLineLength)
+      
+      val newLineIndex = prefix.indexOf('\n'.toInt)
+      if (newLineIndex < 0 && buf.length < maxLineLength) leftBuf = buf
+      else {
+        val (line, bytes) =
+          if (newLineIndex < 0) {
+            val line = prefix.toString(encoding)
+            val bytes = prefix.length
+            (line, bytes)
+          }
+          else {
+            val line = buf.toString(encoding, start = 0, end = newLineIndex)
+            val bytes = newLineIndex + 1
+            (line, bytes)
+          }
+        res.append((line, bytes))
+
+        if (res.length < lines && bytes < buf.length) {
+          loopOverBuffer(buf.subarray(bytes))
+        }
+      }
+    }
+
+    def loop(position: Double): Future[List[(String, Int)]] = {
+      readBytes(position, bufSize).flatMap { buf =>
+        if (buf.length > 0) {
+          loopOverBuffer(
+            if (leftBuf != null) {
+              val resBuf = Buffer.concat(js.Array(leftBuf, buf))
+              leftBuf = null
+              resBuf
+            }
+            else buf
+          )
+        }
+        
+        if (res.length < lines && buf.length > 0) loop(position + buf.length)
+        else {
+          if (res.length < lines && leftBuf != null) {
+            val line = leftBuf.toString(encoding)
+            val bytes = leftBuf.length
+            res.append((line, bytes))
+          }
+          Future.successful(res.toList)
+        }
+      }
+    }
+
+    logError(loop(position))
+  }
+  
+  private def readBytes(position: Double, size: Int): Future[Buffer] = {
+    val buf = Buffer.allocUnsafe(size)
+    fs.read(fd, buf, offset = 0, length = buf.length, position).map { bytesRead =>
+      buf.subarray(0, bytesRead)
+    }
+  }
+  
+  private def logError(f: Future[List[(String, Int)]]): Future[List[(String, Int)]] = {
+    f.andThen {
       case Failure(NonFatal(ex)) =>
         Console.err.println(s"Failed to read from file, error: $ex")
     }

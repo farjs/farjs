@@ -48,7 +48,8 @@ class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
             inputRef = inputRef,
             dispatch = dispatch,
             filePath = filePath,
-            encoding = encoding
+            encoding = encoding,
+            size = size
           ))()
         ),
   

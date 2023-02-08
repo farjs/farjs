@@ -5,7 +5,6 @@ import farjs.ui.WithSizeProps
 import farjs.viewer.ViewerController._
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
-import scommons.nodejs.FS
 import scommons.nodejs.raw.FSConstants
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactRef
@@ -22,13 +21,13 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
 
   //noinspection TypeAnnotation
   class FSMocks {
-    val openSyncMock = mockFunction[String, Int, Int]
-    val closeSyncMock = mockFunction[Int, Unit]
+    val openSync = mockFunction[String, Int, Int]
+    val closeSync = mockFunction[Int, Unit]
 
-    val fs = new FS {
-      override def openSync(path: String, flags: Int): Int = openSyncMock(path, flags)
-      override def closeSync(fd: Int): Unit = closeSyncMock(fd)
-    }
+    val fs = new MockFS(
+      openSyncMock = openSync,
+      closeSyncMock = closeSync
+    )
   }
 
   it should "dispatch error task if failed to open file when mount" in {
@@ -37,12 +36,12 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     ViewerFileReader.fs = fs.fs
     val inputRef = ReactRef.create[BlessedElement]
     val dispatch = mockFunction[Any, Any]
-    val props = ViewerControllerProps(inputRef, dispatch, "test/file", "utf-8")
+    val props = ViewerControllerProps(inputRef, dispatch, "test/file", "utf-8", 10)
     val expectedError = new Exception("test error")
 
     //then
     var openF: Future[_] = null
-    fs.openSyncMock.expects(props.filePath, FSConstants.O_RDONLY).throws(expectedError)
+    fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).throws(expectedError)
     dispatch.expects(*).onCall { action: Any =>
       inside(action) { case FileListTaskAction(FutureTask("Opening file", future)) =>
         openF = future
@@ -68,11 +67,11 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     ViewerFileReader.fs = fs.fs
     val inputRef = ReactRef.create[BlessedElement]
     val dispatch = mockFunction[Any, Any]
-    val props = ViewerControllerProps(inputRef, dispatch, "test/file", "utf-8")
+    val props = ViewerControllerProps(inputRef, dispatch, "test/file", "utf-8", 10)
     val fd = 123
 
     //then
-    fs.openSyncMock.expects(props.filePath, FSConstants.O_RDONLY).returning(fd)
+    fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).returning(fd)
 
     //when
     val renderer = createTestRenderer(<(ViewerController())(^.wrapped := props)())
@@ -84,7 +83,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     }.map { _ =>
       TestRenderer.act { () =>
         //then
-        fs.closeSyncMock.expects(fd)
+        fs.closeSync.expects(fd)
 
         //when
         renderer.unmount()
@@ -99,8 +98,8 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     ViewerFileReader.fs = fs.fs
     val inputRef = ReactRef.create[BlessedElement]
     val dispatch = mockFunction[Any, Any]
-    val props = ViewerControllerProps(inputRef, dispatch, "test/file", "utf-8")
-    fs.openSyncMock.expects(props.filePath, FSConstants.O_RDONLY).returning(123)
+    val props = ViewerControllerProps(inputRef, dispatch, "test/file", "utf-8", 10)
+    fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).returning(123)
 
     //when
     val renderer = createTestRenderer(<(ViewerController())(^.wrapped := props)())
@@ -135,10 +134,11 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
             )(
               if (hasContent) Some {
                 <(viewerContent())(^.assertWrapped(inside(_) {
-                  case ViewerContentProps(inputRef, fileReader, encoding, resWidth, resHeight) =>
+                  case ViewerContentProps(inputRef, fileReader, encoding, resSize, resWidth, resHeight) =>
                     inputRef shouldBe props.inputRef
                     fileReader should not be null
                     encoding shouldBe props.encoding
+                    resSize shouldBe props.size
                     resWidth shouldBe width
                     resHeight shouldBe height
                 }))()

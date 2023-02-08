@@ -17,7 +17,8 @@ import scala.util.control.NonFatal
 case class ViewerControllerProps(inputRef: ReactRef[BlessedElement],
                                  dispatch: Dispatch,
                                  filePath: String,
-                                 encoding: String)
+                                 encoding: String,
+                                 size: Double)
 
 object ViewerController extends FunctionComponent[ViewerControllerProps] {
 
@@ -52,6 +53,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
             inputRef = props.inputRef,
             fileReader = fileReader,
             encoding = props.encoding,
+            size = props.size,
             width = width,
             height = height
           ))()
