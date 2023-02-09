@@ -28,9 +28,9 @@ object FarjsApp extends ScalaJsModule {
 
       //TODO: temporarily disabled
       //  @see: https://github.com/scalameta/metabrowse/issues/271
-      fullOptJS / scalaJSLinkerConfig ~= {
-        _.withOptimizer(false)
-      },
+//      fullOptJS / scalaJSLinkerConfig ~= {
+//        _.withOptimizer(false)
+//      },
 
       scalaJSUseMainModuleInitializer := false,
 
