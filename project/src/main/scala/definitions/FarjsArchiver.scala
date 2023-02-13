@@ -2,7 +2,6 @@ package definitions
 
 import sbt.Keys._
 import sbt._
-import scoverage.ScoverageKeys.coverageExcludedPackages
 
 object FarjsArchiver extends ScalaJsModule {
 
@@ -13,10 +12,7 @@ object FarjsArchiver extends ScalaJsModule {
   override def definition: Project = {
     super.definition
       .settings(
-        description := "Multiple archivers filelist api implementation",
-
-        coverageExcludedPackages :=
-          "farjs.archiver.zip.ZipApi" // avoid "Found a dangling UndefinedParam" during test with coverage
+        description := "Multiple archivers filelist api implementation"
       )
   }
 

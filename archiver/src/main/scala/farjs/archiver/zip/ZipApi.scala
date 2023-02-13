@@ -129,7 +129,7 @@ case class ZipApi(zipPath: String,
 
         def close(): Future[Unit] = {
           if (pos != item.size) {
-            stdout.readable.destroy()
+            stdout.readable.destroy(js.undefined)
           }
 
           exitF.recover {

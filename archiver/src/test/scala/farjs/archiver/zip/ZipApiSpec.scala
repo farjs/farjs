@@ -170,7 +170,7 @@ class ZipApiSpec extends AsyncTestSpec {
     //given
     val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"))
     val file = path.join(tmpDir, "example.txt")
-    val expectedOutput = "hello, World!!!"
+    val expectedOutput = "hello"
     fs.writeFileSync(file, expectedOutput)
     val stdoutStream = fs.createReadStream(file, new CreateReadStreamOptions {
       override val highWaterMark: js.UndefOr[Int] = 5
@@ -188,7 +188,7 @@ class ZipApiSpec extends AsyncTestSpec {
         Future.successful(subProcess)
       }
     }
-    val item = FileListItem("example.txt", size = expectedOutput.length)
+    val item = FileListItem("example.txt", size = expectedOutput.length * 2)
     val buff = new Uint8Array(5)
 
     //when
@@ -197,12 +197,16 @@ class ZipApiSpec extends AsyncTestSpec {
     //then
     (for {
       source <- resultF
-      bytesRead <- source.readNextBytes(buff)
+      _ <- source.readNextBytes(buff).map { bytesRead =>
+        bytesRead shouldBe expectedOutput.length
+      }
+      _ <- source.readNextBytes(buff).map { bytesRead =>
+        bytesRead shouldBe 0
+      }
       _ <- source.close()
       maybeContent <- stdout.readNextBytes(5)
     } yield {
       source.file shouldBe expectedFilePath
-      bytesRead should be < expectedOutput.length
       maybeContent shouldBe None
     }).andThen {
       case _ =>

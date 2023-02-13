@@ -30,13 +30,11 @@ object ZipEntry {
           parent = parent,
           name = name.stripPrefix("/"),
           isDir = pathName.endsWith("/"),
-          size = toDouble(length),
+          size = length.toDouble,
           datetimeMs = DateTimeUtil.parseDateTime(datetime),
           permissions = permissions
         )
       }
     }.toList
   }
-
-  private def toDouble(s: String): Double = if (s.isEmpty) 0.0 else s.toDouble
 }
