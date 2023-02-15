@@ -33,7 +33,7 @@ class ViewerFileReader(bufferSize: Int = 64 * 1024,
     }
   }
 
-  def readPrevLines(lines: Int, position: Double, encoding: String): Future[List[(String, Int)]] = {
+  def readPrevLines(lines: Int, position: Double, maxPos: Double, encoding: String): Future[List[(String, Int)]] = {
     val res = new mutable.ArrayBuffer[(String, Int)](lines)
     var leftBuf: Buffer = null
     val bufSize =
@@ -41,13 +41,19 @@ class ViewerFileReader(bufferSize: Int = 64 * 1024,
       else maxLineLength
 
     @annotation.tailrec
-    def loopOverBuffer(buf: Buffer): Unit = {
+    def loopOverBuffer(buf: Buffer, fromEnd: Boolean): Unit = {
       val suffix =
         if (buf.length > maxLineLength) buf.subarray(buf.length - maxLineLength, buf.length)
         else buf
 
-      val rightNewLineIdx = suffix.lastIndexOf('\n'.toInt, suffix.length, encoding)
-      if (rightNewLineIdx < 0 && buf.length < maxLineLength) leftBuf = buf
+      val rightNewLineIdx =
+        if (fromEnd) suffix.length
+        else suffix.lastIndexOf('\n'.toInt, suffix.length, encoding)
+      val leftNewLineIdx =
+        if (rightNewLineIdx <= 0) -1
+        else suffix.lastIndexOf('\n'.toInt, rightNewLineIdx - 1, encoding)
+
+      if (leftNewLineIdx < 0 && buf.length < maxLineLength) leftBuf = buf
       else {
         val (line, bytes) =
           if (rightNewLineIdx < 0) {
@@ -56,8 +62,7 @@ class ViewerFileReader(bufferSize: Int = 64 * 1024,
             (line, bytes)
           }
           else {
-            val leftNewLineIdx = suffix.lastIndexOf('\n'.toInt, rightNewLineIdx - 1)
-            if (leftNewLineIdx < 0 || suffix.length == 1) {
+            if (leftNewLineIdx < 0) {
               val line = suffix.toString(encoding, start = 0, end = rightNewLineIdx)
               val bytes = suffix.length
               (line, bytes)
@@ -71,7 +76,7 @@ class ViewerFileReader(bufferSize: Int = 64 * 1024,
         res.prepend((line, bytes))
 
         if (res.length < lines && bytes < buf.length) {
-          loopOverBuffer(buf.subarray(0, buf.length - bytes))
+          loopOverBuffer(buf.subarray(0, buf.length - bytes), fromEnd = false)
         }
       }
     }
@@ -88,7 +93,8 @@ class ViewerFileReader(bufferSize: Int = 64 * 1024,
             leftBuf = null
             resBuf
           }
-          else buf
+          else buf,
+          fromEnd = position == maxPos
         )
         
         if (res.length < lines && from > 0) loop(from)
@@ -96,7 +102,7 @@ class ViewerFileReader(bufferSize: Int = 64 * 1024,
           if (res.length < lines && leftBuf != null) {
             val line = leftBuf.toString(encoding, 0, leftBuf.length)
             val bytes = leftBuf.length
-            res.prepend((line, bytes))
+            res.prepend((line.trim, bytes))
           }
           Future.successful(res.toList)
         }

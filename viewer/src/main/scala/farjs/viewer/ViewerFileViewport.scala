@@ -24,7 +24,7 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
   def moveUp(lines: Int, from: Double = position): Future[ViewerFileViewport] = {
     if (from == 0.0) Future.successful(this)
     else {
-      fileReader.readPrevLines(lines, from, encoding).map { data =>
+      fileReader.readPrevLines(lines, from, size, encoding).map { data =>
         if (data.nonEmpty) {
           val bytes = data.map(_._2).sum
           copy(
@@ -42,7 +42,10 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
   def moveDown(lines: Int): Future[ViewerFileViewport] = {
     val bytes = linesData.map(_._2).sum
     val nextPosition = position + bytes
-    if (nextPosition >= size) Future.successful(this)
+    if (nextPosition >= size) {
+      if (linesData.size == height) moveUp(height, from = size)
+      else Future.successful(this)
+    }
     else {
       fileReader.readNextLines(lines, nextPosition, encoding).map { data =>
         if (data.nonEmpty) {

@@ -8,7 +8,7 @@ import scommons.react.ReactRef
 import scommons.react.blessed._
 import scommons.react.test._
 
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
 
 class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -16,12 +16,12 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   //noinspection TypeAnnotation
   class ViewerFileReaderMock {
-    val readPrevLinesMock = mockFunction[Int, Double, String, Future[List[(String, Int)]]]
+    val readPrevLinesMock = mockFunction[Int, Double, Double, String, Future[List[(String, Int)]]]
     val readNextLinesMock = mockFunction[Int, Double, String, Future[List[(String, Int)]]]
 
     val fileReader = new ViewerFileReader(bufferSize = 15, maxLineLength = 10) {
-      override def readPrevLines(lines: Int, position: Double, encoding: String): Future[List[(String, Int)]] = {
-        readPrevLinesMock(lines, position, encoding)
+      override def readPrevLines(lines: Int, position: Double, maxPos: Double, encoding: String): Future[List[(String, Int)]] = {
+        readPrevLinesMock(lines, position, maxPos, encoding)
       }
       override def readNextLines(lines: Int, position: Double, encoding: String): Future[List[(String, Int)]] = {
         readNextLinesMock(lines, position, encoding)
@@ -42,6 +42,37 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     assertViewerContent(renderer.root, props, content = "")
   }
 
+  it should "not move viewport if not completed when onWheel(up/down)" in {
+    //given
+    val inputRef = ReactRef.create[BlessedElement]
+    val fileReader = new ViewerFileReaderMock
+    val props = getViewerContentProps(inputRef, fileReader)
+    val readP = Promise[List[(String, Int)]]()
+    fileReader.readNextLinesMock.expects(props.height, 0.0, props.encoding).returning(readP.future)
+    val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
+
+    assertViewerContent(renderer.root, props, content = "")
+
+    //then
+    fileReader.readPrevLinesMock.expects(*, *, *, *).never()
+    fileReader.readNextLinesMock.expects(*, *, *).never()
+
+    //when
+    findComponentProps(renderer.root, viewerInput).onWheel(true)
+    findComponentProps(renderer.root, viewerInput).onWheel(false)
+    findComponentProps(renderer.root, viewerInput).onWheel(true)
+    findComponentProps(renderer.root, viewerInput).onWheel(false)
+
+    //then
+    assertViewerContent(renderer.root, props, content = "")
+    readP.success("completed".split('\n').map(c => (c, c.length)).toList)
+    eventually {
+      assertViewerContent(renderer.root, props,
+        """completed
+          |""".stripMargin)
+    }
+  }
+
   it should "move viewport when onWheel" in {
     //given
     val ctx = new TestContext
@@ -53,7 +84,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       val readF = Future.successful(content.split('\n').map(c => (c, c.length)).toList)
 
       //then
-      if (up) fileReader.readPrevLinesMock.expects(lines, position, props.encoding).returning(readF)
+      if (up) fileReader.readPrevLinesMock.expects(lines, position, props.size, props.encoding).returning(readF)
       else fileReader.readNextLinesMock.expects(lines, position, props.encoding).returning(readF)
 
       //when
@@ -86,6 +117,43 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }
   }
 
+  it should "re-load prev page if at the end when onKeypress(down)" in {
+    //given
+    val inputRef = ReactRef.create[BlessedElement]
+    val fileReader = new ViewerFileReaderMock
+    val props = getViewerContentProps(inputRef, fileReader).copy(size = 10)
+    val readF = Future.successful("1\n2\n3\n4\n5\n".split('\n').map(c => (c, c.length + 1)).toList)
+    fileReader.readNextLinesMock.expects(props.height, 0.0, props.encoding).returning(readF)
+    val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
+
+    eventually {
+      assertViewerContent(renderer.root, props,
+        """1
+          |2
+          |3
+          |4
+          |5
+          |""".stripMargin)
+    }.flatMap { _ =>
+      //then
+      val resF = Future.successful("2\n3\n4\n5\n\n".split('\n').map(c => (c, c.length + 1)).toList)
+      fileReader.readPrevLinesMock.expects(props.height, props.size, props.size, props.encoding).returning(resF)
+  
+      //when
+      findComponentProps(renderer.root, viewerInput).onKeypress("down")
+  
+      //then
+      eventually {
+        assertViewerContent(renderer.root, props,
+          """2
+            |3
+            |4
+            |5
+            |""".stripMargin)
+      }
+    }
+  }
+
   it should "move viewport when onKeypress" in {
     //given
     val ctx = new TestContext
@@ -101,7 +169,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       //then
       if (Set("end", "up", "pageup").contains(key)) {
         if (position > 0.0) {
-          fileReader.readPrevLinesMock.expects(lines, position, props.encoding).returning(readF)
+          fileReader.readPrevLinesMock.expects(lines, position, props.size, props.encoding).returning(readF)
         }
       }
       else if (position < props.size) {
