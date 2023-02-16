@@ -12,7 +12,8 @@ case class ViewerContentProps(inputRef: ReactRef[BlessedElement],
                               encoding: String,
                               size: Double,
                               width: Int,
-                              height: Int)
+                              height: Int,
+                              onViewProgress: Int => Unit)
 
 object ViewerContent extends FunctionComponent[ViewerContentProps] {
   
@@ -31,21 +32,26 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       )
     }
     
+    def updated(viewport: ViewerFileViewport): Unit = {
+      setViewport(viewport)
+      props.onViewProgress(viewport.progress)
+    }
+    
     def onMoveUp(lines: Int, from: Double = viewport.position): Unit = {
       if (readF.current.isCompleted) {
-        readF.current = viewport.moveUp(lines, from).map(setViewport)
+        readF.current = viewport.moveUp(lines, from).map(updated)
       }
     }
     
     def onMoveDown(lines: Int): Unit = {
       if (readF.current.isCompleted) {
-        readF.current = viewport.moveDown(lines).map(setViewport)
+        readF.current = viewport.moveDown(lines).map(updated)
       }
     }
     
     def onReload(from: Double = viewport.position): Unit = {
       readF.current.onComplete { _ =>
-        readF.current = viewport.reload(from).map(setViewport)
+        readF.current = viewport.reload(from).map(updated)
       }
     }
     
@@ -68,7 +74,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
           width = props.width,
           height = props.height
         )
-        readF.current = newViewport.reload().map(setViewport)
+        readF.current = newViewport.reload().map(updated)
       }
       ()
     }, List(props.encoding, props.size, props.width, props.height))

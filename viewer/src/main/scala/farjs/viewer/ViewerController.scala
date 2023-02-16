@@ -18,7 +18,8 @@ case class ViewerControllerProps(inputRef: ReactRef[BlessedElement],
                                  dispatch: Dispatch,
                                  filePath: String,
                                  encoding: String,
-                                 size: Double)
+                                 size: Double,
+                                 onViewProgress: Int => Unit = _ => ())
 
 object ViewerController extends FunctionComponent[ViewerControllerProps] {
 
@@ -55,7 +56,8 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
             encoding = props.encoding,
             size = props.size,
             width = width,
-            height = height
+            height = height,
+            onViewProgress = props.onViewProgress
           ))()
         }
       )

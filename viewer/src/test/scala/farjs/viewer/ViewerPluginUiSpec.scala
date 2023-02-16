@@ -64,6 +64,23 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     popupProps.onKeypress("unknown") shouldBe false
   }
 
+  it should "update progress when onViewProgress" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val onClose = mockFunction[Unit]
+    val pluginUi = new ViewerPluginUi(dispatch, "item 1", 0)
+    val props = FileListPluginUiProps(onClose = onClose)
+    val comp = testRender(<(pluginUi())(^.plain := props)())
+    val viewerProps = findComponentProps(comp, viewerController)
+    val percent = 50
+    
+    //when
+    viewerProps.onViewProgress(percent)
+    
+    //then
+    findComponentProps(comp, viewerHeader).percent shouldBe percent
+  }
+
   it should "render component" in {
     //given
     val dispatch = mockFunction[Any, Any]
@@ -96,7 +113,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
               resFilePath shouldBe filePath
               resEncoding shouldBe "utf-8"
               resSize shouldBe size
-              resPercent shouldBe 100
+              resPercent shouldBe 0
           }))(),
   
           <.button(
@@ -105,7 +122,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
             ^.rbHeight := "100%-2"
           )(
             <(viewerController())(^.assertWrapped(inside(_) {
-              case ViewerControllerProps(inputRef, resDispatch, resFilePath, resEncoding, resSize) =>
+              case ViewerControllerProps(inputRef, resDispatch, resFilePath, resEncoding, resSize, _) =>
                 inputRef.current shouldBe inputMock
                 resDispatch shouldBe dispatch
                 resFilePath shouldBe filePath

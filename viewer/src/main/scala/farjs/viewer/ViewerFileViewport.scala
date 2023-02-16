@@ -20,6 +20,12 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
     }
     buf.toString()
   }
+  lazy val progress: Int = {
+    val bytes = linesData.map(_._2).sum
+    val viewed = position + bytes
+    if (size == 0.0) 0
+    else ((viewed / size) * 100).toInt
+  }
   
   def moveUp(lines: Int, from: Double = position): Future[ViewerFileViewport] = {
     if (from == 0.0) Future.successful(this)

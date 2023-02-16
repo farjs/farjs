@@ -345,13 +345,19 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }
   }
   
-  it should "render initial component" in {
+  it should "call onViewProgress when non-empty file" in {
     //given
     val inputRef = ReactRef.create[BlessedElement]
     val fileReader = new ViewerFileReaderMock
-    val props = getViewerContentProps(inputRef, fileReader)
-    val readF = Future.successful("test \nfile content".split('\n').map(c => (c, c.length)).toList)
+    val onViewProgress = mockFunction[Int, Unit]
+    val props = getViewerContentProps(inputRef, fileReader, onViewProgress)
+    val readF = Future.successful("test \nfile content\n".split('\n').map(c => (c, c.length + 1)).toList)
     fileReader.readNextLinesMock.expects(props.height, 0.0, props.encoding).returning(readF)
+    val percent = ((19 / props.size) * 100).toInt
+    percent shouldBe 76
+
+    //then
+    onViewProgress.expects(percent)
 
     //when
     val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
@@ -366,15 +372,42 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }
   }
   
+  it should "call onViewProgress when empty file" in {
+    //given
+    val inputRef = ReactRef.create[BlessedElement]
+    val fileReader = new ViewerFileReaderMock
+    val onViewProgress = mockFunction[Int, Unit]
+    val props = getViewerContentProps(inputRef, fileReader, onViewProgress).copy(size = 0)
+    val readF = Future.successful("test content".split('\n').map(c => (c, c.length)).toList)
+    fileReader.readNextLinesMock.expects(props.height, 0.0, props.encoding).returning(readF)
+    val percent = 0
+
+    //then
+    onViewProgress.expects(percent)
+
+    //when
+    val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
+
+    //then
+    assertViewerContent(renderer.root, props, content = "")
+    eventually {
+      assertViewerContent(renderer.root, props,
+        """test content
+          |""".stripMargin)
+    }
+  }
+  
   private def getViewerContentProps(inputRef: ReactRef[BlessedElement],
-                                    fileReader: ViewerFileReaderMock) = {
+                                    fileReader: ViewerFileReaderMock,
+                                    onViewProgress: Int => Unit = _ => ()) = {
     ViewerContentProps(
       inputRef = inputRef,
       fileReader = fileReader.fileReader,
       encoding = "utf-8",
       size = 25,
       width = 60,
-      height = 5
+      height = 5,
+      onViewProgress = onViewProgress
     )
   }
 

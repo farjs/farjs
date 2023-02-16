@@ -14,6 +14,7 @@ class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
 
   protected def render(compProps: Props): ReactElement = {
     val inputRef = useRef[BlessedElement](null)
+    val (percent, setPercent) = useState(0)
     val props = compProps.plain
     val encoding = "utf-8"
 
@@ -35,7 +36,7 @@ class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
           filePath = filePath,
           encoding = encoding,
           size = size,
-          percent = 100
+          percent = percent
         ))(),
   
         <.button(
@@ -49,7 +50,8 @@ class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
             dispatch = dispatch,
             filePath = filePath,
             encoding = encoding,
-            size = size
+            size = size,
+            onViewProgress = setPercent
           ))()
         ),
   

@@ -134,13 +134,14 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
             )(
               if (hasContent) Some {
                 <(viewerContent())(^.assertWrapped(inside(_) {
-                  case ViewerContentProps(inputRef, fileReader, encoding, resSize, resWidth, resHeight) =>
+                  case ViewerContentProps(inputRef, fileReader, encoding, resSize, resWidth, resHeight, onViewProgress) =>
                     inputRef shouldBe props.inputRef
                     fileReader should not be null
                     encoding shouldBe props.encoding
                     resSize shouldBe props.size
                     resWidth shouldBe width
                     resHeight shouldBe height
+                    onViewProgress should be theSameInstanceAs props.onViewProgress
                 }))()
               }
               else None
