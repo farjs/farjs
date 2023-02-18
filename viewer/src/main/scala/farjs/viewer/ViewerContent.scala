@@ -6,14 +6,11 @@ import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.scalajs.js
 
 case class ViewerContentProps(inputRef: ReactRef[BlessedElement],
-                              fileReader: ViewerFileReader,
-                              encoding: String,
-                              size: Double,
-                              width: Int,
-                              height: Int,
-                              onViewProgress: Int => Unit)
+                              viewport: ViewerFileViewport,
+                              setViewport: js.Function1[Option[ViewerFileViewport], Unit])
 
 object ViewerContent extends FunctionComponent[ViewerContentProps] {
   
@@ -22,19 +19,10 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
   protected def render(compProps: Props): ReactElement = {
     val readF = useRef(Future.unit)
     val props = compProps.wrapped
-    val (viewport, setViewport) = useState { () =>
-      ViewerFileViewport(
-        fileReader = props.fileReader,
-        encoding = props.encoding,
-        size = props.size,
-        width = props.width,
-        height = props.height
-      )
-    }
+    val viewport = props.viewport
     
     def updated(viewport: ViewerFileViewport): Unit = {
-      setViewport(viewport)
-      props.onViewProgress(viewport.progress)
+      props.setViewport(Some(viewport))
     }
     
     def onMoveUp(lines: Int, from: Double = viewport.position): Unit = {
@@ -50,7 +38,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
     }
     
     def onReload(from: Double = viewport.position): Unit = {
-      readF.current.onComplete { _ =>
+      readF.current = readF.current.andThen { _ =>
         readF.current = viewport.reload(from).map(updated)
       }
     }
@@ -58,26 +46,20 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
     def onKeypress(keyFull: String): Unit = keyFull match {
       case "C-r" => onReload()
       case "home" => onReload(from = 0)
-      case "end" => onMoveUp(lines = props.height, from = props.size)
+      case "end" => onMoveUp(lines = viewport.height, from = viewport.size)
       case "up" => onMoveUp(lines = 1)
-      case "pageup" => onMoveUp(lines = props.height)
+      case "pageup" => onMoveUp(lines = viewport.height)
       case "down" => onMoveDown(lines = 1)
-      case "pagedown" => onMoveDown(lines = props.height)
+      case "pagedown" => onMoveDown(lines = viewport.height)
       case _ =>
     }
     
     useLayoutEffect({ () =>
-      readF.current.onComplete { _ =>
-        val newViewport = viewport.copy(
-          encoding = props.encoding,
-          size = props.size,
-          width = props.width,
-          height = props.height
-        )
-        readF.current = newViewport.reload().map(updated)
+      readF.current = readF.current.andThen { _ =>
+        readF.current = viewport.reload().map(updated)
       }
       ()
-    }, List(props.encoding, props.size, props.width, props.height))
+    }, List(viewport.encoding, viewport.size, viewport.width, viewport.height))
 
     <(viewerInput())(^.wrapped := ViewerInputProps(
       inputRef = props.inputRef,

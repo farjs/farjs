@@ -14,30 +14,41 @@ class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
 
   protected def render(compProps: Props): ReactElement = {
     val inputRef = useRef[BlessedElement](null)
-    val (percent, setPercent) = useState(0)
+    val (viewport, setViewport) = useState(Option.empty[ViewerFileViewport])
     val props = compProps.plain
-    val encoding = "utf-8"
+
+    val onExit: () => Unit = { () =>
+      viewport.foreach(_.fileReader.close())
+      props.onClose()
+    }
 
     def onKeypress(keyFull: String): Boolean = {
       var processed = true
       keyFull match {
-        case "f3" | "f10" => props.onClose()
+        case "f3" | "f10" => onExit()
         case _ => processed = false
       }
       processed
     }
 
-    <(popupComp())(^.wrapped := PopupProps(onClose = props.onClose, onKeypress = onKeypress))(
+    val headerProps = viewport match {
+      case None =>
+        ViewerHeaderProps(filePath)
+      case Some(vp) =>
+        ViewerHeaderProps(
+          filePath = filePath,
+          encoding = vp.encoding,
+          size = vp.size,
+          percent = vp.progress
+        )
+    }
+
+    <(popupComp())(^.wrapped := PopupProps(onClose = onExit, onKeypress = onKeypress))(
       <.box(
         ^.rbClickable := true,
         ^.rbAutoFocus := false
       )(
-        <(viewerHeader())(^.wrapped := ViewerHeaderProps(
-          filePath = filePath,
-          encoding = encoding,
-          size = size,
-          percent = percent
-        ))(),
+        <(viewerHeader())(^.wrapped := headerProps)(),
   
         <.button(
           ^.reactRef := inputRef,
@@ -49,9 +60,9 @@ class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
             inputRef = inputRef,
             dispatch = dispatch,
             filePath = filePath,
-            encoding = encoding,
             size = size,
-            onViewProgress = setPercent
+            viewport = viewport,
+            setViewport = setViewport
           ))()
         ),
   

@@ -7,6 +7,7 @@ import farjs.viewer.ViewerPluginUi._
 import scommons.react.blessed._
 import scommons.react.test._
 
+import scala.concurrent.Future
 import scala.scalajs.js
 
 class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
@@ -16,16 +17,35 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
   ViewerPluginUi.viewerController = mockUiComponent("ViewerController")
   ViewerPluginUi.bottomMenuComp = mockUiComponent("BottomMenu")
 
+  //noinspection TypeAnnotation
+  class ViewerFileReader {
+    val close = mockFunction[Future[Unit]]
+
+    val fileReader = new MockViewerFileReader(
+      closeMock = close
+    )
+  }
+
   it should "call onClose when onClose" in {
     //given
+    val fileReader = new ViewerFileReader
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
-    val pluginUi = new ViewerPluginUi(dispatch, "item 1", 0)
+    val pluginUi = new ViewerPluginUi(dispatch, "item 1", 123)
     val props = FileListPluginUiProps(onClose = onClose)
-    val comp = testRender(<(pluginUi())(^.plain := props)())
-    val popupProps = findComponentProps(comp, popupComp)
+    val renderer = createTestRenderer(<(pluginUi())(^.plain := props)())
+    val viewport = ViewerFileViewport(
+      fileReader = fileReader.fileReader,
+      encoding = "utf-8",
+      size = 123,
+      width = 1,
+      height = 2
+    )
+    findComponentProps(renderer.root, viewerController).setViewport(Some(viewport))
+    val popupProps = findComponentProps(renderer.root, popupComp)
     
     //then
+    fileReader.close.expects()
     onClose.expects()
 
     //when
@@ -34,14 +54,24 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
   it should "call onClose when onKeypress(F10)" in {
     //given
+    val fileReader = new ViewerFileReader
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
     val pluginUi = new ViewerPluginUi(dispatch, "item 1", 0)
     val props = FileListPluginUiProps(onClose = onClose)
-    val comp = testRender(<(pluginUi())(^.plain := props)())
-    val popupProps = findComponentProps(comp, popupComp)
+    val renderer = createTestRenderer(<(pluginUi())(^.plain := props)())
+    val viewport = ViewerFileViewport(
+      fileReader = fileReader.fileReader,
+      encoding = "utf-8",
+      size = 123,
+      width = 1,
+      height = 2
+    )
+    findComponentProps(renderer.root, viewerController).setViewport(Some(viewport))
+    val popupProps = findComponentProps(renderer.root, popupComp)
     
     //then
+    fileReader.close.expects()
     onClose.expects()
 
     //when
@@ -64,24 +94,38 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     popupProps.onKeypress("unknown") shouldBe false
   }
 
-  it should "update progress when onViewProgress" in {
+  it should "update props when setViewport" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
     val pluginUi = new ViewerPluginUi(dispatch, "item 1", 0)
     val props = FileListPluginUiProps(onClose = onClose)
-    val comp = testRender(<(pluginUi())(^.plain := props)())
-    val viewerProps = findComponentProps(comp, viewerController)
-    val percent = 50
+    val renderer = createTestRenderer(<(pluginUi())(^.plain := props)())
+    val viewerProps = findComponentProps(renderer.root, viewerController)
+    val viewport = ViewerFileViewport(
+      fileReader = new ViewerFileReader().fileReader,
+      encoding = "win",
+      size = 110,
+      width = 1,
+      height = 2,
+      linesData = List(("test...", 55))
+    )
     
     //when
-    viewerProps.onViewProgress(percent)
+    viewerProps.setViewport(Some(viewport))
     
     //then
-    findComponentProps(comp, viewerHeader).percent shouldBe percent
+    inside(findComponentProps(renderer.root, viewerHeader)) {
+      case ViewerHeaderProps(filePath, encoding, size, percent) =>
+        filePath shouldBe "item 1"
+        encoding shouldBe viewport.encoding
+        size shouldBe viewport.size
+        percent shouldBe 50
+    }
+    findComponentProps(renderer.root, viewerController).viewport shouldBe Some(viewport)
   }
 
-  it should "render component" in {
+  it should "render initial component" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
@@ -111,8 +155,8 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
           <(viewerHeader())(^.assertWrapped(inside(_) {
             case ViewerHeaderProps(resFilePath, resEncoding, resSize, resPercent) =>
               resFilePath shouldBe filePath
-              resEncoding shouldBe "utf-8"
-              resSize shouldBe size
+              resEncoding shouldBe ""
+              resSize shouldBe 0
               resPercent shouldBe 0
           }))(),
   
@@ -122,12 +166,12 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
             ^.rbHeight := "100%-2"
           )(
             <(viewerController())(^.assertWrapped(inside(_) {
-              case ViewerControllerProps(inputRef, resDispatch, resFilePath, resEncoding, resSize, _) =>
+              case ViewerControllerProps(inputRef, resDispatch, resFilePath, resSize, viewport, _) =>
                 inputRef.current shouldBe inputMock
                 resDispatch shouldBe dispatch
                 resFilePath shouldBe filePath
-                resEncoding shouldBe "utf-8"
                 resSize shouldBe size
+                viewport shouldBe None
             }))()
           ),
   

@@ -17,9 +17,9 @@ import scala.util.control.NonFatal
 case class ViewerControllerProps(inputRef: ReactRef[BlessedElement],
                                  dispatch: Dispatch,
                                  filePath: String,
-                                 encoding: String,
                                  size: Double,
-                                 onViewProgress: Int => Unit = _ => ())
+                                 viewport: Option[ViewerFileViewport],
+                                 setViewport: js.Function1[Option[ViewerFileViewport], Unit] = _ => ())
 
 object ViewerController extends FunctionComponent[ViewerControllerProps] {
 
@@ -27,37 +27,39 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
   private[viewer] var viewerContent: UiComponent[ViewerContentProps] = ViewerContent
   
   protected def render(compProps: Props): ReactElement = {
-    val (maybeFileReader, setFileReader) = useState(Option.empty[ViewerFileReader])
     val props = compProps.wrapped
     
     useLayoutEffect({ () =>
-      val fileReader = new ViewerFileReader
-      val openF = fileReader.open(props.filePath).map { _ =>
-        setFileReader(Some(fileReader))
+      if (props.viewport.isEmpty) {
+        val fileReader = new ViewerFileReader
+        val openF = fileReader.open(props.filePath).map { _ =>
+          props.setViewport(Some(ViewerFileViewport(
+            fileReader = fileReader,
+            encoding = "utf-8",
+            size = props.size,
+            width = 0,
+            height = 0
+          )))
+        }
+        openF.andThen { case Failure(NonFatal(_)) =>
+          props.dispatch(FileListTaskAction(FutureTask("Opening file", openF)))
+        }
       }
-      openF.andThen { case Failure(NonFatal(_)) =>
-        props.dispatch(FileListTaskAction(FutureTask("Opening file", openF)))
-      }
-      
-      val cleanup: js.Function0[Unit] = { () =>
-        fileReader.close()
-      }
-      cleanup
+      ()
     }, Nil)
 
     <(withSizeComp())(^.plain := WithSizeProps { (width, height) =>
       <.box(
         ^.rbStyle := contentStyle
       )(
-        maybeFileReader.filter(_ => width != 0 && height != 0).map { fileReader =>
+        props.viewport.map { viewport =>
           <(viewerContent())(^.wrapped := ViewerContentProps(
             inputRef = props.inputRef,
-            fileReader = fileReader,
-            encoding = props.encoding,
-            size = props.size,
-            width = width,
-            height = height,
-            onViewProgress = props.onViewProgress
+            viewport = viewport.copy(
+              width = width,
+              height = height
+            ),
+            setViewport = props.setViewport
           ))()
         }
       )

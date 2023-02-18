@@ -15,47 +15,65 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
   ViewerContent.viewerInput = mockUiComponent("ViewerInput")
 
   //noinspection TypeAnnotation
-  class ViewerFileReaderMock {
-    val readPrevLinesMock = mockFunction[Int, Double, Double, String, Future[List[(String, Int)]]]
-    val readNextLinesMock = mockFunction[Int, Double, String, Future[List[(String, Int)]]]
+  class ViewerFileReader {
+    val readPrevLines = mockFunction[Int, Double, Double, String, Future[List[(String, Int)]]]
+    val readNextLines = mockFunction[Int, Double, String, Future[List[(String, Int)]]]
 
-    val fileReader = new ViewerFileReader(bufferSize = 15, maxLineLength = 10) {
-      override def readPrevLines(lines: Int, position: Double, maxPos: Double, encoding: String): Future[List[(String, Int)]] = {
-        readPrevLinesMock(lines, position, maxPos, encoding)
-      }
-      override def readNextLines(lines: Int, position: Double, encoding: String): Future[List[(String, Int)]] = {
-        readNextLinesMock(lines, position, encoding)
-      }
-    }
+    val fileReader = new MockViewerFileReader(
+      readPrevLinesMock = readPrevLines,
+      readNextLinesMock = readNextLines
+    )
   }
 
   //noinspection TypeAnnotation
   class TestContext(implicit pos: Position) {
     
     val inputRef = ReactRef.create[BlessedElement]
-    val fileReader = new ViewerFileReaderMock
-    val props = getViewerContentProps(inputRef, fileReader)
+    val fileReader = new ViewerFileReader
+    val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
+    var props = getViewerContentProps(inputRef, fileReader, setViewport)
+    var viewport = props.viewport
     val readF = Future.successful("test \nfile content".split('\n').map(c => (c, c.length)).toList)
-    fileReader.readNextLinesMock.expects(props.height, 0.0, props.encoding).returning(readF)
+    fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readF)
     val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
   
+    setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
+      inside(maybeViewport) { case Some(vp) =>
+        viewport = vp
+        TestRenderer.act { () =>
+          props = props.copy(viewport = vp)
+          renderer.update(<(ViewerContent())(^.wrapped := props)())
+        }
+      }
+    }.anyNumberOfTimes()
     assertViewerContent(renderer.root, props, content = "")
   }
 
   it should "not move viewport if not completed when onWheel(up/down)" in {
     //given
     val inputRef = ReactRef.create[BlessedElement]
-    val fileReader = new ViewerFileReaderMock
-    val props = getViewerContentProps(inputRef, fileReader)
+    val fileReader = new ViewerFileReader
+    val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
+    var props = getViewerContentProps(inputRef, fileReader, setViewport)
+    var viewport = props.viewport
     val readP = Promise[List[(String, Int)]]()
-    fileReader.readNextLinesMock.expects(props.height, 0.0, props.encoding).returning(readP.future)
+    fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readP.future)
     val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
 
+    setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
+      inside(maybeViewport) { case Some(vp) =>
+        viewport = vp
+        TestRenderer.act { () =>
+          props = props.copy(viewport = vp)
+          renderer.update(<(ViewerContent())(^.wrapped := props)())
+        }
+      }
+    }
     assertViewerContent(renderer.root, props, content = "")
 
     //then
-    fileReader.readPrevLinesMock.expects(*, *, *, *).never()
-    fileReader.readNextLinesMock.expects(*, *, *).never()
+    fileReader.readPrevLines.expects(*, *, *, *).never()
+    fileReader.readNextLines.expects(*, *, *).never()
 
     //when
     findComponentProps(renderer.root, viewerInput).onWheel(true)
@@ -84,8 +102,8 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       val readF = Future.successful(content.split('\n').map(c => (c, c.length)).toList)
 
       //then
-      if (up) fileReader.readPrevLinesMock.expects(lines, position, props.size, props.encoding).returning(readF)
-      else fileReader.readNextLinesMock.expects(lines, position, props.encoding).returning(readF)
+      if (up) fileReader.readPrevLines.expects(lines, position, viewport.size, viewport.encoding).returning(readF)
+      else fileReader.readNextLines.expects(lines, position, viewport.encoding).returning(readF)
 
       //when
       findComponentProps(renderer.root, viewerInput).onWheel(up)
@@ -120,12 +138,26 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
   it should "re-load prev page if at the end when onKeypress(down)" in {
     //given
     val inputRef = ReactRef.create[BlessedElement]
-    val fileReader = new ViewerFileReaderMock
-    val props = getViewerContentProps(inputRef, fileReader).copy(size = 10)
+    val fileReader = new ViewerFileReader
+    val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
+    var props = {
+      val p = getViewerContentProps(inputRef, fileReader, setViewport)
+      p.copy(viewport = p.viewport.copy(size = 10))
+    }
+    var viewport = props.viewport
     val readF = Future.successful("1\n2\n3\n4\n5\n".split('\n').map(c => (c, c.length + 1)).toList)
-    fileReader.readNextLinesMock.expects(props.height, 0.0, props.encoding).returning(readF)
+    fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readF)
     val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
 
+    setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
+      inside(maybeViewport) { case Some(vp) =>
+        viewport = vp
+        TestRenderer.act { () =>
+          props = props.copy(viewport = vp)
+          renderer.update(<(ViewerContent())(^.wrapped := props)())
+        }
+      }
+    }.anyNumberOfTimes()
     eventually {
       assertViewerContent(renderer.root, props,
         """1
@@ -137,7 +169,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }.flatMap { _ =>
       //then
       val resF = Future.successful("2\n3\n4\n5\n\n".split('\n').map(c => (c, c.length + 1)).toList)
-      fileReader.readPrevLinesMock.expects(props.height, props.size, props.size, props.encoding).returning(resF)
+      fileReader.readPrevLines.expects(viewport.height, viewport.size, viewport.size, viewport.encoding).returning(resF)
   
       //when
       findComponentProps(renderer.root, viewerInput).onKeypress("down")
@@ -169,11 +201,11 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       //then
       if (Set("end", "up", "pageup").contains(key)) {
         if (position > 0.0) {
-          fileReader.readPrevLinesMock.expects(lines, position, props.size, props.encoding).returning(readF)
+          fileReader.readPrevLines.expects(lines, position, viewport.size, viewport.encoding).returning(readF)
         }
       }
-      else if (position < props.size) {
-        fileReader.readNextLinesMock.expects(lines, position, props.encoding).returning(readF)
+      else if (position < viewport.size) {
+        fileReader.readNextLines.expects(lines, position, viewport.encoding).returning(readF)
       }
 
       //when
@@ -191,15 +223,15 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }.flatMap { _ =>
       List(
         //when & then
-        check(key = "C-r", lines = props.height, position = 0.0, "new content",
+        check(key = "C-r", lines = viewport.height, position = 0.0, "new content",
           """new content
             |""".stripMargin
         ),
-        check(key = "end", lines = props.height, position = props.size, "ending",
+        check(key = "end", lines = viewport.height, position = viewport.size, "ending",
           """ending
             |""".stripMargin
         ),
-        check(key = "home", lines = props.height, position = 0.0, "beginning",
+        check(key = "home", lines = viewport.height, position = 0.0, "beginning",
           """beginning
             |""".stripMargin
         ),
@@ -233,7 +265,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
             |line2
             |""".stripMargin
         ),
-        check(key = "pageup", lines = props.height, position = 11, "1\n2\n3\n4",
+        check(key = "pageup", lines = viewport.height, position = 11, "1\n2\n3\n4",
           """1
             |2
             |3
@@ -241,7 +273,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
             |prev line
             |""".stripMargin
         ),
-        check(key = "pagedown", lines = props.height, position = 20, "next page",
+        check(key = "pagedown", lines = viewport.height, position = 20, "next page",
           """next page
             |""".stripMargin
         )
@@ -283,20 +315,22 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
           |""".stripMargin)
     }.flatMap { _ =>
       val updatedProps = props.copy(
-        encoding = "utf-16",
-        size = 11,
-        width = 61,
-        height = 21
+        viewport = viewport.copy(
+          encoding = "utf-16",
+          size = 11,
+          width = 61,
+          height = 21
+        )
       )
-      updatedProps.encoding should not be props.encoding
-      updatedProps.size should not be props.size
-      updatedProps.width should not be props.width
-      updatedProps.height should not be props.height
+      updatedProps.viewport.encoding should not be viewport.encoding
+      updatedProps.viewport.size should not be viewport.size
+      updatedProps.viewport.width should not be viewport.width
+      updatedProps.viewport.height should not be viewport.height
       val content2 = "test file content2"
       val read2F = Future.successful(List((content2, content2.length)))
 
       //then
-      fileReader.readNextLinesMock.expects(updatedProps.height, 0.0, updatedProps.encoding)
+      fileReader.readNextLines.expects(updatedProps.viewport.height, 0.0, updatedProps.viewport.encoding)
         .returning(read2F)
 
       //when
@@ -325,10 +359,10 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }.flatMap { _ =>
       val updatedProps = props.copy()
       updatedProps should not be theSameInstanceAs (props)
-      updatedProps.encoding shouldBe props.encoding
-      updatedProps.size shouldBe props.size
-      updatedProps.width shouldBe props.width
-      updatedProps.height shouldBe props.height
+      updatedProps.viewport.encoding shouldBe viewport.encoding
+      updatedProps.viewport.size shouldBe viewport.size
+      updatedProps.viewport.width shouldBe viewport.width
+      updatedProps.viewport.height shouldBe viewport.height
 
       //when
       TestRenderer.act { () =>
@@ -345,69 +379,92 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }
   }
   
-  it should "call onViewProgress when non-empty file" in {
+  it should "call setViewport when non-empty file" in {
     //given
     val inputRef = ReactRef.create[BlessedElement]
-    val fileReader = new ViewerFileReaderMock
-    val onViewProgress = mockFunction[Int, Unit]
-    val props = getViewerContentProps(inputRef, fileReader, onViewProgress)
+    val fileReader = new ViewerFileReader
+    val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
+    var props = getViewerContentProps(inputRef, fileReader, setViewport)
+    var viewport = props.viewport
     val readF = Future.successful("test \nfile content\n".split('\n').map(c => (c, c.length + 1)).toList)
-    fileReader.readNextLinesMock.expects(props.height, 0.0, props.encoding).returning(readF)
-    val percent = ((19 / props.size) * 100).toInt
+    fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readF)
+    val percent = ((19 / viewport.size) * 100).toInt
     percent shouldBe 76
-
-    //then
-    onViewProgress.expects(percent)
 
     //when
     val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
 
     //then
+    setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
+      inside(maybeViewport) { case Some(vp) =>
+        viewport = vp
+        TestRenderer.act { () =>
+          props = props.copy(viewport = vp)
+          renderer.update(<(ViewerContent())(^.wrapped := props)())
+        }
+      }
+    }
     assertViewerContent(renderer.root, props, content = "")
     eventually {
       assertViewerContent(renderer.root, props,
         """test 
           |file content
           |""".stripMargin)
+
+      viewport.progress shouldBe percent
     }
   }
   
-  it should "call onViewProgress when empty file" in {
+  it should "call setViewport when empty file" in {
     //given
     val inputRef = ReactRef.create[BlessedElement]
-    val fileReader = new ViewerFileReaderMock
-    val onViewProgress = mockFunction[Int, Unit]
-    val props = getViewerContentProps(inputRef, fileReader, onViewProgress).copy(size = 0)
+    val fileReader = new ViewerFileReader
+    val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
+    var props = {
+      val p = getViewerContentProps(inputRef, fileReader, setViewport)
+      p.copy(viewport = p.viewport.copy(size = 0))
+    }
+    var viewport = props.viewport
     val readF = Future.successful("test content".split('\n').map(c => (c, c.length)).toList)
-    fileReader.readNextLinesMock.expects(props.height, 0.0, props.encoding).returning(readF)
+    fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readF)
     val percent = 0
-
-    //then
-    onViewProgress.expects(percent)
 
     //when
     val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
 
     //then
+    setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
+      inside(maybeViewport) { case Some(vp) =>
+        viewport = vp
+        TestRenderer.act { () =>
+          props = props.copy(viewport = vp)
+          renderer.update(<(ViewerContent())(^.wrapped := props)())
+        }
+      }
+    }
     assertViewerContent(renderer.root, props, content = "")
     eventually {
       assertViewerContent(renderer.root, props,
         """test content
           |""".stripMargin)
+
+      viewport.progress shouldBe percent
     }
   }
   
   private def getViewerContentProps(inputRef: ReactRef[BlessedElement],
-                                    fileReader: ViewerFileReaderMock,
-                                    onViewProgress: Int => Unit = _ => ()) = {
+                                    fileReader: ViewerFileReader,
+                                    setViewport: Option[ViewerFileViewport] => Unit) = {
     ViewerContentProps(
       inputRef = inputRef,
-      fileReader = fileReader.fileReader,
-      encoding = "utf-8",
-      size = 25,
-      width = 60,
-      height = 5,
-      onViewProgress = onViewProgress
+      viewport = ViewerFileViewport(
+        fileReader = fileReader.fileReader,
+        encoding = "utf-8",
+        size = 25,
+        width = 60,
+        height = 5
+      ),
+      setViewport = setViewport
     )
   }
 

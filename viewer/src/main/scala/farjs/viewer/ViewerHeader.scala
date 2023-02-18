@@ -6,9 +6,9 @@ import scommons.react._
 import scommons.react.blessed._
 
 case class ViewerHeaderProps(filePath: String,
-                             encoding: String,
-                             size: Double,
-                             percent: Int)
+                             encoding: String = "",
+                             size: Double = 0,
+                             percent: Int = 0)
 
 object ViewerHeader extends FunctionComponent[ViewerHeaderProps] {
 
