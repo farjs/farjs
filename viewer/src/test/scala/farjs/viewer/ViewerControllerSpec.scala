@@ -85,11 +85,12 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     assertViewerController(renderer.root, props)
     eventually {
       inside(resViewport) {
-        case ViewerFileViewport(_, encoding, size, width, height, position, linesData) =>
+        case ViewerFileViewport(_, encoding, size, width, height, wrap, position, linesData) =>
           encoding shouldBe "utf-8"
           size shouldBe props.size
           width shouldBe 0
           height shouldBe 0
+          wrap shouldBe false
           position shouldBe 0
           linesData shouldBe Nil
       }

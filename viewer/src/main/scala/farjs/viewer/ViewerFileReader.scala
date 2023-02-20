@@ -48,7 +48,11 @@ class ViewerFileReader(bufferSize: Int = 64 * 1024,
 
       val rightNewLineIdx =
         if (fromEnd) suffix.length
-        else suffix.lastIndexOf('\n'.toInt, suffix.length, encoding)
+        else {
+          val idx = suffix.lastIndexOf('\n'.toInt, suffix.length, encoding)
+          if (idx >= 0 && idx < suffix.length - 1) suffix.length
+          else idx
+        }
       val leftNewLineIdx =
         if (rightNewLineIdx <= 0) -1
         else suffix.lastIndexOf('\n'.toInt, rightNewLineIdx - 1, encoding)

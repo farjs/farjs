@@ -42,6 +42,10 @@ class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
           percent = vp.progress
         )
     }
+    val menuItems = viewport match {
+      case Some(vp) if vp.wrap => defaultMenuItems.updated(1, "Unwrap")
+      case _ => defaultMenuItems
+    }
 
     <(popupComp())(^.wrapped := PopupProps(onClose = onExit, onKeypress = onKeypress))(
       <.box(
@@ -81,9 +85,9 @@ object ViewerPluginUi {
   private[viewer] var viewerController: UiComponent[ViewerControllerProps] = ViewerController
   private[viewer] var bottomMenuComp: UiComponent[BottomMenuProps] = BottomMenu
 
-  private[viewer] val menuItems = List(
+  private[viewer] val defaultMenuItems = List(
     /*  F1 */ "",
-    /*  F2 */ "",
+    /*  F2 */ "Wrap",
     /*  F3 */ "Quit",
     /*  F4 */ "",
     /*  F5 */ "",

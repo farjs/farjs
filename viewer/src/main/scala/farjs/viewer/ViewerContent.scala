@@ -43,7 +43,14 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       }
     }
     
+    def onWrap(): Unit = {
+      readF.current = readF.current.andThen { _ =>
+        updated(viewport.copy(wrap = !viewport.wrap))
+      }
+    }
+    
     def onKeypress(keyFull: String): Unit = keyFull match {
+      case "f2" => onWrap()
       case "C-r" => onReload()
       case "home" => onReload(from = 0)
       case "end" => onMoveUp(lines = viewport.height, from = viewport.size)
@@ -59,7 +66,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
         readF.current = viewport.reload().map(updated)
       }
       ()
-    }, List(viewport.encoding, viewport.size, viewport.width, viewport.height))
+    }, List(viewport.encoding, viewport.size, viewport.width, viewport.height, viewport.wrap))
 
     <(viewerInput())(^.wrapped := ViewerInputProps(
       inputRef = props.inputRef,

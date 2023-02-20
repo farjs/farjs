@@ -276,6 +276,25 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         check(key = "pagedown", lines = viewport.height, position = 20, "next page",
           """next page
             |""".stripMargin
+        ),
+        check(key = "f2", lines = viewport.height, position = 20, "loooooooooooong line\n",
+          """looooooooooo
+            |ong line
+            |""".stripMargin
+        ),
+        check(key = "up", lines = 1, position = 20, "prev liiiiiiiiine 1\n",
+          """iiine 1
+            |looooooooooo
+            |ong line
+            |""".stripMargin
+        ),
+        check(key = "home", lines = viewport.height, position = 0.0, "beginning",
+          """beginning
+            |""".stripMargin
+        ),
+        check(key = "down", lines = 1, position = 9, "next liiiiiiiiine 1\n",
+          """next liiiiii
+            |""".stripMargin
         )
       ).foldLeft(Future.unit)((res, f) => res.flatMap(_ => f())).map(_ => Succeeded)
     }
@@ -461,7 +480,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         fileReader = fileReader.fileReader,
         encoding = "utf-8",
         size = 25,
-        width = 60,
+        width = 12,
         height = 5
       ),
       setViewport = setViewport

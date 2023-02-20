@@ -190,6 +190,33 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     }
   }
 
+  it should "read content from the middle of file when readPrevLines" in {
+    //given
+    val fs = new FSMocks
+    ViewerFileReader.fs = fs.fs
+    val position = 9
+    val lines = 3
+
+    //then
+    fs.read.expects(fd, *, 0, *, *).onCall { (_, buff, _, bufSize, position) =>
+      bufSize shouldBe 9
+      position shouldBe 0
+      val content = "test\nfile"
+      Future.successful(buff.asInstanceOf[Buffer].write(content, 0, content.length, encoding))
+    }
+
+    //when
+    val resultF = reader.readPrevLines(lines, position, maxPos = 25, encoding)
+    
+    //then
+    resultF.map { linesData =>
+      linesData shouldBe List(
+        "test" -> 5,
+        "file" -> 4
+      )
+    }
+  }
+
   it should "read single empty line at the start when readPrevLines" in {
     //given
     val fs = new FSMocks
