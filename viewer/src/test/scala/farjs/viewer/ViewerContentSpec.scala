@@ -191,7 +191,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val ctx = new TestContext
     import ctx._
 
-    def check(key: String, lines: Int, position: Double, content: String, expected: String)
+    def check(key: String, lines: Int, position: Double, content: String, expected: String, noop: Boolean = false)
              (implicit pos: Position): () => Future[Unit] = { () =>
 
       val readF =
@@ -199,13 +199,13 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         else Future.successful(content.split('\n').map(c => (c, c.length)).toList)
 
       //then
-      if (Set("end", "up", "pageup").contains(key)) {
-        if (position > 0.0) {
+      if (!noop) {
+        if (Set("end", "up", "pageup").contains(key)) {
           fileReader.readPrevLines.expects(lines, position, viewport.size, viewport.encoding).returning(readF)
         }
-      }
-      else if (position < viewport.size) {
-        fileReader.readNextLines.expects(lines, position, viewport.encoding).returning(readF)
+        else {
+          fileReader.readNextLines.expects(lines, position, viewport.encoding).returning(readF)
+        }
       }
 
       //when
@@ -235,15 +235,16 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
           """beginning
             |""".stripMargin
         ),
-        check(key = "up", lines = 1, position = 0.0, "already at the beginning", //noop
+        check(key = "up", lines = 1, position = 0.0, "already at the beginning",
           """beginning
-            |""".stripMargin
+            |""".stripMargin,
+          noop = true
         ),
         check(key = "down", lines = 1, position = 9, "next line 1",
           """next line 1
             |""".stripMargin
         ),
-        check(key = "down", lines = 1, position = 20, "", //noop
+        check(key = "down", lines = 1, position = 20, "",
           """next line 1
             |""".stripMargin
         ),
@@ -251,16 +252,17 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
           """line2
             |""".stripMargin
         ),
-        check(key = "down", lines = 1, position = 25, "out of file size", //noop
+        check(key = "down", lines = 1, position = 25, "out of file size",
           """line2
-            |""".stripMargin
+            |""".stripMargin,
+          noop = true
         ),
         check(key = "up", lines = 1, position = 20, "prev line",
           """prev line
             |line2
             |""".stripMargin
         ),
-        check(key = "up", lines = 1, position = 11, "", //noop
+        check(key = "up", lines = 1, position = 11, "",
           """prev line
             |line2
             |""".stripMargin
@@ -273,9 +275,29 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
             |prev line
             |""".stripMargin
         ),
-        check(key = "pagedown", lines = viewport.height, position = 20, "next page",
-          """next page
+        check(key = "pagedown", lines = viewport.height, position = 20, "next paaaaaaage",
+          """next paaaaaa
             |""".stripMargin
+        ),
+        check(key = "left", lines = viewport.height, position = 20, "",
+          """next paaaaaa
+            |""".stripMargin,
+          noop = true
+        ),
+        check(key = "right", lines = viewport.height, position = 20, "",
+          """ext paaaaaaa
+            |""".stripMargin,
+          noop = true
+        ),
+        check(key = "right", lines = viewport.height, position = 20, "",
+          """xt paaaaaaag
+            |""".stripMargin,
+          noop = true
+        ),
+        check(key = "left", lines = viewport.height, position = 20, "",
+          """ext paaaaaaa
+            |""".stripMargin,
+          noop = true
         ),
         check(key = "f2", lines = viewport.height, position = 20, "loooooooooooong line\n",
           """looooooooooo
@@ -294,6 +316,15 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         ),
         check(key = "down", lines = 1, position = 9, "next liiiiiiiiine 1\n",
           """next liiiiii
+            |""".stripMargin
+        ),
+        check(key = "right", lines = viewport.height, position = 9, "",
+          """ext liiiiii
+            |""".stripMargin,
+          noop = true
+        ),
+        check(key = "f2", lines = viewport.height, position = 9, "next liiiiiiiiine 1\n",
+          """ext liiiiiii
             |""".stripMargin
         )
       ).foldLeft(Future.unit)((res, f) => res.flatMap(_ => f())).map(_ => Succeeded)

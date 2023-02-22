@@ -13,13 +13,14 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
                               width: Int,
                               height: Int,
                               wrap: Boolean = false,
+                              column: Int = 0,
                               position: Double = 0.0,
                               linesData: List[(String, Int)] = Nil) {
   
   lazy val content: String = {
     val buf = new StringBuilder()
     linesData.foldLeft(buf) { case (buf, (line, _)) =>
-      buf.append(line.take(width)).append(UI.newLine)
+      buf.append(line.slice(column, column + width)).append(UI.newLine)
     }
     buf.toString()
   }

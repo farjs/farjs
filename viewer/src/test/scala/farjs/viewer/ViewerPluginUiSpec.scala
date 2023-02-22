@@ -109,6 +109,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
       width = 1,
       height = 2,
       wrap = true,
+      column = 3,
       linesData = List(("test...", 55))
     )
     
@@ -117,10 +118,11 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     
     //then
     inside(findComponentProps(renderer.root, viewerHeader)) {
-      case ViewerHeaderProps(filePath, encoding, size, percent) =>
+      case ViewerHeaderProps(filePath, encoding, size, column, percent) =>
         filePath shouldBe "item 1"
         encoding shouldBe viewport.encoding
         size shouldBe viewport.size
+        column shouldBe viewport.column
         percent shouldBe 50
     }
     findComponentProps(renderer.root, viewerController).viewport shouldBe Some(viewport)
@@ -155,10 +157,11 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
           ^.rbAutoFocus := false
         )(
           <(viewerHeader())(^.assertWrapped(inside(_) {
-            case ViewerHeaderProps(resFilePath, resEncoding, resSize, resPercent) =>
+            case ViewerHeaderProps(resFilePath, resEncoding, resSize, resColumn, resPercent) =>
               resFilePath shouldBe filePath
               resEncoding shouldBe ""
               resSize shouldBe 0
+              resColumn shouldBe 0
               resPercent shouldBe 0
           }))(),
   

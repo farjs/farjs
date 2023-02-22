@@ -34,6 +34,7 @@ class ViewerHeaderSpec extends TestSpec with TestRendererUtils {
     val encodingWidth = math.max(props.encoding.length, 10)
     val sizeText = f"${props.size}%,.0f"
     val sizeWidth = math.max(sizeText.length, 12)
+    val columnWidth = 8
     val percentWidth = 4
     val gapWidth = 2
 
@@ -41,7 +42,7 @@ class ViewerHeaderSpec extends TestSpec with TestRendererUtils {
       <(withSizeComp())(^.assertPlain[WithSizeProps](inside(_) {
         case WithSizeProps(render) =>
           val width = 80
-          val dynamicWidth = width - encodingWidth - sizeWidth - percentWidth - gapWidth * 3
+          val dynamicWidth = width - encodingWidth - sizeWidth - columnWidth - percentWidth - gapWidth * 3
           val content = createTestRenderer(render(width, 25)).root
 
           assertNativeComponent(content, <.box(^.rbStyle := style)(
@@ -74,6 +75,17 @@ class ViewerHeaderSpec extends TestSpec with TestRendererUtils {
                 top shouldBe 0
                 resWidth shouldBe sizeWidth
                 text shouldBe sizeText
+                resStyle shouldBe style
+                focused shouldBe js.undefined
+                padding shouldBe 0
+            }))(),
+            <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+              case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
+                align shouldBe TextAlign.left
+                left shouldBe (width - columnWidth - percentWidth)
+                top shouldBe 0
+                resWidth shouldBe columnWidth
+                text shouldBe s"Col ${props.column}"
                 resStyle shouldBe style
                 focused shouldBe js.undefined
                 padding shouldBe 0

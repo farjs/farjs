@@ -39,6 +39,7 @@ class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
           filePath = filePath,
           encoding = vp.encoding,
           size = vp.size,
+          column = vp.column,
           percent = vp.progress
         )
     }

@@ -45,12 +45,28 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
     
     def onWrap(): Unit = {
       readF.current = readF.current.andThen { _ =>
-        updated(viewport.copy(wrap = !viewport.wrap))
+        val wrap = !viewport.wrap
+        val column =
+          if (wrap) 0
+          else viewport.column
+
+        updated(viewport.copy(wrap = wrap, column = column))
+      }
+    }
+    
+    def onColumn(dx: Int): Unit = {
+      readF.current = readF.current.andThen { _ =>
+        val col = viewport.column + dx
+        if (col >= 0 && col < 1000) {
+          updated(viewport.copy(column = col))
+        }
       }
     }
     
     def onKeypress(keyFull: String): Unit = keyFull match {
       case "f2" => onWrap()
+      case "left" => onColumn(dx = -1)
+      case "right" => onColumn(dx = 1)
       case "C-r" => onReload()
       case "home" => onReload(from = 0)
       case "end" => onMoveUp(lines = viewport.height, from = viewport.size)
