@@ -53,14 +53,41 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
         ^.rbStyle := contentStyle
       )(
         props.viewport.map { viewport =>
-          <(viewerContent())(^.wrapped := ViewerContentProps(
-            inputRef = props.inputRef,
-            viewport = viewport.copy(
-              width = width,
-              height = height
-            ),
-            setViewport = props.setViewport
-          ))()
+          val linesCount = viewport.linesData.size
+          
+          <.>()(
+            <(viewerContent())(^.wrapped := ViewerContentProps(
+              inputRef = props.inputRef,
+              viewport = viewport.copy(
+                width = width,
+                height = height
+              ),
+              setViewport = props.setViewport
+            ))(),
+
+            if (viewport.column > 0 && linesCount > 0) Some {
+              <.text(
+                ^.key := "leftScrollIndicators",
+                ^.rbStyle := scrollStyle,
+                ^.rbWidth := 1,
+                ^.rbHeight := linesCount,
+                ^.content := "<" * linesCount
+              )()
+            }
+            else None,
+
+            viewport.scrollIndicators.map { lineIdx =>
+              <.text(
+                ^.key := s"$lineIdx",
+                ^.rbStyle := scrollStyle,
+                ^.rbLeft := width - 1,
+                ^.rbTop := lineIdx,
+                ^.rbWidth := 1,
+                ^.rbHeight := 1,
+                ^.content := ">"
+              )()
+            }
+          )
         }
       )
     })()
@@ -68,6 +95,14 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
 
   private[viewer] lazy val contentStyle: BlessedStyle = {
     val style = Theme.current.fileList.regularItem
+    new BlessedStyle {
+      override val bold = style.bold
+      override val bg = style.bg
+      override val fg = style.fg
+    }
+  }
+  private[viewer] lazy val scrollStyle: BlessedStyle = {
+    val style = Theme.current.fileList.header
     new BlessedStyle {
       override val bold = style.bold
       override val bg = style.bg

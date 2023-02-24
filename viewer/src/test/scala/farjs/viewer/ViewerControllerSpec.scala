@@ -7,12 +7,13 @@ import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.raw.FSConstants
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react.ReactRef
+import scommons.react._
 import scommons.react.blessed._
 import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
 import scala.concurrent.Future
+import scala.scalajs.js
 
 class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -138,35 +139,90 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     }
   }
 
+  it should "render left and right scroll indicators" in {
+    //given
+    val fs = new FSMocks
+    ViewerFileReader.fs = fs.fs
+    val inputRef = ReactRef.create[BlessedElement]
+    val dispatch = mockFunction[Any, Any]
+    val viewport = ViewerFileViewport(
+      fileReader = new MockViewerFileReader,
+      encoding = "win",
+      size = 123,
+      width = 3,
+      height = 2,
+      column = 1,
+      linesData = List(
+        "test" -> 4,
+        "test content" -> 12
+      )
+    )
+    val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, Some(viewport))
+
+    //when
+    val renderer = createTestRenderer(<(ViewerController())(^.wrapped := props)())
+
+    //then
+    assertViewerController(renderer.root, props, scrollIndicators = List(1))
+  }
+
   private def assertViewerController(result: TestInstance,
-                                     props: ViewerControllerProps
+                                     props: ViewerControllerProps,
+                                     scrollIndicators: List[Int] = Nil
                                     )(implicit pos: Position): Assertion = {
 
     assertComponents(result.children, List(
       <(withSizeComp())(^.assertPlain[WithSizeProps](inside(_) {
         case WithSizeProps(render) =>
-          val width = 60
-          val height = 20
+          val width = 3
+          val height = 2
           val renderRes = render(width, height)
           val resComp = createTestRenderer(renderRes).root
 
           assertNativeComponent(resComp,
             <.box(
               ^.rbStyle := contentStyle
-            )(
-              props.viewport.map { viewport =>
-                <(viewerContent())(^.assertWrapped(inside(_) {
-                  case ViewerContentProps(inputRef, resViewport, setViewport) =>
-                    inputRef shouldBe props.inputRef
-                    resViewport shouldBe viewport.copy(
-                      width = width,
-                      height = height
-                    )
-                    setViewport should be theSameInstanceAs props.setViewport
-                }))()
+            )(), { children =>
+              props.viewport match {
+                case Some(viewport) =>
+                  val linesCount = viewport.linesData.size
+                  val content = <(viewerContent())(^.assertWrapped(inside(_) {
+                    case ViewerContentProps(inputRef, resViewport, setViewport) =>
+                      inputRef shouldBe props.inputRef
+                      resViewport shouldBe viewport.copy(
+                        width = width,
+                        height = height
+                      )
+                      setViewport should be theSameInstanceAs props.setViewport
+                  }))()
+
+                  assertComponents(js.Array(children: _*),
+                    if (viewport.column > 0) {
+                      List[ReactElement](
+                        content,
+                        <.text(
+                          ^.rbStyle := scrollStyle,
+                          ^.rbWidth := 1,
+                          ^.rbHeight := linesCount,
+                          ^.content := "<" * linesCount
+                        )()
+                      ) ++ scrollIndicators.map { lineIdx =>
+                        <.text(
+                          ^.rbStyle := scrollStyle,
+                          ^.rbLeft := width - 1,
+                          ^.rbTop := lineIdx,
+                          ^.rbWidth := 1,
+                          ^.rbHeight := 1,
+                          ^.content := ">"
+                        )()
+                      }
+                    }
+                    else List[ReactElement](content)
+                  )
+                case None =>
+                  children should be (empty)
               }
-            )
-          )
+            })
       }))()
     ))
   }

@@ -24,6 +24,13 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
     }
     buf.toString()
   }
+
+  lazy val scrollIndicators: List[Int] = {
+    linesData.zipWithIndex.collect {
+      case ((line, _), index) if line.length > column + width => index
+    }
+  }
+
   lazy val progress: Int = {
     val bytes = linesData.foldLeft(0)(_ + _._2)
     val viewed = position + bytes
