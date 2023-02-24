@@ -54,6 +54,16 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       }
     }
     
+    def onEncoding(): Unit = {
+      readF.current = readF.current.andThen { _ =>
+        val encoding =
+          if (viewport.encoding == ViewerController.defaultEnc) ViewerController.latin1Enc
+          else ViewerController.defaultEnc
+
+        updated(viewport.copy(encoding = encoding))
+      }
+    }
+    
     def onColumn(dx: Int): Unit = {
       readF.current = readF.current.andThen { _ =>
         val col = viewport.column + dx
@@ -65,6 +75,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
     
     def onKeypress(keyFull: String): Unit = keyFull match {
       case "f2" => onWrap()
+      case "f8" => onEncoding()
       case "left" => onColumn(dx = -1)
       case "right" => onColumn(dx = 1)
       case "C-r" => onReload()

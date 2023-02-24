@@ -135,6 +135,50 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }
   }
 
+  it should "switch encoding when onKeypress(F8)" in {
+    //given
+    val ctx = new TestContext
+    import ctx._
+
+    def check(key: String, content: String, encoding: String, expected: String)
+             (implicit pos: Position): () => Future[Unit] = { () =>
+
+      val readF = Future.successful(content.split('\n').map(c => (c, c.length)).toList)
+
+      //then
+      fileReader.readNextLines.expects(viewport.height, viewport.position, encoding).returning(readF)
+
+      //when
+      findComponentProps(renderer.root, viewerInput).onKeypress(key)
+
+      //then
+      eventually(assertViewerContent(renderer.root, props, expected))
+    }
+
+    eventually {
+      assertViewerContent(renderer.root, props,
+        """test 
+          |file content
+          |""".stripMargin)
+    }.flatMap { _ =>
+      List(
+        //when & then
+        check("f8", "reload1", "latin1",
+          """reload1
+            |""".stripMargin
+        ),
+        check("f8", "reload2", "utf-8",
+          """reload2
+            |""".stripMargin
+        ),
+        check("f8", "reload3", "latin1",
+          """reload3
+            |""".stripMargin
+        )
+      ).foldLeft(Future.unit)((res, f) => res.flatMap(_ => f())).map(_ => Succeeded)
+    }
+  }
+
   it should "re-load prev page if at the end when onKeypress(down)" in {
     //given
     val inputRef = ReactRef.create[BlessedElement]

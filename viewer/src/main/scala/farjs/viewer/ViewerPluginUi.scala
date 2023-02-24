@@ -44,8 +44,16 @@ class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
         )
     }
     val menuItems = viewport match {
-      case Some(vp) if vp.wrap => defaultMenuItems.updated(1, "Unwrap")
-      case _ => defaultMenuItems
+      case None => defaultMenuItems
+      case Some(vp) =>
+        var items = defaultMenuItems
+        if (vp.wrap) {
+          items = items.updated(1, "Unwrap")
+        }
+        if (vp.encoding == ViewerController.defaultEnc) {
+          items = items.updated(7, ViewerController.latin1Enc)
+        }
+        items
     }
 
     <(popupComp())(^.wrapped := PopupProps(onClose = onExit, onKeypress = onKeypress))(
@@ -94,7 +102,7 @@ object ViewerPluginUi {
     /*  F5 */ "",
     /*  F6 */ "",
     /*  F7 */ "",
-    /*  F8 */ "",
+    /*  F8 */ ViewerController.defaultEnc,
     /*  F9 */ "",
     /* F10 */ "Quit",
     /* F11 */ "",

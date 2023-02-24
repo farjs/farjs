@@ -104,7 +104,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     val viewerProps = findComponentProps(renderer.root, viewerController)
     val viewport = ViewerFileViewport(
       fileReader = new ViewerFileReader().fileReader,
-      encoding = "win",
+      encoding = "utf-8",
       size = 110,
       width = 1,
       height = 2,
@@ -126,7 +126,11 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
         percent shouldBe 50
     }
     findComponentProps(renderer.root, viewerController).viewport shouldBe Some(viewport)
-    findComponentProps(renderer.root, bottomMenuComp).items shouldBe defaultMenuItems.updated(1, "Unwrap")
+    findComponentProps(renderer.root, bottomMenuComp).items shouldBe {
+      defaultMenuItems
+        .updated(1, "Unwrap")
+        .updated(7, "latin1")
+    }
   }
 
   it should "render initial component" in {

@@ -35,7 +35,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
         val openF = fileReader.open(props.filePath).map { _ =>
           props.setViewport(Some(ViewerFileViewport(
             fileReader = fileReader,
-            encoding = "utf-8",
+            encoding = defaultEnc,
             size = props.size,
             width = 0,
             height = 0
@@ -92,6 +92,9 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
       )
     })()
   }
+
+  private[viewer] lazy val defaultEnc = "utf-8"
+  private[viewer] lazy val latin1Enc = "latin1"
 
   private[viewer] lazy val contentStyle: BlessedStyle = {
     val style = Theme.current.fileList.regularItem
