@@ -34,7 +34,7 @@ object FoldersHistoryPopup extends FunctionComponent[FoldersHistoryPopupProps] {
           props.onChangeDir(items(index))
         },
         onClose = props.onClose,
-        focusLast = true
+        selected = math.max(items.length - 1, 0)
       ))()
     }.orNull
   }

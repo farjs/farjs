@@ -12,10 +12,10 @@ case class ListPopupProps(title: String,
                           items: List[String],
                           onAction: Int => Unit,
                           onClose: () => Unit,
+                          selected: Int = 0,
                           onSelect: js.UndefOr[js.Function1[Int, Unit]] = js.undefined,
                           onKeypress: String => Boolean = _ => false,
                           footer: Option[String] = None,
-                          focusLast: Boolean = false,
                           textPaddingLeft: Int = 2,
                           textPaddingRight: Int = 1)
 
@@ -60,9 +60,7 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
             top = 1,
             width = contentWidth,
             height = contentHeight,
-            selected =
-              if (items.isEmpty || !props.focusLast) 0
-              else items.length - 1,
+            selected = props.selected,
             items = js.Array(items.map { item =>
               textPaddingLeftStr +
                 TextLine.wrapText(item, contentWidth - textPadding) +

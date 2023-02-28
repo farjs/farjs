@@ -66,7 +66,10 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
   
   it should "render popup with max height" in {
     //given
-    val props = getListPopupProps(items = List.fill(20)("item"), focusLast = true)
+    val props = {
+      val props = getListPopupProps(items = List.fill(20)("item"))
+      props.copy(selected = props.items.length - 1)
+    }
     
     //when
     val result = createTestRenderer(<(ListPopup())(^.wrapped := props)()).root
@@ -91,14 +94,12 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
   }
 
   private def getListPopupProps(items: List[String] = List("item 1", "item 2"),
-                                onAction: Int => Unit = _ => (),
-                                focusLast: Boolean = false): ListPopupProps = {
+                                onAction: Int => Unit = _ => ()): ListPopupProps = {
     ListPopupProps(
       title = "Test Title",
       items = items,
       onAction = onAction,
       onClose = () => (),
-      focusLast = focusLast,
       footer = Some("test footer")
     )
   }
@@ -142,10 +143,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
                   top shouldBe 1
                   width shouldBe contentWidth
                   height shouldBe contentHeight
-                  selected shouldBe {
-                    if (items.isEmpty || !props.focusLast) 0
-                    else items.length - 1
-                  }
+                  selected shouldBe props.selected
                   resItems.toList shouldBe items
                   style shouldBe theme
                   onSelect should be theSameInstanceAs props.onSelect
