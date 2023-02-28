@@ -20,7 +20,7 @@ object Portal extends FunctionComponent[Unit] {
     if (ctx == null) {
       throw JavaScriptException(Error(
         "WithPortals.Context is not found." +
-          "\nPlease, make sure you use WithPortals and not creating nested portals."
+          "\nPlease, make sure you use WithPortals.Context.Provider in parent component."
       ))
     }
     

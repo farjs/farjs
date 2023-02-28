@@ -21,8 +21,9 @@ class WithPortals(screen: BlessedScreen) extends FunctionComponent[Unit] {
   protected def render(props: Props): ReactElement = {
     val (portals, setPortals) = useStateUpdater(List.empty[(Int, ReactElement, BlessedElement)])
 
-    val onRender: js.Function2[Int, ReactElement, Unit] = useMemo({ () =>
-      (id, el) => {
+    val context = useMemo({ () =>
+
+      val onRender: js.Function2[Int, ReactElement, Unit] = { (id, el) =>
         setPortals { portals =>
           val updated = portals.map {
             case (pId, _, focused) if pId == id => (id, el, focused)
@@ -35,10 +36,8 @@ class WithPortals(screen: BlessedScreen) extends FunctionComponent[Unit] {
           }
         }
       }
-    }, Nil)
     
-    val onRemove: js.Function1[Int, Unit] = useMemo({ () =>
-      id => {
+      val onRemove: js.Function1[Int, Unit] = { id =>
         setPortals { portals =>
           val index = portals.indexWhere(_._1 == id)
           if (index >= 0) {
@@ -60,17 +59,21 @@ class WithPortals(screen: BlessedScreen) extends FunctionComponent[Unit] {
           else portals
         }
       }
+
+      WithPortalsContext(onRender, onRemove)
     }, Nil)
 
     val lastPortalIndex = portals.size - 1
     
     <.>()(
-      <(WithPortals.Context.Provider)(^.contextValue := WithPortalsContext(onRender, onRemove))(
+      <(WithPortals.Context.Provider)(^.contextValue := context)(
         props.children
       ),
-      portals.zipWithIndex.map { case ((id, content, _), index) =>
-        renderPortal(id, content, index == lastPortalIndex)
-      }
+      <(WithPortals.Context.Provider)(^.contextValue := context)(
+        portals.zipWithIndex.map { case ((id, content, _), index) =>
+          renderPortal(id, content, index == lastPortalIndex)
+        }
+      )
     )
   }
   

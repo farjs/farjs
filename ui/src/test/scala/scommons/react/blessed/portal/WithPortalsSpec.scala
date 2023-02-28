@@ -224,4 +224,31 @@ class WithPortalsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       otherContent shouldBe "some other content"
     }
   }
+
+  it should "render nested portals" in {
+    //given
+    val renderMock = mockFunction[Unit]
+    val screenMock = literal("render" -> renderMock)
+    renderMock.expects().never()
+
+    val withPortals = new WithPortals(screenMock.asInstanceOf[BlessedScreen])
+    val root = createTestRenderer(<(withPortals())()(
+      <(Portal())()(
+        <.>()("parent portal"),
+        <(Portal())()(
+          <.>()("nested portal")
+        )
+      ),
+      <.>()("some other children")
+    )).root
+
+    //when & then
+    inside(root.children.toList) { case List(p1, childrenContent, parentPortal, p2, nestedPortal) =>
+      p1.`type` shouldBe Portal()
+      childrenContent shouldBe "some other children"
+      parentPortal shouldBe "parent portal"
+      p2.`type` shouldBe Portal()
+      nestedPortal shouldBe "nested portal"
+    }
+  }
 }

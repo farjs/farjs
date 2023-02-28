@@ -28,7 +28,7 @@ class PortalSpec extends TestSpec with TestRendererUtils {
     assertNativeComponent(result,
       <.div()(
         "Error: WithPortals.Context is not found." +
-          "\nPlease, make sure you use WithPortals and not creating nested portals."
+          "\nPlease, make sure you use WithPortals.Context.Provider in parent component."
       )
     )
   }
