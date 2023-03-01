@@ -127,9 +127,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     }
     findComponentProps(renderer.root, viewerController).viewport shouldBe Some(viewport)
     findComponentProps(renderer.root, bottomMenuComp).items shouldBe {
-      defaultMenuItems
-        .updated(1, "Unwrap")
-        .updated(7, "latin1")
+      defaultMenuItems.updated(1, "Unwrap")
     }
   }
 

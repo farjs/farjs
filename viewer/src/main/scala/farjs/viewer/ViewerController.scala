@@ -94,7 +94,6 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
   }
 
   private[viewer] lazy val defaultEnc = "utf-8"
-  private[viewer] lazy val latin1Enc = "latin1"
 
   private[viewer] lazy val contentStyle: BlessedStyle = {
     val style = Theme.current.fileList.regularItem

@@ -13,6 +13,7 @@ import scala.concurrent.{Future, Promise}
 class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   ViewerContent.viewerInput = mockUiComponent("ViewerInput")
+  ViewerContent.encodingsPopup = mockUiComponent("EncodingsPopup")
 
   //noinspection TypeAnnotation
   class ViewerFileReader {
@@ -135,12 +136,12 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }
   }
 
-  it should "switch encoding when onKeypress(F8)" in {
+  it should "show popup and switch encoding when onKeypress(F8)" in {
     //given
     val ctx = new TestContext
     import ctx._
 
-    def check(key: String, content: String, encoding: String, expected: String)
+    def check(encoding: String, content: String, expected: String)
              (implicit pos: Position): () => Future[Unit] = { () =>
 
       val readF = Future.successful(content.split('\n').map(c => (c, c.length)).toList)
@@ -149,10 +150,10 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       fileReader.readNextLines.expects(viewport.height, viewport.position, encoding).returning(readF)
 
       //when
-      findComponentProps(renderer.root, viewerInput).onKeypress(key)
+      findComponentProps(renderer.root, encodingsPopup).onApply(encoding)
 
       //then
-      eventually(assertViewerContent(renderer.root, props, expected))
+      eventually(assertViewerContent(renderer.root, props, expected, hasEncodingsPopup = true))
     }
 
     eventually {
@@ -161,20 +162,25 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
           |file content
           |""".stripMargin)
     }.flatMap { _ =>
+      findComponentProps(renderer.root, viewerInput).onKeypress("f8")
+      eventually(findComponentProps(renderer.root, encodingsPopup))
+    }.flatMap { _ =>
       List(
         //when & then
-        check("f8", "reload1", "latin1",
+        check("latin1", "reload1",
           """reload1
             |""".stripMargin
         ),
-        check("f8", "reload2", "utf-8",
+        check("utf-8", "reload2",
           """reload2
             |""".stripMargin
-        ),
-        check("f8", "reload3", "latin1",
-          """reload3
-            |""".stripMargin
-        )
+        ), { () =>
+          Future.successful {
+            findComponentProps(renderer.root, encodingsPopup).onClose()
+            findProps(renderer.root, encodingsPopup) should be (empty)
+            ()
+          }
+        }
       ).foldLeft(Future.unit)((res, f) => res.flatMap(_ => f())).map(_ => Succeeded)
     }
   }
@@ -564,18 +570,37 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   private def assertViewerContent(result: TestInstance,
                                   props: ViewerContentProps,
-                                  content: String)(implicit pos: Position): Assertion = {
+                                  content: String,
+                                  hasEncodingsPopup: Boolean = false
+                                 )(implicit pos: Position): Assertion = {
 
-    assertComponents(result.children, List(
+    assertNativeComponent(result.children.head,
       <(viewerInput())(^.assertWrapped(inside(_) {
         case ViewerInputProps(inputRef, _, _) =>
           inputRef shouldBe props.inputRef
-      }))(
-        <.text(
-          ^.rbStyle := ViewerController.contentStyle,
-          ^.content := content
-        )()
-      )
-    ))
+      }))(), { children =>
+        val (text, maybePopup) = inside(children) {
+          case List(text) => (text, None)
+          case List(text, popup) => (text, Some(popup))
+        }
+
+        assertNativeComponent(text,
+          <.text(
+            ^.rbStyle := ViewerController.contentStyle,
+            ^.content := content
+          )()
+        )
+        maybePopup.isDefined shouldBe hasEncodingsPopup
+        maybePopup.foreach { popup =>
+          assertNativeComponent(popup,
+            <(encodingsPopup())(^.assertWrapped(inside(_) {
+              case EncodingsPopupProps(encoding, _, _) =>
+                encoding shouldBe props.viewport.encoding
+            }))()
+          )
+        }
+        Succeeded
+      }
+    )
   }
 }

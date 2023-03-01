@@ -50,9 +50,6 @@ class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
         if (vp.wrap) {
           items = items.updated(1, "Unwrap")
         }
-        if (vp.encoding == ViewerController.defaultEnc) {
-          items = items.updated(7, ViewerController.latin1Enc)
-        }
         items
     }
 
@@ -102,7 +99,7 @@ object ViewerPluginUi {
     /*  F5 */ "",
     /*  F6 */ "",
     /*  F7 */ "",
-    /*  F8 */ ViewerController.defaultEnc,
+    /*  F8 */ "Encodings",
     /*  F9 */ "",
     /* F10 */ "Quit",
     /* F11 */ "",

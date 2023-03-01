@@ -15,9 +15,11 @@ case class ViewerContentProps(inputRef: ReactRef[BlessedElement],
 object ViewerContent extends FunctionComponent[ViewerContentProps] {
   
   private[viewer] var viewerInput: UiComponent[ViewerInputProps] = ViewerInput
+  private[viewer] var encodingsPopup: UiComponent[EncodingsPopupProps] = EncodingsPopup
 
   protected def render(compProps: Props): ReactElement = {
     val readF = useRef(Future.unit)
+    val (showEncodingsPopup, setShowEncodingsPopup) = useState(false)
     val props = compProps.wrapped
     val viewport = props.viewport
     
@@ -54,12 +56,8 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       }
     }
     
-    def onEncoding(): Unit = {
+    def onEncoding(encoding: String): Unit = {
       readF.current = readF.current.andThen { _ =>
-        val encoding =
-          if (viewport.encoding == ViewerController.defaultEnc) ViewerController.latin1Enc
-          else ViewerController.defaultEnc
-
         updated(viewport.copy(encoding = encoding))
       }
     }
@@ -75,7 +73,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
     
     def onKeypress(keyFull: String): Unit = keyFull match {
       case "f2" => onWrap()
-      case "f8" => onEncoding()
+      case "f8" => setShowEncodingsPopup(true)
       case "left" => onColumn(dx = -1)
       case "right" => onColumn(dx = 1)
       case "C-r" => onReload()
@@ -106,7 +104,18 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       <.text(
         ^.rbStyle := ViewerController.contentStyle,
         ^.content := viewport.content
-      )()
+      )(),
+
+      if (showEncodingsPopup) Some {
+        <(encodingsPopup())(^.wrapped := EncodingsPopupProps(
+          encoding = props.viewport.encoding,
+          onApply = onEncoding,
+          onClose = { () =>
+            setShowEncodingsPopup(false)
+          }
+        ))()
+      }
+      else None
     )
   }
 }
