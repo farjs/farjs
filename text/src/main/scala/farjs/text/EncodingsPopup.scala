@@ -1,10 +1,8 @@
-package farjs.viewer
+package farjs.text
 
 import farjs.ui.popup._
 import scommons.react._
 import scommons.react.hooks._
-
-import scala.scalajs.js
 
 case class EncodingsPopupProps(encoding: String,
                                onApply: String => Unit,
@@ -12,18 +10,14 @@ case class EncodingsPopupProps(encoding: String,
 
 object EncodingsPopup extends FunctionComponent[EncodingsPopupProps] {
 
-  private[viewer] var listPopup: UiComponent[ListPopupProps] = ListPopup
+  private[text] var listPopup: UiComponent[ListPopupProps] = ListPopup
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val (origEncoding, _) = useState(props.encoding)
     val (maybeItems, setItems) = useState(Option.empty[List[String]])
 
     useLayoutEffect({ () =>
-      setItems(Some(List(
-        "utf-8",
-        "latin1"
-      )))
+      setItems(Some(Encoding.encodings))
       ()
     }, Nil)
 
@@ -31,19 +25,15 @@ object EncodingsPopup extends FunctionComponent[EncodingsPopupProps] {
       <(listPopup())(^.wrapped := ListPopupProps(
         title = "Encodings",
         items = items,
-        onAction = { _ =>
-          props.onClose()
-        },
-        onClose = { () =>
-          if (origEncoding != props.encoding) {
-            props.onApply(origEncoding)
+        onAction = { index =>
+          val enc = items(index)
+          if (enc != props.encoding) {
+            props.onApply(enc)
           }
           props.onClose()
         },
-        selected = math.max(items.indexOf(props.encoding), 0),
-        onSelect = { index =>
-          props.onApply(items(index))
-        }: js.Function1[Int, Unit]
+        onClose = props.onClose,
+        selected = math.max(items.indexOf(props.encoding), 0)
       ))()
     }.orNull
   }

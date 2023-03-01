@@ -1,7 +1,7 @@
-package farjs.viewer
+package farjs.text
 
+import farjs.text.EncodingsPopup._
 import farjs.ui.popup.ListPopupProps
-import farjs.viewer.EncodingsPopup._
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
@@ -10,63 +10,33 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
 
   EncodingsPopup.listPopup = mockUiComponent("ListPopup")
 
-  it should "call onApply when onSelect" in {
-    //given
-    val onApply = mockFunction[String, Unit]
-    val props = getEncodingsPopupProps(onApply = onApply)
-
-    val result = createTestRenderer(<(EncodingsPopup())(^.wrapped := props)()).root
-
-    eventually {
-      findComponentProps(result, listPopup)
-    }.map { popup =>
-      //then
-      onApply.expects("latin1")
-
-      //when
-      popup.onSelect.get(1)
-
-      Succeeded
-    }
-  }
-
-  it should "call onApply with original encoding when onClose" in {
+  it should "call onApply with new encoding when onAction" in {
     //given
     val onApply = mockFunction[String, Unit]
     val onClose = mockFunction[Unit]
     val props = getEncodingsPopupProps(onApply = onApply, onClose = onClose)
-    val origEncoding = props.encoding
 
     val renderer = createTestRenderer(<(EncodingsPopup())(^.wrapped := props)())
 
     eventually {
       findComponentProps(renderer.root, listPopup)
-    }.flatMap { popup =>
-      TestRenderer.act { () =>
-        renderer.update(<(EncodingsPopup())(^.wrapped := props.copy(encoding = "latin1"))())
-      }
-      eventually {
-        val popup = findComponentProps(renderer.root, listPopup)
-        popup.selected shouldBe 1
-        popup
-      }
     }.map { popup =>
       //then
-      onApply.expects(origEncoding)
+      onApply.expects("big5")
       onClose.expects()
 
       //when
-      popup.onClose()
+      popup.onAction(1)
 
       Succeeded
     }
   }
 
-  it should "not call onApply if same encoding when onClose" in {
+  it should "not call onApply if same encoding when onAction" in {
     //given
     val onApply = mockFunction[String, Unit]
     val onClose = mockFunction[Unit]
-    val props = getEncodingsPopupProps(onApply = onApply, onClose = onClose)
+    val props = getEncodingsPopupProps(encoding = "big5", onApply = onApply, onClose = onClose)
 
     val result = createTestRenderer(<(EncodingsPopup())(^.wrapped := props)()).root
 
@@ -78,26 +48,6 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       onClose.expects()
 
       //when
-      popup.onClose()
-
-      Succeeded
-    }
-  }
-
-  it should "call onClose when onAction" in {
-    //given
-    val onClose = mockFunction[Unit]
-    val props = getEncodingsPopupProps(onClose = onClose)
-
-    val result = createTestRenderer(<(EncodingsPopup())(^.wrapped := props)()).root
-
-    eventually {
-      findComponentProps(result, listPopup)
-    }.map { popup =>
-      //then
-      onClose.expects()
-
-      //when
       popup.onAction(1)
 
       Succeeded
@@ -106,7 +56,7 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
 
   it should "render popup" in {
     //given
-    val props = getEncodingsPopupProps(encoding = "latin1")
+    val props = getEncodingsPopupProps(encoding = "big5")
     
     //when
     val result = createTestRenderer(<(EncodingsPopup())(^.wrapped := props)()).root
@@ -119,7 +69,7 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     }
   }
   
-  private def getEncodingsPopupProps(encoding: String = "utf-8",
+  private def getEncodingsPopupProps(encoding: String = "utf8",
                                      onApply: String => Unit = _ => (),
                                      onClose: () => Unit = () => ()): EncodingsPopupProps = {
     EncodingsPopupProps(
@@ -135,9 +85,10 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
 
     assertComponents(result.children, List(
       <(listPopup())(^.assertWrapped(inside(_) {
-        case ListPopupProps(title, resItems, _, _, resSelected, _, _, footer, textPaddingLeft, textPaddingRight) =>
+        case ListPopupProps(title, resItems, _, onClose, resSelected, _, _, footer, textPaddingLeft, textPaddingRight) =>
           title shouldBe "Encodings"
-          resItems shouldBe List("utf-8", "latin1")
+          resItems shouldBe Encoding.encodings
+          onClose should be theSameInstanceAs props.onClose
           resSelected shouldBe selected
           footer shouldBe None
           textPaddingLeft shouldBe 2

@@ -1,5 +1,6 @@
 package farjs.viewer
 
+import farjs.text.Encoding
 import farjs.viewer.ViewerFileReader.fs
 import scommons.nodejs
 import scommons.nodejs.raw.FSConstants
@@ -61,18 +62,18 @@ class ViewerFileReader(bufferSize: Int = 64 * 1024,
       else {
         val (line, bytes) =
           if (rightNewLineIdx < 0) {
-            val line = suffix.toString(encoding)
+            val line = Encoding.decode(suffix, encoding, start = 0, end = suffix.length)
             val bytes = suffix.length
             (line, bytes)
           }
           else {
             if (leftNewLineIdx < 0) {
-              val line = suffix.toString(encoding, start = 0, end = rightNewLineIdx)
+              val line = Encoding.decode(suffix, encoding, start = 0, end = rightNewLineIdx)
               val bytes = suffix.length
               (line, bytes)
             }
             else {
-              val line = suffix.toString(encoding, start = leftNewLineIdx + 1, end = rightNewLineIdx)
+              val line = Encoding.decode(suffix, encoding, start = leftNewLineIdx + 1, end = rightNewLineIdx)
               val bytes = suffix.length - leftNewLineIdx - 1
               (line, bytes)
             }
@@ -104,7 +105,7 @@ class ViewerFileReader(bufferSize: Int = 64 * 1024,
         if (res.length < lines && from > 0) loop(from)
         else {
           if (res.length < lines && leftBuf != null) {
-            val line = leftBuf.toString(encoding, 0, leftBuf.length)
+            val line = Encoding.decode(leftBuf, encoding, start = 0, end = leftBuf.length)
             val bytes = leftBuf.length
             res.prepend((line.trim, bytes))
           }
@@ -133,12 +134,12 @@ class ViewerFileReader(bufferSize: Int = 64 * 1024,
       else {
         val (line, bytes) =
           if (newLineIndex < 0) {
-            val line = prefix.toString(encoding)
+            val line = Encoding.decode(prefix, encoding, start = 0, end = prefix.length)
             val bytes = prefix.length
             (line, bytes)
           }
           else {
-            val line = buf.toString(encoding, start = 0, end = newLineIndex)
+            val line = Encoding.decode(prefix, encoding, start = 0, end = newLineIndex)
             val bytes = newLineIndex + 1
             (line, bytes)
           }
@@ -166,7 +167,7 @@ class ViewerFileReader(bufferSize: Int = 64 * 1024,
         if (res.length < lines && buf.length > 0) loop(position + buf.length)
         else {
           if (res.length < lines && leftBuf != null) {
-            val line = leftBuf.toString(encoding, 0, leftBuf.length)
+            val line = Encoding.decode(leftBuf, encoding, start = 0, end = leftBuf.length)
             val bytes = leftBuf.length
             res.append((line, bytes))
           }

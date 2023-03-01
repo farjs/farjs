@@ -51,6 +51,8 @@ jobs:
           D:/a/farjs/farjs/fs/target/scala-2.13/scalajs-bundler/test/package-lock.json
           D:/a/farjs/farjs/archiver/target/scala-2.13/scalajs-bundler/test/node_modules
           D:/a/farjs/farjs/archiver/target/scala-2.13/scalajs-bundler/test/package-lock.json
+          D:/a/farjs/farjs/text/target/scala-2.13/scalajs-bundler/test/node_modules
+          D:/a/farjs/farjs/text/target/scala-2.13/scalajs-bundler/test/package-lock.json
           D:/a/farjs/farjs/viewer/target/scala-2.13/scalajs-bundler/test/node_modules
           D:/a/farjs/farjs/viewer/target/scala-2.13/scalajs-bundler/test/package-lock.json
           D:/a/farjs/farjs/copymove/target/scala-2.13/scalajs-bundler/test/node_modules

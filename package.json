@@ -61,7 +61,8 @@
     "react-redux": "^7.2.4",
     "redux": "^3.6.0",
     "websql": "2.0.3",
-    "module-alias": "2.2.2"
+    "module-alias": "2.2.2",
+    "iconv-lite": "0.6.3"
   },
   "devDependencies": {
   }

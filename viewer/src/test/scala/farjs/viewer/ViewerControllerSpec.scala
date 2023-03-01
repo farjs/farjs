@@ -87,7 +87,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     eventually {
       inside(resViewport) {
         case ViewerFileViewport(_, encoding, size, width, height, wrap, column, position, linesData) =>
-          encoding shouldBe "utf-8"
+          encoding shouldBe "utf8"
           size shouldBe props.size
           width shouldBe 0
           height shouldBe 0

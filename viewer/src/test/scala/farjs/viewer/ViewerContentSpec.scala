@@ -1,5 +1,6 @@
 package farjs.viewer
 
+import farjs.text.EncodingsPopupProps
 import farjs.viewer.ViewerContent._
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}

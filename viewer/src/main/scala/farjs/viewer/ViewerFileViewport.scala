@@ -1,7 +1,7 @@
 package farjs.viewer
 
+import farjs.text.Encoding
 import farjs.ui.UI
-import scommons.nodejs.Buffer
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -103,7 +103,7 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
         if (line.length <= width) res.append(data)
         else {
           val prefix = line.take(width)
-          val prefixBytes = Buffer.byteLength(prefix, encoding)
+          val prefixBytes = Encoding.byteLength(prefix, encoding)
           res.append((prefix, prefixBytes))
 
           loop((line.drop(width), math.max(bytes - prefixBytes, 0)))
