@@ -1,6 +1,7 @@
 package farjs.viewer
 
 import farjs.filelist.FileListActions.FileListTaskAction
+import farjs.text.Encoding
 import farjs.ui.WithSizeProps
 import farjs.viewer.ViewerController._
 import org.scalactic.source.Position
@@ -87,7 +88,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     eventually {
       inside(resViewport) {
         case ViewerFileViewport(_, encoding, size, width, height, wrap, column, position, linesData) =>
-          encoding shouldBe "utf8"
+          encoding shouldBe Encoding.platformEncoding
           size shouldBe props.size
           width shouldBe 0
           height shouldBe 0

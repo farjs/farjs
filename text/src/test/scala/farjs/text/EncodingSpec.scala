@@ -1,15 +1,28 @@
 package farjs.text
 
+import farjs.text.Encoding.{unixDefault, winDefault}
 import farjs.text.raw.Iconv
-import scommons.nodejs.Buffer
+import scommons.nodejs.{Buffer, process}
+import scommons.nodejs.Process.Platform
 import scommons.nodejs.test._
 
 class EncodingSpec extends TestSpec {
 
   it should "return list of supported encodings" in {
     //when & then
-    Encoding.encodings should contain ("utf8")
-    Encoding.encodings should contain ("win1252")
+    Encoding.encodings should contain (unixDefault)
+    Encoding.encodings should contain (winDefault)
+  }
+
+  it should "return platform encoding" in {
+    //when & then
+    Encoding.platformEncoding shouldBe Encoding.getByPlatform(process.platform)
+
+    //when & then
+    Encoding.getByPlatform(Platform.win32) shouldBe winDefault
+    Encoding.getByPlatform(Platform.darwin) shouldBe unixDefault
+    Encoding.getByPlatform(Platform.linux) shouldBe unixDefault
+    Encoding.getByPlatform(Platform.aix) shouldBe unixDefault
   }
 
   it should "support Buffer encoding when decode" in {

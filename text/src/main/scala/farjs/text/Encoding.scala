@@ -1,10 +1,14 @@
 package farjs.text
 
 import farjs.text.raw.Iconv
-import scommons.nodejs.Buffer
+import scommons.nodejs.Process.Platform
+import scommons.nodejs.{Buffer, process}
 
 object Encoding {
   
+  private[text] val winDefault = "win1251"
+  private[text] val unixDefault = "utf8"
+
   lazy val encodings: List[String] = {
     //TODO: load encodings from iconv-lite, see:
     //  https://github.com/ashtuchkin/iconv-lite/issues/289
@@ -48,9 +52,9 @@ object Encoding {
       "utf32le",
       "utf7",
       "utf7imap",
-      "utf8",
+      unixDefault,
       "win1250",
-      "win1251",
+      winDefault,
       "win1252",
       "win1253",
       "win1254",
@@ -59,6 +63,13 @@ object Encoding {
       "win1257",
       "win1258"
     )
+  }
+  
+  lazy val platformEncoding: String = getByPlatform(process.platform)
+
+  private[text] def getByPlatform(platform: Platform): String = {
+    if (platform == Platform.win32) winDefault
+    else unixDefault
   }
 
   def decode(buf: Buffer, encoding: String, start: Int, end: Int): String = {

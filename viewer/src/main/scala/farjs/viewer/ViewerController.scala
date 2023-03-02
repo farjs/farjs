@@ -1,6 +1,7 @@
 package farjs.viewer
 
 import farjs.filelist.FileListActions.FileListTaskAction
+import farjs.text.Encoding
 import farjs.ui.theme.Theme
 import farjs.ui.{WithSize, WithSizeProps}
 import scommons.react._
@@ -35,7 +36,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
         val openF = fileReader.open(props.filePath).map { _ =>
           props.setViewport(Some(ViewerFileViewport(
             fileReader = fileReader,
-            encoding = defaultEnc,
+            encoding = Encoding.platformEncoding,
             size = props.size,
             width = 0,
             height = 0
@@ -92,8 +93,6 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
       )
     })()
   }
-
-  private[viewer] lazy val defaultEnc = "utf8"
 
   private[viewer] lazy val contentStyle: BlessedStyle = {
     val style = Theme.current.fileList.regularItem
