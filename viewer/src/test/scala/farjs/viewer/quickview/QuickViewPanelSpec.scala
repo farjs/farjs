@@ -8,7 +8,7 @@ import farjs.ui.theme.Theme
 import farjs.ui.{TextAlign, TextLineProps}
 import farjs.viewer.quickview.QuickViewPanel._
 import org.scalatest.Assertion
-import scommons.nodejs.test.AsyncTestSpec
+import scommons.nodejs.path
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.redux.Dispatch
@@ -16,13 +16,13 @@ import scommons.react.test._
 
 import scala.scalajs.js
 
-class QuickViewPanelSpec extends AsyncTestSpec with BaseTestSpec
-  with TestRendererUtils {
+class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
 
   QuickViewPanel.doubleBorderComp = mockUiComponent("DoubleBorder")
   QuickViewPanel.horizontalLineComp = mockUiComponent("HorizontalLine")
   QuickViewPanel.textLineComp = mockUiComponent("TextLine")
   QuickViewPanel.quickViewDirComp = mockUiComponent("QuickViewDir")
+  QuickViewPanel.quickViewFileComp = mockUiComponent("QuickViewFile")
 
   private val currComp = "QuickViewPanel".asInstanceOf[ReactClass]
   private val (width, height) = (25, 15)
@@ -39,20 +39,32 @@ class QuickViewPanelSpec extends AsyncTestSpec with BaseTestSpec
     var stackState = List[PanelStackItem[QuickViewParams]](
       PanelStackItem(currComp, None, None, Some(QuickViewParams()))
     )
-    val leftStack = new PanelStack(isActive = false, stackState, { f =>
-      stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]
-    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
-    val rightStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
-    ), null)
+    val leftPanelStack = PanelStackProps(
+      isRight = false,
+      panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
+      stack = new PanelStack(isActive = false, stackState, { f =>
+        stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]
+      }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit),
+      width = width,
+      height = height
+    )
+    val rightPanelStack = PanelStackProps(
+      isRight = true,
+      panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
+      stack = new PanelStack(isActive = true, List(
+        PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
+      ), null),
+      width = width,
+      height = height
+    )
 
     //when
     val result = testRender(
-      withContext(isRight = false, leftStack, rightStack, <(QuickViewPanel())()())
+      withContext(isRight = false, leftPanelStack, rightPanelStack, <(QuickViewPanel())()())
     )
 
     //then
-    assertFileListQuickView(result, dispatch, actions, state, leftStack, FileListItem.currDir)
+    assertFileListQuickView(result, dispatch, actions, state, leftPanelStack, FileListItem.currDir)
   }
 
   it should "render file view" in {
@@ -68,37 +80,49 @@ class QuickViewPanelSpec extends AsyncTestSpec with BaseTestSpec
     var stackState = List[PanelStackItem[QuickViewParams]](
       PanelStackItem(currComp, None, None, Some(QuickViewParams()))
     )
-    val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
-    ), null)
-    val rightStack = new PanelStack(isActive = false, stackState, { f =>
-      stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]
-    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
+    val leftPanelStack = PanelStackProps(
+      isRight = false,
+      panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
+      stack = new PanelStack(isActive = true, List(
+        PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
+      ), null),
+      width = width,
+      height = height
+    )
+    val rightPanelStack = PanelStackProps(
+      isRight = true,
+      panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
+      stack = new PanelStack(isActive = false, stackState, { f =>
+        stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]
+      }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit),
+      width = width,
+      height = height
+    )
 
     //when
     val result = testRender(
-      withContext(isRight = true, leftStack, rightStack, <(QuickViewPanel())()())
+      withContext(isRight = true, leftPanelStack, rightPanelStack, <(QuickViewPanel())()())
     )
 
     //then
-    assertFileListQuickView(result, dispatch, actions, state, rightStack, file)
+    assertFileListQuickView(result, dispatch, actions, state, rightPanelStack, file)
   }
 
   private def withContext(isRight: Boolean,
-                          leftStack: PanelStack,
-                          rightStack: PanelStack,
+                          leftPanelStack: PanelStackProps,
+                          rightPanelStack: PanelStackProps,
                           element: ReactElement): ReactElement = {
 
     WithPanelStacksSpec.withContext(
-      PanelStackSpec.withContext(
-        element = element,
-        isRight = isRight,
-        stack = if (isRight) rightStack else leftStack,
-        width = width,
-        height = height
+      <(PanelStack.Context.Provider)(^.contextValue := {
+        if (isRight) rightPanelStack else leftPanelStack
+      })(
+        element
       ),
-      leftStack,
-      rightStack
+      leftStack = leftPanelStack.stack,
+      rightStack = rightPanelStack.stack,
+      leftInput = leftPanelStack.panelInput,
+      rightInput = rightPanelStack.panelInput
     )
   }
   
@@ -106,7 +130,7 @@ class QuickViewPanelSpec extends AsyncTestSpec with BaseTestSpec
                                       dispatch: Dispatch,
                                       actions: FileListActions,
                                       state: FileListState,
-                                      stack: PanelStack,
+                                      panelStack: PanelStackProps,
                                       currItem: FileListItem): Assertion = {
 
     val theme = Theme.current.fileList
@@ -155,19 +179,28 @@ class QuickViewPanelSpec extends AsyncTestSpec with BaseTestSpec
             resDispatch shouldBe dispatch
             resActions shouldBe actions
             resState shouldBe state
-            resStack shouldBe stack
+            resStack shouldBe panelStack.stack
             resWidth shouldBe width
             resCurrItem shouldBe currItem
         }
       }
       else {
         assertNativeComponent(content,
-          <.text(
-            ^.rbLeft := 2,
-            ^.rbTop := 4,
-            ^.rbStyle := theme.regularItem,
-            ^.content := "TODO: Display file's content here"
-          )()
+          <.box(
+            ^.rbLeft := 1,
+            ^.rbTop := 1,
+            ^.rbWidth := width - 2,
+            ^.rbHeight := height - 5,
+            ^.rbStyle := theme.regularItem
+          )(
+            <(quickViewFileComp())(^assertWrapped(inside(_) {
+              case QuickViewFileProps(resDispatch, resPanelStack, filePath, size) =>
+                resDispatch shouldBe dispatch
+                resPanelStack shouldBe panelStack
+                filePath shouldBe path.join(state.currDir.path, currItem.name)
+                size shouldBe currItem.size
+            }))()
+          )
         )
       }
       

@@ -17,15 +17,10 @@ class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
     val (viewport, setViewport) = useState(Option.empty[ViewerFileViewport])
     val props = compProps.plain
 
-    val onExit: () => Unit = { () =>
-      viewport.foreach(_.fileReader.close())
-      props.onClose()
-    }
-
     def onKeypress(keyFull: String): Boolean = {
       var processed = true
       keyFull match {
-        case "f3" | "f10" => onExit()
+        case "f3" | "f10" => props.onClose()
         case _ => processed = false
       }
       processed
@@ -53,7 +48,7 @@ class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
         items
     }
 
-    <(popupComp())(^.wrapped := PopupProps(onClose = onExit, onKeypress = onKeypress))(
+    <(popupComp())(^.wrapped := PopupProps(onClose = props.onClose, onKeypress = onKeypress))(
       <.box(
         ^.rbClickable := true,
         ^.rbAutoFocus := false

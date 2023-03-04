@@ -7,7 +7,6 @@ import farjs.viewer.ViewerPluginUi._
 import scommons.react.blessed._
 import scommons.react.test._
 
-import scala.concurrent.Future
 import scala.scalajs.js
 
 class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
@@ -17,25 +16,15 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
   ViewerPluginUi.viewerController = mockUiComponent("ViewerController")
   ViewerPluginUi.bottomMenuComp = mockUiComponent("BottomMenu")
 
-  //noinspection TypeAnnotation
-  class ViewerFileReader {
-    val close = mockFunction[Future[Unit]]
-
-    val fileReader = new MockViewerFileReader(
-      closeMock = close
-    )
-  }
-
   it should "call onClose when onClose" in {
     //given
-    val fileReader = new ViewerFileReader
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
     val pluginUi = new ViewerPluginUi(dispatch, "item 1", 123)
     val props = FileListPluginUiProps(onClose = onClose)
     val renderer = createTestRenderer(<(pluginUi())(^.plain := props)())
     val viewport = ViewerFileViewport(
-      fileReader = fileReader.fileReader,
+      fileReader = new MockViewerFileReader,
       encoding = "utf-8",
       size = 123,
       width = 1,
@@ -45,7 +34,6 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     val popupProps = findComponentProps(renderer.root, popupComp)
     
     //then
-    fileReader.close.expects()
     onClose.expects()
 
     //when
@@ -54,14 +42,13 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
   it should "call onClose when onKeypress(F10)" in {
     //given
-    val fileReader = new ViewerFileReader
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
     val pluginUi = new ViewerPluginUi(dispatch, "item 1", 0)
     val props = FileListPluginUiProps(onClose = onClose)
     val renderer = createTestRenderer(<(pluginUi())(^.plain := props)())
     val viewport = ViewerFileViewport(
-      fileReader = fileReader.fileReader,
+      fileReader = new MockViewerFileReader,
       encoding = "utf-8",
       size = 123,
       width = 1,
@@ -71,7 +58,6 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     val popupProps = findComponentProps(renderer.root, popupComp)
     
     //then
-    fileReader.close.expects()
     onClose.expects()
 
     //when
@@ -103,7 +89,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     val renderer = createTestRenderer(<(pluginUi())(^.plain := props)())
     val viewerProps = findComponentProps(renderer.root, viewerController)
     val viewport = ViewerFileViewport(
-      fileReader = new ViewerFileReader().fileReader,
+      fileReader = new MockViewerFileReader(),
       encoding = "utf-8",
       size = 110,
       width = 1,

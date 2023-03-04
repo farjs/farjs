@@ -103,6 +103,8 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       onKeypress = onKeypress
     ))(
       <.text(
+        ^.rbWidth := viewport.width,
+        ^.rbHeight := viewport.height,
         ^.rbStyle := ViewerController.contentStyle,
         ^.content := viewport.content
       )(),

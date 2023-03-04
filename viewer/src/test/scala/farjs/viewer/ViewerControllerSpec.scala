@@ -24,9 +24,11 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
   //noinspection TypeAnnotation
   class FSMocks {
     val openSync = mockFunction[String, Int, Int]
+    val closeSync = mockFunction[Int, Unit]
 
     val fs = new MockFS(
-      openSyncMock = openSync
+      openSyncMock = openSync,
+      closeSyncMock = closeSync
     )
   }
 
@@ -61,7 +63,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     }
   }
   
-  it should "create viewport if not provided when mount" in {
+  it should "open/close viewport file when mount/unmount" in {
     //given
     val fs = new FSMocks
     ViewerFileReader.fs = fs.fs
@@ -98,41 +100,10 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
           linesData shouldBe Nil
       }
     }.map { _ =>
-      //cleanup
-      TestRenderer.act { () =>
-        renderer.unmount()
-      }
-      Succeeded
-    }
-  }
-
-  it should "not create viewport if provided when mount" in {
-    //given
-    val fs = new FSMocks
-    ViewerFileReader.fs = fs.fs
-    val inputRef = ReactRef.create[BlessedElement]
-    val dispatch = mockFunction[Any, Any]
-    val viewport = ViewerFileViewport(
-      fileReader = new MockViewerFileReader,
-      encoding = "win",
-      size = 123,
-      width = 1,
-      height = 2
-    )
-    val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, Some(viewport))
-
-    //then
-    fs.openSync.expects(*, *).never()
-
-    //when
-    val renderer = createTestRenderer(<(ViewerController())(^.wrapped := props)())
-
-    //then
-    assertViewerController(renderer.root, props)
-    eventually {
-      assertViewerController(renderer.root, props)
-    }.map { _ =>
-      //cleanup
+      //then
+      fs.closeSync.expects(fd)
+      
+      //when
       TestRenderer.act { () =>
         renderer.unmount()
       }
@@ -146,7 +117,11 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     ViewerFileReader.fs = fs.fs
     val inputRef = ReactRef.create[BlessedElement]
     val dispatch = mockFunction[Any, Any]
-    val viewport = ViewerFileViewport(
+    val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None)
+    fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).returning(123)
+    val renderer = createTestRenderer(<(ViewerController())(^.wrapped := props)())
+
+    val updatedProps = props.copy(viewport = Some(ViewerFileViewport(
       fileReader = new MockViewerFileReader,
       encoding = "win",
       size = 123,
@@ -157,14 +132,15 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
         "test" -> 4,
         "test content" -> 12
       )
-    )
-    val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, Some(viewport))
+    )))
 
     //when
-    val renderer = createTestRenderer(<(ViewerController())(^.wrapped := props)())
+    TestRenderer.act { () =>
+      renderer.update(<(ViewerController())(^.wrapped := updatedProps)())
+    }
 
     //then
-    assertViewerController(renderer.root, props, scrollIndicators = List(1))
+    assertViewerController(renderer.root, updatedProps, scrollIndicators = List(1))
   }
 
   private def assertViewerController(result: TestInstance,

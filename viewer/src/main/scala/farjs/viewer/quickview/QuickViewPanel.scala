@@ -6,6 +6,7 @@ import farjs.filelist.stack.{PanelStack, WithPanelStacks}
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.theme.Theme
+import scommons.nodejs.path
 import scommons.react._
 import scommons.react.blessed._
 
@@ -15,6 +16,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
   private[quickview] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
   private[quickview] var textLineComp: UiComponent[TextLineProps] = TextLine
   private[quickview] var quickViewDirComp: UiComponent[QuickViewDirProps] = QuickViewDir
+  private[quickview] var quickViewFileComp: UiComponent[QuickViewFileProps] = QuickViewFile
 
   protected def render(compProps: Props): ReactElement = {
     val stacks = WithPanelStacks.usePanelStacks
@@ -70,12 +72,24 @@ object QuickViewPanel extends FunctionComponent[Unit] {
             ))()
           }
           else {
-            <.text(
-              ^.rbLeft := 2,
-              ^.rbTop := 4,
-              ^.rbStyle := theme.regularItem,
-              ^.content := "TODO: Display file's content here"
-            )()
+            val filePath = path.join(state.currDir.path, currItem.name)
+            <.box(
+              ^.rbLeft := 1,
+              ^.rbTop := 1,
+              ^.rbWidth := width - 2,
+              ^.rbHeight := height - 5,
+              ^.rbStyle := theme.regularItem
+            )(
+              <(quickViewFileComp())(
+                ^.key := filePath,
+                ^.wrapped := QuickViewFileProps(
+                  dispatch = dispatch,
+                  panelStack = panelStack,
+                  filePath = filePath,
+                  size = currItem.size
+                )
+              )()
+            )
           },
 
           <.text(

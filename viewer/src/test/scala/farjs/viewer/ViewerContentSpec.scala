@@ -587,6 +587,8 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
         assertNativeComponent(text,
           <.text(
+            ^.rbWidth := props.viewport.width,
+            ^.rbHeight := props.viewport.height,
             ^.rbStyle := ViewerController.contentStyle,
             ^.content := content
           )()

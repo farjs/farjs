@@ -31,22 +31,24 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
     val props = compProps.wrapped
     
     useLayoutEffect({ () =>
-      if (props.viewport.isEmpty) {
-        val fileReader = new ViewerFileReader
-        val openF = fileReader.open(props.filePath).map { _ =>
-          props.setViewport(Some(ViewerFileViewport(
-            fileReader = fileReader,
-            encoding = Encoding.platformEncoding,
-            size = props.size,
-            width = 0,
-            height = 0
-          )))
-        }
-        openF.andThen { case Failure(NonFatal(_)) =>
-          props.dispatch(FileListTaskAction(FutureTask("Opening file", openF)))
-        }
+      val fileReader = new ViewerFileReader
+      val openF = fileReader.open(props.filePath).map { _ =>
+        props.setViewport(Some(ViewerFileViewport(
+          fileReader = fileReader,
+          encoding = Encoding.platformEncoding,
+          size = props.size,
+          width = 0,
+          height = 0
+        )))
       }
-      ()
+      openF.andThen { case Failure(NonFatal(_)) =>
+        props.dispatch(FileListTaskAction(FutureTask("Opening file", openF)))
+      }
+
+      val cleanup: js.Function0[Unit] = { () =>
+        fileReader.close()
+      }
+      cleanup
     }, Nil)
 
     <(withSizeComp())(^.plain := WithSizeProps { (width, height) =>
