@@ -23,7 +23,7 @@ object LogController extends FunctionComponent[LogControllerProps] {
       oldLogRef.current = g.console.log
       oldErrorRef.current = g.console.error
       val log: js.Function1[String, Unit] = { msg: String =>
-        setContent(c => c.takeRight(1000) + s"$msg\n")
+        setContent(c => c.takeRight(64 * 1024) + s"$msg\n")
       }
       g.console.log = log
       g.console.error = log

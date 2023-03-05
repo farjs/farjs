@@ -38,6 +38,7 @@ object FarjsApp {
       val screen = Blessed.screen(new BlessedScreenConfig {
         override val autoPadding = true
         override val smartCSR = true
+        override val tabSize = 1
         override val cursorShape = "underline"
       })
       val screenObj = screen.asInstanceOf[js.Dynamic]
