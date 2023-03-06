@@ -22,6 +22,16 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
     linesData.foldLeft(buf) { case (buf, (line, _)) =>
       buf.append(line.slice(column, column + width)).append(UI.newLine)
     }
+    buf.mapInPlace { origChar =>
+      val c = (origChar & 0xff).toChar // normalize character
+      val isControl =
+        (c >= 0x00 && c <= 0x1f) || // non-printable
+          c == 0x7f ||              // <DEL>
+          c == 0xad                 // Soft Hyphen (SHY)
+
+      if (isControl && c != '\t' && c != '\r' && c != '\n') ' '
+      else origChar
+    }
     buf.toString()
   }
 
