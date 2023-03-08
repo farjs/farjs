@@ -1,7 +1,6 @@
 package farjs.viewer
 
 import farjs.text.Encoding
-import farjs.ui.UI
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -18,16 +17,20 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
                               linesData: List[(String, Int)] = Nil) {
   
   lazy val content: String = {
-    val buf = new StringBuilder()
+    val buf = new mutable.StringBuilder()
     linesData.foldLeft(buf) { case (buf, (line, _)) =>
-      buf.append(line.slice(column, column + width)).append(UI.newLine)
+      buf.append(line.slice(column, column + width)).append('\n')
     }
     buf.mapInPlace { origChar =>
       val c = (origChar & 0xff).toChar // normalize character
       val isControl =
-        (c >= 0x00 && c <= 0x1f) || // non-printable
-          c == 0x7f ||              // <DEL>
-          c == 0xad                 // Soft Hyphen (SHY)
+        c == 0x00 ||   // nul
+          c == 0x07 || // bel
+          c == 0x08 || // backspace
+          c == 0x0b || // vertical tab
+          c == 0x1b || // ESC
+          c == 0x7f || // <DEL>
+          c == 0xad    // Soft Hyphen (SHY)
 
       if (isControl && c != '\t' && c != '\r' && c != '\n') ' '
       else origChar

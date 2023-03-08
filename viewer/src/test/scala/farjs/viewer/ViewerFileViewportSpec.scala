@@ -1,6 +1,5 @@
 package farjs.viewer
 
-import farjs.ui.UI
 import scommons.nodejs.test.TestSpec
 
 class ViewerFileViewportSpec extends TestSpec {
@@ -21,8 +20,8 @@ class ViewerFileViewportSpec extends TestSpec {
     
     //when & then
     viewport.content shouldBe {
-      "\t\rline1\n   " + UI.newLine +
-        " line2" + UI.newLine
+      "\t\rline1\n   " + "\n" +
+        " line2" + "\n"
     }
   }
 }

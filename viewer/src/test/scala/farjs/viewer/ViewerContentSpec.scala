@@ -48,7 +48,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         }
       }
     }.anyNumberOfTimes()
-    assertViewerContent(renderer.root, props, content = "")
+    assertViewerContent(renderer.root, props, content = Nil)
   }
 
   it should "not move viewport if not completed when onWheel(up/down)" in {
@@ -71,7 +71,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         }
       }
     }
-    assertViewerContent(renderer.root, props, content = "")
+    assertViewerContent(renderer.root, props, content = Nil)
 
     //then
     fileReader.readPrevLines.expects(*, *, *, *).never()
@@ -84,12 +84,12 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     findComponentProps(renderer.root, viewerInput).onWheel(false)
 
     //then
-    assertViewerContent(renderer.root, props, content = "")
+    assertViewerContent(renderer.root, props, content = Nil)
     readP.success("completed".split('\n').map(c => (c, c.length)).toList)
     eventually {
-      assertViewerContent(renderer.root, props,
-        """completed
-          |""".stripMargin)
+      assertViewerContent(renderer.root, props, List(
+        "completed"
+      ))
     }
   }
 
@@ -98,7 +98,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val ctx = new TestContext
     import ctx._
 
-    def check(up: Boolean, lines: Int, position: Double, content: String, expected: String)
+    def check(up: Boolean, lines: Int, position: Double, content: String, expected: List[String])
              (implicit pos: Position): () => Future[Unit] = { () =>
 
       val readF = Future.successful(content.split('\n').map(c => (c, c.length)).toList)
@@ -115,24 +115,22 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }
 
     eventually {
-      assertViewerContent(renderer.root, props,
-        """test 
-          |file content
-          |""".stripMargin)
+      assertViewerContent(renderer.root, props, List(
+        "test ",
+        "file content"
+      ))
     }.flatMap { _ =>
       List(
         //when & then
-        check(up = false, lines = 1, position = 17.0, "end",
-          """file content
-            |end
-            |""".stripMargin
-        ),
-        check(up = true, lines = 1, position = 5.0, "begin",
-          """begin
-            |file content
-            |end
-            |""".stripMargin
-        )
+        check(up = false, lines = 1, position = 17.0, "end", List(
+          "file content",
+          "end"
+        )),
+        check(up = true, lines = 1, position = 5.0, "begin", List(
+          "begin",
+          "file content",
+          "end"
+        ))
       ).foldLeft(Future.unit)((res, f) => res.flatMap(_ => f())).map(_ => Succeeded)
     }
   }
@@ -142,7 +140,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val ctx = new TestContext
     import ctx._
 
-    def check(encoding: String, content: String, expected: String)
+    def check(encoding: String, content: String, expected: List[String])
              (implicit pos: Position): () => Future[Unit] = { () =>
 
       val readF = Future.successful(content.split('\n').map(c => (c, c.length)).toList)
@@ -158,24 +156,22 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }
 
     eventually {
-      assertViewerContent(renderer.root, props,
-        """test 
-          |file content
-          |""".stripMargin)
+      assertViewerContent(renderer.root, props, List(
+        "test ",
+        "file content"
+      ))
     }.flatMap { _ =>
       findComponentProps(renderer.root, viewerInput).onKeypress("f8")
       eventually(findComponentProps(renderer.root, encodingsPopup))
     }.flatMap { _ =>
       List(
         //when & then
-        check("latin1", "reload1",
-          """reload1
-            |""".stripMargin
-        ),
-        check("utf-8", "reload2",
-          """reload2
-            |""".stripMargin
-        ), { () =>
+        check("latin1", "reload1", List(
+          "reload1"
+        )),
+        check("utf-8", "reload2", List(
+          "reload2"
+        )), { () =>
           Future.successful {
             findComponentProps(renderer.root, encodingsPopup).onClose()
             findProps(renderer.root, encodingsPopup) should be (empty)
@@ -210,13 +206,13 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       }
     }.anyNumberOfTimes()
     eventually {
-      assertViewerContent(renderer.root, props,
-        """1
-          |2
-          |3
-          |4
-          |5
-          |""".stripMargin)
+      assertViewerContent(renderer.root, props, List(
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ))
     }.flatMap { _ =>
       //then
       val resF = Future.successful("2\n3\n4\n5\n\n".split('\n').map(c => (c, c.length + 1)).toList)
@@ -227,12 +223,12 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
   
       //then
       eventually {
-        assertViewerContent(renderer.root, props,
-          """2
-            |3
-            |4
-            |5
-            |""".stripMargin)
+        assertViewerContent(renderer.root, props, List(
+          "2",
+          "3",
+          "4",
+          "5"
+        ))
       }
     }
   }
@@ -242,7 +238,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val ctx = new TestContext
     import ctx._
 
-    def check(key: String, lines: Int, position: Double, content: String, expected: String, noop: Boolean = false)
+    def check(key: String, lines: Int, position: Double, content: String, expected: List[String], noop: Boolean = false)
              (implicit pos: Position): () => Future[Unit] = { () =>
 
       val readF =
@@ -267,117 +263,88 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }
 
     eventually {
-      assertViewerContent(renderer.root, props,
-        """test 
-          |file content
-          |""".stripMargin)
+      assertViewerContent(renderer.root, props, List(
+        "test ",
+        "file content"
+      ))
     }.flatMap { _ =>
       List(
         //when & then
-        check(key = "C-r", lines = viewport.height, position = 0.0, "new content",
-          """new content
-            |""".stripMargin
-        ),
-        check(key = "end", lines = viewport.height, position = viewport.size, "ending",
-          """ending
-            |""".stripMargin
-        ),
-        check(key = "home", lines = viewport.height, position = 0.0, "beginning",
-          """beginning
-            |""".stripMargin
-        ),
-        check(key = "up", lines = 1, position = 0.0, "already at the beginning",
-          """beginning
-            |""".stripMargin,
-          noop = true
-        ),
-        check(key = "down", lines = 1, position = 9, "next line 1",
-          """next line 1
-            |""".stripMargin
-        ),
-        check(key = "down", lines = 1, position = 20, "",
-          """next line 1
-            |""".stripMargin
-        ),
-        check(key = "down", lines = 1, position = 20, "line2",
-          """line2
-            |""".stripMargin
-        ),
-        check(key = "down", lines = 1, position = 25, "out of file size",
-          """line2
-            |""".stripMargin,
-          noop = true
-        ),
-        check(key = "up", lines = 1, position = 20, "prev line",
-          """prev line
-            |line2
-            |""".stripMargin
-        ),
-        check(key = "up", lines = 1, position = 11, "",
-          """prev line
-            |line2
-            |""".stripMargin
-        ),
-        check(key = "pageup", lines = viewport.height, position = 11, "1\n2\n3\n4",
-          """1
-            |2
-            |3
-            |4
-            |prev line
-            |""".stripMargin
-        ),
-        check(key = "pagedown", lines = viewport.height, position = 20, "next paaaaaaage",
-          """next paaaaaa
-            |""".stripMargin
-        ),
-        check(key = "left", lines = viewport.height, position = 20, "",
-          """next paaaaaa
-            |""".stripMargin,
-          noop = true
-        ),
-        check(key = "right", lines = viewport.height, position = 20, "",
-          """ext paaaaaaa
-            |""".stripMargin,
-          noop = true
-        ),
-        check(key = "right", lines = viewport.height, position = 20, "",
-          """xt paaaaaaag
-            |""".stripMargin,
-          noop = true
-        ),
-        check(key = "left", lines = viewport.height, position = 20, "",
-          """ext paaaaaaa
-            |""".stripMargin,
-          noop = true
-        ),
-        check(key = "f2", lines = viewport.height, position = 20, "loooooooooooong line\n",
-          """looooooooooo
-            |ong line
-            |""".stripMargin
-        ),
-        check(key = "up", lines = 1, position = 20, "prev liiiiiiiiine 1\n",
-          """iiine 1
-            |looooooooooo
-            |ong line
-            |""".stripMargin
-        ),
-        check(key = "home", lines = viewport.height, position = 0.0, "beginning",
-          """beginning
-            |""".stripMargin
-        ),
-        check(key = "down", lines = 1, position = 9, "next liiiiiiiiine 1\n",
-          """next liiiiii
-            |""".stripMargin
-        ),
-        check(key = "right", lines = viewport.height, position = 9, "",
-          """ext liiiiii
-            |""".stripMargin,
-          noop = true
-        ),
-        check(key = "f2", lines = viewport.height, position = 9, "next liiiiiiiiine 1\n",
-          """ext liiiiiii
-            |""".stripMargin
-        )
+        check(key = "C-r", lines = viewport.height, position = 0.0, "new content", List(
+          "new content"
+        )),
+        check(key = "end", lines = viewport.height, position = viewport.size, "ending", List(
+          "ending"
+        )),
+        check(key = "home", lines = viewport.height, position = 0.0, "beginning", List(
+          "beginning"
+        )),
+        check(key = "up", lines = 1, position = 0.0, "already at the beginning", List(
+          "beginning"
+        ), noop = true),
+        check(key = "down", lines = 1, position = 9, "next line 1", List(
+          "next line 1"
+        )),
+        check(key = "down", lines = 1, position = 20, "", List(
+          "next line 1"
+        )),
+        check(key = "down", lines = 1, position = 20, "line2", List(
+          "line2"
+        )),
+        check(key = "down", lines = 1, position = 25, "out of file size", List(
+          "line2"
+        ), noop = true),
+        check(key = "up", lines = 1, position = 20, "prev line", List(
+          "prev line",
+          "line2"
+        )),
+        check(key = "up", lines = 1, position = 11, "", List(
+          "prev line",
+            "line2"
+        )),
+        check(key = "pageup", lines = viewport.height, position = 11, "1\n2\n3\n4", List(
+          "1",
+          "2",
+          "3",
+          "4",
+          "prev line"
+        )),
+        check(key = "pagedown", lines = viewport.height, position = 20, "next paaaaaaage", List(
+          "next paaaaaa"
+        )),
+        check(key = "left", lines = viewport.height, position = 20, "", List(
+          "next paaaaaa"
+        ), noop = true),
+        check(key = "right", lines = viewport.height, position = 20, "", List(
+          "ext paaaaaaa"
+        ), noop = true),
+        check(key = "right", lines = viewport.height, position = 20, "", List(
+          "xt paaaaaaag"
+        ), noop = true),
+        check(key = "left", lines = viewport.height, position = 20, "", List(
+          "ext paaaaaaa"
+        ), noop = true),
+        check(key = "f2", lines = viewport.height, position = 20, "loooooooooooong line\n", List(
+          "looooooooooo",
+          "ong line"
+        )),
+        check(key = "up", lines = 1, position = 20, "prev liiiiiiiiine 1\n", List(
+          "iiine 1",
+          "looooooooooo",
+          "ong line"
+        )),
+        check(key = "home", lines = viewport.height, position = 0.0, "beginning", List(
+          "beginning",
+        )),
+        check(key = "down", lines = 1, position = 9, "next liiiiiiiiine 1\n", List(
+          "next liiiiii"
+        )),
+        check(key = "right", lines = viewport.height, position = 9, "", List(
+          "ext liiiiii"
+        ), noop = true),
+        check(key = "f2", lines = viewport.height, position = 9, "next liiiiiiiiine 1\n", List(
+          "ext liiiiiii"
+        ))
       ).foldLeft(Future.unit)((res, f) => res.flatMap(_ => f())).map(_ => Succeeded)
     }
   }
@@ -387,20 +354,20 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val ctx = new TestContext
     import ctx._
     eventually {
-      assertViewerContent(renderer.root, props,
-        """test 
-          |file content
-          |""".stripMargin)
+      assertViewerContent(renderer.root, props, List(
+        "test ",
+        "file content"
+      ))
     }.flatMap { _ =>
       //when
       findComponentProps(renderer.root, viewerInput).onKeypress("unknown")
   
       //then
       eventually {
-        assertViewerContent(renderer.root, props,
-          """test 
-            |file content
-            |""".stripMargin)
+        assertViewerContent(renderer.root, props, List(
+          "test ",
+          "file content"
+        ))
       }
     }
   }
@@ -410,10 +377,10 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val ctx = new TestContext
     import ctx._
     eventually {
-      assertViewerContent(renderer.root, props,
-        """test 
-          |file content
-          |""".stripMargin)
+      assertViewerContent(renderer.root, props, List(
+        "test ",
+        "file content"
+      ))
     }.flatMap { _ =>
       val updatedProps = props.copy(
         viewport = viewport.copy(
@@ -441,9 +408,9 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
       //then
       eventually {
-        assertViewerContent(renderer.root, updatedProps,
-          """test file content2
-            |""".stripMargin)
+        assertViewerContent(renderer.root, updatedProps, List(
+          "test file content2"
+        ))
       }
     }
   }
@@ -453,10 +420,10 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val ctx = new TestContext
     import ctx._
     eventually {
-      assertViewerContent(renderer.root, props,
-        """test 
-          |file content
-          |""".stripMargin)
+      assertViewerContent(renderer.root, props, List(
+        "test ",
+        "file content"
+      ))
     }.flatMap { _ =>
       val updatedProps = props.copy()
       updatedProps should not be theSameInstanceAs (props)
@@ -472,10 +439,10 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
       //then
       eventually {
-        assertViewerContent(renderer.root, updatedProps,
-          """test 
-            |file content
-            |""".stripMargin)
+        assertViewerContent(renderer.root, updatedProps, List(
+          "test ",
+          "file content"
+        ))
       }
     }
   }
@@ -505,12 +472,12 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         }
       }
     }
-    assertViewerContent(renderer.root, props, content = "")
+    assertViewerContent(renderer.root, props, content = Nil)
     eventually {
-      assertViewerContent(renderer.root, props,
-        """test 
-          |file content
-          |""".stripMargin)
+      assertViewerContent(renderer.root, props, List(
+        "test ",
+        "file content"
+      ))
 
       viewport.progress shouldBe percent
     }
@@ -543,11 +510,11 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         }
       }
     }
-    assertViewerContent(renderer.root, props, content = "")
+    assertViewerContent(renderer.root, props, content = Nil)
     eventually {
-      assertViewerContent(renderer.root, props,
-        """test content
-          |""".stripMargin)
+      assertViewerContent(renderer.root, props, List(
+        "test content"
+      ))
 
       viewport.progress shouldBe percent
     }
@@ -571,7 +538,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   private def assertViewerContent(result: TestInstance,
                                   props: ViewerContentProps,
-                                  content: String,
+                                  content: List[String],
                                   hasEncodingsPopup: Boolean = false
                                  )(implicit pos: Position): Assertion = {
 
@@ -590,7 +557,10 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
             ^.rbWidth := props.viewport.width,
             ^.rbHeight := props.viewport.height,
             ^.rbStyle := ViewerController.contentStyle,
-            ^.content := content
+            ^.content := {
+              if (content.isEmpty) ""
+              else s"${content.mkString("\n")}\n"
+            }
           )()
         )
         maybePopup.isDefined shouldBe hasEncodingsPopup
