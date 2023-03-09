@@ -14,7 +14,7 @@ class ViewerFileViewportSpec extends TestSpec {
       height = 3,
       linesData = List(
         "\t\rline1\n\u0000\u0008\u001b" -> 1,
-        "\u00adline2" -> 2
+        "\u007fline2" -> 2
       )
     )
     

@@ -21,19 +21,17 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
     linesData.foldLeft(buf) { case (buf, (line, _)) =>
       buf.append(line.slice(column, column + width)).append('\n')
     }
-    buf.mapInPlace { origChar =>
-      val c = (origChar & 0xff).toChar // normalize character
+    buf.mapInPlace { ch =>
       val isControl =
-        c == 0x00 ||   // nul
-          c == 0x07 || // bel
-          c == 0x08 || // backspace
-          c == 0x0b || // vertical tab
-          c == 0x1b || // ESC
-          c == 0x7f || // <DEL>
-          c == 0xad    // Soft Hyphen (SHY)
+        ch == 0x00 ||   // nul
+          ch == 0x07 || // bel
+          ch == 0x08 || // backspace
+          ch == 0x0b || // vertical tab
+          ch == 0x1b || // ESC
+          ch == 0x7f    // <DEL>
 
-      if (isControl && c != '\t' && c != '\r' && c != '\n') ' '
-      else origChar
+      if (isControl && ch != '\t' && ch != '\r' && ch != '\n') ' '
+      else ch
     }
     buf.toString()
   }
