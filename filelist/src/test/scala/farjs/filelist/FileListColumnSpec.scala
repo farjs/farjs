@@ -100,7 +100,7 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
         FileListItem("file 3"),
         FileListItem(".dir \r4", isDir = true),
         FileListItem(".file \n5"),
-        FileListItem(" file 6"),
+        FileListItem(" fileй 6"),
         FileListItem("file.zip")
       ),
       focusedIndex = 2,
@@ -118,7 +118,7 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
         |{bold}{yellow-fg}{#008-bg}file 3        {/}{bold}{#5ce-fg}{#008-bg}│{/}
         |{bold}{#055-fg}{#008-bg}.dir 4        {/}{bold}{#5ce-fg}{#008-bg}│{/}
         |{bold}{#055-fg}{#008-bg}.file 5       {/}{bold}{#5ce-fg}{#008-bg}│{/}
-        |{bold}{#5ce-fg}{#008-bg} file 6       {/}{bold}{#5ce-fg}{#008-bg}│{/}
+        |{bold}{#5ce-fg}{#008-bg} fileй 6      {/}{bold}{#5ce-fg}{#008-bg}│{/}
         |{bold}{#a05-fg}{#008-bg}file.zip      {/}{bold}{#5ce-fg}{#008-bg}│{/}""".stripMargin
     ))
     
@@ -172,6 +172,7 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
           ^.rbWidth := props.size._1 + 1,
           ^.rbTop := 1,
           ^.rbTags := true,
+          ^.rbWrap := false,
           ^.content := content
         )())
       }

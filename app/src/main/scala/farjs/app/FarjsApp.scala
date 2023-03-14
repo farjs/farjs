@@ -39,6 +39,7 @@ object FarjsApp {
         override val autoPadding = true
         override val smartCSR = true
         override val tabSize = 1
+        override val fullUnicode = true
         override val cursorShape = "underline"
       })
       val screenObj = screen.asInstanceOf[js.Dynamic]

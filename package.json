@@ -57,7 +57,7 @@
     "react-blessed": "0.7.2",
     "react": "^17.0.1",
     "blessed": "0.1.81",
-    "@farjs/blessed": "0.2.3",
+    "@farjs/blessed": "0.2.4",
     "react-redux": "^7.2.4",
     "redux": "^3.6.0",
     "websql": "2.0.3",

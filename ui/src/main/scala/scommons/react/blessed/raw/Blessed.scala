@@ -5,6 +5,7 @@ import scommons.react.blessed.TerminalName
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport
+import scala.scalajs.js.|
 
 @js.native
 @JSImport("@farjs/blessed", JSImport.Default)
@@ -13,6 +14,20 @@ object Blessed extends js.Object {
   def screen(config: BlessedScreenConfig): BlessedScreen = js.native
   
   def escape(text: String): String = js.native
+
+  def unicode: BlessedUnicode = js.native
+}
+
+@js.native
+trait BlessedUnicode extends js.Object {
+
+  def charWidth(str: String | Int, i: js.UndefOr[Int] = js.native): Int = js.native
+
+  def strWidth(str: String): Int = js.native
+
+  def isSurrogate(str: String | Int, i: js.UndefOr[Int] = js.native): Boolean = js.native
+
+  def isCombining(str: String | Int, i: js.UndefOr[Int] = js.native): Boolean = js.native
 }
 
 @js.native
