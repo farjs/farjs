@@ -49,7 +49,7 @@ object ListView extends FunctionComponent[ListViewProps] {
     val viewport@ListViewport(offset, focused, length, viewLength) = props.viewport
     val itemsContent =
       renderItems(focused, props.items.slice(offset, offset + viewLength), props.width, props.style)
-        .mkString(UI.newLine)
+        .mkString("\n")
 
     useLayoutEffect({ () =>
       props.setViewport(viewport.resize(props.height))
