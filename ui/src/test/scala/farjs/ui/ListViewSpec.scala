@@ -16,10 +16,10 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
     setViewport.expects(props.viewport)
 
     val renderer = createTestRenderer(<(ListView())(^.wrapped := props)())
-    assertListView(renderer.root, props,
-      """{bold}{white-fg}{cyan-bg}  item 1            {/}
-        |{bold}{white-fg}{black-bg}  item 2            {/}""".stripMargin
-    )
+    assertListView(renderer.root, props, List(
+      "{bold}{white-fg}{cyan-bg}  item 1            {/}",
+      "{bold}{white-fg}{black-bg}  item 2            {/}"
+    ))
     val updatedProps = props.copy(height = 1)
     val expectedViewport = props.viewport.copy(offset = 1, focused = 0, viewLength = 1)
 
@@ -84,10 +84,10 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
     setViewport.expects(props.viewport)
 
     val renderer = createTestRenderer(<(ListView())(^.wrapped := props)())
-    assertListView(renderer.root, props,
-      """{bold}{white-fg}{cyan-bg}  item 1            {/}
-        |{bold}{white-fg}{black-bg}  item 2            {/}""".stripMargin
-    )
+    assertListView(renderer.root, props, List(
+      "{bold}{white-fg}{cyan-bg}  item 1            {/}",
+      "{bold}{white-fg}{black-bg}  item 2            {/}"
+    ))
     val text = inside(findComponents(renderer.root, <.text.name)) {
       case List(text) => text
     }
@@ -107,10 +107,10 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
     setViewport.expects(props.viewport)
 
     val renderer = createTestRenderer(<(ListView())(^.wrapped := props)())
-    assertListView(renderer.root, props,
-      """{bold}{white-fg}{black-bg}  item 1            {/}
-        |{bold}{white-fg}{cyan-bg}  item 2            {/}""".stripMargin
-    )
+    assertListView(renderer.root, props, List(
+      "{bold}{white-fg}{black-bg}  item 1            {/}",
+      "{bold}{white-fg}{cyan-bg}  item 2            {/}"
+    ))
     val text = inside(findComponents(renderer.root, <.text.name)) {
       case List(text) => text
     }
@@ -137,13 +137,13 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
     val result = createTestRenderer(<(ListView())(^.wrapped := props)()).root
 
     //then
-    assertListView(result, props,
-      """{bold}{white-fg}{black-bg}  dir 1 {open}b{/}
-        |{bold}{white-fg}{cyan-bg}  .dir 2 l{/}
-        |{bold}{white-fg}{cyan-bg}  .dir 4  {/}
-        |{bold}{white-fg}{cyan-bg}  .file 5 {/}
-        |{bold}{white-fg}{cyan-bg}  item    {/}""".stripMargin
-    )
+    assertListView(result, props, List(
+      "{bold}{white-fg}{black-bg}  dir 1 {open}b{/}",
+      "{bold}{white-fg}{cyan-bg}  .dir 2 l{/}",
+      "{bold}{white-fg}{cyan-bg}  .dir 4  {/}",
+      "{bold}{white-fg}{cyan-bg}  .file 5 {/}",
+      "{bold}{white-fg}{cyan-bg}  item    {/}"
+    ))
   }
 
   private def getListViewProps(width: Int = 20,
@@ -170,7 +170,7 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
 
   private def assertListView(result: TestInstance,
                              props: ListViewProps,
-                             expectedContent: String)(implicit pos: Position): Unit = {
+                             expectedContent: List[String])(implicit pos: Position): Unit = {
 
     assertComponents(result.children, List(
       <.text(
@@ -183,7 +183,7 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
         ^.rbHeight := props.height,
         ^.rbStyle := props.style,
         ^.rbTags := true,
-        ^.content := expectedContent
+        ^.content := expectedContent.mkString("\n")
       )()
     ))
   }

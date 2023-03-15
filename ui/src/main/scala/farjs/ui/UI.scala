@@ -2,9 +2,6 @@ package farjs.ui
 
 object UI {
 
-  val newLine: String = """
-                          |""".stripMargin
-
   def splitText(text: String, maxLen: Int): List[String] = {
     val sentences = text.split('\n')
     
