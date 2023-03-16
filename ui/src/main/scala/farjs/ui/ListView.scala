@@ -29,16 +29,16 @@ object ListView extends FunctionComponent[ListViewProps] {
           if (selected == index) theme.focus.getOrElse(null)
           else theme
 
-        val text = item
+        val text = UiString(item
           .replace("\n", "")
           .replace("\r", "")
-          .replace('\t', ' ')
+          .replace('\t', ' '))
 
         TextBox.renderText(
           isBold = style.bold.getOrElse(false),
           fgColor = style.fg.orNull,
           bgColor = style.bg.orNull,
-          text = text.take(width).padTo(width, ' ')
+          text = text.ensureWidth(width, ' ')
         )
     }
   }
@@ -80,6 +80,7 @@ object ListView extends FunctionComponent[ListViewProps] {
       },
       ^.rbStyle := props.style,
       ^.rbTags := true,
+      ^.rbWrap := false,
       ^.content := itemsContent
     )()
   }

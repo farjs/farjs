@@ -130,7 +130,7 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
       "  .dir 2 looooooong",
       "  .dir \r4",
       "  .file \n5",
-      "  item"
+      "  itemй"
     ))
     
     //when
@@ -142,7 +142,7 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
       "{bold}{white-fg}{cyan-bg}  .dir 2 l{/}",
       "{bold}{white-fg}{cyan-bg}  .dir 4  {/}",
       "{bold}{white-fg}{cyan-bg}  .file 5 {/}",
-      "{bold}{white-fg}{cyan-bg}  item    {/}"
+      "{bold}{white-fg}{cyan-bg}  itemй   {/}"
     ))
   }
 
@@ -183,6 +183,7 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
         ^.rbHeight := props.height,
         ^.rbStyle := props.style,
         ^.rbTags := true,
+        ^.rbWrap := false,
         ^.content := expectedContent.mkString("\n")
       )()
     ))
