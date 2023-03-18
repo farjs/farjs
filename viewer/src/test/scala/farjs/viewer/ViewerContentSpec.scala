@@ -557,6 +557,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
             ^.rbWidth := props.viewport.width,
             ^.rbHeight := props.viewport.height,
             ^.rbStyle := ViewerController.contentStyle,
+            ^.rbWrap := false,
             ^.content := {
               if (content.isEmpty) ""
               else s"${content.mkString("\n")}\n"

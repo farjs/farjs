@@ -1,6 +1,7 @@
 package farjs.viewer
 
 import farjs.text.Encoding
+import farjs.ui.UiString
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -19,7 +20,7 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
   lazy val content: String = {
     val buf = new mutable.StringBuilder()
     linesData.foldLeft(buf) { case (buf, (line, _)) =>
-      buf.append(line.slice(column, column + width)).append('\n')
+      buf.append(UiString(line).slice(column, column + width)).append('\n')
     }
     buf.mapInPlace { ch =>
       val isControl =
@@ -38,7 +39,7 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
 
   lazy val scrollIndicators: List[Int] = {
     linesData.zipWithIndex.collect {
-      case ((line, _), index) if line.length > column + width => index
+      case ((line, _), index) if UiString(line).strWidth > column + width => index
     }
   }
 

@@ -106,6 +106,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
         ^.rbWidth := viewport.width,
         ^.rbHeight := viewport.height,
         ^.rbStyle := ViewerController.contentStyle,
+        ^.rbWrap := false,
         ^.content := viewport.content
       )(),
 
