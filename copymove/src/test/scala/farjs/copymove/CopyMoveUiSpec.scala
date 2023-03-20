@@ -62,7 +62,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowCopyToTarget,
       from = FileListData(dispatch, actions.actions, state),
@@ -115,7 +115,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowMoveToTarget,
       from = FileListData(dispatch, actions.actions, state),
@@ -170,7 +170,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowCopyToTarget,
       from = FileListData(dispatch, actions.actions, state),
@@ -199,7 +199,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowCopyToTarget,
       from = FileListData(dispatch, actions.actions, state),
@@ -252,7 +252,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowMoveToTarget,
       from = FileListData(dispatch, actions.actions, state),
@@ -307,7 +307,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowCopyToTarget,
       from = FileListData(dispatch, actions.actions, state),
@@ -363,7 +363,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowMoveToTarget,
       from = FileListData(dispatch, actions.actions, state),
@@ -413,7 +413,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowMoveInplace,
       from = FileListData(dispatch, actions.actions, state),
@@ -453,7 +453,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowCopyInplace,
       from = FileListData(dispatch, actions.actions, state),
@@ -503,7 +503,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowMoveToTarget,
       from = FileListData(dispatch, actions.actions, state),
@@ -566,7 +566,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowMoveToTarget,
       from = FileListData(dispatch, actions.actions, state),
@@ -622,7 +622,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toActions = new Actions
     val toState = FileListState(currDir = rightDir)
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(fromDispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowCopyToTarget,
       from = FileListData(fromDispatch, fromActions.actions, fromState),
@@ -695,7 +695,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toActions = new Actions
     val toState = FileListState(currDir = rightDir)
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(fromDispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowCopyInplace,
       from = FileListData(fromDispatch, fromActions.actions, fromState),
@@ -746,7 +746,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toActions = new MockFileListActions
     val toState = FileListState(currDir = FileListDir("/test-path", isRoot = false, Nil))
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowCopyToTarget,
       from = FileListData(dispatch, actions.actions, state),
@@ -777,7 +777,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toActions = new MockFileListActions
     val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, Nil))
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowCopyToTarget,
       from = FileListData(dispatch, actions.actions, state),
@@ -815,7 +815,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toActions = new MockFileListActions
     val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, Nil))
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(fromDispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowMoveToTarget,
       from = FileListData(fromDispatch, fromActions, fromState),
@@ -853,7 +853,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, Nil))
     val toActions = new MockFileListActions
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(fromDispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowMoveToTarget,
       from = FileListData(fromDispatch, fromActions, fromState),
@@ -892,7 +892,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toDispatch = mockFunction[Any, Any]
     val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, Nil))
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(fromDispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
       show = ShowMoveInplace,
       from = FileListData(fromDispatch, fromActions, fromState),

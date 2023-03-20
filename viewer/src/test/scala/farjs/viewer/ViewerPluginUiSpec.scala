@@ -21,7 +21,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
     val pluginUi = new ViewerPluginUi(dispatch, "item 1", 123)
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val renderer = createTestRenderer(<(pluginUi())(^.plain := props)())
     val viewport = ViewerFileViewport(
       fileReader = new MockViewerFileReader,
@@ -45,7 +45,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
     val pluginUi = new ViewerPluginUi(dispatch, "item 1", 0)
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val renderer = createTestRenderer(<(pluginUi())(^.plain := props)())
     val viewport = ViewerFileViewport(
       fileReader = new MockViewerFileReader,
@@ -69,7 +69,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
     val pluginUi = new ViewerPluginUi(dispatch, "item 1", 0)
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
     val popupProps = findComponentProps(comp, popupComp)
     
@@ -85,7 +85,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
     val pluginUi = new ViewerPluginUi(dispatch, "item 1", 0)
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val renderer = createTestRenderer(<(pluginUi())(^.plain := props)())
     val viewerProps = findComponentProps(renderer.root, viewerController)
     val viewport = ViewerFileViewport(
@@ -124,7 +124,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     val filePath = "item 1"
     val size = 123
     val pluginUi = new ViewerPluginUi(dispatch, filePath, size)
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val inputMock = js.Dynamic.literal()
     
     //when

@@ -34,7 +34,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val currDir = FileListDir("/folder", isRoot = false, List(dir1, file1))
     val state = FileListState(currDir = currDir, isActive = true, selectedNames = Set("dir 1", "file 1"))
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val p = Promise[Boolean]()
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
       p.future.map { res =>
@@ -86,7 +86,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     ))
     val state = FileListState(currDir = currDir, isActive = true)
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val p = Promise[Boolean]()
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
       p.future.map { res =>
@@ -127,7 +127,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     ))
     val state = FileListState(currDir = currDir, isActive = true)
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val p = Promise[Boolean]()
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).returning(p.future)
     val viewItemsPopup = new ViewItemsPopup(FileListData(dispatch, actions.actions, state))
@@ -161,7 +161,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val actions = new Actions
     val state = FileListState()
     val onClose = mockFunction[Unit]
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val action = FileListDirUpdatedAction(state.currDir)
     val viewItemsPopup = new ViewItemsPopup(FileListData(dispatch, actions.actions, state))
 

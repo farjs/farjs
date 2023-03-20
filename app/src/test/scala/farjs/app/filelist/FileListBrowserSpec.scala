@@ -567,7 +567,8 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       case List(uiComp) =>
         var resOnClose: js.Function0[Unit] = null
         assertNativeComponent(uiComp, <(pluginUi)(^.assertPlain[FileListPluginUiProps](inside(_) {
-          case FileListPluginUiProps(onClose) =>
+          case FileListPluginUiProps(resDispatch, onClose) =>
+            resDispatch shouldBe dispatch
             resOnClose = onClose
         }))())
 

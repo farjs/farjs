@@ -156,6 +156,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
 
       currPluginUi.map { pluginUi =>
         <(pluginUi)(^.plain := FileListPluginUiProps(
+          dispatch = props.dispatch,
           onClose = { () =>
             setCurrPluginUi(None)
           }

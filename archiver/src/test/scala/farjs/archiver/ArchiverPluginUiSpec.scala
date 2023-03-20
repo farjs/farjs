@@ -36,7 +36,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
       currDir = FileListDir("/sub-dir", isRoot = false, items = items)
     ))
     val pluginUi = new ArchiverPluginUi(data, "item 1.zip", items)
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
     val controller = findComponentProps(comp, addToArchController)
     
@@ -67,7 +67,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
       selectedNames = ListSet("item 3", "item 2")
     ))
     val pluginUi = new ArchiverPluginUi(data, "item 1.zip", items)
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
     val controller = findComponentProps(comp, addToArchController)
     
@@ -101,7 +101,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val data = FileListData(dispatch, actions, state)
     val items = List(FileListItem("item 1"))
     val pluginUi = new ArchiverPluginUi(data, "item 1.zip", items)
-    val props = FileListPluginUiProps(onClose = onClose)
+    val props = FileListPluginUiProps(dispatch, onClose)
     
     //when
     val result = createTestRenderer(<(pluginUi())(^.plain := props)()).root
