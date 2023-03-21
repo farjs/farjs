@@ -1,12 +1,12 @@
 package farjs.fs.popups
 
-import FSPopupsActions.FolderShortcutsPopupAction
 import scommons.react._
-import scommons.react.redux.Dispatch
 
-case class FolderShortcutsControllerProps(dispatch: Dispatch,
-                                          showPopup: Boolean,
-                                          onChangeDir: String => Unit)
+import scala.scalajs.js
+
+case class FolderShortcutsControllerProps(showPopup: Boolean,
+                                          onChangeDir: String => Unit,
+                                          onClose: js.Function0[Unit])
 
 object FolderShortcutsController extends FunctionComponent[FolderShortcutsControllerProps] {
 
@@ -18,12 +18,10 @@ object FolderShortcutsController extends FunctionComponent[FolderShortcutsContro
     if (props.showPopup) {
       <(folderShortcutsPopup())(^.wrapped := FolderShortcutsPopupProps(
         onChangeDir = { dir =>
-          props.dispatch(FolderShortcutsPopupAction(show = false))
+          props.onClose()
           props.onChangeDir(dir)
         },
-        onClose = { () =>
-          props.dispatch(FolderShortcutsPopupAction(show = false))
-        }
+        onClose = props.onClose
       ))()
     }
     else null

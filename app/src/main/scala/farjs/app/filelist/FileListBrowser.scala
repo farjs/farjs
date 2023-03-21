@@ -5,7 +5,6 @@ import farjs.filelist._
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.stack._
 import farjs.fs.FSPlugin
-import farjs.fs.popups.FSPopupsActions._
 import farjs.ui.menu.{BottomMenu, BottomMenuProps}
 import scommons.nodejs.path
 import scommons.react._
@@ -29,7 +28,6 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
   private[filelist] var bottomMenuComp: UiComponent[BottomMenuProps] = BottomMenu
   private[filelist] var fsPlugin: FSPlugin = FSPlugin
   private[filelist] var fileListPopups: ReactClass = FileListPopupsController()
-  private[filelist] var fsPopups: ReactClass = FSPopupsController()
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -78,10 +76,6 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (_, key) =>
       def screen = leftButtonRef.current.screen
       key.full match {
-        case "M-l" => props.dispatch(DrivePopupAction(show = ShowDriveOnLeft))
-        case "M-r" => props.dispatch(DrivePopupAction(show = ShowDriveOnRight))
-        case "M-h" => props.dispatch(FoldersHistoryPopupAction(show = true))
-        case "C-d" => props.dispatch(FolderShortcutsPopupAction(show = true))
         case "f9" => props.dispatch(FileListPopupMenuAction(show = true))
         case "f10" => props.dispatch(FileListPopupExitAction(show = true))
         case "tab" | "S-tab" => screen.focusNext()
@@ -152,7 +146,6 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       ),
 
       <(fileListPopups).empty,
-      <(fsPopups).empty,
 
       currPluginUi.map { pluginUi =>
         <(pluginUi)(^.plain := FileListPluginUiProps(

@@ -1,12 +1,12 @@
 package farjs.fs.popups
 
-import FSPopupsActions.FoldersHistoryPopupAction
 import scommons.react._
-import scommons.react.redux.Dispatch
 
-case class FoldersHistoryControllerProps(dispatch: Dispatch,
-                                         showPopup: Boolean,
-                                         onChangeDir: String => Unit)
+import scala.scalajs.js
+
+case class FoldersHistoryControllerProps(showPopup: Boolean,
+                                         onChangeDir: String => Unit,
+                                         onClose: js.Function0[Unit])
 
 object FoldersHistoryController extends FunctionComponent[FoldersHistoryControllerProps] {
 
@@ -18,12 +18,10 @@ object FoldersHistoryController extends FunctionComponent[FoldersHistoryControll
     if (props.showPopup) {
       <(foldersHistoryPopup())(^.wrapped := FoldersHistoryPopupProps(
         onChangeDir = { dir =>
-          props.dispatch(FoldersHistoryPopupAction(show = false))
+          props.onClose()
           props.onChangeDir(dir)
         },
-        onClose = { () =>
-          props.dispatch(FoldersHistoryPopupAction(show = false))
-        }
+        onClose = props.onClose
       ))()
     }
     else null

@@ -1,12 +1,12 @@
-package farjs.fs.popups
+package farjs.fs
 
 import farjs.filelist.FileListActions.FileListDirChangeAction
 import farjs.filelist.api.FileListDir
 import farjs.filelist.stack.WithPanelStacksSpec.withContext
 import farjs.filelist.stack.{PanelStack, PanelStackItem}
-import farjs.filelist.{FileListState, MockFileListActions}
-import farjs.fs.popups.FSPopups._
-import farjs.fs.popups.FSPopupsActions.DrivePopupHidden
+import farjs.filelist.{FileListPluginUiProps, FileListState, MockFileListActions}
+import farjs.fs.FSPluginUi._
+import farjs.fs.popups._
 import scommons.react.ReactClass
 import scommons.react.redux.Dispatch
 import scommons.react.redux.task.FutureTask
@@ -15,11 +15,11 @@ import scommons.react.test._
 import scala.concurrent.Future
 import scala.scalajs.js
 
-class FSPopupsSpec extends TestSpec with TestRendererUtils {
+class FSPluginUiSpec extends TestSpec with TestRendererUtils {
 
-  FSPopups.drive = mockUiComponent("DriveController")
-  FSPopups.foldersHistory = mockUiComponent("FoldersHistoryController")
-  FSPopups.folderShortcuts = mockUiComponent("FolderShortcutsController")
+  FSPluginUi.drive = mockUiComponent("DriveController")
+  FSPluginUi.foldersHistory = mockUiComponent("FoldersHistoryController")
+  FSPluginUi.folderShortcuts = mockUiComponent("FolderShortcutsController")
 
   //noinspection TypeAnnotation
   class Actions {
@@ -33,8 +33,9 @@ class FSPopupsSpec extends TestSpec with TestRendererUtils {
   it should "dispatch FileListDirChangeAction when onChangeDir in active panel" in {
     //given
     val dispatch = mockFunction[Any, Any]
+    val onClose = mockFunction[Unit]
     val actions = new Actions
-    val props = FSPopupsProps(dispatch, FSPopupsState())
+    val fsPluginUi = new FSPluginUi()
     val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, Nil))
     val currFsItem = PanelStackItem(
       "fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(currState)
@@ -52,9 +53,11 @@ class FSPopupsSpec extends TestSpec with TestRendererUtils {
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(otherState))
     ), updater = null)
 
-    val renderer = createTestRenderer(
-      withContext(<(FSPopups())(^.wrapped := props)(), leftStack = currStack, rightStack = otherStack)
-    )
+    val renderer = createTestRenderer(withContext(
+      <(fsPluginUi())(^.plain := FileListPluginUiProps(dispatch, onClose))(),
+      leftStack = currStack,
+      rightStack = otherStack
+    ))
     val foldersHistoryProps = findComponentProps(renderer.root, foldersHistory)
     val action = FileListDirChangeAction(FutureTask("Changing Dir",
       Future.successful(FileListDir("/", isRoot = true, items = Nil))
@@ -75,8 +78,9 @@ class FSPopupsSpec extends TestSpec with TestRendererUtils {
   it should "dispatch FileListDirChangeAction when onChangeDir in Drive popup" in {
     //given
     val dispatch = mockFunction[Any, Any]
+    val onClose = mockFunction[Unit]
     val actions = new Actions
-    val props = FSPopupsProps(dispatch, FSPopupsState())
+    val fsPluginUi = new FSPluginUi()
     val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, Nil))
     val currStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(currState))
@@ -86,9 +90,11 @@ class FSPopupsSpec extends TestSpec with TestRendererUtils {
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(otherState))
     ), updater = null)
 
-    val renderer = createTestRenderer(
-      withContext(<(FSPopups())(^.wrapped := props)(), leftStack = otherStack, rightStack = currStack)
-    )
+    val renderer = createTestRenderer(withContext(
+      <(fsPluginUi())(^.plain := FileListPluginUiProps(dispatch, onClose))(),
+      leftStack = otherStack,
+      rightStack = currStack
+    ))
     val driveProps = findComponentProps(renderer.root, drive)
     val action = FileListDirChangeAction(FutureTask("Changing Dir",
       Future.successful(FileListDir("/", isRoot = true, items = Nil))
@@ -106,8 +112,9 @@ class FSPopupsSpec extends TestSpec with TestRendererUtils {
   it should "not dispatch FileListDirChangeAction if same dir when onChangeDir" in {
     //given
     val dispatch = mockFunction[Any, Any]
+    val onClose = mockFunction[Unit]
     val actions = new Actions
-    val props = FSPopupsProps(dispatch, FSPopupsState())
+    val fsPluginUi = new FSPluginUi()
     val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, Nil))
     val currFsItem = PanelStackItem(
       "fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(currState)
@@ -125,9 +132,11 @@ class FSPopupsSpec extends TestSpec with TestRendererUtils {
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(otherState))
     ), updater = null)
 
-    val renderer = createTestRenderer(
-      withContext(<(FSPopups())(^.wrapped := props)(), leftStack = otherStack, rightStack = currStack)
-    )
+    val renderer = createTestRenderer(withContext(
+      <(fsPluginUi())(^.plain := FileListPluginUiProps(dispatch, onClose))(),
+      leftStack = otherStack,
+      rightStack = currStack
+    ))
     val foldersHistoryProps = findComponentProps(renderer.root, foldersHistory)
     val dir = currState.currDir.path
 
@@ -145,7 +154,8 @@ class FSPopupsSpec extends TestSpec with TestRendererUtils {
   it should "render component" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = FSPopupsProps(dispatch, FSPopupsState())
+    val onClose: js.Function0[Unit] = mockFunction[Unit]
+    val fsPluginUi = new FSPluginUi()
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), None, None)
     ), null)
@@ -154,31 +164,34 @@ class FSPopupsSpec extends TestSpec with TestRendererUtils {
     ), null)
 
     //when
-    val result = createTestRenderer(
-      withContext(<(FSPopups())(^.wrapped := props)(), leftStack, rightStack)
-    ).root
+    val result = createTestRenderer(withContext(
+      <(fsPluginUi())(^.plain := FileListPluginUiProps(dispatch, onClose))(),
+      leftStack,
+      rightStack
+    )).root
 
     //then
     val onChangeDirInActivePanel = findComponentProps(result, foldersHistory).onChangeDir
     assertComponents(result.children, List(
       <(drive())(^.assertWrapped(inside(_) {
-        case DriveControllerProps(dispatch, show, _) =>
-          dispatch shouldBe props.dispatch
-          show shouldBe DrivePopupHidden
+        case DriveControllerProps(resDispatch, showDrivePopupOnLeft, _, resOnClose) =>
+          resDispatch shouldBe dispatch
+          showDrivePopupOnLeft shouldBe None
+          resOnClose should be theSameInstanceAs onClose
       }))(),
 
       <(foldersHistory())(^.assertWrapped(inside(_) {
-        case FoldersHistoryControllerProps(dispatch, showPopup, onChangeDir) =>
-          dispatch shouldBe props.dispatch
+        case FoldersHistoryControllerProps(showPopup, onChangeDir, resOnClose) =>
           showPopup shouldBe false
           onChangeDir shouldBe onChangeDirInActivePanel
+          resOnClose should be theSameInstanceAs onClose
       }))(),
 
       <(folderShortcuts())(^.assertWrapped(inside(_) {
-        case FolderShortcutsControllerProps(dispatch, showPopup, onChangeDir) =>
-          dispatch shouldBe props.dispatch
+        case FolderShortcutsControllerProps(showPopup, onChangeDir, resOnClose) =>
           showPopup shouldBe false
           onChangeDir shouldBe onChangeDirInActivePanel
+          resOnClose should be theSameInstanceAs onClose
       }))()
     ))
   }

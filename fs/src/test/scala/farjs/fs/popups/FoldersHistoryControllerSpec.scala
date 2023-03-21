@@ -1,6 +1,5 @@
 package farjs.fs.popups
 
-import farjs.fs.popups.FSPopupsActions._
 import farjs.fs.popups.FoldersHistoryController._
 import org.scalatest.Succeeded
 import scommons.react.test._
@@ -11,30 +10,30 @@ class FoldersHistoryControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "call onChangeDir when onChangeDir" in {
     //given
-    val dispatch = mockFunction[Any, Any]
     val onChangeDir = mockFunction[String, Unit]
-    val props = FoldersHistoryControllerProps(dispatch, showPopup = true, onChangeDir)
+    val onClose = mockFunction[Unit]
+    val props = FoldersHistoryControllerProps(showPopup = true, onChangeDir, onClose)
     val renderer = createTestRenderer(<(FoldersHistoryController())(^.wrapped := props)())
     val dir = "test dir"
 
     //then
-    dispatch.expects(FoldersHistoryPopupAction(show = false))
+    onClose.expects()
     onChangeDir.expects(dir)
 
     //when
     findComponentProps(renderer.root, foldersHistoryPopup).onChangeDir(dir)
   }
 
-  it should "dispatch FoldersHistoryPopupAction when onClose" in {
+  it should "call onClose when onClose" in {
     //given
-    val dispatch = mockFunction[Any, Any]
     val onChangeDir = mockFunction[String, Unit]
-    val props = FoldersHistoryControllerProps(dispatch, showPopup = true, onChangeDir)
+    val onClose = mockFunction[Unit]
+    val props = FoldersHistoryControllerProps(showPopup = true, onChangeDir, onClose)
     val comp = testRender(<(FoldersHistoryController())(^.wrapped := props)())
     val popup = findComponentProps(comp, foldersHistoryPopup)
 
     //then
-    dispatch.expects(FoldersHistoryPopupAction(show = false))
+    onClose.expects()
     onChangeDir.expects(*).never()
 
     //when
@@ -43,8 +42,7 @@ class FoldersHistoryControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "render popup component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
-    val props = FoldersHistoryControllerProps(dispatch, showPopup = true, _ => ())
+    val props = FoldersHistoryControllerProps(showPopup = true, _ => (), () => ())
 
     //when
     val result = testRender(<(FoldersHistoryController())(^.wrapped := props)())
@@ -57,8 +55,7 @@ class FoldersHistoryControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "render empty component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
-    val props = FoldersHistoryControllerProps(dispatch, showPopup = false, _ => ())
+    val props = FoldersHistoryControllerProps(showPopup = false, _ => (), () => ())
 
     //when
     val renderer = createTestRenderer(<(FoldersHistoryController())(^.wrapped := props)())

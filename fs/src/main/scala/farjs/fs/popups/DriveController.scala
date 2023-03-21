@@ -1,12 +1,14 @@
 package farjs.fs.popups
 
-import farjs.fs.popups.FSPopupsActions._
 import scommons.react._
 import scommons.react.redux.Dispatch
 
+import scala.scalajs.js
+
 case class DriveControllerProps(dispatch: Dispatch,
-                                show: DrivePopupShow,
-                                onChangeDir: (String, Boolean) => Unit)
+                                showDrivePopupOnLeft: Option[Boolean],
+                                onChangeDir: (String, Boolean) => Unit,
+                                onClose: js.Function0[Unit])
 
 object DriveController extends FunctionComponent[DriveControllerProps] {
 
@@ -14,21 +16,19 @@ object DriveController extends FunctionComponent[DriveControllerProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val showOnLeft = props.show == ShowDriveOnLeft
 
-    if (props.show != DrivePopupHidden) {
-      <(drivePopup())(^.wrapped := DrivePopupProps(
-        dispatch = props.dispatch,
-        onChangeDir = { dir =>
-          props.dispatch(DrivePopupAction(show = DrivePopupHidden))
-          props.onChangeDir(dir, showOnLeft)
-        },
-        onClose = { () =>
-          props.dispatch(DrivePopupAction(show = DrivePopupHidden))
-        },
-        showOnLeft = showOnLeft
-      ))()
+    props.showDrivePopupOnLeft match {
+      case Some(showOnLeft) =>
+        <(drivePopup())(^.wrapped := DrivePopupProps(
+          dispatch = props.dispatch,
+          onChangeDir = { dir =>
+            props.onClose()
+            props.onChangeDir(dir, showOnLeft)
+          },
+          onClose = props.onClose,
+          showOnLeft = showOnLeft
+        ))()
+      case None => null
     }
-    else null
   }
 }

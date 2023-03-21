@@ -1,7 +1,6 @@
 package farjs.fs.popups
 
 import farjs.fs.popups.DriveController._
-import farjs.fs.popups.FSPopupsActions._
 import scommons.react.test._
 
 class DriveControllerSpec extends TestSpec with TestRendererUtils {
@@ -12,12 +11,13 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val onChangeDir = mockFunction[String, Boolean, Unit]
-    val props = DriveControllerProps(dispatch, show = ShowDriveOnLeft, onChangeDir)
+    val onClose = mockFunction[Unit]
+    val props = DriveControllerProps(dispatch, showDrivePopupOnLeft = Some(true), onChangeDir, onClose)
     val renderer = createTestRenderer(<(DriveController())(^.wrapped := props)())
     val dir = "test dir"
 
     //then
-    dispatch.expects(DrivePopupAction(show = DrivePopupHidden))
+    onClose.expects()
     onChangeDir.expects(dir, true)
 
     //when
@@ -28,28 +28,30 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val onChangeDir = mockFunction[String, Boolean, Unit]
-    val props = DriveControllerProps(dispatch, show = ShowDriveOnRight, onChangeDir)
+    val onClose = mockFunction[Unit]
+    val props = DriveControllerProps(dispatch, showDrivePopupOnLeft = Some(false), onChangeDir, onClose)
     val renderer = createTestRenderer(<(DriveController())(^.wrapped := props)())
     val dir = "test dir"
 
     //then
-    dispatch.expects(DrivePopupAction(show = DrivePopupHidden))
+    onClose.expects()
     onChangeDir.expects(dir, false)
 
     //when
     findComponentProps(renderer.root, drivePopup).onChangeDir(dir)
   }
 
-  it should "dispatch DrivePopupAction when onClose" in {
+  it should "call onClose when onClose" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val onChangeDir = mockFunction[String, Boolean, Unit]
-    val props = DriveControllerProps(dispatch, show = ShowDriveOnLeft, onChangeDir)
+    val onClose = mockFunction[Unit]
+    val props = DriveControllerProps(dispatch, showDrivePopupOnLeft = Some(true), onChangeDir, onClose)
     val comp = testRender(<(DriveController())(^.wrapped := props)())
     val popup = findComponentProps(comp, drivePopup)
 
     //then
-    dispatch.expects(DrivePopupAction(show = DrivePopupHidden))
+    onClose.expects()
     onChangeDir.expects(*, *).never()
 
     //when
@@ -59,7 +61,7 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
   it should "render popup on the left" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = DriveControllerProps(dispatch, show = ShowDriveOnLeft, (_, _) => ())
+    val props = DriveControllerProps(dispatch, showDrivePopupOnLeft = Some(true), (_, _) => (), () => ())
 
     //when
     val result = testRender(<(DriveController())(^.wrapped := props)())
@@ -75,7 +77,7 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
   it should "render popup on the right" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = DriveControllerProps(dispatch, show = ShowDriveOnRight, (_, _) => ())
+    val props = DriveControllerProps(dispatch, showDrivePopupOnLeft = Some(false), (_, _) => (), () => ())
 
     //when
     val result = testRender(<(DriveController())(^.wrapped := props)())
@@ -91,7 +93,7 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
   it should "render empty component" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val props = DriveControllerProps(dispatch, show = DrivePopupHidden, (_, _) => ())
+    val props = DriveControllerProps(dispatch, showDrivePopupOnLeft = None, (_, _) => (), () => ())
 
     //when
     val renderer = createTestRenderer(<(DriveController())(^.wrapped := props)())

@@ -7,7 +7,6 @@ import farjs.filelist.api._
 import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.stack._
 import farjs.fs.FSPlugin
-import farjs.fs.popups.FSPopupsActions._
 import farjs.ui.menu.BottomMenuProps
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.path
@@ -28,7 +27,6 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   FileListBrowser.bottomMenuComp = mockUiComponent("BottomMenu")
   FileListBrowser.fsPlugin = new FSPlugin((s, _) => s)
   FileListBrowser.fileListPopups = "test_filelist_popups".asInstanceOf[ReactClass]
-  FileListBrowser.fsPopups = "test_fs_popups".asInstanceOf[ReactClass]
   
   //noinspection TypeAnnotation
   class Actions {
@@ -167,7 +165,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
   }
 
-  it should "dispatch actions when onKeypress(Alt+L/Alt+R/Alt+H/Ctrl+D/F9/F10)" in {
+  it should "dispatch actions when onKeypress(F9/F10)" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val props = FileListBrowserProps(dispatch)
@@ -192,10 +190,6 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
 
     //when & then
-    check("M-l", DrivePopupAction(show = ShowDriveOnLeft))
-    check("M-r", DrivePopupAction(show = ShowDriveOnRight))
-    check("M-h", FoldersHistoryPopupAction(show = true))
-    check("C-d", FolderShortcutsPopupAction(show = true))
     check("f9", FileListPopupMenuAction(show = true))
     check("f10", FileListPopupExitAction(show = true))
 
@@ -637,8 +631,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         <(bottomMenuComp())(^.wrapped := BottomMenuProps(menuItems))()
       ),
 
-      <(fileListPopups).empty,
-      <(fsPopups).empty
+      <(fileListPopups).empty
     ))
   }
 }

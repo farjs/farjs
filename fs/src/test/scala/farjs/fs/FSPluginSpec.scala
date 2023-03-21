@@ -1,12 +1,19 @@
 package farjs.fs
 
-import farjs.filelist.FileListState
-import farjs.filelist.stack.{PanelStack, PanelStackItem}
+import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.filelist.stack._
+import farjs.filelist.{FileListState, MockFileListActions}
 import scommons.nodejs.test.TestSpec
+import scommons.react.ReactClass
 
 import scala.scalajs.js
 
 class FSPluginSpec extends TestSpec {
+
+  it should "define triggerKeys" in {
+    //when & then
+    FSPlugin.triggerKeys.toList shouldBe List("M-l", "M-r", "M-h", "C-d")
+  }
 
   it should "initialize dispatch, actions and state when init" in {
     //given
@@ -50,5 +57,34 @@ class FSPluginSpec extends TestSpec {
           resState shouldBe Some(updatedState)
       }
     }
+  }
+
+  it should "return None/Some if non-/trigger key when onKeyTrigger" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val actions = new MockFileListActions
+    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+      FileListItem("item 1")
+    )))
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
+    ), updater = null)
+
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
+    ), updater = null)
+    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+
+    //when & then
+    FSPlugin.onKeyTrigger("test_key", stacks) shouldBe None
+    FSPlugin.onKeyTrigger("M-l", stacks) should not be None
+  }
+
+  it should "return Some(ui) if trigger key when createUi" in {
+    //when & then
+    inside(FSPlugin.createUi("M-l")) { case Some(FSPluginUi(Some(true), false, false)) => }
+    inside(FSPlugin.createUi("M-r")) { case Some(FSPluginUi(Some(false), false, false)) => }
+    inside(FSPlugin.createUi("M-h")) { case Some(FSPluginUi(None, true, false)) => }
+    inside(FSPlugin.createUi("C-d")) { case Some(FSPluginUi(None, false, true)) => }
   }
 }
