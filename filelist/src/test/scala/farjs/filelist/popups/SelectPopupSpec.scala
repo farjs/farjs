@@ -2,7 +2,6 @@ package farjs.filelist.popups
 
 import farjs.filelist.FileListServicesSpec.withServicesContext
 import farjs.filelist.history.MockFileListHistoryService
-import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.SelectPopup._
 import farjs.ui._
 import farjs.ui.popup.ModalProps
@@ -30,7 +29,7 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "set pattern when onChange in TextBox" in {
     //given
     val pattern = "initial pattern"
-    val props = getSelectPopupProps(ShowSelect)
+    val props = getSelectPopupProps(showSelect = true)
     val historyService = new HistoryService
     val itemsF = Future.successful(List("pattern", pattern))
     historyService.getAll.expects().returning(itemsF)
@@ -55,7 +54,7 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = getSelectPopupProps(ShowSelect, onAction, onCancel)
+    val props = getSelectPopupProps(showSelect = true, onAction, onCancel)
     val historyService = new HistoryService
     val itemsF = Future.successful(List("pattern", "test"))
     historyService.getAll.expects().returning(itemsF)
@@ -81,7 +80,7 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = getSelectPopupProps(ShowSelect, onAction, onCancel)
+    val props = getSelectPopupProps(showSelect = true, onAction, onCancel)
     val historyService = new HistoryService
     val itemsF = Future.successful(Nil)
     historyService.getAll.expects().returning(itemsF)
@@ -105,7 +104,7 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   
   it should "render Select component" in {
     //given
-    val props = getSelectPopupProps(ShowSelect)
+    val props = getSelectPopupProps(showSelect = true)
     val historyService = new HistoryService
     val itemsF = Future.successful(List("pattern", "pattern 2"))
     historyService.getAll.expects().returning(itemsF)
@@ -123,7 +122,7 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "render Deselect component" in {
     //given
-    val props = getSelectPopupProps(ShowDeselect)
+    val props = getSelectPopupProps(showSelect = false)
     val historyService = new HistoryService
     val itemsF = Future.successful(List("pattern", "pattern 2"))
     historyService.getAll.expects().returning(itemsF)
@@ -139,11 +138,11 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     }
   }
   
-  private def getSelectPopupProps(action: FileListPopupSelect,
+  private def getSelectPopupProps(showSelect: Boolean,
                                   onAction: String => Unit = _ => (),
                                   onCancel: () => Unit = () => ()): SelectPopupProps = {
     SelectPopupProps(
-      action = action,
+      showSelect = showSelect,
       onAction = onAction,
       onCancel = onCancel
     )

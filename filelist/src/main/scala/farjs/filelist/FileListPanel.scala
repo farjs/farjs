@@ -1,8 +1,7 @@
 package farjs.filelist
 
 import farjs.filelist.FileListActions._
-import farjs.filelist.api.{FileListCapability, FileListItem}
-import farjs.filelist.popups.FileListPopupsActions._
+import farjs.filelist.api.FileListItem
 import farjs.filelist.sort._
 import farjs.filelist.stack.PanelStack
 import scommons.nodejs._
@@ -45,15 +44,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
 
     def onKeypress(screen: BlessedScreen, key: String): Unit = {
       if (!props.onKeypress(screen, key)) {
-        val currItem = props.state.currentItem.filter(_ != FileListItem.up)
         key match {
-          case "f1" => props.dispatch(FileListPopupHelpAction(show = true))
-          case "f7" if props.actions.capabilities.contains(FileListCapability.mkDirs) =>
-            props.dispatch(FileListPopupMkFolderAction(show = true))
-          case "f8" | "delete" if props.actions.capabilities.contains(FileListCapability.delete) =>
-            if (props.state.selectedNames.nonEmpty || currItem.isDefined) {
-              props.dispatch(FileListPopupDeleteAction(show = true))
-            }
           case "C-f3" => props.dispatch(FileListSortByAction(SortMode.Name))
           case "C-f4" => props.dispatch(FileListSortByAction(SortMode.Extension))
           case "C-f5" => props.dispatch(FileListSortByAction(SortMode.ModificationTime))
@@ -97,10 +88,6 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
               ))
             }
           case "C-s" => setMaybeQuickSearch(Some(""))
-          case "+" if maybeQuickSearch.isEmpty =>
-            props.dispatch(FileListPopupSelectAction(ShowSelect))
-          case "-" if maybeQuickSearch.isEmpty =>
-            props.dispatch(FileListPopupSelectAction(ShowDeselect))
           case _ =>
         }
       }

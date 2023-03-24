@@ -1,7 +1,7 @@
 package farjs.filelist.popups
 
+import farjs.filelist.FileListUiData
 import farjs.filelist.popups.ExitController._
-import farjs.filelist.popups.FileListPopupsActions._
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
 import scommons.nodejs._
@@ -16,11 +16,10 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "dispatch FileListPopupExitAction and emit Ctrl+Q when YES action" in {
     //given
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showExitPopup = true))
+    val onClose = mockFunction[Unit]
+    val props = FileListUiData(showExitPopup = true, onClose = onClose)
     val comp = testRender(<(ExitController())(^.wrapped := props)())
     val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
-    val action = FileListPopupExitAction(show = false)
 
     val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
     val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
@@ -34,7 +33,7 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
     process.stdin.on("keypress", listener)
 
     //then
-    dispatch.expects(action)
+    onClose.expects()
     onKey.expects("e", true, false, false)
 
     //when
@@ -44,16 +43,15 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
     process.stdin.removeListener("keypress", listener)
   }
 
-  it should "dispatch FileListPopupExitAction when NO action" in {
+  it should "call onClose when NO action" in {
     //given
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showExitPopup = true))
+    val onClose = mockFunction[Unit]
+    val props = FileListUiData(showExitPopup = true, onClose = onClose)
     val comp = testRender(<(ExitController())(^.wrapped := props)())
     val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
-    val action = FileListPopupExitAction(show = false)
 
     //then
-    dispatch.expects(action)
+    onClose.expects()
 
     //when
     msgBox.actions(1).onAction()
@@ -61,8 +59,7 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "render popup component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showExitPopup = true))
+    val props = FileListUiData(showExitPopup = true)
 
     //when
     val result = testRender(<(ExitController())(^.wrapped := props)())
@@ -81,8 +78,7 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "render empty component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState())
+    val props = FileListUiData()
 
     //when
     val renderer = createTestRenderer(<(ExitController())(^.wrapped := props)())

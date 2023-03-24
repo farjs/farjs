@@ -3,7 +3,6 @@ package farjs.filelist
 import farjs.filelist.FileListActions._
 import farjs.filelist.FileListPanel._
 import farjs.filelist.api.{FileListCapability, FileListDir, FileListItem}
-import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.sort.{SortMode, SortModesPopupProps}
 import farjs.filelist.stack.PanelStackSpec.withContext
 import org.scalactic.source.Position
@@ -59,40 +58,14 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
     val renderer = createTestRenderer(withContext(<(FileListPanel())(^.wrapped := props)()))
 
-    def check(fullKey: String,
-              action: Any,
-              index: Int = 0,
-              handled: Boolean = false,
-              selectedNames: Set[String] = Set.empty,
-              never: Boolean = false): Unit = {
-      //given
-      renderer.update(withContext(
-        <(FileListPanel())(^.wrapped := props.copy(
-          state = props.state.copy(index = index, selectedNames = selectedNames)
-        ))()
-      ))
-
+    def check(fullKey: String, action: Any): Unit = {
       //then
-      onKeypress.expects(screen, fullKey).returning(handled)
-      if (never) dispatch.expects(action).never()
-      else dispatch.expects(action)
+      onKeypress.expects(screen, fullKey).returning(false)
+      dispatch.expects(action)
 
       //when
       findComponentProps(renderer.root, fileListPanelView).onKeypress(screen, fullKey)
     }
-
-    //when & then
-    check("f1", FileListPopupHelpAction(show = true))
-
-    //when & then
-    check("f7", FileListPopupMkFolderAction(show = true), handled = true, never = true)
-    check("f7", FileListPopupMkFolderAction(show = true))
-
-    //when & then
-    check("f8", FileListPopupDeleteAction(show = true), never = true)
-    check("f8", FileListPopupDeleteAction(show = true), index = 1)
-    check("delete", FileListPopupDeleteAction(show = true), never = true)
-    check("delete", FileListPopupDeleteAction(show = true), selectedNames = Set("file 1"))
 
     //when & then
     check("C-f3", FileListSortByAction(SortMode.Name))
@@ -103,24 +76,6 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     check("C-f8", FileListSortByAction(SortMode.CreationTime))
     check("C-f9", FileListSortByAction(SortMode.AccessTime))
 
-    //when & then
-    check("+", FileListPopupSelectAction(ShowSelect))
-    check("-", FileListPopupSelectAction(ShowDeselect))
-
-    //given
-    onKeypress.expects(screen, "C-s").returning(false)
-    findComponentProps(renderer.root, fileListPanelView).onKeypress(screen, "C-s")
-    findProps(renderer.root, fileListQuickSearch) should not be empty
-
-    //when & then
-    check("+", FileListPopupSelectAction(ShowSelect), never = true)
-    check("-", FileListPopupSelectAction(ShowDeselect), never = true)
-    
-    //cleanup
-    onKeypress.expects(screen, "escape").returning(false)
-    findComponentProps(renderer.root, fileListPanelView).onKeypress(screen, "escape")
-    findProps(renderer.root, fileListQuickSearch) should be (empty)
-    
     Succeeded
   }
 
@@ -462,7 +417,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         FileListItem.up,
         FileListItem("aB 1"),
         FileListItem("aBc1"),
-        FileListItem("aBc 2")
+        FileListItem("aBc 2"),
+        FileListItem("aBc+3"),
+        FileListItem("aBc-4")
       ))
     )
     val props = FileListPanelProps(dispatch, actions.actions, state)
@@ -497,7 +454,13 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     check("d", index = 2, text = "aB", dispatchAction = false)
     check("c", index = 2, text = "aBc", dispatchAction = true)
     check("space", index = 3, text = "aBc ", dispatchAction = true)
-    check("2", index = 3, text = "aBc 2", dispatchAction = true)
+    check("backspace", index = 3, text = "aBc", dispatchAction = false)
+    check("1", index = 2, text = "aBc1", dispatchAction = true)
+    check("backspace", index = 2, text = "aBc", dispatchAction = false)
+    check("+", index = 4, text = "aBc+", dispatchAction = true)
+    check("backspace", index = 4, text = "aBc", dispatchAction = false)
+    check("-", index = 5, text = "aBc-", dispatchAction = true)
+    check("4", index = 5, text = "aBc-4", dispatchAction = true)
 
     Succeeded
   }

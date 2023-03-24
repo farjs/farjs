@@ -1,23 +1,22 @@
 package farjs.filelist.popups
 
-import farjs.filelist.popups.FileListPopupsActions._
+import farjs.filelist.FileListUiData
 import farjs.ui.popup.{MessageBox, MessageBoxAction, MessageBoxProps}
 import farjs.ui.theme.Theme
 import scommons.react._
 
 import scala.scalajs.js
 
-object DeleteController extends FunctionComponent[PopupControllerProps] {
+object DeleteController extends FunctionComponent[FileListUiData] {
 
   private[popups] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val popups = props.popups
     val theme = Theme.current.popup
 
     props.data match {
-      case Some(data) if popups.showDeletePopup =>
+      case Some(data) if props.showDeletePopup =>
         <(messageBoxComp())(^.plain := MessageBoxProps(
           title = "Delete",
           message = "Do you really want to delete selected item(s)?",
@@ -27,7 +26,7 @@ object DeleteController extends FunctionComponent[PopupControllerProps] {
                 if (data.state.selectedItems.nonEmpty) data.state.selectedItems
                 else data.state.currentItem.toList
 
-              data.dispatch(FileListPopupDeleteAction(show = false))
+              props.onClose()
               data.dispatch(data.actions.deleteAction(
                 dispatch = data.dispatch,
                 dir = data.state.currDir.path,
@@ -35,7 +34,7 @@ object DeleteController extends FunctionComponent[PopupControllerProps] {
               ))
             },
             MessageBoxAction.NO { () =>
-              data.dispatch(FileListPopupDeleteAction(show = false))
+              props.onClose()
             }
           ),
           style = theme.error

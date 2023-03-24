@@ -2,10 +2,12 @@
 [![CI](https://github.com/farjs/farjs/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/farjs/farjs/actions/workflows/ci.yml?query=workflow%3Aci+branch%3Amain)
 [![Coverage Status](https://coveralls.io/repos/github/farjs/farjs/badge.svg?branch=main)](https://coveralls.io/github/farjs/farjs?branch=main)
 [![npm version](https://img.shields.io/npm/v/farjs-app)](https://www.npmjs.com/package/farjs-app)
-[![Downloads](https://img.shields.io/npm/dm/farjs-app.svg)](https://www.pkgstats.com/pkg:farjs-app)
-[![Publish Size](https://badgen.net/packagephobia/publish/farjs-app)](https://packagephobia.com/result?p=farjs-app)
 [![Rate on Openbase](https://badges.openbase.com/js/rating/farjs-app.svg)](https://openbase.com/js/farjs-app?utm_source=embedded&utm_medium=badge&utm_campaign=rate-badge)
 [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.13.0.svg)](https://www.scala-js.org)
+
+[![Downloads](https://img.shields.io/npm/dm/farjs-app.svg)](https://www.pkgstats.com/pkg:farjs-app)
+[![Publish Size](https://badgen.net/packagephobia/publish/farjs-app)](https://packagephobia.com/result?p=farjs-app)
+[![Install Size](https://badgen.net/packagephobia/install/farjs-app)](https://packagephobia.com/result?p=farjs-app)
 
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://vshymanskyy.github.io/StandWithUkraine)
 [![Русский корабль, иди на хуй!](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/RussianWarship.svg)](https://vshymanskyy.github.io/StandWithUkraine)

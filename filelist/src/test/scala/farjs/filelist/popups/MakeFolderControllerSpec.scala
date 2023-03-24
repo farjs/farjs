@@ -5,7 +5,6 @@ import farjs.filelist.FileListServicesSpec.withServicesContext
 import farjs.filelist._
 import farjs.filelist.api.FileListDir
 import farjs.filelist.history.MockFileListHistoryService
-import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.popups.MakeFolderController._
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
@@ -44,12 +43,17 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val actions = new Actions
     val currDir = FileListDir("/sub-dir", isRoot = false, items = Seq.empty)
     val state = FileListState(isActive = true, currDir = currDir)
-    val props = PopupControllerProps(Some(FileListData(dispatch, actions.actions, state)),
-      FileListPopupsState(showMkFolderPopup = true))
+    val onClose = mockFunction[Unit]
+    val props = FileListUiData(
+      showMkFolderPopup = true,
+      data = Some(FileListData(dispatch, actions.actions, state)),
+      onClose = onClose
+    )
     val historyService = new HistoryService
     val renderer = createTestRenderer(withServicesContext(
       <(MakeFolderController())(^.wrapped := props)(), mkDirsHistory = historyService.service
     ))
+    findComponentProps(renderer.root, makeFolderPopup).multiple shouldBe false
     val action = FileListDirCreateAction(
       FutureTask("Creating...", Future.successful(()))
     )
@@ -61,7 +65,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     actions.createDir.expects(dispatch, currDir.path, dir, multiple).returning(action)
     historyService.save.expects(dir).returning(saveF)
     dispatch.expects(action)
-    dispatch.expects(FileListPopupMkFolderAction(show = false))
+    onClose.expects()
 
     //when
     findComponentProps(renderer.root, makeFolderPopup).onOk(dir, multiple)
@@ -78,13 +82,17 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     }
   }
 
-  it should "dispatch FileListPopupMkFolderAction when Cancel action" in {
+  it should "call onClose when Cancel action" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val state = FileListState()
-    val props = PopupControllerProps(Some(FileListData(dispatch, actions.actions, state)),
-      FileListPopupsState(showMkFolderPopup = true))
+    val onClose = mockFunction[Unit]
+    val props = FileListUiData(
+      showMkFolderPopup = true,
+      data = Some(FileListData(dispatch, actions.actions, state)),
+      onClose = onClose
+    )
     val historyService = new MockFileListHistoryService
     val comp = testRender(withServicesContext(
       <(MakeFolderController())(^.wrapped := props)(), mkDirsHistory = historyService
@@ -92,7 +100,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val popup = findComponentProps(comp, makeFolderPopup)
 
     //then
-    dispatch.expects(FileListPopupMkFolderAction(show = false))
+    onClose.expects()
 
     //when
     popup.onCancel()
@@ -105,8 +113,10 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val state = FileListState()
-    val props = PopupControllerProps(Some(FileListData(dispatch, actions.actions, state)),
-      FileListPopupsState(showMkFolderPopup = true))
+    val props = FileListUiData(
+      showMkFolderPopup = true,
+      data = Some(FileListData(dispatch, actions.actions, state))
+    )
     val historyService = new MockFileListHistoryService
 
     //when
@@ -116,18 +126,31 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
 
     //then
     assertTestComponent(result, makeFolderPopup) {
-      case MakeFolderPopupProps(multiple, _, _) =>
-        multiple shouldBe false
+      case MakeFolderPopupProps(initialMultiple, _, _) =>
+        initialMultiple shouldBe true
     }
   }
 
-  it should "render empty component" in {
+  it should "render empty component if showMkFolderPopup=false" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
     val state = FileListState()
-    val props = PopupControllerProps(Some(FileListData(dispatch, actions, state)),
-      FileListPopupsState())
+    val props = FileListUiData(data = Some(FileListData(dispatch, actions, state)))
+    val historyService = new MockFileListHistoryService
+
+    //when
+    val renderer = createTestRenderer(withServicesContext(
+      <(MakeFolderController())(^.wrapped := props)(), mkDirsHistory = historyService
+    ))
+
+    //then
+    renderer.root.children.toList should be (empty)
+  }
+
+  it should "render empty component if data is None" in {
+    //given
+    val props = FileListUiData(showMkFolderPopup = true)
     val historyService = new MockFileListHistoryService
 
     //when

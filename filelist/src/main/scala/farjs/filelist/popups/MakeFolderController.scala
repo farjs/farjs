@@ -1,24 +1,24 @@
 package farjs.filelist.popups
 
-import farjs.filelist.FileListServices
-import farjs.filelist.popups.FileListPopupsActions._
+import farjs.filelist.{FileListServices, FileListUiData}
 import scommons.react._
 import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object MakeFolderController extends FunctionComponent[PopupControllerProps] {
+object MakeFolderController extends FunctionComponent[FileListUiData] {
 
   private[popups] var makeFolderPopup: UiComponent[MakeFolderPopupProps] = MakeFolderPopup
 
+  private var initialMultiple = false
+
   protected def render(compProps: Props): ReactElement = {
     val services = FileListServices.useServices
-    val (multiple, setMultiple) = useState(false)
+    val (multiple, setMultiple) = useState(initialMultiple)
     val props = compProps.wrapped
-    val popups = props.popups
 
     props.data match {
-      case Some(data) if popups.showMkFolderPopup =>
+      case Some(data) if props.showMkFolderPopup =>
         <(makeFolderPopup())(^.wrapped := MakeFolderPopupProps(
           multiple = multiple,
           onOk = { (dir, multiple) =>
@@ -33,14 +33,13 @@ object MakeFolderController extends FunctionComponent[PopupControllerProps] {
               _ <- services.mkDirsHistory.save(dir)
             } yield {
               setMultiple(multiple)
+              initialMultiple = multiple
 
-              data.dispatch(FileListPopupMkFolderAction(show = false))
+              props.onClose()
             }
             data.dispatch(action)
           },
-          onCancel = { () =>
-            data.dispatch(FileListPopupMkFolderAction(show = false))
-          }
+          onCancel = props.onClose
         ))()
       case _ => null
     }

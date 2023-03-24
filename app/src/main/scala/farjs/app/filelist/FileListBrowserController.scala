@@ -20,7 +20,8 @@ object FileListBrowserController extends BaseStateController[FarjsStateDef, File
     ArchiverPlugin,
     ViewerPlugin,
     CopyMovePlugin,
-    FSPlugin
+    FSPlugin,
+    FileListUiPlugin
   )
 
   def mapStateToProps(dispatch: Dispatch, state: FarjsStateDef, props: Props[Unit]): FileListBrowserProps = {

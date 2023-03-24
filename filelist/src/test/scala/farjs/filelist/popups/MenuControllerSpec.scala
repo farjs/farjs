@@ -1,11 +1,10 @@
 package farjs.filelist.popups
 
-import farjs.filelist.popups.FileListPopupsActions._
+import farjs.filelist.FileListUiData
 import farjs.filelist.popups.MenuController._
 import farjs.filelist.stack.PanelStack
 import farjs.filelist.stack.WithPanelStacksSpec.withContext
 import farjs.ui.menu.MenuBarProps
-import farjs.ui.popup.PopupOverlay
 import scommons.nodejs._
 import scommons.react.blessed._
 import scommons.react.test._
@@ -30,8 +29,8 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     }
     process.stdin.on("keypress", listener)
 
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showMenuPopup = true))
+    val onClose = mockFunction[Unit]
+    val props = FileListUiData(showMenuPopup = true, onClose = onClose)
     val comp = testRender(withContext(
       <(MenuController())(^.wrapped := props)(),
       leftStack = new PanelStack(isActive = true, Nil, null),
@@ -40,7 +39,7 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val popup = findComponentProps(comp, menuBarComp)
 
     //then
-    dispatch.expects(FileListPopupMenuAction(show = false))
+    onClose.expects()
     onKey.expects("f3", "f3", false, false, false)
 
     //when
@@ -66,8 +65,8 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
       "emit" -> emitter
     ).asInstanceOf[BlessedElement]
 
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showMenuPopup = true))
+    val onClose = mockFunction[Unit]
+    val props = FileListUiData(showMenuPopup = true, onClose = onClose)
     val comp = testRender(withContext(
       <(MenuController())(^.wrapped := props)(),
       leftStack = new PanelStack(isActive = true, Nil, null),
@@ -77,7 +76,7 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val popup = findComponentProps(comp, menuBarComp)
 
     //then
-    dispatch.expects(FileListPopupMenuAction(show = false))
+    onClose.expects()
     onKey.expects("l", "M-l", false, true, false)
 
     //when
@@ -100,8 +99,8 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
       "emit" -> emitter
     ).asInstanceOf[BlessedElement]
 
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showMenuPopup = true))
+    val onClose = mockFunction[Unit]
+    val props = FileListUiData(showMenuPopup = true, onClose = onClose)
     val comp = testRender(withContext(
       <(MenuController())(^.wrapped := props)(),
       leftStack = new PanelStack(isActive = true, Nil, null),
@@ -111,17 +110,17 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val popup = findComponentProps(comp, menuBarComp)
 
     //then
-    dispatch.expects(FileListPopupMenuAction(show = false))
+    onClose.expects()
     onKey.expects("r", "M-r", false, true, false)
 
     //when
     popup.onAction(4, 4)
   }
 
-  it should "dispatch FileListPopupMenuAction(show=false) when onClose" in {
+  it should "call onClose when onClose" in {
     //given
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showMenuPopup = true))
+    val onClose = mockFunction[Unit]
+    val props = FileListUiData(showMenuPopup = true, onClose = onClose)
     val comp = testRender(withContext(
       <(MenuController())(^.wrapped := props)(),
       leftStack = new PanelStack(isActive = true, Nil, null),
@@ -130,36 +129,15 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val popup = findComponentProps(comp, menuBarComp)
 
     //then
-    dispatch.expects(FileListPopupMenuAction(show = false))
+    onClose.expects()
 
     //when
     popup.onClose()
   }
 
-  it should "dispatch FileListPopupMenuAction(show=true) when onClick" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState())
-    val comp = testRender(withContext(
-      <(MenuController())(^.wrapped := props)(),
-      leftStack = new PanelStack(isActive = true, Nil, null),
-      rightStack = new PanelStack(isActive = false, Nil, null)
-    ))
-    val boxComp = inside(findComponents(comp, <.box.name)) {
-      case List(box) => box
-    }
-
-    //then
-    dispatch.expects(FileListPopupMenuAction(show = true))
-
-    //when
-    boxComp.props.onClick(null)
-  }
-
   it should "render MenuBar component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showMenuPopup = true))
+    val props = FileListUiData(showMenuPopup = true)
     val leftInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
     val rightInput = js.Dynamic.literal().asInstanceOf[BlessedElement]
 
@@ -177,29 +155,5 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
       case MenuBarProps(resItems, _, _) =>
         resItems shouldBe items
     }
-  }
-
-  it should "render clickable box component" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState())
-
-    //when
-    val result = testRender(withContext(
-      <(MenuController())(^.wrapped := props)(),
-      leftStack = new PanelStack(isActive = true, Nil, null),
-      rightStack = new PanelStack(isActive = false, Nil, null)
-    ))
-
-    //then
-    assertNativeComponent(result,
-      <.box(
-        ^.rbHeight := 1,
-        ^.rbClickable := true,
-        ^.rbMouse := true,
-        ^.rbAutoFocus := false,
-        ^.rbStyle := PopupOverlay.style
-      )()
-    )
   }
 }

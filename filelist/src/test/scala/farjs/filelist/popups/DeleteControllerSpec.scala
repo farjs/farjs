@@ -4,7 +4,6 @@ import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.popups.DeleteController._
-import farjs.filelist.popups.FileListPopupsActions._
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
@@ -38,8 +37,12 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("file 2")
     ))
     val state = FileListState(currDir = currDir)
-    val props = PopupControllerProps(Some(FileListData(dispatch, actions.actions, state)),
-      FileListPopupsState(showDeletePopup = true))
+    val onClose = mockFunction[Unit]
+    val props = FileListUiData(
+      showDeletePopup = true,
+      data = Some(FileListData(dispatch, actions.actions, state)),
+      onClose = onClose
+    )
     val comp = testRender(<(DeleteController())(^.wrapped := props)())
     val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
     val deleteAction = FileListTaskAction(
@@ -50,7 +53,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     //then
     actions.deleteAction.expects(dispatch, currDir.path, items).returning(deleteAction)
     dispatch.expects(deleteAction)
-    dispatch.expects(FileListPopupDeleteAction(show = false))
+    onClose.expects()
 
     //when
     msgBox.actions.head.onAction()
@@ -67,8 +70,12 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("file 2")
     ))
     val state = FileListState(isActive = true, currDir = currDir, selectedNames = Set("file 2"))
-    val props = PopupControllerProps(Some(FileListData(dispatch, actions.actions, state)),
-      FileListPopupsState(showDeletePopup = true))
+    val onClose = mockFunction[Unit]
+    val props = FileListUiData(
+      showDeletePopup = true,
+      data = Some(FileListData(dispatch, actions.actions, state)),
+      onClose = onClose
+    )
     val comp = testRender(<(DeleteController())(^.wrapped := props)())
     val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
     val deleteAction = FileListTaskAction(
@@ -79,7 +86,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     //then
     actions.deleteAction.expects(dispatch, currDir.path, items).returning(deleteAction)
     dispatch.expects(deleteAction)
-    dispatch.expects(FileListPopupDeleteAction(show = false))
+    onClose.expects()
 
     //when
     msgBox.actions.head.onAction()
@@ -87,19 +94,22 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     deleteAction.task.future.map(_ => Succeeded)
   }
 
-  it should "dispatch FileListPopupDeleteAction when NO action" in {
+  it should "call onClose when NO action" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val state = FileListState()
-    val props = PopupControllerProps(Some(FileListData(dispatch, actions.actions, state)),
-      FileListPopupsState(showDeletePopup = true))
+    val onClose = mockFunction[Unit]
+    val props = FileListUiData(
+      showDeletePopup = true,
+      data = Some(FileListData(dispatch, actions.actions, state)),
+      onClose = onClose
+    )
     val comp = testRender(<(DeleteController())(^.wrapped := props)())
     val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
-    val action = FileListPopupDeleteAction(show = false)
 
     //then
-    dispatch.expects(action)
+    onClose.expects()
 
     //when
     msgBox.actions(1).onAction()
@@ -112,8 +122,10 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val state = FileListState()
-    val props = PopupControllerProps(Some(FileListData(dispatch, actions.actions, state)),
-      FileListPopupsState(showDeletePopup = true))
+    val props = FileListUiData(
+      showDeletePopup = true,
+      data = Some(FileListData(dispatch, actions.actions, state))
+    )
 
     //when
     val result = testRender(<(DeleteController())(^.wrapped := props)())
@@ -130,13 +142,23 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     }
   }
 
-  it should "render empty component" in {
+  it should "render empty component if showDeletePopup=false" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
     val state = FileListState()
-    val props = PopupControllerProps(Some(FileListData(dispatch, actions, state)),
-      FileListPopupsState())
+    val props = FileListUiData(data = Some(FileListData(dispatch, actions, state)))
+
+    //when
+    val renderer = createTestRenderer(<(DeleteController())(^.wrapped := props)())
+
+    //then
+    renderer.root.children.toList should be (empty)
+  }
+
+  it should "render empty component if data is None" in {
+    //given
+    val props = FileListUiData(showDeletePopup = true)
 
     //when
     val renderer = createTestRenderer(<(DeleteController())(^.wrapped := props)())

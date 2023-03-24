@@ -1,26 +1,24 @@
 package farjs.filelist.popups
 
 import farjs.filelist.FileListActions.FileListParamsChangedAction
-import farjs.filelist.FileListServices
 import farjs.filelist.api.FileListItem
-import farjs.filelist.popups.FileListPopupsActions._
+import farjs.filelist.{FileListServices, FileListUiData}
 import scommons.react._
 
 import java.util.regex.Pattern
 
-object SelectController extends FunctionComponent[PopupControllerProps] {
+object SelectController extends FunctionComponent[FileListUiData] {
 
   private[popups] var selectPopupComp: UiComponent[SelectPopupProps] = SelectPopup
 
   protected def render(compProps: Props): ReactElement = {
     val services = FileListServices.useServices
     val props = compProps.wrapped
-    val popups = props.popups
 
-    props.data match {
-      case Some(data) if popups.showSelectPopup != SelectHidden =>
+    (props.data, props.showSelectPopup) match {
+      case (Some(data), Some(showSelectPopup)) =>
         <(selectPopupComp())(^.wrapped := SelectPopupProps(
-          action = popups.showSelectPopup,
+          showSelect = showSelectPopup,
           onAction = { pattern =>
             services.selectPatternsHistory.save(pattern)
 
@@ -30,7 +28,7 @@ object SelectController extends FunctionComponent[PopupControllerProps] {
               .filter(i => i != FileListItem.up && regexes.exists(_.matcher(i.name).matches()))
               .map(_.name)
             val updatedSelection =
-              if (popups.showSelectPopup == ShowSelect) {
+              if (showSelectPopup) {
                 data.state.selectedNames ++ matchedNames
               }
               else data.state.selectedNames -- matchedNames
@@ -42,11 +40,9 @@ object SelectController extends FunctionComponent[PopupControllerProps] {
                 selectedNames = updatedSelection
               ))
             }
-            data.dispatch(FileListPopupSelectAction(SelectHidden))
+            props.onClose()
           },
-          onCancel = { () =>
-            data.dispatch(FileListPopupSelectAction(SelectHidden))
-          }
+          onCancel = props.onClose
         ))()
       case _ => null
     }

@@ -1,7 +1,6 @@
 package farjs.filelist.popups
 
 import farjs.filelist.FileListServices
-import farjs.filelist.popups.FileListPopupsActions._
 import farjs.ui._
 import farjs.ui.popup.ModalContent._
 import farjs.ui.popup._
@@ -12,7 +11,7 @@ import scommons.react.hooks._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 
-case class SelectPopupProps(action: FileListPopupSelect,
+case class SelectPopupProps(showSelect: Boolean,
                             onAction: String => Unit,
                             onCancel: () => Unit)
 
@@ -51,7 +50,7 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
     maybeItems.map { items =>
       <(modalComp())(^.wrapped := ModalProps(
         title =
-          if (props.action == ShowSelect) "Select"
+          if (props.showSelect) "Select"
           else "Deselect",
         size = size,
         style = theme,

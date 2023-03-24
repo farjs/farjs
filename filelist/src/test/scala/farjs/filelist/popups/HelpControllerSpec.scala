@@ -1,6 +1,6 @@
 package farjs.filelist.popups
 
-import farjs.filelist.popups.FileListPopupsActions._
+import farjs.filelist.FileListUiData
 import farjs.filelist.popups.HelpController._
 import farjs.ui.popup._
 import farjs.ui.theme.Theme
@@ -12,14 +12,13 @@ class HelpControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "dispatch FileListPopupHelpAction when OK action" in {
     //given
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showHelpPopup = true))
+    val onClose = mockFunction[Unit]
+    val props = FileListUiData(showHelpPopup = true, onClose = onClose)
     val comp = testRender(<(HelpController())(^.wrapped := props)())
     val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
-    val action = FileListPopupHelpAction(show = false)
 
     //then
-    dispatch.expects(action)
+    onClose.expects()
 
     //when
     msgBox.actions.head.onAction()
@@ -27,8 +26,7 @@ class HelpControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "render popup component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState(showHelpPopup = true))
+    val props = FileListUiData(showHelpPopup = true)
 
     //when
     val result = testRender(<(HelpController())(^.wrapped := props)())
@@ -47,8 +45,7 @@ class HelpControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "render empty component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListPopupsProps(dispatch, FileListPopupsState())
+    val props = FileListUiData()
 
     //when
     val renderer = createTestRenderer(<(HelpController())(^.wrapped := props)())

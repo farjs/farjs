@@ -1,26 +1,23 @@
 package farjs.filelist.popups
 
-import farjs.filelist.popups.FileListPopupsActions._
+import farjs.filelist.FileListUiData
 import farjs.filelist.stack.WithPanelStacks
 import farjs.ui.menu._
-import farjs.ui.popup.PopupOverlay
 import scommons.nodejs._
 import scommons.react._
-import scommons.react.blessed._
 
 import scala.scalajs.js
 
-object MenuController extends FunctionComponent[FileListPopupsProps] {
+object MenuController extends FunctionComponent[FileListUiData] {
 
   private[popups] var menuBarComp: UiComponent[MenuBarProps] = MenuBar
 
   protected def render(compProps: Props): ReactElement = {
     val stacks = WithPanelStacks.usePanelStacks
     val props = compProps.wrapped
-    val popups = props.popups
 
     def onAction(menuIndex: Int, subIndex: Int): Unit = {
-      props.dispatch(FileListPopupMenuAction(show = false))
+      props.onClose()
 
       val action = actions(menuIndex)._2(subIndex)
       val keyFull = action._3
@@ -38,26 +35,25 @@ object MenuController extends FunctionComponent[FileListPopupsProps] {
       }
     }
     
-    if (popups.showMenuPopup) {
+    if (props.showMenuPopup) {
       <(menuBarComp())(^.wrapped := MenuBarProps(
         items = items,
         onAction = onAction,
-        onClose = { () =>
-          props.dispatch(FileListPopupMenuAction(show = false))
-        }
+        onClose = props.onClose
       ))()
     }
     else {
-      <.box(
-        ^.rbHeight := 1,
-        ^.rbClickable := true,
-        ^.rbMouse := true,
-        ^.rbAutoFocus := false,
-        ^.rbStyle := PopupOverlay.style,
-        ^.rbOnClick := { _ =>
-          props.dispatch(FileListPopupMenuAction(show = true))
-        }
-      )()
+      null
+//      <.box(
+//        ^.rbHeight := 1,
+//        ^.rbClickable := true,
+//        ^.rbMouse := true,
+//        ^.rbAutoFocus := false,
+//        ^.rbStyle := PopupOverlay.style,
+//        ^.rbOnClick := { _ =>
+//          props.dispatch(FileListPopupMenuAction(show = true))
+//        }
+//      )()
     }
   }
 

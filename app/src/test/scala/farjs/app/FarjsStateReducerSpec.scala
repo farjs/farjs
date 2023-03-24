@@ -1,7 +1,6 @@
 package farjs.app
 
 import farjs.filelist.FileListActions._
-import farjs.filelist.FileListsState
 import farjs.filelist.api.FileListDir
 import scommons.react.redux.task.{AbstractTask, FutureTask}
 import scommons.react.test.TestSpec
@@ -16,16 +15,15 @@ class FarjsStateReducerSpec extends TestSpec {
     
     //then
     inside(result) {
-      case FarjsState(currentTask, fileListsState) =>
+      case FarjsState(currentTask) =>
         currentTask shouldBe None
-        fileListsState shouldBe FileListsState()
     }
   }
   
   it should "set currentTask when TaskAction" in {
     //given
     val currTask = mock[AbstractTask]
-    val state = FarjsState(Some(currTask), FileListsState())
+    val state = FarjsState(Some(currTask))
     val task = FutureTask("test task", Future.successful(FileListDir("/", isRoot = true, Seq.empty)))
     
     //when

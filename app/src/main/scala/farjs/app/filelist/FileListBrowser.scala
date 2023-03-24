@@ -2,7 +2,6 @@ package farjs.app.filelist
 
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
-import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.stack._
 import farjs.fs.FSPlugin
 import farjs.ui.menu.{BottomMenu, BottomMenuProps}
@@ -27,7 +26,6 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
   private[filelist] var panelStackComp: UiComponent[PanelStackProps] = PanelStack
   private[filelist] var bottomMenuComp: UiComponent[BottomMenuProps] = BottomMenu
   private[filelist] var fsPlugin: FSPlugin = FSPlugin
-  private[filelist] var fileListPopups: ReactClass = FileListPopupsController()
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -76,8 +74,6 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (_, key) =>
       def screen = leftButtonRef.current.screen
       key.full match {
-        case "f9" => props.dispatch(FileListPopupMenuAction(show = true))
-        case "f10" => props.dispatch(FileListPopupExitAction(show = true))
         case "tab" | "S-tab" => screen.focusNext()
         case "C-u" =>
           setIsRight(!_)
@@ -144,8 +140,6 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       <.box(^.rbTop := "100%-1")(
         <(bottomMenuComp())(^.wrapped := BottomMenuProps(menuItems))()
       ),
-
-      <(fileListPopups).empty,
 
       currPluginUi.map { pluginUi =>
         <(pluginUi)(^.plain := FileListPluginUiProps(

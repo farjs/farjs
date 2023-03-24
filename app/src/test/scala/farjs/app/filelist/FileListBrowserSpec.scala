@@ -4,7 +4,6 @@ import farjs.app.filelist.FileListBrowser._
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api._
-import farjs.filelist.popups.FileListPopupsActions._
 import farjs.filelist.stack._
 import farjs.fs.FSPlugin
 import farjs.ui.menu.BottomMenuProps
@@ -26,7 +25,6 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   FileListBrowser.panelStackComp = mockUiComponent("PanelStack")
   FileListBrowser.bottomMenuComp = mockUiComponent("BottomMenu")
   FileListBrowser.fsPlugin = new FSPlugin((s, _) => s)
-  FileListBrowser.fileListPopups = "test_filelist_popups".asInstanceOf[ReactClass]
   
   //noinspection TypeAnnotation
   class Actions {
@@ -163,37 +161,6 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         rightStack.isRight shouldBe true
         rightStack.stack.isActive shouldBe true
     }
-  }
-
-  it should "dispatch actions when onKeypress(F9/F10)" in {
-    //given
-    val dispatch = mockFunction[Any, Any]
-    val props = FileListBrowserProps(dispatch)
-    val focusMock = mockFunction[Unit]
-    val buttonMock = literal("focus" -> focusMock)
-    focusMock.expects()
-
-    val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
-      if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
-      else null
-    })
-    val button = inside(findComponents(comp, <.button.name)) {
-      case List(button, _) => button
-    }
-
-    def check(fullKey: String, action: Any): Unit = {
-      //then
-      dispatch.expects(action)
-  
-      //when
-      button.props.onKeypress(null, literal(full = fullKey).asInstanceOf[KeyboardKey])
-    }
-
-    //when & then
-    check("f9", FileListPopupMenuAction(show = true))
-    check("f10", FileListPopupExitAction(show = true))
-
-    Succeeded
   }
 
   it should "focus next panel when onKeypress(tab|S-tab)" in {
@@ -629,9 +596,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
       <.box(^.rbTop := "100%-1")(
         <(bottomMenuComp())(^.wrapped := BottomMenuProps(menuItems))()
-      ),
-
-      <(fileListPopups).empty
+      )
     ))
   }
 }
