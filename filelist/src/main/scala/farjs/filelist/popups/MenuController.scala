@@ -42,19 +42,7 @@ object MenuController extends FunctionComponent[FileListUiData] {
         onClose = props.onClose
       ))()
     }
-    else {
-      null
-//      <.box(
-//        ^.rbHeight := 1,
-//        ^.rbClickable := true,
-//        ^.rbMouse := true,
-//        ^.rbAutoFocus := false,
-//        ^.rbStyle := PopupOverlay.style,
-//        ^.rbOnClick := { _ =>
-//          props.dispatch(FileListPopupMenuAction(show = true))
-//        }
-//      )()
-    }
+    else null
   }
 
   private lazy val actions = List[(String, List[(String, Option[Boolean], String)])](

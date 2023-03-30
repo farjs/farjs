@@ -4,7 +4,7 @@ import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.stack._
 import farjs.fs.FSPlugin
-import farjs.ui.menu.{BottomMenu, BottomMenuProps}
+import farjs.ui.menu._
 import scommons.nodejs.path
 import scommons.react._
 import scommons.react.blessed._
@@ -25,6 +25,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
 
   private[filelist] var panelStackComp: UiComponent[PanelStackProps] = PanelStack
   private[filelist] var bottomMenuComp: UiComponent[BottomMenuProps] = BottomMenu
+  private[filelist] var menuBarTrigger: UiComponent[Unit] = MenuBarTrigger
   private[filelist] var fsPlugin: FSPlugin = FSPlugin
 
   protected def render(compProps: Props): ReactElement = {
@@ -140,6 +141,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       <.box(^.rbTop := "100%-1")(
         <(bottomMenuComp())(^.wrapped := BottomMenuProps(menuItems))()
       ),
+      <(menuBarTrigger())()(),
 
       currPluginUi.map { pluginUi =>
         <(pluginUi)(^.plain := FileListPluginUiProps(

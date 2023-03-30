@@ -24,6 +24,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   
   FileListBrowser.panelStackComp = mockUiComponent("PanelStack")
   FileListBrowser.bottomMenuComp = mockUiComponent("BottomMenu")
+  FileListBrowser.menuBarTrigger = mockUiComponent("MenuBarTrigger")
   FileListBrowser.fsPlugin = new FSPlugin((s, _) => s)
   
   //noinspection TypeAnnotation
@@ -596,7 +597,8 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
       <.box(^.rbTop := "100%-1")(
         <(bottomMenuComp())(^.wrapped := BottomMenuProps(menuItems))()
-      )
+      ),
+      <(menuBarTrigger())()()
     ))
   }
 }
