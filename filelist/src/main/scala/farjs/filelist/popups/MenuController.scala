@@ -51,7 +51,7 @@ object MenuController extends FunctionComponent[FileListUiData] {
       (SubMenu.separator, None, ""),
       ("  Sort modes    Ctrl-F12  ", Some(false), "C-f12"),
       ("  Re-read       Ctrl-R    ", Some(false), "C-r"),
-      ("  Change drive  Alt-F1    ", Some(false), "M-l")
+      ("  Change drive  Alt-L     ", Some(false), "M-l")
     ),
     "Files" -> List(
       ("  View            F3        ", None, "f3"),
@@ -62,11 +62,11 @@ object MenuController extends FunctionComponent[FileListUiData] {
       (SubMenu.separator, None, ""),
       ("  Add to archive  Shift-F7  ", None, "S-f7"),
       (SubMenu.separator, None, ""),
-      ("  Select group    +         ", None, "+"),
-      ("  Unselect group  -         ", None, "-")
+      ("  Select group    Alt-S     ", None, "M-s"),
+      ("  Unselect group  Alt-D     ", None, "M-d")
     ),
     "Commands" -> List(
-      ("  Folders history   Alt-F12  ", None, "M-h"),
+      ("  Folders history   Alt-H    ", None, "M-h"),
       (SubMenu.separator, None, ""),
       ("  Swap panels       Ctrl-U   ", None, "C-u"),
       ("  Quick search      Ctrl-S   ", None, "C-s"),
@@ -81,7 +81,7 @@ object MenuController extends FunctionComponent[FileListUiData] {
       (SubMenu.separator, None, ""),
       ("  Sort modes    Ctrl-F12  ", Some(true), "C-f12"),
       ("  Re-read       Ctrl-R    ", Some(true), "C-r"),
-      ("  Change drive  Alt-F2    ", Some(true), "M-r")
+      ("  Change drive  Alt-R     ", Some(true), "M-r")
     )
   )
 

@@ -10,7 +10,7 @@ class FileListUiPluginSpec extends TestSpec {
   it should "define triggerKeys" in {
     //when & then
     FileListUiPlugin.triggerKeys.toList shouldBe List(
-      "f1", "f7", "f8", "delete", "f9", "f10", "+", "-"
+      "f1", "f7", "f8", "delete", "f9", "f10", "M-s", "M-d"
     )
   }
 
@@ -35,7 +35,7 @@ class FileListUiPluginSpec extends TestSpec {
     FileListUiPlugin.onKeyTrigger("f1", stacks) should not be None
   }
 
-  it should "return Some(ui) if trigger key=f1/f9/f10/+/- when createUi" in {
+  it should "return Some(ui) if trigger key=f1/f9/f10/Alt-S/Alt-D when createUi" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
@@ -54,10 +54,10 @@ class FileListUiPluginSpec extends TestSpec {
     inside(FileListUiPlugin.createUiData("f10", someData)) {
       case Some(FileListUiData(false, true, false, false, false, None, `someData`, _)) =>
     }
-    inside(FileListUiPlugin.createUiData("+", someData)) {
+    inside(FileListUiPlugin.createUiData("M-s", someData)) {
       case Some(FileListUiData(false, false, false, false, false, Some(true), `someData`, _)) =>
     }
-    inside(FileListUiPlugin.createUiData("-", someData)) {
+    inside(FileListUiPlugin.createUiData("M-d", someData)) {
       case Some(FileListUiData(false, false, false, false, false, Some(false), `someData`, _)) =>
     }
   }

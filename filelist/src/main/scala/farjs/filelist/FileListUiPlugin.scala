@@ -9,7 +9,7 @@ import scala.scalajs.js
 object FileListUiPlugin extends FileListPlugin {
 
   override val triggerKeys: js.Array[String] = js.Array(
-    "f1", "f7", "f8", "delete", "f9", "f10", "+", "-"
+    "f1", "f7", "f8", "delete", "f9", "f10", "M-s", "M-d"
   )
 
   override def onKeyTrigger(key: String, stacks: WithPanelStacksProps): Option[ReactClass] = {
@@ -38,8 +38,8 @@ object FileListUiPlugin extends FileListPlugin {
       }
       case "f9" => Some(FileListUiData(showMenuPopup = true, data = data))
       case "f10" => Some(FileListUiData(showExitPopup = true, data = data))
-      case "+" => Some(FileListUiData(showSelectPopup = Some(true), data = data))
-      case "-" => Some(FileListUiData(showSelectPopup = Some(false), data = data))
+      case "M-s" => Some(FileListUiData(showSelectPopup = Some(true), data = data))
+      case "M-d" => Some(FileListUiData(showSelectPopup = Some(false), data = data))
       case _ => None
     }
   }
