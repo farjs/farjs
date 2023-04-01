@@ -4,7 +4,7 @@ import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.fs.FSPanel._
-import scommons.react.redux.task.FutureTask
+import farjs.ui.task.FutureTask
 import scommons.react.test._
 
 import scala.concurrent.Future

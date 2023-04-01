@@ -6,13 +6,13 @@ import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack.WithPanelStacks
+import farjs.ui.Dispatch
 import farjs.ui.popup.{MessageBox, MessageBoxAction, MessageBoxProps}
+import farjs.ui.task.FutureTask
 import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed.BlessedScreen
 import scommons.react.hooks._
-import scommons.react.redux.Dispatch
-import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

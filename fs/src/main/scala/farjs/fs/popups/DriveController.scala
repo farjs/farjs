@@ -1,7 +1,7 @@
 package farjs.fs.popups
 
+import farjs.ui.Dispatch
 import scommons.react._
-import scommons.react.redux.Dispatch
 
 import scala.scalajs.js
 

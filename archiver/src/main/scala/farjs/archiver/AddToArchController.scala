@@ -4,11 +4,11 @@ import farjs.archiver.zip.ZipApi
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.FileListItem
 import farjs.filelist.{FileListActions, FileListState}
+import farjs.ui.Dispatch
 import farjs.ui.popup.{StatusPopup, StatusPopupProps}
+import farjs.ui.task.FutureTask
 import scommons.react._
 import scommons.react.hooks._
-import scommons.react.redux.Dispatch
-import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

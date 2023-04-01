@@ -6,11 +6,11 @@ import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.FileListItem
 import farjs.ui.popup._
+import farjs.ui.task.FutureTask
 import farjs.ui.theme.Theme
 import scommons.nodejs.path
 import scommons.react._
 import scommons.react.hooks._
-import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

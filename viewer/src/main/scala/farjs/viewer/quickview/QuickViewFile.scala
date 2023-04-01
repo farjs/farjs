@@ -1,11 +1,11 @@
 package farjs.viewer.quickview
 
 import farjs.filelist.stack.PanelStackProps
+import farjs.ui.Dispatch
 import farjs.viewer._
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
-import scommons.react.redux.Dispatch
 
 case class QuickViewFileProps(dispatch: Dispatch,
                               panelStack: PanelStackProps,

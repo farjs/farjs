@@ -2,8 +2,8 @@ package farjs.fs
 
 import farjs.filelist._
 import farjs.filelist.stack._
+import farjs.ui.Dispatch
 import scommons.react.ReactClass
-import scommons.react.redux.Dispatch
 
 import scala.scalajs.js
 

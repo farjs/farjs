@@ -3,12 +3,12 @@ package farjs.filelist
 import farjs.filelist.FileList._
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.ui.Dispatch
+import farjs.ui.task.FutureTask
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.blessed.BlessedScreen
-import scommons.react.redux.Dispatch
-import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
 import scala.concurrent.Future

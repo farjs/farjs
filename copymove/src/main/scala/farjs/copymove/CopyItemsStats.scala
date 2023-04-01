@@ -3,11 +3,11 @@ package farjs.copymove
 import farjs.filelist.FileListActions
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.api.FileListItem
+import farjs.ui.Dispatch
 import farjs.ui.popup.{StatusPopup, StatusPopupProps}
+import farjs.ui.task.FutureTask
 import scommons.react._
 import scommons.react.hooks._
-import scommons.react.redux.Dispatch
-import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

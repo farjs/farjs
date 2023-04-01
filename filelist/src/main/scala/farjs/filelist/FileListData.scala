@@ -1,6 +1,6 @@
 package farjs.filelist
 
-import scommons.react.redux.Dispatch
+import farjs.ui.Dispatch
 
 case class FileListData(dispatch: Dispatch,
                         actions: FileListActions,

@@ -6,13 +6,12 @@ import farjs.filelist.stack.WithPanelStacks
 import farjs.fs.{FSDisk, FSService}
 import farjs.ui.border.SingleChars
 import farjs.ui.menu.{MenuPopup, MenuPopupProps}
-import farjs.ui.{WithSize, WithSizeProps}
+import farjs.ui.task.FutureTask
+import farjs.ui.{Dispatch, WithSize, WithSizeProps}
 import scommons.nodejs.Process.Platform
 import scommons.nodejs.process
 import scommons.react._
 import scommons.react.hooks._
-import scommons.react.redux.Dispatch
-import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

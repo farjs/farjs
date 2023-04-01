@@ -2,7 +2,7 @@ package farjs.filelist
 
 import farjs.filelist.FileListActions._
 import farjs.filelist.api._
-import scommons.react.redux.Dispatch
+import farjs.ui.Dispatch
 
 import scala.concurrent.Future
 

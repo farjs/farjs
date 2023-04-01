@@ -14,8 +14,9 @@ class FileListRootSpec extends TestSpec with TestRendererUtils {
     //given
     val (fileListCtx, fsCtx, servicesComp) = getServicesCtxHook
     FileListRoot.fileListComp = servicesComp
+    val dispatch = mockFunction[Any, Any]
     val module = mock[FileListModule]
-    val rootComp = new FileListRoot(module)
+    val rootComp = new FileListRoot(dispatch, module)
     
     //when
     val result = createTestRenderer(<(rootComp()).empty).root
@@ -24,7 +25,12 @@ class FileListRootSpec extends TestSpec with TestRendererUtils {
     fileListCtx.get() shouldBe module.fileListServices
     fsCtx.get() shouldBe module.fsServices
     assertComponents(result.children, List(
-      <(servicesComp).empty
+      <(servicesComp)(^.assertWrapped(inside(_) {
+        case FileListBrowserProps(resDispatch, isRightInitiallyActive, plugins) =>
+          resDispatch should be theSameInstanceAs dispatch
+          isRightInitiallyActive shouldBe false
+          plugins should not be empty
+      }))()
     ))
   }
 

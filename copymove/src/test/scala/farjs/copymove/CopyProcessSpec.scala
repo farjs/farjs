@@ -4,6 +4,7 @@ import farjs.copymove.CopyProcess._
 import farjs.filelist.FileListActions.{FileListDirUpdateAction, FileListTaskAction}
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem, FileTarget}
+import farjs.ui.Dispatch
 import farjs.ui.popup.MessageBoxProps
 import farjs.ui.theme.Theme
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -12,7 +13,6 @@ import scommons.nodejs
 import scommons.nodejs._
 import scommons.nodejs.raw.Timers
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react.redux.Dispatch
 import scommons.react.test._
 import scommons.react.test.raw.TestRenderer
 

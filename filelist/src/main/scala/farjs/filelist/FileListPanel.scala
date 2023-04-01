@@ -4,11 +4,11 @@ import farjs.filelist.FileListActions._
 import farjs.filelist.api.FileListItem
 import farjs.filelist.sort._
 import farjs.filelist.stack.PanelStack
+import farjs.ui.Dispatch
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed.BlessedScreen
 import scommons.react.hooks._
-import scommons.react.redux.Dispatch
 
 import scala.scalajs.js
 

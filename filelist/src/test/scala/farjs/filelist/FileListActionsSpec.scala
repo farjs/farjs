@@ -3,10 +3,10 @@ package farjs.filelist
 import farjs.filelist.FileListActions._
 import farjs.filelist.FileListActionsSpec._
 import farjs.filelist.api._
+import farjs.ui.task.FutureTask
 import org.scalatest.Succeeded
 import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.Future
 import scala.scalajs.js.typedarray.Uint8Array

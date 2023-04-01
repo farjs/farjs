@@ -1,7 +1,9 @@
 package farjs.app
 
 import farjs.app.FarjsRoot._
+import farjs.app.task.FarjsTaskManagerUi
 import farjs.app.util._
+import farjs.ui.task.{TaskManager, TaskManagerProps}
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
@@ -11,8 +13,7 @@ import scala.concurrent.Future
 import scala.scalajs.js
 
 class FarjsRoot(withPortalsComp: UiComponent[Unit],
-                loadFileListUi: => Future[ReactClass],
-                taskController: ReactClass,
+                loadFileListUi: js.Function1[Any, Unit] => Future[ReactClass],
                 initialDevTool: DevTool
                ) extends FunctionComponent[Unit] {
 
@@ -20,6 +21,7 @@ class FarjsRoot(withPortalsComp: UiComponent[Unit],
     val (maybeFileListUi, setFileListUi) = useState(Option.empty[ReactClass])
     val elementRef = useRef[BlessedElement](null)
     val (devTool, setDevTool) = useStateUpdater(initialDevTool)
+    val (state, dispatch) = useReducer(FarjsStateReducer.apply, FarjsState())
 
     useLayoutEffect({ () =>
       val screen = elementRef.current.screen
@@ -55,12 +57,12 @@ class FarjsRoot(withPortalsComp: UiComponent[Unit],
             case None => <.text()("Loading...")
             case Some(fileListComp) => <(fileListComp).empty
           },
-          <(taskController).empty
+          <(taskControllerComp())(^.wrapped := TaskManagerProps(state.currentTask))()
         )
       ),
       
       <(logControllerComp())(^.wrapped := LogControllerProps(onReady = { () =>
-        loadFileListUi.map { fileListUi =>
+        loadFileListUi(dispatch).map { fileListUi =>
           setFileListUi(Some(fileListUi))
         }
       }, { content =>
@@ -85,6 +87,11 @@ class FarjsRoot(withPortalsComp: UiComponent[Unit],
 
 object FarjsRoot {
 
+  private[app] var taskControllerComp: UiComponent[TaskManagerProps] = {
+    TaskManager.uiComponent = FarjsTaskManagerUi
+    TaskManager.errorHandler = FarjsTaskManagerUi.errorHandler
+    TaskManager
+  }
   private[app] var logControllerComp: UiComponent[LogControllerProps] = LogController
   private[app] var devToolPanelComp: UiComponent[DevToolPanelProps] = DevToolPanel
 }

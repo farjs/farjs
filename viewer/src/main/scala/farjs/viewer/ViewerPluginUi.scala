@@ -1,13 +1,13 @@
 package farjs.viewer
 
 import farjs.filelist._
+import farjs.ui.Dispatch
 import farjs.ui.menu.{BottomMenu, BottomMenuProps}
 import farjs.ui.popup.{Popup, PopupProps}
 import farjs.viewer.ViewerPluginUi._
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
-import scommons.react.redux.Dispatch
 
 class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
   extends FunctionComponent[FileListPluginUiProps] {

@@ -3,8 +3,8 @@ package farjs.archiver.zip
 import farjs.archiver.ArchiverPlugin
 import farjs.filelist.FileListActions
 import farjs.filelist.FileListActions._
-import scommons.react.redux.Dispatch
-import scommons.react.redux.task.FutureTask
+import farjs.ui.Dispatch
+import farjs.ui.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

@@ -3,9 +3,9 @@ package farjs.filelist
 import farjs.filelist.FileListActions._
 import farjs.filelist.api._
 import farjs.filelist.sort.SortMode
+import farjs.ui.Dispatch
+import farjs.ui.task.{FutureTask, TaskAction}
 import scommons.nodejs.{path => nodePath}
-import scommons.react.redux._
-import scommons.react.redux.task.{FutureTask, TaskAction}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -157,17 +157,17 @@ object FileListActions {
 
   case class FileListParamsChangedAction(offset: Int,
                                          index: Int,
-                                         selectedNames: Set[String]) extends Action
+                                         selectedNames: Set[String])
 
   case class FileListDirChangeAction(task: FutureTask[FileListDir]) extends TaskAction
-  case class FileListDirChangedAction(dir: String, currDir: FileListDir) extends Action
+  case class FileListDirChangedAction(dir: String, currDir: FileListDir)
   
   case class FileListDirUpdateAction(task: FutureTask[FileListDir]) extends TaskAction
-  case class FileListDirUpdatedAction(currDir: FileListDir) extends Action
+  case class FileListDirUpdatedAction(currDir: FileListDir)
   case class FileListDirCreateAction(task: FutureTask[Unit]) extends TaskAction
 
-  case class FileListItemCreatedAction(name: String, currDir: FileListDir) extends Action
+  case class FileListItemCreatedAction(name: String, currDir: FileListDir)
   
-  case class FileListDiskSpaceUpdatedAction(diskSpace: Double) extends Action
-  case class FileListSortByAction(mode: SortMode) extends Action
+  case class FileListDiskSpaceUpdatedAction(diskSpace: Double)
+  case class FileListSortByAction(mode: SortMode)
 }

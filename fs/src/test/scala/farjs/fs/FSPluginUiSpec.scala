@@ -7,9 +7,9 @@ import farjs.filelist.stack.{PanelStack, PanelStackItem}
 import farjs.filelist.{FileListPluginUiProps, FileListState, MockFileListActions}
 import farjs.fs.FSPluginUi._
 import farjs.fs.popups._
+import farjs.ui.Dispatch
+import farjs.ui.task.FutureTask
 import scommons.react.ReactClass
-import scommons.react.redux.Dispatch
-import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
 import scala.concurrent.Future

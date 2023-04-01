@@ -2,12 +2,12 @@ package farjs.viewer
 
 import farjs.filelist.FileListActions.{FileListDirUpdatedAction, FileListTaskAction}
 import farjs.filelist._
+import farjs.ui.Dispatch
 import farjs.ui.popup._
+import farjs.ui.task.FutureTask
 import farjs.viewer.ViewItemsPopup._
 import scommons.react._
 import scommons.react.hooks._
-import scommons.react.redux.Dispatch
-import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

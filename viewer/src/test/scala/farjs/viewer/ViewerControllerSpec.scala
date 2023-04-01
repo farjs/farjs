@@ -3,6 +3,7 @@ package farjs.viewer
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.text.Encoding
 import farjs.ui.WithSizeProps
+import farjs.ui.task.FutureTask
 import farjs.viewer.ViewerController._
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
@@ -10,7 +11,6 @@ import scommons.nodejs.raw.FSConstants
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
 import scala.concurrent.Future

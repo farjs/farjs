@@ -5,13 +5,12 @@ import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack._
 import farjs.ui.border._
 import farjs.ui.theme.Theme
-import farjs.ui.{TextAlign, TextLineProps}
+import farjs.ui.{Dispatch, TextAlign, TextLineProps}
 import farjs.viewer.quickview.QuickViewPanel._
 import org.scalatest.Assertion
 import scommons.nodejs.path
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.redux.Dispatch
 import scommons.react.test._
 
 import scala.scalajs.js

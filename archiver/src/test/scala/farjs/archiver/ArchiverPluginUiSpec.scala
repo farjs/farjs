@@ -4,10 +4,10 @@ import farjs.archiver.ArchiverPluginUi._
 import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.ui.Dispatch
+import farjs.ui.task.FutureTask
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react.redux.Dispatch
-import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
 import scala.collection.immutable.ListSet

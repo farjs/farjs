@@ -3,9 +3,9 @@ package farjs.archiver.zip
 import farjs.archiver.ArchiverPlugin
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.ui.task.FutureTask
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.Future
 

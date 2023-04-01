@@ -34,9 +34,6 @@ object FarjsApp extends ScalaJsModule {
 
       scalaJSUseMainModuleInitializer := false,
 
-      // our custom mocks during test
-      scommonsNodeJsTestLibs := Seq("test.aliases.js"),
-
       Compile / npmUpdate := {
         def copyToWorkingDir(targetDir: File)(file: File): File = {
           val copy = targetDir / file.name
@@ -52,10 +49,6 @@ object FarjsApp extends ScalaJsModule {
 
       //useYarn := true,
       //yarnExtraArgs := Seq("--frozen-lockfile"),
-
-      Compile / npmDependencies ++= Seq(
-        "module-alias" -> "2.2.2"
-      ),
 
       Compile / additionalNpmConfig := {
         import com.fasterxml.jackson.databind.node._

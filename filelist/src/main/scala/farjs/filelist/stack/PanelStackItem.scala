@@ -1,8 +1,8 @@
 package farjs.filelist.stack
 
 import farjs.filelist.{FileListActions, FileListState}
+import farjs.ui.Dispatch
 import scommons.react.ReactClass
-import scommons.react.redux.Dispatch
 
 case class PanelStackItem[T](
   component: ReactClass,

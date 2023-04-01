@@ -2,13 +2,12 @@ package farjs.viewer
 
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.text.Encoding
+import farjs.ui.task.FutureTask
 import farjs.ui.theme.Theme
-import farjs.ui.{WithSize, WithSizeProps}
+import farjs.ui.{Dispatch, WithSize, WithSizeProps}
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
-import scommons.react.redux.Dispatch
-import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js

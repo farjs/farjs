@@ -1,6 +1,6 @@
 package farjs.filelist
 
-import scommons.react.redux.Dispatch
+import farjs.ui.Dispatch
 
 import scala.scalajs.js
 

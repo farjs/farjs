@@ -2,8 +2,8 @@ package farjs.app.task
 
 import farjs.app.task.FarjsTaskManagerUi._
 import farjs.ui.popup._
+import farjs.ui.task.{TaskManager, TaskManagerUiProps}
 import farjs.ui.theme.Theme
-import scommons.react.redux.task._
 import scommons.react.test._
 
 import scala.scalajs.js.JavaScriptException

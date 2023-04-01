@@ -7,14 +7,14 @@ import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.history.{FileListHistoryService, MockFileListHistoryService}
+import farjs.ui.Dispatch
 import farjs.ui.popup.MessageBoxProps
+import farjs.ui.task.FutureTask
 import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
 import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
-import scommons.react.redux.Dispatch
-import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
 import scala.concurrent.Future

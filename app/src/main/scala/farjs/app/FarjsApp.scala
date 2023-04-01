@@ -1,13 +1,10 @@
 package farjs.app
 
 import farjs.app.filelist.{FileListModule, FileListRoot}
-import farjs.app.task.FarjsTaskController
 import farjs.app.util.DevTool
 import farjs.domain.FarjsDBContext
 import farjs.fs.FSFileListActions
 import farjs.ui.theme.{Theme, XTerm256Theme}
-import io.github.shogowada.scalajs.reactjs.redux.ReactRedux._
-import io.github.shogowada.scalajs.reactjs.redux.Redux
 import scommons.nodejs.{process, global => nodeGlobal}
 import scommons.react._
 import scommons.react.blessed._
@@ -65,18 +62,15 @@ object FarjsApp {
       Theme.current = XTerm256Theme
     }
 
-    val store = Redux.createStore(FarjsStateReducer.reduce)
-    
     val root = new FarjsRoot(
       withPortalsComp = new WithPortals(screen),
-      loadFileListUi = {
+      loadFileListUi = { dispatch =>
         prepareDB().map { db =>
           val ctx = new FarjsDBContext(db)
           val fileListModule = new FileListModule(ctx)
-          new FileListRoot(fileListModule).apply()
+          new FileListRoot(dispatch, fileListModule).apply()
         }
       },
-      taskController = FarjsTaskController(),
       initialDevTool = if (showDevTools) DevTool.Logs else DevTool.Hidden
     )
     
@@ -85,9 +79,7 @@ object FarjsApp {
       .getOrElse(createRenderer())
 
     renderer(
-      <.Provider(^.store := store)(
-        <(root()).empty
-      ),
+      <(root()).empty,
       screen
     )
     screen

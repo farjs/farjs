@@ -4,12 +4,12 @@ import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.popups.DeleteController._
+import farjs.ui.Dispatch
 import farjs.ui.popup._
+import farjs.ui.task.FutureTask
 import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react.redux.Dispatch
-import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
 import scala.concurrent.Future

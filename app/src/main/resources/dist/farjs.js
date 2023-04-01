@@ -1,10 +1,5 @@
 #!/usr/bin/env node
 
-const moduleAlias = require('module-alias')
-moduleAlias.addAliases({
-  'react-redux': 'react-redux/lib/alternate-renderers'
-})
-
 process.title = "FAR.js"
 
 const versionChecker = require('./versionChecker.js')

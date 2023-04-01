@@ -1,17 +1,17 @@
 package farjs.app
 
-import scommons.react.redux.task.{AbstractTask, TaskReducer}
+import farjs.ui.task.{AbstractTask, TaskReducer}
 
 trait FarjsStateDef {
 
   def currentTask: Option[AbstractTask]
 }
 
-case class FarjsState(currentTask: Option[AbstractTask]) extends FarjsStateDef
+case class FarjsState(currentTask: Option[AbstractTask] = None) extends FarjsStateDef
 
 object FarjsStateReducer {
 
-  def reduce(state: Option[FarjsState], action: Any): FarjsState = FarjsState(
-    currentTask = TaskReducer(state.flatMap(_.currentTask), action)
+  def apply(state: FarjsState, action: Any): FarjsState = FarjsState(
+    currentTask = TaskReducer(state.currentTask, action)
   )
 }

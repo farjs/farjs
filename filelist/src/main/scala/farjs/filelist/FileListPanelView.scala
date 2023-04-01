@@ -8,7 +8,6 @@ import farjs.ui.border._
 import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.redux.Dispatch
 
 import scala.scalajs.js
 

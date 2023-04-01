@@ -6,12 +6,11 @@ import farjs.filelist.stack.PanelStack
 import farjs.filelist.{FileListActions, FileListState}
 import farjs.ui._
 import farjs.ui.popup.{StatusPopup, StatusPopupProps}
+import farjs.ui.task.FutureTask
 import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
-import scommons.react.redux.Dispatch
-import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js

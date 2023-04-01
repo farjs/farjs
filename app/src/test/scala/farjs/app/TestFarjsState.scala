@@ -1,6 +1,6 @@
 package farjs.app
 
-import scommons.react.redux.task.AbstractTask
+import farjs.ui.task.AbstractTask
 
 //noinspection NotImplementedCode
 case class TestFarjsState(

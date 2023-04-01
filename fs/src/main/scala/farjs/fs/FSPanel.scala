@@ -2,9 +2,9 @@ package farjs.fs
 
 import farjs.filelist.FileListActions._
 import farjs.filelist._
+import farjs.ui.task.FutureTask
 import scommons.react._
 import scommons.react.blessed.BlessedScreen
-import scommons.react.redux.task.FutureTask
 
 object FSPanel extends FunctionComponent[FileListPanelProps] {
 

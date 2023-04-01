@@ -7,12 +7,12 @@ import farjs.filelist.api._
 import farjs.filelist.stack._
 import farjs.fs.FSPlugin
 import farjs.ui.menu.BottomMenuProps
+import farjs.ui.task.FutureTask
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 import scommons.react.blessed._
-import scommons.react.redux.task.FutureTask
 import scommons.react.test._
 
 import scala.concurrent.Future

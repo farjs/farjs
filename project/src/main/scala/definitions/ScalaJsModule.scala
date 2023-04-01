@@ -15,7 +15,6 @@ trait ScalaJsModule extends FarjsModule with CommonNodeJsModule {
   override def superRepoProjectsDependencies: Seq[(String, String, Option[String])] = {
     super.superRepoProjectsDependencies ++ Seq(
       ("scommons-react", "scommons-react-core", None),
-      ("scommons-react", "scommons-react-redux", None),
 
       ("scommons-react", "scommons-react-test", Some("test"))
     )
@@ -23,8 +22,7 @@ trait ScalaJsModule extends FarjsModule with CommonNodeJsModule {
 
   override def runtimeDependencies: Def.Initialize[Seq[ModuleID]] = Def.setting {
     super.runtimeDependencies.value ++ Seq(
-      Libs.scommonsReactCore.value,
-      Libs.scommonsReactRedux.value
+      Libs.scommonsReactCore.value
     )
   }
 

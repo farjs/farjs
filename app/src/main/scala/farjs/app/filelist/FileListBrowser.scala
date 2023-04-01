@@ -4,13 +4,13 @@ import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.stack._
 import farjs.fs.FSPlugin
+import farjs.ui.Dispatch
 import farjs.ui.menu._
+import farjs.ui.task.FutureTask
 import scommons.nodejs.path
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
-import scommons.react.redux.Dispatch
-import scommons.react.redux.task.FutureTask
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js

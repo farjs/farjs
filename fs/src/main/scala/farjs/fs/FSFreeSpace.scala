@@ -2,9 +2,9 @@ package farjs.fs
 
 import farjs.filelist.FileListActions.FileListDiskSpaceUpdatedAction
 import farjs.filelist.api.FileListDir
+import farjs.ui.Dispatch
 import scommons.react._
 import scommons.react.hooks._
-import scommons.react.redux.Dispatch
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.control.NonFatal
