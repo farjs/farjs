@@ -1,6 +1,6 @@
-package farjs.app.util
+package farjs.ui.tool
 
-import farjs.app.util.DevTool._
+import farjs.ui.tool.DevTool._
 import scommons.nodejs.test.TestSpec
 
 class DevToolSpec extends TestSpec {

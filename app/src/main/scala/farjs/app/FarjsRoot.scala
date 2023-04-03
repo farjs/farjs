@@ -1,9 +1,8 @@
 package farjs.app
 
 import farjs.app.FarjsRoot._
-import farjs.app.task.FarjsTaskManagerUi
-import farjs.app.util._
-import farjs.ui.task.{TaskManager, TaskManagerProps}
+import farjs.ui.task._
+import farjs.ui.tool._
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._

@@ -1,8 +1,8 @@
 package farjs.app
 
 import farjs.app.FarjsRoot._
-import farjs.app.util._
 import farjs.ui.task.TaskManagerProps
+import farjs.ui.tool._
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass

@@ -1,6 +1,6 @@
-package farjs.app.util
+package farjs.ui.tool
 
-import farjs.app.util.InputController._
+import farjs.ui.tool.InputController._
 import scommons.react.test._
 
 import scala.scalajs.js

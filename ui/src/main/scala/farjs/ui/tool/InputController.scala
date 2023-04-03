@@ -1,4 +1,4 @@
-package farjs.app.util
+package farjs.ui.tool
 
 import scommons.nodejs.global
 import scommons.react._
@@ -10,8 +10,8 @@ object InputController extends FunctionComponent[Unit] {
 
   private val g: js.Dynamic = global.asInstanceOf[js.Dynamic]
 
-  private[util] var logPanelComp: UiComponent[LogPanelProps] = LogPanel
-  private[util] var maxBufferLength: Int = 4000
+  private[tool] var logPanelComp: UiComponent[LogPanelProps] = LogPanel
+  private[tool] var maxBufferLength: Int = 4000
   
   protected def render(compProps: Props): ReactElement = {
     val (content, setContent) = useStateUpdater("")

@@ -1,8 +1,8 @@
-package farjs.app.util
+package farjs.ui.tool
 
-import farjs.app.util.DevToolPanel._
 import farjs.ui.TextBox
 import farjs.ui.theme.Theme
+import farjs.ui.tool.DevToolPanel._
 import org.scalatest.{Assertion, Succeeded}
 import scommons.react.blessed._
 import scommons.react.test._

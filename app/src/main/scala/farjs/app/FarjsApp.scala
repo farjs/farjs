@@ -1,10 +1,10 @@
 package farjs.app
 
 import farjs.app.filelist.{FileListModule, FileListRoot}
-import farjs.app.util.DevTool
 import farjs.domain.FarjsDBContext
 import farjs.fs.FSFileListActions
 import farjs.ui.theme.{Theme, XTerm256Theme}
+import farjs.ui.tool.DevTool
 import scommons.nodejs.{process, global => nodeGlobal}
 import scommons.react._
 import scommons.react.blessed._

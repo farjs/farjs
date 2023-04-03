@@ -1,4 +1,4 @@
-package farjs.app.util
+package farjs.ui.tool
 
 import farjs.ui.TextBox
 import farjs.ui.theme.Theme
@@ -11,9 +11,9 @@ case class DevToolPanelProps(devTool: DevTool,
 
 object DevToolPanel extends FunctionComponent[DevToolPanelProps] {
 
-  private[util] var logPanelComp: UiComponent[LogPanelProps] = LogPanel
-  private[util] var inputController: UiComponent[Unit] = InputController
-  private[util] var colorPanelComp: UiComponent[Unit] = ColorPanel
+  private[tool] var logPanelComp: UiComponent[LogPanelProps] = LogPanel
+  private[tool] var inputController: UiComponent[Unit] = InputController
+  private[tool] var colorPanelComp: UiComponent[Unit] = ColorPanel
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped

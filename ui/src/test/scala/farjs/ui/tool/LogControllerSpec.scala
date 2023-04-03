@@ -1,4 +1,4 @@
-package farjs.app.util
+package farjs.ui.tool
 
 import scommons.nodejs.global
 import scommons.react._

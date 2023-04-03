@@ -1,4 +1,4 @@
-package farjs.app.util
+package farjs.ui.tool
 
 sealed abstract class DevTool(next: => DevTool) {
 

@@ -1,8 +1,7 @@
-package farjs.app.task
+package farjs.ui.task
 
-import farjs.app.task.FarjsTaskManagerUi._
 import farjs.ui.popup._
-import farjs.ui.task.{TaskManager, TaskManagerUiProps}
+import farjs.ui.task.FarjsTaskManagerUi._
 import farjs.ui.theme.Theme
 import scommons.react.test._
 
