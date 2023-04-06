@@ -349,6 +349,47 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }
   }
 
+  it should "do nothing if onKeypress callback returns true when onKeypress(f2)" in {
+    //given
+    val inputRef = ReactRef.create[BlessedElement]
+    val fileReader = new ViewerFileReader
+    val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
+    var props = getViewerContentProps(inputRef, fileReader, setViewport, onKeypress = _ => true)
+    var viewport = props.viewport
+    val readF = Future.successful("test \nfile content".split('\n').map(c => (c, c.length)).toList)
+    fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readF)
+    val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
+
+    setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
+      inside(maybeViewport) { case Some(vp) =>
+        viewport = vp
+        TestRenderer.act { () =>
+          props = props.copy(viewport = vp)
+          renderer.update(<(ViewerContent())(^.wrapped := props)())
+        }
+      }
+    }.anyNumberOfTimes()
+    assertViewerContent(renderer.root, props, content = Nil)
+
+    eventually {
+      assertViewerContent(renderer.root, props, List(
+        "test ",
+        "file content"
+      ))
+    }.flatMap { _ =>
+      //when
+      findComponentProps(renderer.root, viewerInput).onKeypress("f2")
+  
+      //then
+      eventually {
+        assertViewerContent(renderer.root, props, List(
+          "test ",
+          "file content"
+        ))
+      }
+    }
+  }
+
   it should "do nothing when onKeypress(unknown)" in {
     //given
     val ctx = new TestContext
@@ -522,7 +563,8 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
   
   private def getViewerContentProps(inputRef: ReactRef[BlessedElement],
                                     fileReader: ViewerFileReader,
-                                    setViewport: Option[ViewerFileViewport] => Unit) = {
+                                    setViewport: Option[ViewerFileViewport] => Unit,
+                                    onKeypress: String => Boolean = _ => false) = {
     ViewerContentProps(
       inputRef = inputRef,
       viewport = ViewerFileViewport(
@@ -532,7 +574,8 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         width = 12,
         height = 5
       ),
-      setViewport = setViewport
+      setViewport = setViewport,
+      onKeypress = onKeypress
     )
   }
 

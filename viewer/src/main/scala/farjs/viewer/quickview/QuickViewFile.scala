@@ -7,6 +7,8 @@ import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
 
+import scala.scalajs.js
+
 case class QuickViewFileProps(dispatch: Dispatch,
                               panelStack: PanelStackProps,
                               filePath: String,
@@ -21,13 +23,29 @@ object QuickViewFile extends FunctionComponent[QuickViewFileProps] {
     val (viewport, setViewport) = useState(Option.empty[ViewerFileViewport])
     val inputRef = useRef[BlessedElement](props.panelStack.panelInput)
 
+    def onKeypress(key: String): Boolean = {
+      var processed = true
+      key match {
+        case "f3" =>
+          inputRef.current.emit("keypress", js.undefined, js.Dynamic.literal(
+            name = "",
+            full =
+              if (props.panelStack.isRight) ViewerEvent.onViewerOpenLeft
+              else ViewerEvent.onViewerOpenRight
+          ))
+        case _ => processed = false
+      }
+      processed
+    }
+
     <(viewerController())(^.wrapped := ViewerControllerProps(
       inputRef = inputRef,
       dispatch = props.dispatch,
       filePath = props.filePath,
       size = props.size,
       viewport = viewport,
-      setViewport = setViewport
+      setViewport = setViewport,
+      onKeypress = onKeypress
     ))()
   }
 }

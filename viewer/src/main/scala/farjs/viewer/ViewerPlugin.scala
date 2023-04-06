@@ -3,6 +3,7 @@ package farjs.viewer
 import farjs.filelist._
 import farjs.filelist.api.FileListItem
 import farjs.filelist.stack.WithPanelStacksProps
+import farjs.viewer.ViewerEvent._
 import scommons.nodejs._
 import scommons.react._
 
@@ -10,10 +11,15 @@ import scala.scalajs.js
 
 object ViewerPlugin extends FileListPlugin {
 
-  override val triggerKeys: js.Array[String] = js.Array("f3")
+  override val triggerKeys: js.Array[String] = js.Array("f3", onViewerOpenLeft, onViewerOpenRight)
 
   override def onKeyTrigger(key: String, stacks: WithPanelStacksProps): Option[ReactClass] = {
-    val stackItem = stacks.activeStack.peek[FileListState]
+    val stack = key match {
+      case `onViewerOpenLeft` => stacks.leftStack
+      case `onViewerOpenRight` => stacks.rightStack
+      case _ => stacks.activeStack
+    }
+    val stackItem = stack.peek[FileListState]
     stackItem.getActions.zip(stackItem.state).flatMap { case ((dispatch, actions), state) =>
       val data = FileListData(dispatch, actions, state)
       state.currentItem.filter(_ != FileListItem.up) match {

@@ -164,13 +164,14 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
                 case Some(viewport) =>
                   val linesCount = viewport.linesData.size
                   val content = <(viewerContent())(^.assertWrapped(inside(_) {
-                    case ViewerContentProps(inputRef, resViewport, setViewport) =>
+                    case ViewerContentProps(inputRef, resViewport, setViewport, onKeypress) =>
                       inputRef shouldBe props.inputRef
                       resViewport shouldBe viewport.copy(
                         width = width,
                         height = height
                       )
                       setViewport should be theSameInstanceAs props.setViewport
+                      onKeypress should be theSameInstanceAs props.onKeypress
                   }))()
 
                   assertComponents(js.Array(children: _*),

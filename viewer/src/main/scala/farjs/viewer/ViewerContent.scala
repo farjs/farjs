@@ -11,7 +11,8 @@ import scala.scalajs.js
 
 case class ViewerContentProps(inputRef: ReactRef[BlessedElement],
                               viewport: ViewerFileViewport,
-                              setViewport: js.Function1[Option[ViewerFileViewport], Unit])
+                              setViewport: js.Function1[Option[ViewerFileViewport], Unit],
+                              onKeypress: String => Boolean)
 
 object ViewerContent extends FunctionComponent[ViewerContentProps] {
   
@@ -72,19 +73,23 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       }
     }
     
-    def onKeypress(keyFull: String): Unit = keyFull match {
-      case "f2" => onWrap()
-      case "f8" => setShowEncodingsPopup(true)
-      case "left" => onColumn(dx = -1)
-      case "right" => onColumn(dx = 1)
-      case "C-r" => onReload()
-      case "home" => onReload(from = 0)
-      case "end" => onMoveUp(lines = viewport.height, from = viewport.size)
-      case "up" => onMoveUp(lines = 1)
-      case "pageup" => onMoveUp(lines = viewport.height)
-      case "down" => onMoveDown(lines = 1)
-      case "pagedown" => onMoveDown(lines = viewport.height)
-      case _ =>
+    def onKeypress(keyFull: String): Unit = {
+      if (!props.onKeypress(keyFull)) {
+        keyFull match {
+          case "f2" => onWrap()
+          case "f8" => setShowEncodingsPopup(true)
+          case "left" => onColumn(dx = -1)
+          case "right" => onColumn(dx = 1)
+          case "C-r" => onReload()
+          case "home" => onReload(from = 0)
+          case "end" => onMoveUp(lines = viewport.height, from = viewport.size)
+          case "up" => onMoveUp(lines = 1)
+          case "pageup" => onMoveUp(lines = viewport.height)
+          case "down" => onMoveDown(lines = 1)
+          case "pagedown" => onMoveDown(lines = viewport.height)
+          case _ =>
+        }
+      }
     }
     
     useLayoutEffect({ () =>

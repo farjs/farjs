@@ -19,7 +19,8 @@ case class ViewerControllerProps(inputRef: ReactRef[BlessedElement],
                                  filePath: String,
                                  size: Double,
                                  viewport: Option[ViewerFileViewport],
-                                 setViewport: js.Function1[Option[ViewerFileViewport], Unit] = _ => ())
+                                 setViewport: js.Function1[Option[ViewerFileViewport], Unit] = _ => (),
+                                 onKeypress: String => Boolean = _ => false)
 
 object ViewerController extends FunctionComponent[ViewerControllerProps] {
 
@@ -64,7 +65,8 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
                 width = width,
                 height = height
               ),
-              setViewport = props.setViewport
+              setViewport = props.setViewport,
+              onKeypress = props.onKeypress
             ))(),
 
             if (viewport.column > 0 && linesCount > 0) Some {
