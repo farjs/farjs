@@ -5,10 +5,8 @@ process.title = "FAR.js"
 const versionChecker = require('./versionChecker.js')
 
 var npmVersion = undefined
-versionChecker.getNpmVersion((error, version) => {
-  if (!error) {
-    npmVersion = version
-  }
+versionChecker.fetchLatestVersion().then((version) => {
+  npmVersion = version
 })
 
 const onExit = () => {
