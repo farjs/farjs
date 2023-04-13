@@ -35,7 +35,7 @@ object FarjsApp extends ScalaJsModule {
       scalaJSUseMainModuleInitializer := false,
 
       Compile / npmDependencies ++= Seq(
-        "@farjs/better-sqlite3-websql" -> "^1.0.0"
+        "@farjs/better-sqlite3-websql" -> "^1.0.1"
       ),
 
       Compile / npmUpdate := {
