@@ -3,7 +3,6 @@ package definitions
 import common.Libs
 import sbt.Keys._
 import sbt._
-import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
 import scommons.sbtplugin.project.CommonNodeJsModule
 
 object FarjsDao extends FarjsModule with CommonNodeJsModule {
@@ -16,11 +15,7 @@ object FarjsDao extends FarjsModule with CommonNodeJsModule {
     super.definition
       .settings(ScalaJsModule.settings: _*)
       .settings(
-        description := "Data access object (DAO) module for FAR.js app",
-
-        Compile / npmDependencies ++= Seq(
-          "websql" -> "2.0.3"
-        )
+        description := "Data access object (DAO) module for FAR.js app"
       )
   }
 

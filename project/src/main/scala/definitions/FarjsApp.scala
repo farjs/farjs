@@ -34,6 +34,10 @@ object FarjsApp extends ScalaJsModule {
 
       scalaJSUseMainModuleInitializer := false,
 
+      Compile / npmDependencies ++= Seq(
+        "@farjs/better-sqlite3-websql" -> "^1.0.0"
+      ),
+
       Compile / npmUpdate := {
         def copyToWorkingDir(targetDir: File)(file: File): File = {
           val copy = targetDir / file.name

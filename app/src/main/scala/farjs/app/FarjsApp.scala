@@ -1,6 +1,7 @@
 package farjs.app
 
 import farjs.app.filelist.{FileListModule, FileListRoot}
+import farjs.app.raw.BetterSqlite3WebSQL
 import farjs.domain.FarjsDBContext
 import farjs.fs.FSFileListActions
 import farjs.ui.theme.{Theme, XTerm256Theme}
@@ -10,7 +11,7 @@ import scommons.react._
 import scommons.react.blessed._
 import scommons.react.blessed.portal.WithPortals
 import scommons.react.blessed.raw.{Blessed, ReactBlessed}
-import scommons.websql.{Database, WebSQL}
+import scommons.websql.Database
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -88,7 +89,7 @@ object FarjsApp {
   private def prepareDB(): Future[Database] = {
     val dbF = for {
       _ <- FSFileListActions.mkDirs(FarjsData.getDataDir)
-      db = WebSQL.openDatabase(FarjsData.getDBFilePath)
+      db = BetterSqlite3WebSQL.openDatabase(FarjsData.getDBFilePath)
       _ <- FarjsDBMigrations.apply(db)
     } yield db
 

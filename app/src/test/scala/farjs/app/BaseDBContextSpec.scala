@@ -1,9 +1,9 @@
 package farjs.app
 
+import farjs.app.raw.BetterSqlite3WebSQL
 import farjs.domain._
 import org.scalatest.Assertion
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.websql.WebSQL
 
 import scala.concurrent.Future
 
@@ -19,7 +19,7 @@ object BaseDBContextSpec {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   private lazy val contextF: Future[FarjsDBContext] = {
-    val db = WebSQL.openDatabase(":memory:")
+    val db = BetterSqlite3WebSQL.openDatabase(":memory:")
     
     FarjsDBMigrations.apply(db).map { _ =>
       new FarjsDBContext(db)
