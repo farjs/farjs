@@ -13,7 +13,7 @@ To run the app use the following commands:
 ```bash
 sbt "project farjs-app" npmUpdate fastOptJS
 
-node ./app/target/scala-2.13/scalajs-bundler/main/dev.loader.js
+node ./app/target/scala-2.13/scalajs-bundler/main/dev.loader.mjs
 ```
 
 ### How to Run with Reload Workflow
@@ -25,7 +25,7 @@ sbt
 >~fastOptJS
 
 #console 2:
-node --watch ./app/target/scala-2.13/scalajs-bundler/main/dev.loader.js
+node --watch ./app/target/scala-2.13/scalajs-bundler/main/dev.loader.mjs
 ```
 
 ## Resources

@@ -39,16 +39,17 @@
     "text-ui"
   ],
   "bin": {
-    "farjs": "dist/farjs.js"
+    "farjs": "dist/farjs.mjs"
   },
   "files": [
-    "dist/farjs.js",
-    "dist/versionChecker.js",
+    "dist/farjs.mjs",
+    "dist/versionChecker.mjs",
     "farjs/domain/bundle.json",
     "farjs-app-opt.js",
     "LICENSE.txt",
     "README.md"
   ],
+  "type": "module",
   "main": "./farjs-app-opt.js",
   "exports": "./farjs-app-opt.js",
   "preferGlobal": true,

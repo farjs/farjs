@@ -1,54 +1,58 @@
 "use strict";
 
-const packageJson = require('../package.json')
+import https from 'https';
+import { readFile } from 'fs/promises';
+
+const packageJson = JSON.parse(
+  await readFile(new URL('../package.json', import.meta.url), 'utf8')
+);
 
 function fetchLatestVersion() {
   return new Promise((resolve, reject) => {
-    const https = require('https')
     https.get(`https://registry.npmjs.org/${packageJson.name}/latest`, (resp) => {
-      const { statusCode } = resp
-      const contentType = resp.headers['content-type']
+      const { statusCode } = resp;
+      const contentType = resp.headers['content-type'];
     
-      let error
+      let error;
       if (statusCode !== 200) {
         error = new Error('Request Failed.\n' +
-                          `Status Code: ${statusCode}`)
+                          `Status Code: ${statusCode}`);
       } else if (!/^application\/json/.test(contentType)) {
         error = new Error('Invalid content-type.\n' +
-                          `Expected application/json but received ${contentType}`)
+                          `Expected application/json but received ${contentType}`);
       }
       if (error) {
-        resp.resume() // Consume response data to free up memory
-        reject(error.message)
-        return
+        resp.resume(); // Consume response data to free up memory
+        reject(error.message);
+        return;
       }
     
-      let rawData = ''
-      resp.setEncoding('utf8')
-      resp.on('data', (chunk) => { rawData += chunk })
+      let rawData = '';
+      resp.setEncoding('utf8');
+      resp.on('data', (chunk) => { rawData += chunk });
       resp.once('end', () => {
         try {
-          const parsedData = JSON.parse(rawData)
-          resolve(parsedData.version)
+          const parsedData = JSON.parse(rawData);
+          resolve(parsedData.version);
         } catch (e) {
-          reject(e)
+          reject(e);
         }
       })
     }).once('error', (e) => {
-      reject(e)
-    })
-  })
+      reject(e);
+    });
+  });
 }
 
 function green(text) {
   return '\u001b[32m' + text + '\u001b[39m';
 }
 
-module.exports = {
+export default {
 
   fetchLatestVersion: fetchLatestVersion,
 
-  checkNpmVersion: function (npmVersion) {
+  checkNpmVersion: (npmVersion) => {
 
     if (npmVersion && npmVersion != packageJson.version) {
       console.log(green(
@@ -63,7 +67,7 @@ module.exports = {
 
   See the changelog here: https://github.com/farjs/farjs/releases
 `
-      ))
+      ));
     }
   }
-}
+};
