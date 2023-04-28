@@ -12,7 +12,7 @@ import scala.scalajs.js.annotation.JSImport
 object BetterSqlite3WebSQL {
 
   @js.native
-  @JSImport("@farjs/better-sqlite3-websql", JSImport.Namespace)
+  @JSImport("@farjs/better-sqlite3-websql", JSImport.Default)
   private object _openDatabase extends js.Function
 
   def openDatabase(name: String): Database = {

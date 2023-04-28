@@ -20,6 +20,7 @@ object FarjsApp extends ScalaJsModule {
       publishLocal := ((): Unit),
       publishM2 := ((): Unit),
 
+      scommonsResourcesFileFilter := scommonsResourcesFileFilter.value || "*.mjs",
       scommonsBundlesFileFilter := "*.sql",
 
       coverageExcludedPackages :=
