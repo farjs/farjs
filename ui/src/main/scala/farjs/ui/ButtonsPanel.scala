@@ -9,7 +9,7 @@ import scala.scalajs.js
 
 object ButtonsPanel extends FunctionComponent[ButtonsPanelProps] {
 
-  private[ui] var buttonComp: UiComponent[ButtonProps] = Button
+  private[ui] var buttonComp: ReactClass = Button
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
@@ -25,7 +25,7 @@ object ButtonsPanel extends FunctionComponent[ButtonsPanelProps] {
         (s"$padding${action.label}$padding", action.onAction, nextPos) :: result
     }.reverse.map {
       case (label, onAction, pos) =>
-        (label.length, <(buttonComp())(^.key := label, ^.plain := ButtonProps(
+        (label.length, <(buttonComp)(^.key := label, ^.plain := ButtonProps(
           left = pos,
           top = 0,
           label = label,

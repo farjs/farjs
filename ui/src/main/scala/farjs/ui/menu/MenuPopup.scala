@@ -16,7 +16,7 @@ object MenuPopup extends FunctionComponent[MenuPopupProps] {
 
   private[menu] var popupComp: UiComponent[PopupProps] = Popup
   private[menu] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
-  private[menu] var buttonComp: UiComponent[ButtonProps] = Button
+  private[menu] var buttonComp: ReactClass = Button
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -35,7 +35,7 @@ object MenuPopup extends FunctionComponent[MenuPopupProps] {
         left = props.getLeft(width)
       ))(
         props.items.zipWithIndex.map { case (text, index) =>
-          <(buttonComp())(^.key := s"$index", ^.plain := ButtonProps(
+          <(buttonComp)(^.key := s"$index", ^.plain := ButtonProps(
             left = 1,
             top = 1 + index,
             label = text,

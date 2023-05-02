@@ -99,6 +99,8 @@ object ScalaJsModule {
         .withSourceMap(false)
         .withESFeatures(_.withESVersion(ESVersion.ES2015))
     },
+
+    npmExtraArgs := Seq("--install-links=true"),
     
     Test / additionalNpmConfig := Map(
       "type" -> JSON.str("module")

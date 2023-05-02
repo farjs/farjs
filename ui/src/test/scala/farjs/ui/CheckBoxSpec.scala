@@ -1,25 +1,26 @@
 package farjs.ui
 
 import farjs.ui.CheckBox._
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
 class CheckBoxSpec extends TestSpec with TestRendererUtils {
 
-  CheckBox.buttonComp = mockUiComponent("Button")
+  CheckBox.buttonComp = "Button".asInstanceOf[ReactClass]
 
   it should "call onChange when press button" in {
     //given
     val onChange = mockFunction[Unit]
     val props = getCheckBoxProps(onChange = onChange)
     val comp = testRender(<(CheckBox())(^.plain := props)())
-    val button = findComponentProps(comp, buttonComp, plain = true)
+    val button = findComponents(comp, buttonComp).head
 
     //then
     onChange.expects()
 
     //when
-    button.onPress()
+    button.props.onPress()
   }
 
   it should "render checked component" in {
@@ -64,13 +65,13 @@ class CheckBoxSpec extends TestSpec with TestRendererUtils {
 
   private def assertCheckBox(result: TestInstance, props: CheckBoxProps): Unit = {
     inside(result.children.toList) { case List(button, text) =>
-      assertTestComponent(button, buttonComp, plain = true)(inside(_) {
+      assertNativeComponent(button, <(buttonComp)(^.assertPlain[ButtonProps](inside(_) {
         case ButtonProps(resLeft, resTop, label, resStyle, _) =>
           resLeft shouldBe props.left
           resTop shouldBe props.top
           label shouldBe (if (props.value) "[x]" else "[ ]")
           resStyle shouldBe props.style
-      })
+      }))())
 
       assertNativeComponent(text,
         <.text(

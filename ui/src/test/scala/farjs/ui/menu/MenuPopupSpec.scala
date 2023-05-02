@@ -5,13 +5,14 @@ import farjs.ui.menu.MenuPopup._
 import farjs.ui.popup.{ModalContentProps, PopupProps}
 import farjs.ui.theme.Theme
 import org.scalatest.Succeeded
+import scommons.react.ReactClass
 import scommons.react.test._
 
 class MenuPopupSpec extends TestSpec with TestRendererUtils {
 
   MenuPopup.popupComp = mockUiComponent("Popup")
   MenuPopup.modalContentComp = mockUiComponent("ModalContent")
-  MenuPopup.buttonComp = mockUiComponent("Button")
+  MenuPopup.buttonComp = "Button".asInstanceOf[ReactClass]
 
   it should "call onSelect when onPress item" in {
     //given
@@ -24,7 +25,7 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
       onClose = () => ()
     )
     val comp = testRender(<(MenuPopup())(^.wrapped := props)())
-    val button2 = inside(findProps(comp, buttonComp, plain = true)) {
+    val button2 = inside(findComponents(comp, buttonComp)) {
       case List(_, b2) => b2
     }
     
@@ -32,7 +33,7 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
     onSelect.expects(1)
     
     //when
-    button2.onPress()
+    button2.props.onPress()
   }
 
   it should "render component" in {
@@ -86,13 +87,13 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
       }, inside(_) { case lines =>
         lines.size shouldBe props.items.size
         lines.zipWithIndex.zip(props.items).foreach { case ((line, index), expected) =>
-          assertTestComponent(line, buttonComp, plain = true)(inside(_) {
+          assertNativeComponent(line, <(buttonComp)(^.assertPlain[ButtonProps](inside(_) {
             case ButtonProps(left, top, label, resStyle, _) =>
               left shouldBe 1
               top shouldBe (1 + index)
               label shouldBe expected
               resStyle shouldBe theme
-          })
+          }))())
         }
         Succeeded
       })

@@ -5,13 +5,13 @@ import scommons.react.blessed._
 
 object CheckBox extends FunctionComponent[CheckBoxProps] {
 
-  private[ui] var buttonComp: UiComponent[ButtonProps] = Button
+  private[ui] var buttonComp: ReactClass = Button
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
     
     <.>()(
-      <(buttonComp())(^.plain := ButtonProps(
+      <(buttonComp)(^.plain := ButtonProps(
         left = props.left,
         top = props.top,
         label = if (props.value) "[x]" else "[ ]",

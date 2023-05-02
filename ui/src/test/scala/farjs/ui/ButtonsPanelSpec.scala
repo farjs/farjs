@@ -3,6 +3,7 @@ package farjs.ui
 import farjs.ui.ButtonsPanel._
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -10,7 +11,7 @@ import scala.scalajs.js
 
 class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  ButtonsPanel.buttonComp = mockUiComponent("Button")
+  ButtonsPanel.buttonComp = "Button".asInstanceOf[ReactClass]
 
   it should "call onAction1 when press button1" in {
     //given
@@ -21,7 +22,7 @@ class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
       "button2" -> onAction2
     ))
     val comp = testRender(<(ButtonsPanel())(^.plain := props)())
-    val (b1, _) = inside(findProps(comp, buttonComp, plain = true)) {
+    val (b1, _) = inside(findComponents(comp, buttonComp)) {
       case List(b1, b2) => (b1, b2)
     }
 
@@ -33,7 +34,7 @@ class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     onAction2.expects().never()
     
     //when
-    b1.onPress()
+    b1.props.onPress()
 
     //then
     eventually {
@@ -50,7 +51,7 @@ class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
       "button2" -> onAction2
     ))
     val comp = testRender(<(ButtonsPanel())(^.plain := props)())
-    val (_, b2) = inside(findProps(comp, buttonComp, plain = true)) {
+    val (_, b2) = inside(findComponents(comp, buttonComp)) {
       case List(b1, b2) => (b1, b2)
     }
 
@@ -62,7 +63,7 @@ class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     }
     
     //when
-    b2.onPress()
+    b2.props.onPress()
 
     //then
     eventually {
@@ -118,13 +119,13 @@ class ButtonsPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
       )(), { buttons: List[TestInstance] =>
         buttons.size shouldBe actions.size
         buttons.zip(actions).foreach { case (btn, (action, pos)) =>
-          assertTestComponent(btn, buttonComp, plain = true)(inside(_) {
+          assertNativeComponent(btn, <(buttonComp)(^.assertPlain[ButtonProps](inside(_) {
             case ButtonProps(left, top, label, resStyle, _) =>
               left shouldBe pos
               top shouldBe 0
               label shouldBe action
               resStyle shouldBe props.style
-          })
+          }))())
         }
         Succeeded
       }
