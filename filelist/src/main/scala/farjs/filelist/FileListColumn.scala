@@ -28,8 +28,8 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
     val (width, height) = props.size
     val theme = Theme.current.fileList
     
-    val borderEnd = TextBox.renderText(theme.regularItem, props.borderCh)
-    val overlapEnd = TextBox.renderText(theme.regularItem, "}")
+    val borderEnd = UI.renderText2(theme.regularItem, props.borderCh)
+    val overlapEnd = UI.renderText2(theme.regularItem, "}")
 
     def renderItems(): Seq[String] = props.items.zipWithIndex.map {
       case (item, index) =>
@@ -54,7 +54,7 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
           .replace("\n", "")
           .replace("\r", "")
           .replace('\t', ' '))
-        val content = TextBox.renderText(
+        val content = UI.renderText(
           isBold = style.bold.getOrElse(false),
           fgColor = style.fg.orNull,
           bgColor = style.bg.orNull,

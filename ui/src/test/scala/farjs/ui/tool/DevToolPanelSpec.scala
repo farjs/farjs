@@ -1,6 +1,6 @@
 package farjs.ui.tool
 
-import farjs.ui.TextBox
+import farjs.ui.UI
 import farjs.ui.theme.Theme
 import farjs.ui.tool.DevToolPanel._
 import org.scalatest.{Assertion, Succeeded}
@@ -112,7 +112,7 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
                 if (label == activeTab) theme.focus.getOrElse(theme)
                 else theme
 
-              TextBox.renderText(style, label)
+              UI.renderText2(style, label)
             }
           )())
         }

@@ -34,7 +34,7 @@ object ListView extends FunctionComponent[ListViewProps] {
           .replace("\r", "")
           .replace('\t', ' '))
 
-        TextBox.renderText(
+        UI.renderText(
           isBold = style.bold.getOrElse(false),
           fgColor = style.fg.orNull,
           bgColor = style.bg.orNull,

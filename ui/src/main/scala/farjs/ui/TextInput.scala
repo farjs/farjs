@@ -1,6 +1,6 @@
 package farjs.ui
 
-import farjs.ui.TextBox.renderText
+import farjs.ui.UI.renderText2
 import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
@@ -199,11 +199,11 @@ object TextInput extends FunctionComponent[TextInputProps] {
       ^.rbTags := true,
       ^.content := {
         if (selEnd - selStart > 0) {
-          val part1 = renderText(theme.regular, props.value.slice(offset, selStart))
-          val part2 = renderText(theme.selected, props.value.slice(math.max(selStart, offset), selEnd))
-          val part3 = renderText(theme.regular, props.value.substring(math.min(selEnd, props.value.length)))
+          val part1 = renderText2(theme.regular, props.value.slice(offset, selStart))
+          val part2 = renderText2(theme.selected, props.value.slice(math.max(selStart, offset), selEnd))
+          val part3 = renderText2(theme.regular, props.value.substring(math.min(selEnd, props.value.length)))
           s"$part1$part2$part3"
-        } else renderText(theme.regular, props.value.substring(math.min(offset, props.value.length)))
+        } else renderText2(theme.regular, props.value.substring(math.min(offset, props.value.length)))
       },
       ^.rbOnClick := onClick,
       ^.rbOnResize := onResize,

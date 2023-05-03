@@ -359,11 +359,11 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
       val theme = Theme.current.textBox
       inputEl.props.content shouldBe {
         if (selEnd - selStart > 0) {
-          val part1 = TextBox.renderText(theme.regular, newVal.slice(offset, selStart))
-          val part2 = TextBox.renderText(theme.selected, newVal.slice(math.max(selStart, offset), selEnd))
-          val part3 = TextBox.renderText(theme.regular, newVal.substring(math.min(selEnd, newVal.length)))
+          val part1 = UI.renderText2(theme.regular, newVal.slice(offset, selStart))
+          val part2 = UI.renderText2(theme.selected, newVal.slice(math.max(selStart, offset), selEnd))
+          val part3 = UI.renderText2(theme.regular, newVal.substring(math.min(selEnd, newVal.length)))
           s"$part1$part2$part3"
-        } else TextBox.renderText(theme.regular, newVal.substring(math.min(offset, newVal.length)))
+        } else UI.renderText2(theme.regular, newVal.substring(math.min(offset, newVal.length)))
       }
     }
 
@@ -489,7 +489,7 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
         ^.rbLeft := props.left,
         ^.rbTop := props.top,
         ^.rbStyle := theme.regular,
-        ^.content := TextBox.renderText(theme.selected, selectedText)
+        ^.content := UI.renderText2(theme.selected, selectedText)
       )()
     )
   }

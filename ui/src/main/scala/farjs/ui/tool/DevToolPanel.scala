@@ -1,6 +1,6 @@
 package farjs.ui.tool
 
-import farjs.ui.TextBox
+import farjs.ui.UI
 import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
@@ -54,7 +54,7 @@ object DevToolPanel extends FunctionComponent[DevToolPanelProps] {
               if (tool == props.devTool) theme.focus.getOrElse(theme)
               else theme
 
-            TextBox.renderText(style, label)
+            UI.renderText2(style, label)
           }
         )())
     }
