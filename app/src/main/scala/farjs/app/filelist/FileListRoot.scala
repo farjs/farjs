@@ -5,6 +5,7 @@ import farjs.archiver.ArchiverPlugin
 import farjs.copymove.CopyMovePlugin
 import farjs.filelist._
 import farjs.fs.{FSPlugin, FSServices}
+import farjs.text.TextServices
 import farjs.ui.Dispatch
 import farjs.viewer.ViewerPlugin
 import farjs.viewer.quickview.QuickViewPlugin
@@ -15,10 +16,12 @@ class FileListRoot(dispatch: Dispatch, module: FileListModule) extends FunctionC
   protected def render(compProps: Props): ReactElement = {
     <(FileListServices.Context.Provider)(^.contextValue := module.fileListServices)(
       <(FSServices.Context.Provider)(^.contextValue := module.fsServices)(
-        <(fileListComp)(^.wrapped := FileListBrowserProps(
-          dispatch = dispatch,
-          plugins = plugins
-        ))()
+        <(TextServices.Context.Provider)(^.contextValue := module.textServices)(
+          <(fileListComp)(^.wrapped := FileListBrowserProps(
+            dispatch = dispatch,
+            plugins = plugins
+          ))()
+        )
       )
     )
   }

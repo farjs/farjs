@@ -5,6 +5,7 @@ import farjs.domain.FarjsDBContext
 import farjs.domain.dao._
 import farjs.filelist.FileListServices
 import farjs.fs.FSServices
+import farjs.text.TextServices
 
 class FileListModule(ctx: FarjsDBContext) {
 
@@ -32,5 +33,10 @@ class FileListModule(ctx: FarjsDBContext) {
 
   val fsServices = new FSServices(
     folderShortcuts = folderShortcutsService
+  )
+  
+  val fileViewHistoryService = new FileViewHistoryServiceImpl
+  val textServices = new TextServices(
+    fileViewHistory = fileViewHistoryService
   )
 }

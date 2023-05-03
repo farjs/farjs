@@ -2,6 +2,7 @@ package farjs.app.filelist
 
 import farjs.filelist.FileListServices
 import farjs.fs.FSServices
+import farjs.text.TextServices
 import scommons.react._
 import scommons.react.hooks._
 import scommons.react.test._
@@ -12,7 +13,7 @@ class FileListRootSpec extends TestSpec with TestRendererUtils {
 
   it should "render component with contexts" in {
     //given
-    val (fileListCtx, fsCtx, servicesComp) = getServicesCtxHook
+    val (fileListCtx, fsCtx, textCtx, servicesComp) = getServicesCtxHook
     FileListRoot.fileListComp = servicesComp
     val dispatch = mockFunction[Any, Any]
     val module = mock[FileListModule]
@@ -24,6 +25,7 @@ class FileListRootSpec extends TestSpec with TestRendererUtils {
     //then
     fileListCtx.get() shouldBe module.fileListServices
     fsCtx.get() shouldBe module.fsServices
+    textCtx.get() shouldBe module.textServices
     assertComponents(result.children, List(
       <(servicesComp)(^.assertWrapped(inside(_) {
         case FileListBrowserProps(resDispatch, isRightInitiallyActive, plugins) =>
@@ -35,15 +37,17 @@ class FileListRootSpec extends TestSpec with TestRendererUtils {
   }
 
   private def getServicesCtxHook: (
-    AtomicReference[FileListServices], AtomicReference[FSServices], ReactClass
+    AtomicReference[FileListServices], AtomicReference[FSServices], AtomicReference[TextServices], ReactClass
     ) = {
 
     val fileListRef = new AtomicReference[FileListServices](null)
     val fsRef = new AtomicReference[FSServices](null)
-    (fileListRef, fsRef, new FunctionComponent[Unit] {
+    val textRef = new AtomicReference[TextServices](null)
+    (fileListRef, fsRef, textRef, new FunctionComponent[Unit] {
       protected def render(props: Props): ReactElement = {
         fileListRef.set(useContext(FileListServices.Context))
         fsRef.set(useContext(FSServices.Context))
+        textRef.set(useContext(TextServices.Context))
         <.>()()
       }
     }.apply())
