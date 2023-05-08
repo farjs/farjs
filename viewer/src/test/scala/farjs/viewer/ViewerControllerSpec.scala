@@ -1,7 +1,8 @@
 package farjs.viewer
 
 import farjs.filelist.FileListActions.FileListTaskAction
-import farjs.text.Encoding
+import farjs.text.TextServicesSpec.withServicesContext
+import farjs.text.{Encoding, FileViewHistory, MockFileViewHistoryService}
 import farjs.ui.WithSizeProps
 import farjs.ui.task.FutureTask
 import farjs.viewer.ViewerController._
@@ -32,6 +33,17 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     )
   }
 
+  //noinspection TypeAnnotation
+  class FileViewHistoryService {
+    val getOne = mockFunction[String, Boolean, Future[Option[FileViewHistory]]]
+    val save = mockFunction[FileViewHistory, Future[Unit]]
+
+    val service = new MockFileViewHistoryService(
+      getOneMock = getOne,
+      saveMock = save
+    )
+  }
+
   it should "dispatch error task if failed to open file when mount" in {
     //given
     val fs = new FSMocks
@@ -40,6 +52,8 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val dispatch = mockFunction[Any, Any]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None)
     val expectedError = new Exception("test error")
+    val historyService = new FileViewHistoryService
+    historyService.getOne.expects(props.filePath, false).returning(Future.successful(None))
 
     //then
     var openF: Future[_] = null
@@ -51,7 +65,9 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     }
 
     //when
-    val renderer = createTestRenderer(<(ViewerController())(^.wrapped := props)())
+    val renderer = createTestRenderer(withServicesContext(
+      <(ViewerController())(^.wrapped := props)(), historyService.service
+    ))
 
     //then
     eventually {
@@ -63,7 +79,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     }
   }
   
-  it should "open/close viewport file when mount/unmount" in {
+  it should "open/close file and use default viewport params if no history when mount/unmount" in {
     //given
     val fs = new FSMocks
     ViewerFileReader.fs = fs.fs
@@ -73,6 +89,8 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None, setViewport)
     val fd = 123
     var resViewport: ViewerFileViewport = null
+    val historyService = new FileViewHistoryService
+    historyService.getOne.expects(props.filePath, false).returning(Future.successful(None))
 
     //then
     fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).returning(fd)
@@ -83,7 +101,9 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     }
 
     //when
-    val renderer = createTestRenderer(<(ViewerController())(^.wrapped := props)())
+    val renderer = createTestRenderer(withServicesContext(
+      <(ViewerController())(^.wrapped := props)(), historyService.service
+    ))
 
     //then
     assertViewerController(renderer.root, props)
@@ -111,6 +131,74 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     }
   }
 
+  it should "open/close file and use viewport params from history when mount/unmount" in {
+    //given
+    val fs = new FSMocks
+    ViewerFileReader.fs = fs.fs
+    val inputRef = ReactRef.create[BlessedElement]
+    val dispatch = mockFunction[Any, Any]
+    val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
+    val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None, setViewport)
+    val fd = 123
+    var resViewport: ViewerFileViewport = null
+    val historyService = new FileViewHistoryService
+    val history = FileViewHistory(
+      path = props.filePath,
+      isEdit = false,
+      encoding = "test-enc",
+      position = 456,
+      wrap = Some(true),
+      column = Some(7)
+    )
+    historyService.getOne.expects(props.filePath, false).returning(Future.successful(Some(history)))
+
+    //then
+    fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).returning(fd)
+    setViewport.expects(*).onCall { viewport: Option[ViewerFileViewport] =>
+      inside(viewport) {
+        case Some(vp) => resViewport = vp
+      }
+    }
+
+    //when
+    val renderer = createTestRenderer(withServicesContext(
+      <(ViewerController())(^.wrapped := props)(), historyService.service
+    ))
+
+    //then
+    assertViewerController(renderer.root, props)
+    eventually {
+      inside(resViewport) {
+        case ViewerFileViewport(_, encoding, size, width, height, wrap, column, position, linesData) =>
+          encoding shouldBe history.encoding
+          size shouldBe props.size
+          width shouldBe 0
+          height shouldBe 0
+          wrap shouldBe history.wrap.get
+          column shouldBe history.column.get
+          position shouldBe history.position
+          linesData shouldBe Nil
+      }
+    }.map { _ =>
+      //when
+      TestRenderer.act { () =>
+        renderer.update(withServicesContext(
+          <(ViewerController())(^.wrapped := props.copy(viewport = Some(resViewport)))(), historyService.service
+        ))
+      }
+
+      //then
+      fs.closeSync.expects(fd)
+      historyService.save.expects(history).returning(Future.unit)
+
+      //when
+      TestRenderer.act { () =>
+        renderer.unmount()
+      }
+      Succeeded
+    }
+  }
+
   it should "render left and right scroll indicators" in {
     //given
     val fs = new FSMocks
@@ -119,7 +207,12 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val dispatch = mockFunction[Any, Any]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None)
     fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).returning(123)
-    val renderer = createTestRenderer(<(ViewerController())(^.wrapped := props)())
+    val historyService = new FileViewHistoryService
+    historyService.getOne.expects(props.filePath, false).returning(Future.successful(None))
+
+    val renderer = createTestRenderer(withServicesContext(
+      <(ViewerController())(^.wrapped := props)(), historyService.service
+    ))
 
     val updatedProps = props.copy(viewport = Some(ViewerFileViewport(
       fileReader = new MockViewerFileReader,
@@ -136,7 +229,9 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
 
     //when
     TestRenderer.act { () =>
-      renderer.update(<(ViewerController())(^.wrapped := updatedProps)())
+      renderer.update(withServicesContext(
+        <(ViewerController())(^.wrapped := updatedProps)(), historyService.service
+      ))
     }
 
     //then

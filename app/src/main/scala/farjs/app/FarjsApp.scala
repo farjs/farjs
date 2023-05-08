@@ -64,12 +64,11 @@ object FarjsApp {
     }
 
     val root = new FarjsRoot(
-      withPortalsComp = new WithPortals(screen),
       loadFileListUi = { dispatch =>
         prepareDB().map { db =>
           val ctx = new FarjsDBContext(db)
           val fileListModule = new FileListModule(ctx)
-          new FileListRoot(dispatch, fileListModule).apply()
+          new FileListRoot(dispatch, fileListModule, new WithPortals(screen)).apply()
         }
       },
       initialDevTool = if (showDevTools) DevTool.Logs else DevTool.Hidden

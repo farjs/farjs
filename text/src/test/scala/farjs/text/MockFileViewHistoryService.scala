@@ -5,10 +5,13 @@ import scala.concurrent.Future
 //noinspection NotImplementedCode
 class MockFileViewHistoryService(
   getAllMock: () => Future[Seq[FileViewHistory]] = () => ???,
+  getOneMock: (String, Boolean) => Future[Option[FileViewHistory]] = (_, _) => ???,
   saveMock: FileViewHistory => Future[Unit] = _ => ???
 ) extends FileViewHistoryService {
 
-  override def getAll: Future[Seq[FileViewHistory]] = getAllMock()
+  def getAll: Future[Seq[FileViewHistory]] = getAllMock()
 
-  override def save(h: FileViewHistory): Future[Unit] = saveMock(h)
+  def getOne(path: String, isEdit: Boolean): Future[Option[FileViewHistory]] = getOneMock(path, isEdit)
+
+  def save(h: FileViewHistory): Future[Unit] = saveMock(h)
 }

@@ -11,8 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
 
-class FarjsRoot(withPortalsComp: UiComponent[Unit],
-                loadFileListUi: js.Function1[Any, Unit] => Future[ReactClass],
+class FarjsRoot(loadFileListUi: js.Function1[Any, Unit] => Future[ReactClass],
                 initialDevTool: DevTool
                ) extends FunctionComponent[Unit] {
 
@@ -51,13 +50,13 @@ class FarjsRoot(withPortalsComp: UiComponent[Unit],
           else "70%"
         }
       )(
-        <(withPortalsComp())()(
-          maybeFileListUi match {
-            case None => <.text()("Loading...")
-            case Some(fileListComp) => <(fileListComp).empty
-          },
-          <(taskControllerComp())(^.wrapped := TaskManagerProps(state.currentTask))()
-        )
+        maybeFileListUi match {
+          case None => <.text()("Loading...")
+          case Some(fileListComp) =>
+            <(fileListComp)()(
+              <(taskControllerComp())(^.wrapped := TaskManagerProps(state.currentTask))()
+            )
+        }
       ),
       
       <(logControllerComp())(^.wrapped := LogControllerProps(onReady = { () =>

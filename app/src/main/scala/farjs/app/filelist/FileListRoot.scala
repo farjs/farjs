@@ -11,16 +11,23 @@ import farjs.viewer.ViewerPlugin
 import farjs.viewer.quickview.QuickViewPlugin
 import scommons.react._
 
-class FileListRoot(dispatch: Dispatch, module: FileListModule) extends FunctionComponent[Unit] {
+class FileListRoot(dispatch: Dispatch,
+                   module: FileListModule,
+                   withPortalsComp: UiComponent[Unit]
+                  ) extends FunctionComponent[Unit] {
 
   protected def render(compProps: Props): ReactElement = {
     <(FileListServices.Context.Provider)(^.contextValue := module.fileListServices)(
       <(FSServices.Context.Provider)(^.contextValue := module.fsServices)(
         <(TextServices.Context.Provider)(^.contextValue := module.textServices)(
-          <(fileListComp)(^.wrapped := FileListBrowserProps(
-            dispatch = dispatch,
-            plugins = plugins
-          ))()
+          <(withPortalsComp())()(
+            <(fileListComp)(^.wrapped := FileListBrowserProps(
+              dispatch = dispatch,
+              plugins = plugins
+            ))(),
+
+            compProps.children
+          )
         )
       )
     )

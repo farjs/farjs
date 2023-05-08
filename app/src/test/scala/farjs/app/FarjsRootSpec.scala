@@ -15,7 +15,6 @@ import scala.scalajs.js.Dynamic.literal
 
 class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  private val withPortalsComp = mockUiComponent[Unit]("WithPortals")
   private val fileListComp = mockUiComponent[Unit]("FileListBrowser").apply()
   
   FarjsRoot.taskControllerComp = mockUiComponent("TaskManager")
@@ -28,7 +27,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
   it should "set devTool and emit resize event when on F12" in {
     //given
-    val root = new FarjsRoot(withPortalsComp, fileListUiF, DevTool.Hidden)
+    val root = new FarjsRoot(fileListUiF, DevTool.Hidden)
     val emitMock = mockFunction[String, Unit]
     val program = literal("emit" -> emitMock)
     val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
@@ -75,7 +74,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
   it should "set devTool when onActivate" in {
     //given
-    val root = new FarjsRoot(withPortalsComp, fileListUiF, DevTool.Colors)
+    val root = new FarjsRoot(fileListUiF, DevTool.Colors)
     val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
     val screen = literal("on" -> onMock)
     val boxMock = literal("screen" -> screen)
@@ -106,7 +105,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
   it should "render fileListUi when onReady" in {
     //given
-    val root = new FarjsRoot(withPortalsComp, fileListUiF, DevTool.Hidden)
+    val root = new FarjsRoot(fileListUiF, DevTool.Hidden)
     val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
     val screen = literal("on" -> onMock)
     val boxMock = literal("screen" -> screen)
@@ -119,12 +118,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     assertComponents(renderer.root.children, List(
       <.box(^.rbWidth := "100%")(
-        <(withPortalsComp())()(
-          <.text()("Loading..."),
-          <(taskControllerComp())(^.assertWrapped(inside(_) {
-            case TaskManagerProps(currentTask) => currentTask shouldBe None
-          }))()
-        )
+        <.text()("Loading...")
       ),
       <(logControllerComp())(^.assertWrapped(inside(_) {
         case LogControllerProps(onReady, render) =>
@@ -139,8 +133,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     eventually {
       assertComponents(renderer.root.children, List(
         <.box(^.rbWidth := "100%")(
-          <(withPortalsComp())()(
-            <(fileListComp).empty,
+          <(fileListComp)()(
             <(taskControllerComp())(^.assertWrapped(inside(_) {
               case TaskManagerProps(currentTask) => currentTask shouldBe None
             }))()
@@ -153,7 +146,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   
   it should "render component without DevTools" in {
     //given
-    val root = new FarjsRoot(withPortalsComp, fileListUiF, DevTool.Hidden)
+    val root = new FarjsRoot(fileListUiF, DevTool.Hidden)
     val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
     val screen = literal("on" -> onMock)
     val boxMock = literal("screen" -> screen)
@@ -168,12 +161,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     //then
     assertComponents(result.children, List(
       <.box(^.rbWidth := "100%")(
-        <(withPortalsComp())()(
-          <.text()("Loading..."),
-          <(taskControllerComp())(^.assertWrapped(inside(_) {
-            case TaskManagerProps(currentTask) => currentTask shouldBe None
-          }))()
-        )
+        <.text()("Loading...")
       ),
       <(logControllerComp())(^.assertWrapped(inside(_) {
         case LogControllerProps(_, render) =>
@@ -184,7 +172,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   
   it should "render component with DevTools" in {
     //given
-    val root = new FarjsRoot(withPortalsComp, fileListUiF, DevTool.Logs)
+    val root = new FarjsRoot(fileListUiF, DevTool.Logs)
     val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
     val screen = literal("on" -> onMock)
     val boxMock = literal("screen" -> screen)
@@ -199,12 +187,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     //then
     assertComponents(result.children, List(
       <.box(^.rbWidth := "70%")(
-        <(withPortalsComp())()(
-          <.text()("Loading..."),
-          <(taskControllerComp())(^.assertWrapped(inside(_) {
-            case TaskManagerProps(currentTask) => currentTask shouldBe None
-          }))()
-        )
+        <.text()("Loading...")
       ),
       <(logControllerComp())(^.assertWrapped(inside(_) {
         case LogControllerProps(_, render) =>

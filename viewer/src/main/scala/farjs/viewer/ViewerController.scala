@@ -1,7 +1,7 @@
 package farjs.viewer
 
 import farjs.filelist.FileListActions.FileListTaskAction
-import farjs.text.Encoding
+import farjs.text.{Encoding, FileViewHistory, TextServices}
 import farjs.ui.task.FutureTask
 import farjs.ui.theme.Theme
 import farjs.ui.{Dispatch, WithSize, WithSizeProps}
@@ -28,17 +28,26 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
   private[viewer] var viewerContent: UiComponent[ViewerContentProps] = ViewerContent
   
   protected def render(compProps: Props): ReactElement = {
+    val services = TextServices.useServices
     val props = compProps.wrapped
+    val viewportRef = useRef(props.viewport)
+    viewportRef.current = props.viewport
     
     useLayoutEffect({ () =>
       val fileReader = new ViewerFileReader
-      val openF = fileReader.open(props.filePath).map { _ =>
+      val openF = for {
+        history <- services.fileViewHistory.getOne(props.filePath, isEdit = false)
+        _ <- fileReader.open(props.filePath)
+      } yield {
         props.setViewport(Some(ViewerFileViewport(
           fileReader = fileReader,
-          encoding = Encoding.platformEncoding,
+          encoding = history.map(_.encoding).getOrElse(Encoding.platformEncoding),
           size = props.size,
           width = 0,
-          height = 0
+          height = 0,
+          wrap = history.flatMap(_.wrap).getOrElse(false),
+          column = history.flatMap(_.column).getOrElse(0),
+          position = history.map(_.position).getOrElse(0.0)
         )))
       }
       openF.andThen { case Failure(NonFatal(_)) =>
@@ -47,6 +56,16 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
 
       val cleanup: js.Function0[Unit] = { () =>
         fileReader.close()
+        viewportRef.current.foreach { vp =>
+          services.fileViewHistory.save(FileViewHistory(
+            path = props.filePath,
+            isEdit = false,
+            encoding = vp.encoding,
+            position = vp.position,
+            wrap = Some(vp.wrap),
+            column = Some(vp.column)
+          ))
+        }
       }
       cleanup
     }, Nil)

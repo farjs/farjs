@@ -11,28 +11,36 @@ import java.util.concurrent.atomic.AtomicReference
 
 class FileListRootSpec extends TestSpec with TestRendererUtils {
 
+  private val withPortalsComp = mockUiComponent[Unit]("WithPortals")
+
   it should "render component with contexts" in {
     //given
     val (fileListCtx, fsCtx, textCtx, servicesComp) = getServicesCtxHook
     FileListRoot.fileListComp = servicesComp
     val dispatch = mockFunction[Any, Any]
     val module = mock[FileListModule]
-    val rootComp = new FileListRoot(dispatch, module)
+    val rootComp = new FileListRoot(dispatch, module, withPortalsComp)
     
     //when
-    val result = createTestRenderer(<(rootComp()).empty).root
+    val result = createTestRenderer(<(rootComp())()(
+      "test_child"
+    )).root
     
     //then
     fileListCtx.get() shouldBe module.fileListServices
     fsCtx.get() shouldBe module.fsServices
     textCtx.get() shouldBe module.textServices
     assertComponents(result.children, List(
-      <(servicesComp)(^.assertWrapped(inside(_) {
-        case FileListBrowserProps(resDispatch, isRightInitiallyActive, plugins) =>
-          resDispatch should be theSameInstanceAs dispatch
-          isRightInitiallyActive shouldBe false
-          plugins should not be empty
-      }))()
+      <(withPortalsComp())()(
+        <(servicesComp)(^.assertWrapped(inside(_) {
+          case FileListBrowserProps(resDispatch, isRightInitiallyActive, plugins) =>
+            resDispatch should be theSameInstanceAs dispatch
+            isRightInitiallyActive shouldBe false
+            plugins should not be empty
+        }))(),
+
+        "test_child"
+      )
     ))
   }
 
