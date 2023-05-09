@@ -35,7 +35,8 @@ class FileListModule(ctx: FarjsDBContext) {
     folderShortcuts = folderShortcutsService
   )
   
-  val fileViewHistoryService = new FileViewHistoryServiceImpl
+  val fileViewHistoryDao = new FileViewHistoryDao(ctx)
+  val fileViewHistoryService = new FileViewHistoryServiceImpl(fileViewHistoryDao)
   val textServices = new TextServices(
     fileViewHistory = fileViewHistoryService
   )
