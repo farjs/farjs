@@ -109,7 +109,7 @@ class FileViewHistoryServiceImplSpec extends BaseDBContextSpec {
     val resultF = beforeF.flatMap { existing =>
       val entity = existing.head
       Future.sequence((1 to 5).toList.map { i =>
-        dao.save(entity.copy(path = s"${entity.path}$i", updatedAt = entity.updatedAt + i))
+        dao.save(entity.copy(path = s"${entity.path}$i", updatedAt = entity.updatedAt + (i * 10)))
       })
     }
 
