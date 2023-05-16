@@ -44,4 +44,22 @@ object ComboBoxProps {
       arg.onEnter
     ))
   }
+
+  def copy(p: ComboBoxProps)(left: Int = p.left,
+                             top: Int = p.top,
+                             width: Int = p.width,
+                             items: js.Array[String] = p.items,
+                             value: String = p.value,
+                             onChange: js.Function1[String, Unit] = p.onChange,
+                             onEnter: js.UndefOr[js.Function0[Unit]] = p.onEnter): ComboBoxProps = {
+    ComboBoxProps(
+      left = left,
+      top = top,
+      width = width,
+      items = items,
+      value = value,
+      onChange = onChange,
+      onEnter = onEnter
+    )
+  }
 }

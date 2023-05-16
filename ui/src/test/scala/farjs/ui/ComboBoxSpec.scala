@@ -9,7 +9,6 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.blessed._
 import scommons.react.test._
 
-import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
 
@@ -123,7 +122,9 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onChange = mockFunction[String, Unit]
     val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
+    var onKeyCalled = false
     val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
+      onKeyCalled = true
       onKey(
         key.name,
         key.ctrl.getOrElse(false),
@@ -144,8 +145,11 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //when
     findComponentProps(renderer.root, textInputComp).onKeypress("b") shouldBe false
 
-    //cleanup
-    Future.unit.map { _ =>
+    //then
+    eventually {
+      onKeyCalled shouldBe true
+    }.map { _ =>
+      //cleanup
       process.stdin.removeListener("keypress", listener)
       Succeeded
     }
@@ -155,7 +159,9 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onChange = mockFunction[String, Unit]
     val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
+    var onKeyCalled = false
     val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
+      onKeyCalled = true
       onKey(
         key.name,
         key.ctrl.getOrElse(false),
@@ -175,8 +181,11 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //when
     textInput.onKeypress("a") shouldBe false
 
-    //cleanup
-    Future.unit.map { _ =>
+    //then
+    eventually {
+      onKeyCalled shouldBe true
+    }.map { _ =>
+      //cleanup
       process.stdin.removeListener("keypress", listener)
       Succeeded
     }
@@ -186,7 +195,9 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onChange = mockFunction[String, Unit]
     val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
+    var onKeyCalled = false
     val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
+      onKeyCalled = true
       onKey(
         key.name,
         key.ctrl.getOrElse(false),
@@ -206,8 +217,11 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //when
     textInput.onKeypress("S-b") shouldBe false
 
-    //cleanup
-    Future.unit.map { _ =>
+    //then
+    eventually {
+      onKeyCalled shouldBe true
+    }.map { _ =>
+      //cleanup
       process.stdin.removeListener("keypress", listener)
       Succeeded
     }
@@ -217,7 +231,9 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onChange = mockFunction[String, Unit]
     val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
+    var onKeyCalled = false
     val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
+      onKeyCalled = true
       onKey(
         key.name,
         key.ctrl.getOrElse(false),
@@ -237,8 +253,50 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //when
     textInput.onKeypress("space") shouldBe false
 
-    //cleanup
-    Future.unit.map { _ =>
+    //then
+    eventually {
+      onKeyCalled shouldBe true
+    }.map { _ =>
+      //cleanup
+      process.stdin.removeListener("keypress", listener)
+      Succeeded
+    }
+  }
+
+  it should "clear timeout when autocomplete" in {
+    //given
+    val onChange = mockFunction[String, Unit]
+    val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
+    var onKeyCalled = false
+    val listener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
+      onKeyCalled = true
+      onKey(
+        key.name,
+        key.ctrl.getOrElse(false),
+        key.meta.getOrElse(false),
+        key.shift.getOrElse(false)
+      )
+    }
+    process.stdin.on("keypress", listener)
+    val props = getComboBoxProps(items = List("abc", "ac"), value = "", onChange = onChange)
+    val renderer = createTestRenderer(<(ComboBox())(^.plain := props)())
+
+    //then
+    onChange.expects("abc")
+    onKey.expects("end", false, false, true)
+
+    //when
+    findComponentProps(renderer.root, textInputComp).onKeypress("a") shouldBe false
+    TestRenderer.act { () =>
+      renderer.update(<(ComboBox())(^.plain := ComboBoxProps.copy(props)(value = "a"))())
+    }
+    findComponentProps(renderer.root, textInputComp).onKeypress("b") shouldBe false
+
+    //then
+    eventually {
+      onKeyCalled shouldBe true
+    }.map { _ =>
+      //cleanup
       process.stdin.removeListener("keypress", listener)
       Succeeded
     }

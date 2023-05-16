@@ -9,8 +9,6 @@ import scommons.react.blessed._
 import scommons.react.blessed.raw.BlessedProgram
 import scommons.react.hooks._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.scalajs.js
 
 object ComboBox extends FunctionComponent[ComboBoxProps] {
@@ -22,6 +20,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
     val props = compProps.plain
     val inputRef = useRef[BlessedElement](null)
     val programRef = useRef[BlessedProgram](null)
+    val autoCompleteTimeoutRef = useRef[Timeout](null)
     val (maybePopup, setPopup) = useState[Option[ListViewport]](None)
     val (state, setState) = useStateUpdater(() => TextInputState())
     val theme = Theme.current.popup.menu
@@ -76,8 +75,13 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
         else value
 
       if (newValue != value) {
+        if (autoCompleteTimeoutRef.current != null) {
+          global.clearTimeout(autoCompleteTimeoutRef.current)
+          autoCompleteTimeoutRef.current = null
+        }
+        
         props.items.find(_.startsWith(newValue)).foreach { existing =>
-          Future {
+          autoCompleteTimeoutRef.current = global.setTimeout(() => {
             props.onChange(existing)
 
             process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
@@ -86,7 +90,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
               meta = false,
               shift = true
             ))
-          }
+          }, 25)
         }
       }
     }
