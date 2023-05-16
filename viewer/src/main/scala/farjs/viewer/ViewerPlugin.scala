@@ -13,7 +13,9 @@ object ViewerPlugin extends FileListPlugin {
 
   override val triggerKeys: js.Array[String] = js.Array("f3", onViewerOpenLeft, onViewerOpenRight)
 
-  override def onKeyTrigger(key: String, stacks: WithPanelStacksProps): Option[ReactClass] = {
+  override def onKeyTrigger(key: String,
+                            stacks: WithPanelStacksProps,
+                            data: js.UndefOr[js.Dynamic] = js.undefined): Option[ReactClass] = {
     val stack = key match {
       case `onViewerOpenLeft` => stacks.leftStack
       case `onViewerOpenRight` => stacks.rightStack

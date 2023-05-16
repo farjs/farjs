@@ -89,7 +89,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           }
         case keyFull =>
           props.plugins.find(_.triggerKeys.contains(keyFull)).foreach { plugin =>
-            val maybePluginUi = plugin.onKeyTrigger(keyFull, stacks)
+            val maybePluginUi = plugin.onKeyTrigger(keyFull, stacks, key.data)
             maybePluginUi.foreach { pluginUi =>
               setCurrPluginUi(Some(pluginUi))
             }

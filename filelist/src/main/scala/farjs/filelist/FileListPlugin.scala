@@ -10,7 +10,9 @@ trait FileListPlugin {
 
   val triggerKeys: js.Array[String] = js.Array()
   
-  def onKeyTrigger(key: String, stacks: WithPanelStacksProps): Option[ReactClass] = None
+  def onKeyTrigger(key: String,
+                   stacks: WithPanelStacksProps,
+                   data: js.UndefOr[js.Dynamic]): Option[ReactClass] = None
 
   def onFileTrigger(filePath: String,
                     fileHeader: Uint8Array,

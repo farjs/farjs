@@ -12,7 +12,9 @@ object FileListUiPlugin extends FileListPlugin {
     "f1", "f7", "f8", "delete", "f9", "f10", "M-s", "M-d"
   )
 
-  override def onKeyTrigger(key: String, stacks: WithPanelStacksProps): Option[ReactClass] = {
+  override def onKeyTrigger(key: String,
+                            stacks: WithPanelStacksProps,
+                            data: js.UndefOr[js.Dynamic] = js.undefined): Option[ReactClass] = {
     val maybeCurrData = {
       val stackItem = stacks.activeStack.peek[FileListState]
       stackItem.getActions.zip(stackItem.state).map { case ((dispatch, actions), state) =>

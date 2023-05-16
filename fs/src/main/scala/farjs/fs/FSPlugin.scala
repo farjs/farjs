@@ -22,8 +22,12 @@ class FSPlugin(reducer: (FileListState, Any) => FileListState) extends FileListP
     }
   }
 
-  override def onKeyTrigger(key: String, stacks: WithPanelStacksProps): Option[ReactClass] =
+  override def onKeyTrigger(key: String,
+                            stacks: WithPanelStacksProps,
+                            data: js.UndefOr[js.Dynamic] = js.undefined): Option[ReactClass] = {
+
     createUi(key).map(_.apply())
+  }
   
   private[fs] def createUi(key: String): Option[FSPluginUi] = {
     key match {

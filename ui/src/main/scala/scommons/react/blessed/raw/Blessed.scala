@@ -110,4 +110,7 @@ trait KeyboardKey extends js.Object {
   val meta: js.UndefOr[Boolean] = js.native
   
   var defaultPrevented: js.UndefOr[Boolean] = js.native
+
+  //custom event data
+  var data: js.UndefOr[js.Dynamic] = js.native
 }

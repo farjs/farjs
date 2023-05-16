@@ -13,7 +13,10 @@ object CopyMovePlugin extends FileListPlugin {
 
   override val triggerKeys: js.Array[String] = js.Array("f5", "f6", "S-f5", "S-f6")
 
-  override def onKeyTrigger(key: String, stacks: WithPanelStacksProps): Option[ReactClass] = {
+  override def onKeyTrigger(key: String,
+                            stacks: WithPanelStacksProps,
+                            data: js.UndefOr[js.Dynamic] = js.undefined): Option[ReactClass] = {
+    
     val (maybeFrom, maybeTo, toInput) =
       if (stacks.leftStack.isActive) {
         (getData(stacks.leftStack), getData(stacks.rightStack), stacks.rightInput)
