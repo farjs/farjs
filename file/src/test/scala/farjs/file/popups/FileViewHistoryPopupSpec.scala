@@ -1,8 +1,8 @@
-package farjs.text.popups
+package farjs.file.popups
 
-import farjs.text.TextServicesSpec.withServicesContext
-import farjs.text.popups.FileViewHistoryPopup._
-import farjs.text.{FileViewHistory, MockFileViewHistoryService}
+import farjs.file.FileServicesSpec.withServicesContext
+import farjs.file.popups.FileViewHistoryPopup._
+import farjs.file.{FileViewHistory, MockFileViewHistoryService}
 import farjs.ui.popup.ListPopupProps
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec

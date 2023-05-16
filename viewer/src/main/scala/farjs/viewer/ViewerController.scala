@@ -1,7 +1,7 @@
 package farjs.viewer
 
+import farjs.file.{Encoding, FileServices, FileViewHistory}
 import farjs.filelist.FileListActions.FileListTaskAction
-import farjs.text.{Encoding, FileViewHistory, TextServices}
 import farjs.ui.task.FutureTask
 import farjs.ui.theme.Theme
 import farjs.ui.{Dispatch, WithSize, WithSizeProps}
@@ -28,7 +28,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
   private[viewer] var viewerContent: UiComponent[ViewerContentProps] = ViewerContent
   
   protected def render(compProps: Props): ReactElement = {
-    val services = TextServices.useServices
+    val services = FileServices.useServices
     val props = compProps.wrapped
     val viewportRef = useRef(props.viewport)
     viewportRef.current = props.viewport

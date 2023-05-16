@@ -1,6 +1,6 @@
 package farjs.viewer
 
-import farjs.text.Encoding
+import farjs.file.Encoding
 import farjs.viewer.ViewerFileReader.fs
 import scommons.nodejs
 import scommons.nodejs.raw.FSConstants

@@ -1,4 +1,4 @@
-package farjs.text.raw
+package farjs.file.raw
 
 import scommons.nodejs.Buffer
 

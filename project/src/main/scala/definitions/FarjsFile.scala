@@ -5,18 +5,18 @@ import sbt._
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
 import scoverage.ScoverageKeys.coverageExcludedPackages
 
-object FarjsText extends ScalaJsModule {
+object FarjsFile extends ScalaJsModule {
 
-  override val id = "farjs-text"
+  override val id = "farjs-file"
 
-  override val base: File = file("text")
+  override val base: File = file("file")
 
   override def definition: Project = {
     super.definition
       .settings(
-        description := "Text encodings and other text utils",
+        description := "File encodings and other file utils",
 
-        coverageExcludedPackages := "farjs.text.raw",
+        coverageExcludedPackages := "farjs.file.raw",
 
         Compile / npmDependencies ++= Seq(
           "iconv-lite" -> "0.6.3"

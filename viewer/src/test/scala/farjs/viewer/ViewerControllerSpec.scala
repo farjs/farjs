@@ -1,8 +1,8 @@
 package farjs.viewer
 
+import farjs.file.FileServicesSpec.withServicesContext
+import farjs.file.{Encoding, FileViewHistory, MockFileViewHistoryService}
 import farjs.filelist.FileListActions.FileListTaskAction
-import farjs.text.TextServicesSpec.withServicesContext
-import farjs.text.{Encoding, FileViewHistory, MockFileViewHistoryService}
 import farjs.ui.WithSizeProps
 import farjs.ui.task.FutureTask
 import farjs.viewer.ViewerController._

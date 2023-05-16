@@ -1,4 +1,4 @@
-package farjs.text
+package farjs.file
 
 import scala.concurrent.Future
 

@@ -1,6 +1,6 @@
 package farjs.viewer
 
-import farjs.text.{EncodingsPopup, EncodingsPopupProps}
+import farjs.file.popups.{EncodingsPopup, EncodingsPopupProps}
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._

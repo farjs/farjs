@@ -1,5 +1,6 @@
-package farjs.text
+package farjs.file.popups
 
+import farjs.file.Encoding
 import farjs.ui.popup._
 import scommons.react._
 import scommons.react.hooks._
@@ -10,7 +11,7 @@ case class EncodingsPopupProps(encoding: String,
 
 object EncodingsPopup extends FunctionComponent[EncodingsPopupProps] {
 
-  private[text] var listPopup: UiComponent[ListPopupProps] = ListPopup
+  private[file] var listPopup: UiComponent[ListPopupProps] = ListPopup
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped

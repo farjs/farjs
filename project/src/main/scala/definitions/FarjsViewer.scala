@@ -18,6 +18,6 @@ object FarjsViewer extends ScalaJsModule {
 
   override def internalDependencies: Seq[ClasspathDep[ProjectReference]] = Seq(
     FarjsFileList.definition % "compile->compile;test->test",
-    FarjsText.definition % "compile->compile;test->test"
+    FarjsFile.definition % "compile->compile;test->test"
   )
 }

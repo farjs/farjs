@@ -1,6 +1,6 @@
-package farjs.text.popups
+package farjs.file.popups
 
-import farjs.text.{FileViewHistory, TextServices}
+import farjs.file.{FileServices, FileViewHistory}
 import farjs.ui.popup._
 import scommons.react._
 import scommons.react.hooks._
@@ -15,7 +15,7 @@ object FileViewHistoryPopup extends FunctionComponent[FileViewHistoryPopupProps]
   private[popups] var listPopup: UiComponent[ListPopupProps] = ListPopup
   
   protected def render(compProps: Props): ReactElement = {
-    val services = TextServices.useServices
+    val services = FileServices.useServices
     val (maybeItems, setItems) = useState(Option.empty[List[FileViewHistory]])
     val props = compProps.wrapped
 

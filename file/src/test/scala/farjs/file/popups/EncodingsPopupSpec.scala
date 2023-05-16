@@ -1,6 +1,7 @@
-package farjs.text
+package farjs.file.popups
 
-import farjs.text.EncodingsPopup._
+import farjs.file.Encoding
+import farjs.file.popups.EncodingsPopup._
 import farjs.ui.popup.ListPopupProps
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec

@@ -3,9 +3,9 @@ package farjs.app.filelist
 import farjs.app.filelist.service._
 import farjs.domain.FarjsDBContext
 import farjs.domain.dao._
+import farjs.file.FileServices
 import farjs.filelist.FileListServices
 import farjs.fs.FSServices
-import farjs.text.TextServices
 
 class FileListModule(ctx: FarjsDBContext) {
 
@@ -37,7 +37,7 @@ class FileListModule(ctx: FarjsDBContext) {
   
   val fileViewHistoryDao = new FileViewHistoryDao(ctx)
   val fileViewHistoryService = new FileViewHistoryServiceImpl(fileViewHistoryDao)
-  val textServices = new TextServices(
+  val fileServices = new FileServices(
     fileViewHistory = fileViewHistoryService
   )
 }

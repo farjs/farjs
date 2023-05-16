@@ -3,7 +3,7 @@ package farjs.app.filelist.service
 import farjs.app.BaseDBContextSpec
 import farjs.app.filelist.FileListModule
 import farjs.domain.dao.FileViewHistoryDao
-import farjs.text.FileViewHistory
+import farjs.file.FileViewHistory
 import org.scalatest.Succeeded
 
 import scala.concurrent.Future

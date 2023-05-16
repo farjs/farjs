@@ -3,7 +3,7 @@ package farjs.app.filelist.service
 import farjs.app.filelist.service.FileViewHistoryServiceImpl._
 import farjs.domain.FileViewHistoryEntity
 import farjs.domain.dao.FileViewHistoryDao
-import farjs.text.{FileViewHistory, FileViewHistoryService}
+import farjs.file.{FileViewHistory, FileViewHistoryService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

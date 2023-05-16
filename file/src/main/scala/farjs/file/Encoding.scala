@@ -1,13 +1,13 @@
-package farjs.text
+package farjs.file
 
-import farjs.text.raw.Iconv
+import farjs.file.raw.Iconv
 import scommons.nodejs.Process.Platform
 import scommons.nodejs.{Buffer, process}
 
 object Encoding {
   
-  private[text] val winDefault = "win1251"
-  private[text] val unixDefault = "utf8"
+  private[file] val winDefault = "win1251"
+  private[file] val unixDefault = "utf8"
 
   lazy val encodings: List[String] = {
     //TODO: load encodings from iconv-lite, see:
@@ -67,7 +67,7 @@ object Encoding {
   
   lazy val platformEncoding: String = getByPlatform(process.platform)
 
-  private[text] def getByPlatform(platform: Platform): String = {
+  private[file] def getByPlatform(platform: Platform): String = {
     if (platform == Platform.win32) winDefault
     else unixDefault
   }

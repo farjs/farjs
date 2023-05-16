@@ -1,10 +1,10 @@
-package farjs.text
+package farjs.file
 
-import farjs.text.Encoding.{unixDefault, winDefault}
-import farjs.text.raw.Iconv
-import scommons.nodejs.{Buffer, process}
+import farjs.file.Encoding.{unixDefault, winDefault}
+import farjs.file.raw.Iconv
 import scommons.nodejs.Process.Platform
 import scommons.nodejs.test._
+import scommons.nodejs.{Buffer, process}
 
 class EncodingSpec extends TestSpec {
 

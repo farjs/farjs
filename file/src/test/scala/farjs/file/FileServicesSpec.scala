@@ -1,17 +1,17 @@
-package farjs.text
+package farjs.file
 
 import scommons.react._
 import scommons.react.test._
 
 import scala.scalajs.js
 
-class TextServicesSpec extends TestSpec with TestRendererUtils {
+class FileServicesSpec extends TestSpec with TestRendererUtils {
 
   it should "fail if no context when useServices" in {
     //given
     val wrapper = new FunctionComponent[Unit] {
       protected def render(props: Props): ReactElement = {
-        TextServices.useServices
+        FileServices.useServices
         <.>()()
       }
     }
@@ -32,20 +32,20 @@ class TextServicesSpec extends TestSpec with TestRendererUtils {
 
     assertNativeComponent(result,
       <.div()(
-        "Error: TextServices.Context is not found." +
-          "\nPlease, make sure you use TextServices.Context.Provider in parent components"
+        "Error: FileServices.Context is not found." +
+          "\nPlease, make sure you use FileServices.Context.Provider in parent components"
       )
     )
   }
 }
 
-object TextServicesSpec {
+object FileServicesSpec {
 
   def withServicesContext(element: ReactElement,
                           fileViewHistory: FileViewHistoryService = new MockFileViewHistoryService
                          ): ReactElement = {
 
-    <(TextServices.Context.Provider)(^.contextValue := TextServices(
+    <(FileServices.Context.Provider)(^.contextValue := FileServices(
       fileViewHistory = fileViewHistory
     ))(element)
   }

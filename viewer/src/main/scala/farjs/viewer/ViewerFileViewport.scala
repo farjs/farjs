@@ -1,6 +1,6 @@
 package farjs.viewer
 
-import farjs.text.Encoding
+import farjs.file.Encoding
 import farjs.ui.UiString
 
 import scala.collection.mutable
