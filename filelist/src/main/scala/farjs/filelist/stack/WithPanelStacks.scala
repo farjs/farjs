@@ -14,6 +14,10 @@ case class WithPanelStacksProps(leftStack: PanelStack,
   def activeStack: PanelStack =
     if (leftStack.isActive) leftStack
     else rightStack
+
+  def activeInput: BlessedElement =
+    if (leftStack.isActive) leftInput
+    else rightInput
 }
 
 object WithPanelStacks extends FunctionComponent[WithPanelStacksProps] {

@@ -25,6 +25,6 @@ object FarjsFile extends ScalaJsModule {
   }
 
   override def internalDependencies: Seq[ClasspathDep[ProjectReference]] = Seq(
-    FarjsUi.definition
+    FarjsFileList.definition % "compile->compile;test->test"
   )
 }

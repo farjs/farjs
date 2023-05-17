@@ -3,7 +3,7 @@ package farjs.app.filelist
 import farjs.app.filelist.FileListRoot._
 import farjs.archiver.ArchiverPlugin
 import farjs.copymove.CopyMovePlugin
-import farjs.file.FileServices
+import farjs.file.{FilePlugin, FileServices}
 import farjs.filelist._
 import farjs.fs.{FSPlugin, FSServices}
 import farjs.ui.Dispatch
@@ -44,6 +44,7 @@ object FileListRoot {
     ViewerPlugin,
     CopyMovePlugin,
     FSPlugin,
-    FileListUiPlugin
+    FileListUiPlugin,
+    FilePlugin
   )
 }
