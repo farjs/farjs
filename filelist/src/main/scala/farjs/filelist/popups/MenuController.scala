@@ -66,12 +66,13 @@ object MenuController extends FunctionComponent[FileListUiData] {
       ("  Unselect group  Alt-D     ", None, "M-d")
     ),
     "Commands" -> List(
-      ("  Folders history   Alt-H    ", None, "M-h"),
+      ("  File view history  Alt-V   ", None, "M-v"),
+      ("  Folders history    Alt-H   ", None, "M-h"),
       (SubMenu.separator, None, ""),
-      ("  Swap panels       Ctrl-U   ", None, "C-u"),
-      ("  Quick search      Ctrl-S   ", None, "C-s"),
+      ("  Swap panels        Ctrl-U  ", None, "C-u"),
+      ("  Quick search       Ctrl-S  ", None, "C-s"),
       (SubMenu.separator, None, ""),
-      ("  Folder shortcuts  Ctrl-D   ", None, "C-d")
+      ("  Folder shortcuts   Ctrl-D  ", None, "C-d")
     ),
     "Options" -> List(
       ("  DevTools    F12  ", None, "f12")

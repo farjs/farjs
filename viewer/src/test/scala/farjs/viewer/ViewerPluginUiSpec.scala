@@ -20,7 +20,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
-    val pluginUi = new ViewerPluginUi(dispatch, "item 1", 123)
+    val pluginUi = new ViewerPluginUi("item 1", 123)
     val props = FileListPluginUiProps(dispatch, onClose)
     val renderer = createTestRenderer(<(pluginUi())(^.plain := props)())
     val viewport = ViewerFileViewport(
@@ -44,7 +44,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
-    val pluginUi = new ViewerPluginUi(dispatch, "item 1", 0)
+    val pluginUi = new ViewerPluginUi("item 1", 0)
     val props = FileListPluginUiProps(dispatch, onClose)
     val renderer = createTestRenderer(<(pluginUi())(^.plain := props)())
     val viewport = ViewerFileViewport(
@@ -68,7 +68,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
-    val pluginUi = new ViewerPluginUi(dispatch, "item 1", 0)
+    val pluginUi = new ViewerPluginUi("item 1", 0)
     val props = FileListPluginUiProps(dispatch, onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
     val popupProps = findComponentProps(comp, popupComp)
@@ -84,7 +84,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
-    val pluginUi = new ViewerPluginUi(dispatch, "item 1", 0)
+    val pluginUi = new ViewerPluginUi("item 1", 0)
     val props = FileListPluginUiProps(dispatch, onClose)
     val renderer = createTestRenderer(<(pluginUi())(^.plain := props)())
     val viewerProps = findComponentProps(renderer.root, viewerController)
@@ -123,7 +123,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val filePath = "item 1"
     val size = 123
-    val pluginUi = new ViewerPluginUi(dispatch, filePath, size)
+    val pluginUi = new ViewerPluginUi(filePath, size)
     val props = FileListPluginUiProps(dispatch, onClose)
     val inputMock = js.Dynamic.literal()
     

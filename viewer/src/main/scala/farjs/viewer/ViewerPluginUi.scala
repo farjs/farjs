@@ -1,7 +1,6 @@
 package farjs.viewer
 
 import farjs.filelist._
-import farjs.ui.Dispatch
 import farjs.ui.menu.{BottomMenu, BottomMenuProps}
 import farjs.ui.popup.{Popup, PopupProps}
 import farjs.viewer.ViewerPluginUi._
@@ -9,7 +8,7 @@ import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
 
-class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
+class ViewerPluginUi(filePath: String, size: Double)
   extends FunctionComponent[FileListPluginUiProps] {
 
   protected def render(compProps: Props): ReactElement = {
@@ -63,7 +62,7 @@ class ViewerPluginUi(dispatch: Dispatch, filePath: String, size: Double)
         )(
           <(viewerController())(^.wrapped := ViewerControllerProps(
             inputRef = inputRef,
-            dispatch = dispatch,
+            dispatch = props.dispatch,
             filePath = filePath,
             size = size,
             viewport = viewport,
