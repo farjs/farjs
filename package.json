@@ -55,7 +55,7 @@
   "preferGlobal": true,
   "browserslist": "maintained node versions",
   "engines": {
-    "node": ">=14.21.1"
+    "node": ">=16"
   },
   "dependencies": {
     "react-blessed": "0.7.2",
