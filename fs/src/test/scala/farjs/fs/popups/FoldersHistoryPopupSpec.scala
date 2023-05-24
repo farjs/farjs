@@ -81,7 +81,19 @@ class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestR
     
     assertComponents(result.children, List(
       <(listPopup())(^.assertWrapped(inside(_) {
-        case ListPopupProps(title, resItems, _, onClose, selected, _, _, footer, textPaddingLeft, textPaddingRight) =>
+        case ListPopupProps(
+          title,
+          resItems,
+          _,
+          onClose,
+          selected,
+          _,
+          _,
+          footer,
+          textPaddingLeft,
+          textPaddingRight,
+          itemWrapPrefixLen
+        ) =>
           title shouldBe "Folders history"
           resItems shouldBe items
           onClose should be theSameInstanceAs props.onClose
@@ -89,6 +101,7 @@ class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestR
           footer shouldBe None
           textPaddingLeft shouldBe 2
           textPaddingRight shouldBe 1
+          itemWrapPrefixLen shouldBe 3
       }))()
     ))
   }

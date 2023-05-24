@@ -17,7 +17,8 @@ case class ListPopupProps(title: String,
                           onKeypress: String => Boolean = _ => false,
                           footer: Option[String] = None,
                           textPaddingLeft: Int = 2,
-                          textPaddingRight: Int = 1)
+                          textPaddingRight: Int = 1,
+                          itemWrapPrefixLen: Int = 3)
 
 object ListPopup extends FunctionComponent[ListPopupProps] {
 
@@ -63,7 +64,7 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
             selected = props.selected,
             items = js.Array(items.map { item =>
               textPaddingLeftStr +
-                TextLine.wrapText(item, contentWidth - textPadding) +
+                TextLine.wrapText(item, contentWidth - textPadding, props.itemWrapPrefixLen) +
                 textPaddingRightStr
             }: _*),
             style = theme,

@@ -29,7 +29,14 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     val props = getFileViewHistoryPopupProps(onAction = onAction)
     val historyService = new HistoryService
     val items = List("item 1", "item 2").map { path =>
-      FileViewHistory(path, isEdit = false, encoding = "utf8", position = 0, wrap = None, column = None)
+      FileViewHistory(
+        path = path,
+        isEdit = false,
+        encoding = "utf8",
+        position = 0,
+        wrap = None,
+        column = None
+      )
     }
     val itemsF = Future.successful(items)
     historyService.getAll.expects().returning(itemsF)
@@ -55,8 +62,15 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     //given
     val props = getFileViewHistoryPopupProps()
     val historyService = new HistoryService
-    val items = List.fill(20)("item").map { path =>
-      FileViewHistory(path, isEdit = false, encoding = "utf8", position = 0, wrap = None, column = None)
+    val items = List.fill(20)("item").zipWithIndex.map { case (path, index) =>
+      FileViewHistory(
+        path = path,
+        isEdit = index % 2 == 0,
+        encoding = "utf8",
+        position = 0,
+        wrap = None,
+        column = None
+      )
     }
     val itemsF = Future.successful(items)
     historyService.getAll.expects().returning(itemsF)
@@ -73,7 +87,8 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     }
   }
   
-  private def getFileViewHistoryPopupProps(onAction: FileViewHistory => Unit = _ => ()): FileViewHistoryPopupProps = {
+  private def getFileViewHistoryPopupProps(onAction: FileViewHistory => Unit = _ => ()
+                                          ): FileViewHistoryPopupProps = {
     FileViewHistoryPopupProps(
       onAction = onAction,
       onClose = () => ()
@@ -86,14 +101,32 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     
     assertComponents(result.children, List(
       <(listPopup())(^.assertWrapped(inside(_) {
-        case ListPopupProps(title, resItems, _, onClose, selected, _, _, footer, textPaddingLeft, textPaddingRight) =>
+        case ListPopupProps(
+          title,
+          resItems,
+          _,
+          onClose,
+          selected,
+          _,
+          _,
+          footer,
+          textPaddingLeft,
+          textPaddingRight,
+          itemWrapPrefixLen
+        ) =>
           title shouldBe "File view history"
-          resItems shouldBe items.map(_.path)
+          resItems shouldBe items.map { item =>
+            val prefix =
+              if (item.isEdit) "Edit: "
+              else "View: "
+            s"$prefix${item.path}"
+          }
           onClose should be theSameInstanceAs props.onClose
           selected shouldBe (items.length - 1)
           footer shouldBe None
           textPaddingLeft shouldBe 2
           textPaddingRight shouldBe 1
+          itemWrapPrefixLen shouldBe 9
       }))()
     ))
   }

@@ -29,12 +29,18 @@ object FileViewHistoryPopup extends FunctionComponent[FileViewHistoryPopupProps]
     maybeItems.map { items =>
       <(listPopup())(^.wrapped := ListPopupProps(
         title = "File view history",
-        items = items.map(_.path),
+        items = items.map { item =>
+          val prefix =
+            if (item.isEdit) "Edit: "
+            else "View: "
+          s"$prefix${item.path}"
+        },
         onAction = { index =>
           props.onAction(items(index))
         },
         onClose = props.onClose,
-        selected = math.max(items.length - 1, 0)
+        selected = math.max(items.length - 1, 0),
+        itemWrapPrefixLen = 9
       ))()
     }.orNull
   }

@@ -295,7 +295,19 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     
     assertComponents(result.children, List(
       <(listPopup())(^.assertWrapped(inside(_) {
-        case ListPopupProps(title, resItems, _, onClose, selected, _, _, footer, textPaddingLeft, textPaddingRight) =>
+        case ListPopupProps(
+          title,
+          resItems,
+          _,
+          onClose,
+          selected,
+          _,
+          _,
+          footer,
+          textPaddingLeft,
+          textPaddingRight,
+          itemWrapPrefixLen
+        ) =>
           title shouldBe "Folder shortcuts"
           resItems shouldBe items
           onClose should be theSameInstanceAs props.onClose
@@ -303,6 +315,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
           footer shouldBe Some("Edit: +, -")
           textPaddingLeft shouldBe 2
           textPaddingRight shouldBe 1
+          itemWrapPrefixLen shouldBe 3
       }))()
     ))
   }

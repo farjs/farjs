@@ -5,11 +5,11 @@ import scommons.react.blessed._
 
 object TextLine extends FunctionComponent[TextLineProps] {
   
-  def wrapText(text: String, width: Int): String = {
+  def wrapText(text: String, width: Int, prefixLen: Int = 3): String = {
     val dx = text.length - width
     if (dx > 0) {
-      val prefix = text.take(3)
-      val sufix = text.drop(dx + 6) // prefix + ...
+      val prefix = text.take(prefixLen)
+      val sufix = text.drop(dx + prefixLen + 3) // prefix + ...
       s"$prefix...$sufix"
     }
     else text

@@ -86,7 +86,19 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
 
     assertComponents(result.children, List(
       <(listPopup())(^.assertWrapped(inside(_) {
-        case ListPopupProps(title, resItems, _, onClose, resSelected, _, _, footer, textPaddingLeft, textPaddingRight) =>
+        case ListPopupProps(
+          title,
+          resItems,
+          _,
+          onClose,
+          resSelected,
+          _,
+          _,
+          footer,
+          textPaddingLeft,
+          textPaddingRight,
+          itemWrapPrefixLen
+        ) =>
           title shouldBe "Encodings"
           resItems shouldBe Encoding.encodings
           onClose should be theSameInstanceAs props.onClose
@@ -94,6 +106,7 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
           footer shouldBe None
           textPaddingLeft shouldBe 2
           textPaddingRight shouldBe 1
+          itemWrapPrefixLen shouldBe 3
       }))()
     ))
   }
