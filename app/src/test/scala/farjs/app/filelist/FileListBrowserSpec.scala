@@ -245,11 +245,11 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   it should "not trigger plugin if dir when onKeypress(enter)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val onTriggerMock = mockFunction[String, Uint8Array, () => Unit, Option[PanelStackItem[FileListState]]]
+    val onTriggerMock = mockFunction[String, Uint8Array, () => Unit, Future[Option[PanelStackItem[FileListState]]]]
     val plugin = new FileListPlugin {
       override def onFileTrigger(filePath: String,
                                  fileHeader: Uint8Array,
-                                 onClose: () => Unit): Option[PanelStackItem[FileListState]] = {
+                                 onClose: () => Unit): Future[Option[PanelStackItem[FileListState]]] = {
         onTriggerMock(filePath, fileHeader, onClose)
       }
     }
@@ -281,23 +281,25 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     //then
     onTriggerMock.expects(*, *, *).never()
 
-    //when & then
+    //when
     button.props.onKeypress(null, literal(full = keyFull).asInstanceOf[KeyboardKey])
-    inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _, _, _) =>
-      leftStack.peek[FileListState] shouldBe fsItem
-    }
 
-    Succeeded
+    //then
+    Future.unit.map { _ =>
+      inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _, _, _) =>
+        leftStack.peek[FileListState] shouldBe fsItem
+      }
+    }
   }
 
   it should "not trigger plugin if not local FS when onKeypress(enter)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val onTriggerMock = mockFunction[String, Uint8Array, () => Unit, Option[PanelStackItem[FileListState]]]
+    val onTriggerMock = mockFunction[String, Uint8Array, () => Unit, Future[Option[PanelStackItem[FileListState]]]]
     val plugin = new FileListPlugin {
       override def onFileTrigger(filePath: String,
                                  fileHeader: Uint8Array,
-                                 onClose: () => Unit): Option[PanelStackItem[FileListState]] = {
+                                 onClose: () => Unit): Future[Option[PanelStackItem[FileListState]]] = {
         onTriggerMock(filePath, fileHeader, onClose)
       }
     }
@@ -338,23 +340,25 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     //then
     onTriggerMock.expects(*, *, *).never()
 
-    //when & then
+    //when
     button.props.onKeypress(null, literal(full = keyFull).asInstanceOf[KeyboardKey])
-    inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _, _, _) =>
-      leftStack.peek[FileListState] shouldBe nonFSItem
+    
+    //then
+    Future.unit.map { _ =>
+      inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _, _, _) =>
+        leftStack.peek[FileListState] shouldBe nonFSItem
+      }
     }
-
-    Succeeded
   }
 
   it should "dispatch error task if failed open file when onKeypress(enter)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val onTriggerMock = mockFunction[String, Uint8Array, () => Unit, Option[PanelStackItem[FileListState]]]
+    val onTriggerMock = mockFunction[String, Uint8Array, () => Unit, Future[Option[PanelStackItem[FileListState]]]]
     val plugin = new FileListPlugin {
       override def onFileTrigger(filePath: String,
                                  fileHeader: Uint8Array,
-                                 onClose: () => Unit): Option[PanelStackItem[FileListState]] = {
+                                 onClose: () => Unit): Future[Option[PanelStackItem[FileListState]]] = {
         onTriggerMock(filePath, fileHeader, onClose)
       }
     }
@@ -412,20 +416,20 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   it should "trigger plugin if file when onKeypress(enter)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val onTrigger2Mock = mockFunction[String, Uint8Array, () => Unit, Option[PanelStackItem[FileListState]]]
-    val onTrigger3Mock = mockFunction[String, Uint8Array, () => Unit, Option[PanelStackItem[FileListState]]]
+    val onTrigger2Mock = mockFunction[String, Uint8Array, () => Unit, Future[Option[PanelStackItem[FileListState]]]]
+    val onTrigger3Mock = mockFunction[String, Uint8Array, () => Unit, Future[Option[PanelStackItem[FileListState]]]]
     val plugin1 = new FileListPlugin {}
     val plugin2 = new FileListPlugin {
       override def onFileTrigger(filePath: String,
                                  fileHeader: Uint8Array,
-                                 onClose: () => Unit): Option[PanelStackItem[FileListState]] = {
+                                 onClose: () => Unit): Future[Option[PanelStackItem[FileListState]]] = {
         onTrigger2Mock(filePath, fileHeader, onClose)
       }
     }
     val plugin3 = new FileListPlugin {
       override def onFileTrigger(filePath: String,
                                  fileHeader: Uint8Array,
-                                 onClose: () => Unit): Option[PanelStackItem[FileListState]] = {
+                                 onClose: () => Unit): Future[Option[PanelStackItem[FileListState]]] = {
         onTrigger3Mock(filePath, fileHeader, onClose)
       }
     }
@@ -469,14 +473,14 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     onTrigger2Mock.expects(filePath, *, *).onCall { (_, fileHeader, onClose) =>
       fileHeader.length shouldBe 123
       onCloseCapture = onClose
-      Some(pluginItem)
+      Future.successful(Some(pluginItem))
     }
     onTrigger3Mock.expects(*, *, *).never()
 
     //when
     button.props.onKeypress(null, literal(full = keyFull).asInstanceOf[KeyboardKey])
     
-    eventually(onCloseCapture should not be null).map { _ =>
+    eventually(onCloseCapture should not be null).flatMap { _ =>
       //then
       inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _, _, _) =>
         val item = leftStack.peek[FileListState]
@@ -484,10 +488,14 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         item.dispatch should not be None
       }
 
-      //when & then
+      //when
       onCloseCapture()
-      inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _, _, _) =>
-        leftStack.peek[FileListState] shouldBe fsItem
+      
+      //then
+      Future.unit.map { _ =>
+        inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _, _, _) =>
+          leftStack.peek[FileListState] shouldBe fsItem
+        }
       }
     }
   }
@@ -495,11 +503,11 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   it should "trigger and render plugin ui when onKeypress(triggerKey)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val onTriggerMock = mockFunction[String, WithPanelStacksProps, js.UndefOr[js.Dynamic], Option[ReactClass]]
+    val onTriggerMock = mockFunction[String, WithPanelStacksProps, js.UndefOr[js.Dynamic], Future[Option[ReactClass]]]
     val keyFull = "C-p"
     val plugin = new FileListPlugin {
       override val triggerKeys: js.Array[String] = js.Array(keyFull)
-      override def onKeyTrigger(key: String, stacks: WithPanelStacksProps, data: js.UndefOr[js.Dynamic]): Option[ReactClass] = {
+      override def onKeyTrigger(key: String, stacks: WithPanelStacksProps, data: js.UndefOr[js.Dynamic]): Future[Option[ReactClass]] = {
         onTriggerMock(key, stacks, data)
       }
     }
@@ -520,26 +528,75 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val data: js.UndefOr[js.Dynamic] = js.Dynamic.literal()
     
     //then
-    onTriggerMock.expects(keyFull, stacks, data).returning(Some(pluginUi))
+    onTriggerMock.expects(keyFull, stacks, data).returning(Future.successful(Some(pluginUi)))
 
     //when
     button.props.onKeypress(null, literal(full = keyFull, data = data).asInstanceOf[KeyboardKey])
 
     //then
-    inside(findComponents(renderer.root, pluginUi)) {
-      case List(uiComp) =>
-        var resOnClose: js.Function0[Unit] = null
-        assertNativeComponent(uiComp, <(pluginUi)(^.assertPlain[FileListPluginUiProps](inside(_) {
-          case FileListPluginUiProps(resDispatch, onClose) =>
-            resDispatch shouldBe dispatch
-            resOnClose = onClose
-        }))())
+    Future.unit.map { _ =>
+      inside(findComponents(renderer.root, pluginUi)) {
+        case List(uiComp) =>
+          var resOnClose: js.Function0[Unit] = null
+          assertNativeComponent(uiComp, <(pluginUi)(^.assertPlain[FileListPluginUiProps](inside(_) {
+            case FileListPluginUiProps(resDispatch, onClose) =>
+              resDispatch shouldBe dispatch
+              resOnClose = onClose
+          }))())
 
-        //when
-        resOnClose()
-        
-        //then
-        findComponents(renderer.root, pluginUi) should be (empty)
+          //when
+          resOnClose()
+
+          //then
+          findComponents(renderer.root, pluginUi) should be(empty)
+      }
+    }
+  }
+
+  it should "dispatch error task if failed open plugin when onKeypress(triggerKey)" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val onTriggerMock = mockFunction[String, WithPanelStacksProps, js.UndefOr[js.Dynamic], Future[Option[ReactClass]]]
+    val keyFull = "C-p"
+    val plugin = new FileListPlugin {
+      override val triggerKeys: js.Array[String] = js.Array(keyFull)
+      override def onKeyTrigger(key: String, stacks: WithPanelStacksProps, data: js.UndefOr[js.Dynamic]): Future[Option[ReactClass]] = {
+        onTriggerMock(key, stacks, data)
+      }
+    }
+    val props = FileListBrowserProps(dispatch, plugins = List(plugin))
+    val focusMock = mockFunction[Unit]
+    val buttonMock = literal("focus" -> focusMock)
+    focusMock.expects()
+
+    val renderer = createTestRenderer(<(FileListBrowser())(^.wrapped := props)(), { el =>
+      if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
+      else null
+    })
+    val stacks = findComponentProps(renderer.root, WithPanelStacks)
+    val button = inside(findComponents(renderer.root, <.button.name)) {
+      case List(button, _) => button
+    }
+    val data: js.UndefOr[js.Dynamic] = js.Dynamic.literal()
+    val expectedError = new Exception("test error")
+    
+    //then
+    onTriggerMock.expects(keyFull, stacks, data).returning(Future.failed(expectedError))
+    var openF: Future[_] = null
+    dispatch.expects(*).onCall { action: Any =>
+      inside(action) { case FileListTaskAction(FutureTask("Opening Plugin", future)) =>
+        openF = future
+      }
+    }
+
+    //when
+    button.props.onKeypress(null, literal(full = keyFull, data = data).asInstanceOf[KeyboardKey])
+
+    //then
+    eventually {
+      openF should not be null
+    }.flatMap(_ => openF.failed).map { ex =>
+      ex shouldBe expectedError
     }
   }
 

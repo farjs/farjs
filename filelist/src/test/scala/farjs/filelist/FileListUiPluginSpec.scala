@@ -2,10 +2,13 @@ package farjs.filelist
 
 import farjs.filelist.api._
 import farjs.filelist.stack._
-import scommons.nodejs.test.TestSpec
+import org.scalatest.Succeeded
+import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 
-class FileListUiPluginSpec extends TestSpec {
+import scala.concurrent.Future
+
+class FileListUiPluginSpec extends AsyncTestSpec {
 
   it should "define triggerKeys" in {
     //when & then
@@ -31,8 +34,10 @@ class FileListUiPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    FileListUiPlugin.onKeyTrigger("test_key", stacks) shouldBe None
-    FileListUiPlugin.onKeyTrigger("f1", stacks) should not be None
+    Future.sequence(Seq(
+      FileListUiPlugin.onKeyTrigger("test_key", stacks).map(_ shouldBe None),
+      FileListUiPlugin.onKeyTrigger("f1", stacks).map(_ should not be None)
+    )).map(_ => Succeeded)
   }
 
   it should "return Some(ui) if trigger key=f1/f9/f10/Alt-S/Alt-D when createUi" in {
@@ -60,6 +65,7 @@ class FileListUiPluginSpec extends TestSpec {
     inside(FileListUiPlugin.createUiData("M-d", someData)) {
       case Some(FileListUiData(false, false, false, false, false, Some(false), `someData`, _)) =>
     }
+    Succeeded
   }
 
   it should "return None/Some if trigger key=f7 when createUi" in {
@@ -78,6 +84,7 @@ class FileListUiPluginSpec extends TestSpec {
     inside(FileListUiPlugin.createUiData("f7", correctData)) {
       case Some(FileListUiData(false, false, false, false, true, None, `correctData`, _)) =>
     }
+    Succeeded
   }
 
   it should "return None/Some if trigger key=f8/delete when createUi" in {
@@ -108,5 +115,6 @@ class FileListUiPluginSpec extends TestSpec {
     inside(FileListUiPlugin.createUiData("delete", currItemData)) {
       case Some(FileListUiData(false, false, false, true, false, None, `currItemData`, _)) =>
     }
+    Succeeded
   }
 }

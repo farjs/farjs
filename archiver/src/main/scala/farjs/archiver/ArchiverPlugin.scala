@@ -20,10 +20,10 @@ object ArchiverPlugin extends FileListPlugin {
 
   override def onKeyTrigger(key: String,
                             stacks: WithPanelStacksProps,
-                            data: js.UndefOr[js.Dynamic] = js.undefined): Option[ReactClass] = {
+                            data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
 
     val stackItem = stacks.activeStack.peek[FileListState]
-    stackItem.getActions.zip(stackItem.state).flatMap { case ((dispatch, actions), state) =>
+    val res = stackItem.getActions.zip(stackItem.state).flatMap { case ((dispatch, actions), state) =>
       val items =
         if (state.selectedNames.nonEmpty) state.selectedItems
         else state.currentItem.filter(_ != FileListItem.up).toList
@@ -35,27 +35,31 @@ object ArchiverPlugin extends FileListPlugin {
       }
       else None
     }
+    Future.successful(res)
   }
   
   override def onFileTrigger(filePath: String,
                              fileHeader: Uint8Array,
-                             onClose: () => Unit): Option[PanelStackItem[FileListState]] = {
+                             onClose: () => Unit): Future[Option[PanelStackItem[FileListState]]] = {
     val pathLower = filePath.toLowerCase
-    if (pathLower.endsWith(".zip") || pathLower.endsWith(".jar") || checkFileHeader(fileHeader)) {
-      val fileName = path.parse(filePath).base
-      val rootPath = s"zip://$fileName"
-      val entriesByParentF = readZip(filePath)
-      
-      Some(PanelStackItem(
-        component = new FileListPanelController(new ZipPanel(filePath, rootPath, entriesByParentF, onClose)).apply(),
-        dispatch = None,
-        actions = Some(new ZipActions(createApi(filePath, rootPath, entriesByParentF))),
-        state = Some(FileListState(
-          currDir = FileListDir(rootPath, isRoot = false, items = Nil)
+    val res =
+      if (pathLower.endsWith(".zip") || pathLower.endsWith(".jar") || checkFileHeader(fileHeader)) {
+        val fileName = path.parse(filePath).base
+        val rootPath = s"zip://$fileName"
+        val entriesByParentF = readZip(filePath)
+        
+        Some(PanelStackItem(
+          component = new FileListPanelController(new ZipPanel(filePath, rootPath, entriesByParentF, onClose)).apply(),
+          dispatch = None,
+          actions = Some(new ZipActions(createApi(filePath, rootPath, entriesByParentF))),
+          state = Some(FileListState(
+            currDir = FileListDir(rootPath, isRoot = false, items = Nil)
+          ))
         ))
-      ))
-    }
-    else None
+      }
+      else None
+
+    Future.successful(res)
   }
   
   private def checkFileHeader(header: Uint8Array): Boolean = {

@@ -13,6 +13,7 @@ import scommons.react.blessed._
 import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.Failure
@@ -89,9 +90,14 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           }
         case keyFull =>
           props.plugins.find(_.triggerKeys.contains(keyFull)).foreach { plugin =>
-            val maybePluginUi = plugin.onKeyTrigger(keyFull, stacks, key.data)
-            maybePluginUi.foreach { pluginUi =>
-              setCurrPluginUi(Some(pluginUi))
+            val pluginRes = plugin.onKeyTrigger(keyFull, stacks, key.data)
+            pluginRes.foreach { maybePluginUi =>
+              maybePluginUi.foreach { pluginUi =>
+                setCurrPluginUi(Some(pluginUi))
+              }
+            }
+            pluginRes.andThen { case Failure(_) =>
+              props.dispatch(FileListTaskAction(FutureTask("Opening Plugin", pluginRes)))
             }
           }
       }
@@ -188,14 +194,18 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         _ <- source.close()
       } yield {
         buff.subarray(0, bytesRead)
-      }).map { fileHeader =>
-        val maybePluginItem = plugins.foldLeft(Option.empty[PanelStackItem[FileListState]]) {
-          case (None, plugin) => plugin.onFileTrigger(filePath, fileHeader, onClose)
-          case (res@Some(_), _) => res
+      }).flatMap { fileHeader =>
+        val zero = Future.successful(Option.empty[PanelStackItem[FileListState]])
+        val pluginRes = plugins.foldLeft(zero) { (resF, plugin) =>
+          resF.flatMap {
+            case None => plugin.onFileTrigger(filePath, fileHeader, onClose)
+            case Some(_) => resF
+          }
         }
-  
-        maybePluginItem.foreach { item =>
-          stack.push(PanelStackItem.initDispatch(dispatch, FileListStateReducer.apply, stack, item))
+        pluginRes.map { maybePluginItem =>
+          maybePluginItem.foreach { item =>
+            stack.push(PanelStackItem.initDispatch(dispatch, FileListStateReducer.apply, stack, item))
+          }
         }
       }
 

@@ -7,13 +7,13 @@ import farjs.filelist.stack._
 import farjs.filelist.{FileListState, MockFileListActions}
 import farjs.viewer.ViewerEvent._
 import scommons.nodejs.Stats
-import scommons.nodejs.test.TestSpec
+import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 
 import scala.scalajs.js
 import scala.scalajs.js.JavaScriptException
 
-class ViewerPluginSpec extends TestSpec {
+class ViewerPluginSpec extends AsyncTestSpec {
 
   //noinspection TypeAnnotation
   class FS {
@@ -47,8 +47,11 @@ class ViewerPluginSpec extends TestSpec {
     //then
     fs.lstatSync.expects(data.path).throwing(JavaScriptException(js.Error("no such file")))
 
-    //when & then
-    ViewerPlugin.onKeyTrigger(onFileView, null, data.asInstanceOf[js.Dynamic]) should not be None
+    //when
+    ViewerPlugin.onKeyTrigger(onFileView, null, data.asInstanceOf[js.Dynamic]).map { res =>
+      //then
+      res should not be None
+    }
   }
 
   it should "return Some(ViewerPluginUi) when onKeyTrigger(onFileView)" in {
@@ -67,8 +70,11 @@ class ViewerPluginSpec extends TestSpec {
     //then
     fs.lstatSync.expects(data.path).returning(js.Dynamic.literal(size = 50).asInstanceOf[Stats])
 
-    //when & then
-    ViewerPlugin.onKeyTrigger(onFileView, null, data.asInstanceOf[js.Dynamic]) should not be None
+    //when
+    ViewerPlugin.onKeyTrigger(onFileView, null, data.asInstanceOf[js.Dynamic]).map { res =>
+      //then
+      res should not be None
+    }
   }
 
   it should "return None if .. when onKeyTrigger(f3)" in {
@@ -89,7 +95,7 @@ class ViewerPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ViewerPlugin.onKeyTrigger("f3", stacks) shouldBe None
+    ViewerPlugin.onKeyTrigger("f3", stacks).map(_ shouldBe None)
   }
 
   it should "return None if non-local fs when onKeyTrigger(f3)" in {
@@ -109,7 +115,7 @@ class ViewerPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ViewerPlugin.onKeyTrigger("f3", stacks) shouldBe None
+    ViewerPlugin.onKeyTrigger("f3", stacks).map(_ shouldBe None)
   }
 
   it should "return Some(ViewerPluginUi) if file when onKeyTrigger(f3)" in {
@@ -129,7 +135,7 @@ class ViewerPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ViewerPlugin.onKeyTrigger("f3", stacks) should not be None
+    ViewerPlugin.onKeyTrigger("f3", stacks).map(_ should not be None)
   }
 
   it should "return Some(ViewerPluginUi) if file when onKeyTrigger(onViewerOpenLeft)" in {
@@ -149,7 +155,7 @@ class ViewerPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ViewerPlugin.onKeyTrigger(onViewerOpenLeft, stacks) should not be None
+    ViewerPlugin.onKeyTrigger(onViewerOpenLeft, stacks).map(_ should not be None)
   }
 
   it should "return Some(ViewerPluginUi) if file when onKeyTrigger(onViewerOpenRight)" in {
@@ -169,7 +175,7 @@ class ViewerPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ViewerPlugin.onKeyTrigger(onViewerOpenRight, stacks) should not be None
+    ViewerPlugin.onKeyTrigger(onViewerOpenRight, stacks).map(_ should not be None)
   }
 
   it should "return Some(ViewItemsPopup) if dir when onKeyTrigger(f3)" in {
@@ -189,6 +195,6 @@ class ViewerPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    ViewerPlugin.onKeyTrigger("f3", stacks) should not be None
+    ViewerPlugin.onKeyTrigger("f3", stacks).map(_ should not be None)
   }
 }

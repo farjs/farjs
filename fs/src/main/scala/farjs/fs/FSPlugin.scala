@@ -5,6 +5,7 @@ import farjs.filelist.stack._
 import farjs.ui.Dispatch
 import scommons.react.ReactClass
 
+import scala.concurrent.Future
 import scala.scalajs.js
 
 class FSPlugin(reducer: (FileListState, Any) => FileListState) extends FileListPlugin {
@@ -24,9 +25,9 @@ class FSPlugin(reducer: (FileListState, Any) => FileListState) extends FileListP
 
   override def onKeyTrigger(key: String,
                             stacks: WithPanelStacksProps,
-                            data: js.UndefOr[js.Dynamic] = js.undefined): Option[ReactClass] = {
+                            data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
 
-    createUi(key).map(_.apply())
+    Future.successful(createUi(key).map(_.apply()))
   }
   
   private[fs] def createUi(key: String): Option[FSPluginUi] = {

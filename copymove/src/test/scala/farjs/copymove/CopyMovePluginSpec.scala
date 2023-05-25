@@ -5,13 +5,15 @@ import farjs.filelist._
 import farjs.filelist.api._
 import farjs.filelist.stack._
 import org.scalactic.source.Position
-import scommons.nodejs.test.TestSpec
+import org.scalatest.Succeeded
+import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 import scommons.react.blessed.BlessedElement
 
+import scala.concurrent.Future
 import scala.scalajs.js
 
-class CopyMovePluginSpec extends TestSpec {
+class CopyMovePluginSpec extends AsyncTestSpec {
 
   it should "define triggerKeys" in {
     //when & then
@@ -42,10 +44,12 @@ class CopyMovePluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    CopyMovePlugin.onKeyTrigger("f5", stacks) shouldBe None
-    CopyMovePlugin.onKeyTrigger("f6", stacks) shouldBe None
-    CopyMovePlugin.onKeyTrigger("S-f5", stacks) shouldBe None
-    CopyMovePlugin.onKeyTrigger("S-f6", stacks) shouldBe None
+    Future.sequence(Seq(
+      CopyMovePlugin.onKeyTrigger("f5", stacks).map(_ shouldBe None),
+      CopyMovePlugin.onKeyTrigger("f6", stacks).map(_ shouldBe None),
+      CopyMovePlugin.onKeyTrigger("S-f5", stacks).map(_ shouldBe None),
+      CopyMovePlugin.onKeyTrigger("S-f6", stacks).map(_ shouldBe None)
+    )).map(_ => Succeeded)
   }
 
   it should "return None if other state type when onKeyTrigger" in {
@@ -68,10 +72,12 @@ class CopyMovePluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    CopyMovePlugin.onKeyTrigger("f5", stacks) shouldBe None
-    CopyMovePlugin.onKeyTrigger("f6", stacks) shouldBe None
-    CopyMovePlugin.onKeyTrigger("S-f5", stacks) shouldBe None
-    CopyMovePlugin.onKeyTrigger("S-f6", stacks) shouldBe None
+    Future.sequence(Seq(
+      CopyMovePlugin.onKeyTrigger("f5", stacks).map(_ shouldBe None),
+      CopyMovePlugin.onKeyTrigger("f6", stacks).map(_ shouldBe None),
+      CopyMovePlugin.onKeyTrigger("S-f5", stacks).map(_ shouldBe None),
+      CopyMovePlugin.onKeyTrigger("S-f6", stacks).map(_ shouldBe None)
+    )).map(_ => Succeeded)
   }
 
   it should "return None when onKeyTrigger(unknown)" in {
@@ -97,7 +103,7 @@ class CopyMovePluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    CopyMovePlugin.onKeyTrigger("unknown", stacks) shouldBe None
+    CopyMovePlugin.onKeyTrigger("unknown", stacks).map(_ shouldBe None)
   }
 
   it should "return Some(ui) when onKeyTrigger(Shift-F5)" in {
@@ -117,7 +123,7 @@ class CopyMovePluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    CopyMovePlugin.onKeyTrigger("S-f5", stacks) should not be None
+    CopyMovePlugin.onKeyTrigger("S-f5", stacks).map(_ should not be None)
   }
 
   it should "return Some(ui) when onKeyTrigger(F5)" in {
@@ -139,7 +145,7 @@ class CopyMovePluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    CopyMovePlugin.onKeyTrigger("f5", stacks) should not be None
+    CopyMovePlugin.onKeyTrigger("f5", stacks).map(_ should not be None)
   }
 
   it should "return Some(ui) if selected items when onKeyTrigger(F6)" in {
@@ -162,7 +168,7 @@ class CopyMovePluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    CopyMovePlugin.onKeyTrigger("f6", stacks) should not be None
+    CopyMovePlugin.onKeyTrigger("f6", stacks).map(_ should not be None)
   }
 
   it should "return CopyMoveUiAction when onCopyMoveInplace" in {
@@ -211,6 +217,8 @@ class CopyMovePluginSpec extends TestSpec {
     check("S-f6", ShowMoveInplace, index = 1, never = true, capabilities = Set(FileListCapability.copyInplace))
     check("S-f6", ShowMoveInplace, index = 1, capabilities = Set(FileListCapability.moveInplace))
     check("S-f6", ShowMoveInplace, index = 2)
+    
+    Succeeded
   }
 
   it should "return CopyMoveUiAction or emit FileListEvent when onCopyMove" in {
@@ -287,5 +295,7 @@ class CopyMovePluginSpec extends TestSpec {
     check("f6", ShowMoveToTarget, index = 1)
     check("f6", ShowMoveToTarget, index = 2)
     check("f6", ShowMoveToTarget, selectedNames = Set("file 1"))
+    
+    Succeeded
   }
 }

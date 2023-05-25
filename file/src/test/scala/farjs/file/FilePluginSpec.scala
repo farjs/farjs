@@ -3,10 +3,13 @@ package farjs.file
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack._
 import farjs.filelist.{FileListState, MockFileListActions}
-import scommons.nodejs.test.TestSpec
+import org.scalatest.Succeeded
+import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 
-class FilePluginSpec extends TestSpec {
+import scala.concurrent.Future
+
+class FilePluginSpec extends AsyncTestSpec {
 
   it should "define triggerKeys" in {
     //when & then
@@ -30,12 +33,15 @@ class FilePluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    FilePlugin.onKeyTrigger("test_key", stacks) shouldBe None
-    FilePlugin.onKeyTrigger("M-v", stacks) should not be None
+    Future.sequence(Seq(
+      FilePlugin.onKeyTrigger("test_key", stacks).map(_ shouldBe None),
+      FilePlugin.onKeyTrigger("M-v", stacks).map(_ should not be None)
+    )).map(_ => Succeeded)
   }
 
   it should "return Some(ui) if trigger key when createUi" in {
     //when & then
     inside(FilePlugin.createUi("M-v")) { case Some(FilePluginUi(true)) => }
+    Succeeded
   }
 }

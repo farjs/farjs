@@ -7,6 +7,7 @@ import farjs.filelist.stack.{PanelStack, WithPanelStacksProps}
 import scommons.react.ReactClass
 import scommons.react.blessed.BlessedElement
 
+import scala.concurrent.Future
 import scala.scalajs.js
 
 object CopyMovePlugin extends FileListPlugin {
@@ -15,7 +16,7 @@ object CopyMovePlugin extends FileListPlugin {
 
   override def onKeyTrigger(key: String,
                             stacks: WithPanelStacksProps,
-                            data: js.UndefOr[js.Dynamic] = js.undefined): Option[ReactClass] = {
+                            data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
     
     val (maybeFrom, maybeTo, toInput) =
       if (stacks.leftStack.isActive) {
@@ -23,7 +24,7 @@ object CopyMovePlugin extends FileListPlugin {
       }
       else (getData(stacks.rightStack), getData(stacks.leftStack), stacks.leftInput)
 
-    key match {
+    val res = key match {
       case "f5" | "f6" =>
         maybeFrom.zip(maybeTo).flatMap { case (from, to) =>
           onCopyMove(key == "f6", from, to, toInput).map { action =>
@@ -38,6 +39,7 @@ object CopyMovePlugin extends FileListPlugin {
         }
       case _ => None
     }
+    Future.successful(res)
   }
 
   private def getData(stack: PanelStack): Option[FileListData] = {

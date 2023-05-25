@@ -3,12 +3,14 @@ package farjs.fs
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack._
 import farjs.filelist.{FileListState, MockFileListActions}
-import scommons.nodejs.test.TestSpec
+import org.scalatest.Succeeded
+import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 
+import scala.concurrent.Future
 import scala.scalajs.js
 
-class FSPluginSpec extends TestSpec {
+class FSPluginSpec extends AsyncTestSpec {
 
   it should "define triggerKeys" in {
     //when & then
@@ -76,8 +78,10 @@ class FSPluginSpec extends TestSpec {
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
     //when & then
-    FSPlugin.onKeyTrigger("test_key", stacks) shouldBe None
-    FSPlugin.onKeyTrigger("M-l", stacks) should not be None
+    Future.sequence(Seq(
+      FSPlugin.onKeyTrigger("test_key", stacks).map(_ shouldBe None),
+      FSPlugin.onKeyTrigger("M-l", stacks).map(_ should not be None)
+    )).map(_ => Succeeded)
   }
 
   it should "return Some(ui) if trigger key when createUi" in {
@@ -86,5 +90,6 @@ class FSPluginSpec extends TestSpec {
     inside(FSPlugin.createUi("M-r")) { case Some(FSPluginUi(Some(false), false, false)) => }
     inside(FSPlugin.createUi("M-h")) { case Some(FSPluginUi(None, true, false)) => }
     inside(FSPlugin.createUi("C-d")) { case Some(FSPluginUi(None, false, true)) => }
+    Succeeded
   }
 }

@@ -1,10 +1,10 @@
 package farjs.viewer.quickview
 
 import farjs.filelist.stack._
+import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
-import scommons.react.test.TestSpec
 
-class QuickViewPluginSpec extends TestSpec {
+class QuickViewPluginSpec extends AsyncTestSpec {
   
   //noinspection TypeAnnotation
   class Stack(isActive: Boolean = false) {
@@ -36,7 +36,7 @@ class QuickViewPluginSpec extends TestSpec {
     leftStack.pop.expects()
 
     //when
-    QuickViewPlugin.onKeyTrigger("", stacks) shouldBe None
+    QuickViewPlugin.onKeyTrigger("", stacks).map(_ shouldBe None)
   }
   
   it should "remove plugin from right panel when onKeyTrigger" in {
@@ -51,7 +51,7 @@ class QuickViewPluginSpec extends TestSpec {
     rightStack.pop.expects()
 
     //when
-    QuickViewPlugin.onKeyTrigger("", stacks) shouldBe None
+    QuickViewPlugin.onKeyTrigger("", stacks).map(_ shouldBe None)
   }
   
   it should "add plugin to left panel when onKeyTrigger" in {
@@ -66,7 +66,7 @@ class QuickViewPluginSpec extends TestSpec {
     leftStack.push.expects(PanelStackItem(QuickViewPanel(), None, None, Some(QuickViewParams())))
 
     //when
-    QuickViewPlugin.onKeyTrigger("", stacks) shouldBe None
+    QuickViewPlugin.onKeyTrigger("", stacks).map(_ shouldBe None)
   }
   
   it should "add plugin to right panel when onKeyTrigger" in {
@@ -81,6 +81,6 @@ class QuickViewPluginSpec extends TestSpec {
     rightStack.push.expects(PanelStackItem(QuickViewPanel(), None, None, Some(QuickViewParams())))
 
     //when
-    QuickViewPlugin.onKeyTrigger("", stacks) shouldBe None
+    QuickViewPlugin.onKeyTrigger("", stacks).map(_ shouldBe None)
   }
 }
