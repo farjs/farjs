@@ -6,7 +6,7 @@ import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack._
 import farjs.filelist.{FileListState, MockFileListActions}
 import farjs.viewer.ViewerEvent._
-import scommons.nodejs.Stats
+import scommons.nodejs._
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 
@@ -31,7 +31,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     )
   }
 
-  it should "not fail if no such file when onKeyTrigger(onFileView)" in {
+  it should "return failed Future if no such file when onKeyTrigger(onFileView)" in {
     //given
     val fs = new FS
     ViewerPlugin.fs = fs.fs
@@ -48,9 +48,9 @@ class ViewerPluginSpec extends AsyncTestSpec {
     fs.lstatSync.expects(data.path).throwing(JavaScriptException(js.Error("no such file")))
 
     //when
-    ViewerPlugin.onKeyTrigger(onFileView, null, data.asInstanceOf[js.Dynamic]).map { res =>
+    ViewerPlugin.onKeyTrigger(onFileView, null, data.asInstanceOf[js.Dynamic]).failed.map { ex =>
       //then
-      res should not be None
+      ex.getMessage should include("no such file")
     }
   }
 
@@ -118,13 +118,14 @@ class ViewerPluginSpec extends AsyncTestSpec {
     ViewerPlugin.onKeyTrigger("f3", stacks).map(_ shouldBe None)
   }
 
-  it should "return Some(ViewerPluginUi) if file when onKeyTrigger(f3)" in {
+  it should "return failed Future if no such file when onKeyTrigger(f3)" in {
     //given
+    val fs = new FS
+    ViewerPlugin.fs = fs.fs
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
-    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
-      FileListItem("item 1")
-    )))
+    val item = FileListItem("item 1")
+    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(item)))
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
     ), updater = null)
@@ -133,6 +134,38 @@ class ViewerPluginSpec extends AsyncTestSpec {
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val filePath = path.join(leftState.currDir.path, item.name)
+
+    //then
+    fs.lstatSync.expects(filePath).throwing(JavaScriptException(js.Error("no such file")))
+
+    //when
+    ViewerPlugin.onKeyTrigger("f3", stacks).failed.map { ex =>
+      //then
+      ex.getMessage should include("no such file")
+    }
+  }
+
+  it should "return Some(ViewerPluginUi) if file when onKeyTrigger(f3)" in {
+    //given
+    val fs = new FS
+    ViewerPlugin.fs = fs.fs
+    val dispatch = mockFunction[Any, Any]
+    val actions = new MockFileListActions
+    val item = FileListItem("item 1")
+    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(item)))
+    val leftStack = new PanelStack(isActive = true, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
+    ), updater = null)
+
+    val rightStack = new PanelStack(isActive = false, List(
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+    ), updater = null)
+    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val filePath = path.join(leftState.currDir.path, item.name)
+
+    //then
+    fs.lstatSync.expects(filePath).returning(js.Dynamic.literal(size = 50).asInstanceOf[Stats])
 
     //when & then
     ViewerPlugin.onKeyTrigger("f3", stacks).map(_ should not be None)
@@ -140,11 +173,12 @@ class ViewerPluginSpec extends AsyncTestSpec {
 
   it should "return Some(ViewerPluginUi) if file when onKeyTrigger(onViewerOpenLeft)" in {
     //given
+    val fs = new FS
+    ViewerPlugin.fs = fs.fs
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
-    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
-      FileListItem("item 1")
-    )))
+    val item = FileListItem("item 1")
+    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(item)))
     val leftStack = new PanelStack(isActive = false, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
     ), updater = null)
@@ -153,6 +187,10 @@ class ViewerPluginSpec extends AsyncTestSpec {
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val filePath = path.join(leftState.currDir.path, item.name)
+    
+    //then
+    fs.lstatSync.expects(filePath).returning(js.Dynamic.literal(size = 50).asInstanceOf[Stats])
 
     //when & then
     ViewerPlugin.onKeyTrigger(onViewerOpenLeft, stacks).map(_ should not be None)
@@ -160,11 +198,12 @@ class ViewerPluginSpec extends AsyncTestSpec {
 
   it should "return Some(ViewerPluginUi) if file when onKeyTrigger(onViewerOpenRight)" in {
     //given
+    val fs = new FS
+    ViewerPlugin.fs = fs.fs
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
-    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
-      FileListItem("item 1")
-    )))
+    val item = FileListItem("item 1")
+    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(item)))
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
     ), updater = null)
@@ -173,6 +212,10 @@ class ViewerPluginSpec extends AsyncTestSpec {
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val filePath = path.join(leftState.currDir.path, item.name)
+
+    //then
+    fs.lstatSync.expects(filePath).returning(js.Dynamic.literal(size = 50).asInstanceOf[Stats])
 
     //when & then
     ViewerPlugin.onKeyTrigger(onViewerOpenRight, stacks).map(_ should not be None)
