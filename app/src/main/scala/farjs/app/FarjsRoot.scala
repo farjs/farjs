@@ -59,26 +59,29 @@ class FarjsRoot(loadFileListUi: js.Function1[Any, Unit] => Future[ReactClass],
         }
       ),
       
-      <(logControllerComp())(^.wrapped := LogControllerProps(onReady = { () =>
-        loadFileListUi(dispatch).map { fileListUi =>
-          setFileListUi(Some(fileListUi))
+      <(logControllerComp())(^.plain := LogControllerProps(
+        onReady = { () =>
+          loadFileListUi(dispatch).map { fileListUi =>
+            setFileListUi(Some(fileListUi))
+          }
+        },
+        render = { content =>
+          if (devTool != DevTool.Hidden) {
+            <.box(
+              ^.rbWidth := "30%",
+              ^.rbHeight := "100%",
+              ^.rbLeft := "70%"
+            )(<(devToolPanelComp())(^.wrapped := DevToolPanelProps(
+              devTool = devTool,
+              logContent = content,
+              onActivate = { tool =>
+                setDevTool(_ => tool)
+              }
+            ))())
+          }
+          else null
         }
-      }, { content =>
-        if (devTool != DevTool.Hidden) {
-          <.box(
-            ^.rbWidth := "30%",
-            ^.rbHeight := "100%",
-            ^.rbLeft := "70%"
-          )(<(devToolPanelComp())(^.wrapped := DevToolPanelProps(
-            devTool = devTool,
-            logContent = content,
-            onActivate = { tool =>
-              setDevTool(_ => tool)
-            }
-          ))())
-        }
-        else null
-      }))()
+      ))()
     )
   }
 }

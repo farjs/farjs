@@ -24,7 +24,7 @@ class LogControllerSpec extends TestSpec with TestRendererUtils {
     render.expects("").returning(rendered)
 
     //when & then
-    val renderer = createTestRenderer(<(LogController())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(LogController())(^.plain := props)())
     g.console.log should not be oldLog
     g.console.error should not be oldError
     
