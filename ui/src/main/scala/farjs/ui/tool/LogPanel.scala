@@ -5,12 +5,10 @@ import scommons.react.blessed._
 
 import scala.scalajs.js
 
-case class LogPanelProps(content: String)
-
 object LogPanel extends FunctionComponent[LogPanelProps] {
   
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     
     <.log(
       ^.rbAutoFocus := false,

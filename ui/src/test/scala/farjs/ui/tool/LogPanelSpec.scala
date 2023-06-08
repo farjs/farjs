@@ -10,7 +10,7 @@ class LogPanelSpec extends TestSpec with TestRendererUtils {
     val props = LogPanelProps("some log content")
     
     //when & then
-    val result = testRender(<(LogPanel())(^.wrapped := props)())
+    val result = testRender(<(LogPanel())(^.plain := props)())
 
     assertNativeComponent(result,
       <.log(

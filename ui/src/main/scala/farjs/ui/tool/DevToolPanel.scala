@@ -21,7 +21,7 @@ object DevToolPanel extends FunctionComponent[DevToolPanelProps] {
 
     val comp = props.devTool match {
       case DevTool.Hidden => null
-      case DevTool.Logs => <(logPanelComp())(^.wrapped := LogPanelProps(props.logContent))()
+      case DevTool.Logs => <(logPanelComp())(^.plain := LogPanelProps(props.logContent))()
       case DevTool.Inputs => <(inputController())()()
       case DevTool.Colors => <(colorPanelComp())()()
     }

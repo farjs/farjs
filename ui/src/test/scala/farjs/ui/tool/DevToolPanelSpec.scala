@@ -124,9 +124,10 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
       props.devTool match {
         case DevTool.Hidden => fail("unexpected dev tool")
         case DevTool.Logs =>
-          assertTestComponent(comp, logPanelComp) { case LogPanelProps(resContent) =>
-            resContent shouldBe props.logContent
-          }
+          assertNativeComponent(comp, <(logPanelComp())(^.assertPlain[LogPanelProps](inside(_) {
+            case LogPanelProps(resContent) =>
+              resContent shouldBe props.logContent
+          }))())
         case DevTool.Inputs =>
           assertNativeComponent(comp, <(inputController())()())
         case DevTool.Colors =>

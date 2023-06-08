@@ -35,6 +35,6 @@ object InputController extends FunctionComponent[Unit] {
       cleanup
     }, Nil)
 
-    <(logPanelComp())(^.wrapped := LogPanelProps(content))()
+    <(logPanelComp())(^.plain := LogPanelProps(content))()
   }
 }

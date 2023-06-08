@@ -21,21 +21,27 @@ class InputControllerSpec extends TestSpec with TestRendererUtils {
 
     //when & then
     g.farjsLogKeys("key 1")
-    assertTestComponent(renderer.root.children(0), logPanelComp) {
-      case LogPanelProps(content) => content shouldBe "key 1\n"
-    }
+    assertComponents(renderer.root.children, List(
+      <(logPanelComp())(^.assertPlain[LogPanelProps](inside(_) {
+        case LogPanelProps(content) => content shouldBe "key 1\n"
+      }))()
+    ))
     
     //when & then
     g.farjsLogKeys("k 2")
-    assertTestComponent(renderer.root.children(0), logPanelComp) {
-      case LogPanelProps(content) => content shouldBe "key 1\nk 2\n"
-    }
+    assertComponents(renderer.root.children, List(
+      <(logPanelComp())(^.assertPlain[LogPanelProps](inside(_) {
+        case LogPanelProps(content) => content shouldBe "key 1\nk 2\n"
+      }))()
+    ))
     
     //when & then
     g.farjsLogKeys("k 3")
-    assertTestComponent(renderer.root.children(0), logPanelComp) {
-      case LogPanelProps(content) => content shouldBe "k 2\nk 3\n"
-    }
+    assertComponents(renderer.root.children, List(
+      <(logPanelComp())(^.assertPlain[LogPanelProps](inside(_) {
+        case LogPanelProps(content) => content shouldBe "k 2\nk 3\n"
+      }))()
+    ))
     
     //when & then
     TestRenderer.act { () =>
