@@ -26,7 +26,7 @@ class FarjsRoot(loadFileListUi: js.Function1[Any, Unit] => Future[ReactClass],
       val keyListener: js.Function2[js.Object, KeyboardKey, Unit] = { (_, key) =>
         if (key.full == "f12") {
           setDevTool { from =>
-            val to = from.getNext
+            val to = DevTool.getNext(from)
             if (DevTool.shouldResize(from, to)) Future[Unit] { //exec on the next tick
               screen.program.emit("resize")
             }
@@ -71,7 +71,7 @@ class FarjsRoot(loadFileListUi: js.Function1[Any, Unit] => Future[ReactClass],
               ^.rbWidth := "30%",
               ^.rbHeight := "100%",
               ^.rbLeft := "70%"
-            )(<(devToolPanelComp())(^.wrapped := DevToolPanelProps(
+            )(<(devToolPanelComp())(^.plain := DevToolPanelProps(
               devTool = devTool,
               logContent = content,
               onActivate = { tool =>

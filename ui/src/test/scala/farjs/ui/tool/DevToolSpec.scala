@@ -18,14 +18,14 @@ class DevToolSpec extends TestSpec {
   
   it should "transition state from Hidden to Hidden when getNext" in {
     //given
-    var state: DevTool = Hidden.getNext
+    var state = DevTool.getNext(Hidden)
     state should not be Hidden
     
     //when
     var count = 1
     while (state != Hidden && count < 10) {
       count += 1
-      state = state.getNext
+      state = DevTool.getNext(state)
     }
 
     //then

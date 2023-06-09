@@ -17,7 +17,7 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
     //given
     val onActivate = mockFunction[DevTool, Unit]
     val props = DevToolPanelProps(DevTool.Colors, "test logs", onActivate)
-    val comp = createTestRenderer(<(DevToolPanel())(^.wrapped := props)()).root
+    val comp = createTestRenderer(<(DevToolPanel())(^.plain := props)()).root
     val tab1 = inside(findComponents(comp, <.text.name)) {
       case List(t1, _, _) => t1
     }
@@ -34,7 +34,7 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
     val props = DevToolPanelProps(DevTool.Logs, "test logs", _ => ())
 
     //when
-    val result = createTestRenderer(<(DevToolPanel())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(DevToolPanel())(^.plain := props)()).root
 
     //then
     assertDevToolPanel(
@@ -50,7 +50,7 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
     val props = DevToolPanelProps(DevTool.Inputs, "test logs", _ => ())
 
     //when
-    val result = createTestRenderer(<(DevToolPanel())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(DevToolPanel())(^.plain := props)()).root
 
     //then
     assertDevToolPanel(
@@ -66,7 +66,7 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
     val props = DevToolPanelProps(DevTool.Colors, "test logs", _ => ())
 
     //when
-    val result = createTestRenderer(<(DevToolPanel())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(DevToolPanel())(^.plain := props)()).root
 
     //then
     assertDevToolPanel(

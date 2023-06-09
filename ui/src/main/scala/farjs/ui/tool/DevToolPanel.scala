@@ -5,10 +5,6 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 
-case class DevToolPanelProps(devTool: DevTool,
-                             logContent: String,
-                             onActivate: DevTool => Unit)
-
 object DevToolPanel extends FunctionComponent[DevToolPanelProps] {
 
   private[tool] var logPanelComp: UiComponent[LogPanelProps] = LogPanel
@@ -16,7 +12,7 @@ object DevToolPanel extends FunctionComponent[DevToolPanelProps] {
   private[tool] var colorPanelComp: UiComponent[Unit] = ColorPanel
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val theme = Theme.current.popup.menu
 
     val comp = props.devTool match {

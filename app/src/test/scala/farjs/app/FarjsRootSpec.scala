@@ -87,7 +87,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val devToolProps = {
       val logProps = findComponentProps(renderer.root, logControllerComp, plain = true)
       val renderedContent = createTestRenderer(logProps.render("test log content")).root
-      findComponentProps(renderedContent, devToolPanelComp)
+      findComponentProps(renderedContent, devToolPanelComp, plain = true)
     }
     devToolProps.devTool shouldBe DevTool.Colors
 
@@ -98,7 +98,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     val updatedProps = {
       val logProps = findComponentProps(renderer.root, logControllerComp, plain = true)
       val renderedContent = createTestRenderer(logProps.render("test log content")).root
-      findComponentProps(renderedContent, devToolPanelComp)
+      findComponentProps(renderedContent, devToolPanelComp, plain = true)
     }
     updatedProps.devTool shouldBe DevTool.Logs
   }
@@ -198,13 +198,13 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
               ^.rbWidth := "30%",
               ^.rbHeight := "100%",
               ^.rbLeft := "70%"
-            )(), inside(_) { case List(comp) =>
-              assertTestComponent(comp, devToolPanelComp) {
+            )(
+              <(devToolPanelComp())(^.assertPlain[DevToolPanelProps](inside(_) {
                 case DevToolPanelProps(devTool, logContent, _) =>
                   devTool shouldBe DevTool.Logs
                   logContent shouldBe content
-              }
-            }
+              }))()
+            )
           )
       }))()
     ))

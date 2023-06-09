@@ -1,9 +1,9 @@
 package farjs.ui.tool
 
-sealed abstract class DevTool(next: => DevTool) {
+import scala.scalajs.js
 
-  def getNext: DevTool = next
-}
+@js.native
+sealed trait DevTool extends js.Object
 
 object DevTool {
 
@@ -11,8 +11,15 @@ object DevTool {
     from == Hidden || to == Hidden
   }
 
-  object Hidden extends DevTool(Logs)
-  object Logs extends DevTool(Inputs)
-  object Inputs extends DevTool(Colors)
-  object Colors extends DevTool(Hidden)
+  def getNext(from: DevTool): DevTool = from match {
+    case Hidden => Logs
+    case Logs => Inputs
+    case Inputs => Colors
+    case Colors => Hidden
+  }
+
+  val Hidden: DevTool = "Hidden".asInstanceOf[DevTool]
+  val Logs: DevTool = "Logs".asInstanceOf[DevTool]
+  val Inputs: DevTool = "Inputs".asInstanceOf[DevTool]
+  val Colors: DevTool = "Colors".asInstanceOf[DevTool]
 }
