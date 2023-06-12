@@ -5,6 +5,7 @@ import farjs.ui.popup.MessageBox._
 import farjs.ui.popup.ModalContent._
 import farjs.ui.theme.Theme
 import org.scalatest.{Assertion, Succeeded}
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.scalajs.js
@@ -14,7 +15,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
   MessageBox.popupComp = mockUiComponent("Popup")
   MessageBox.modalContentComp = mockUiComponent("ModalContent")
   MessageBox.textLineComp = mockUiComponent("TextLine")
-  MessageBox.buttonsPanelComp = mockUiComponent("ButtonsPanel")
+  MessageBox.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
   "OK popup" should "call OK action when onClose popup" in {
     //given
@@ -39,7 +40,10 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       MessageBoxAction.OK(onAction)
     ), Theme.current.popup.regular)
     val comp = testRender(<(MessageBox())(^.plain := props)())
-    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
+    val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
+      case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+    }
+    val action = buttonsProps.actions.head
 
     //then
     onAction.expects()
@@ -94,7 +98,10 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       MessageBoxAction.NO(onNoAction)
     ), Theme.current.popup.regular)
     val comp = testRender(<(MessageBox())(^.plain := props)())
-    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
+    val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
+      case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+    }
+    val action = buttonsProps.actions.head
 
     //then
     onYesAction.expects()
@@ -113,7 +120,10 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       MessageBoxAction.NO(onNoAction)
     ), Theme.current.popup.regular)
     val comp = testRender(<(MessageBox())(^.plain := props)())
-    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions(1)
+    val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
+      case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+    }
+    val action = buttonsProps.actions(1)
 
     //then
     onNoAction.expects()
@@ -199,14 +209,16 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
         }
       }
       
-      assertTestComponent(actionsBox, buttonsPanelComp, plain = true) {
-        case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
-          top shouldBe (1 + textLines.size)
-          resActions.map(_.label).toList shouldBe actions
-          resStyle shouldBe props.style
-          padding shouldBe 1
-          margin shouldBe js.undefined
-      }
+      assertNativeComponent(actionsBox,
+        <(buttonsPanelComp)(^.assertPlain[ButtonsPanelProps](inside(_) {
+          case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
+            top shouldBe (1 + textLines.size)
+            resActions.map(_.label).toList shouldBe actions
+            resStyle shouldBe props.style
+            padding shouldBe 1
+            margin shouldBe js.undefined
+        }))()
+      )
     }
     
     assertTestComponent(result, popupComp)({ case PopupProps(_, resClosable, focusable, _, _) =>

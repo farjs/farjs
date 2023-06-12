@@ -10,8 +10,6 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 @JSExportAll
 object Exports {
 
-  val ButtonsPanel: ReactClass = farjs.ui.ButtonsPanel()
-
   val CheckBox: ReactClass = farjs.ui.CheckBox()
 
   val ComboBox: ReactClass = farjs.ui.ComboBox()

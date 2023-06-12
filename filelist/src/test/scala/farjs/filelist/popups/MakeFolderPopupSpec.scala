@@ -9,6 +9,7 @@ import farjs.ui.popup.ModalProps
 import farjs.ui.theme.Theme
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.Future
@@ -21,7 +22,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   MakeFolderPopup.comboBoxComp = mockUiComponent("ComboBox")
   MakeFolderPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
   MakeFolderPopup.checkBoxComp = mockUiComponent("CheckBox")
-  MakeFolderPopup.buttonsPanelComp = mockUiComponent("ButtonsPanel")
+  MakeFolderPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class HistoryService {
@@ -117,7 +118,10 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
     )).root
     itemsF.flatMap { _ =>
-      val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
+      val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
+        case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+      }
+      val action = buttonsProps.actions.head
 
       //then
       onOk.expects("test", true)
@@ -143,7 +147,10 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
     )).root
     itemsF.flatMap { _ =>
-      val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
+      val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
+        case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+      }
+      val action = buttonsProps.actions.head
 
       //then
       onOk.expects(*, *).never()
@@ -169,7 +176,10 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
     )).root
     itemsF.flatMap { _ =>
-      val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions(1)
+      val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
+        case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+      }
+      val action = buttonsProps.actions(1)
 
       //then
       onOk.expects(*, *).never()
@@ -276,7 +286,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
             startCh shouldBe DoubleChars.leftSingle
             endCh shouldBe DoubleChars.rightSingle
         }))(),
-        <(buttonsPanelComp())(^.assertPlain[ButtonsPanelProps](inside(_) {
+        <(buttonsPanelComp)(^.assertPlain[ButtonsPanelProps](inside(_) {
           case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
             top shouldBe 6
             resActions.map(_.label).toList shouldBe actions

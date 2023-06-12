@@ -11,6 +11,7 @@ import farjs.ui.popup.ModalProps
 import farjs.ui.theme.Theme
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.Future
@@ -22,7 +23,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
   CopyItemsPopup.textLineComp = mockUiComponent("TextLine")
   CopyItemsPopup.comboBoxComp = mockUiComponent("ComboBox")
   CopyItemsPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
-  CopyItemsPopup.buttonsPanelComp = mockUiComponent("ButtonsPanel")
+  CopyItemsPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class HistoryService {
@@ -96,7 +97,10 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       <(CopyItemsPopup())(^.wrapped := props)(), copyItemsHistory = historyService.service
     )).root
     itemsF.flatMap { _ =>
-      val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
+      val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
+        case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+      }
+      val action = buttonsProps.actions.head
 
       //then
       onAction.expects("test")
@@ -122,7 +126,10 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       <(CopyItemsPopup())(^.wrapped := props)(), copyItemsHistory = historyService.service
     )).root
     itemsF.flatMap { _ =>
-      val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
+      val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
+        case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+      }
+      val action = buttonsProps.actions.head
 
       //then
       onAction.expects(*).never()
@@ -148,7 +155,10 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       <(CopyItemsPopup())(^.wrapped := props)(), copyItemsHistory = historyService.service
     )).root
     itemsF.flatMap { _ =>
-      val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions(1)
+      val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
+        case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+      }
+      val action = buttonsProps.actions(1)
 
       //then
       onAction.expects(*).never()
@@ -246,14 +256,16 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
           startCh shouldBe DoubleChars.leftSingle
           endCh shouldBe DoubleChars.rightSingle
       }
-      assertTestComponent(actionsBox, buttonsPanelComp, plain = true) {
-        case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
-          top shouldBe 4
-          resActions.map(_.label).toList shouldBe actions
-          resStyle shouldBe style
-          padding shouldBe js.undefined
-          margin shouldBe 2
-      }
+      assertNativeComponent(actionsBox,
+        <(buttonsPanelComp)(^.assertPlain[ButtonsPanelProps](inside(_) {
+          case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
+            top shouldBe 4
+            resActions.map(_.label).toList shouldBe actions
+            resStyle shouldBe style
+            padding shouldBe js.undefined
+            margin shouldBe 2
+        }))()
+      )
     }
     
     assertTestComponent(result, modalComp)({ case ModalProps(resTitle, size, resStyle, onCancel) =>

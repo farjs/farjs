@@ -23,7 +23,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
   private[popups] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
   private[popups] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
   private[popups] var checkBoxComp: UiComponent[CheckBoxProps] = CheckBox
-  private[popups] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
+  private[popups] var buttonsPanelComp: ReactClass = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
     val services = FileListServices.useServices
@@ -110,7 +110,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           startCh = DoubleChars.leftSingle,
           endCh = DoubleChars.rightSingle
         ))(),
-        <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
+        <(buttonsPanelComp)(^.plain := ButtonsPanelProps(
           top = 6,
           actions = actions,
           style = theme,

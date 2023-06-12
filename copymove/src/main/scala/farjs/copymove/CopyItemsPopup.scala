@@ -25,7 +25,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
   private[copymove] var textLineComp: UiComponent[TextLineProps] = TextLine
   private[copymove] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
   private[copymove] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
-  private[copymove] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
+  private[copymove] var buttonsPanelComp: ReactClass = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
     val services = FileListServices.useServices
@@ -96,7 +96,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
           startCh = DoubleChars.leftSingle,
           endCh = DoubleChars.rightSingle
         ))(),
-        <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
+        <(buttonsPanelComp)(^.plain := ButtonsPanelProps(
           top = 4,
           actions = actions,
           style = theme,

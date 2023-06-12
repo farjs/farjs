@@ -19,7 +19,7 @@ case class MenuBarProps(items: List[(String, List[String])],
 object MenuBar extends FunctionComponent[MenuBarProps] {
 
   private[menu] var popupComp: UiComponent[PopupProps] = Popup
-  private[menu] var buttonsPanel: UiComponent[ButtonsPanelProps] = ButtonsPanel
+  private[menu] var buttonsPanel: ReactClass = ButtonsPanel
   private[menu] var subMenuComp: UiComponent[SubMenuProps] = SubMenu
 
   protected def render(compProps: Props): ReactElement = {
@@ -115,7 +115,7 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
             ^.rbHeight := 1,
             ^.rbLeft := marginLeft
           )(
-            <(buttonsPanel())(^.plain := ButtonsPanelProps(
+            <(buttonsPanel)(^.plain := ButtonsPanelProps(
               top = 0,
               actions = js.Array(actions: _*),
               style = theme,

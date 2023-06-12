@@ -11,7 +11,7 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
   private[popup] var popupComp: UiComponent[PopupProps] = Popup
   private[popup] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
   private[popup] var textLineComp: UiComponent[TextLineProps] = TextLine
-  private[popup] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
+  private[popup] var buttonsPanelComp: ReactClass = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
@@ -48,7 +48,7 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
           ))()
         },
         
-        <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
+        <(buttonsPanelComp)(^.plain := ButtonsPanelProps(
           top = 1 + textLines.size,
           actions = actions,
           style = props.style,

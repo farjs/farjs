@@ -5,6 +5,7 @@ import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.ModalProps
 import farjs.ui.theme.Theme
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.scalajs.js
@@ -15,7 +16,7 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
   AddToArchPopup.textLineComp = mockUiComponent("TextLine")
   AddToArchPopup.textBoxComp = mockUiComponent("TextBox")
   AddToArchPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
-  AddToArchPopup.buttonsPanelComp = mockUiComponent("ButtonsPanel")
+  AddToArchPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
   it should "set zipName when onChange in TextBox" in {
     //given
@@ -55,7 +56,10 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = AddToArchPopupProps("test", AddToArchAction.Add, onAction, onCancel)
     val comp = testRender(<(AddToArchPopup())(^.wrapped := props)())
-    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
+    val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
+      case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+    }
+    val action = buttonsProps.actions.head
 
     //then
     onAction.expects("test")
@@ -71,7 +75,10 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = AddToArchPopupProps("", AddToArchAction.Add, onAction, onCancel)
     val comp = testRender(<(AddToArchPopup())(^.wrapped := props)())
-    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions.head
+    val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
+      case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+    }
+    val action = buttonsProps.actions.head
 
     //then
     onAction.expects(*).never()
@@ -87,7 +94,10 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = AddToArchPopupProps("", AddToArchAction.Add, onAction, onCancel)
     val comp = testRender(<(AddToArchPopup())(^.wrapped := props)())
-    val action = findComponentProps(comp, buttonsPanelComp, plain = true).actions(1)
+    val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
+      case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+    }
+    val action = buttonsProps.actions(1)
 
     //then
     onAction.expects(*).never()
@@ -151,7 +161,7 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
             startCh shouldBe DoubleChars.leftSingle
             endCh shouldBe DoubleChars.rightSingle
         }))(),
-        <(buttonsPanelComp())(^.assertPlain[ButtonsPanelProps](inside(_) {
+        <(buttonsPanelComp)(^.assertPlain[ButtonsPanelProps](inside(_) {
           case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>
             top shouldBe 4
             resActions.map(_.label).toList shouldBe actions

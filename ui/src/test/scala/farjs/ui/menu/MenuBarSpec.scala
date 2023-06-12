@@ -7,6 +7,7 @@ import farjs.ui.theme.Theme
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs._
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -15,7 +16,7 @@ import scala.scalajs.js
 class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   MenuBar.popupComp = mockUiComponent("Popup")
-  MenuBar.buttonsPanel = mockUiComponent("ButtonsPanel")
+  MenuBar.buttonsPanel = "ButtonsPanel".asInstanceOf[ReactClass]
   MenuBar.subMenuComp = mockUiComponent("SubMenu")
   
   private val items = List(
@@ -52,7 +53,9 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
     val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
-    val buttonsProps = findComponentProps(renderer.root, buttonsPanel, plain = true)
+    val buttonsProps = inside(findComponents(renderer.root, buttonsPanel)) {
+      case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+    }
     buttonsProps.actions.head.onAction()
     findProps(renderer.root, subMenuComp) should not be empty
     val popupProps = findComponentProps(renderer.root, popupComp)
@@ -78,7 +81,9 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
     val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
-    val buttonsProps = findComponentProps(renderer.root, buttonsPanel, plain = true)
+    val buttonsProps = inside(findComponents(renderer.root, buttonsPanel)) {
+      case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+    }
     buttonsProps.actions.head.onAction()
     inside(findComponentProps(renderer.root, subMenuComp)) {
       case SubMenuProps(selected, items, _, _, _) =>
@@ -162,7 +167,9 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
     val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
-    val buttonsProps = findComponentProps(renderer.root, buttonsPanel, plain = true)
+    val buttonsProps = inside(findComponents(renderer.root, buttonsPanel)) {
+      case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+    }
     buttonsProps.actions.head.onAction()
     findComponentProps(renderer.root, subMenuComp).left shouldBe 2
 
@@ -188,7 +195,9 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     val onAction = mockFunction[Int, Int, Unit]
     val props = MenuBarProps(items, onAction, () => ())
     val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
-    val buttonsProps = findComponentProps(renderer.root, buttonsPanel, plain = true)
+    val buttonsProps = inside(findComponents(renderer.root, buttonsPanel)) {
+      case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+    }
     buttonsProps.actions.head.onAction()
     findComponentProps(renderer.root, popupComp).onKeypress("down") shouldBe true
     findComponentProps(renderer.root, subMenuComp).selected shouldBe 2
@@ -231,7 +240,9 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     val onAction = mockFunction[Int, Int, Unit]
     val props = MenuBarProps(items, onAction, () => ())
     val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
-    val buttonsProps = findComponentProps(renderer.root, buttonsPanel, plain = true)
+    val buttonsProps = inside(findComponents(renderer.root, buttonsPanel)) {
+      case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+    }
     buttonsProps.actions.head.onAction()
     findComponentProps(renderer.root, subMenuComp).selected shouldBe 0
 
@@ -252,7 +263,9 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
     val renderer = createTestRenderer(<(MenuBar())(^.wrapped := props)())
-    val buttonsProps = findComponentProps(renderer.root, buttonsPanel, plain = true)
+    val buttonsProps = inside(findComponents(renderer.root, buttonsPanel)) {
+      case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
+    }
 
     //when
     buttonsProps.actions.head.onAction()
@@ -301,7 +314,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
             ^.rbHeight := 1,
             ^.rbLeft := 2
           )(
-            <(buttonsPanel())(^.assertPlain[ButtonsPanelProps](inside(_) {
+            <(buttonsPanel)(^.assertPlain[ButtonsPanelProps](inside(_) {
               case ButtonsPanelProps(top, actions, `theme`, padding, margin) =>
                 top shouldBe 0
                 actions.map(_.label).toList shouldBe List(

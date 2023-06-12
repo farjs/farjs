@@ -21,7 +21,7 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
   private[copymove] var modalComp: UiComponent[ModalProps] = Modal
   private[copymove] var textLineComp: UiComponent[TextLineProps] = TextLine
   private[copymove] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
-  private[copymove] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
+  private[copymove] var buttonsPanelComp: ReactClass = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -111,7 +111,7 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
         startCh = DoubleChars.leftSingle,
         endCh = DoubleChars.rightSingle
       ))(),
-      <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
+      <(buttonsPanelComp)(^.plain := ButtonsPanelProps(
         top = 7,
         actions = actions,
         style = theme,

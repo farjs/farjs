@@ -12,4 +12,8 @@ package object ui {
   @js.native
   @JSImport("@farjs/ui/Button.mjs", JSImport.Default)
   object Button extends ReactClass
+
+  @js.native
+  @JSImport("@farjs/ui/ButtonsPanel.mjs", JSImport.Default)
+  object ButtonsPanel extends ReactClass
 }

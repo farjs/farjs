@@ -21,7 +21,7 @@ object AddToArchPopup extends FunctionComponent[AddToArchPopupProps] {
   private[archiver] var textLineComp: UiComponent[TextLineProps] = TextLine
   private[archiver] var textBoxComp: UiComponent[TextBoxProps] = TextBox
   private[archiver] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
-  private[archiver] var buttonsPanelComp: UiComponent[ButtonsPanelProps] = ButtonsPanel
+  private[archiver] var buttonsPanelComp: ReactClass = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -72,7 +72,7 @@ object AddToArchPopup extends FunctionComponent[AddToArchPopupProps] {
         startCh = DoubleChars.leftSingle,
         endCh = DoubleChars.rightSingle
       ))(),
-      <(buttonsPanelComp())(^.plain := ButtonsPanelProps(
+      <(buttonsPanelComp)(^.plain := ButtonsPanelProps(
         top = 4,
         actions = actions,
         style = theme,
