@@ -1,6 +1,7 @@
 package farjs.ui.tool
 
 import farjs.ui.tool.InputController._
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.scalajs.js
@@ -8,7 +9,7 @@ import scala.scalajs.js.Dynamic.{global => g}
 
 class InputControllerSpec extends TestSpec with TestRendererUtils {
 
-  InputController.logPanelComp = mockUiComponent("LogPanel")
+  InputController.logPanelComp = "LogPanel".asInstanceOf[ReactClass]
   InputController.maxBufferLength = 10
 
   it should "render component and collect keys input" in {
@@ -22,7 +23,7 @@ class InputControllerSpec extends TestSpec with TestRendererUtils {
     //when & then
     g.farjsLogKeys("key 1")
     assertComponents(renderer.root.children, List(
-      <(logPanelComp())(^.assertPlain[LogPanelProps](inside(_) {
+      <(logPanelComp)(^.assertPlain[LogPanelProps](inside(_) {
         case LogPanelProps(content) => content shouldBe "key 1\n"
       }))()
     ))
@@ -30,7 +31,7 @@ class InputControllerSpec extends TestSpec with TestRendererUtils {
     //when & then
     g.farjsLogKeys("k 2")
     assertComponents(renderer.root.children, List(
-      <(logPanelComp())(^.assertPlain[LogPanelProps](inside(_) {
+      <(logPanelComp)(^.assertPlain[LogPanelProps](inside(_) {
         case LogPanelProps(content) => content shouldBe "key 1\nk 2\n"
       }))()
     ))
@@ -38,7 +39,7 @@ class InputControllerSpec extends TestSpec with TestRendererUtils {
     //when & then
     g.farjsLogKeys("k 3")
     assertComponents(renderer.root.children, List(
-      <(logPanelComp())(^.assertPlain[LogPanelProps](inside(_) {
+      <(logPanelComp)(^.assertPlain[LogPanelProps](inside(_) {
         case LogPanelProps(content) => content shouldBe "k 2\nk 3\n"
       }))()
     ))

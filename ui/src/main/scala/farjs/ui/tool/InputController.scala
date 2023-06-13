@@ -10,7 +10,7 @@ object InputController extends FunctionComponent[Unit] {
 
   private val g: js.Dynamic = global.asInstanceOf[js.Dynamic]
 
-  private[tool] var logPanelComp: UiComponent[LogPanelProps] = LogPanel
+  private[tool] var logPanelComp: ReactClass = LogPanel
   private[tool] var maxBufferLength: Int = 4000
   
   protected def render(compProps: Props): ReactElement = {
@@ -35,6 +35,6 @@ object InputController extends FunctionComponent[Unit] {
       cleanup
     }, Nil)
 
-    <(logPanelComp())(^.plain := LogPanelProps(content))()
+    <(logPanelComp)(^.plain := LogPanelProps(content))()
   }
 }

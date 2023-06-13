@@ -7,7 +7,7 @@ import scommons.react.blessed._
 
 object DevToolPanel extends FunctionComponent[DevToolPanelProps] {
 
-  private[tool] var logPanelComp: UiComponent[LogPanelProps] = LogPanel
+  private[tool] var logPanelComp: ReactClass = LogPanel
   private[tool] var inputController: UiComponent[Unit] = InputController
   private[tool] var colorPanelComp: UiComponent[Unit] = ColorPanel
 
@@ -17,7 +17,7 @@ object DevToolPanel extends FunctionComponent[DevToolPanelProps] {
 
     val comp = props.devTool match {
       case DevTool.Hidden => null
-      case DevTool.Logs => <(logPanelComp())(^.plain := LogPanelProps(props.logContent))()
+      case DevTool.Logs => <(logPanelComp)(^.plain := LogPanelProps(props.logContent))()
       case DevTool.Inputs => <(inputController())()()
       case DevTool.Colors => <(colorPanelComp())()()
     }

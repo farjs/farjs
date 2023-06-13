@@ -4,12 +4,13 @@ import farjs.ui.UI
 import farjs.ui.theme.Theme
 import farjs.ui.tool.DevToolPanel._
 import org.scalatest.{Assertion, Succeeded}
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
 class DevToolPanelSpec extends TestSpec with TestRendererUtils {
 
-  DevToolPanel.logPanelComp = mockUiComponent("LogPanel")
+  DevToolPanel.logPanelComp = "LogPanel".asInstanceOf[ReactClass]
   DevToolPanel.inputController = mockUiComponent("InputController")
   DevToolPanel.colorPanelComp = mockUiComponent("ColorPanel")
 
@@ -124,7 +125,7 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
       props.devTool match {
         case DevTool.Hidden => fail("unexpected dev tool")
         case DevTool.Logs =>
-          assertNativeComponent(comp, <(logPanelComp())(^.assertPlain[LogPanelProps](inside(_) {
+          assertNativeComponent(comp, <(logPanelComp)(^.assertPlain[LogPanelProps](inside(_) {
             case LogPanelProps(resContent) =>
               resContent shouldBe props.logContent
           }))())
