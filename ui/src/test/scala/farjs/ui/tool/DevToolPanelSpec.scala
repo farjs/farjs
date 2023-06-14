@@ -11,7 +11,7 @@ import scommons.react.test._
 class DevToolPanelSpec extends TestSpec with TestRendererUtils {
 
   DevToolPanel.logPanelComp = "LogPanel".asInstanceOf[ReactClass]
-  DevToolPanel.inputController = mockUiComponent("InputController")
+  DevToolPanel.inputController = "InputController".asInstanceOf[ReactClass]
   DevToolPanel.colorPanelComp = "ColorPanel".asInstanceOf[ReactClass]
 
   it should "call onActivate when click on tab" in {
@@ -130,7 +130,7 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
               resContent shouldBe props.logContent
           }))())
         case DevTool.Inputs =>
-          assertNativeComponent(comp, <(inputController())()())
+          assertNativeComponent(comp, <(inputController)()())
         case DevTool.Colors =>
           assertNativeComponent(comp, <(colorPanelComp)()())
       }
