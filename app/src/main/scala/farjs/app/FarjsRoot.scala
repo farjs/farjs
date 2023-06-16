@@ -59,7 +59,7 @@ class FarjsRoot(loadFileListUi: js.Function1[Any, Unit] => Future[ReactClass],
         }
       ),
       
-      <(logControllerComp())(^.plain := LogControllerProps(
+      <(logControllerComp)(^.plain := LogControllerProps(
         onReady = { () =>
           loadFileListUi(dispatch).map { fileListUi =>
             setFileListUi(Some(fileListUi))
@@ -93,6 +93,6 @@ object FarjsRoot {
     TaskManager.errorHandler = FarjsTaskManagerUi.errorHandler
     TaskManager
   }
-  private[app] var logControllerComp: UiComponent[LogControllerProps] = LogController
+  private[app] var logControllerComp: ReactClass = LogController
   private[app] var devToolPanelComp: UiComponent[DevToolPanelProps] = DevToolPanel
 }

@@ -16,6 +16,10 @@ package object tool {
   object InputController extends ReactClass
 
   @js.native
+  @JSImport("@farjs/ui/tool/LogController.mjs", JSImport.Default)
+  object LogController extends ReactClass
+
+  @js.native
   @JSImport("@farjs/ui/tool/LogPanel.mjs", JSImport.Default)
   object LogPanel extends ReactClass
 }

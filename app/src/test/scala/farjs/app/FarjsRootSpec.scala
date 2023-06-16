@@ -18,7 +18,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   private val fileListComp = mockUiComponent[Unit]("FileListBrowser").apply()
   
   FarjsRoot.taskControllerComp = mockUiComponent("TaskManager")
-  FarjsRoot.logControllerComp = mockUiComponent("LogController")
+  FarjsRoot.logControllerComp = "LogController".asInstanceOf[ReactClass]
   FarjsRoot.devToolPanelComp = mockUiComponent("DevToolPanel")
   
   private val fileListUiF: js.Function1[Any, Unit] => Future[ReactClass] = { _ =>
@@ -85,7 +85,9 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       else null
     })
     val devToolProps = {
-      val logProps = findComponentProps(renderer.root, logControllerComp, plain = true)
+      val logProps = inside(findComponents(renderer.root, logControllerComp)) {
+        case List(log) => log.props.asInstanceOf[LogControllerProps]
+      }
       val renderedContent = createTestRenderer(logProps.render("test log content")).root
       findComponentProps(renderedContent, devToolPanelComp, plain = true)
     }
@@ -96,7 +98,9 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     
     //then
     val updatedProps = {
-      val logProps = findComponentProps(renderer.root, logControllerComp, plain = true)
+      val logProps = inside(findComponents(renderer.root, logControllerComp)) {
+        case List(log) => log.props.asInstanceOf[LogControllerProps]
+      }
       val renderedContent = createTestRenderer(logProps.render("test log content")).root
       findComponentProps(renderedContent, devToolPanelComp, plain = true)
     }
@@ -120,7 +124,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       <.box(^.rbWidth := "100%")(
         <.text()("Loading...")
       ),
-      <(logControllerComp())(^.assertPlain[LogControllerProps](inside(_) {
+      <(logControllerComp)(^.assertPlain[LogControllerProps](inside(_) {
         case LogControllerProps(onReady, render) =>
           render("test log content") shouldBe null
 
@@ -139,7 +143,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
             }))()
           )
         ),
-        <(logControllerComp()).empty
+        <(logControllerComp).empty
       ))
     }
   }
@@ -163,7 +167,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       <.box(^.rbWidth := "100%")(
         <.text()("Loading...")
       ),
-      <(logControllerComp())(^.assertPlain[LogControllerProps](inside(_) {
+      <(logControllerComp)(^.assertPlain[LogControllerProps](inside(_) {
         case LogControllerProps(_, render) =>
           render("test log content") shouldBe null
       }))()
@@ -189,7 +193,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       <.box(^.rbWidth := "70%")(
         <.text()("Loading...")
       ),
-      <(logControllerComp())(^.assertPlain[LogControllerProps](inside(_) {
+      <(logControllerComp)(^.assertPlain[LogControllerProps](inside(_) {
         case LogControllerProps(_, render) =>
           val content = "test log content"
 
