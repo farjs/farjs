@@ -1,25 +1,21 @@
 package farjs.ui.tool
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
 @js.native
 sealed trait DevTool extends js.Object
 
-object DevTool {
+@js.native
+@JSImport("@farjs/ui/tool/DevTool.mjs", JSImport.Default)
+object DevTool extends js.Object {
 
-  def shouldResize(from: DevTool, to: DevTool): Boolean = {
-    from == Hidden || to == Hidden
-  }
+  def shouldResize(from: DevTool, to: DevTool): Boolean = js.native
 
-  def getNext(from: DevTool): DevTool = from match {
-    case Hidden => Logs
-    case Logs => Inputs
-    case Inputs => Colors
-    case Colors => Hidden
-  }
+  def getNext(from: DevTool): DevTool = js.native
 
-  val Hidden: DevTool = "Hidden".asInstanceOf[DevTool]
-  val Logs: DevTool = "Logs".asInstanceOf[DevTool]
-  val Inputs: DevTool = "Inputs".asInstanceOf[DevTool]
-  val Colors: DevTool = "Colors".asInstanceOf[DevTool]
+  val Hidden: DevTool = js.native
+  val Logs: DevTool = js.native
+  val Inputs: DevTool = js.native
+  val Colors: DevTool = js.native
 }
