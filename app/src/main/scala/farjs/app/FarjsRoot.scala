@@ -2,6 +2,7 @@ package farjs.app
 
 import farjs.app.FarjsRoot._
 import farjs.ui.task._
+import farjs.ui.theme.Theme
 import farjs.ui.tool._
 import scommons.react._
 import scommons.react.blessed._
@@ -11,12 +12,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
 
-class FarjsRoot(loadFileListUi: js.Function1[Any, Unit] => Future[ReactClass],
-                initialDevTool: DevTool
+class FarjsRoot(loadMainUi: js.Function1[Any, Unit] => Future[(Theme, ReactClass)],
+                initialDevTool: DevTool,
+                defaultTheme: Theme
                ) extends FunctionComponent[Unit] {
 
   protected def render(compProps: Props): ReactElement = {
-    val (maybeFileListUi, setFileListUi) = useState(Option.empty[ReactClass])
+    val (currTheme, setCurrTheme) = useState(defaultTheme)
+    val (maybeMainUi, setMainUi) = useState(Option.empty[ReactClass])
     val elementRef = useRef[BlessedElement](null)
     val (devTool, setDevTool) = useStateUpdater(initialDevTool)
     val (state, dispatch) = useReducer(FarjsStateReducer.apply, FarjsState())
@@ -42,7 +45,7 @@ class FarjsRoot(loadFileListUi: js.Function1[Any, Unit] => Future[ReactClass],
       cleanup
     }, Nil)
 
-    <.>()(
+    <(Theme.Context.Provider)(^.contextValue := currTheme)(
       <.box(
         ^.reactRef := elementRef,
         ^.rbWidth := {
@@ -50,10 +53,10 @@ class FarjsRoot(loadFileListUi: js.Function1[Any, Unit] => Future[ReactClass],
           else "70%"
         }
       )(
-        maybeFileListUi match {
+        maybeMainUi match {
           case None => <.text()("Loading...")
-          case Some(fileListComp) =>
-            <(fileListComp)()(
+          case Some(mainComp) =>
+            <(mainComp)()(
               <(taskControllerComp())(^.wrapped := TaskManagerProps(state.currentTask))()
             )
         }
@@ -61,8 +64,9 @@ class FarjsRoot(loadFileListUi: js.Function1[Any, Unit] => Future[ReactClass],
       
       <(logControllerComp)(^.plain := LogControllerProps(
         onReady = { () =>
-          loadFileListUi(dispatch).map { fileListUi =>
-            setFileListUi(Some(fileListUi))
+          loadMainUi(dispatch).map { case (theme, mainUi) =>
+            setCurrTheme(theme)
+            setMainUi(Some(mainUi))
           }
         },
         render = { content =>

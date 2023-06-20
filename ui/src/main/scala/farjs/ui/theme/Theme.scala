@@ -1,10 +1,26 @@
 package farjs.ui.theme
 
+import scommons.react.ReactContext
 import scommons.react.blessed.BlessedStyle
+import scommons.react.hooks.useContext
+
+import scala.scalajs.js
 
 object Theme {
 
   var current: Theme = DefaultTheme
+  val Context: ReactContext[Theme] = ReactContext[Theme](defaultValue = null)
+
+  def useTheme: Theme = {
+    val ctx = useContext(Context)
+    if (ctx == null) {
+      throw js.JavaScriptException(js.Error(
+        "Theme.Context is not found." +
+          "\nPlease, make sure you use Theme.Context.Provider in parent components"
+      ))
+    }
+    ctx
+  }
 }
 
 trait Theme {

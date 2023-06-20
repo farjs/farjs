@@ -4,7 +4,7 @@ import farjs.app.filelist.{FileListModule, FileListRoot}
 import farjs.app.raw.BetterSqlite3WebSQL
 import farjs.domain.FarjsDBContext
 import farjs.fs.FSFileListActions
-import farjs.ui.theme.{Theme, XTerm256Theme}
+import farjs.ui.theme.{DefaultTheme, Theme, XTerm256Theme}
 import farjs.ui.tool.DevTool
 import scommons.nodejs.{process, global => nodeGlobal}
 import scommons.react._
@@ -64,14 +64,20 @@ object FarjsApp {
     }
 
     val root = new FarjsRoot(
-      loadFileListUi = { dispatch =>
+      loadMainUi = { dispatch =>
         prepareDB().map { db =>
           val ctx = new FarjsDBContext(db)
           val fileListModule = new FileListModule(ctx)
-          new FileListRoot(dispatch, fileListModule, new WithPortals(screen)).apply()
+          val mainUi = new FileListRoot(dispatch, fileListModule, new WithPortals(screen)).apply()
+          val theme =
+            if (screen.terminal == TerminalName.`xterm-256color`) XTerm256Theme
+            else DefaultTheme
+
+          (theme, mainUi)
         }
       },
-      initialDevTool = if (showDevTools) DevTool.Logs else DevTool.Hidden
+      initialDevTool = if (showDevTools) DevTool.Logs else DevTool.Hidden,
+      defaultTheme = DefaultTheme
     )
     
     val screenObj = screen.asInstanceOf[js.Dynamic]

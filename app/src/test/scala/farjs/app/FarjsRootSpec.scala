@@ -2,32 +2,35 @@ package farjs.app
 
 import farjs.app.FarjsRoot._
 import farjs.ui.task.TaskManagerProps
+import farjs.ui.theme.{DefaultTheme, Theme, XTerm256Theme}
 import farjs.ui.tool._
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react.ReactClass
+import scommons.react._
 import scommons.react.blessed._
+import scommons.react.hooks._
 import scommons.react.test._
 
+import java.util.concurrent.atomic.AtomicReference
 import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
 
 class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  private val fileListComp = mockUiComponent[Unit]("FileListBrowser").apply()
+  private val mainComp = mockUiComponent[Unit]("AppMainUIMock").apply()
   
   FarjsRoot.taskControllerComp = mockUiComponent("TaskManager")
   FarjsRoot.logControllerComp = "LogController".asInstanceOf[ReactClass]
   FarjsRoot.devToolPanelComp = mockUiComponent("DevToolPanel")
   
-  private val fileListUiF: js.Function1[Any, Unit] => Future[ReactClass] = { _ =>
-    Future.successful(fileListComp)
+  private val mainUiF: js.Function1[Any, Unit] => Future[(Theme, ReactClass)] = { _ =>
+    Future.successful((XTerm256Theme, mainComp))
   }
 
   it should "set devTool and emit resize event when on F12" in {
     //given
-    val root = new FarjsRoot(fileListUiF, DevTool.Hidden)
+    val root = new FarjsRoot(mainUiF, DevTool.Hidden, DefaultTheme)
     val emitMock = mockFunction[String, Unit]
     val program = literal("emit" -> emitMock)
     val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
@@ -74,7 +77,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
   it should "set devTool when onActivate" in {
     //given
-    val root = new FarjsRoot(fileListUiF, DevTool.Colors)
+    val root = new FarjsRoot(mainUiF, DevTool.Colors, DefaultTheme)
     val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
     val screen = literal("on" -> onMock)
     val boxMock = literal("screen" -> screen)
@@ -107,9 +110,23 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
     updatedProps.devTool shouldBe DevTool.Logs
   }
 
-  it should "render fileListUi when onReady" in {
+  it should "render mainUi when onReady" in {
     //given
-    val root = new FarjsRoot(fileListUiF, DevTool.Hidden)
+    def getThemeCtxHook: (AtomicReference[Theme], ReactClass) = {
+      val ref = new AtomicReference[Theme](null)
+      (ref, new FunctionComponent[Unit] {
+        protected def render(props: Props): ReactElement = {
+          val ctx = useContext(Theme.Context)
+          ref.set(ctx)
+          props.children
+        }
+      }.apply())
+    }
+    val (themeCtx, mainComp) = getThemeCtxHook
+    val mainUiF: js.Function1[Any, Unit] => Future[(Theme, ReactClass)] = { _ =>
+      Future.successful((XTerm256Theme, mainComp))
+    }
+    val root = new FarjsRoot(mainUiF, DevTool.Hidden, DefaultTheme)
     val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
     val screen = literal("on" -> onMock)
     val boxMock = literal("screen" -> screen)
@@ -135,9 +152,10 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
     //then
     eventually {
+      themeCtx.get() shouldBe XTerm256Theme
       assertComponents(renderer.root.children, List(
         <.box(^.rbWidth := "100%")(
-          <(fileListComp)()(
+          <(mainComp)()(
             <(taskControllerComp())(^.assertWrapped(inside(_) {
               case TaskManagerProps(currentTask) => currentTask shouldBe None
             }))()
@@ -150,7 +168,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   
   it should "render component without DevTools" in {
     //given
-    val root = new FarjsRoot(fileListUiF, DevTool.Hidden)
+    val root = new FarjsRoot(mainUiF, DevTool.Hidden, DefaultTheme)
     val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
     val screen = literal("on" -> onMock)
     val boxMock = literal("screen" -> screen)
@@ -176,7 +194,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   
   it should "render component with DevTools" in {
     //given
-    val root = new FarjsRoot(fileListUiF, DevTool.Logs)
+    val root = new FarjsRoot(mainUiF, DevTool.Logs, DefaultTheme)
     val onMock = mockFunction[String, js.Function2[js.Object, KeyboardKey, Unit], Unit]
     val screen = literal("on" -> onMock)
     val boxMock = literal("screen" -> screen)
