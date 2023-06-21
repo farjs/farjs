@@ -29,7 +29,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
     val panelStack = PanelStack.usePanelStack
     val width = panelStack.width
     val height = panelStack.height
-    val theme = Theme.current.fileList
+    val theme = Theme.useTheme.fileList
     
     val currItem = props.state.currentItem
     val selectedItems = props.state.selectedItems

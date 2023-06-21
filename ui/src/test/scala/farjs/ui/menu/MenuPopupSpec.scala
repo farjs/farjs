@@ -3,7 +3,8 @@ package farjs.ui.menu
 import farjs.ui._
 import farjs.ui.menu.MenuPopup._
 import farjs.ui.popup.{ModalContentProps, PopupProps}
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.Succeeded
 import scommons.react.ReactClass
 import scommons.react.test._
@@ -24,7 +25,7 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
       onSelect = onSelect,
       onClose = () => ()
     )
-    val comp = testRender(<(MenuPopup())(^.wrapped := props)())
+    val comp = testRender(withThemeContext(<(MenuPopup())(^.wrapped := props)()))
     val button2 = inside(findComponents(comp, buttonComp)) {
       case List(_, b2) => b2
     }
@@ -47,7 +48,7 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
     )
     
     //when
-    val result = testRender(<(MenuPopup())(^.wrapped := props)())
+    val result = testRender(withThemeContext(<(MenuPopup())(^.wrapped := props)()))
     
     //then
     assertMenuPopup(result, props)
@@ -68,7 +69,7 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
     val textWidth = props.items.maxBy(_.length).length
     val width = textWidth + 3 * 2
     val height = 2 * 2 + props.items.size
-    val theme = Theme.current.popup.menu
+    val theme = DefaultTheme.popup.menu
 
     assertTestComponent(result, popupComp)({
       case PopupProps(onClose, closable, focusable, _, _) =>

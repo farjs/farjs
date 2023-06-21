@@ -5,6 +5,8 @@ import farjs.file.{Encoding, FileViewHistory, MockFileViewHistoryService}
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.ui.WithSizeProps
 import farjs.ui.task.FutureTask
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import farjs.viewer.ViewerController._
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
@@ -65,9 +67,9 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     }
 
     //when
-    val renderer = createTestRenderer(withServicesContext(
+    val renderer = createTestRenderer(withThemeContext(withServicesContext(
       <(ViewerController())(^.wrapped := props)(), historyService.service
-    ))
+    )))
 
     //then
     eventually {
@@ -101,9 +103,9 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     }
 
     //when
-    val renderer = createTestRenderer(withServicesContext(
+    val renderer = createTestRenderer(withThemeContext(withServicesContext(
       <(ViewerController())(^.wrapped := props)(), historyService.service
-    ))
+    )))
 
     //then
     assertViewerController(renderer.root, props)
@@ -161,9 +163,9 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     }
 
     //when
-    val renderer = createTestRenderer(withServicesContext(
+    val renderer = createTestRenderer(withThemeContext(withServicesContext(
       <(ViewerController())(^.wrapped := props)(), historyService.service
-    ))
+    )))
 
     //then
     assertViewerController(renderer.root, props)
@@ -182,9 +184,9 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     }.map { _ =>
       //when
       TestRenderer.act { () =>
-        renderer.update(withServicesContext(
+        renderer.update(withThemeContext(withServicesContext(
           <(ViewerController())(^.wrapped := props.copy(viewport = Some(resViewport)))(), historyService.service
-        ))
+        )))
       }
 
       //then
@@ -210,9 +212,9 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val historyService = new FileViewHistoryService
     historyService.getOne.expects(props.filePath, false).returning(Future.successful(None))
 
-    val renderer = createTestRenderer(withServicesContext(
+    val renderer = createTestRenderer(withThemeContext(withServicesContext(
       <(ViewerController())(^.wrapped := props)(), historyService.service
-    ))
+    )))
 
     val updatedProps = props.copy(viewport = Some(ViewerFileViewport(
       fileReader = new MockViewerFileReader,
@@ -229,9 +231,9 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
 
     //when
     TestRenderer.act { () =>
-      renderer.update(withServicesContext(
+      renderer.update(withThemeContext(withServicesContext(
         <(ViewerController())(^.wrapped := updatedProps)(), historyService.service
-      ))
+      )))
     }
 
     //then
@@ -242,6 +244,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
                                      props: ViewerControllerProps,
                                      scrollIndicators: List[Int] = Nil
                                     )(implicit pos: Position): Assertion = {
+    val theme = DefaultTheme
 
     assertComponents(result.children, List(
       <(withSizeComp())(^.assertPlain[WithSizeProps](inside(_) {
@@ -253,7 +256,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
 
           assertNativeComponent(resComp,
             <.box(
-              ^.rbStyle := contentStyle
+              ^.rbStyle := contentStyle(theme)
             )(), { children =>
               props.viewport match {
                 case Some(viewport) =>
@@ -274,14 +277,14 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
                       List[ReactElement](
                         content,
                         <.text(
-                          ^.rbStyle := scrollStyle,
+                          ^.rbStyle := scrollStyle(theme),
                           ^.rbWidth := 1,
                           ^.rbHeight := linesCount,
                           ^.content := "<" * linesCount
                         )()
                       ) ++ scrollIndicators.map { lineIdx =>
                         <.text(
-                          ^.rbStyle := scrollStyle,
+                          ^.rbStyle := scrollStyle(theme),
                           ^.rbLeft := width - 1,
                           ^.rbTop := lineIdx,
                           ^.rbWidth := 1,

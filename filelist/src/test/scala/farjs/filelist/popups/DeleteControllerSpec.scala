@@ -7,7 +7,8 @@ import farjs.filelist.popups.DeleteController._
 import farjs.ui.Dispatch
 import farjs.ui.popup._
 import farjs.ui.task.FutureTask
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
@@ -43,7 +44,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
       data = Some(FileListData(dispatch, actions.actions, state)),
       onClose = onClose
     )
-    val comp = testRender(<(DeleteController())(^.wrapped := props)())
+    val comp = testRender(withThemeContext(<(DeleteController())(^.wrapped := props)()))
     val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
     val deleteAction = FileListTaskAction(
       FutureTask("Deleting Items", Future.successful(()))
@@ -76,7 +77,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
       data = Some(FileListData(dispatch, actions.actions, state)),
       onClose = onClose
     )
-    val comp = testRender(<(DeleteController())(^.wrapped := props)())
+    val comp = testRender(withThemeContext(<(DeleteController())(^.wrapped := props)()))
     val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
     val deleteAction = FileListTaskAction(
       FutureTask("Deleting Items", Future.successful(()))
@@ -105,7 +106,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
       data = Some(FileListData(dispatch, actions.actions, state)),
       onClose = onClose
     )
-    val comp = testRender(<(DeleteController())(^.wrapped := props)())
+    val comp = testRender(withThemeContext(<(DeleteController())(^.wrapped := props)()))
     val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
 
     //then
@@ -128,9 +129,10 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     )
 
     //when
-    val result = testRender(<(DeleteController())(^.wrapped := props)())
+    val result = testRender(withThemeContext(<(DeleteController())(^.wrapped := props)()))
 
     //then
+    val currTheme = DefaultTheme
     assertTestComponent(result, messageBoxComp, plain = true) {
       case MessageBoxProps(title, message, resActions, style) =>
         title shouldBe "Delete"
@@ -138,7 +140,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
         inside(resActions.toList) {
           case List(MessageBoxAction("YES", _, false), MessageBoxAction("NO", _, true)) =>
         }
-        style shouldBe Theme.current.popup.error
+        style shouldBe currTheme.popup.error
     }
   }
 
@@ -150,7 +152,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val props = FileListUiData(data = Some(FileListData(dispatch, actions, state)))
 
     //when
-    val renderer = createTestRenderer(<(DeleteController())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(DeleteController())(^.wrapped := props)()))
 
     //then
     renderer.root.children.toList should be (empty)
@@ -161,7 +163,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val props = FileListUiData(showDeletePopup = true)
 
     //when
-    val renderer = createTestRenderer(<(DeleteController())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(DeleteController())(^.wrapped := props)()))
 
     //then
     renderer.root.children.toList should be (empty)

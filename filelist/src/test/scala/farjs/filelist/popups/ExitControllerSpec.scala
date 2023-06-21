@@ -3,7 +3,8 @@ package farjs.filelist.popups
 import farjs.filelist.FileListUiData
 import farjs.filelist.popups.ExitController._
 import farjs.ui.popup._
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import scommons.nodejs._
 import scommons.react.blessed._
 import scommons.react.test._
@@ -18,7 +19,7 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
     //given
     val onClose = mockFunction[Unit]
     val props = FileListUiData(showExitPopup = true, onClose = onClose)
-    val comp = testRender(<(ExitController())(^.wrapped := props)())
+    val comp = testRender(withThemeContext(<(ExitController())(^.wrapped := props)()))
     val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
 
     val onKey = mockFunction[String, Boolean, Boolean, Boolean, Unit]
@@ -47,7 +48,7 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
     //given
     val onClose = mockFunction[Unit]
     val props = FileListUiData(showExitPopup = true, onClose = onClose)
-    val comp = testRender(<(ExitController())(^.wrapped := props)())
+    val comp = testRender(withThemeContext(<(ExitController())(^.wrapped := props)()))
     val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
 
     //then
@@ -62,9 +63,10 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListUiData(showExitPopup = true)
 
     //when
-    val result = testRender(<(ExitController())(^.wrapped := props)())
+    val result = testRender(withThemeContext(<(ExitController())(^.wrapped := props)()))
 
     //then
+    val currThem = DefaultTheme
     assertTestComponent(result, messageBoxComp, plain = true) {
       case MessageBoxProps(title, message, resActions, style) =>
         title shouldBe "Exit"
@@ -72,7 +74,7 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
         inside(resActions.toList) {
           case List(MessageBoxAction("YES", _, false), MessageBoxAction("NO", _, true)) =>
         }
-        style shouldBe Theme.current.popup.regular
+        style shouldBe currThem.popup.regular
     }
   }
 
@@ -81,7 +83,7 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListUiData()
 
     //when
-    val renderer = createTestRenderer(<(ExitController())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(ExitController())(^.wrapped := props)()))
 
     //then
     renderer.root.children.toList should be (empty)

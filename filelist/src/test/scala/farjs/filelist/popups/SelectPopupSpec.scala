@@ -5,7 +5,8 @@ import farjs.filelist.history.MockFileListHistoryService
 import farjs.filelist.popups.SelectPopup._
 import farjs.ui._
 import farjs.ui.popup.ModalProps
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
@@ -35,7 +36,7 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     historyService.getAll.expects().returning(itemsF)
 
     val renderer = createTestRenderer(withServicesContext(
-      <(SelectPopup())(^.wrapped := props)(), selectPatternsHistory = historyService.service
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), selectPatternsHistory = historyService.service
     ))
     itemsF.flatMap { _ =>
       val comboBox = findComponentProps(renderer.root, comboBoxComp, plain = true)
@@ -60,7 +61,7 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     historyService.getAll.expects().returning(itemsF)
 
     val comp = createTestRenderer(withServicesContext(
-      <(SelectPopup())(^.wrapped := props)(), selectPatternsHistory = historyService.service
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), selectPatternsHistory = historyService.service
     )).root
 
     itemsF.flatMap { _ =>
@@ -86,7 +87,7 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     historyService.getAll.expects().returning(itemsF)
 
     val comp = createTestRenderer(withServicesContext(
-      <(SelectPopup())(^.wrapped := props)(), selectPatternsHistory = historyService.service
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), selectPatternsHistory = historyService.service
     )).root
 
     itemsF.flatMap { _ =>
@@ -111,7 +112,7 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     //when
     val result = createTestRenderer(withServicesContext(
-      <(SelectPopup())(^.wrapped := props)(), selectPatternsHistory = historyService.service
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), selectPatternsHistory = historyService.service
     )).root
 
     //then
@@ -129,7 +130,7 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     //when
     val result = createTestRenderer(withServicesContext(
-      <(SelectPopup())(^.wrapped := props)(), selectPatternsHistory = historyService.service
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), selectPatternsHistory = historyService.service
     )).root
 
     //then
@@ -154,7 +155,7 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
                                 expectedTitle: String): Assertion = {
 
     val (width, height) = (55, 5)
-    val style = Theme.current.popup.regular
+    val style = DefaultTheme.popup.regular
     
     assertNativeComponent(result,
       <(modalComp())(^.assertWrapped(inside(_) {

@@ -31,7 +31,7 @@ class ZipPanel(zipPath: String,
       useState(Option.empty[(Dispatch, FileListActions, FileListState, Seq[FileListItem], Boolean)])
     val (showWarning, setShowWarning) = useState(false)
     val props = compProps.wrapped
-    val theme = Theme.current.popup
+    val theme = Theme.useTheme.popup
     
     def onClosePanel(): Unit = {
       val stackData = {

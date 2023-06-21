@@ -30,6 +30,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
     val columnSizeRef = useRef[Int](0)
     val columnsPosRef = useRef[Seq[(Int, Int, Int)]](null)
     val inputEl = PanelStack.usePanelStack.panelInput
+    val currTheme = Theme.useTheme
     
     val props = compProps.wrapped
     propsRef.current = props
@@ -107,17 +108,19 @@ object FileListView extends FunctionComponent[FileListViewProps] {
         columnsItems.zipAll(columnsPosRef.current, Nil, (0, 0, 0)).map {
           case (colItems, (colLeft, colWidth, colIndex)) =>
             <.>(^.key := s"$colIndex")(
-              if (colIndex != columns - 1) Some(
-                <(verticalLineComp())(^.plain := VerticalLineProps(
-                  left = colLeft + colWidth,
-                  top = -1,
-                  length = height + 2,
-                  lineCh = SingleChars.vertical,
-                  style = Theme.current.fileList.regularItem,
-                  startCh = DoubleChars.topSingle,
-                  endCh = SingleChars.bottom
-                ))()
-              )
+              if (colIndex != columns - 1) {
+                Some(
+                  <(verticalLineComp())(^.plain := VerticalLineProps(
+                    left = colLeft + colWidth,
+                    top = -1,
+                    length = height + 2,
+                    lineCh = SingleChars.vertical,
+                    style = currTheme.fileList.regularItem,
+                    startCh = DoubleChars.topSingle,
+                    endCh = SingleChars.bottom
+                  ))()
+                )
+              }
               else None,
 
               <(fileListColumnComp())(^.wrapped := FileListColumnProps(

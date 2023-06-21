@@ -23,8 +23,9 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
     val autoCompleteTimeoutRef = useRef[Timeout](null)
     val (maybePopup, setPopup) = useState[Option[ListViewport]](None)
     val (state, setState) = useStateUpdater(() => TextInputState())
-    val theme = Theme.current.popup.menu
-    val arrowStyle = Theme.current.popup.regular
+    val currTheme = Theme.useTheme
+    val theme = currTheme.popup.menu
+    val arrowStyle = currTheme.popup.regular
     
     def showOrHidePopup(): Unit = {
       if (maybePopup.isDefined) hidePopup()

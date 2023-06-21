@@ -1,6 +1,7 @@
 package farjs.viewer
 
 import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import farjs.ui.{TextAlign, TextLineProps, WithSizeProps}
 import farjs.viewer.ViewerHeader._
 import scommons.react.blessed._
@@ -23,7 +24,7 @@ class ViewerHeaderSpec extends TestSpec with TestRendererUtils {
     )
     
     //when
-    val result = createTestRenderer(<(ViewerHeader())(^.wrapped := props)()).root
+    val result = createTestRenderer(withThemeContext(<(ViewerHeader())(^.wrapped := props)())).root
 
     //then
     assertViewerHeader(result, props)

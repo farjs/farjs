@@ -4,7 +4,8 @@ import farjs.filelist.FileListColumn._
 import farjs.filelist.api.FileListItem
 import farjs.ui._
 import farjs.ui.border._
-import farjs.ui.theme.{Theme, XTerm256Theme}
+import farjs.ui.theme.ThemeSpec.withThemeContext
+import farjs.ui.theme.{DefaultTheme, Theme, XTerm256Theme}
 import org.scalatest.Assertion
 import scommons.react.blessed._
 import scommons.react.test._
@@ -29,16 +30,18 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
       focusedIndex = 1,
       selectedNames = Set("item 2", "item 3")
     )
-    val renderer = createTestRenderer(<(FileListColumn())(^.wrapped := props)(
+    val renderer = createTestRenderer(withThemeContext(<(FileListColumn())(^.wrapped := props)(
       <.text(^.content := "initial")()
-    ))
+    )))
     val testEl = renderer.root.children.head.children.head.children(2)
     testEl.`type` shouldBe "text"
     testEl.props.content shouldBe "initial"
 
     //when
-    renderer.update(<(FileListColumn())(^.wrapped := props.copy(selectedNames = Set("item 3", "item 2")))(
-      <.text(^.content := "update")()
+    renderer.update(withThemeContext(
+      <(FileListColumn())(^.wrapped := props.copy(selectedNames = Set("item 3", "item 2")))(
+        <.text(^.content := "update")()
+      )
     ))
 
     //then
@@ -64,16 +67,18 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
       focusedIndex = 1,
       selectedNames = Set("item 2", "item 3")
     )
-    val renderer = createTestRenderer(<(FileListColumn())(^.wrapped := props)(
+    val renderer = createTestRenderer(withThemeContext(<(FileListColumn())(^.wrapped := props)(
       <.text(^.content := "initial")()
-    ))
+    )))
     val testEl = renderer.root.children.head.children.head.children(2)
     testEl.`type` shouldBe "text"
     testEl.props.content shouldBe "initial"
 
     //when
-    renderer.update(<(FileListColumn())(^.wrapped := props.copy(selectedNames = Set("item 3")))(
-      <.text(^.content := "update")()
+    renderer.update(withThemeContext(
+      <(FileListColumn())(^.wrapped := props.copy(selectedNames = Set("item 3")))(
+        <.text(^.content := "update")()
+      )
     ))
 
     //then
@@ -87,8 +92,7 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
   
   it should "render non-empty component" in {
     //given
-    val savedTheme = Theme.current
-    Theme.current = XTerm256Theme
+    val currTheme = XTerm256Theme
     val props = FileListColumnProps(
       size = (14, 3),
       left = 2,
@@ -108,7 +112,7 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
     )
 
     //when
-    val result = testRender(<(FileListColumn())(^.wrapped := props)())
+    val result = testRender(withThemeContext(<(FileListColumn())(^.wrapped := props)(), currTheme))
 
     //then
     assertFileListColumn(result, props, Some(
@@ -122,10 +126,7 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
         "{bold}{#5ce-fg}{#008-bg} fileй 6      {/}{bold}{#5ce-fg}{#008-bg}│{/}",
         "{bold}{#a05-fg}{#008-bg}file.zip      {/}{bold}{#5ce-fg}{#008-bg}│{/}"
       ).mkString("\n")
-    ))
-    
-    //cleanup
-    Theme.current = savedTheme
+    ), currTheme)
   }
   
   it should "render empty component" in {
@@ -140,7 +141,7 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
     )
 
     //when
-    val result = testRender(<(FileListColumn())(^.wrapped := props)())
+    val result = testRender(withThemeContext(<(FileListColumn())(^.wrapped := props)()))
 
     //then
     assertFileListColumn(result, props, None)
@@ -148,9 +149,10 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
   
   private def assertFileListColumn(result: TestInstance,
                                    props: FileListColumnProps,
-                                   expectedContent: Option[String]): Unit = {
+                                   expectedContent: Option[String],
+                                   currTheme: Theme = DefaultTheme): Unit = {
     
-    val theme = Theme.current.fileList
+    val theme = currTheme.fileList
     
     def assertElements(header: TestInstance, itemsText: Option[TestInstance]): Assertion = {
       assertTestComponent(header, textLineComp, plain = true) {

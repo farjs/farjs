@@ -14,7 +14,7 @@ object ExitController extends FunctionComponent[FileListUiData] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val theme = Theme.current.popup
+    val theme = Theme.useTheme.popup
 
     if (props.showExitPopup) {
       <(messageBoxComp())(^.plain := MessageBoxProps(

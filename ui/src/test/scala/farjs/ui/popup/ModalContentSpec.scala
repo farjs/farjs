@@ -2,7 +2,7 @@ package farjs.ui.popup
 
 import farjs.ui.border._
 import farjs.ui.popup.ModalContent._
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
 import org.scalatest.Assertion
 import scommons.react._
 import scommons.react.blessed._
@@ -16,7 +16,7 @@ class ModalContentSpec extends TestSpec with TestRendererUtils {
 
   it should "render component" in {
     //given
-    val props = ModalContentProps("test title", (10, 20), Theme.current.popup.regular)
+    val props = ModalContentProps("test title", (10, 20), DefaultTheme.popup.regular)
     val children = <.button()("some child")
 
     //when
@@ -33,7 +33,7 @@ class ModalContentSpec extends TestSpec with TestRendererUtils {
     val props = ModalContentProps(
       title = "test title",
       size = (10, 20),
-      style = Theme.current.popup.regular,
+      style = DefaultTheme.popup.regular,
       footer = Some("test footer")
     )
     val children = <.button()("some child")

@@ -6,7 +6,8 @@ import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem, FileTarget}
 import farjs.ui.Dispatch
 import farjs.ui.popup.MessageBoxProps
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs
@@ -77,7 +78,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       onTimer = callback
       timerId
     }
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     
     //when & then
     for (_ <- 1 to 10) {
@@ -126,7 +127,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       onTimer = callback
       timerId
     }
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     val progressProps = findComponentProps(renderer.root, copyProgressPopup)
     progressProps.onCancel()
 
@@ -167,7 +168,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         onProgressFn = onProgress
         p.future
     }
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     eventually {
       onProgressFn should not be null
     }.flatMap { _ =>
@@ -208,7 +209,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val to = FileListData(toDispatch, toActions, FileListState())
     val props = CopyProcessProps(from, to, move = false,
       "/from/path", Nil, "/to/path", 12345, _ => (), () => ())
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     val progressProps = findComponentProps(renderer.root, copyProgressPopup)
     progressProps.onCancel()
     val cancelProps = findComponentProps(renderer.root, messageBoxComp, plain = true)
@@ -230,13 +231,14 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val to = FileListData(toDispatch, toActions, FileListState())
     val props = CopyProcessProps(from, to, move = false,
       "/from/path", Nil, "/to/path", 12345, _ => (), () => ())
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     val progressProps = findComponentProps(renderer.root, copyProgressPopup)
 
     //when
     progressProps.onCancel()
 
     //then
+    val currTheme = DefaultTheme
     inside(renderer.root.children.toList) { case List(_, cancel) =>
       assertTestComponent(cancel, messageBoxComp, plain = true) {
         case MessageBoxProps(title, message, resActions, style) =>
@@ -246,7 +248,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
             yes.label shouldBe "YES"
             no.label shouldBe "NO"
           }
-          style shouldBe Theme.current.popup.error
+          style shouldBe currTheme.popup.error
       }
     }
   }
@@ -274,7 +276,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         Future.successful(None)
     }
     actions.copyFile.expects(List("/from/path"), item, *, *).returning(p.future)
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     
     eventually(onExistsFn should not be null).flatMap { _ =>
       val existsF = onExistsFn(FileListItem("existing.file"))
@@ -325,7 +327,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         Future.successful(None)
     }
     actions.copyFile.expects(List("/from/path"), item, *, *).returning(p.future)
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     
     eventually(onExistsFn should not be null).flatMap { _ =>
       val existsF = onExistsFn(FileListItem("existing.file"))
@@ -377,7 +379,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         Future.successful(None)
     }
     actions.copyFile.expects(List("/from/path"), item, *, *).returning(p.future)
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     
     eventually(onExistsFn should not be null).flatMap { _ =>
       val existsF = onExistsFn(FileListItem("existing.file"))
@@ -428,7 +430,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         Future.successful(None)
     }
     actions.copyFile.expects(List("/from/path"), item, *, *).returning(p.future)
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     
     eventually {
       onExistsFn should not be null
@@ -490,7 +492,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         Future.successful(None)
     }
     actions.copyFile.expects(List("/from/path"), item, *, *).returning(p.future)
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     
     eventually {
       onExistsFn should not be null
@@ -550,7 +552,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         Future.successful(None)
     }
     actions.copyFile.expects(List("/from/path"), item2, *, *).returning(p2.future)
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
 
     eventually(onExistsFn1 should not be null).flatMap { _ =>
       //given
@@ -620,7 +622,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         Future.successful(None)
     }
     actions.copyFile.expects(List("/from/path"), item2, *, *).returning(p2.future)
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
 
     eventually(onExistsFn1 should not be null).flatMap { _ =>
       //given
@@ -681,7 +683,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         onProgressFn = onProgress
         p.future
     }
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     
     eventually {
       onProgressFn should not be null
@@ -745,7 +747,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         onProgressFn = onProgress
         p.future
     }
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     eventually {
       onProgressFn should not be null
     }.flatMap { _ =>
@@ -789,7 +791,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val p = Promise[Boolean]()
     toActions.writeFile.expects(List("/to/path"), "newName", *).returning(Future.successful(None))
     actions.copyFile.expects(List("/from/path"), item, *, *).returning(p.future)
-    testRender(<(CopyProcess())(^.wrapped := props)())
+    testRender(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
 
     //then
     onTopItem.expects(*).never()
@@ -841,7 +843,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         onProgressFn = onProgress
         p.future
     }
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     eventually {
       onProgressFn should not be null
     }.flatMap { _ =>
@@ -895,7 +897,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         onProgressFn = onProgress
         p.future
     }
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     eventually {
       onProgressFn should not be null
     }.flatMap { _ =>
@@ -956,7 +958,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         onProgressFn2 = onProgress
         p2.future
     }
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     eventually {
       onProgressFn1 should not be null
     }.flatMap { _ =>
@@ -1032,7 +1034,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         onProgressFn2 = onProgress
         p2.future
     }
-    val renderer = createTestRenderer(<(CopyProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     eventually {
       onProgressFn1 should not be null
     }.flatMap { _ =>
@@ -1085,7 +1087,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
                                       itemPercent: Int,
                                       totalPercent: Int): Assertion = {
 
-    renderer.update(<(CopyProcess())(^.wrapped := props)())
+    renderer.update(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
 
     assertTestComponent(renderer.root.children.head, copyProgressPopup) {
       case CopyProgressPopupProps(

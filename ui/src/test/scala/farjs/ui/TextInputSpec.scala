@@ -1,6 +1,7 @@
 package farjs.ui
 
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalactic.source.Position
 import scommons.react.ReactRef
 import scommons.react.blessed._
@@ -11,6 +12,8 @@ import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
 
 class TextInputSpec extends TestSpec with TestRendererUtils {
+
+  private val currTheme = DefaultTheme
 
   it should "move cursor and grab focus when onClick" in {
     //given
@@ -29,12 +32,12 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
     inputMock.atop = 3
     omoveMock.expects(10, 3)
 
-    val renderer = createTestRenderer(<(TextInput())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(withThemeContext(<(TextInput())(^.wrapped := props)()), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
     TestRenderer.act { () =>
-      renderer.update(<(TextInput())(^.wrapped := props.copy(state = state))())
+      renderer.update(withThemeContext(<(TextInput())(^.wrapped := props.copy(state = state))()))
     }
 
     //then
@@ -65,12 +68,12 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
     inputMock.atop = 2
     omoveMock.expects(5, 2)
     
-    val renderer = createTestRenderer(<(TextInput())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(withThemeContext(<(TextInput())(^.wrapped := props)()), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
     TestRenderer.act { () =>
-      renderer.update(<(TextInput())(^.wrapped := props.copy(state = state))())
+      renderer.update(withThemeContext(<(TextInput())(^.wrapped := props.copy(state = state))()))
     }
 
     //then
@@ -100,12 +103,12 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
     inputMock.atop = 2
     omoveMock.expects(5, 2)
     
-    val renderer = createTestRenderer(<(TextInput())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(withThemeContext(<(TextInput())(^.wrapped := props)()), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
     TestRenderer.act { () =>
-      renderer.update(<(TextInput())(^.wrapped := props.copy(state = state))())
+      renderer.update(withThemeContext(<(TextInput())(^.wrapped := props.copy(state = state))()))
     }
 
     //then
@@ -138,12 +141,12 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
     inputMock.atop = 2
     omoveMock.expects(10, 2)
 
-    val renderer = createTestRenderer(<(TextInput())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(withThemeContext(<(TextInput())(^.wrapped := props)()), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
     TestRenderer.act { () =>
-      renderer.update(<(TextInput())(^.wrapped := props.copy(state = state))())
+      renderer.update(withThemeContext(<(TextInput())(^.wrapped := props.copy(state = state))()))
     }
 
     //then
@@ -174,7 +177,7 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
     inputMock.atop = props.top
     omoveMock.expects(props.left + cursorX, props.top)
 
-    val inputEl = testRender(<(TextInput())(^.wrapped := props)(), { el =>
+    val inputEl = testRender(withThemeContext(<(TextInput())(^.wrapped := props)()), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
@@ -209,7 +212,7 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
     inputMock.atop = props.top
     omoveMock.expects(props.left + cursorX, props.top)
 
-    val inputEl = testRender(<(TextInput())(^.wrapped := props)(), { el =>
+    val inputEl = testRender(withThemeContext(<(TextInput())(^.wrapped := props)()), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
@@ -244,12 +247,12 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
     inputMock.atop = props.top
     omoveMock.expects(props.left + cursorX, props.top)
 
-    val renderer = createTestRenderer(<(TextInput())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(withThemeContext(<(TextInput())(^.wrapped := props)()), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
     TestRenderer.act { () =>
-      renderer.update(<(TextInput())(^.wrapped := props.copy(state = state))())
+      renderer.update(withThemeContext(<(TextInput())(^.wrapped := props.copy(state = state))()))
     }
     val inputEl = renderer.root.children(0)
     val key = literal("full" -> "C-c").asInstanceOf[KeyboardKey]
@@ -279,7 +282,7 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
         props = props.copy(state = state)
         TestRenderer.act { () =>
           if (renderer != null) {
-            renderer.update(<(TextInput())(^.wrapped := props)())
+            renderer.update(withThemeContext(<(TextInput())(^.wrapped := props)()))
           }
         }
     }
@@ -307,12 +310,12 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
     inputMock.atop = atop
     omoveMock.expects(aleft + cursorX, atop)
 
-    renderer = createTestRenderer(<(TextInput())(^.wrapped := props)(), { el =>
+    renderer = createTestRenderer(withThemeContext(<(TextInput())(^.wrapped := props)()), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
     TestRenderer.act { () =>
-      renderer.update(<(TextInput())(^.wrapped := props)())
+      renderer.update(withThemeContext(<(TextInput())(^.wrapped := props)()))
     }
     
     def check(defaultPrevented: Boolean,
@@ -352,11 +355,11 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
         props = props.copy(value = newVal)
 
         TestRenderer.act { () =>
-          renderer.update(<(TextInput())(^.wrapped := props)())
+          renderer.update(withThemeContext(<(TextInput())(^.wrapped := props)()))
         }
       }
       
-      val theme = Theme.current.textBox
+      val theme = currTheme.textBox
       inputEl.props.content shouldBe {
         if (selEnd - selStart > 0) {
           val part1 = UI.renderText2(theme.regular, newVal.slice(offset, selStart))
@@ -444,12 +447,12 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
     omoveMock.expects(10, 3)
 
     //when
-    val renderer = createTestRenderer(<(TextInput())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(withThemeContext(<(TextInput())(^.wrapped := props)()), { el =>
       if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
       else null
     })
     TestRenderer.act { () =>
-      renderer.update(<(TextInput())(^.wrapped := props.copy(state = state))())
+      renderer.update(withThemeContext(<(TextInput())(^.wrapped := props.copy(state = state))()))
     }
 
     //then
@@ -476,7 +479,7 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
   )
 
   private def assertTextInput(result: TestInstance, props: TextInputProps): Unit = {
-    val theme = Theme.current.textBox
+    val theme = currTheme.textBox
     val selectedText = props.value.drop(props.value.length - props.width + 1)
     
     assertNativeComponent(result,

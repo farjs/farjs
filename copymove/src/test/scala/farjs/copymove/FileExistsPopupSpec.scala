@@ -5,7 +5,8 @@ import farjs.filelist.api.FileListItem
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.ModalProps
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.Assertion
 import scommons.react.ReactClass
 import scommons.react.blessed._
@@ -25,7 +26,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onAction = mockFunction[FileExistsAction, Unit]
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
-    val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
+    val comp = testRender(withThemeContext(<(FileExistsPopup())(^.wrapped := props)()))
     val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
@@ -44,7 +45,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onAction = mockFunction[FileExistsAction, Unit]
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
-    val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
+    val comp = testRender(withThemeContext(<(FileExistsPopup())(^.wrapped := props)()))
     val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
@@ -63,7 +64,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onAction = mockFunction[FileExistsAction, Unit]
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
-    val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
+    val comp = testRender(withThemeContext(<(FileExistsPopup())(^.wrapped := props)()))
     val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
@@ -82,7 +83,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onAction = mockFunction[FileExistsAction, Unit]
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
-    val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
+    val comp = testRender(withThemeContext(<(FileExistsPopup())(^.wrapped := props)()))
     val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
@@ -101,7 +102,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onAction = mockFunction[FileExistsAction, Unit]
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
-    val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
+    val comp = testRender(withThemeContext(<(FileExistsPopup())(^.wrapped := props)()))
     val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
@@ -120,7 +121,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onAction = mockFunction[FileExistsAction, Unit]
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), onAction, onCancel)
-    val comp = testRender(<(FileExistsPopup())(^.wrapped := props)())
+    val comp = testRender(withThemeContext(<(FileExistsPopup())(^.wrapped := props)()))
     val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
@@ -144,7 +145,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     )
 
     //when
-    val result = testRender(<(FileExistsPopup())(^.wrapped := props)())
+    val result = testRender(withThemeContext(<(FileExistsPopup())(^.wrapped := props)()))
 
     //then
     assertFileExistsPopup(result, props, List(
@@ -161,7 +162,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
                                     props: FileExistsPopupProps,
                                     actions: List[String]): Unit = {
     val (width, height) = (58, 11)
-    val theme = Theme.current.popup.error
+    val theme = DefaultTheme.popup.error
     
     def assertComponents(label1: TestInstance,
                          item : TestInstance,

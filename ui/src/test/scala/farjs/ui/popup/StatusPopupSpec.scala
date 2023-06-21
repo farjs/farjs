@@ -3,7 +3,8 @@ package farjs.ui.popup
 import farjs.ui._
 import farjs.ui.popup.ModalContent._
 import farjs.ui.popup.StatusPopup._
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest._
 import scommons.nodejs.test.TestSpec
 import scommons.react.blessed._
@@ -17,7 +18,7 @@ class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils 
   StatusPopup.modalContentComp = mockUiComponent("ModalContent")
   StatusPopup.textLineComp = mockUiComponent("TextLine")
 
-  private val theme = Theme.current.popup.regular
+  private val theme = DefaultTheme.popup.regular
   private val style = new BlessedStyle {
     override val bold = theme.bold
     override val bg = theme.bg
@@ -34,7 +35,7 @@ class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils 
     )
 
     //when
-    val result = testRender(<(StatusPopup())(^.wrapped := props)())
+    val result = testRender(withThemeContext(<(StatusPopup())(^.wrapped := props)()))
 
     //then
     assertTaskStatusPopup(result, props)

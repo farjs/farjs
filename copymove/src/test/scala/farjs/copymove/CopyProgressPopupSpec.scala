@@ -5,7 +5,8 @@ import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.ModalContent._
 import farjs.ui.popup.ModalProps
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.Assertion
 import scommons.react.blessed._
 import scommons.react.test._
@@ -23,7 +24,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
     val props = getCopyProgressPopupProps(move = false)
 
     //when
-    val result = testRender(<(CopyProgressPopup())(^.wrapped := props)())
+    val result = testRender(withThemeContext(<(CopyProgressPopup())(^.wrapped := props)()))
 
     //then
     assertCopyProgressPopup(result, props)
@@ -34,7 +35,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
     val props = getCopyProgressPopupProps(move = true)
 
     //when
-    val result = testRender(<(CopyProgressPopup())(^.wrapped := props)())
+    val result = testRender(withThemeContext(<(CopyProgressPopup())(^.wrapped := props)()))
 
     //then
     assertCopyProgressPopup(result, props)
@@ -89,7 +90,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
     val (width, height) = (50, 13)
     val contentWidth = width - (paddingHorizontal + 2) * 2
     val contentLeft = 2
-    val theme = Theme.current.popup.regular
+    val theme = DefaultTheme.popup.regular
 
     def assertComponents(label: TestInstance,
                          item: TestInstance,

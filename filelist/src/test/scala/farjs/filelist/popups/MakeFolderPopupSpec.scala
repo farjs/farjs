@@ -6,7 +6,8 @@ import farjs.filelist.popups.MakeFolderPopup._
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.ModalProps
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
@@ -42,7 +43,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     historyService.getAll.expects().returning(itemsF)
 
     val renderer = createTestRenderer(withServicesContext(
-      <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
+      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
     ))
     itemsF.flatMap { _ =>
       val textBox = findComponentProps(renderer.root, comboBoxComp, plain = true)
@@ -65,7 +66,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     historyService.getAll.expects().returning(itemsF)
 
     val renderer = createTestRenderer(withServicesContext(
-      <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
+      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
     ))
     itemsF.flatMap { _ =>
       val checkbox = findComponentProps(renderer.root, checkBoxComp, plain = true)
@@ -89,7 +90,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     historyService.getAll.expects().returning(itemsF)
 
     val comp = createTestRenderer(withServicesContext(
-      <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
+      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
     )).root
     itemsF.flatMap { _ =>
       val textBox = findComponentProps(comp, comboBoxComp, plain = true)
@@ -115,7 +116,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     historyService.getAll.expects().returning(itemsF)
 
     val comp = createTestRenderer(withServicesContext(
-      <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
+      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
     )).root
     itemsF.flatMap { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
@@ -144,7 +145,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     historyService.getAll.expects().returning(itemsF)
 
     val comp = createTestRenderer(withServicesContext(
-      <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
+      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
     )).root
     itemsF.flatMap { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
@@ -173,7 +174,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     historyService.getAll.expects().returning(itemsF)
 
     val comp = createTestRenderer(withServicesContext(
-      <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
+      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
     )).root
     itemsF.flatMap { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
@@ -201,7 +202,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
     //when
     val result = createTestRenderer(withServicesContext(
-      <(MakeFolderPopup())(^.wrapped := props)(), mkDirsHistory = historyService.service
+      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
     )).root
 
     //then
@@ -227,7 +228,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
                                     items: List[String],
                                     actions: List[String]): Assertion = {
     val (width, height) = (75, 10)
-    val style = Theme.current.popup.regular
+    val style = DefaultTheme.popup.regular
     
     assertNativeComponent(result,
       <(modalComp())(^.assertWrapped(inside(_) {

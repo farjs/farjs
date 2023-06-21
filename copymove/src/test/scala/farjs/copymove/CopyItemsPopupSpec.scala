@@ -8,7 +8,8 @@ import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.ModalContent._
 import farjs.ui.popup.ModalProps
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
@@ -43,7 +44,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     historyService.getAll.expects().returning(itemsF)
 
     val renderer = createTestRenderer(withServicesContext(
-      <(CopyItemsPopup())(^.wrapped := props)(), copyItemsHistory = historyService.service
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
     ))
     itemsF.flatMap { _ =>
       val textBox = findComponentProps(renderer.root, comboBoxComp, plain = true)
@@ -68,7 +69,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     historyService.getAll.expects().returning(itemsF)
 
     val comp = createTestRenderer(withServicesContext(
-      <(CopyItemsPopup())(^.wrapped := props)(), copyItemsHistory = historyService.service
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
     )).root
     itemsF.flatMap { _ =>
       val textBox = findComponentProps(comp, comboBoxComp, plain = true)
@@ -94,7 +95,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     historyService.getAll.expects().returning(itemsF)
 
     val comp = createTestRenderer(withServicesContext(
-      <(CopyItemsPopup())(^.wrapped := props)(), copyItemsHistory = historyService.service
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
     )).root
     itemsF.flatMap { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
@@ -123,7 +124,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     historyService.getAll.expects().returning(itemsF)
 
     val comp = createTestRenderer(withServicesContext(
-      <(CopyItemsPopup())(^.wrapped := props)(), copyItemsHistory = historyService.service
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
     )).root
     itemsF.flatMap { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
@@ -152,7 +153,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     historyService.getAll.expects().returning(itemsF)
 
     val comp = createTestRenderer(withServicesContext(
-      <(CopyItemsPopup())(^.wrapped := props)(), copyItemsHistory = historyService.service
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
     )).root
     itemsF.flatMap { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
@@ -180,7 +181,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
 
     //when
     val result = createTestRenderer(withServicesContext(
-      <(CopyItemsPopup())(^.wrapped := props)(), copyItemsHistory = historyService.service
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
     )).root
 
     //then
@@ -198,7 +199,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
 
     //when
     val result = createTestRenderer(withServicesContext(
-      <(CopyItemsPopup())(^.wrapped := props)(), copyItemsHistory = historyService.service
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
     )).root
 
     //then
@@ -212,7 +213,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
                                    items: List[String],
                                    actions: List[String]): Assertion = {
     val (width, height) = (75, 8)
-    val style = Theme.current.popup.regular
+    val style = DefaultTheme.popup.regular
     val count = props.items.size
     val itemsText =
       if (count > 1) s"$count items"

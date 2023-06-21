@@ -4,7 +4,8 @@ import farjs.filelist.FileListView._
 import farjs.filelist.api.FileListItem
 import farjs.filelist.stack.{PanelStack, PanelStackProps}
 import farjs.ui.border._
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
@@ -44,7 +45,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     onMock.expects("keypress", *)
     onMock.expects("click", *)
     
-    val renderer = createTestRenderer(withContext(<(FileListView())(^.wrapped := props)(), input), { el =>
+    val renderer = createTestRenderer(withContext(withThemeContext(<(FileListView())(^.wrapped := props)()), input), { el =>
       if (el.`type` == <.box.name.asInstanceOf[js.Any]) literal(aleft = 5, atop = 3)
       else null
     })
@@ -100,7 +101,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     onMock.expects("wheelup", *)
     onMock.expects("wheeldown", *)
     
-    val renderer = createTestRenderer(withContext(<(FileListView())(^.wrapped := props)(), input), { el =>
+    val renderer = createTestRenderer(withContext(withThemeContext(<(FileListView())(^.wrapped := props)()), input), { el =>
       if (el.`type` == <.box.name.asInstanceOf[js.Any]) literal(aleft = 5, atop = 3)
       else null
     })
@@ -158,7 +159,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     onMock.expects("wheeldown", *)
     onMock.expects("click", *)
     
-    val renderer = createTestRenderer(withContext(<(FileListView())(^.wrapped := props)(), input))
+    val renderer = createTestRenderer(withContext(withThemeContext(<(FileListView())(^.wrapped := props)()), input))
     val keyFull = "some-key"
     
     //then
@@ -183,7 +184,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     val (width, height) = props.size
 
     //when
-    val result = testRender(withContext(<(FileListView())(^.wrapped := props)()))
+    val result = testRender(withContext(withThemeContext(<(FileListView())(^.wrapped := props)())))
 
     //then
     assertNativeComponent(result, <.box(^.rbWidth := width, ^.rbHeight := height)())
@@ -195,7 +196,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     val (width, height) = props.size
 
     //when
-    val result = testRender(withContext(<(FileListView())(^.wrapped := props)()))
+    val result = testRender(withContext(withThemeContext(<(FileListView())(^.wrapped := props)())))
 
     //then
     assertNativeComponent(result, <.box(^.rbWidth := width, ^.rbHeight := height)())
@@ -206,7 +207,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListViewProps((7, 2), columns = 2, items = Nil)
 
     //when
-    val result = testRender(withContext(<(FileListView())(^.wrapped := props)()))
+    val result = testRender(withContext(withThemeContext(<(FileListView())(^.wrapped := props)())))
 
     //then
     assertFileListView(result, props, List(
@@ -224,7 +225,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     )
 
     //when
-    val result = testRender(withContext(<(FileListView())(^.wrapped := props)()))
+    val result = testRender(withContext(withThemeContext(<(FileListView())(^.wrapped := props)())))
 
     //then
     assertFileListView(result, props, List(
@@ -242,6 +243,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
   private def assertFileListView(result: TestInstance,
                                  props: FileListViewProps,
                                  expectedData: List[(List[FileListItem], Int, Set[String])]): Unit = {
+    val currThem = DefaultTheme
     
     assertNativeComponent(result, <.box(
       ^.rbWidth := props.size._1,
@@ -255,7 +257,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
           resTop shouldBe -1
           resLength shouldBe 4
           ch shouldBe SingleChars.vertical
-          style shouldBe Theme.current.fileList.regularItem
+          style shouldBe currThem.fileList.regularItem
           start shouldBe DoubleChars.topSingle
           end shouldBe SingleChars.bottom
       }

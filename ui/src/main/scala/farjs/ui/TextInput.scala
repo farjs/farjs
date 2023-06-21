@@ -28,7 +28,7 @@ object TextInput extends FunctionComponent[TextInputProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val theme = Theme.current.textBox
+    val theme = Theme.useTheme.textBox
     val elementRef = props.inputRef
     val (offset, cursorX) = (props.state.offset, props.state.cursorX)
     val (selStart, selEnd) = (props.state.selStart, props.state.selEnd)

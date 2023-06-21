@@ -1,6 +1,8 @@
 package farjs.viewer
 
 import farjs.file.popups.EncodingsPopupProps
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import farjs.viewer.ViewerContent._
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
@@ -37,14 +39,14 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     var viewport = props.viewport
     val readF = Future.successful("test \nfile content".split('\n').map(c => (c, c.length)).toList)
     fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readF)
-    val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
   
     setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
       inside(maybeViewport) { case Some(vp) =>
         viewport = vp
         TestRenderer.act { () =>
           props = props.copy(viewport = vp)
-          renderer.update(<(ViewerContent())(^.wrapped := props)())
+          renderer.update(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
         }
       }
     }.anyNumberOfTimes()
@@ -60,14 +62,14 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     var viewport = props.viewport
     val readP = Promise[List[(String, Int)]]()
     fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readP.future)
-    val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
 
     setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
       inside(maybeViewport) { case Some(vp) =>
         viewport = vp
         TestRenderer.act { () =>
           props = props.copy(viewport = vp)
-          renderer.update(<(ViewerContent())(^.wrapped := props)())
+          renderer.update(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
         }
       }
     }
@@ -194,14 +196,14 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     var viewport = props.viewport
     val readF = Future.successful("1\n2\n3\n4\n5\n".split('\n').map(c => (c, c.length + 1)).toList)
     fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readF)
-    val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
 
     setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
       inside(maybeViewport) { case Some(vp) =>
         viewport = vp
         TestRenderer.act { () =>
           props = props.copy(viewport = vp)
-          renderer.update(<(ViewerContent())(^.wrapped := props)())
+          renderer.update(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
         }
       }
     }.anyNumberOfTimes()
@@ -358,14 +360,14 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     var viewport = props.viewport
     val readF = Future.successful("test \nfile content".split('\n').map(c => (c, c.length)).toList)
     fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readF)
-    val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
 
     setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
       inside(maybeViewport) { case Some(vp) =>
         viewport = vp
         TestRenderer.act { () =>
           props = props.copy(viewport = vp)
-          renderer.update(<(ViewerContent())(^.wrapped := props)())
+          renderer.update(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
         }
       }
     }.anyNumberOfTimes()
@@ -444,7 +446,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
       //when
       TestRenderer.act { () =>
-        renderer.update(<(ViewerContent())(^.wrapped := updatedProps)())
+        renderer.update(withThemeContext(<(ViewerContent())(^.wrapped := updatedProps)()))
       }
 
       //then
@@ -475,7 +477,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
       //when
       TestRenderer.act { () =>
-        renderer.update(<(ViewerContent())(^.wrapped := updatedProps)())
+        renderer.update(withThemeContext(<(ViewerContent())(^.wrapped := updatedProps)()))
       }
 
       //then
@@ -501,7 +503,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     percent shouldBe 76
 
     //when
-    val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
 
     //then
     setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
@@ -509,7 +511,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         viewport = vp
         TestRenderer.act { () =>
           props = props.copy(viewport = vp)
-          renderer.update(<(ViewerContent())(^.wrapped := props)())
+          renderer.update(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
         }
       }
     }
@@ -539,7 +541,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val percent = 0
 
     //when
-    val renderer = createTestRenderer(<(ViewerContent())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
 
     //then
     setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
@@ -547,7 +549,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         viewport = vp
         TestRenderer.act { () =>
           props = props.copy(viewport = vp)
-          renderer.update(<(ViewerContent())(^.wrapped := props)())
+          renderer.update(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
         }
       }
     }
@@ -584,6 +586,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
                                   content: List[String],
                                   hasEncodingsPopup: Boolean = false
                                  )(implicit pos: Position): Assertion = {
+    val theme = DefaultTheme
 
     assertNativeComponent(result.children.head,
       <(viewerInput())(^.assertWrapped(inside(_) {
@@ -599,7 +602,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
           <.text(
             ^.rbWidth := props.viewport.width,
             ^.rbHeight := props.viewport.height,
-            ^.rbStyle := ViewerController.contentStyle,
+            ^.rbStyle := ViewerController.contentStyle(theme),
             ^.rbWrap := false,
             ^.content := {
               if (content.isEmpty) ""

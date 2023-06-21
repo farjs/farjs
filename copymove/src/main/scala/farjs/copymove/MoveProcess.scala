@@ -38,6 +38,7 @@ object MoveProcess extends FunctionComponent[MoveProcessProps] {
     val inProgress = useRef(false)
     val existsPromise = useRef(Promise.successful[Boolean](true))
     val askWhenExists = useRef(true)
+    val currTheme = Theme.useTheme
     val props = compProps.wrapped
 
     def moveItems(): Unit = {
@@ -115,7 +116,7 @@ object MoveProcess extends FunctionComponent[MoveProcessProps] {
               triggeredOnClose = true
             )
           ),
-          style = Theme.current.popup.error
+          style = currTheme.popup.error
         ))()
       }
     )

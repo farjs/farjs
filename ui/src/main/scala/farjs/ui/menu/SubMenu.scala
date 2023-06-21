@@ -22,7 +22,7 @@ object SubMenu extends FunctionComponent[SubMenuProps] {
     val textWidth = props.items.maxBy(_.length).length
     val width = 2 + textWidth
     val height = 2 + props.items.size
-    val theme = Theme.current.popup.menu
+    val theme = Theme.useTheme.popup.menu
 
     <.box(
       ^.rbClickable := true,

@@ -29,7 +29,7 @@ object AddToArchPopup extends FunctionComponent[AddToArchPopupProps] {
     val size@(width, _) = (75, 8)
     val contentWidth = width - (paddingHorizontal + 2) * 2
     val contentLeft = 2
-    val theme = Theme.current.popup.regular
+    val theme = Theme.useTheme.popup.regular
 
     val onAction: js.Function0[Unit] = { () =>
       if (zipName.nonEmpty) {

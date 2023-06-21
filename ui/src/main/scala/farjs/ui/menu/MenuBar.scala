@@ -25,7 +25,7 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
   protected def render(compProps: Props): ReactElement = {
     val (maybeSubMenu, setSubMenu) = useState[Option[(Int, Int)]](None)
     val props = compProps.wrapped
-    val theme = Theme.current.popup.menu
+    val theme = Theme.useTheme.popup.menu
     val marginLeft = 2
     val padding = 2
     val width = props.items.foldLeft(0) { (res, item) =>

@@ -40,6 +40,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
     val (showStats, setShowStats) = useState(false)
     val (showMove, setShowMove) = useState(false)
     val copied = useRef(Set.empty[String])
+    val currTheme = Theme.useTheme
 
     val props = compProps.plain
     
@@ -150,7 +151,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
           title = "Error",
           message = error,
           actions = js.Array(MessageBoxAction.OK(props.onClose)),
-          style = Theme.current.popup.error
+          style = currTheme.popup.error
         ))()
       }
       else if (showStats) Some {

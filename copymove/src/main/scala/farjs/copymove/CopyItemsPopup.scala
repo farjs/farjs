@@ -35,7 +35,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
     val size@(width, _) = (75, 8)
     val contentWidth = width - (paddingHorizontal + 2) * 2
     val contentLeft = 2
-    val theme = Theme.current.popup.regular
+    val theme = Theme.useTheme.popup.regular
     
     val count = props.items.size
     val itemsText =

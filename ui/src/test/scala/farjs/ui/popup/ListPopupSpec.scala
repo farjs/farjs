@@ -2,6 +2,7 @@ package farjs.ui.popup
 
 import farjs.ui.popup.ListPopup._
 import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import farjs.ui.{ListBoxProps, WithSizeProps}
 import scommons.react.test._
 
@@ -16,7 +17,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onAction = mockFunction[Int, Unit]
     val props = getListPopupProps(items = Nil, onAction = onAction)
-    val result = createTestRenderer(<(ListPopup())(^.wrapped := props)()).root
+    val result = createTestRenderer(withThemeContext(<(ListPopup())(^.wrapped := props)())).root
     val renderContent = findComponentProps(result, withSizeComp, plain = true).render(60, 20)
     val resultContent = createTestRenderer(renderContent).root
 
@@ -31,7 +32,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onAction = mockFunction[Int, Unit]
     val props = getListPopupProps(onAction = onAction)
-    val result = createTestRenderer(<(ListPopup())(^.wrapped := props)()).root
+    val result = createTestRenderer(withThemeContext(<(ListPopup())(^.wrapped := props)())).root
     val renderContent = findComponentProps(result, withSizeComp, plain = true).render(60, 20)
     val resultContent = createTestRenderer(renderContent).root
 
@@ -47,7 +48,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
     val props = getListPopupProps(items = Nil)
     
     //when
-    val result = createTestRenderer(<(ListPopup())(^.wrapped := props)()).root
+    val result = createTestRenderer(withThemeContext(<(ListPopup())(^.wrapped := props)())).root
 
     //then
     assertListPopup(result, props, Nil, (60, 20), (56, 14))
@@ -58,7 +59,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
     val props = getListPopupProps(items = List.fill(20)("item"))
     
     //when
-    val result = createTestRenderer(<(ListPopup())(^.wrapped := props)()).root
+    val result = createTestRenderer(withThemeContext(<(ListPopup())(^.wrapped := props)())).root
 
     //then
     assertListPopup(result, props, List.fill(20)("  item "), (55, 13), (56, 14))
@@ -72,7 +73,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
     }
     
     //when
-    val result = createTestRenderer(<(ListPopup())(^.wrapped := props)()).root
+    val result = createTestRenderer(withThemeContext(<(ListPopup())(^.wrapped := props)())).root
 
     //then
     assertListPopup(result, props, List.fill(20)("  item "), (60, 20), (56, 16))
@@ -85,7 +86,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
     ))
     
     //when
-    val result = createTestRenderer(<(ListPopup())(^.wrapped := props)()).root
+    val result = createTestRenderer(withThemeContext(<(ListPopup())(^.wrapped := props)())).root
 
     //then
     assertListPopup(result, props, List.fill(20)(

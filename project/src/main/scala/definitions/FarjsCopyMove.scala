@@ -17,6 +17,7 @@ object FarjsCopyMove extends ScalaJsModule {
   }
 
   override def internalDependencies: Seq[ClasspathDep[ProjectReference]] = Seq(
+    FarjsUi.definition % "compile->compile;test->test",
     FarjsFileList.definition % "compile->compile;test->test"
   )
 }

@@ -16,7 +16,7 @@ object SortIndicator extends FunctionComponent[SortIndicatorProps] {
     val stackProps = PanelStack.usePanelStack
     val props = compProps.wrapped
     val text = s"${getIndicator(props.mode, props.ascending)} "
-    val theme = Theme.current.fileList
+    val theme = Theme.useTheme.fileList
 
     <.text(
       ^.rbWidth := text.length,

@@ -5,7 +5,8 @@ import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.FileListItem
 import farjs.ui.popup.{MessageBoxProps, StatusPopupProps}
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.Succeeded
 import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec
@@ -45,7 +46,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", onTopItem, onDone)
     val p = Promise[Unit]()
     fs.rename.expects(path.join(props.fromPath, "dir 1"), path.join(props.toPath, "newName1")).returning(p.future)
-    val renderer = createTestRenderer(<(MoveProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
 
     eventually {
       assertTestComponent(renderer.root.children(0), statusPopupComp) {
@@ -91,7 +92,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", onTopItem, onDone)
     val p = Promise[Unit]()
     fs.rename.expects(path.join(props.fromPath, "dir 1"), path.join(props.toPath, "dir 1")).returning(p.future)
-    createTestRenderer(<(MoveProcess())(^.wrapped := props)())
+    createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
 
     //then
     onDone.expects()
@@ -128,7 +129,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", onTopItem, onDone)
     val p = Promise[Unit]()
     fs.rename.expects(path.join(props.fromPath, "dir 1"), path.join(props.toPath, "dir 1")).returning(p.future)
-    val renderer = createTestRenderer(<(MoveProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
 
     eventually {
       assertTestComponent(renderer.root.children(0), statusPopupComp) {
@@ -172,7 +173,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", onTopItem, onDone)
     val newPath = path.join(props.toPath, "file 1")
     fs.existsSync.expects(newPath).returning(true)
-    val renderer = createTestRenderer(<(MoveProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
 
     eventually {
       inside(renderer.root.children.toList) { case List(_, existsMessage) =>
@@ -188,7 +189,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
               cancel.label shouldBe "Cancel"
               cancel.triggeredOnClose shouldBe true
             }
-            style shouldBe Theme.current.popup.error
+            style shouldBe DefaultTheme.popup.error
         }
       }
     }.flatMap { _ =>
@@ -225,7 +226,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", onTopItem, onDone)
     val newPath1 = path.join(props.toPath, "file 1")
     fs.existsSync.expects(newPath1).returning(true)
-    val renderer = createTestRenderer(<(MoveProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
 
     eventually {
       inside(renderer.root.children.toList) { case List(_, existsMessage) =>
@@ -292,7 +293,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", onTopItem, onDone)
     val newPath1 = path.join(props.toPath, "file 1")
     fs.existsSync.expects(newPath1).returning(true)
-    val renderer = createTestRenderer(<(MoveProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
 
     eventually {
       inside(renderer.root.children.toList) { case List(_, existsMessage) =>
@@ -343,7 +344,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", onTopItem, onDone)
     val newPath1 = path.join(props.toPath, "file 1")
     fs.existsSync.expects(newPath1).returning(true)
-    val renderer = createTestRenderer(<(MoveProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
 
     eventually {
       inside(renderer.root.children.toList) { case List(_, existsMessage) =>
@@ -404,7 +405,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", onTopItem, onDone)
     val newPath1 = path.join(props.toPath, "file 1")
     fs.existsSync.expects(newPath1).returning(true)
-    val renderer = createTestRenderer(<(MoveProcess())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
 
     eventually {
       inside(renderer.root.children.toList) { case List(_, existsMessage) =>

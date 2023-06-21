@@ -18,7 +18,7 @@ object ViewerHeader extends FunctionComponent[ViewerHeaderProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val style = Theme.current.menu.item
+    val style = Theme.useTheme.menu.item
     val encodingWidth = math.max(props.encoding.length, 10)
     val sizeText = f"${props.size}%,.0f"
     val sizeWidth = math.max(sizeText.length, 12)

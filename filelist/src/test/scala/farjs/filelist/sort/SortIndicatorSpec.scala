@@ -3,7 +3,8 @@ package farjs.filelist.sort
 import farjs.filelist.sort.SortIndicator._
 import farjs.filelist.stack.PanelStack
 import farjs.filelist.stack.PanelStackSpec.withContext
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import scommons.nodejs._
 import scommons.react.blessed._
 import scommons.react.test._
@@ -29,7 +30,7 @@ class SortIndicatorSpec extends TestSpec with TestRendererUtils {
     val stack = new PanelStack(isActive = true, Nil, null)
     val props = SortIndicatorProps(SortMode.Name, ascending = true)
     val textElem = testRender(withContext(
-      <(SortIndicator())(^.wrapped := props)(), stack = stack, isRight = isRight
+      withThemeContext(<(SortIndicator())(^.wrapped := props)()), stack = stack, isRight = isRight
     ))
 
     //then
@@ -59,7 +60,7 @@ class SortIndicatorSpec extends TestSpec with TestRendererUtils {
     val stack = new PanelStack(isActive = false, Nil, null)
     val props = SortIndicatorProps(SortMode.Name, ascending = true)
     val textElem = testRender(withContext(
-      <(SortIndicator())(^.wrapped := props)(), stack = stack, isRight = isRight
+      withThemeContext(<(SortIndicator())(^.wrapped := props)()), stack = stack, isRight = isRight
     ))
 
     //then
@@ -79,10 +80,11 @@ class SortIndicatorSpec extends TestSpec with TestRendererUtils {
 
     //when
     val result = testRender(withContext(
-      <(SortIndicator())(^.wrapped := props)(), stack = stack
+      withThemeContext(<(SortIndicator())(^.wrapped := props)()), stack = stack
     ))
 
     //then
+    val currTheme = DefaultTheme
     assertNativeComponent(result,
       <.text(
         ^.rbWidth := 2,
@@ -92,7 +94,7 @@ class SortIndicatorSpec extends TestSpec with TestRendererUtils {
         ^.rbAutoFocus := false,
         ^.rbClickable := true,
         ^.rbMouse := true,
-        ^.rbStyle := Theme.current.fileList.header,
+        ^.rbStyle := currTheme.fileList.header,
         ^.content := "n "
       )()
     )

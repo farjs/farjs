@@ -6,7 +6,8 @@ import farjs.filelist.sort.SortIndicatorProps
 import farjs.filelist.stack.{PanelStack, PanelStackProps}
 import farjs.ui._
 import farjs.ui.border._
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
@@ -30,7 +31,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListPanelViewProps(dispatch, actions, FileListState())
 
     //when
-    val result = testRender(withContext(<(FileListPanelView())(^.wrapped := props)()))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
 
     //then
     assertFileListPanelView(result, props, FileListState())
@@ -48,7 +49,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
-    val result = testRender(withContext(<(FileListPanelView())(^.wrapped := props)()))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
 
     //then
     assertFileListPanelView(result, props, state, "file", "3", showDate = true,
@@ -67,7 +68,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
-    val result = testRender(withContext(<(FileListPanelView())(^.wrapped := props)()))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
 
     //then
     assertFileListPanelView(result, props, state, "file", "3", showDate = true,
@@ -86,7 +87,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
-    val result = testRender(withContext(<(FileListPanelView())(^.wrapped := props)()))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
 
     //then
     assertFileListPanelView(result, props, state, "file 2", "2", permissions = "drwxr-xr-x", showDate = true, dirSize = "6 (3)")
@@ -104,7 +105,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
-    val result = testRender(withContext(<(FileListPanelView())(^.wrapped := props)()))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
 
     //then
     assertFileListPanelView(result, props, state, "dir 2", "999,999,999", permissions = "drwxr-xr-x", showDate = true, dirSize = "4 (2)")
@@ -122,7 +123,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
-    val result = testRender(withContext(<(FileListPanelView())(^.wrapped := props)()))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
 
     //then
     assertFileListPanelView(result, props, state, "file 2", "~1 G", permissions = "drwxr-xr-x", showDate = true, dirSize = "1,123,456,793 (3)")
@@ -140,7 +141,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
-    val result = testRender(withContext(<(FileListPanelView())(^.wrapped := props)()))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
 
     //then
     assertFileListPanelView(result, props, state, "dir", "1", permissions = "dr--r--r--", showDate = true, dirSize = "2 (1)")
@@ -158,7 +159,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
-    val result = testRender(withContext(<(FileListPanelView())(^.wrapped := props)()))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
 
     //then
     assertFileListPanelView(result, props, state, "..", dirSize = "2 (1)")
@@ -187,7 +188,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
                                       dirSize: String = "0 (0)",
                                       diskSpace: Option[Double] = None): Unit = {
     
-    val theme = Theme.current.fileList
+    val theme = DefaultTheme.fileList
     
     assertNativeComponent(result, <.box(^.rbStyle := theme.regularItem)(
       <(doubleBorderComp())(^.assertPlain[DoubleBorderProps](inside(_) {

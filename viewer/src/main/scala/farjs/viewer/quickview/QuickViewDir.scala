@@ -35,7 +35,7 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
     val props = compProps.wrapped
     val stack = props.stack
     val params = stack.params[QuickViewParams]
-    val theme = Theme.current.fileList
+    val theme = Theme.useTheme.fileList
 
     def scanDir(): Unit = {
       val parent = props.state.currDir.path

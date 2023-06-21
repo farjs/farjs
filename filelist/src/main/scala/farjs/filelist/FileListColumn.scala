@@ -26,7 +26,7 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val (width, height) = props.size
-    val theme = Theme.current.fileList
+    val theme = Theme.useTheme.fileList
     
     val borderEnd = UI.renderText2(theme.regularItem, props.borderCh)
     val overlapEnd = UI.renderText2(theme.regularItem, "}")

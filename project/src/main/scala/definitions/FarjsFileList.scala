@@ -9,6 +9,6 @@ object FarjsFileList extends ScalaJsModule {
   override val base: File = file("filelist")
 
   override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Seq(
-    FarjsUi.definition
+    FarjsUi.definition % "compile->compile;test->test"
   )
 }

@@ -28,6 +28,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
   private[viewer] var viewerContent: UiComponent[ViewerContentProps] = ViewerContent
   
   protected def render(compProps: Props): ReactElement = {
+    val theme = Theme.useTheme
     val services = FileServices.useServices
     val props = compProps.wrapped
     val viewportRef = useRef(props.viewport)
@@ -72,7 +73,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
 
     <(withSizeComp())(^.plain := WithSizeProps { (width, height) =>
       <.box(
-        ^.rbStyle := contentStyle
+        ^.rbStyle := contentStyle(theme)
       )(
         props.viewport.map { viewport =>
           val linesCount = viewport.linesData.size
@@ -91,7 +92,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
             if (viewport.column > 0 && linesCount > 0) Some {
               <.text(
                 ^.key := "leftScrollIndicators",
-                ^.rbStyle := scrollStyle,
+                ^.rbStyle := scrollStyle(theme),
                 ^.rbWidth := 1,
                 ^.rbHeight := linesCount,
                 ^.content := "<" * linesCount
@@ -102,7 +103,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
             viewport.scrollIndicators.map { lineIdx =>
               <.text(
                 ^.key := s"$lineIdx",
-                ^.rbStyle := scrollStyle,
+                ^.rbStyle := scrollStyle(theme),
                 ^.rbLeft := width - 1,
                 ^.rbTop := lineIdx,
                 ^.rbWidth := 1,
@@ -116,16 +117,16 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
     })()
   }
 
-  private[viewer] lazy val contentStyle: BlessedStyle = {
-    val style = Theme.current.fileList.regularItem
+  private[viewer] def contentStyle(theme: Theme): BlessedStyle = {
+    val style = theme.fileList.regularItem
     new BlessedStyle {
       override val bold = style.bold
       override val bg = style.bg
       override val fg = style.fg
     }
   }
-  private[viewer] lazy val scrollStyle: BlessedStyle = {
-    val style = Theme.current.fileList.header
+  private[viewer] def scrollStyle(theme: Theme): BlessedStyle = {
+    val style = theme.fileList.header
     new BlessedStyle {
       override val bold = style.bold
       override val bg = style.bg

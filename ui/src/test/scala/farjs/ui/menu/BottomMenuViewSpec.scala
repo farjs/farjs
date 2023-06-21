@@ -1,6 +1,7 @@
 package farjs.ui.menu
 
-import farjs.ui.theme.{Theme, XTerm256Theme}
+import farjs.ui.theme.ThemeSpec.withThemeContext
+import farjs.ui.theme.XTerm256Theme
 import scommons.nodejs._
 import scommons.react.blessed._
 import scommons.react.test._
@@ -23,7 +24,7 @@ class BottomMenuViewSpec extends TestSpec with TestRendererUtils {
     process.stdin.on("keypress", listener)
     
     val props = BottomMenuViewProps(width = 80, items = List.fill(12)("item"))
-    val clickables = createTestRenderer(<(BottomMenuView())(^.wrapped := props)())
+    val clickables = createTestRenderer(withThemeContext(<(BottomMenuView())(^.wrapped := props)()))
       .root.children.head.children
 
     //then
@@ -64,9 +65,9 @@ class BottomMenuViewSpec extends TestSpec with TestRendererUtils {
     //given
     val items = List.fill(12)("item")
     val props = BottomMenuViewProps(width = 98, items = items)
-    val renderer = createTestRenderer(<(BottomMenuView())(^.wrapped := props)(
+    val renderer = createTestRenderer(withThemeContext(<(BottomMenuView())(^.wrapped := props)(
       <.text(^.content := "initial")()
-    ))
+    )))
     val testEl = renderer.root.children.head.children(12)
     testEl.`type` shouldBe "text"
     testEl.props.content shouldBe "initial"
@@ -75,9 +76,9 @@ class BottomMenuViewSpec extends TestSpec with TestRendererUtils {
     props2 should not be theSameInstanceAs(props)
 
     //when
-    renderer.update(<(BottomMenuView())(^.wrapped := props2)(
+    renderer.update(withThemeContext(<(BottomMenuView())(^.wrapped := props2)(
       <.text(^.content := "update")()
-    ))
+    )))
 
     //then
     val sameEl = renderer.root.children.head.children(12)
@@ -88,17 +89,17 @@ class BottomMenuViewSpec extends TestSpec with TestRendererUtils {
   it should "re-render component if different props" in {
     //given
     val props = BottomMenuViewProps(width = 98, items = List.fill(12)("item"))
-    val renderer = createTestRenderer(<(BottomMenuView())(^.wrapped := props)(
+    val renderer = createTestRenderer(withThemeContext(<(BottomMenuView())(^.wrapped := props)(
       <.text(^.content := "initial")()
-    ))
+    )))
     val testEl = renderer.root.children.head.children(12)
     testEl.`type` shouldBe "text"
     testEl.props.content shouldBe "initial"
 
     //when
-    renderer.update(<(BottomMenuView())(^.wrapped := props.copy(width = 95))(
+    renderer.update(withThemeContext(<(BottomMenuView())(^.wrapped := props.copy(width = 95))(
       <.text(^.content := "update")()
-    ))
+    )))
 
     //then
     val updatedEl = renderer.root.children.head.children(12)
@@ -108,13 +109,12 @@ class BottomMenuViewSpec extends TestSpec with TestRendererUtils {
   
   it should "render component" in {
     //given
-    val savedTheme = Theme.current
-    Theme.current = XTerm256Theme
-    val theme = Theme.current.menu
+    val currTheme = XTerm256Theme
+    val theme = currTheme.menu
     val props = BottomMenuViewProps(width = 98, items = List.fill(12)("item").updated(5, "longitem"))
 
     //when
-    val result = testRender(<(BottomMenuView())(^.wrapped := props)())
+    val result = testRender(withThemeContext(<(BottomMenuView())(^.wrapped := props)(), currTheme))
 
     //then
     val itemsWithPos = List(
@@ -151,8 +151,5 @@ class BottomMenuViewSpec extends TestSpec with TestRendererUtils {
           )()
         )
     }
-
-    //cleanup
-    Theme.current = savedTheme
   }
 }

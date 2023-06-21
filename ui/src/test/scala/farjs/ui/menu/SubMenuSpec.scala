@@ -2,7 +2,8 @@ package farjs.ui.menu
 
 import farjs.ui.border._
 import farjs.ui.menu.SubMenu._
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -23,7 +24,7 @@ class SubMenuSpec extends TestSpec with TestRendererUtils {
       left = 2,
       onClick = onClick
     )
-    val comp = testRender(<(SubMenu())(^.wrapped := props)())
+    val comp = testRender(withThemeContext(<(SubMenu())(^.wrapped := props)()))
     val textEl = inside(findComponents(comp, <.text.name)) {
       case List(_, text) => text
     }
@@ -46,7 +47,7 @@ class SubMenuSpec extends TestSpec with TestRendererUtils {
     )
     
     //when
-    val result = testRender(<(SubMenu())(^.wrapped := props)())
+    val result = testRender(withThemeContext(<(SubMenu())(^.wrapped := props)()))
     
     //then
     assertSubMenuPopup(result, props)
@@ -56,7 +57,7 @@ class SubMenuSpec extends TestSpec with TestRendererUtils {
     val textWidth = props.items.maxBy(_.length).length
     val width = 2 + textWidth
     val height = 2 + props.items.size
-    val theme = Theme.current.popup.menu
+    val theme = DefaultTheme.popup.menu
 
     assertNativeComponent(result,
       <.box(

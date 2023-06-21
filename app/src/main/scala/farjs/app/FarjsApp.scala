@@ -4,7 +4,7 @@ import farjs.app.filelist.{FileListModule, FileListRoot}
 import farjs.app.raw.BetterSqlite3WebSQL
 import farjs.domain.FarjsDBContext
 import farjs.fs.FSFileListActions
-import farjs.ui.theme.{DefaultTheme, Theme, XTerm256Theme}
+import farjs.ui.theme.{DefaultTheme, XTerm256Theme}
 import farjs.ui.tool.DevTool
 import scommons.nodejs.{process, global => nodeGlobal}
 import scommons.react._
@@ -57,10 +57,6 @@ object FarjsApp {
         }
       })
       screen
-    }
-
-    if (screen.terminal == TerminalName.`xterm-256color`) {
-      Theme.current = XTerm256Theme
     }
 
     val root = new FarjsRoot(

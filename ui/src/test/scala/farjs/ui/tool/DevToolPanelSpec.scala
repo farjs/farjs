@@ -1,7 +1,8 @@
 package farjs.ui.tool
 
 import farjs.ui.UI
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import farjs.ui.tool.DevToolPanel._
 import org.scalatest.{Assertion, Succeeded}
 import scommons.react.ReactClass
@@ -18,7 +19,7 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
     //given
     val onActivate = mockFunction[DevTool, Unit]
     val props = DevToolPanelProps(DevTool.Colors, "test logs", onActivate)
-    val comp = createTestRenderer(<(DevToolPanel())(^.plain := props)()).root
+    val comp = createTestRenderer(withThemeContext(<(DevToolPanel())(^.plain := props)())).root
     val tab1 = inside(findComponents(comp, <.text.name)) {
       case List(t1, _, _) => t1
     }
@@ -35,7 +36,7 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
     val props = DevToolPanelProps(DevTool.Logs, "test logs", _ => ())
 
     //when
-    val result = createTestRenderer(<(DevToolPanel())(^.plain := props)()).root
+    val result = createTestRenderer(withThemeContext(<(DevToolPanel())(^.plain := props)())).root
 
     //then
     assertDevToolPanel(
@@ -51,7 +52,7 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
     val props = DevToolPanelProps(DevTool.Inputs, "test logs", _ => ())
 
     //when
-    val result = createTestRenderer(<(DevToolPanel())(^.plain := props)()).root
+    val result = createTestRenderer(withThemeContext(<(DevToolPanel())(^.plain := props)())).root
 
     //then
     assertDevToolPanel(
@@ -67,7 +68,7 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
     val props = DevToolPanelProps(DevTool.Colors, "test logs", _ => ())
 
     //when
-    val result = createTestRenderer(<(DevToolPanel())(^.plain := props)()).root
+    val result = createTestRenderer(withThemeContext(<(DevToolPanel())(^.plain := props)())).root
 
     //then
     assertDevToolPanel(
@@ -83,7 +84,7 @@ class DevToolPanelSpec extends TestSpec with TestRendererUtils {
                                  expectedTabs: List[(String, Int)],
                                  activeTab: String): Assertion = {
 
-    val theme = Theme.current.popup.menu
+    val theme = DefaultTheme.popup.menu
     
     val (header, compWrap) = inside(result.children.toList) {
       case List(header, compWrap) => (header, compWrap)

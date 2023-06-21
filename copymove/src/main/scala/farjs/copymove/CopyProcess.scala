@@ -51,6 +51,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
     val cancelPromise = useRef(Promise.successful(()))
     val existsPromise = useRef(Promise.successful[Option[Boolean]](None))
     val data = useRef(CopyInfo())
+    val currTheme = Theme.useTheme
     val props = compProps.wrapped
     
     def doCopy(): Unit = {
@@ -224,7 +225,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
               cancelPromise.current.trySuccess(())
             }
           ),
-          style = Theme.current.popup.error
+          style = currTheme.popup.error
         ))()
       }
       else None

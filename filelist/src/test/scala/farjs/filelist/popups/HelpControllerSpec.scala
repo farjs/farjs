@@ -3,7 +3,8 @@ package farjs.filelist.popups
 import farjs.filelist.FileListUiData
 import farjs.filelist.popups.HelpController._
 import farjs.ui.popup._
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import scommons.react.test._
 
 class HelpControllerSpec extends TestSpec with TestRendererUtils {
@@ -14,7 +15,7 @@ class HelpControllerSpec extends TestSpec with TestRendererUtils {
     //given
     val onClose = mockFunction[Unit]
     val props = FileListUiData(showHelpPopup = true, onClose = onClose)
-    val comp = testRender(<(HelpController())(^.wrapped := props)())
+    val comp = testRender(withThemeContext(<(HelpController())(^.wrapped := props)()))
     val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
 
     //then
@@ -29,9 +30,10 @@ class HelpControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListUiData(showHelpPopup = true)
 
     //when
-    val result = testRender(<(HelpController())(^.wrapped := props)())
+    val result = testRender(withThemeContext(<(HelpController())(^.wrapped := props)()))
 
     //then
+    val currTheme = DefaultTheme
     assertTestComponent(result, messageBoxComp, plain = true) {
       case MessageBoxProps(title, message, resActions, style) =>
         title shouldBe "Help"
@@ -39,7 +41,7 @@ class HelpControllerSpec extends TestSpec with TestRendererUtils {
         inside(resActions.toList) {
           case List(MessageBoxAction("OK", _, true)) =>
         }
-        style shouldBe Theme.current.popup.regular
+        style shouldBe currTheme.popup.regular
     }
   }
 
@@ -48,7 +50,7 @@ class HelpControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListUiData()
 
     //when
-    val renderer = createTestRenderer(<(HelpController())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(HelpController())(^.wrapped := props)()))
 
     //then
     renderer.root.children.toList should be (empty)

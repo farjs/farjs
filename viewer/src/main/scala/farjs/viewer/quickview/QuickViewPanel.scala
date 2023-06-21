@@ -24,7 +24,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
     val width = panelStack.width
     val height = panelStack.height
     
-    val theme = Theme.current.fileList
+    val theme = Theme.useTheme.fileList
     val stack =
       if (!panelStack.isRight) stacks.rightStack
       else stacks.leftStack

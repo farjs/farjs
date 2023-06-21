@@ -30,7 +30,7 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val items = props.items
-    val theme = Theme.current.popup.menu
+    val theme = Theme.useTheme.popup.menu
     val textPadding = props.textPaddingLeft + props.textPaddingRight
     val textPaddingLeftStr = " " * props.textPaddingLeft
     val textPaddingRightStr = " " * props.textPaddingRight

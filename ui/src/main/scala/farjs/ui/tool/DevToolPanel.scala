@@ -13,7 +13,7 @@ object DevToolPanel extends FunctionComponent[DevToolPanelProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
-    val theme = Theme.current.popup.menu
+    val theme = Theme.useTheme.popup.menu
 
     val comp = props.devTool match {
       case DevTool.Hidden => null

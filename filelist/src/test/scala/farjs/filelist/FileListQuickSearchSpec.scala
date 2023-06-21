@@ -3,7 +3,8 @@ package farjs.filelist
 import farjs.filelist.FileListQuickSearch._
 import farjs.ui.border.DoubleBorderProps
 import farjs.ui.popup.PopupOverlay
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -32,7 +33,7 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
     textMock.atop = 3
     omoveMock.expects(5, 3)
     
-    val comp = testRender(<(FileListQuickSearch())(^.wrapped := props)(), { el =>
+    val comp = testRender(withThemeContext(<(FileListQuickSearch())(^.wrapped := props)()), { el =>
       if (el.`type` == "text".asInstanceOf[js.Any]) textMock
       else null
     })
@@ -61,7 +62,7 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
     textMock.atop = 3
     omoveMock.expects(5, 3)
     
-    val renderer = createTestRenderer(<(FileListQuickSearch())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(withThemeContext(<(FileListQuickSearch())(^.wrapped := props)()), { el =>
       if (el.`type` == "text".asInstanceOf[js.Any]) textMock
       else null
     })
@@ -95,7 +96,7 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
     textMock.atop = 3
     omoveMock.expects(5, 3)
     
-    val renderer = createTestRenderer(<(FileListQuickSearch())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(withThemeContext(<(FileListQuickSearch())(^.wrapped := props)()), { el =>
       if (el.`type` == "text".asInstanceOf[js.Any]) textMock
       else null
     })
@@ -107,7 +108,7 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
     
     //when
     TestRenderer.act { () =>
-      renderer.update(<(FileListQuickSearch())(^.wrapped := props.copy(text = "text2"))())
+      renderer.update(withThemeContext(<(FileListQuickSearch())(^.wrapped := props.copy(text = "text2"))()))
     }
   }
   
@@ -128,7 +129,7 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
     textMock.atop = 3
     omoveMock.expects(5, 3)
     
-    val renderer = createTestRenderer(<(FileListQuickSearch())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(withThemeContext(<(FileListQuickSearch())(^.wrapped := props)()), { el =>
       if (el.`type` == "text".asInstanceOf[js.Any]) textMock
       else null
     })
@@ -162,7 +163,7 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
     omoveMock.expects(23, 3)
 
     //when
-    val result = testRender(<(FileListQuickSearch())(^.wrapped := props)(), { el =>
+    val result = testRender(withThemeContext(<(FileListQuickSearch())(^.wrapped := props)()), { el =>
       if (el.`type` == "text".asInstanceOf[js.Any]) textMock
       else null
     })
@@ -175,8 +176,9 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
                                         props: FileListQuickSearchProps): Unit = {
     val width = 25
     val height = 3
-    val boxStyle = Theme.current.popup.regular
-    val textStyle = Theme.current.textBox.regular
+    val currTheme = DefaultTheme
+    val boxStyle = currTheme.popup.regular
+    val textStyle = currTheme.textBox.regular
     val textWidth = width - 2
     
     assertNativeComponent(result, <.form(

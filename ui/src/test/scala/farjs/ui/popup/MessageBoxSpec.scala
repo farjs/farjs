@@ -3,7 +3,7 @@ package farjs.ui.popup
 import farjs.ui._
 import farjs.ui.popup.MessageBox._
 import farjs.ui.popup.ModalContent._
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
 import org.scalatest.{Assertion, Succeeded}
 import scommons.react.ReactClass
 import scommons.react.test._
@@ -22,7 +22,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     val onAction = mockFunction[Unit]
     val props = MessageBoxProps("test title", "test message", js.Array(
       MessageBoxAction.OK(onAction)
-    ), Theme.current.popup.regular)
+    ), DefaultTheme.popup.regular)
     val comp = testRender(<(MessageBox())(^.plain := props)())
     val popup = findComponentProps(comp, popupComp)
 
@@ -38,7 +38,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     val onAction = mockFunction[Unit]
     val props = MessageBoxProps("test title", "test message", js.Array(
       MessageBoxAction.OK(onAction)
-    ), Theme.current.popup.regular)
+    ), DefaultTheme.popup.regular)
     val comp = testRender(<(MessageBox())(^.plain := props)())
     val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
@@ -58,7 +58,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       title = "test title",
       message = "Toooooooooooooooooooooooooooooo looooooooooooooooooooooooong test message",
       actions = js.Array(MessageBoxAction.OK(() => ())),
-      style = Theme.current.popup.regular
+      style = DefaultTheme.popup.regular
     )
 
     //when
@@ -75,7 +75,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     val props = MessageBoxProps("test title", "test message", js.Array(
       MessageBoxAction.YES(onYesAction),
       MessageBoxAction.NO(onNoAction)
-    ), Theme.current.popup.regular)
+    ), DefaultTheme.popup.regular)
     val comp = testRender(<(MessageBox())(^.plain := props)())
     val popup = findComponentProps(comp, popupComp)
 
@@ -96,7 +96,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     val props = MessageBoxProps("test title", "test message", js.Array(
       MessageBoxAction.YES(onYesAction),
       MessageBoxAction.NO(onNoAction)
-    ), Theme.current.popup.regular)
+    ), DefaultTheme.popup.regular)
     val comp = testRender(<(MessageBox())(^.plain := props)())
     val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
@@ -118,7 +118,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     val props = MessageBoxProps("test title", "test message", js.Array(
       MessageBoxAction.YES(onYesAction),
       MessageBoxAction.NO(onNoAction)
-    ), Theme.current.popup.regular)
+    ), DefaultTheme.popup.regular)
     val comp = testRender(<(MessageBox())(^.plain := props)())
     val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
@@ -138,7 +138,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     val props = MessageBoxProps("test title", "test message", js.Array(
       MessageBoxAction.YES(() => ()),
       MessageBoxAction.NO(() => ())
-    ), Theme.current.popup.regular)
+    ), DefaultTheme.popup.regular)
 
     //when
     val result = testRender(<(MessageBox())(^.plain := props)())
@@ -154,7 +154,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     val props = MessageBoxProps("test title", "test message", js.Array(
       MessageBoxAction.YES(onYesAction),
       MessageBoxAction.NO_NON_CLOSABLE(onNoAction)
-    ), Theme.current.popup.regular)
+    ), DefaultTheme.popup.regular)
     val comp = testRender(<(MessageBox())(^.plain := props)())
     val popup = findComponentProps(comp, popupComp)
 
@@ -173,7 +173,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
     val props = MessageBoxProps("test title", "test message", js.Array(
       MessageBoxAction.YES(() => ()),
       MessageBoxAction.NO_NON_CLOSABLE(() => ())
-    ), Theme.current.popup.regular)
+    ), DefaultTheme.popup.regular)
 
     //when
     val result = testRender(<(MessageBox())(^.plain := props)())

@@ -10,7 +10,8 @@ import farjs.filelist.stack._
 import farjs.ui.Dispatch
 import farjs.ui.popup.{MessageBoxAction, MessageBoxProps}
 import farjs.ui.task.FutureTask
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
@@ -557,7 +558,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
             //then
             findProps(renderer.root, messageBoxComp, plain = true) should be (empty)
         }
-        style shouldBe Theme.current.popup.regular
+        style shouldBe DefaultTheme.popup.regular
     }
   }
 
@@ -703,7 +704,7 @@ object ZipPanelSpec {
       rightStack = rightStack,
       rightInput = null
     ))(
-      element
+      withThemeContext(element)
     )
   }
 }

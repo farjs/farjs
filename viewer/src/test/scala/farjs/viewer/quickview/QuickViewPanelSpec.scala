@@ -4,7 +4,8 @@ import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack._
 import farjs.ui.border._
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import farjs.ui.{Dispatch, TextAlign, TextLineProps}
 import farjs.viewer.quickview.QuickViewPanel._
 import org.scalatest.Assertion
@@ -59,7 +60,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
 
     //when
     val result = testRender(
-      withContext(isRight = false, leftPanelStack, rightPanelStack, <(QuickViewPanel())()())
+      withContext(isRight = false, leftPanelStack, rightPanelStack, withThemeContext(<(QuickViewPanel())()()))
     )
 
     //then
@@ -100,7 +101,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
 
     //when
     val result = testRender(
-      withContext(isRight = true, leftPanelStack, rightPanelStack, <(QuickViewPanel())()())
+      withContext(isRight = true, leftPanelStack, rightPanelStack, withThemeContext(<(QuickViewPanel())()()))
     )
 
     //then
@@ -132,7 +133,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
                                       panelStack: PanelStackProps,
                                       currItem: FileListItem): Assertion = {
 
-    val theme = Theme.current.fileList
+    val theme = DefaultTheme.fileList
 
     def assertComponents(border: TestInstance,
                          line: TestInstance,

@@ -4,7 +4,8 @@ import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack.{PanelStack, PanelStackItem}
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import farjs.ui.{TextAlign, TextLineProps}
 import farjs.viewer.quickview.QuickViewDir._
 import org.scalatest.Assertion
@@ -58,7 +59,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       ))
       p.future
     }
-    val renderer = createTestRenderer(<(QuickViewDir())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)()))
     
     eventually {
       val popup = findComponentProps(renderer.root, statusPopupComp)
@@ -100,7 +101,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       ))
       p.future
     }
-    val renderer = createTestRenderer(<(QuickViewDir())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)()))
     
     eventually {
       val popup = findComponentProps(renderer.root, statusPopupComp)
@@ -139,7 +140,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       onNextDirFn = onNextDir
       p.future
     }
-    val renderer = createTestRenderer(<(QuickViewDir())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)()))
     val popup = findComponentProps(renderer.root, statusPopupComp)
 
     eventually {
@@ -183,7 +184,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val p = Promise[Boolean]()
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).returning(p.future)
 
-    val renderer = createTestRenderer(<(QuickViewDir())(^.wrapped := props)())
+    val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)()))
     findProps(renderer.root, statusPopupComp) should not be empty
 
     //then
@@ -224,7 +225,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
 
     //when
-    val result = createTestRenderer(<(QuickViewDir())(^.wrapped := props)()).root
+    val result = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)())).root
 
     //then
     assertQuickViewDir(result.children, props, params)
@@ -234,7 +235,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
                                  props: QuickViewDirProps,
                                  params: QuickViewParams): Assertion = {
     
-    val theme = Theme.current.fileList
+    val theme = DefaultTheme.fileList
 
     assertComponents(children, List(
       <.text(

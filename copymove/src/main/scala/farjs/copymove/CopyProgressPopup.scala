@@ -31,7 +31,7 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
     val size@(width, _) = (50, 13)
     val contentWidth = width - (paddingHorizontal + 2) * 2
     val contentLeft = 2
-    val theme = Theme.current.popup.regular
+    val theme = Theme.useTheme.popup.regular
     
     <(modalComp())(^.wrapped := ModalProps(if (props.move) "Move" else "Copy", size, theme, props.onCancel))(
       <.text(

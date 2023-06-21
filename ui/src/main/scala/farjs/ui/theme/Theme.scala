@@ -8,7 +8,6 @@ import scala.scalajs.js
 
 object Theme {
 
-  var current: Theme = DefaultTheme
   val Context: ReactContext[Theme] = ReactContext[Theme](defaultValue = null)
 
   def useTheme: Theme = {

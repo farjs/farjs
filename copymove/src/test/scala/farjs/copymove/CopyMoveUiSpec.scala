@@ -10,7 +10,8 @@ import farjs.filelist.history.{FileListHistoryService, MockFileListHistoryServic
 import farjs.ui.Dispatch
 import farjs.ui.popup.MessageBoxProps
 import farjs.ui.task.FutureTask
-import farjs.ui.theme.Theme
+import farjs.ui.theme.DefaultTheme
+import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.Succeeded
 import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec
@@ -26,6 +27,8 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
   CopyMoveUi.copyProcessComp = mockUiComponent("CopyProcess")
   CopyMoveUi.messageBoxComp = mockUiComponent("MessageBox")
   CopyMoveUi.moveProcessComp = mockUiComponent("MoveProcess")
+
+  private val currTheme = DefaultTheme
   
   //noinspection TypeAnnotation
   class Actions(isLocalFS: Boolean = true) {
@@ -228,7 +231,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
           inside(resActions.toList) { case List(ok) =>
             ok.label shouldBe "OK"
           }
-          style shouldBe Theme.current.popup.error
+          style shouldBe currTheme.popup.error
       }
     }.map { _ =>
       //then
@@ -283,7 +286,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
           inside(resActions.toList) { case List(ok) =>
             ok.label shouldBe "OK"
           }
-          style shouldBe Theme.current.popup.error
+          style shouldBe currTheme.popup.error
       }
     }.map { _ =>
       //then
@@ -336,7 +339,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
           inside(resActions.toList) { case List(ok) =>
             ok.label shouldBe "OK"
           }
-          style shouldBe Theme.current.popup.error
+          style shouldBe currTheme.popup.error
       }
     }.map { _ =>
       //then
@@ -920,6 +923,6 @@ object CopyMoveUiSpec {
                   copyItemsHistory: FileListHistoryService = new MockFileListHistoryService
                  ): ReactElement = {
 
-    FileListServicesSpec.withServicesContext(element, copyItemsHistory = copyItemsHistory)
+    FileListServicesSpec.withServicesContext(withThemeContext(element), copyItemsHistory = copyItemsHistory)
   }
 }
