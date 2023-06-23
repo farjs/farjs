@@ -4,10 +4,10 @@ import farjs.filelist.FileListPanelView._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.sort.SortIndicatorProps
 import farjs.filelist.stack.{PanelStack, PanelStackProps}
+import farjs.filelist.theme.FileListTheme
+import farjs.filelist.theme.FileListThemeSpec.withThemeContext
 import farjs.ui._
 import farjs.ui.border._
-import farjs.ui.theme.DefaultTheme
-import farjs.ui.theme.ThemeSpec.withThemeContext
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
@@ -188,7 +188,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
                                       dirSize: String = "0 (0)",
                                       diskSpace: Option[Double] = None): Unit = {
     
-    val theme = DefaultTheme.fileList
+    val theme = FileListTheme.defaultTheme.fileList
     
     assertNativeComponent(result, <.box(^.rbStyle := theme.regularItem)(
       <(doubleBorderComp())(^.assertPlain[DoubleBorderProps](inside(_) {

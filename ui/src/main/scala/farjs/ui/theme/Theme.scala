@@ -22,39 +22,28 @@ object Theme {
   }
 }
 
-trait Theme {
+trait Theme extends js.Object {
 
-  def fileList: ThemeFileList
-  def popup: ThemePopup
-  def menu: ThemeMenu
-  def textBox: ThemeTextBox
+  val popup: ThemePopup
+  val menu: ThemeMenu
+  val textBox: ThemeTextBox
 }
 
-trait ThemeFileList {
+trait ThemePopup extends js.Object {
 
-  def archiveItem: BlessedStyle
-  def regularItem: BlessedStyle
-  def dirItem: BlessedStyle
-  def hiddenItem: BlessedStyle
-  def selectedItem: BlessedStyle
-  def header: BlessedStyle
+  val regular: BlessedStyle
+  val error: BlessedStyle
+  val menu: BlessedStyle
 }
 
-trait ThemePopup {
+trait ThemeMenu extends js.Object {
 
-  def regular: BlessedStyle
-  def error: BlessedStyle
-  def menu: BlessedStyle
+  val key: BlessedStyle
+  val item: BlessedStyle
 }
 
-trait ThemeMenu {
+trait ThemeTextBox extends js.Object {
 
-  def key: BlessedStyle
-  def item: BlessedStyle
-}
-
-trait ThemeTextBox {
-
-  def regular: BlessedStyle
-  def selected: BlessedStyle
+  val regular: BlessedStyle
+  val selected: BlessedStyle
 }

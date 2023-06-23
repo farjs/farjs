@@ -2,8 +2,8 @@ package farjs.viewer
 
 import farjs.file.{Encoding, FileServices, FileViewHistory}
 import farjs.filelist.FileListActions.FileListTaskAction
+import farjs.filelist.theme.FileListTheme
 import farjs.ui.task.FutureTask
-import farjs.ui.theme.Theme
 import farjs.ui.{Dispatch, WithSize, WithSizeProps}
 import scommons.react._
 import scommons.react.blessed._
@@ -28,7 +28,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
   private[viewer] var viewerContent: UiComponent[ViewerContentProps] = ViewerContent
   
   protected def render(compProps: Props): ReactElement = {
-    val theme = Theme.useTheme
+    val theme = FileListTheme.useTheme
     val services = FileServices.useServices
     val props = compProps.wrapped
     val viewportRef = useRef(props.viewport)
@@ -117,7 +117,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
     })()
   }
 
-  private[viewer] def contentStyle(theme: Theme): BlessedStyle = {
+  private[viewer] def contentStyle(theme: FileListTheme): BlessedStyle = {
     val style = theme.fileList.regularItem
     new BlessedStyle {
       override val bold = style.bold
@@ -125,7 +125,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
       override val fg = style.fg
     }
   }
-  private[viewer] def scrollStyle(theme: Theme): BlessedStyle = {
+  private[viewer] def scrollStyle(theme: FileListTheme): BlessedStyle = {
     val style = theme.fileList.header
     new BlessedStyle {
       override val bold = style.bold

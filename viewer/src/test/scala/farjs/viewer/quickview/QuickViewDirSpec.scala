@@ -4,8 +4,8 @@ import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack.{PanelStack, PanelStackItem}
-import farjs.ui.theme.DefaultTheme
-import farjs.ui.theme.ThemeSpec.withThemeContext
+import farjs.filelist.theme.FileListTheme
+import farjs.filelist.theme.FileListThemeSpec.withThemeContext
 import farjs.ui.{TextAlign, TextLineProps}
 import farjs.viewer.quickview.QuickViewDir._
 import org.scalatest.Assertion
@@ -235,7 +235,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
                                  props: QuickViewDirProps,
                                  params: QuickViewParams): Assertion = {
     
-    val theme = DefaultTheme.fileList
+    val theme = FileListTheme.defaultTheme.fileList
 
     assertComponents(children, List(
       <.text(

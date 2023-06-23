@@ -1,7 +1,7 @@
 package farjs.filelist.sort
 
 import farjs.filelist.stack.PanelStack
-import farjs.ui.theme.Theme
+import farjs.filelist.theme.FileListTheme
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed._
@@ -16,7 +16,7 @@ object SortIndicator extends FunctionComponent[SortIndicatorProps] {
     val stackProps = PanelStack.usePanelStack
     val props = compProps.wrapped
     val text = s"${getIndicator(props.mode, props.ascending)} "
-    val theme = Theme.useTheme.fileList
+    val theme = FileListTheme.useTheme.fileList
 
     <.text(
       ^.rbWidth := text.length,

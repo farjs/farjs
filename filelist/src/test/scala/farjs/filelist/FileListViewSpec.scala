@@ -3,9 +3,9 @@ package farjs.filelist
 import farjs.filelist.FileListView._
 import farjs.filelist.api.FileListItem
 import farjs.filelist.stack.{PanelStack, PanelStackProps}
+import farjs.filelist.theme.FileListTheme
+import farjs.filelist.theme.FileListThemeSpec.withThemeContext
 import farjs.ui.border._
-import farjs.ui.theme.DefaultTheme
-import farjs.ui.theme.ThemeSpec.withThemeContext
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
@@ -243,7 +243,8 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
   private def assertFileListView(result: TestInstance,
                                  props: FileListViewProps,
                                  expectedData: List[(List[FileListItem], Int, Set[String])]): Unit = {
-    val currThem = DefaultTheme
+
+    val currThem = FileListTheme.defaultTheme
     
     assertNativeComponent(result, <.box(
       ^.rbWidth := props.size._1,

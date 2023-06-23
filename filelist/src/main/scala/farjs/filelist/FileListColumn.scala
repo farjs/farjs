@@ -1,8 +1,8 @@
 package farjs.filelist
 
 import farjs.filelist.api.FileListItem
+import farjs.filelist.theme.FileListTheme
 import farjs.ui._
-import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 
@@ -26,7 +26,7 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val (width, height) = props.size
-    val theme = Theme.useTheme.fileList
+    val theme = FileListTheme.useTheme.fileList
     
     val borderEnd = UI.renderText2(theme.regularItem, props.borderCh)
     val overlapEnd = UI.renderText2(theme.regularItem, "}")

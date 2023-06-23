@@ -3,9 +3,9 @@ package farjs.filelist
 import farjs.filelist.api.FileListItem
 import farjs.filelist.sort.{SortIndicator, SortIndicatorProps}
 import farjs.filelist.stack.PanelStack
+import farjs.filelist.theme.FileListTheme
 import farjs.ui._
 import farjs.ui.border._
-import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 
@@ -29,7 +29,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
     val panelStack = PanelStack.usePanelStack
     val width = panelStack.width
     val height = panelStack.height
-    val theme = Theme.useTheme.fileList
+    val theme = FileListTheme.useTheme.fileList
     
     val currItem = props.state.currentItem
     val selectedItems = props.state.selectedItems

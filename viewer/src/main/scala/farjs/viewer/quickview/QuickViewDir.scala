@@ -3,11 +3,11 @@ package farjs.viewer.quickview
 import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.api.FileListItem
 import farjs.filelist.stack.PanelStack
+import farjs.filelist.theme.FileListTheme
 import farjs.filelist.{FileListActions, FileListState}
 import farjs.ui._
 import farjs.ui.popup.{StatusPopup, StatusPopupProps}
 import farjs.ui.task.FutureTask
-import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
@@ -35,7 +35,7 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
     val props = compProps.wrapped
     val stack = props.stack
     val params = stack.params[QuickViewParams]
-    val theme = Theme.useTheme.fileList
+    val theme = FileListTheme.useTheme.fileList
 
     def scanDir(): Unit = {
       val parent = props.state.currDir.path

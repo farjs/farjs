@@ -2,8 +2,8 @@ package farjs.filelist
 
 import farjs.filelist.api.FileListItem
 import farjs.filelist.stack.PanelStack
+import farjs.filelist.theme.FileListTheme
 import farjs.ui.border._
-import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
@@ -30,7 +30,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
     val columnSizeRef = useRef[Int](0)
     val columnsPosRef = useRef[Seq[(Int, Int, Int)]](null)
     val inputEl = PanelStack.usePanelStack.panelInput
-    val currTheme = Theme.useTheme
+    val currTheme = FileListTheme.useTheme
     
     val props = compProps.wrapped
     propsRef.current = props

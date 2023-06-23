@@ -1,7 +1,7 @@
 package farjs.viewer
 
 import farjs.file.popups.{EncodingsPopup, EncodingsPopupProps}
-import farjs.ui.theme.Theme
+import farjs.filelist.theme.FileListTheme
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
@@ -21,7 +21,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
   private[viewer] var encodingsPopup: UiComponent[EncodingsPopupProps] = EncodingsPopup
 
   protected def render(compProps: Props): ReactElement = {
-    val theme = Theme.useTheme
+    val theme = FileListTheme.useTheme
     val readF = useRef(Future.unit)
     val (showEncodingsPopup, setShowEncodingsPopup) = useState(false)
     val props = compProps.wrapped

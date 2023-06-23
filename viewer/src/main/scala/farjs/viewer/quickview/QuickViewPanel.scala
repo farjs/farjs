@@ -3,9 +3,9 @@ package farjs.viewer.quickview
 import farjs.filelist.FileListState
 import farjs.filelist.api.FileListItem
 import farjs.filelist.stack.{PanelStack, WithPanelStacks}
+import farjs.filelist.theme.FileListTheme
 import farjs.ui._
 import farjs.ui.border._
-import farjs.ui.theme.Theme
 import scommons.nodejs.path
 import scommons.react._
 import scommons.react.blessed._
@@ -24,7 +24,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
     val width = panelStack.width
     val height = panelStack.height
     
-    val theme = Theme.useTheme.fileList
+    val theme = FileListTheme.useTheme.fileList
     val stack =
       if (!panelStack.isRight) stacks.rightStack
       else stacks.leftStack

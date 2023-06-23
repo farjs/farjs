@@ -1,8 +1,8 @@
 package farjs.viewer
 
 import farjs.file.popups.EncodingsPopupProps
-import farjs.ui.theme.DefaultTheme
-import farjs.ui.theme.ThemeSpec.withThemeContext
+import farjs.filelist.theme.FileListTheme
+import farjs.filelist.theme.FileListThemeSpec.withThemeContext
 import farjs.viewer.ViewerContent._
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
@@ -586,7 +586,8 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
                                   content: List[String],
                                   hasEncodingsPopup: Boolean = false
                                  )(implicit pos: Position): Assertion = {
-    val theme = DefaultTheme
+
+    val theme = FileListTheme.defaultTheme
 
     assertNativeComponent(result.children.head,
       <(viewerInput())(^.assertWrapped(inside(_) {
