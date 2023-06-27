@@ -23,7 +23,7 @@ object StatusPopup extends FunctionComponent[StatusPopupProps] {
     val textWidth = width - (paddingHorizontal + 2) * 2
     val textLines = UI.splitText(props.text, textWidth)
     val height = (paddingVertical + 1) * 2 + textLines.size
-    val theme = Theme.useTheme.popup.regular
+    val theme = Theme.useTheme().popup.regular
     val style = new BlessedStyle {
       override val bold = theme.bold
       override val bg = theme.bg

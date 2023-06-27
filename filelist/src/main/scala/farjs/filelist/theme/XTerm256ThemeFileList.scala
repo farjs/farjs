@@ -1,6 +1,7 @@
 package farjs.filelist.theme
 
-import scommons.react.blessed.{BlessedStyle, Color}
+import farjs.ui.theme.Color
+import scommons.react.blessed.BlessedStyle
 
 object XTerm256ThemeFileList extends ThemeFileList {
 

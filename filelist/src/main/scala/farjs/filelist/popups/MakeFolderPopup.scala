@@ -34,7 +34,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
     val size@(width, _) = (75, 10)
     val contentWidth = width - (paddingHorizontal + 2) * 2
     val contentLeft = 2
-    val theme = Theme.useTheme.popup.regular
+    val theme = Theme.useTheme().popup.regular
 
     val onOk: js.Function0[Unit] = { () =>
       if (folderName.nonEmpty) {

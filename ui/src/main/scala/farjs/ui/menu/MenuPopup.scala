@@ -24,7 +24,7 @@ object MenuPopup extends FunctionComponent[MenuPopupProps] {
     val textWidth = props.items.maxBy(_.length).length
     val width = textWidth + (paddingHorizontal + 1) * 2
     val height = (paddingVertical + 1) * 2 + props.items.size
-    val theme = Theme.useTheme.popup.menu
+    val theme = Theme.useTheme().popup.menu
 
     <(popupComp())(^.wrapped := PopupProps(onClose = props.onClose))(
       <(modalContentComp())(^.wrapped := ModalContentProps(

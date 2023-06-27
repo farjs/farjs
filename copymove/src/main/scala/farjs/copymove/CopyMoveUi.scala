@@ -40,7 +40,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
     val (showStats, setShowStats) = useState(false)
     val (showMove, setShowMove) = useState(false)
     val copied = useRef(Set.empty[String])
-    val currTheme = Theme.useTheme
+    val currTheme = Theme.useTheme()
 
     val props = compProps.plain
     

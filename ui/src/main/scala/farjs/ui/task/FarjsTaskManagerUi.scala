@@ -34,7 +34,7 @@ object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
     val props = compProps.wrapped
     val statusMessage = props.status.filter(_ => props.showLoading).getOrElse("")
     val errorMessage = props.error.getOrElse("").trim
-    val theme = Theme.useTheme.popup
+    val theme = Theme.useTheme().popup
 
     useLayoutEffect({ () =>
       if (errorMessage.nonEmpty) {

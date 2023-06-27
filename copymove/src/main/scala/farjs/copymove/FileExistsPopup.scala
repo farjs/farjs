@@ -28,7 +28,7 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
     val size@(width, _) = (58, 11)
     val contentWidth = width - (paddingHorizontal + 2) * 2
     val contentLeft = 2
-    val theme = Theme.useTheme.popup.error
+    val theme = Theme.useTheme().popup.error
 
     def onButton(action: FileExistsAction): js.Function0[Unit] = { () =>
       props.onAction(action)

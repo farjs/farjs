@@ -8,7 +8,6 @@ import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.hooks._
 import scommons.react.test._
 
 import java.util.concurrent.atomic.AtomicReference
@@ -116,7 +115,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       val ref = new AtomicReference[Theme](null)
       (ref, new FunctionComponent[Unit] {
         protected def render(props: Props): ReactElement = {
-          val ctx = useContext(Theme.Context)
+          val ctx = Theme.useTheme()
           ref.set(ctx)
           props.children
         }

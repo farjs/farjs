@@ -1,25 +1,36 @@
 package farjs.ui.theme
 
-import scommons.react.ReactContext
 import scommons.react.blessed.BlessedStyle
-import scommons.react.hooks.useContext
+import scommons.react.raw.NativeContext
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
-object Theme {
+@js.native
+@JSImport("@farjs/ui/theme/XTerm256Theme.mjs", JSImport.Default)
+object XTerm256Theme extends Theme {
 
-  val Context: ReactContext[Theme] = ReactContext[Theme](defaultValue = null)
+  val popup: ThemePopup = js.native
+  val menu: ThemeMenu = js.native
+  val textBox: ThemeTextBox = js.native
+}
 
-  def useTheme: Theme = {
-    val ctx = useContext(Context)
-    if (ctx == null) {
-      throw js.JavaScriptException(js.Error(
-        "Theme.Context is not found." +
-          "\nPlease, make sure you use Theme.Context.Provider in parent components"
-      ))
-    }
-    ctx
-  }
+@js.native
+@JSImport("@farjs/ui/theme/DefaultTheme.mjs", JSImport.Default)
+object DefaultTheme extends Theme {
+
+  val popup: ThemePopup = js.native
+  val menu: ThemeMenu = js.native
+  val textBox: ThemeTextBox = js.native
+}
+
+@js.native
+@JSImport("@farjs/ui/theme/Theme.mjs", JSImport.Default)
+object Theme extends js.Object {
+
+  val Context: NativeContext = js.native
+
+  def useTheme(): Theme = js.native
 }
 
 trait Theme extends js.Object {

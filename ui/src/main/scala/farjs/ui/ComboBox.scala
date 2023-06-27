@@ -23,7 +23,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
     val autoCompleteTimeoutRef = useRef[Timeout](null)
     val (maybePopup, setPopup) = useState[Option[ListViewport]](None)
     val (state, setState) = useStateUpdater(() => TextInputState())
-    val currTheme = Theme.useTheme
+    val currTheme = Theme.useTheme()
     val theme = currTheme.popup.menu
     val arrowStyle = currTheme.popup.regular
     

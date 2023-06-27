@@ -9,7 +9,7 @@ import scala.scalajs.js.|
 object FileListTheme {
 
   def useTheme: FileListTheme = {
-    Theme.useTheme.asInstanceOf[FileListTheme]
+    Theme.useTheme().asInstanceOf[FileListTheme]
   }
   
   lazy val defaultTheme: FileListTheme = {

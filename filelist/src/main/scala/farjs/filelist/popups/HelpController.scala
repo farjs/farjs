@@ -13,7 +13,7 @@ object HelpController extends FunctionComponent[FileListUiData] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val theme = Theme.useTheme.popup
+    val theme = Theme.useTheme().popup
 
     if (props.showHelpPopup) {
       <(messageBoxComp())(^.plain := MessageBoxProps(

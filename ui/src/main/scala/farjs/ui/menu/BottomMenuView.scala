@@ -19,7 +19,7 @@ object BottomMenuView extends FunctionComponent[BottomMenuViewProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val theme = Theme.useTheme.menu
+    val theme = Theme.useTheme().menu
     val width = props.width
     val items = props.items
 

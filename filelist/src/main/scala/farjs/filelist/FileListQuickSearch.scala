@@ -20,7 +20,7 @@ object FileListQuickSearch extends FunctionComponent[FileListQuickSearchProps] {
     val props = compProps.wrapped
     val width = 25
     val height = 3
-    val currTheme = Theme.useTheme
+    val currTheme = Theme.useTheme()
     val boxStyle = currTheme.popup.regular
     val textStyle = currTheme.textBox.regular
     val textWidth = width - 2
