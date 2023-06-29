@@ -1,4 +1,4 @@
-package scommons.react.blessed.portal
+package farjs.ui.portal
 
 import java.util.concurrent.atomic.AtomicReference
 import scommons.nodejs.test.AsyncTestSpec

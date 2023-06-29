@@ -1,7 +1,7 @@
 package farjs.ui.popup
 
+import farjs.ui.portal.Portal
 import scommons.react._
-import scommons.react.blessed.portal._
 
 case class PopupProps(onClose: () => Unit,
                       closable: Boolean = true,

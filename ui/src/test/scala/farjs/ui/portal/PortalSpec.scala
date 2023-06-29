@@ -1,4 +1,4 @@
-package scommons.react.blessed.portal
+package farjs.ui.portal
 
 import scommons.react._
 import scommons.react.test._

@@ -5,11 +5,11 @@ import farjs.app.raw.BetterSqlite3WebSQL
 import farjs.domain.FarjsDBContext
 import farjs.filelist.theme.FileListTheme
 import farjs.fs.FSFileListActions
+import farjs.ui.portal.WithPortals
 import farjs.ui.tool.DevTool
 import scommons.nodejs.{process, global => nodeGlobal}
 import scommons.react._
 import scommons.react.blessed._
-import scommons.react.blessed.portal.WithPortals
 import scommons.react.blessed.raw.{Blessed, ReactBlessed}
 import scommons.websql.Database
 
