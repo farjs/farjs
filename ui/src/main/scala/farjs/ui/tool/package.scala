@@ -12,6 +12,10 @@ package object tool {
   object ColorPanel extends ReactClass
 
   @js.native
+  @JSImport("@farjs/ui/tool/DevToolPanel.mjs", JSImport.Default)
+  object DevToolPanel extends ReactClass
+
+  @js.native
   @JSImport("@farjs/ui/tool/InputController.mjs", JSImport.Default)
   object InputController extends ReactClass
 

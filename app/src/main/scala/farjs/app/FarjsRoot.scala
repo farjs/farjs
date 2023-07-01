@@ -75,7 +75,7 @@ class FarjsRoot(loadMainUi: js.Function1[Any, Unit] => Future[(Theme, ReactClass
               ^.rbWidth := "30%",
               ^.rbHeight := "100%",
               ^.rbLeft := "70%"
-            )(<(devToolPanelComp())(^.plain := DevToolPanelProps(
+            )(<(devToolPanelComp)(^.plain := DevToolPanelProps(
               devTool = devTool,
               logContent = content,
               onActivate = { tool =>
@@ -98,5 +98,5 @@ object FarjsRoot {
     TaskManager
   }
   private[app] var logControllerComp: ReactClass = LogController
-  private[app] var devToolPanelComp: UiComponent[DevToolPanelProps] = DevToolPanel
+  private[app] var devToolPanelComp: ReactClass = DevToolPanel
 }

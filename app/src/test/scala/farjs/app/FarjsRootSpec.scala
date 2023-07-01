@@ -21,7 +21,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
   
   FarjsRoot.taskControllerComp = mockUiComponent("TaskManager")
   FarjsRoot.logControllerComp = "LogController".asInstanceOf[ReactClass]
-  FarjsRoot.devToolPanelComp = mockUiComponent("DevToolPanel")
+  FarjsRoot.devToolPanelComp = "DevToolPanel".asInstanceOf[ReactClass]
   
   private val mainUiF: js.Function1[Any, Unit] => Future[(Theme, ReactClass)] = { _ =>
     Future.successful((XTerm256Theme, mainComp))
@@ -91,7 +91,9 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
         case List(log) => log.props.asInstanceOf[LogControllerProps]
       }
       val renderedContent = createTestRenderer(logProps.render("test log content")).root
-      findComponentProps(renderedContent, devToolPanelComp, plain = true)
+      inside(findComponents(renderedContent, devToolPanelComp)) {
+        case List(devToolPanel) => devToolPanel.props.asInstanceOf[DevToolPanelProps]
+      }
     }
     devToolProps.devTool shouldBe DevTool.Colors
 
@@ -104,7 +106,9 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
         case List(log) => log.props.asInstanceOf[LogControllerProps]
       }
       val renderedContent = createTestRenderer(logProps.render("test log content")).root
-      findComponentProps(renderedContent, devToolPanelComp, plain = true)
+      inside(findComponents(renderedContent, devToolPanelComp)) {
+        case List(devToolPanel) => devToolPanel.props.asInstanceOf[DevToolPanelProps]
+      }
     }
     updatedProps.devTool shouldBe DevTool.Logs
   }
@@ -220,7 +224,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
               ^.rbHeight := "100%",
               ^.rbLeft := "70%"
             )(
-              <(devToolPanelComp())(^.assertPlain[DevToolPanelProps](inside(_) {
+              <(devToolPanelComp)(^.assertPlain[DevToolPanelProps](inside(_) {
                 case DevToolPanelProps(devTool, logContent, _) =>
                   devTool shouldBe DevTool.Logs
                   logContent shouldBe content
