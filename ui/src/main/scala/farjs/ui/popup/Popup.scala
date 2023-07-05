@@ -11,13 +11,13 @@ case class PopupProps(onClose: () => Unit,
 
 object Popup extends FunctionComponent[PopupProps] {
   
-  private[popup] var portalComp: UiComponent[Unit] = Portal
+  private[popup] var portalComp: ReactClass = Portal
   private[popup] var popupOverlayComp: UiComponent[PopupProps] = PopupOverlay
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
 
-    <(portalComp())()(
+    <(portalComp)()(
       <(popupOverlayComp())(^.wrapped := props)(
         compProps.children
       )

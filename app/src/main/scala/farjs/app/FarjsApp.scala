@@ -64,7 +64,7 @@ object FarjsApp {
         prepareDB().map { db =>
           val ctx = new FarjsDBContext(db)
           val fileListModule = new FileListModule(ctx)
-          val mainUi = new FileListRoot(dispatch, fileListModule, new WithPortals(screen)).apply()
+          val mainUi = new FileListRoot(dispatch, fileListModule, WithPortals.create(screen)).apply()
           val theme =
             if (screen.terminal == TerminalName.`xterm-256color`) FileListTheme.xterm256Theme
             else FileListTheme.defaultTheme

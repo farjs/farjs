@@ -13,14 +13,14 @@ import scommons.react._
 
 class FileListRoot(dispatch: Dispatch,
                    module: FileListModule,
-                   withPortalsComp: UiComponent[Unit]
+                   withPortalsComp: ReactClass
                   ) extends FunctionComponent[Unit] {
 
   protected def render(compProps: Props): ReactElement = {
     <(FileListServices.Context.Provider)(^.contextValue := module.fileListServices)(
       <(FSServices.Context.Provider)(^.contextValue := module.fsServices)(
         <(FileServices.Context.Provider)(^.contextValue := module.fileServices)(
-          <(withPortalsComp())()(
+          <(withPortalsComp)()(
             <(fileListComp)(^.wrapped := FileListBrowserProps(
               dispatch = dispatch,
               plugins = plugins

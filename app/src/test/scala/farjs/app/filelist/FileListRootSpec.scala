@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 class FileListRootSpec extends TestSpec with TestRendererUtils {
 
-  private val withPortalsComp = mockUiComponent[Unit]("WithPortals")
+  private val withPortalsComp = "WithPortals".asInstanceOf[ReactClass]
 
   it should "render component with contexts" in {
     //given
@@ -31,7 +31,7 @@ class FileListRootSpec extends TestSpec with TestRendererUtils {
     fsCtx.get() shouldBe module.fsServices
     fileCtx.get() shouldBe module.fileServices
     assertComponents(result.children, List(
-      <(withPortalsComp())()(
+      <(withPortalsComp)()(
         <(servicesComp)(^.assertWrapped(inside(_) {
           case FileListBrowserProps(resDispatch, isRightInitiallyActive, plugins) =>
             resDispatch should be theSameInstanceAs dispatch

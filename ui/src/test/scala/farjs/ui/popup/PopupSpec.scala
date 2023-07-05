@@ -7,7 +7,7 @@ import scommons.react.test._
 
 class PopupSpec extends TestSpec with TestRendererUtils {
 
-  Popup.portalComp = mockUiComponent("Portal")
+  Popup.portalComp = "Portal".asInstanceOf[ReactClass]
   Popup.popupOverlayComp = mockUiComponent("PopupOverlay")
 
   it should "render component" in {
@@ -26,7 +26,7 @@ class PopupSpec extends TestSpec with TestRendererUtils {
                           props: PopupProps,
                           children: ReactElement): Unit = {
     
-    assertNativeComponent(result, <(portalComp()).empty, inside(_) { case List(content) =>
+    assertNativeComponent(result, <(portalComp).empty, inside(_) { case List(content) =>
       assertTestComponent(content, popupOverlayComp)({ resProps =>
         resProps should be theSameInstanceAs props
       }, inside(_) {
