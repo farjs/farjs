@@ -24,13 +24,13 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       MessageBoxAction.OK(onAction)
     ), DefaultTheme.popup.regular)
     val comp = testRender(<(MessageBox())(^.plain := props)())
-    val popup = findComponentProps(comp, popupComp)
+    val popup = findComponentProps(comp, popupComp, plain = true)
 
     //then
     onAction.expects()
     
     //when
-    popup.onClose()
+    popup.onClose.foreach(_.apply())
   }
   
   it should "call OK action when onPress OK button" in {
@@ -77,14 +77,14 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       MessageBoxAction.NO(onNoAction)
     ), DefaultTheme.popup.regular)
     val comp = testRender(<(MessageBox())(^.plain := props)())
-    val popup = findComponentProps(comp, popupComp)
+    val popup = findComponentProps(comp, popupComp, plain = true)
 
     //then
     onYesAction.expects().never()
     onNoAction.expects()
     
     //when
-    popup.onClose()
+    popup.onClose.foreach(_.apply())
 
     Succeeded
   }
@@ -156,14 +156,14 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       MessageBoxAction.NO_NON_CLOSABLE(onNoAction)
     ), DefaultTheme.popup.regular)
     val comp = testRender(<(MessageBox())(^.plain := props)())
-    val popup = findComponentProps(comp, popupComp)
+    val popup = findComponentProps(comp, popupComp, plain = true)
 
     //then
     onYesAction.expects().never()
     onNoAction.expects().never()
 
     //when
-    popup.onClose()
+    popup.onClose.foreach(_.apply())
 
     Succeeded
   }
@@ -221,9 +221,9 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       )
     }
     
-    assertTestComponent(result, popupComp)({ case PopupProps(_, resClosable, focusable, _, _) =>
-      resClosable shouldBe closable
-      focusable shouldBe true
+    assertTestComponent(result, popupComp, plain = true)({ case PopupProps(onClose, focusable, _, _) =>
+      onClose.isDefined shouldBe closable
+      focusable shouldBe js.undefined
     }, inside(_) { case List(content) =>
       assertTestComponent(content, modalContentComp)({
         case ModalContentProps(title, size, style, padding, left, footer) =>

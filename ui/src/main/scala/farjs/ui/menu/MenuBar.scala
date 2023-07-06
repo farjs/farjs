@@ -49,7 +49,7 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
       }
     }
     
-    def onKeypress(keyFull: String): Boolean = {
+    val onKeypress: js.Function1[String, Boolean] = { keyFull =>
       var processed = true
       keyFull match {
         case "f10" => props.onClose()
@@ -105,7 +105,7 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
     }
 
     <.>()(
-      <(popupComp())(^.wrapped := PopupProps(onClose = props.onClose, onKeypress = onKeypress))(
+      <(popupComp())(^.plain := PopupProps(onClose = props.onClose: js.Function0[Unit], onKeypress = onKeypress))(
         <.box(
           ^.rbHeight := 1,
           ^.rbStyle := theme

@@ -3,6 +3,8 @@ package farjs.ui.popup
 import scommons.react._
 import scommons.react.blessed._
 
+import scala.scalajs.js
+
 case class ModalProps(title: String,
                       size: (Int, Int),
                       style: BlessedStyle,
@@ -16,7 +18,7 @@ object Modal extends FunctionComponent[ModalProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
 
-    <(popupComp())(^.wrapped := PopupProps(onClose = props.onCancel))(
+    <(popupComp())(^.plain := PopupProps(onClose = props.onCancel: js.Function0[Unit]))(
       <(modalContentComp())(^.wrapped := ModalContentProps(
         title = props.title,
         size = props.size,

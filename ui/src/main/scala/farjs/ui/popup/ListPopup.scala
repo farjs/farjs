@@ -35,7 +35,10 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
     val textPaddingLeftStr = " " * props.textPaddingLeft
     val textPaddingRightStr = " " * props.textPaddingRight
 
-    <(popupComp())(^.wrapped := PopupProps(onClose = props.onClose, onKeypress = props.onKeypress))(
+    <(popupComp())(^.plain := PopupProps(
+      onClose = props.onClose: js.Function0[Unit],
+      onKeypress = props.onKeypress: js.Function1[String, Boolean]
+    ))(
       <(withSizeComp())(^.plain := WithSizeProps { (width, height) =>
         val maxContentWidth = {
           if (items.isEmpty) 2 * (paddingHorizontal + 1)

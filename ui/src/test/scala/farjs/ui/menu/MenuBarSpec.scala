@@ -41,13 +41,13 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     val onClose = mockFunction[Unit]
     val props = MenuBarProps(items, (_, _) => (), onClose)
     val comp = testRender(withThemeContext(<(MenuBar())(^.wrapped := props)()))
-    val popupProps = findComponentProps(comp, popupComp)
+    val popupProps = findComponentProps(comp, popupComp, plain = true)
 
     //then
     onClose.expects()
 
     //when & then
-    popupProps.onKeypress("f10") shouldBe true
+    popupProps.onKeypress.map(_.apply("f10")).getOrElse(false) shouldBe true
   }
 
   it should "hide sub-menu when onKeypress(escape)" in {
@@ -59,10 +59,10 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     }
     buttonsProps.actions.head.onAction()
     findProps(renderer.root, subMenuComp) should not be empty
-    val popupProps = findComponentProps(renderer.root, popupComp)
+    val popupProps = findComponentProps(renderer.root, popupComp, plain = true)
 
     //when
-    popupProps.onKeypress("escape") shouldBe true
+    popupProps.onKeypress.map(_.apply("escape")).getOrElse(false) shouldBe true
     
     //then
     findProps(renderer.root, subMenuComp) shouldBe Nil
@@ -72,10 +72,10 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
     val comp = testRender(withThemeContext(<(MenuBar())(^.wrapped := props)()))
-    val popupProps = findComponentProps(comp, popupComp)
+    val popupProps = findComponentProps(comp, popupComp, plain = true)
 
     //when & then
-    popupProps.onKeypress("escape") shouldBe false
+    popupProps.onKeypress.map(_.apply("escape")).getOrElse(false) shouldBe false
   }
 
   it should "select sub-menu items when onKeypress(down/up)" in {
@@ -98,31 +98,31 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     }
 
     //when & then
-    findComponentProps(renderer.root, popupComp).onKeypress("up") shouldBe true
+    findComponentProps(renderer.root, popupComp, plain = true).onKeypress.map(_.apply("up")).getOrElse(false) shouldBe true
     findComponentProps(renderer.root, subMenuComp).selected shouldBe 3
 
     //when & then
-    findComponentProps(renderer.root, popupComp).onKeypress("down") shouldBe true
+    findComponentProps(renderer.root, popupComp, plain = true).onKeypress.map(_.apply("down")).getOrElse(false) shouldBe true
     findComponentProps(renderer.root, subMenuComp).selected shouldBe 0
 
     //when & then
-    findComponentProps(renderer.root, popupComp).onKeypress("down") shouldBe true
+    findComponentProps(renderer.root, popupComp, plain = true).onKeypress.map(_.apply("down")).getOrElse(false) shouldBe true
     findComponentProps(renderer.root, subMenuComp).selected shouldBe 2
 
     //when & then
-    findComponentProps(renderer.root, popupComp).onKeypress("up") shouldBe true
+    findComponentProps(renderer.root, popupComp, plain = true).onKeypress.map(_.apply("up")).getOrElse(false) shouldBe true
     findComponentProps(renderer.root, subMenuComp).selected shouldBe 0
 
     //when & then
-    findComponentProps(renderer.root, popupComp).onKeypress("down") shouldBe true
+    findComponentProps(renderer.root, popupComp, plain = true).onKeypress.map(_.apply("down")).getOrElse(false) shouldBe true
     findComponentProps(renderer.root, subMenuComp).selected shouldBe 2
 
     //when & then
-    findComponentProps(renderer.root, popupComp).onKeypress("down") shouldBe true
+    findComponentProps(renderer.root, popupComp, plain = true).onKeypress.map(_.apply("down")).getOrElse(false) shouldBe true
     findComponentProps(renderer.root, subMenuComp).selected shouldBe 3
 
     //when & then
-    findComponentProps(renderer.root, popupComp).onKeypress("down") shouldBe true
+    findComponentProps(renderer.root, popupComp, plain = true).onKeypress.map(_.apply("down")).getOrElse(false) shouldBe true
     findComponentProps(renderer.root, subMenuComp).selected shouldBe 0
   }
 
@@ -141,13 +141,13 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
 
     val props = MenuBarProps(items, (_, _) => (), () => ())
     val comp = testRender(withThemeContext(<(MenuBar())(^.wrapped := props)()))
-    val popupProps = findComponentProps(comp, popupComp)
+    val popupProps = findComponentProps(comp, popupComp, plain = true)
 
     //then
     onKey.expects("enter", false, false, false)
 
     //when
-    popupProps.onKeypress("down") shouldBe true
+    popupProps.onKeypress.map(_.apply("down")).getOrElse(false) shouldBe true
 
     //cleanup
     process.stdin.removeListener("keypress", listener)
@@ -158,10 +158,10 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
     val comp = testRender(withThemeContext(<(MenuBar())(^.wrapped := props)()))
-    val popupProps = findComponentProps(comp, popupComp)
+    val popupProps = findComponentProps(comp, popupComp, plain = true)
 
     //when & then
-    popupProps.onKeypress("up") shouldBe true
+    popupProps.onKeypress.map(_.apply("up")).getOrElse(false) shouldBe true
   }
   
   it should "show next/prev sub-menu when onKeypress(right/left)" in {
@@ -175,19 +175,19 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     findComponentProps(renderer.root, subMenuComp).left shouldBe 2
 
     //when & then
-    findComponentProps(renderer.root, popupComp).onKeypress("left") shouldBe false
+    findComponentProps(renderer.root, popupComp, plain = true).onKeypress.map(_.apply("left")).getOrElse(false) shouldBe false
     findComponentProps(renderer.root, subMenuComp).left shouldBe 22
 
     //when & then
-    findComponentProps(renderer.root, popupComp).onKeypress("right") shouldBe false
+    findComponentProps(renderer.root, popupComp, plain = true).onKeypress.map(_.apply("right")).getOrElse(false) shouldBe false
     findComponentProps(renderer.root, subMenuComp).left shouldBe 2
 
     //when & then
-    findComponentProps(renderer.root, popupComp).onKeypress("right") shouldBe false
+    findComponentProps(renderer.root, popupComp, plain = true).onKeypress.map(_.apply("right")).getOrElse(false) shouldBe false
     findComponentProps(renderer.root, subMenuComp).left shouldBe 12
 
     //when & then
-    findComponentProps(renderer.root, popupComp).onKeypress("left") shouldBe false
+    findComponentProps(renderer.root, popupComp, plain = true).onKeypress.map(_.apply("left")).getOrElse(false) shouldBe false
     findComponentProps(renderer.root, subMenuComp).left shouldBe 2
   }
 
@@ -200,7 +200,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
     buttonsProps.actions.head.onAction()
-    findComponentProps(renderer.root, popupComp).onKeypress("down") shouldBe true
+    findComponentProps(renderer.root, popupComp, plain = true).onKeypress.map(_.apply("down")).getOrElse(false) shouldBe true
     findComponentProps(renderer.root, subMenuComp).selected shouldBe 2
 
     //then
@@ -210,7 +210,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     }
     
     //when
-    findComponentProps(renderer.root, popupComp).onKeypress("enter") shouldBe true
+    findComponentProps(renderer.root, popupComp, plain = true).onKeypress.map(_.apply("enter")).getOrElse(false) shouldBe true
 
     //then
     eventually(onActionCalled shouldBe true)
@@ -220,20 +220,20 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
     val comp = testRender(withThemeContext(<(MenuBar())(^.wrapped := props)()))
-    val popupProps = findComponentProps(comp, popupComp)
+    val popupProps = findComponentProps(comp, popupComp, plain = true)
 
     //when & then
-    popupProps.onKeypress("space") shouldBe false
+    popupProps.onKeypress.map(_.apply("space")).getOrElse(false) shouldBe false
   }
 
   it should "return false when onKeypress(other)" in {
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
     val comp = testRender(withThemeContext(<(MenuBar())(^.wrapped := props)()))
-    val popupProps = findComponentProps(comp, popupComp)
+    val popupProps = findComponentProps(comp, popupComp, plain = true)
 
     //when & then
-    popupProps.onKeypress("other") shouldBe false
+    popupProps.onKeypress.map(_.apply("other")).getOrElse(false) shouldBe false
   }
   
   it should "call onAction when onClick" in {
@@ -301,10 +301,10 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     val theme = DefaultTheme.popup.menu
     
     assertNativeComponent(result,
-      <(popupComp())(^.assertWrapped(inside(_) {
-        case PopupProps(props.onClose, closable, focusable, _, _) =>
-          closable shouldBe true
-          focusable shouldBe true
+      <(popupComp())(^.assertPlain[PopupProps](inside(_) {
+        case PopupProps(onClose, focusable, _, _) =>
+          onClose.isDefined shouldBe true
+          focusable shouldBe js.undefined
       }))(
         <.box(
           ^.rbHeight := 1,

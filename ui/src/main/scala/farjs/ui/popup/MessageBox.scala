@@ -25,11 +25,11 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
       ButtonsPanelAction(action.label, action.onAction)
     }
 
-    <(popupComp())(^.wrapped := PopupProps(
-      onClose = { () =>
-        onClose.getOrElse(dummyOnClose).apply()
-      },
-      closable = onClose.isDefined
+    <(popupComp())(^.plain := PopupProps(
+      onClose = onClose match {
+        case Some(f) => f
+        case None => js.undefined
+      }
     ))(
       <(modalContentComp())(^.wrapped := ModalContentProps(
         title = props.title,
@@ -57,6 +57,4 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
       )
     )
   }
-  
-  private val dummyOnClose: js.Function0[Unit] = () => ()
 }

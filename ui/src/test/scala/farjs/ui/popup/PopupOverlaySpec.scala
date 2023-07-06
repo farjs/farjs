@@ -12,8 +12,9 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
 
   it should "call onOpen and focus first element if focusable when mount" in {
     //given
+    val onClose = mockFunction[Unit]
     val onOpen = mockFunction[Unit]
-    val props = PopupProps(onClose = () => (), onOpen = onOpen)
+    val props = PopupProps(onClose = onClose: js.Function0[Unit], onOpen = onOpen: js.Function0[Unit])
     val onMock = mockFunction[String, js.Function, Unit]
     val focusFirstMock = mockFunction[Unit]
     val formMock = literal("on" -> onMock, "focusFirst" -> focusFirstMock)
@@ -27,7 +28,7 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
     onOpen.expects()
 
     //when
-    createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
+    createTestRenderer(<(PopupOverlay())(^.plain := props)(), { el =>
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock
       else null
     })
@@ -38,8 +39,9 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
 
   it should "call onOpen and not focus first element if not focusable when mount" in {
     //given
+    val onClose = mockFunction[Unit]
     val onOpen = mockFunction[Unit]
-    val props = PopupProps(onClose = () => (), onOpen = onOpen, focusable = false)
+    val props = PopupProps(onClose = onClose: js.Function0[Unit], onOpen = onOpen: js.Function0[Unit], focusable = false)
     val onMock = mockFunction[String, js.Function, Unit]
     val focusFirstMock = mockFunction[Unit]
     val formMock = literal("on" -> onMock, "focusFirst" -> focusFirstMock)
@@ -51,7 +53,7 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
     onOpen.expects()
 
     //when
-    createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
+    createTestRenderer(<(PopupOverlay())(^.plain := props)(), { el =>
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock
       else null
     })
@@ -59,14 +61,15 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
 
   it should "remove listeners when unmount" in {
     //given
-    val props = PopupProps(onClose = () => (), focusable = false)
+    val onClose = mockFunction[Unit]
+    val props = PopupProps(onClose = onClose: js.Function0[Unit], focusable = false)
     val onMock = mockFunction[String, js.Function, Unit]
     val offMock = mockFunction[String, js.Function, Unit]
     val formMock = literal("on" -> onMock, "off" -> offMock)
     onMock.expects("element keypress", *)
     onMock.expects("element focus", *)
     
-    val renderer = createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(<(PopupOverlay())(^.plain := props)(), { el =>
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
       else null
     })
@@ -81,14 +84,15 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
 
   it should "re-subscribe element listeners when update" in {
     //given
-    val props = PopupProps(onClose = () => (), focusable = false)
+    val onClose = mockFunction[Unit]
+    val props = PopupProps(onClose = onClose: js.Function0[Unit], focusable = false)
     val onMock = mockFunction[String, js.Function, Unit]
     val offMock = mockFunction[String, js.Function, Unit]
     val formMock = literal("on" -> onMock, "off" -> offMock)
     onMock.expects("element keypress", *)
     onMock.expects("element focus", *)
     
-    val renderer = createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(<(PopupOverlay())(^.plain := props)(), { el =>
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock.asInstanceOf[js.Any]
       else null
     })
@@ -100,14 +104,14 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
     offMock.expects("element focus", *)
 
     //when
-    renderer.update(<(PopupOverlay())(^.wrapped := props.copy(onClose = () => ()))())
+    renderer.update(<(PopupOverlay())(^.plain := PopupProps.copy(props)(onClose = (() => ()): js.Function0[Unit]))())
   }
 
   it should "listen to element keys and perform actions" in {
     //given
     val onClose = mockFunction[Unit]
     val onKeypress = mockFunction[String, Boolean]
-    val props = PopupProps(onClose = onClose, focusable = false, onKeypress = onKeypress)
+    val props = PopupProps(onClose = onClose: js.Function0[Unit], focusable = false, onKeypress = onKeypress: js.Function1[String, Boolean])
     val onMock = mockFunction[String, js.Function, Unit]
     val offMock = mockFunction[String, js.Function, Unit]
     val focusNextMock = mockFunction[Unit]
@@ -124,7 +128,7 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
       keyListener = listener.asInstanceOf[js.Function3[BlessedElement, js.Object, KeyboardKey, Unit]]
     }
     onMock.expects("element focus", *)
-    createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
+    createTestRenderer(<(PopupOverlay())(^.plain := props)(), { el =>
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock
       else null
     })
@@ -161,16 +165,12 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
     check(defaultPrevented = true, handled = false, "unknown")
   }
 
-  it should "not call onClose if non-closable when escape" in {
+  it should "do nothing if non-closable when escape" in {
     //given
-    val onClose = mockFunction[Unit]
-    val props = PopupProps(onClose = onClose, focusable = false, closable = false)
+    val props = PopupProps(focusable = false)
     val onMock = mockFunction[String, js.Function, Unit]
     val formMock = literal("on" -> onMock)
     
-    //then
-    onClose.expects().never()
-
     onMock.expects("element keypress", *).onCall { (_, listener) =>
       //when
       val keyListener = listener.asInstanceOf[js.Function3[BlessedElement, js.Object, KeyboardKey, Unit]]
@@ -179,7 +179,7 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
     onMock.expects("element focus", *)
 
     //when
-    createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
+    createTestRenderer(<(PopupOverlay())(^.plain := props)(), { el =>
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock
       else null
     })
@@ -187,7 +187,7 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
 
   it should "set form._selected element when child element is focused" in {
     //given
-    val props = PopupProps(onClose = () => (), focusable = false, closable = false)
+    val props = PopupProps(focusable = false)
     val childElement = literal("some" -> "childElement").asInstanceOf[BlessedElement]
     val onMock = mockFunction[String, js.Function, Unit]
     val formMock = literal("on" -> onMock, "_selected" -> childElement)
@@ -201,7 +201,7 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
     }
 
     //when
-    createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
+    createTestRenderer(<(PopupOverlay())(^.plain := props)(), { el =>
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock
       else null
     })
@@ -210,7 +210,7 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
   it should "call onClose if closable when onClick" in {
     //given
     val onClose = mockFunction[Unit]
-    val props = PopupProps(onClose = onClose)
+    val props = PopupProps(onClose = onClose: js.Function0[Unit])
     val onMock = mockFunction[String, js.Function, Unit]
     val focusFirstMock = mockFunction[Unit]
     val formMock = literal("on" -> onMock, "focusFirst" -> focusFirstMock)
@@ -219,7 +219,7 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
     onMock.expects("element keypress", *)
     onMock.expects("element focus", *)
 
-    val form = createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
+    val form = createTestRenderer(<(PopupOverlay())(^.plain := props)(), { el =>
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock
       else null
     }).root.children(0)
@@ -231,10 +231,9 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
     form.props.onClick()
   }
   
-  it should "not call onClose if non-closable when onClick" in {
+  it should "do nothing if non-closable when onClick" in {
     //given
-    val onClose = mockFunction[Unit]
-    val props = PopupProps(onClose = onClose, closable = false)
+    val props = PopupProps()
     val onMock = mockFunction[String, js.Function, Unit]
     val focusFirstMock = mockFunction[Unit]
     val formMock = literal("on" -> onMock, "focusFirst" -> focusFirstMock)
@@ -242,14 +241,11 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
     onMock.expects("element keypress", *)
     onMock.expects("element focus", *)
 
-    val form = createTestRenderer(<(PopupOverlay())(^.wrapped := props)(), { el =>
+    val form = createTestRenderer(<(PopupOverlay())(^.plain := props)(), { el =>
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock
       else null
     }).root.children(0)
 
-    //then
-    onClose.expects().never()
-    
     //when
     form.props.onClick()
   }
@@ -257,7 +253,7 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
   it should "render component" in {
     //given
     val children: ReactElement = <.box()("test popup child")
-    val props = PopupProps(onClose = () => ())
+    val props = PopupProps(onClose = (() => ()): js.Function0[Unit])
     val onMock = mockFunction[String, js.Function, Unit]
     val focusFirstMock = mockFunction[Unit]
     val formMock = literal("on" -> onMock, "focusFirst" -> focusFirstMock)
@@ -266,7 +262,7 @@ class PopupOverlaySpec extends TestSpec with TestRendererUtils {
     onMock.expects("element focus", *)
 
     //when
-    val result = createTestRenderer(<(PopupOverlay())(^.wrapped := props)(children), { el =>
+    val result = createTestRenderer(<(PopupOverlay())(^.plain := props)(children), { el =>
       if (el.`type` == "form".asInstanceOf[js.Any]) formMock
       else null
     }).root.children(0)

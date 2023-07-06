@@ -6,6 +6,8 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 
+import scala.scalajs.js
+
 case class MenuPopupProps(title: String,
                           items: List[String],
                           getLeft: Int => String,
@@ -26,7 +28,7 @@ object MenuPopup extends FunctionComponent[MenuPopupProps] {
     val height = (paddingVertical + 1) * 2 + props.items.size
     val theme = Theme.useTheme().popup.menu
 
-    <(popupComp())(^.wrapped := PopupProps(onClose = props.onClose))(
+    <(popupComp())(^.plain := PopupProps(onClose = props.onClose: js.Function0[Unit]))(
       <(modalContentComp())(^.wrapped := ModalContentProps(
         title = props.title,
         size = (width, height),

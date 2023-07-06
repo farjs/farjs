@@ -9,6 +9,8 @@ import org.scalatest.Succeeded
 import scommons.react.ReactClass
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class MenuPopupSpec extends TestSpec with TestRendererUtils {
 
   MenuPopup.popupComp = mockUiComponent("Popup")
@@ -71,11 +73,10 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
     val height = 2 * 2 + props.items.size
     val theme = DefaultTheme.popup.menu
 
-    assertTestComponent(result, popupComp)({
-      case PopupProps(onClose, closable, focusable, _, _) =>
-        onClose should be theSameInstanceAs props.onClose
-        closable shouldBe true
-        focusable shouldBe true
+    assertTestComponent(result, popupComp, plain = true)({
+      case PopupProps(onClose, focusable, _, _) =>
+        onClose.isDefined shouldBe true
+        focusable shouldBe js.undefined
     }, inside(_) { case List(content) =>
       assertTestComponent(content, modalContentComp)({
         case ModalContentProps(title, resSize, style, padding, left, footer) =>

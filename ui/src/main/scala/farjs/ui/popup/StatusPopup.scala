@@ -6,6 +6,8 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 
+import scala.scalajs.js
+
 case class StatusPopupProps(text: String,
                             title: String = "Status",
                             closable: Boolean = false,
@@ -30,9 +32,10 @@ object StatusPopup extends FunctionComponent[StatusPopupProps] {
       override val fg = theme.fg
     }
 
-    <(popupComp())(^.wrapped := PopupProps(
-      onClose = props.onClose,
-      closable = props.closable
+    <(popupComp())(^.plain := PopupProps(
+      onClose =
+        if (props.closable) props.onClose: js.Function0[Unit]
+        else js.undefined
     ))(
       <(modalContentComp())(^.wrapped := ModalContentProps(
         title = props.title,

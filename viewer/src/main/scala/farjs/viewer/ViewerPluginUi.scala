@@ -8,6 +8,8 @@ import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
 
+import scala.scalajs.js
+
 class ViewerPluginUi(filePath: String, size: Double)
   extends FunctionComponent[FileListPluginUiProps] {
 
@@ -16,7 +18,7 @@ class ViewerPluginUi(filePath: String, size: Double)
     val (viewport, setViewport) = useState(Option.empty[ViewerFileViewport])
     val props = compProps.plain
 
-    def onKeypress(keyFull: String): Boolean = {
+    val onKeypress: js.Function1[String, Boolean] = { keyFull =>
       var processed = true
       keyFull match {
         case "f3" | "f10" => props.onClose()
@@ -47,7 +49,10 @@ class ViewerPluginUi(filePath: String, size: Double)
         items
     }
 
-    <(popupComp())(^.wrapped := PopupProps(onClose = props.onClose, onKeypress = onKeypress))(
+    <(popupComp())(^.plain := PopupProps(
+      onClose = props.onClose,
+      onKeypress = onKeypress
+    ))(
       <.box(
         ^.rbClickable := true,
         ^.rbAutoFocus := false

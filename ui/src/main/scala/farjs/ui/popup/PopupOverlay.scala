@@ -10,23 +10,23 @@ object PopupOverlay extends FunctionComponent[PopupProps] {
   
   protected def render(compProps: Props): ReactElement = {
     val formRef = useRef[BlessedElement](null)
-    val props = compProps.wrapped
+    val props = compProps.plain
 
     useLayoutEffect({ () =>
-      if (props.focusable) {
+      if (props.focusable.getOrElse(true)) {
         formRef.current.asInstanceOf[js.Dynamic].focusFirst()
       }
       
-      props.onOpen()
+      props.onOpen.foreach(_.apply())
     }, Nil)
     
     useLayoutEffect({ () =>
       val form = formRef.current.asInstanceOf[js.Dynamic]
       val keyListener: js.Function3[BlessedElement, js.Object, KeyboardKey, Unit] = { (_, _, key) =>
         val keyFull = key.full
-        if (!key.defaultPrevented.getOrElse(false) && !props.onKeypress(keyFull)) {
+        if (!key.defaultPrevented.getOrElse(false) && !props.onKeypress.map(_.apply(keyFull)).getOrElse(false)) {
           keyFull match {
-            case "escape" if props.closable => props.onClose()
+            case "escape" => props.onClose.foreach(_.apply())
             case "tab" | "down" | "right" => form.focusNext()
             case "S-tab" | "up" | "left" => form.focusPrevious()
             case _ =>
@@ -43,7 +43,7 @@ object PopupOverlay extends FunctionComponent[PopupProps] {
         form.off("element keypress", keyListener)
         form.off("element focus", focusListener)
       }
-    }, List(props.closable, props.onClose.asInstanceOf[js.Any], props.onKeypress.asInstanceOf[js.Any]))
+    }, List(props.onClose, props.onKeypress))
     
     <.form(
       ^.reactRef := formRef,
@@ -52,9 +52,7 @@ object PopupOverlay extends FunctionComponent[PopupProps] {
       ^.rbAutoFocus := false,
       ^.rbStyle := style,
       ^.rbOnClick := { _ =>
-        if (props.closable) {
-          props.onClose()
-        }
+        props.onClose.foreach(_.apply())
       }
     )(
       compProps.children

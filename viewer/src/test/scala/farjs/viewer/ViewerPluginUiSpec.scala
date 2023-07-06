@@ -31,13 +31,13 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
       height = 2
     )
     findComponentProps(renderer.root, viewerController).setViewport(Some(viewport))
-    val popupProps = findComponentProps(renderer.root, popupComp)
+    val popupProps = findComponentProps(renderer.root, popupComp, plain = true)
     
     //then
     onClose.expects()
 
     //when
-    popupProps.onClose()
+    popupProps.onClose.foreach(_.apply())
   }
 
   it should "call onClose when onKeypress(F10)" in {
@@ -55,13 +55,13 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
       height = 2
     )
     findComponentProps(renderer.root, viewerController).setViewport(Some(viewport))
-    val popupProps = findComponentProps(renderer.root, popupComp)
+    val popupProps = findComponentProps(renderer.root, popupComp, plain = true)
     
     //then
     onClose.expects()
 
     //when
-    popupProps.onKeypress("f10") shouldBe true
+    popupProps.onKeypress.map(_.apply("f10")).getOrElse(false) shouldBe true
   }
 
   it should "do nothing when onKeypress(unknown)" in {
@@ -71,13 +71,13 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     val pluginUi = new ViewerPluginUi("item 1", 0)
     val props = FileListPluginUiProps(dispatch, onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
-    val popupProps = findComponentProps(comp, popupComp)
+    val popupProps = findComponentProps(comp, popupComp, plain = true)
     
     //then
     onClose.expects().never()
 
     //when
-    popupProps.onKeypress("unknown") shouldBe false
+    popupProps.onKeypress.map(_.apply("unknown")).getOrElse(false) shouldBe false
   }
 
   it should "update props when setViewport" in {
@@ -135,10 +135,10 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
     //then
     assertComponents(result.children, List(
-      <(popupComp())(^.assertWrapped(inside(_) {
-        case PopupProps(_, closable, focusable, _, _) =>
-          closable shouldBe true
-          focusable shouldBe true
+      <(popupComp())(^.assertPlain[PopupProps](inside(_) {
+        case PopupProps(onClose, focusable, _, _) =>
+          onClose.isDefined shouldBe true
+          focusable shouldBe js.undefined
       }))(
         <.box(
           ^.rbClickable := true,

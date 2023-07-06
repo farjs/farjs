@@ -49,10 +49,9 @@ class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils 
     val textLines = UI.splitText(props.text, textWidth)
     val height = (paddingVertical + 1) * 2 + textLines.size
 
-    assertTestComponent(result, popupComp)({ case PopupProps(onClose, resClosable, focusable, _, _) =>
-      onClose should be theSameInstanceAs props.onClose
-      resClosable shouldBe props.closable
-      focusable shouldBe true
+    assertTestComponent(result, popupComp, plain = true)({ case PopupProps(onClose, focusable, _, _) =>
+      onClose.isDefined shouldBe props.closable
+      focusable shouldBe js.undefined
     }, inside(_) { case List(content) =>
       assertTestComponent(content, modalContentComp)({
         case ModalContentProps(title, size, resStyle, padding, left, footer) =>
