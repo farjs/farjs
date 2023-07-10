@@ -22,7 +22,7 @@ case class ListPopupProps(title: String,
 
 object ListPopup extends FunctionComponent[ListPopupProps] {
 
-  private[popup] var popupComp: UiComponent[PopupProps] = Popup
+  private[popup] var popupComp: ReactClass = Popup
   private[popup] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
   private[popup] var withSizeComp: UiComponent[WithSizeProps] = WithSize
   private[popup] var listBoxComp: UiComponent[ListBoxProps] = ListBox
@@ -35,7 +35,7 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
     val textPaddingLeftStr = " " * props.textPaddingLeft
     val textPaddingRightStr = " " * props.textPaddingRight
 
-    <(popupComp())(^.plain := PopupProps(
+    <(popupComp)(^.plain := PopupProps(
       onClose = props.onClose: js.Function0[Unit],
       onKeypress = props.onKeypress: js.Function1[String, Boolean]
     ))(

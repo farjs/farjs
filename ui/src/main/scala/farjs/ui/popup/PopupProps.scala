@@ -34,16 +34,4 @@ object PopupProps {
       arg.onKeypress
     ))
   }
-
-  def copy(p: PopupProps)(onClose: js.UndefOr[js.Function0[Unit]] = p.onClose,
-                          focusable: js.UndefOr[Boolean] = p.focusable,
-                          onOpen: js.UndefOr[js.Function0[Unit]] = p.onOpen,
-                          onKeypress: js.UndefOr[js.Function1[String, Boolean]] = p.onKeypress): PopupProps = {
-    PopupProps(
-      onClose = onClose,
-      focusable = focusable,
-      onOpen = onOpen,
-      onKeypress = onKeypress
-    )
-  }
 }

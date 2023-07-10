@@ -8,7 +8,7 @@ import scala.scalajs.js
 
 object MessageBox extends FunctionComponent[MessageBoxProps] {
 
-  private[popup] var popupComp: UiComponent[PopupProps] = Popup
+  private[popup] var popupComp: ReactClass = Popup
   private[popup] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
   private[popup] var textLineComp: UiComponent[TextLineProps] = TextLine
   private[popup] var buttonsPanelComp: ReactClass = ButtonsPanel
@@ -25,7 +25,7 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
       ButtonsPanelAction(action.label, action.onAction)
     }
 
-    <(popupComp())(^.plain := PopupProps(
+    <(popupComp)(^.plain := PopupProps(
       onClose = onClose match {
         case Some(f) => f
         case None => js.undefined

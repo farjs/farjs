@@ -49,7 +49,7 @@ class ViewerPluginUi(filePath: String, size: Double)
         items
     }
 
-    <(popupComp())(^.plain := PopupProps(
+    <(popupComp)(^.plain := PopupProps(
       onClose = props.onClose,
       onKeypress = onKeypress
     ))(
@@ -85,7 +85,7 @@ class ViewerPluginUi(filePath: String, size: Double)
 
 object ViewerPluginUi {
 
-  private[viewer] var popupComp: UiComponent[PopupProps] = Popup
+  private[viewer] var popupComp: ReactClass = Popup
   private[viewer] var viewerHeader: UiComponent[ViewerHeaderProps] = ViewerHeader
   private[viewer] var viewerController: UiComponent[ViewerControllerProps] = ViewerController
   private[viewer] var bottomMenuComp: UiComponent[BottomMenuProps] = BottomMenu

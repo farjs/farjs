@@ -12,7 +12,7 @@ import scala.scalajs.js
 
 class MessageBoxSpec extends TestSpec with TestRendererUtils {
 
-  MessageBox.popupComp = mockUiComponent("Popup")
+  MessageBox.popupComp = "Popup".asInstanceOf[ReactClass]
   MessageBox.modalContentComp = mockUiComponent("ModalContent")
   MessageBox.textLineComp = mockUiComponent("TextLine")
   MessageBox.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
@@ -24,7 +24,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       MessageBoxAction.OK(onAction)
     ), DefaultTheme.popup.regular)
     val comp = testRender(<(MessageBox())(^.plain := props)())
-    val popup = findComponentProps(comp, popupComp, plain = true)
+    val popup = findPopupProps(comp)
 
     //then
     onAction.expects()
@@ -77,7 +77,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       MessageBoxAction.NO(onNoAction)
     ), DefaultTheme.popup.regular)
     val comp = testRender(<(MessageBox())(^.plain := props)())
-    val popup = findComponentProps(comp, popupComp, plain = true)
+    val popup = findPopupProps(comp)
 
     //then
     onYesAction.expects().never()
@@ -156,7 +156,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       MessageBoxAction.NO_NON_CLOSABLE(onNoAction)
     ), DefaultTheme.popup.regular)
     val comp = testRender(<(MessageBox())(^.plain := props)())
-    val popup = findComponentProps(comp, popupComp, plain = true)
+    val popup = findPopupProps(comp)
 
     //then
     onYesAction.expects().never()
@@ -180,6 +180,12 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
 
     //then
     assertMessageBox(result, props, List("YES", "NO"), closable = false)
+  }
+
+  private def findPopupProps(root: TestInstance): PopupProps = {
+    inside(findComponents(root, popupComp)) {
+      case List(popup) => popup.props.asInstanceOf[PopupProps]
+    }
   }
 
   private def assertMessageBox(result: TestInstance,
@@ -221,10 +227,11 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
       )
     }
     
-    assertTestComponent(result, popupComp, plain = true)({ case PopupProps(onClose, focusable, _, _) =>
-      onClose.isDefined shouldBe closable
-      focusable shouldBe js.undefined
-    }, inside(_) { case List(content) =>
+    assertNativeComponent(result, <(popupComp)(^.assertPlain[PopupProps](inside(_) {
+      case PopupProps(onClose, focusable, _, _) =>
+        onClose.isDefined shouldBe closable
+        focusable shouldBe js.undefined
+    }))(), inside(_) { case List(content) =>
       assertTestComponent(content, modalContentComp)({
         case ModalContentProps(title, size, style, padding, left, footer) =>
           title shouldBe props.title

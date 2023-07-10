@@ -4,6 +4,7 @@ import farjs.filelist._
 import farjs.ui.menu.BottomMenuProps
 import farjs.ui.popup.PopupProps
 import farjs.viewer.ViewerPluginUi._
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -11,7 +12,7 @@ import scala.scalajs.js
 
 class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
-  ViewerPluginUi.popupComp = mockUiComponent("Popup")
+  ViewerPluginUi.popupComp = "Popup".asInstanceOf[ReactClass]
   ViewerPluginUi.viewerHeader = mockUiComponent("ViewerHeader")
   ViewerPluginUi.viewerController = mockUiComponent("ViewerController")
   ViewerPluginUi.bottomMenuComp = mockUiComponent("BottomMenu")
@@ -31,7 +32,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
       height = 2
     )
     findComponentProps(renderer.root, viewerController).setViewport(Some(viewport))
-    val popupProps = findComponentProps(renderer.root, popupComp, plain = true)
+    val popupProps = findPopupProps(renderer.root)
     
     //then
     onClose.expects()
@@ -55,7 +56,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
       height = 2
     )
     findComponentProps(renderer.root, viewerController).setViewport(Some(viewport))
-    val popupProps = findComponentProps(renderer.root, popupComp, plain = true)
+    val popupProps = findPopupProps(renderer.root)
     
     //then
     onClose.expects()
@@ -71,7 +72,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     val pluginUi = new ViewerPluginUi("item 1", 0)
     val props = FileListPluginUiProps(dispatch, onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
-    val popupProps = findComponentProps(comp, popupComp, plain = true)
+    val popupProps = findPopupProps(comp)
     
     //then
     onClose.expects().never()
@@ -135,7 +136,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
     //then
     assertComponents(result.children, List(
-      <(popupComp())(^.assertPlain[PopupProps](inside(_) {
+      <(popupComp)(^.assertPlain[PopupProps](inside(_) {
         case PopupProps(onClose, focusable, _, _) =>
           onClose.isDefined shouldBe true
           focusable shouldBe js.undefined
@@ -177,5 +178,11 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
         )
       )
     ))
+  }
+
+  private def findPopupProps(root: TestInstance): PopupProps = {
+    inside(findComponents(root, popupComp)) {
+      case List(popup) => popup.props.asInstanceOf[PopupProps]
+    }
   }
 }

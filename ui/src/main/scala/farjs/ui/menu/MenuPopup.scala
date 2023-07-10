@@ -16,7 +16,7 @@ case class MenuPopupProps(title: String,
 
 object MenuPopup extends FunctionComponent[MenuPopupProps] {
 
-  private[menu] var popupComp: UiComponent[PopupProps] = Popup
+  private[menu] var popupComp: ReactClass = Popup
   private[menu] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
   private[menu] var buttonComp: ReactClass = Button
 
@@ -28,7 +28,7 @@ object MenuPopup extends FunctionComponent[MenuPopupProps] {
     val height = (paddingVertical + 1) * 2 + props.items.size
     val theme = Theme.useTheme().popup.menu
 
-    <(popupComp())(^.plain := PopupProps(onClose = props.onClose: js.Function0[Unit]))(
+    <(popupComp)(^.plain := PopupProps(onClose = props.onClose: js.Function0[Unit]))(
       <(modalContentComp())(^.wrapped := ModalContentProps(
         title = props.title,
         size = (width, height),

@@ -7,6 +7,7 @@ import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest._
 import scommons.nodejs.test.TestSpec
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -14,7 +15,7 @@ import scala.scalajs.js
 
 class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils {
 
-  StatusPopup.popupComp = mockUiComponent("Popup")
+  StatusPopup.popupComp = "Popup".asInstanceOf[ReactClass]
   StatusPopup.modalContentComp = mockUiComponent("ModalContent")
   StatusPopup.textLineComp = mockUiComponent("TextLine")
 
@@ -49,10 +50,11 @@ class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils 
     val textLines = UI.splitText(props.text, textWidth)
     val height = (paddingVertical + 1) * 2 + textLines.size
 
-    assertTestComponent(result, popupComp, plain = true)({ case PopupProps(onClose, focusable, _, _) =>
-      onClose.isDefined shouldBe props.closable
-      focusable shouldBe js.undefined
-    }, inside(_) { case List(content) =>
+    assertNativeComponent(result, <(popupComp)(^.assertPlain[PopupProps](inside(_) {
+      case PopupProps(onClose, focusable, _, _) =>
+        onClose.isDefined shouldBe props.closable
+        focusable shouldBe js.undefined
+    }))(), inside(_) { case List(content) =>
       assertTestComponent(content, modalContentComp)({
         case ModalContentProps(title, size, resStyle, padding, left, footer) =>
           title shouldBe props.title

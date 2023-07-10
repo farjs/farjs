@@ -18,7 +18,7 @@ case class MenuBarProps(items: List[(String, List[String])],
 
 object MenuBar extends FunctionComponent[MenuBarProps] {
 
-  private[menu] var popupComp: UiComponent[PopupProps] = Popup
+  private[menu] var popupComp: ReactClass = Popup
   private[menu] var buttonsPanel: ReactClass = ButtonsPanel
   private[menu] var subMenuComp: UiComponent[SubMenuProps] = SubMenu
 
@@ -105,7 +105,7 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
     }
 
     <.>()(
-      <(popupComp())(^.plain := PopupProps(onClose = props.onClose: js.Function0[Unit], onKeypress = onKeypress))(
+      <(popupComp)(^.plain := PopupProps(onClose = props.onClose: js.Function0[Unit], onKeypress = onKeypress))(
         <.box(
           ^.rbHeight := 1,
           ^.rbStyle := theme

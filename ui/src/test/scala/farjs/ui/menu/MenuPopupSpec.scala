@@ -13,7 +13,7 @@ import scala.scalajs.js
 
 class MenuPopupSpec extends TestSpec with TestRendererUtils {
 
-  MenuPopup.popupComp = mockUiComponent("Popup")
+  MenuPopup.popupComp = "Popup".asInstanceOf[ReactClass]
   MenuPopup.modalContentComp = mockUiComponent("ModalContent")
   MenuPopup.buttonComp = "Button".asInstanceOf[ReactClass]
 
@@ -73,11 +73,11 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
     val height = 2 * 2 + props.items.size
     val theme = DefaultTheme.popup.menu
 
-    assertTestComponent(result, popupComp, plain = true)({
+    assertNativeComponent(result, <(popupComp)(^.assertPlain[PopupProps](inside(_) {
       case PopupProps(onClose, focusable, _, _) =>
         onClose.isDefined shouldBe true
         focusable shouldBe js.undefined
-    }, inside(_) { case List(content) =>
+    }))(), inside(_) { case List(content) =>
       assertTestComponent(content, modalContentComp)({
         case ModalContentProps(title, resSize, style, padding, left, footer) =>
           title shouldBe props.title

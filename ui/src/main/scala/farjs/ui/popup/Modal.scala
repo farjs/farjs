@@ -12,13 +12,13 @@ case class ModalProps(title: String,
 
 object Modal extends FunctionComponent[ModalProps] {
 
-  private[popup] var popupComp: UiComponent[PopupProps] = Popup
+  private[popup] var popupComp: ReactClass = Popup
   private[popup] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
 
-    <(popupComp())(^.plain := PopupProps(onClose = props.onCancel: js.Function0[Unit]))(
+    <(popupComp)(^.plain := PopupProps(onClose = props.onCancel: js.Function0[Unit]))(
       <(modalContentComp())(^.wrapped := ModalContentProps(
         title = props.title,
         size = props.size,

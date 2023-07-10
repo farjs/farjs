@@ -4,13 +4,14 @@ import farjs.ui.popup.ListPopup._
 import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
 import farjs.ui.{ListBoxProps, WithSizeProps}
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.scalajs.js
 
 class ListPopupSpec extends TestSpec with TestRendererUtils {
 
-  ListPopup.popupComp = mockUiComponent("Popup")
+  ListPopup.popupComp = "Popup".asInstanceOf[ReactClass]
   ListPopup.modalContentComp = mockUiComponent("ModalContent")
   ListPopup.withSizeComp = mockUiComponent("WithSize")
   ListPopup.listBoxComp = mockUiComponent("ListBox")
@@ -120,7 +121,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
     val contentHeight = expectedHeight - 2 * (paddingVertical + 1)
     
     assertComponents(result.children, List(
-      <(popupComp())(^.assertPlain[PopupProps](inside(_) {
+      <(popupComp)(^.assertPlain[PopupProps](inside(_) {
         case PopupProps(onClose, focusable, _, onKeypress) =>
           onClose.isDefined shouldBe true
           focusable shouldBe js.undefined

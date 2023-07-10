@@ -15,7 +15,7 @@ case class StatusPopupProps(text: String,
 
 object StatusPopup extends FunctionComponent[StatusPopupProps] {
 
-  private[popup] var popupComp: UiComponent[PopupProps] = Popup
+  private[popup] var popupComp: ReactClass = Popup
   private[popup] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
   private[popup] var textLineComp: UiComponent[TextLineProps] = TextLine
 
@@ -32,7 +32,7 @@ object StatusPopup extends FunctionComponent[StatusPopupProps] {
       override val fg = theme.fg
     }
 
-    <(popupComp())(^.plain := PopupProps(
+    <(popupComp)(^.plain := PopupProps(
       onClose =
         if (props.closable) props.onClose: js.Function0[Unit]
         else js.undefined
