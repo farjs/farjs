@@ -17,7 +17,7 @@ import scala.scalajs.js
 class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
 
   FileExistsPopup.modalComp = mockUiComponent("Modal")
-  FileExistsPopup.textLineComp = mockUiComponent("TextLine")
+  FileExistsPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
   FileExistsPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
   FileExistsPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
@@ -181,7 +181,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
           ^.content := "File already exists"
         )()
       )
-      assertTestComponent(item, textLineComp, plain = true) {
+      assertNativeComponent(item, <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
         case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
           align shouldBe TextAlign.center
           left shouldBe 2
@@ -191,7 +191,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
           resStyle shouldBe theme
           focused shouldBe js.undefined
           padding shouldBe 0
-      }
+      }))())
       assertTestComponent(sep1, horizontalLineComp, plain = true) {
         case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
           resLeft shouldBe 0
@@ -213,7 +213,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
               |Existing""".stripMargin
         )()
       )
-      assertTestComponent(newItem, textLineComp, plain = true) {
+      assertNativeComponent(newItem, <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
         case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
           align shouldBe TextAlign.right
           left shouldBe 2
@@ -223,8 +223,8 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
           resStyle shouldBe theme
           focused shouldBe js.undefined
           padding shouldBe 0
-      }
-      assertTestComponent(existing, textLineComp, plain = true) {
+      }))())
+      assertNativeComponent(existing, <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
         case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
           align shouldBe TextAlign.right
           left shouldBe 2
@@ -234,7 +234,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
           resStyle shouldBe theme
           focused shouldBe js.undefined
           padding shouldBe 0
-      }
+      }))())
 
       assertTestComponent(sep2, horizontalLineComp, plain = true) {
         case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>

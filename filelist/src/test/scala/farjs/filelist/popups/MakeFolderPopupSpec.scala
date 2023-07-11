@@ -19,7 +19,7 @@ import scala.scalajs.js
 class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   MakeFolderPopup.modalComp = mockUiComponent("Modal")
-  MakeFolderPopup.textLineComp = mockUiComponent("TextLine")
+  MakeFolderPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
   MakeFolderPopup.comboBoxComp = mockUiComponent("ComboBox")
   MakeFolderPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
   MakeFolderPopup.checkBoxComp = mockUiComponent("CheckBox")
@@ -238,7 +238,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
           resStyle shouldBe style
           onCancel should be theSameInstanceAs props.onCancel
       }))(
-        <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+        <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
           case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
             align shouldBe TextAlign.left
             left shouldBe 2

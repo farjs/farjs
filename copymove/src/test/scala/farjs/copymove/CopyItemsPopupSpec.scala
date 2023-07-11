@@ -21,7 +21,7 @@ import scala.scalajs.js
 class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   CopyItemsPopup.modalComp = mockUiComponent("Modal")
-  CopyItemsPopup.textLineComp = mockUiComponent("TextLine")
+  CopyItemsPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
   CopyItemsPopup.comboBoxComp = mockUiComponent("ComboBox")
   CopyItemsPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
   CopyItemsPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
@@ -227,7 +227,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
                          sep: TestInstance,
                          actionsBox: TestInstance): Assertion = {
 
-      assertTestComponent(label, textLineComp, plain = true) {
+      assertNativeComponent(label, <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
         case TextLineProps(align, left, top, resWidth, resText, resStyle, focused, padding) =>
           align shouldBe TextAlign.left
           left shouldBe 2
@@ -237,7 +237,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
           resStyle shouldBe style
           focused shouldBe js.undefined
           padding shouldBe 0
-      }
+      }))())
       assertTestComponent(input, comboBoxComp, plain = true) {
         case ComboBoxProps(left, top, resWidth, resItems, resValue, _, _) =>
           left shouldBe 2

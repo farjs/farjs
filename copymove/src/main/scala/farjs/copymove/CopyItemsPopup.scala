@@ -22,7 +22,7 @@ case class CopyItemsPopupProps(move: Boolean,
 object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
 
   private[copymove] var modalComp: UiComponent[ModalProps] = Modal
-  private[copymove] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[copymove] var textLineComp: ReactClass = TextLine
   private[copymove] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
   private[copymove] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
   private[copymove] var buttonsPanelComp: ReactClass = ButtonsPanel
@@ -66,7 +66,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
 
     maybeItems.map { items =>
       <(modalComp())(^.wrapped := ModalProps(title, size, theme, props.onCancel))(
-        <(textLineComp())(^.plain := TextLineProps(
+        <(textLineComp)(^.plain := TextLineProps(
           align = TextAlign.left,
           left = contentLeft,
           top = 1,

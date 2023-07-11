@@ -21,7 +21,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
   with TestRendererUtils {
 
   QuickViewDir.statusPopupComp = mockUiComponent("StatusPopup")
-  QuickViewDir.textLineComp = mockUiComponent("TextLine")
+  QuickViewDir.textLineComp = "TextLine".asInstanceOf[ReactClass]
 
   private val currComp = "QuickViewPanel".asInstanceOf[ReactClass]
 
@@ -252,7 +252,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
             |Files size""".stripMargin
       )(),
 
-      <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+      <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
         case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
           align shouldBe TextAlign.left
           left shouldBe 12

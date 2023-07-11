@@ -20,7 +20,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
 
   QuickViewPanel.doubleBorderComp = mockUiComponent("DoubleBorder")
   QuickViewPanel.horizontalLineComp = mockUiComponent("HorizontalLine")
-  QuickViewPanel.textLineComp = mockUiComponent("TextLine")
+  QuickViewPanel.textLineComp = "TextLine".asInstanceOf[ReactClass]
   QuickViewPanel.quickViewDirComp = mockUiComponent("QuickViewDir")
   QuickViewPanel.quickViewFileComp = mockUiComponent("QuickViewFile")
 
@@ -161,7 +161,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
           startCh shouldBe DoubleChars.leftSingle
           endCh shouldBe DoubleChars.rightSingle
       }
-      assertTestComponent(header, textLineComp, plain = true) {
+      assertNativeComponent(header, <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
         case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
           align shouldBe TextAlign.center
           left shouldBe 1
@@ -171,7 +171,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
           style shouldBe theme.regularItem
           focused shouldBe !state.isActive
           padding shouldBe js.undefined
-      }
+      }))())
 
       if (currItem.isDir) {
         assertTestComponent(content, quickViewDirComp) {

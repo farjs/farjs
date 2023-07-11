@@ -14,7 +14,7 @@ case class ViewerHeaderProps(filePath: String,
 object ViewerHeader extends FunctionComponent[ViewerHeaderProps] {
 
   private[viewer] var withSizeComp: UiComponent[WithSizeProps] = WithSize
-  private[viewer] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[viewer] var textLineComp: ReactClass = TextLine
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -31,7 +31,7 @@ object ViewerHeader extends FunctionComponent[ViewerHeaderProps] {
         width - encodingWidth - sizeWidth - columnWidth - percentWidth - gapWidth * 3
 
       <.box(^.rbStyle := style)(
-        <(textLineComp())(^.plain := TextLineProps(
+        <(textLineComp)(^.plain := TextLineProps(
           align = TextAlign.left,
           left = 0,
           top = 0,
@@ -40,7 +40,7 @@ object ViewerHeader extends FunctionComponent[ViewerHeaderProps] {
           style = style,
           padding = 0
         ))(),
-        <(textLineComp())(^.plain := TextLineProps(
+        <(textLineComp)(^.plain := TextLineProps(
           align = TextAlign.center,
           left = dynamicWidth + gapWidth,
           top = 0,
@@ -49,7 +49,7 @@ object ViewerHeader extends FunctionComponent[ViewerHeaderProps] {
           style = style,
           padding = 0
         ))(),
-        <(textLineComp())(^.plain := TextLineProps(
+        <(textLineComp)(^.plain := TextLineProps(
           align = TextAlign.right,
           left = dynamicWidth + encodingWidth + gapWidth * 2,
           top = 0,
@@ -58,7 +58,7 @@ object ViewerHeader extends FunctionComponent[ViewerHeaderProps] {
           style = style,
           padding = 0
         ))(),
-        <(textLineComp())(^.plain := TextLineProps(
+        <(textLineComp)(^.plain := TextLineProps(
           align = TextAlign.left,
           left = width - columnWidth - percentWidth,
           top = 0,
@@ -67,7 +67,7 @@ object ViewerHeader extends FunctionComponent[ViewerHeaderProps] {
           style = style,
           padding = 0
         ))(),
-        <(textLineComp())(^.plain := TextLineProps(
+        <(textLineComp)(^.plain := TextLineProps(
           align = TextAlign.right,
           left = width - percentWidth,
           top = 0,

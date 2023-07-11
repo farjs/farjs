@@ -15,7 +15,7 @@ case class FileListColumnProps(size: (Int, Int),
 
 object FileListColumn extends FunctionComponent[FileListColumnProps] {
 
-  private[filelist] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[filelist] var textLineComp: ReactClass = TextLine
 
   override protected def create(): ReactClass = {
     ReactMemo[Props](super.create(), { (prevProps, nextProps) =>
@@ -72,7 +72,7 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
       ^.rbLeft := props.left,
       ^.rbStyle := theme.regularItem
     )(
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.center,
         left = 0,
         top = 0,

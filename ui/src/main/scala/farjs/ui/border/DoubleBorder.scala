@@ -7,7 +7,7 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
 
   private[border] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
   private[border] var verticalLineComp: UiComponent[VerticalLineProps] = VerticalLine
-  private[border] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[border] var textLineComp: ReactClass = TextLine
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
@@ -26,7 +26,7 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
       ))(),
       
       props.title.toOption.map { title =>
-        <(textLineComp())(^.plain := TextLineProps(
+        <(textLineComp)(^.plain := TextLineProps(
           align = TextAlign.center,
           left = left,
           top = top,
@@ -63,7 +63,7 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
       ))(),
 
       props.footer.toOption.map { footer =>
-        <(textLineComp())(^.plain := TextLineProps(
+        <(textLineComp)(^.plain := TextLineProps(
           align = TextAlign.center,
           left = left,
           top = top + props.height - 1,

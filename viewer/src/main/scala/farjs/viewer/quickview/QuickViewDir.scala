@@ -26,7 +26,7 @@ case class QuickViewDirProps(dispatch: Dispatch,
 object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
 
   private[quickview] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
-  private[quickview] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[quickview] var textLineComp: ReactClass = TextLine
 
   protected def render(compProps: Props): ReactElement = {
     val (showPopup, setShowPopup) = useState(false)
@@ -111,7 +111,7 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
             |Files size""".stripMargin
       )(),
 
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.left,
         left = 12,
         top = 2,

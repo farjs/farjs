@@ -4,6 +4,7 @@ import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
 import farjs.ui.{TextAlign, TextLineProps, WithSizeProps}
 import farjs.viewer.ViewerHeader._
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -12,7 +13,7 @@ import scala.scalajs.js
 class ViewerHeaderSpec extends TestSpec with TestRendererUtils {
 
   ViewerHeader.withSizeComp = mockUiComponent("WithSize")
-  ViewerHeader.textLineComp = mockUiComponent("TextLine")
+  ViewerHeader.textLineComp = "TextLine".asInstanceOf[ReactClass]
 
   it should "render component" in {
     //given
@@ -47,7 +48,7 @@ class ViewerHeaderSpec extends TestSpec with TestRendererUtils {
           val content = createTestRenderer(render(width, 25)).root
 
           assertNativeComponent(content, <.box(^.rbStyle := style)(
-            <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+            <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
               case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
                 align shouldBe TextAlign.left
                 left shouldBe 0
@@ -58,7 +59,7 @@ class ViewerHeaderSpec extends TestSpec with TestRendererUtils {
                 focused shouldBe js.undefined
                 padding shouldBe 0
             }))(),
-            <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+            <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
               case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
                 align shouldBe TextAlign.center
                 left shouldBe (dynamicWidth + gapWidth)
@@ -69,7 +70,7 @@ class ViewerHeaderSpec extends TestSpec with TestRendererUtils {
                 focused shouldBe js.undefined
                 padding shouldBe 0
             }))(),
-            <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+            <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
               case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
                 align shouldBe TextAlign.right
                 left shouldBe (dynamicWidth + encodingWidth + gapWidth * 2)
@@ -80,7 +81,7 @@ class ViewerHeaderSpec extends TestSpec with TestRendererUtils {
                 focused shouldBe js.undefined
                 padding shouldBe 0
             }))(),
-            <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+            <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
               case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
                 align shouldBe TextAlign.left
                 left shouldBe (width - columnWidth - percentWidth)
@@ -91,7 +92,7 @@ class ViewerHeaderSpec extends TestSpec with TestRendererUtils {
                 focused shouldBe js.undefined
                 padding shouldBe 0
             }))(),
-            <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+            <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
               case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
                 align shouldBe TextAlign.right
                 left shouldBe (width - percentWidth)

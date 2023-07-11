@@ -61,7 +61,7 @@
     "react-blessed": "0.7.2",
     "react": "^17.0.1",
     "blessed": "0.1.81",
-    "@farjs/ui": "0.3.3",
+    "@farjs/ui": "0.3.4",
     "@farjs/better-sqlite3-websql": "^1.0.1",
     "iconv-lite": "0.6.3"
   },

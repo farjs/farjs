@@ -14,7 +14,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
 
   MessageBox.popupComp = "Popup".asInstanceOf[ReactClass]
   MessageBox.modalContentComp = mockUiComponent("ModalContent")
-  MessageBox.textLineComp = mockUiComponent("TextLine")
+  MessageBox.textLineComp = "TextLine".asInstanceOf[ReactClass]
   MessageBox.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
   "OK popup" should "call OK action when onClose popup" in {
@@ -202,7 +202,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
 
       msgs.size shouldBe textLines.size
       msgs.zip(textLines).zipWithIndex.foreach { case ((msg, textLine), index) =>
-        assertTestComponent(msg, textLineComp, plain = true) {
+        assertNativeComponent(msg, <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
           case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
             align shouldBe TextAlign.center
             left shouldBe 2
@@ -212,7 +212,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
             style shouldBe props.style
             focused shouldBe js.undefined
             padding shouldBe 0
-        }
+        }))())
       }
       
       assertNativeComponent(actionsBox,

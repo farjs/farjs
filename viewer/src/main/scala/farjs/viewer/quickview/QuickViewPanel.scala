@@ -14,7 +14,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
 
   private[quickview] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
   private[quickview] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
-  private[quickview] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[quickview] var textLineComp: ReactClass = TextLine
   private[quickview] var quickViewDirComp: UiComponent[QuickViewDirProps] = QuickViewDir
   private[quickview] var quickViewFileComp: UiComponent[QuickViewFileProps] = QuickViewFile
 
@@ -49,7 +49,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
         startCh = DoubleChars.leftSingle,
         endCh = DoubleChars.rightSingle
       ))(),
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.center,
         left = 1,
         top = 0,

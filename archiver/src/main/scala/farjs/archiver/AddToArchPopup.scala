@@ -18,7 +18,7 @@ case class AddToArchPopupProps(zipName: String,
 object AddToArchPopup extends FunctionComponent[AddToArchPopupProps] {
 
   private[archiver] var modalComp: UiComponent[ModalProps] = Modal
-  private[archiver] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[archiver] var textLineComp: ReactClass = TextLine
   private[archiver] var textBoxComp: UiComponent[TextBoxProps] = TextBox
   private[archiver] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
   private[archiver] var buttonsPanelComp: ReactClass = ButtonsPanel
@@ -43,7 +43,7 @@ object AddToArchPopup extends FunctionComponent[AddToArchPopupProps] {
     )
 
     <(modalComp())(^.wrapped := ModalProps(s"${props.action} files to archive", size, theme, props.onCancel))(
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.left,
         left = contentLeft,
         top = 1,

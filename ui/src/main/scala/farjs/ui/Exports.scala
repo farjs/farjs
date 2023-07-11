@@ -22,10 +22,6 @@ object Exports {
 
   val TextBox: ReactClass = farjs.ui.TextBox()
 
-  val TextAlign: TextAlign = farjs.ui.TextAlign
-
-  val TextLine: ReactClass = farjs.ui.TextLine()
-
   val WithSize: ReactClass = farjs.ui.WithSize()
 
   val border: BorderExports = farjs.ui.border.BorderExports

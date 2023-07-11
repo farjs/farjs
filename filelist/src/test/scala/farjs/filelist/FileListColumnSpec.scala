@@ -7,6 +7,7 @@ import farjs.filelist.theme.FileListThemeSpec.withThemeContext
 import farjs.ui._
 import farjs.ui.border._
 import org.scalatest.Assertion
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -14,7 +15,7 @@ import scala.scalajs.js
 
 class FileListColumnSpec extends TestSpec with TestRendererUtils {
 
-  FileListColumn.textLineComp = mockUiComponent("TextLine")
+  FileListColumn.textLineComp = "TextLine".asInstanceOf[ReactClass]
 
   it should "not re-render component if the same props" in {
     //given
@@ -155,7 +156,7 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
     val theme = currTheme.fileList
     
     def assertElements(header: TestInstance, itemsText: Option[TestInstance]): Assertion = {
-      assertTestComponent(header, textLineComp, plain = true) {
+      assertNativeComponent(header, <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
         case TextLineProps(align, left, top, width, text, style, focused, padding) =>
           align shouldBe TextAlign.center
           left shouldBe 0
@@ -165,7 +166,7 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
           style shouldBe theme.header
           focused shouldBe js.undefined
           padding shouldBe 0
-      }
+      }))())
 
       expectedContent.foreach { content =>
         val textEl = inside(itemsText) {

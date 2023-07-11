@@ -19,7 +19,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   FileListPanelView.doubleBorderComp = mockUiComponent("DoubleBorder")
   FileListPanelView.horizontalLineComp = mockUiComponent("HorizontalLine")
   FileListPanelView.fileListComp = mockUiComponent("FileList")
-  FileListPanelView.textLineComp = mockUiComponent("TextLine")
+  FileListPanelView.textLineComp = "TextLine".asInstanceOf[ReactClass]
   FileListPanelView.sortIndicator = mockUiComponent("SortIndicator")
 
   private val (width, height) = (25, 15)
@@ -220,7 +220,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           columns shouldBe 2
           onKeypress shouldBe props.onKeypress
       }))(),
-      <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+      <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
         case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
           align shouldBe TextAlign.center
           left shouldBe 1
@@ -238,7 +238,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
       }))(),
       
       selected.map { selectedText =>
-        <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+        <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
           case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
             align shouldBe TextAlign.center
             left shouldBe 1
@@ -251,7 +251,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
         }))()
       },
       
-      <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+      <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
         case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
           align shouldBe TextAlign.left
           left shouldBe 1
@@ -262,7 +262,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           focused shouldBe js.undefined
           padding shouldBe 0
       }))(),
-      <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+      <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
         case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
           align shouldBe TextAlign.right
           left shouldBe (1 + width - 2 - 12)
@@ -274,7 +274,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           padding shouldBe 0
       }))(),
       
-      <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+      <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
         case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
           align shouldBe TextAlign.left
           left shouldBe 1
@@ -285,7 +285,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           focused shouldBe js.undefined
           padding shouldBe 0
       }))(),
-      <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+      <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
         case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
           align shouldBe TextAlign.right
           left shouldBe (1 + width - 2 - 25)
@@ -298,7 +298,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           padding shouldBe 0
       }))(),
       
-      <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+      <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
         case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
           align shouldBe TextAlign.center
           left shouldBe 1
@@ -310,7 +310,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           padding shouldBe js.undefined
       }))(),
       diskSpace.map { bytes =>
-        <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+        <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
           case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
             align shouldBe TextAlign.center
             left shouldBe ((width - 2) / 2 + 1)

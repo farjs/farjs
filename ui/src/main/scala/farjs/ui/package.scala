@@ -16,4 +16,11 @@ package object ui {
   @js.native
   @JSImport("@farjs/ui/ButtonsPanel.mjs", JSImport.Default)
   object ButtonsPanel extends ReactClass
+
+  @js.native
+  @JSImport("@farjs/ui/TextLine.mjs", JSImport.Default)
+  object TextLine extends ReactClass {
+
+    def wrapText(text: String, width: Int, prefixLen: js.UndefOr[Int] = js.undefined): String = js.native
+  }
 }

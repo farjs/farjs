@@ -22,7 +22,7 @@ case class CopyProgressPopupProps(move: Boolean,
 object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
 
   private[copymove] var modalComp: UiComponent[ModalProps] = Modal
-  private[copymove] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[copymove] var textLineComp: ReactClass = TextLine
   private[copymove] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
   private[copymove] var progressBarComp: UiComponent[ProgressBarProps] = ProgressBar
 
@@ -44,7 +44,7 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
              |to
              |""".stripMargin
       )(),
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.left,
         left = contentLeft,
         top = 2,
@@ -53,7 +53,7 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
         style = theme,
         padding = 0
       ))(),
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.left,
         left = contentLeft,
         top = 4,
@@ -77,7 +77,7 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
         lineCh = SingleChars.horizontal,
         style = theme
       ))(),
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.center,
         left = contentLeft,
         top = 6,
@@ -107,7 +107,7 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
         ^.rbStyle := theme,
         ^.content := s"Time: ${toTime(props.timeSeconds)} Left: ${toTime(props.leftSeconds)}"
       )(),
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.right,
         left = contentLeft + 30,
         top = 9,

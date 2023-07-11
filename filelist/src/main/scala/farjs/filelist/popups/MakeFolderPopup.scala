@@ -19,7 +19,7 @@ case class MakeFolderPopupProps(multiple: Boolean,
 object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
 
   private[popups] var modalComp: UiComponent[ModalProps] = Modal
-  private[popups] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[popups] var textLineComp: ReactClass = TextLine
   private[popups] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
   private[popups] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
   private[popups] var checkBoxComp: UiComponent[CheckBoxProps] = CheckBox
@@ -60,7 +60,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
 
     maybeItems.map { items =>
       <(modalComp())(^.wrapped := ModalProps("Make Folder", size, theme, props.onCancel))(
-        <(textLineComp())(^.plain := TextLineProps(
+        <(textLineComp)(^.plain := TextLineProps(
           align = TextAlign.left,
           left = contentLeft,
           top = 1,

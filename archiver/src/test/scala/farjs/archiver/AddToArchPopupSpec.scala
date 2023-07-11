@@ -14,7 +14,7 @@ import scala.scalajs.js
 class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
 
   AddToArchPopup.modalComp = mockUiComponent("Modal")
-  AddToArchPopup.textLineComp = mockUiComponent("TextLine")
+  AddToArchPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
   AddToArchPopup.textBoxComp = mockUiComponent("TextBox")
   AddToArchPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
   AddToArchPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
@@ -133,7 +133,7 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
           resStyle shouldBe style
           onCancel should be theSameInstanceAs props.onCancel
       }))(
-        <(textLineComp())(^.assertPlain[TextLineProps](inside(_) {
+        <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
           case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
             align shouldBe TextAlign.left
             left shouldBe 2

@@ -21,7 +21,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
   private[filelist] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
   private[filelist] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
   private[filelist] var fileListComp: UiComponent[FileListProps] = FileList
-  private[filelist] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[filelist] var textLineComp: ReactClass = TextLine
   private[filelist] var sortIndicator: UiComponent[SortIndicatorProps] = SortIndicator
 
   protected def render(compProps: Props): ReactElement = {
@@ -53,7 +53,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         columns = 2,
         onKeypress = props.onKeypress
       ))(),
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.center,
         left = 1,
         top = 0,
@@ -68,7 +68,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
       ))(),
 
       if (selectedItems.nonEmpty) Some(
-        <(textLineComp())(^.plain := TextLineProps(
+        <(textLineComp)(^.plain := TextLineProps(
           align = TextAlign.center,
           left = 1,
           top = height - 4,
@@ -84,7 +84,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
       )
       else None,
 
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.left,
         left = 1,
         top = height - 3,
@@ -93,7 +93,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         style = theme.regularItem,
         padding = 0
       ))(),
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.right,
         left = 1 + width - 2 - 12,
         top = height - 3,
@@ -107,7 +107,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         padding = 0
       ))(),
 
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.left,
         left = 1,
         top = height - 2,
@@ -116,7 +116,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         style = theme.regularItem,
         padding = 0
       ))(),
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.right,
         left = 1 + width - 2 - 25,
         top = height - 2,
@@ -129,7 +129,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         padding = 0
       ))(),
 
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.center,
         left = 1,
         top = height - 1,
@@ -142,7 +142,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         style = theme.regularItem
       ))(),
       props.state.diskSpace.map { bytes =>
-        <(textLineComp())(^.plain := TextLineProps(
+        <(textLineComp)(^.plain := TextLineProps(
           align = TextAlign.center,
           left = (width - 2) / 2 + 1,
           top = height - 1,

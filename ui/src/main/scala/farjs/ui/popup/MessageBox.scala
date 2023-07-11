@@ -10,7 +10,7 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
 
   private[popup] var popupComp: ReactClass = Popup
   private[popup] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
-  private[popup] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[popup] var textLineComp: ReactClass = TextLine
   private[popup] var buttonsPanelComp: ReactClass = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
@@ -37,7 +37,7 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
         style = props.style
       ))(
         textLines.zipWithIndex.map { case (text, index) =>
-          <(textLineComp())(^.key := s"$index", ^.plain := TextLineProps(
+          <(textLineComp)(^.key := s"$index", ^.plain := TextLineProps(
             align = TextAlign.center,
             left = 2,
             top = 1 + index,

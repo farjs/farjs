@@ -17,7 +17,7 @@ object StatusPopup extends FunctionComponent[StatusPopupProps] {
 
   private[popup] var popupComp: ReactClass = Popup
   private[popup] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
-  private[popup] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[popup] var textLineComp: ReactClass = TextLine
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -50,7 +50,7 @@ object StatusPopup extends FunctionComponent[StatusPopupProps] {
           ^.rbStyle := style
         )(
           textLines.zipWithIndex.map { case (text, index) =>
-            <(textLineComp())(^.key := s"$index", ^.plain := TextLineProps(
+            <(textLineComp)(^.key := s"$index", ^.plain := TextLineProps(
               align = TextAlign.center,
               left = 0,
               top = index,

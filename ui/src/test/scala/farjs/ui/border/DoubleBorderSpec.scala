@@ -3,6 +3,7 @@ package farjs.ui.border
 import farjs.ui._
 import farjs.ui.border.DoubleBorder._
 import org.scalatest.{Assertion, Succeeded}
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -12,7 +13,7 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
 
   DoubleBorder.horizontalLineComp = mockUiComponent("HorizontalLine")
   DoubleBorder.verticalLineComp = mockUiComponent("VerticalLine")
-  DoubleBorder.textLineComp = mockUiComponent("TextLine")
+  DoubleBorder.textLineComp = "TextLine".asInstanceOf[ReactClass]
 
   it should "render component" in {
     //given
@@ -83,7 +84,7 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
 
       title.isDefined shouldBe props.title.isDefined
       title.foreach { t =>
-        assertTestComponent(t, textLineComp, plain = true) {
+        assertNativeComponent(t, <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
           case TextLineProps(align, resLeft, resTop, resWidth, text, style, focused, padding) =>
             align shouldBe TextAlign.center
             resLeft shouldBe left
@@ -93,7 +94,7 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
             style shouldBe props.style
             focused shouldBe js.undefined
             padding shouldBe js.undefined
-        }
+        }))())
       }
 
       assertTestComponent(line2, verticalLineComp, plain = true) {
@@ -129,7 +130,7 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
 
       footer.isDefined shouldBe props.footer.isDefined
       footer.foreach { t =>
-        assertTestComponent(t, textLineComp, plain = true) {
+        assertNativeComponent(t, <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
           case TextLineProps(align, resLeft, resTop, resWidth, text, style, focused, padding) =>
             align shouldBe TextAlign.center
             resLeft shouldBe left
@@ -139,7 +140,7 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
             style shouldBe props.style
             focused shouldBe js.undefined
             padding shouldBe js.undefined
-        }
+        }))())
       }
       Succeeded
     }

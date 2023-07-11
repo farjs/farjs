@@ -19,7 +19,7 @@ case class FileExistsPopupProps(newItem: FileListItem,
 object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
   
   private[copymove] var modalComp: UiComponent[ModalProps] = Modal
-  private[copymove] var textLineComp: UiComponent[TextLineProps] = TextLine
+  private[copymove] var textLineComp: ReactClass = TextLine
   private[copymove] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
   private[copymove] var buttonsPanelComp: ReactClass = ButtonsPanel
 
@@ -50,7 +50,7 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
         ^.rbStyle := theme,
         ^.content := "File already exists"
       )(),
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.center,
         left = contentLeft,
         top = 2,
@@ -77,7 +77,7 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
           """New
             |Existing""".stripMargin
       )(),
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.right,
         left = contentLeft,
         top = 4,
@@ -89,7 +89,7 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
         style = theme,
         padding = 0
       ))(),
-      <(textLineComp())(^.plain := TextLineProps(
+      <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.right,
         left = contentLeft,
         top = 5,

@@ -5,7 +5,7 @@ import scommons.react.blessed.BlessedStyle
 import scala.scalajs.js
 
 sealed trait TextLineProps extends js.Object {
-  val align: String
+  val align: TextAlign
   val left: Int
   val top: Int
   val width: Int
@@ -17,7 +17,7 @@ sealed trait TextLineProps extends js.Object {
 
 object TextLineProps {
 
-  def apply(align: String,
+  def apply(align: TextAlign,
             left: Int,
             top: Int,
             width: Int,
@@ -38,7 +38,7 @@ object TextLineProps {
     ).asInstanceOf[TextLineProps]
   }
 
-  def unapply(arg: TextLineProps): Option[(String, Int, Int, Int, String, BlessedStyle, js.UndefOr[Boolean], js.UndefOr[Int])] = {
+  def unapply(arg: TextLineProps): Option[(TextAlign, Int, Int, Int, String, BlessedStyle, js.UndefOr[Boolean], js.UndefOr[Int])] = {
     Some((
       arg.align,
       arg.left,
@@ -49,26 +49,5 @@ object TextLineProps {
       arg.focused,
       arg.padding
     ))
-  }
-  
-  def copy(p: TextLineProps)(align: String = p.align,
-                             left: Int = p.left,
-                             top: Int = p.top,
-                             width: Int = p.width,
-                             text: String = p.text,
-                             style: BlessedStyle = p.style,
-                             focused: js.UndefOr[Boolean] = p.focused,
-                             padding: js.UndefOr[Int] = p.padding): TextLineProps = {
-
-    TextLineProps(
-      align = align,
-      left = left,
-      top = top,
-      width = width,
-      text = text,
-      style = style,
-      focused = focused,
-      padding = padding
-    )
   }
 }

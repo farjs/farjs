@@ -17,7 +17,7 @@ class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils 
 
   StatusPopup.popupComp = "Popup".asInstanceOf[ReactClass]
   StatusPopup.modalContentComp = mockUiComponent("ModalContent")
-  StatusPopup.textLineComp = mockUiComponent("TextLine")
+  StatusPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
 
   private val theme = DefaultTheme.popup.regular
   private val style = new BlessedStyle {
@@ -74,7 +74,7 @@ class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils 
           )(), { msgs =>
             msgs.size shouldBe textLines.size
             msgs.zip(textLines).zipWithIndex.foreach { case ((msg, textLine), index) =>
-              assertTestComponent(msg, textLineComp, plain = true) {
+              assertNativeComponent(msg, <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
                 case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
                   align shouldBe TextAlign.center
                   left shouldBe 0
@@ -84,7 +84,7 @@ class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils 
                   assertObject(resStyle, style)
                   focused shouldBe js.undefined
                   padding shouldBe 0
-              }
+              }))())
             }
             Succeeded
           }
