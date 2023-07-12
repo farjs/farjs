@@ -11,7 +11,7 @@ import scala.scalajs.js
 
 class DoubleBorderSpec extends TestSpec with TestRendererUtils {
 
-  DoubleBorder.horizontalLineComp = mockUiComponent("HorizontalLine")
+  DoubleBorder.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   DoubleBorder.verticalLineComp = mockUiComponent("VerticalLine")
   DoubleBorder.textLineComp = "TextLine".asInstanceOf[ReactClass]
 
@@ -71,7 +71,7 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
                          line4: TestInstance,
                          footer: Option[TestInstance]): Assertion = {
 
-      assertTestComponent(line1, horizontalLineComp, plain = true) {
+      assertNativeComponent(line1, <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
         case HorizontalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
           resLeft shouldBe left
           resTop shouldBe top
@@ -80,7 +80,7 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
           style shouldBe props.style
           startCh shouldBe DoubleChars.topLeft
           endCh shouldBe DoubleChars.topRight
-      }
+      }))())
 
       title.isDefined shouldBe props.title.isDefined
       title.foreach { t =>
@@ -117,7 +117,7 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
           startCh shouldBe js.undefined
           endCh shouldBe js.undefined
       }
-      assertTestComponent(line4, horizontalLineComp, plain = true) {
+      assertNativeComponent(line4, <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
         case HorizontalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
           resLeft shouldBe left
           resTop shouldBe (top + props.height - 1)
@@ -126,7 +126,7 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
           style shouldBe props.style
           startCh shouldBe DoubleChars.bottomLeft
           endCh shouldBe DoubleChars.bottomRight
-      }
+      }))())
 
       footer.isDefined shouldBe props.footer.isDefined
       footer.foreach { t =>

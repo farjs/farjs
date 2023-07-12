@@ -18,7 +18,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
 
   CopyProgressPopup.modalComp = mockUiComponent("Modal")
   CopyProgressPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
-  CopyProgressPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
+  CopyProgressPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
 
   it should "render component when copy" in {
     //given
@@ -148,7 +148,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           resLength shouldBe contentWidth
           resStyle shouldBe theme
       }
-      assertTestComponent(sep1, horizontalLineComp, plain = true) {
+      assertNativeComponent(sep1, <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
         case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
           resLeft shouldBe contentLeft
           resTop shouldBe 6
@@ -157,7 +157,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           resStyle shouldBe theme
           startCh shouldBe js.undefined
           endCh shouldBe js.undefined
-      }
+      }))())
       assertNativeComponent(total, <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
         case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
           align shouldBe TextAlign.center
@@ -178,7 +178,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           resStyle shouldBe theme
       }
 
-      assertTestComponent(sep2, horizontalLineComp, plain = true) {
+      assertNativeComponent(sep2, <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
         case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
           resLeft shouldBe contentLeft
           resTop shouldBe 8
@@ -187,7 +187,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           resStyle shouldBe theme
           startCh shouldBe js.undefined
           endCh shouldBe js.undefined
-      }
+      }))())
 
       assertNativeComponent(time,
         <.text(

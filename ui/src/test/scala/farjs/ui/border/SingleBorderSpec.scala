@@ -1,6 +1,7 @@
 package farjs.ui.border
 
 import farjs.ui.border.SingleBorder._
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -8,7 +9,7 @@ import scala.scalajs.js
 
 class SingleBorderSpec extends TestSpec with TestRendererUtils {
 
-  SingleBorder.horizontalLineComp = mockUiComponent("HorizontalLine")
+  SingleBorder.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   SingleBorder.verticalLineComp = mockUiComponent("VerticalLine")
 
   it should "render component" in {
@@ -26,7 +27,7 @@ class SingleBorderSpec extends TestSpec with TestRendererUtils {
     val (line1, line2, line3, line4) = inside(result.children.toList) {
       case List(line1, line2, line3, line4) => (line1, line2, line3, line4)
     }
-    assertTestComponent(line1, horizontalLineComp, plain = true) {
+    assertNativeComponent(line1, <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
       case HorizontalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
         resLeft shouldBe 0
         resTop shouldBe 0
@@ -35,7 +36,7 @@ class SingleBorderSpec extends TestSpec with TestRendererUtils {
         style shouldBe props.style
         startCh shouldBe SingleChars.topLeft
         endCh shouldBe SingleChars.topRight
-    }
+    }))())
     assertTestComponent(line2, verticalLineComp, plain = true) {
       case VerticalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
         resLeft shouldBe 0
@@ -56,7 +57,7 @@ class SingleBorderSpec extends TestSpec with TestRendererUtils {
         startCh shouldBe js.undefined
         endCh shouldBe js.undefined
     }
-    assertTestComponent(line4, horizontalLineComp, plain = true) {
+    assertNativeComponent(line4, <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
       case HorizontalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
         resLeft shouldBe 0
         resTop shouldBe 3
@@ -65,6 +66,6 @@ class SingleBorderSpec extends TestSpec with TestRendererUtils {
         style shouldBe props.style
         startCh shouldBe SingleChars.bottomLeft
         endCh shouldBe SingleChars.bottomRight
-    }
+    }))())
   }
 }

@@ -14,7 +14,7 @@ case class SubMenuProps(selected: Int,
 object SubMenu extends FunctionComponent[SubMenuProps] {
 
   private[menu] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
-  private[menu] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[menu] var horizontalLineComp: ReactClass = HorizontalLine
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -42,7 +42,7 @@ object SubMenu extends FunctionComponent[SubMenuProps] {
 
       props.items.zipWithIndex.map { case (text, index) =>
         if (text == separator) {
-          <(horizontalLineComp())(^.key := s"$index", ^.plain := HorizontalLineProps(
+          <(horizontalLineComp)(^.key := s"$index", ^.plain := HorizontalLineProps(
             left = 0,
             top = 1 + index,
             length = width,

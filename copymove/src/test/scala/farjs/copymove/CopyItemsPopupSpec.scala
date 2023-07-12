@@ -23,7 +23,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
   CopyItemsPopup.modalComp = mockUiComponent("Modal")
   CopyItemsPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
   CopyItemsPopup.comboBoxComp = mockUiComponent("ComboBox")
-  CopyItemsPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
+  CopyItemsPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   CopyItemsPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
@@ -247,7 +247,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
           resValue shouldBe props.path
       }
 
-      assertTestComponent(sep, horizontalLineComp, plain = true) {
+      assertNativeComponent(sep, <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
         case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
           resLeft shouldBe 0
           resTop shouldBe 3
@@ -256,7 +256,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
           resStyle shouldBe style
           startCh shouldBe DoubleChars.leftSingle
           endCh shouldBe DoubleChars.rightSingle
-      }
+      }))())
       assertNativeComponent(actionsBox,
         <(buttonsPanelComp)(^.assertPlain[ButtonsPanelProps](inside(_) {
           case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>

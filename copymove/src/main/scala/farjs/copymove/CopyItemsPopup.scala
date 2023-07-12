@@ -24,7 +24,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
   private[copymove] var modalComp: UiComponent[ModalProps] = Modal
   private[copymove] var textLineComp: ReactClass = TextLine
   private[copymove] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
-  private[copymove] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[copymove] var horizontalLineComp: ReactClass = HorizontalLine
   private[copymove] var buttonsPanelComp: ReactClass = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
@@ -87,7 +87,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
           onEnter = onCopy
         ))(),
         
-        <(horizontalLineComp())(^.plain := HorizontalLineProps(
+        <(horizontalLineComp)(^.plain := HorizontalLineProps(
           left = 0,
           top = 3,
           length = width - paddingHorizontal * 2,

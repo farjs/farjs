@@ -21,7 +21,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   MakeFolderPopup.modalComp = mockUiComponent("Modal")
   MakeFolderPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
   MakeFolderPopup.comboBoxComp = mockUiComponent("ComboBox")
-  MakeFolderPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
+  MakeFolderPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   MakeFolderPopup.checkBoxComp = mockUiComponent("CheckBox")
   MakeFolderPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
@@ -258,7 +258,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
             resValue shouldBe items.lastOption.getOrElse("")
         }))(),
         
-        <(horizontalLineComp())(^.assertPlain[HorizontalLineProps](inside(_) {
+        <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
           case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
             resLeft shouldBe 0
             resTop shouldBe 3
@@ -277,7 +277,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
             resStyle shouldBe style
         }))(),
 
-        <(horizontalLineComp())(^.assertPlain[HorizontalLineProps](inside(_) {
+        <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
           case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
             resLeft shouldBe 0
             resTop shouldBe 5

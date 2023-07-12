@@ -20,7 +20,7 @@ object AddToArchPopup extends FunctionComponent[AddToArchPopupProps] {
   private[archiver] var modalComp: UiComponent[ModalProps] = Modal
   private[archiver] var textLineComp: ReactClass = TextLine
   private[archiver] var textBoxComp: UiComponent[TextBoxProps] = TextBox
-  private[archiver] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[archiver] var horizontalLineComp: ReactClass = HorizontalLine
   private[archiver] var buttonsPanelComp: ReactClass = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
@@ -63,7 +63,7 @@ object AddToArchPopup extends FunctionComponent[AddToArchPopupProps] {
         onEnter = onAction
       ))(),
       
-      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+      <(horizontalLineComp)(^.plain := HorizontalLineProps(
         left = 0,
         top = 3,
         length = width - paddingHorizontal * 2,

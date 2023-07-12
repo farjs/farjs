@@ -21,7 +21,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
   private[popups] var modalComp: UiComponent[ModalProps] = Modal
   private[popups] var textLineComp: ReactClass = TextLine
   private[popups] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
-  private[popups] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[popups] var horizontalLineComp: ReactClass = HorizontalLine
   private[popups] var checkBoxComp: UiComponent[CheckBoxProps] = CheckBox
   private[popups] var buttonsPanelComp: ReactClass = ButtonsPanel
 
@@ -81,7 +81,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           onEnter = onOk
         ))(),
         
-        <(horizontalLineComp())(^.plain := HorizontalLineProps(
+        <(horizontalLineComp)(^.plain := HorizontalLineProps(
           left = 0,
           top = 3,
           length = width - paddingHorizontal * 2,
@@ -101,7 +101,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           }
         ))(),
         
-        <(horizontalLineComp())(^.plain := HorizontalLineProps(
+        <(horizontalLineComp)(^.plain := HorizontalLineProps(
           left = 0,
           top = 5,
           length = width - paddingHorizontal * 2,

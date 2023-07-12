@@ -5,7 +5,7 @@ import scommons.react._
 
 object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
 
-  private[border] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[border] var horizontalLineComp: ReactClass = HorizontalLine
   private[border] var verticalLineComp: UiComponent[VerticalLineProps] = VerticalLine
   private[border] var textLineComp: ReactClass = TextLine
 
@@ -15,7 +15,7 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
     val top = props.top.getOrElse(0)
 
     <.>()(
-      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+      <(horizontalLineComp)(^.plain := HorizontalLineProps(
         left = left,
         top = top,
         length = props.width,
@@ -52,7 +52,7 @@ object DoubleBorder extends FunctionComponent[DoubleBorderProps] {
         style = props.style
       ))(),
 
-      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+      <(horizontalLineComp)(^.plain := HorizontalLineProps(
         left = left,
         top = top + props.height - 1,
         length = props.width,

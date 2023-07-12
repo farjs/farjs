@@ -17,7 +17,7 @@ import scala.scalajs.js
 class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
 
   FileListPanelView.doubleBorderComp = mockUiComponent("DoubleBorder")
-  FileListPanelView.horizontalLineComp = mockUiComponent("HorizontalLine")
+  FileListPanelView.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   FileListPanelView.fileListComp = mockUiComponent("FileList")
   FileListPanelView.textLineComp = "TextLine".asInstanceOf[ReactClass]
   FileListPanelView.sortIndicator = mockUiComponent("SortIndicator")
@@ -201,7 +201,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           title shouldBe js.undefined
           footer shouldBe js.undefined
       }))(),
-      <(horizontalLineComp())(^.assertPlain[HorizontalLineProps](inside(_) {
+      <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
         case HorizontalLineProps(resLeft, resTop, len, lineCh, style, startCh, endCh) =>
           resLeft shouldBe 0
           resTop shouldBe (height - 4)

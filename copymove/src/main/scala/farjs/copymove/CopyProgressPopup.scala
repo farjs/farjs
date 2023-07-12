@@ -23,7 +23,7 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
 
   private[copymove] var modalComp: UiComponent[ModalProps] = Modal
   private[copymove] var textLineComp: ReactClass = TextLine
-  private[copymove] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[copymove] var horizontalLineComp: ReactClass = HorizontalLine
   private[copymove] var progressBarComp: UiComponent[ProgressBarProps] = ProgressBar
 
   protected def render(compProps: Props): ReactElement = {
@@ -70,7 +70,7 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
         length = contentWidth,
         style = theme
       ))(),
-      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+      <(horizontalLineComp)(^.plain := HorizontalLineProps(
         left = contentLeft,
         top = 6,
         length = contentWidth,
@@ -93,7 +93,7 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
         style = theme
       ))(),
 
-      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+      <(horizontalLineComp)(^.plain := HorizontalLineProps(
         left = contentLeft,
         top = 8,
         length = contentWidth,

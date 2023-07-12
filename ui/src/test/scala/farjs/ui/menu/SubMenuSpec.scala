@@ -4,6 +4,7 @@ import farjs.ui.border._
 import farjs.ui.menu.SubMenu._
 import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -12,7 +13,7 @@ import scala.scalajs.js
 class SubMenuSpec extends TestSpec with TestRendererUtils {
 
   SubMenu.doubleBorderComp = mockUiComponent("DoubleBorder")
-  SubMenu.horizontalLineComp = mockUiComponent("HorizontalLine")
+  SubMenu.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
 
   it should "call onClick with item index when onClick" in {
     //given
@@ -83,7 +84,7 @@ class SubMenuSpec extends TestSpec with TestRendererUtils {
 
         props.items.zipWithIndex.map { case (text, index) =>
           if (text == separator) {
-            <(horizontalLineComp())(^.assertPlain[HorizontalLineProps](inside(_) {
+            <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
               case HorizontalLineProps(resLeft, resTop, length, lineCh, style, startCh, endCh) =>
                 resLeft shouldBe 0
                 resTop shouldBe (1 + index)

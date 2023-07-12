@@ -19,7 +19,7 @@ case class FileListPanelViewProps(dispatch: Dispatch,
 object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
 
   private[filelist] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
-  private[filelist] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[filelist] var horizontalLineComp: ReactClass = HorizontalLine
   private[filelist] var fileListComp: UiComponent[FileListProps] = FileList
   private[filelist] var textLineComp: ReactClass = TextLine
   private[filelist] var sortIndicator: UiComponent[SortIndicatorProps] = SortIndicator
@@ -36,7 +36,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
 
     <.box(^.rbStyle := theme.regularItem)(
       <(doubleBorderComp())(^.plain := DoubleBorderProps(width, height, theme.regularItem))(),
-      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+      <(horizontalLineComp)(^.plain := HorizontalLineProps(
         left = 0,
         top = height - 4,
         length = width,

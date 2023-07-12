@@ -13,7 +13,7 @@ import scommons.react.blessed._
 object QuickViewPanel extends FunctionComponent[Unit] {
 
   private[quickview] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
-  private[quickview] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[quickview] var horizontalLineComp: ReactClass = HorizontalLine
   private[quickview] var textLineComp: ReactClass = TextLine
   private[quickview] var quickViewDirComp: UiComponent[QuickViewDirProps] = QuickViewDir
   private[quickview] var quickViewFileComp: UiComponent[QuickViewFileProps] = QuickViewFile
@@ -40,7 +40,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
 
     <.box(^.rbStyle := theme.regularItem)(
       <(doubleBorderComp())(^.plain := DoubleBorderProps(width, height, theme.regularItem))(),
-      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+      <(horizontalLineComp)(^.plain := HorizontalLineProps(
         left = 0,
         top = height - 4,
         length = width,

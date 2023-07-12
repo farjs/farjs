@@ -16,7 +16,7 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
   AddToArchPopup.modalComp = mockUiComponent("Modal")
   AddToArchPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
   AddToArchPopup.textBoxComp = mockUiComponent("TextBox")
-  AddToArchPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
+  AddToArchPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   AddToArchPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
   it should "set zipName when onChange in TextBox" in {
@@ -152,7 +152,7 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
             resValue shouldBe props.zipName
         }))(),
 
-        <(horizontalLineComp())(^.assertPlain[HorizontalLineProps](inside(_) {
+        <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
           case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
             resLeft shouldBe 0
             resTop shouldBe 3

@@ -46,23 +46,4 @@ object HorizontalLineProps {
       arg.endCh
     ))
   }
-
-  def copy(p: HorizontalLineProps)(left: Int = p.left,
-                                   top: Int = p.top,
-                                   length: Int = p.length,
-                                   lineCh: String = p.lineCh,
-                                   style: BlessedStyle = p.style,
-                                   startCh: js.UndefOr[String] = p.startCh,
-                                   endCh: js.UndefOr[String] = p.endCh): HorizontalLineProps = {
-
-    HorizontalLineProps(
-      left = left,
-      top = top,
-      length = length,
-      lineCh = lineCh,
-      style = style,
-      startCh = startCh,
-      endCh = endCh
-    )
-  }
 }

@@ -18,7 +18,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
 
   FileExistsPopup.modalComp = mockUiComponent("Modal")
   FileExistsPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
-  FileExistsPopup.horizontalLineComp = mockUiComponent("HorizontalLine")
+  FileExistsPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   FileExistsPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
   it should "call onAction(Overwrite) when press Overwrite button" in {
@@ -192,7 +192,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
           focused shouldBe js.undefined
           padding shouldBe 0
       }))())
-      assertTestComponent(sep1, horizontalLineComp, plain = true) {
+      assertNativeComponent(sep1, <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
         case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
           resLeft shouldBe 0
           resTop shouldBe 3
@@ -201,7 +201,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
           resStyle shouldBe theme
           startCh shouldBe DoubleChars.leftSingle
           endCh shouldBe DoubleChars.rightSingle
-      }
+      }))())
       
       assertNativeComponent(label2,
         <.text(
@@ -236,7 +236,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
           padding shouldBe 0
       }))())
 
-      assertTestComponent(sep2, horizontalLineComp, plain = true) {
+      assertNativeComponent(sep2, <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
         case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
           resLeft shouldBe 0
           resTop shouldBe 6
@@ -245,7 +245,7 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
           resStyle shouldBe theme
           startCh shouldBe DoubleChars.leftSingle
           endCh shouldBe DoubleChars.rightSingle
-      }
+      }))())
       assertNativeComponent(actionsBox,
         <(buttonsPanelComp)(^.assertPlain[ButtonsPanelProps](inside(_) {
           case ButtonsPanelProps(top, resActions, resStyle, padding, margin) =>

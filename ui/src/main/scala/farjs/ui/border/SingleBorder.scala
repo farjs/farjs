@@ -4,14 +4,14 @@ import scommons.react._
 
 object SingleBorder extends FunctionComponent[SingleBorderProps] {
 
-  private[border] var horizontalLineComp: UiComponent[HorizontalLineProps] = HorizontalLine
+  private[border] var horizontalLineComp: ReactClass = HorizontalLine
   private[border] var verticalLineComp: UiComponent[VerticalLineProps] = VerticalLine
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
 
     <.>()(
-      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+      <(horizontalLineComp)(^.plain := HorizontalLineProps(
         left = 0,
         top = 0,
         length = props.width,
@@ -37,7 +37,7 @@ object SingleBorder extends FunctionComponent[SingleBorderProps] {
         style = props.style
       ))(),
 
-      <(horizontalLineComp())(^.plain := HorizontalLineProps(
+      <(horizontalLineComp)(^.plain := HorizontalLineProps(
         left = 0,
         top = props.height - 1,
         length = props.width,
