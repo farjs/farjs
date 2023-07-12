@@ -12,7 +12,7 @@ import scala.scalajs.js
 class DoubleBorderSpec extends TestSpec with TestRendererUtils {
 
   DoubleBorder.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
-  DoubleBorder.verticalLineComp = mockUiComponent("VerticalLine")
+  DoubleBorder.verticalLineComp = "VerticalLine".asInstanceOf[ReactClass]
   DoubleBorder.textLineComp = "TextLine".asInstanceOf[ReactClass]
 
   it should "render component" in {
@@ -97,7 +97,7 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
         }))())
       }
 
-      assertTestComponent(line2, verticalLineComp, plain = true) {
+      assertNativeComponent(line2, <(verticalLineComp)(^.assertPlain[VerticalLineProps](inside(_) {
         case VerticalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
           resLeft shouldBe left
           resTop shouldBe (top + 1)
@@ -106,8 +106,8 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
           style shouldBe props.style
           startCh shouldBe js.undefined
           endCh shouldBe js.undefined
-      }
-      assertTestComponent(line3, verticalLineComp, plain = true) {
+      }))())
+      assertNativeComponent(line3, <(verticalLineComp)(^.assertPlain[VerticalLineProps](inside(_) {
         case VerticalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
           resLeft shouldBe (left + props.width - 1)
           resTop shouldBe (top + 1)
@@ -116,7 +116,7 @@ class DoubleBorderSpec extends TestSpec with TestRendererUtils {
           style shouldBe props.style
           startCh shouldBe js.undefined
           endCh shouldBe js.undefined
-      }
+      }))())
       assertNativeComponent(line4, <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
         case HorizontalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
           resLeft shouldBe left

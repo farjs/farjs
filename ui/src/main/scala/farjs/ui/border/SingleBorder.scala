@@ -5,7 +5,7 @@ import scommons.react._
 object SingleBorder extends FunctionComponent[SingleBorderProps] {
 
   private[border] var horizontalLineComp: ReactClass = HorizontalLine
-  private[border] var verticalLineComp: UiComponent[VerticalLineProps] = VerticalLine
+  private[border] var verticalLineComp: ReactClass = VerticalLine
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
@@ -21,7 +21,7 @@ object SingleBorder extends FunctionComponent[SingleBorderProps] {
         endCh = SingleChars.topRight
       ))(),
       
-      <(verticalLineComp())(^.plain := VerticalLineProps(
+      <(verticalLineComp)(^.plain := VerticalLineProps(
         left = 0,
         top = 1,
         length = props.height - 2,
@@ -29,7 +29,7 @@ object SingleBorder extends FunctionComponent[SingleBorderProps] {
         style = props.style
       ))(),
       
-      <(verticalLineComp())(^.plain := VerticalLineProps(
+      <(verticalLineComp)(^.plain := VerticalLineProps(
         left = props.width - 1,
         top = 1,
         length = props.height - 2,

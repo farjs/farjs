@@ -21,7 +21,7 @@ case class FileListViewProps(size: (Int, Int),
 
 object FileListView extends FunctionComponent[FileListViewProps] {
 
-  private[filelist] var verticalLineComp: UiComponent[VerticalLineProps] = VerticalLine
+  private[filelist] var verticalLineComp: ReactClass = VerticalLine
   private[filelist] var fileListColumnComp: UiComponent[FileListColumnProps] = FileListColumn
   
   protected def render(compProps: Props): ReactElement = {
@@ -110,7 +110,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
             <.>(^.key := s"$colIndex")(
               if (colIndex != columns - 1) {
                 Some(
-                  <(verticalLineComp())(^.plain := VerticalLineProps(
+                  <(verticalLineComp)(^.plain := VerticalLineProps(
                     left = colLeft + colWidth,
                     top = -1,
                     length = height + 2,

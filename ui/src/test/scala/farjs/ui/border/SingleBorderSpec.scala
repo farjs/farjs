@@ -10,7 +10,7 @@ import scala.scalajs.js
 class SingleBorderSpec extends TestSpec with TestRendererUtils {
 
   SingleBorder.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
-  SingleBorder.verticalLineComp = mockUiComponent("VerticalLine")
+  SingleBorder.verticalLineComp = "VerticalLine".asInstanceOf[ReactClass]
 
   it should "render component" in {
     //given
@@ -37,7 +37,7 @@ class SingleBorderSpec extends TestSpec with TestRendererUtils {
         startCh shouldBe SingleChars.topLeft
         endCh shouldBe SingleChars.topRight
     }))())
-    assertTestComponent(line2, verticalLineComp, plain = true) {
+    assertNativeComponent(line2, <(verticalLineComp)(^.assertPlain[VerticalLineProps](inside(_) {
       case VerticalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
         resLeft shouldBe 0
         resTop shouldBe 1
@@ -46,8 +46,8 @@ class SingleBorderSpec extends TestSpec with TestRendererUtils {
         style shouldBe props.style
         startCh shouldBe js.undefined
         endCh shouldBe js.undefined
-    }
-    assertTestComponent(line3, verticalLineComp, plain = true) {
+    }))())
+    assertNativeComponent(line3, <(verticalLineComp)(^.assertPlain[VerticalLineProps](inside(_) {
       case VerticalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
         resLeft shouldBe 2
         resTop shouldBe 1
@@ -56,7 +56,7 @@ class SingleBorderSpec extends TestSpec with TestRendererUtils {
         style shouldBe props.style
         startCh shouldBe js.undefined
         endCh shouldBe js.undefined
-    }
+    }))())
     assertNativeComponent(line4, <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
       case HorizontalLineProps(resLeft, resTop, resLength, lineCh, style, startCh, endCh) =>
         resLeft shouldBe 0
