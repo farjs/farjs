@@ -17,7 +17,7 @@ case class ComboBoxPopupProps(left: Int,
 
 object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
   
-  private[ui] var singleBorderComp: UiComponent[SingleBorderProps] = SingleBorder
+  private[ui] var singleBorderComp: ReactClass = SingleBorder
   private[ui] var listViewComp: UiComponent[ListViewProps] = ListView
   private[ui] var scrollBarComp: UiComponent[ScrollBarProps] = ScrollBar
 
@@ -46,7 +46,7 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
       },
       ^.rbStyle := theme
     )(
-      <(singleBorderComp())(^.plain := SingleBorderProps(
+      <(singleBorderComp)(^.plain := SingleBorderProps(
         width = width,
         height = height,
         style = theme

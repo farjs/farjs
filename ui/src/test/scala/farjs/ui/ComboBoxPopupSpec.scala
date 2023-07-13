@@ -3,6 +3,7 @@ package farjs.ui
 import farjs.ui.ComboBoxPopup._
 import farjs.ui.border._
 import farjs.ui.theme.DefaultTheme
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -10,7 +11,7 @@ import scala.scalajs.js
 
 class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
 
-  ComboBoxPopup.singleBorderComp = mockUiComponent("SingleBorder")
+  ComboBoxPopup.singleBorderComp = "SingleBorder".asInstanceOf[ReactClass]
   ComboBoxPopup.listViewComp = mockUiComponent("ListView")
   ComboBoxPopup.scrollBarComp = mockUiComponent("ScrollBar")
   
@@ -121,7 +122,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
         ^.rbTop := props.top,
         ^.rbStyle := theme
       )(
-        <(singleBorderComp())(^.assertPlain[SingleBorderProps](inside(_) {
+        <(singleBorderComp)(^.assertPlain[SingleBorderProps](inside(_) {
           case SingleBorderProps(resWidth, resHeight, style) =>
             resWidth shouldBe width
             resHeight shouldBe height

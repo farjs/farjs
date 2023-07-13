@@ -16,6 +16,10 @@ package object border {
   object HorizontalLine extends ReactClass
 
   @js.native
+  @JSImport("@farjs/ui/border/SingleBorder.mjs", JSImport.Default)
+  object SingleBorder extends ReactClass
+
+  @js.native
   @JSImport("@farjs/ui/border/VerticalLine.mjs", JSImport.Default)
   object VerticalLine extends ReactClass
 }
