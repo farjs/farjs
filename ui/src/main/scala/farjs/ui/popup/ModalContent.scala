@@ -13,7 +13,7 @@ case class ModalContentProps(title: String,
 
 object ModalContent extends FunctionComponent[ModalContentProps] {
 
-  private[popup] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
+  private[popup] var doubleBorderComp: ReactClass = DoubleBorder
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -31,7 +31,7 @@ object ModalContent extends FunctionComponent[ModalContentProps] {
       ^.rbPadding := padding,
       ^.rbStyle := props.style
     )(
-      <(doubleBorderComp())(^.plain := DoubleBorderProps(
+      <(doubleBorderComp)(^.plain := DoubleBorderProps(
         width = width - padding.left - padding.right,
         height = height - padding.top - padding.bottom,
         style = props.style,

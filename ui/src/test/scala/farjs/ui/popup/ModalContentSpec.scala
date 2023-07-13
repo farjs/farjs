@@ -12,7 +12,7 @@ import scala.scalajs.js
 
 class ModalContentSpec extends TestSpec with TestRendererUtils {
 
-  ModalContent.doubleBorderComp = mockUiComponent("DoubleBorder")
+  ModalContent.doubleBorderComp = "DoubleBorder".asInstanceOf[ReactClass]
 
   it should "render component" in {
     //given
@@ -70,7 +70,7 @@ class ModalContentSpec extends TestSpec with TestRendererUtils {
         },
         ^.rbStyle := props.style
       )(), inside(_) { case List(border, child)=>
-        assertTestComponent(border, doubleBorderComp, plain = true) {
+        assertNativeComponent(border, <(doubleBorderComp)(^.assertPlain[DoubleBorderProps](inside(_) {
           case DoubleBorderProps(resWidth, resHeight, style, resLeft, resTop, title, footer) =>
             resWidth shouldBe (width - paddingHorizontal * 2)
             resHeight shouldBe (height - paddingVertical * 2)
@@ -79,7 +79,7 @@ class ModalContentSpec extends TestSpec with TestRendererUtils {
             resTop shouldBe js.undefined
             title shouldBe props.title
             footer shouldBe props.footer.getOrElse(())
-        }
+        }))())
 
         assertNativeComponent(child, children)
       }

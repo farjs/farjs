@@ -13,7 +13,7 @@ case class SubMenuProps(selected: Int,
 
 object SubMenu extends FunctionComponent[SubMenuProps] {
 
-  private[menu] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
+  private[menu] var doubleBorderComp: ReactClass = DoubleBorder
   private[menu] var horizontalLineComp: ReactClass = HorizontalLine
 
   protected def render(compProps: Props): ReactElement = {
@@ -34,7 +34,7 @@ object SubMenu extends FunctionComponent[SubMenuProps] {
       ^.rbShadow := true,
       ^.rbStyle := theme
     )(
-      <(doubleBorderComp())(^.plain := DoubleBorderProps(
+      <(doubleBorderComp)(^.plain := DoubleBorderProps(
         width = width,
         height = height,
         style = theme

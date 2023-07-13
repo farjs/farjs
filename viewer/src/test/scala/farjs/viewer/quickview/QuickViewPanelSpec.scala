@@ -18,7 +18,7 @@ import scala.scalajs.js
 
 class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
 
-  QuickViewPanel.doubleBorderComp = mockUiComponent("DoubleBorder")
+  QuickViewPanel.doubleBorderComp = "DoubleBorder".asInstanceOf[ReactClass]
   QuickViewPanel.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   QuickViewPanel.textLineComp = "TextLine".asInstanceOf[ReactClass]
   QuickViewPanel.quickViewDirComp = mockUiComponent("QuickViewDir")
@@ -141,7 +141,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
                          content: TestInstance,
                          item: TestInstance): Assertion = {
 
-      assertTestComponent(border, doubleBorderComp, plain = true) {
+      assertNativeComponent(border, <(doubleBorderComp)(^.assertPlain[DoubleBorderProps](inside(_) {
         case DoubleBorderProps(resWidth, resHeight, style, resLeft, resTop, title, footer) =>
           resWidth shouldBe width
           resHeight shouldBe height
@@ -150,7 +150,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
           resTop shouldBe js.undefined
           title shouldBe js.undefined
           footer shouldBe js.undefined
-      }
+      }))())
       assertNativeComponent(line, <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
         case HorizontalLineProps(resLeft, resTop, len, lineCh, style, startCh, endCh) =>
           resLeft shouldBe 0

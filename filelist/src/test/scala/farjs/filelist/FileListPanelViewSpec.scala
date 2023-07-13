@@ -16,7 +16,7 @@ import scala.scalajs.js
 
 class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
 
-  FileListPanelView.doubleBorderComp = mockUiComponent("DoubleBorder")
+  FileListPanelView.doubleBorderComp = "DoubleBorder".asInstanceOf[ReactClass]
   FileListPanelView.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   FileListPanelView.fileListComp = mockUiComponent("FileList")
   FileListPanelView.textLineComp = "TextLine".asInstanceOf[ReactClass]
@@ -191,7 +191,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val theme = FileListTheme.defaultTheme.fileList
     
     assertNativeComponent(result, <.box(^.rbStyle := theme.regularItem)(
-      <(doubleBorderComp())(^.assertPlain[DoubleBorderProps](inside(_) {
+      <(doubleBorderComp)(^.assertPlain[DoubleBorderProps](inside(_) {
         case DoubleBorderProps(resWidth, resHeight, style, resLeft, resTop, title, footer) =>
           resWidth shouldBe width
           resHeight shouldBe height

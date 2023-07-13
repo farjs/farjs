@@ -12,7 +12,7 @@ import scala.scalajs.js
 
 class SubMenuSpec extends TestSpec with TestRendererUtils {
 
-  SubMenu.doubleBorderComp = mockUiComponent("DoubleBorder")
+  SubMenu.doubleBorderComp = "DoubleBorder".asInstanceOf[ReactClass]
   SubMenu.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
 
   it should "call onClick with item index when onClick" in {
@@ -71,7 +71,7 @@ class SubMenuSpec extends TestSpec with TestRendererUtils {
         ^.rbShadow := true,
         ^.rbStyle := theme
       )(
-        <(doubleBorderComp())(^.assertPlain[DoubleBorderProps](inside(_) {
+        <(doubleBorderComp)(^.assertPlain[DoubleBorderProps](inside(_) {
           case DoubleBorderProps(resWidth, resHeight, style, resLeft, resTop, title, footer) =>
             resWidth shouldBe width
             resHeight shouldBe height

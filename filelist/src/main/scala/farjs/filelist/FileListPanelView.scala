@@ -18,7 +18,7 @@ case class FileListPanelViewProps(dispatch: Dispatch,
 
 object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
 
-  private[filelist] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
+  private[filelist] var doubleBorderComp: ReactClass = DoubleBorder
   private[filelist] var horizontalLineComp: ReactClass = HorizontalLine
   private[filelist] var fileListComp: UiComponent[FileListProps] = FileList
   private[filelist] var textLineComp: ReactClass = TextLine
@@ -35,7 +35,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
     val selectedItems = props.state.selectedItems
 
     <.box(^.rbStyle := theme.regularItem)(
-      <(doubleBorderComp())(^.plain := DoubleBorderProps(width, height, theme.regularItem))(),
+      <(doubleBorderComp)(^.plain := DoubleBorderProps(width, height, theme.regularItem))(),
       <(horizontalLineComp)(^.plain := HorizontalLineProps(
         left = 0,
         top = height - 4,

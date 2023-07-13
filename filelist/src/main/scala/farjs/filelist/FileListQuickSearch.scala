@@ -13,7 +13,7 @@ case class FileListQuickSearchProps(text: String, onClose: () => Unit)
 
 object FileListQuickSearch extends FunctionComponent[FileListQuickSearchProps] {
 
-  private[filelist] var doubleBorderComp: UiComponent[DoubleBorderProps] = DoubleBorder
+  private[filelist] var doubleBorderComp: ReactClass = DoubleBorder
 
   protected def render(compProps: Props): ReactElement = {
     val elementRef = useRef[BlessedElement](null)
@@ -69,7 +69,7 @@ object FileListQuickSearch extends FunctionComponent[FileListQuickSearchProps] {
         ^.rbLeft := 10,
         ^.rbStyle := boxStyle
       )(
-        <(doubleBorderComp())(^.plain := DoubleBorderProps(
+        <(doubleBorderComp)(^.plain := DoubleBorderProps(
           width = width,
           height = height,
           style = boxStyle,

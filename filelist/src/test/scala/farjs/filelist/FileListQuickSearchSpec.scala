@@ -5,6 +5,7 @@ import farjs.ui.border.DoubleBorderProps
 import farjs.ui.popup.PopupOverlay
 import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -13,7 +14,7 @@ import scala.scalajs.js.Dynamic.literal
 
 class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
 
-  FileListQuickSearch.doubleBorderComp = mockUiComponent("DoubleBorder")
+  FileListQuickSearch.doubleBorderComp = "DoubleBorder".asInstanceOf[ReactClass]
 
   it should "call onClose when onClick" in {
     //given
@@ -196,7 +197,7 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
         ^.rbLeft := 10,
         ^.rbStyle := boxStyle
       )(), inside(_) { case List(border, text) =>
-        assertTestComponent(border, doubleBorderComp, plain = true) {
+        assertNativeComponent(border, <(doubleBorderComp)(^.assertPlain[DoubleBorderProps](inside(_) {
           case DoubleBorderProps(resWidth, resHeight, style, resLeft, resTop, title, footer) =>
             resWidth shouldBe width
             resHeight shouldBe height
@@ -205,7 +206,7 @@ class FileListQuickSearchSpec extends TestSpec with TestRendererUtils {
             resTop shouldBe js.undefined
             title shouldBe "Search"
             footer shouldBe js.undefined
-        }
+        }))())
 
         assertNativeComponent(text,
           <.text(

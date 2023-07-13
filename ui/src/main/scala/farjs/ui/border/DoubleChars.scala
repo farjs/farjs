@@ -1,36 +1,36 @@
 package farjs.ui.border
 
-import scala.scalajs.js.annotation.JSExportAll
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
-@JSExportAll
-sealed trait DoubleChars {
+@js.native
+@JSImport("@farjs/ui/border/DoubleChars.mjs", JSImport.Default)
+object DoubleChars extends js.Object {
 
   // lines
-  val horizontal = "\u2550"
-  val vertical = "\u2551"
+  val horizontal: String = js.native
+  val vertical: String = js.native
 
   // corners
-  val topLeft = "\u2554"
-  val topRight = "\u2557"
-  val bottomLeft = "\u255a"
-  val bottomRight = "\u255d"
+  val topLeft: String = js.native
+  val topRight: String = js.native
+  val bottomLeft: String = js.native
+  val bottomRight: String = js.native
 
   // connectors
-  val top = "\u2566"
-  val bottom = "\u2569"
-  val left = "\u2560"
-  val right = "\u2563"
+  val top: String = js.native
+  val bottom: String = js.native
+  val left: String = js.native
+  val right: String = js.native
 
   // single connectors
-  val topSingle = "\u2564"
-  val bottomSingle = "\u2567"
-  val leftSingle = "\u255f"
-  val rightSingle = "\u2562"
+  val topSingle: String = js.native
+  val bottomSingle: String = js.native
+  val leftSingle: String = js.native
+  val rightSingle: String = js.native
 
   // crosses
-  val cross = "\u256c"
-  val crossSingleVert = "\u256a"
-  val crossSingleHoriz = "\u256b"
+  val cross: String = js.native
+  val crossSingleVert: String = js.native
+  val crossSingleHoriz: String = js.native
 }
-
-object DoubleChars extends DoubleChars
