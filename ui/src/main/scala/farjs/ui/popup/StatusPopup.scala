@@ -37,9 +37,10 @@ object StatusPopup extends FunctionComponent[StatusPopupProps] {
         if (props.closable) props.onClose: js.Function0[Unit]
         else js.undefined
     ))(
-      <(modalContentComp())(^.wrapped := ModalContentProps(
+      <(modalContentComp())(^.plain := ModalContentProps(
         title = props.title,
-        size = (width, height),
+        width = width,
+        height = height,
         style = style
       ))(
         <.button(

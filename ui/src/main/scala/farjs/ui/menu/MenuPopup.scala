@@ -29,9 +29,10 @@ object MenuPopup extends FunctionComponent[MenuPopupProps] {
     val theme = Theme.useTheme().popup.menu
 
     <(popupComp)(^.plain := PopupProps(onClose = props.onClose: js.Function0[Unit]))(
-      <(modalContentComp())(^.wrapped := ModalContentProps(
+      <(modalContentComp())(^.plain := ModalContentProps(
         title = props.title,
-        size = (width, height),
+        width = width,
+        height = height,
         style = theme,
         padding = padding,
         left = props.getLeft(width)

@@ -52,12 +52,16 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
         val contentWidth = modalWidth - 2 * (paddingHorizontal + 1) // padding + border
         val contentHeight = modalHeight - 2 * (paddingVertical + 1)
 
-        <(modalContentComp())(^.wrapped := ModalContentProps(
+        <(modalContentComp())(^.plain := ModalContentProps(
           title = props.title,
-          size = (modalWidth, modalHeight),
+          width = modalWidth,
+          height = modalHeight,
           style = theme,
           padding = padding,
-          footer = props.footer
+          footer = props.footer match {
+            case None => ()
+            case Some(footer) => footer
+          }
         ))(
           <(listBoxComp())(^.plain := ListBoxProps(
             left = 1,

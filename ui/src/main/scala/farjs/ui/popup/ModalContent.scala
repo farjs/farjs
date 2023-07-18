@@ -4,21 +4,16 @@ import farjs.ui.border._
 import scommons.react._
 import scommons.react.blessed._
 
-case class ModalContentProps(title: String,
-                             size: (Int, Int),
-                             style: BlessedStyle,
-                             padding: BlessedPadding = ModalContent.padding,
-                             left: String = "center",
-                             footer: Option[String] = None)
-
 object ModalContent extends FunctionComponent[ModalContentProps] {
 
   private[popup] var doubleBorderComp: ReactClass = DoubleBorder
   
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
-    val (width, height) = props.size
-    val padding = props.padding
+    val props = compProps.plain
+    val width = props.width
+    val height = props.height
+    val padding = props.padding.getOrElse(ModalContent.padding)
+    val left = props.left.getOrElse("center")
 
     <.box(
       ^.rbClickable := true,
@@ -26,7 +21,7 @@ object ModalContent extends FunctionComponent[ModalContentProps] {
       ^.rbWidth := width,
       ^.rbHeight := height,
       ^.rbTop := "center",
-      ^.rbLeft := props.left,
+      ^.rbLeft := left,
       ^.rbShadow := true,
       ^.rbPadding := padding,
       ^.rbStyle := props.style
@@ -36,10 +31,7 @@ object ModalContent extends FunctionComponent[ModalContentProps] {
         height = height - padding.top - padding.bottom,
         style = props.style,
         title = props.title,
-        footer = props.footer match {
-          case None => ()
-          case Some(footer) => footer
-        }
+        footer = props.footer
       ))(),
       
       compProps.children

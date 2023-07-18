@@ -31,9 +31,10 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
         case None => js.undefined
       }
     ))(
-      <(modalContentComp())(^.wrapped := ModalContentProps(
+      <(modalContentComp())(^.plain := ModalContentProps(
         title = props.title,
-        size = (width, height),
+        width = width,
+        height = height,
         style = props.style
       ))(
         textLines.zipWithIndex.map { case (text, index) =>

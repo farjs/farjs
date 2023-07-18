@@ -55,14 +55,15 @@ class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils 
         onClose.isDefined shouldBe props.closable
         focusable shouldBe js.undefined
     }))(), inside(_) { case List(content) =>
-      assertTestComponent(content, modalContentComp)({
-        case ModalContentProps(title, size, resStyle, padding, left, footer) =>
+      assertTestComponent(content, modalContentComp, plain = true)({
+        case ModalContentProps(title, resWidth, resHeight, resStyle, padding, left, footer) =>
           title shouldBe props.title
-          size shouldBe width -> height
+          resWidth shouldBe width
+          resHeight shouldBe height
           assertObject(resStyle, style)
-          padding shouldBe ModalContent.padding
-          left shouldBe "center"
-          footer shouldBe None
+          padding shouldBe js.undefined
+          left shouldBe js.undefined
+          footer shouldBe js.undefined
       }, inside(_) { case List(btn) =>
         assertNativeComponent(btn,
           <.button(

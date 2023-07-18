@@ -78,14 +78,15 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
         onClose.isDefined shouldBe true
         focusable shouldBe js.undefined
     }))(), inside(_) { case List(content) =>
-      assertTestComponent(content, modalContentComp)({
-        case ModalContentProps(title, resSize, style, padding, left, footer) =>
+      assertTestComponent(content, modalContentComp, plain = true)({
+        case ModalContentProps(title, resWidth, resHeight, style, padding, left, footer) =>
           title shouldBe props.title
-          resSize shouldBe width -> height
+          resWidth shouldBe width
+          resHeight shouldBe height
           style shouldBe theme
           padding shouldBe MenuPopup.padding
           left shouldBe props.getLeft(width)
-          footer shouldBe None
+          footer shouldBe js.undefined
       }, inside(_) { case lines =>
         lines.size shouldBe props.items.size
         lines.zipWithIndex.zip(props.items).foreach { case ((line, index), expected) =>

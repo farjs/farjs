@@ -232,14 +232,15 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
         onClose.isDefined shouldBe closable
         focusable shouldBe js.undefined
     }))(), inside(_) { case List(content) =>
-      assertTestComponent(content, modalContentComp)({
-        case ModalContentProps(title, size, style, padding, left, footer) =>
+      assertTestComponent(content, modalContentComp, plain = true)({
+        case ModalContentProps(title, resWidth, resHeight, style, padding, left, footer) =>
           title shouldBe props.title
-          size shouldBe width -> height
+          resWidth shouldBe width
+          resHeight shouldBe height
           style shouldBe props.style
-          padding shouldBe ModalContent.padding
-          left shouldBe "center"
-          footer shouldBe None
+          padding shouldBe js.undefined
+          left shouldBe js.undefined
+          footer shouldBe js.undefined
       }, inside(_) {
           case List(msg, actionsBox) if textLines.size == 1 =>
             assertComponents(List(msg), actionsBox)

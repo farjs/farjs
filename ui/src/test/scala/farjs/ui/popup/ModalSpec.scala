@@ -33,14 +33,14 @@ class ModalSpec extends TestSpec with TestRendererUtils {
         onClose.isDefined shouldBe true
         focusable shouldBe js.undefined
     }))(), inside(_) { case List(content) =>
-      assertTestComponent(content, modalContentComp)({
-        case ModalContentProps(title, size, style, padding, left, footer) =>
+      assertTestComponent(content, modalContentComp, plain = true)({
+        case ModalContentProps(title, width, height, style, padding, left, footer) =>
           title shouldBe props.title
-          size shouldBe props.size
+          (width -> height) shouldBe props.size
           style shouldBe props.style
-          padding shouldBe ModalContent.padding
-          left shouldBe "center"
-          footer shouldBe None
+          padding shouldBe js.undefined
+          left shouldBe js.undefined
+          footer shouldBe js.undefined
       }, inside(_) { case List(child) =>
         assertNativeComponent(child, children)
       })

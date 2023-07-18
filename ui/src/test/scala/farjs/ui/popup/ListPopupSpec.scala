@@ -131,14 +131,15 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
           case WithSizeProps(render) =>
             val content = createTestRenderer(render(width, height)).root
             
-            assertTestComponent(content, modalContentComp)({
-              case ModalContentProps(title, size, style, padding, left, footer) =>
+            assertTestComponent(content, modalContentComp, plain = true)({
+              case ModalContentProps(title, width, height, style, padding, left, footer) =>
                 title shouldBe props.title
-                size shouldBe (expectedWidth -> expectedHeight)
+                width shouldBe expectedWidth
+                height shouldBe expectedHeight
                 style shouldBe theme
                 padding shouldBe ListPopup.padding
-                left shouldBe "center"
-                footer shouldBe props.footer
+                left shouldBe js.undefined
+                footer shouldBe props.footer.getOrElse(())
             }, inside(_) { case List(view) =>
               assertTestComponent(view, listBoxComp, plain = true) {
                 case ListBoxProps(left, top, width, height, selected, resItems, style, _, onSelect) =>

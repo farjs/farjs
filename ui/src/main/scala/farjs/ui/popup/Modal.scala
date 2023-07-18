@@ -17,11 +17,13 @@ object Modal extends FunctionComponent[ModalProps] {
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
+    val (width, height) = props.size
 
     <(popupComp)(^.plain := PopupProps(onClose = props.onCancel: js.Function0[Unit]))(
-      <(modalContentComp())(^.wrapped := ModalContentProps(
+      <(modalContentComp())(^.plain := ModalContentProps(
         title = props.title,
-        size = props.size,
+        width = width,
+        height = height,
         style = props.style
       ))(
         compProps.children

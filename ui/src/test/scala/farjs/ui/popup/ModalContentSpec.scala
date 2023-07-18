@@ -16,11 +16,11 @@ class ModalContentSpec extends TestSpec with TestRendererUtils {
 
   it should "render component" in {
     //given
-    val props = ModalContentProps("test title", (10, 20), DefaultTheme.popup.regular)
+    val props = ModalContentProps("test title", 10, 20, DefaultTheme.popup.regular)
     val children = <.button()("some child")
 
     //when
-    val result = testRender(<(ModalContent())(^.wrapped := props)(
+    val result = testRender(<(ModalContent())(^.plain := props)(
       children
     ))
 
@@ -32,14 +32,17 @@ class ModalContentSpec extends TestSpec with TestRendererUtils {
     //given
     val props = ModalContentProps(
       title = "test title",
-      size = (10, 20),
+      width = 10,
+      height = 20,
       style = DefaultTheme.popup.regular,
-      footer = Some("test footer")
+      padding = js.undefined,
+      left = js.undefined,
+      footer = "test footer"
     )
     val children = <.button()("some child")
 
     //when
-    val result = testRender(<(ModalContent())(^.wrapped := props)(
+    val result = testRender(<(ModalContent())(^.plain := props)(
       children
     ))
 
@@ -51,7 +54,8 @@ class ModalContentSpec extends TestSpec with TestRendererUtils {
                                  props: ModalContentProps,
                                  children: ReactElement): Assertion = {
     
-    val (width, height) = props.size
+    val width = props.width
+    val height = props.height
     
     assertNativeComponent(result,
       <.box(
@@ -78,7 +82,7 @@ class ModalContentSpec extends TestSpec with TestRendererUtils {
             resLeft shouldBe js.undefined
             resTop shouldBe js.undefined
             title shouldBe props.title
-            footer shouldBe props.footer.getOrElse(())
+            footer shouldBe props.footer
         }))())
 
         assertNativeComponent(child, children)
