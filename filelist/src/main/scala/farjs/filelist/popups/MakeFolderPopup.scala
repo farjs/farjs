@@ -31,7 +31,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
     val props = compProps.wrapped
     val (folderName, setFolderName) = useState("")
     val (multiple, setMultiple) = useState(props.multiple)
-    val size@(width, _) = (75, 10)
+    val (width, height) = (75, 10)
     val contentWidth = width - (paddingHorizontal + 2) * 2
     val contentLeft = 2
     val theme = Theme.useTheme().popup.regular
@@ -59,7 +59,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
     }, Nil)
 
     maybeItems.map { items =>
-      <(modalComp())(^.wrapped := ModalProps("Make Folder", size, theme, props.onCancel))(
+      <(modalComp())(^.plain := ModalProps("Make Folder", width, height, theme, props.onCancel))(
         <(textLineComp)(^.plain := TextLineProps(
           align = TextAlign.left,
           left = contentLeft,

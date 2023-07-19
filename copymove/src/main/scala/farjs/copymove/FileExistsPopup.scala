@@ -25,7 +25,7 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val size@(width, _) = (58, 11)
+    val (width, height) = (58, 11)
     val contentWidth = width - (paddingHorizontal + 2) * 2
     val contentLeft = 2
     val theme = Theme.useTheme().popup.error
@@ -43,7 +43,7 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
       ButtonsPanelAction("Cancel", props.onCancel)
     )
 
-    <(modalComp())(^.wrapped := ModalProps("Warning", size, theme, props.onCancel))(
+    <(modalComp())(^.plain := ModalProps("Warning", width, height, theme, props.onCancel))(
       <.text(
         ^.rbLeft := "center",
         ^.rbTop := 1,

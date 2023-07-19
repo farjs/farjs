@@ -20,6 +20,20 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
   CopyProgressPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
   CopyProgressPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
 
+  it should "call onCancel when onCancel in modal" in {
+    //given
+    val onCancel = mockFunction[Unit]
+    val props = getCopyProgressPopupProps(move = false, onCancel = onCancel)
+    val comp = testRender(withThemeContext(<(CopyProgressPopup())(^.wrapped := props)()))
+    val modal = findComponentProps(comp, modalComp, plain = true)
+
+    //then
+    onCancel.expects()
+
+    //when
+    modal.onCancel()
+  }
+
   it should "render component when copy" in {
     //given
     val props = getCopyProgressPopupProps(move = false)
@@ -214,11 +228,11 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
       )
     }
 
-    assertTestComponent(result, modalComp)({ case ModalProps(title, size, resStyle, onCancel) =>
+    assertTestComponent(result, modalComp, plain = true)({ case ModalProps(title, resWidth, resHeight, resStyle, _) =>
       title shouldBe (if (props.move) "Move" else "Copy")
-      size shouldBe width -> height
+      resWidth shouldBe width
+      resHeight shouldBe height
       resStyle shouldBe theme
-      onCancel should be theSameInstanceAs props.onCancel
     }, inside(_) {
       case List(label, item, to, itemPercent, sep1, total, totalPercent, sep2, time, speed, button) =>
         assertComponents(label, item, to, itemPercent, sep1, total, totalPercent, sep2, time, speed, button)

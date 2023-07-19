@@ -35,6 +35,30 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     )
   }
 
+  it should "call onCancel when onCancel in modal" in {
+    //given
+    val onCancel = mockFunction[Unit]
+    val props = CopyItemsPopupProps(move = false, "path", Seq(FileListItem("file 1")), _ => (), onCancel)
+    val historyService = new HistoryService
+    val itemsF = Future.successful(List("path", "path 2"))
+    historyService.getAll.expects().returning(itemsF)
+
+    val renderer = createTestRenderer(withServicesContext(
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
+    ))
+    itemsF.flatMap { _ =>
+      val modal = findComponentProps(renderer.root, modalComp, plain = true)
+
+      //then
+      onCancel.expects()
+
+      //when
+      modal.onCancel()
+      
+      Succeeded
+    }
+  }
+  
   it should "set path when onChange in TextBox" in {
     //given
     val path = "initial path"
@@ -269,11 +293,11 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       )
     }
     
-    assertTestComponent(result, modalComp)({ case ModalProps(resTitle, size, resStyle, onCancel) =>
+    assertTestComponent(result, modalComp, plain = true)({ case ModalProps(resTitle, resWidth, resHeight, resStyle, _) =>
       resTitle shouldBe title
-      size shouldBe width -> height
+      resWidth shouldBe width
+      resHeight shouldBe height
       resStyle shouldBe style
-      onCancel should be theSameInstanceAs props.onCancel
     }, inside(_) { case List(label, input, sep, actionsBox) =>
       assertComponents(label, input, sep, actionsBox)
     })

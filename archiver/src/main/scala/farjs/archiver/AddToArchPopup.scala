@@ -26,7 +26,7 @@ object AddToArchPopup extends FunctionComponent[AddToArchPopupProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val (zipName, setZipName) = useState(props.zipName)
-    val size@(width, _) = (75, 8)
+    val (width, height) = (75, 8)
     val contentWidth = width - (paddingHorizontal + 2) * 2
     val contentLeft = 2
     val theme = Theme.useTheme().popup.regular
@@ -42,7 +42,7 @@ object AddToArchPopup extends FunctionComponent[AddToArchPopupProps] {
       ButtonsPanelAction("[ Cancel ]", props.onCancel)
     )
 
-    <(modalComp())(^.wrapped := ModalProps(s"${props.action} files to archive", size, theme, props.onCancel))(
+    <(modalComp())(^.plain := ModalProps(s"${props.action} files to archive", width, height, theme, props.onCancel))(
       <(textLineComp)(^.plain := TextLineProps(
         align = TextAlign.left,
         left = contentLeft,

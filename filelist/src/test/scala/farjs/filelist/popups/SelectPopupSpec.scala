@@ -27,6 +27,31 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     )
   }
 
+  it should "call onCancel when onCancel in modal" in {
+    //given
+    val onCancel = mockFunction[Unit]
+    val props = getSelectPopupProps(showSelect = true, onCancel = onCancel)
+    val historyService = new HistoryService
+    val itemsF = Future.successful(List("pattern", "test"))
+    historyService.getAll.expects().returning(itemsF)
+
+    val comp = createTestRenderer(withServicesContext(
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), selectPatternsHistory = historyService.service
+    )).root
+
+    itemsF.flatMap { _ =>
+      val modal = findComponentProps(comp, modalComp, plain = true)
+
+      //then
+      onCancel.expects()
+
+      //when
+      modal.onCancel()
+
+      Succeeded
+    }
+  }
+
   it should "set pattern when onChange in TextBox" in {
     //given
     val pattern = "initial pattern"
@@ -158,12 +183,12 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val style = DefaultTheme.popup.regular
     
     assertNativeComponent(result,
-      <(modalComp())(^.assertWrapped(inside(_) {
-        case ModalProps(title, size, resStyle, onCancel) =>
+      <(modalComp())(^.assertPlain[ModalProps](inside(_) {
+        case ModalProps(title, resWidth, resHeight, resStyle, _) =>
           title shouldBe expectedTitle
-          size shouldBe width -> height
+          resWidth shouldBe width
+          resHeight shouldBe height
           resStyle shouldBe style
-          onCancel should be theSameInstanceAs props.onCancel
       }))(
         <(comboBoxComp())(^.assertPlain[ComboBoxProps](inside(_) {
           case ComboBoxProps(left, top, resWidth, resItems, resValue, _, _) =>

@@ -28,12 +28,12 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val size@(width, _) = (50, 13)
+    val (width, height) = (50, 13)
     val contentWidth = width - (paddingHorizontal + 2) * 2
     val contentLeft = 2
     val theme = Theme.useTheme().popup.regular
     
-    <(modalComp())(^.wrapped := ModalProps(if (props.move) "Move" else "Copy", size, theme, props.onCancel))(
+    <(modalComp())(^.plain := ModalProps(if (props.move) "Move" else "Copy", width, height, theme, props.onCancel))(
       <.text(
         ^.rbLeft := contentLeft,
         ^.rbTop := 1,

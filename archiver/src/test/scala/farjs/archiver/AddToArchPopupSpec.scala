@@ -19,6 +19,20 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
   AddToArchPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   AddToArchPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
+  it should "call onCancel when onCancel in modal" in {
+    //given
+    val onCancel = mockFunction[Unit]
+    val props = AddToArchPopupProps("zipName", AddToArchAction.Add, _ => (), onCancel)
+    val renderer = createTestRenderer(withThemeContext(<(AddToArchPopup())(^.wrapped := props)()))
+    val modal = findComponentProps(renderer.root, modalComp, plain = true)
+
+    //then
+    onCancel.expects()
+
+    //when
+    modal.onCancel()
+  }
+  
   it should "set zipName when onChange in TextBox" in {
     //given
     val zipName = "initial zip name"
@@ -126,12 +140,12 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
     val style = DefaultTheme.popup.regular
 
     assertNativeComponent(result,
-      <(modalComp())(^.assertWrapped(inside(_) {
-        case ModalProps(title, size, resStyle, onCancel) =>
+      <(modalComp())(^.assertPlain[ModalProps](inside(_) {
+        case ModalProps(title, resWidth, resHeight, resStyle, _) =>
           title shouldBe "Add files to archive"
-          size shouldBe width -> height
+          resWidth shouldBe width
+          resHeight shouldBe height
           resStyle shouldBe style
-          onCancel should be theSameInstanceAs props.onCancel
       }))(
         <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
           case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>

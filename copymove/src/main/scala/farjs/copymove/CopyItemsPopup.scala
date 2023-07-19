@@ -32,7 +32,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
     val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
     val props = compProps.wrapped
     val (path, setPath) = useState(props.path)
-    val size@(width, _) = (75, 8)
+    val (width, height) = (75, 8)
     val contentWidth = width - (paddingHorizontal + 2) * 2
     val contentLeft = 2
     val theme = Theme.useTheme().popup.regular
@@ -65,7 +65,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
     }, Nil)
 
     maybeItems.map { items =>
-      <(modalComp())(^.wrapped := ModalProps(title, size, theme, props.onCancel))(
+      <(modalComp())(^.plain := ModalProps(title, width, height, theme, props.onCancel))(
         <(textLineComp)(^.plain := TextLineProps(
           align = TextAlign.left,
           left = contentLeft,

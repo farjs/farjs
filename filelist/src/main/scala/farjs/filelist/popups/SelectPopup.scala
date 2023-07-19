@@ -25,7 +25,7 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
     val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
     val props = compProps.wrapped
     val (pattern, setPattern) = useState("")
-    val size@(width, _) = (55, 5)
+    val (width, height) = (55, 5)
     val contentWidth = width - (paddingHorizontal + 2) * 2
     val contentLeft = 2
     val theme = Theme.useTheme().popup.regular
@@ -48,11 +48,12 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
     }, Nil)
 
     maybeItems.map { items =>
-      <(modalComp())(^.wrapped := ModalProps(
+      <(modalComp())(^.plain := ModalProps(
         title =
           if (props.showSelect) "Select"
           else "Deselect",
-        size = size,
+        width = width,
+        height = height,
         style = theme,
         onCancel = props.onCancel
       ))(

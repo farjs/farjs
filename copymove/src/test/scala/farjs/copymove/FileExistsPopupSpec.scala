@@ -21,6 +21,20 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
   FileExistsPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   FileExistsPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
+  it should "call onCancel when onCancel in modal" in {
+    //given
+    val onCancel = mockFunction[Unit]
+    val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), _ => (), onCancel)
+    val comp = testRender(withThemeContext(<(FileExistsPopup())(^.wrapped := props)()))
+    val modal = findComponentProps(comp, modalComp, plain = true)
+
+    //then
+    onCancel.expects()
+    
+    //when
+    modal.onCancel()
+  }
+  
   it should "call onAction(Overwrite) when press Overwrite button" in {
     //given
     val onAction = mockFunction[FileExistsAction, Unit]
@@ -258,11 +272,11 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
       )
     }
     
-    assertTestComponent(result, modalComp)({ case ModalProps(title, size, resStyle, onCancel) =>
+    assertTestComponent(result, modalComp, plain = true)({ case ModalProps(title, resWidth, resHeight, resStyle, _) =>
       title shouldBe "Warning"
-      size shouldBe width -> height
+      resWidth shouldBe width
+      resHeight shouldBe height
       resStyle shouldBe theme
-      onCancel should be theSameInstanceAs props.onCancel
     }, inside(_) {
       case List(label1, item, sep1, label2, newItem, existing, sep2, actionsBox) =>
         assertComponents(label1, item, sep1, label2, newItem, existing, sep2, actionsBox)

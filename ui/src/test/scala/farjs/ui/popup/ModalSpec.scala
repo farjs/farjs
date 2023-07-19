@@ -15,11 +15,11 @@ class ModalSpec extends TestSpec with TestRendererUtils {
 
   it should "render component" in {
     //given
-    val props = ModalProps("test title", (10, 20), DefaultTheme.popup.regular, () => ())
+    val props = ModalProps("test title", 10, 20, DefaultTheme.popup.regular, () => ())
     val children = <.button()("some child")
 
     //when
-    val result = testRender(<(Modal())(^.wrapped := props)(
+    val result = testRender(<(Modal())(^.plain := props)(
       children
     ))
 
@@ -36,7 +36,8 @@ class ModalSpec extends TestSpec with TestRendererUtils {
       assertTestComponent(content, modalContentComp, plain = true)({
         case ModalContentProps(title, width, height, style, padding, left, footer) =>
           title shouldBe props.title
-          (width -> height) shouldBe props.size
+          width shouldBe props.width
+          height shouldBe props.height
           style shouldBe props.style
           padding shouldBe js.undefined
           left shouldBe js.undefined

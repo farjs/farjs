@@ -34,6 +34,30 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     )
   }
 
+  it should "call onCancel when onCancel in modal" in {
+    //given
+    val onCancel = mockFunction[Unit]
+    val props = getMakeFolderPopupProps(onCancel = onCancel)
+    val historyService = new HistoryService
+    val itemsF = Future.successful(List("folder"))
+    historyService.getAll.expects().returning(itemsF)
+
+    val renderer = createTestRenderer(withServicesContext(
+      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
+    ))
+    itemsF.flatMap { _ =>
+      val modal = findComponentProps(renderer.root, modalComp, plain = true)
+
+      //then
+      onCancel.expects()
+
+      //when
+      modal.onCancel()
+
+      Succeeded
+    }
+  }
+
   it should "set folderName when onChange in ComboBox" in {
     //given
     val folderName = "initial folder name"
@@ -231,12 +255,12 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val style = DefaultTheme.popup.regular
     
     assertNativeComponent(result,
-      <(modalComp())(^.assertWrapped(inside(_) {
-        case ModalProps(title, size, resStyle, onCancel) =>
+      <(modalComp())(^.assertPlain[ModalProps](inside(_) {
+        case ModalProps(title, resWidth, resHeight, resStyle, _) =>
           title shouldBe "Make Folder"
-          size shouldBe width -> height
+          resWidth shouldBe width
+          resHeight shouldBe height
           resStyle shouldBe style
-          onCancel should be theSameInstanceAs props.onCancel
       }))(
         <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
           case TextLineProps(align, left, top, resWidth, text, resStyle, focused, padding) =>
