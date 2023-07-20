@@ -5,13 +5,13 @@ import scommons.react._
 object Modal extends FunctionComponent[ModalProps] {
 
   private[popup] var popupComp: ReactClass = Popup
-  private[popup] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
+  private[popup] var modalContentComp: ReactClass = ModalContent
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
 
     <(popupComp)(^.plain := PopupProps(onClose = props.onCancel))(
-      <(modalContentComp())(^.plain := ModalContentProps(
+      <(modalContentComp)(^.plain := ModalContentProps(
         title = props.title,
         width = props.width,
         height = props.height,

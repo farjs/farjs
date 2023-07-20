@@ -1,12 +1,21 @@
 package farjs.ui
 
 import scommons.react.ReactClass
-import scommons.react.blessed.BlessedStyle
+import scommons.react.blessed.{BlessedPadding, BlessedStyle}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport
 
 package object popup {
+
+  @js.native
+  @JSImport("@farjs/ui/popup/ModalContent.mjs", JSImport.Default)
+  object ModalContent extends ReactClass {
+
+    val paddingHorizontal: Int = js.native
+    val paddingVertical: Int = js.native
+    val padding: BlessedPadding = js.native
+  }
 
   @js.native
   @JSImport("@farjs/ui/popup/Popup.mjs", JSImport.Default)

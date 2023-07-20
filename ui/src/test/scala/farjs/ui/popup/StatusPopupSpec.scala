@@ -16,7 +16,7 @@ import scala.scalajs.js
 class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils {
 
   StatusPopup.popupComp = "Popup".asInstanceOf[ReactClass]
-  StatusPopup.modalContentComp = mockUiComponent("ModalContent")
+  StatusPopup.modalContentComp = "ModalContent".asInstanceOf[ReactClass]
   StatusPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
 
   private val theme = DefaultTheme.popup.regular
@@ -55,7 +55,7 @@ class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils 
         onClose.isDefined shouldBe props.closable
         focusable shouldBe js.undefined
     }))(), inside(_) { case List(content) =>
-      assertTestComponent(content, modalContentComp, plain = true)({
+      assertNativeComponent(content, <(modalContentComp)(^.assertPlain[ModalContentProps](inside(_) {
         case ModalContentProps(title, resWidth, resHeight, resStyle, padding, left, footer) =>
           title shouldBe props.title
           resWidth shouldBe width
@@ -64,7 +64,7 @@ class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils 
           padding shouldBe js.undefined
           left shouldBe js.undefined
           footer shouldBe js.undefined
-      }, inside(_) { case List(btn) =>
+      }))(), inside(_) { case List(btn) =>
         assertNativeComponent(btn,
           <.button(
             ^.rbWidth := textWidth,

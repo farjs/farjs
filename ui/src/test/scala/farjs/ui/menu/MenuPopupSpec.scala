@@ -14,7 +14,7 @@ import scala.scalajs.js
 class MenuPopupSpec extends TestSpec with TestRendererUtils {
 
   MenuPopup.popupComp = "Popup".asInstanceOf[ReactClass]
-  MenuPopup.modalContentComp = mockUiComponent("ModalContent")
+  MenuPopup.modalContentComp = "ModalContent".asInstanceOf[ReactClass]
   MenuPopup.buttonComp = "Button".asInstanceOf[ReactClass]
 
   it should "call onSelect when onPress item" in {
@@ -78,7 +78,7 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
         onClose.isDefined shouldBe true
         focusable shouldBe js.undefined
     }))(), inside(_) { case List(content) =>
-      assertTestComponent(content, modalContentComp, plain = true)({
+      assertNativeComponent(content, <(modalContentComp)(^.assertPlain[ModalContentProps](inside(_) {
         case ModalContentProps(title, resWidth, resHeight, style, padding, left, footer) =>
           title shouldBe props.title
           resWidth shouldBe width
@@ -87,7 +87,7 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
           padding shouldBe MenuPopup.padding
           left shouldBe props.getLeft(width)
           footer shouldBe js.undefined
-      }, inside(_) { case lines =>
+      }))(), inside(_) { case lines =>
         lines.size shouldBe props.items.size
         lines.zipWithIndex.zip(props.items).foreach { case ((line, index), expected) =>
           assertNativeComponent(line, <(buttonComp)(^.assertPlain[ButtonProps](inside(_) {

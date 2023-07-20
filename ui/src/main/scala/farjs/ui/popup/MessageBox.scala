@@ -9,7 +9,7 @@ import scala.scalajs.js
 object MessageBox extends FunctionComponent[MessageBoxProps] {
 
   private[popup] var popupComp: ReactClass = Popup
-  private[popup] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
+  private[popup] var modalContentComp: ReactClass = ModalContent
   private[popup] var textLineComp: ReactClass = TextLine
   private[popup] var buttonsPanelComp: ReactClass = ButtonsPanel
 
@@ -31,7 +31,7 @@ object MessageBox extends FunctionComponent[MessageBoxProps] {
         case None => js.undefined
       }
     ))(
-      <(modalContentComp())(^.plain := ModalContentProps(
+      <(modalContentComp)(^.plain := ModalContentProps(
         title = props.title,
         width = width,
         height = height,

@@ -16,7 +16,7 @@ case class StatusPopupProps(text: String,
 object StatusPopup extends FunctionComponent[StatusPopupProps] {
 
   private[popup] var popupComp: ReactClass = Popup
-  private[popup] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
+  private[popup] var modalContentComp: ReactClass = ModalContent
   private[popup] var textLineComp: ReactClass = TextLine
 
   protected def render(compProps: Props): ReactElement = {
@@ -37,7 +37,7 @@ object StatusPopup extends FunctionComponent[StatusPopupProps] {
         if (props.closable) props.onClose: js.Function0[Unit]
         else js.undefined
     ))(
-      <(modalContentComp())(^.plain := ModalContentProps(
+      <(modalContentComp)(^.plain := ModalContentProps(
         title = props.title,
         width = width,
         height = height,

@@ -12,7 +12,7 @@ import scala.scalajs.js
 class ListPopupSpec extends TestSpec with TestRendererUtils {
 
   ListPopup.popupComp = "Popup".asInstanceOf[ReactClass]
-  ListPopup.modalContentComp = mockUiComponent("ModalContent")
+  ListPopup.modalContentComp = "ModalContent".asInstanceOf[ReactClass]
   ListPopup.withSizeComp = mockUiComponent("WithSize")
   ListPopup.listBoxComp = mockUiComponent("ListBox")
 
@@ -131,7 +131,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
           case WithSizeProps(render) =>
             val content = createTestRenderer(render(width, height)).root
             
-            assertTestComponent(content, modalContentComp, plain = true)({
+            assertNativeComponent(content, <(modalContentComp)(^.assertPlain[ModalContentProps](inside(_) {
               case ModalContentProps(title, width, height, style, padding, left, footer) =>
                 title shouldBe props.title
                 width shouldBe expectedWidth
@@ -140,7 +140,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
                 padding shouldBe ListPopup.padding
                 left shouldBe js.undefined
                 footer shouldBe props.footer.getOrElse(())
-            }, inside(_) { case List(view) =>
+            }))(), inside(_) { case List(view) =>
               assertTestComponent(view, listBoxComp, plain = true) {
                 case ListBoxProps(left, top, width, height, selected, resItems, style, _, onSelect) =>
                   left shouldBe 1

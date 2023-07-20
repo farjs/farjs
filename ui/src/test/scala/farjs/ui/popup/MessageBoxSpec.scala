@@ -13,7 +13,7 @@ import scala.scalajs.js
 class MessageBoxSpec extends TestSpec with TestRendererUtils {
 
   MessageBox.popupComp = "Popup".asInstanceOf[ReactClass]
-  MessageBox.modalContentComp = mockUiComponent("ModalContent")
+  MessageBox.modalContentComp = "ModalContent".asInstanceOf[ReactClass]
   MessageBox.textLineComp = "TextLine".asInstanceOf[ReactClass]
   MessageBox.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
@@ -232,7 +232,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
         onClose.isDefined shouldBe closable
         focusable shouldBe js.undefined
     }))(), inside(_) { case List(content) =>
-      assertTestComponent(content, modalContentComp, plain = true)({
+      assertNativeComponent(content, <(modalContentComp)(^.assertPlain[ModalContentProps](inside(_) {
         case ModalContentProps(title, resWidth, resHeight, style, padding, left, footer) =>
           title shouldBe props.title
           resWidth shouldBe width
@@ -241,7 +241,7 @@ class MessageBoxSpec extends TestSpec with TestRendererUtils {
           padding shouldBe js.undefined
           left shouldBe js.undefined
           footer shouldBe js.undefined
-      }, inside(_) {
+      }))(), inside(_) {
           case List(msg, actionsBox) if textLines.size == 1 =>
             assertComponents(List(msg), actionsBox)
           case List(msg1, msg2, actionsBox) if textLines.size == 2 =>

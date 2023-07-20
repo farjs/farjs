@@ -17,7 +17,7 @@ case class MenuPopupProps(title: String,
 object MenuPopup extends FunctionComponent[MenuPopupProps] {
 
   private[menu] var popupComp: ReactClass = Popup
-  private[menu] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
+  private[menu] var modalContentComp: ReactClass = ModalContent
   private[menu] var buttonComp: ReactClass = Button
 
   protected def render(compProps: Props): ReactElement = {
@@ -29,7 +29,7 @@ object MenuPopup extends FunctionComponent[MenuPopupProps] {
     val theme = Theme.useTheme().popup.menu
 
     <(popupComp)(^.plain := PopupProps(onClose = props.onClose: js.Function0[Unit]))(
-      <(modalContentComp())(^.plain := ModalContentProps(
+      <(modalContentComp)(^.plain := ModalContentProps(
         title = props.title,
         width = width,
         height = height,

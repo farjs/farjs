@@ -23,7 +23,7 @@ case class ListPopupProps(title: String,
 object ListPopup extends FunctionComponent[ListPopupProps] {
 
   private[popup] var popupComp: ReactClass = Popup
-  private[popup] var modalContentComp: UiComponent[ModalContentProps] = ModalContent
+  private[popup] var modalContentComp: ReactClass = ModalContent
   private[popup] var withSizeComp: UiComponent[WithSizeProps] = WithSize
   private[popup] var listBoxComp: UiComponent[ListBoxProps] = ListBox
   
@@ -52,7 +52,7 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
         val contentWidth = modalWidth - 2 * (paddingHorizontal + 1) // padding + border
         val contentHeight = modalHeight - 2 * (paddingVertical + 1)
 
-        <(modalContentComp())(^.plain := ModalContentProps(
+        <(modalContentComp)(^.plain := ModalContentProps(
           title = props.title,
           width = modalWidth,
           height = modalHeight,

@@ -11,7 +11,7 @@ import scala.scalajs.js
 class ModalSpec extends TestSpec with TestRendererUtils {
 
   Modal.popupComp = "Popup".asInstanceOf[ReactClass]
-  Modal.modalContentComp = mockUiComponent("ModalContent")
+  Modal.modalContentComp = "ModalContent".asInstanceOf[ReactClass]
 
   it should "render component" in {
     //given
@@ -33,7 +33,7 @@ class ModalSpec extends TestSpec with TestRendererUtils {
         onClose.isDefined shouldBe true
         focusable shouldBe js.undefined
     }))(), inside(_) { case List(content) =>
-      assertTestComponent(content, modalContentComp, plain = true)({
+      assertNativeComponent(content, <(modalContentComp)(^.assertPlain[ModalContentProps](inside(_) {
         case ModalContentProps(title, width, height, style, padding, left, footer) =>
           title shouldBe props.title
           width shouldBe props.width
@@ -42,7 +42,7 @@ class ModalSpec extends TestSpec with TestRendererUtils {
           padding shouldBe js.undefined
           left shouldBe js.undefined
           footer shouldBe js.undefined
-      }, inside(_) { case List(child) =>
+      }))(), inside(_) { case List(child) =>
         assertNativeComponent(child, children)
       })
     })
