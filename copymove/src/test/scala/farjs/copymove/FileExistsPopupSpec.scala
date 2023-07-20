@@ -16,7 +16,7 @@ import scala.scalajs.js
 
 class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
 
-  FileExistsPopup.modalComp = mockUiComponent("Modal")
+  FileExistsPopup.modalComp = "Modal".asInstanceOf[ReactClass]
   FileExistsPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
   FileExistsPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   FileExistsPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
@@ -26,7 +26,9 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = FileExistsPopupProps(FileListItem("file 1"), FileListItem("file 1"), _ => (), onCancel)
     val comp = testRender(withThemeContext(<(FileExistsPopup())(^.wrapped := props)()))
-    val modal = findComponentProps(comp, modalComp, plain = true)
+    val modal = inside(findComponents(comp, modalComp)) {
+      case List(modal) => modal.props.asInstanceOf[ModalProps]
+    }
 
     //then
     onCancel.expects()
@@ -272,12 +274,13 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
       )
     }
     
-    assertTestComponent(result, modalComp, plain = true)({ case ModalProps(title, resWidth, resHeight, resStyle, _) =>
-      title shouldBe "Warning"
-      resWidth shouldBe width
-      resHeight shouldBe height
-      resStyle shouldBe theme
-    }, inside(_) {
+    assertNativeComponent(result, <(modalComp)(^.assertPlain[ModalProps](inside(_) {
+      case ModalProps(title, resWidth, resHeight, resStyle, _) =>
+        title shouldBe "Warning"
+        resWidth shouldBe width
+        resHeight shouldBe height
+        resStyle shouldBe theme
+    }))(), inside(_) {
       case List(label1, item, sep1, label2, newItem, existing, sep2, actionsBox) =>
         assertComponents(label1, item, sep1, label2, newItem, existing, sep2, actionsBox)
     })

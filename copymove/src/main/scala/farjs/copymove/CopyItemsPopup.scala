@@ -21,7 +21,7 @@ case class CopyItemsPopupProps(move: Boolean,
 
 object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
 
-  private[copymove] var modalComp: UiComponent[ModalProps] = Modal
+  private[copymove] var modalComp: ReactClass = Modal
   private[copymove] var textLineComp: ReactClass = TextLine
   private[copymove] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
   private[copymove] var horizontalLineComp: ReactClass = HorizontalLine
@@ -65,7 +65,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
     }, Nil)
 
     maybeItems.map { items =>
-      <(modalComp())(^.plain := ModalProps(title, width, height, theme, props.onCancel))(
+      <(modalComp)(^.plain := ModalProps(title, width, height, theme, props.onCancel))(
         <(textLineComp)(^.plain := TextLineProps(
           align = TextAlign.left,
           left = contentLeft,

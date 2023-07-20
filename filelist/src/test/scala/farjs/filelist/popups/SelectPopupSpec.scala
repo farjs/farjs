@@ -9,13 +9,14 @@ import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.Future
 
 class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  SelectPopup.modalComp = mockUiComponent("Modal")
+  SelectPopup.modalComp = "Modal".asInstanceOf[ReactClass]
   SelectPopup.comboBoxComp = mockUiComponent("ComboBox")
 
   //noinspection TypeAnnotation
@@ -40,7 +41,9 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     )).root
 
     itemsF.flatMap { _ =>
-      val modal = findComponentProps(comp, modalComp, plain = true)
+      val modal = inside(findComponents(comp, modalComp)) {
+        case List(modal) => modal.props.asInstanceOf[ModalProps]
+      }
 
       //then
       onCancel.expects()
@@ -183,7 +186,7 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val style = DefaultTheme.popup.regular
     
     assertNativeComponent(result,
-      <(modalComp())(^.assertPlain[ModalProps](inside(_) {
+      <(modalComp)(^.assertPlain[ModalProps](inside(_) {
         case ModalProps(title, resWidth, resHeight, resStyle, _) =>
           title shouldBe expectedTitle
           resWidth shouldBe width

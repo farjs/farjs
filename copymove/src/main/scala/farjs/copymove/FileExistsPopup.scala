@@ -18,7 +18,7 @@ case class FileExistsPopupProps(newItem: FileListItem,
 
 object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
   
-  private[copymove] var modalComp: UiComponent[ModalProps] = Modal
+  private[copymove] var modalComp: ReactClass = Modal
   private[copymove] var textLineComp: ReactClass = TextLine
   private[copymove] var horizontalLineComp: ReactClass = HorizontalLine
   private[copymove] var buttonsPanelComp: ReactClass = ButtonsPanel
@@ -43,7 +43,7 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
       ButtonsPanelAction("Cancel", props.onCancel)
     )
 
-    <(modalComp())(^.plain := ModalProps("Warning", width, height, theme, props.onCancel))(
+    <(modalComp)(^.plain := ModalProps("Warning", width, height, theme, props.onCancel))(
       <.text(
         ^.rbLeft := "center",
         ^.rbTop := 1,

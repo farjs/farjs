@@ -17,7 +17,7 @@ case class SelectPopupProps(showSelect: Boolean,
 
 object SelectPopup extends FunctionComponent[SelectPopupProps] {
 
-  private[popups] var modalComp: UiComponent[ModalProps] = Modal
+  private[popups] var modalComp: ReactClass = Modal
   private[popups] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
 
   protected def render(compProps: Props): ReactElement = {
@@ -48,7 +48,7 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
     }, Nil)
 
     maybeItems.map { items =>
-      <(modalComp())(^.plain := ModalProps(
+      <(modalComp)(^.plain := ModalProps(
         title =
           if (props.showSelect) "Select"
           else "Deselect",

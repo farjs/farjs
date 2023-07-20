@@ -13,7 +13,7 @@ import scala.scalajs.js
 
 class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
 
-  AddToArchPopup.modalComp = mockUiComponent("Modal")
+  AddToArchPopup.modalComp = "Modal".asInstanceOf[ReactClass]
   AddToArchPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
   AddToArchPopup.textBoxComp = mockUiComponent("TextBox")
   AddToArchPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
@@ -24,7 +24,9 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = AddToArchPopupProps("zipName", AddToArchAction.Add, _ => (), onCancel)
     val renderer = createTestRenderer(withThemeContext(<(AddToArchPopup())(^.wrapped := props)()))
-    val modal = findComponentProps(renderer.root, modalComp, plain = true)
+    val modal = inside(findComponents(renderer.root, modalComp)) {
+      case List(modal) => modal.props.asInstanceOf[ModalProps]
+    }
 
     //then
     onCancel.expects()
@@ -140,7 +142,7 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
     val style = DefaultTheme.popup.regular
 
     assertNativeComponent(result,
-      <(modalComp())(^.assertPlain[ModalProps](inside(_) {
+      <(modalComp)(^.assertPlain[ModalProps](inside(_) {
         case ModalProps(title, resWidth, resHeight, resStyle, _) =>
           title shouldBe "Add files to archive"
           resWidth shouldBe width

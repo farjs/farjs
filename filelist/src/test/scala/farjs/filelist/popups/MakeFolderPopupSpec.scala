@@ -18,7 +18,7 @@ import scala.scalajs.js
 
 class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  MakeFolderPopup.modalComp = mockUiComponent("Modal")
+  MakeFolderPopup.modalComp = "Modal".asInstanceOf[ReactClass]
   MakeFolderPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
   MakeFolderPopup.comboBoxComp = mockUiComponent("ComboBox")
   MakeFolderPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
@@ -46,7 +46,9 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
     ))
     itemsF.flatMap { _ =>
-      val modal = findComponentProps(renderer.root, modalComp, plain = true)
+      val modal = inside(findComponents(renderer.root, modalComp)) {
+        case List(modal) => modal.props.asInstanceOf[ModalProps]
+      }
 
       //then
       onCancel.expects()
@@ -255,7 +257,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val style = DefaultTheme.popup.regular
     
     assertNativeComponent(result,
-      <(modalComp())(^.assertPlain[ModalProps](inside(_) {
+      <(modalComp)(^.assertPlain[ModalProps](inside(_) {
         case ModalProps(title, resWidth, resHeight, resStyle, _) =>
           title shouldBe "Make Folder"
           resWidth shouldBe width

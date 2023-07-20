@@ -9,6 +9,10 @@ import scala.scalajs.js.annotation.JSImport
 package object popup {
 
   @js.native
+  @JSImport("@farjs/ui/popup/Modal.mjs", JSImport.Default)
+  object Modal extends ReactClass
+
+  @js.native
   @JSImport("@farjs/ui/popup/ModalContent.mjs", JSImport.Default)
   object ModalContent extends ReactClass {
 

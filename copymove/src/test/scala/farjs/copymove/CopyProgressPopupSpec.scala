@@ -16,7 +16,7 @@ import scala.scalajs.js
 
 class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
 
-  CopyProgressPopup.modalComp = mockUiComponent("Modal")
+  CopyProgressPopup.modalComp = "Modal".asInstanceOf[ReactClass]
   CopyProgressPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
   CopyProgressPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
 
@@ -25,7 +25,9 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = getCopyProgressPopupProps(move = false, onCancel = onCancel)
     val comp = testRender(withThemeContext(<(CopyProgressPopup())(^.wrapped := props)()))
-    val modal = findComponentProps(comp, modalComp, plain = true)
+    val modal = inside(findComponents(comp, modalComp)) {
+      case List(modal) => modal.props.asInstanceOf[ModalProps]
+    }
 
     //then
     onCancel.expects()
@@ -228,12 +230,13 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
       )
     }
 
-    assertTestComponent(result, modalComp, plain = true)({ case ModalProps(title, resWidth, resHeight, resStyle, _) =>
-      title shouldBe (if (props.move) "Move" else "Copy")
-      resWidth shouldBe width
-      resHeight shouldBe height
-      resStyle shouldBe theme
-    }, inside(_) {
+    assertNativeComponent(result, <(modalComp)(^.assertPlain[ModalProps](inside(_) {
+      case ModalProps(title, resWidth, resHeight, resStyle, _) =>
+        title shouldBe (if (props.move) "Move" else "Copy")
+        resWidth shouldBe width
+        resHeight shouldBe height
+        resStyle shouldBe theme
+    }))(), inside(_) {
       case List(label, item, to, itemPercent, sep1, total, totalPercent, sep2, time, speed, button) =>
         assertComponents(label, item, to, itemPercent, sep1, total, totalPercent, sep2, time, speed, button)
     })

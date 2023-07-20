@@ -20,7 +20,7 @@ import scala.scalajs.js
 
 class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  CopyItemsPopup.modalComp = mockUiComponent("Modal")
+  CopyItemsPopup.modalComp = "Modal".asInstanceOf[ReactClass]
   CopyItemsPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
   CopyItemsPopup.comboBoxComp = mockUiComponent("ComboBox")
   CopyItemsPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
@@ -47,7 +47,9 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
     ))
     itemsF.flatMap { _ =>
-      val modal = findComponentProps(renderer.root, modalComp, plain = true)
+      val modal = inside(findComponents(renderer.root, modalComp)) {
+        case List(modal) => modal.props.asInstanceOf[ModalProps]
+      }
 
       //then
       onCancel.expects()
@@ -293,12 +295,13 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       )
     }
     
-    assertTestComponent(result, modalComp, plain = true)({ case ModalProps(resTitle, resWidth, resHeight, resStyle, _) =>
-      resTitle shouldBe title
-      resWidth shouldBe width
-      resHeight shouldBe height
-      resStyle shouldBe style
-    }, inside(_) { case List(label, input, sep, actionsBox) =>
+    assertNativeComponent(result, <(modalComp)(^.assertPlain[ModalProps](inside(_) {
+      case ModalProps(resTitle, resWidth, resHeight, resStyle, _) =>
+        resTitle shouldBe title
+        resWidth shouldBe width
+        resHeight shouldBe height
+        resStyle shouldBe style
+    }))(), inside(_) { case List(label, input, sep, actionsBox) =>
       assertComponents(label, input, sep, actionsBox)
     })
   }

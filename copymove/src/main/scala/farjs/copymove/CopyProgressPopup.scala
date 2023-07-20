@@ -21,7 +21,7 @@ case class CopyProgressPopupProps(move: Boolean,
 
 object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
 
-  private[copymove] var modalComp: UiComponent[ModalProps] = Modal
+  private[copymove] var modalComp: ReactClass = Modal
   private[copymove] var textLineComp: ReactClass = TextLine
   private[copymove] var horizontalLineComp: ReactClass = HorizontalLine
   private[copymove] var progressBarComp: UiComponent[ProgressBarProps] = ProgressBar
@@ -33,7 +33,7 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
     val contentLeft = 2
     val theme = Theme.useTheme().popup.regular
     
-    <(modalComp())(^.plain := ModalProps(if (props.move) "Move" else "Copy", width, height, theme, props.onCancel))(
+    <(modalComp)(^.plain := ModalProps(if (props.move) "Move" else "Copy", width, height, theme, props.onCancel))(
       <.text(
         ^.rbLeft := contentLeft,
         ^.rbTop := 1,
