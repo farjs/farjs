@@ -12,7 +12,13 @@ lazy val `farjs` = (project in file("."))
     publishM2 := ((): Unit)
   )
   .settings(
-    ideExcludedDirectories += baseDirectory.value / "docs" / "_site"
+    ideExcludedDirectories ++= {
+      val base = baseDirectory.value
+      List(
+        base / "docs" / "_site",
+        base / "node_modules"
+      )
+    }
   )
   .aggregate(
     `farjs-ui`,
