@@ -1,5 +1,10 @@
 ## Developing
 
+### Install node dependencies
+```bash
+npm i --install-links=true
+```
+
 ### How to Build
 
 To build and run all the tests use the following command:

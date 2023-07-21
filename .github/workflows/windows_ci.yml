@@ -41,30 +41,13 @@ jobs:
       with:
         path: |
           ~/AppData/Roaming/npm
-          D:/a/farjs/farjs/app/target/scala-2.13/scalajs-bundler/main/node_modules
-          D:/a/farjs/farjs/app/target/scala-2.13/scalajs-bundler/main/package-lock.json
-          D:/a/farjs/farjs/app/target/scala-2.13/scalajs-bundler/test/node_modules
-          D:/a/farjs/farjs/app/target/scala-2.13/scalajs-bundler/test/package-lock.json
-          D:/a/farjs/farjs/filelist/target/scala-2.13/scalajs-bundler/test/node_modules
-          D:/a/farjs/farjs/filelist/target/scala-2.13/scalajs-bundler/test/package-lock.json
-          D:/a/farjs/farjs/ui/target/scala-2.13/scalajs-bundler/test/node_modules
-          D:/a/farjs/farjs/ui/target/scala-2.13/scalajs-bundler/test/package-lock.json
-          D:/a/farjs/farjs/dao/target/scala-2.13/scalajs-bundler/test/node_modules
-          D:/a/farjs/farjs/dao/target/scala-2.13/scalajs-bundler/test/package-lock.json
-          D:/a/farjs/farjs/fs/target/scala-2.13/scalajs-bundler/test/node_modules
-          D:/a/farjs/farjs/fs/target/scala-2.13/scalajs-bundler/test/package-lock.json
-          D:/a/farjs/farjs/archiver/target/scala-2.13/scalajs-bundler/test/node_modules
-          D:/a/farjs/farjs/archiver/target/scala-2.13/scalajs-bundler/test/package-lock.json
-          D:/a/farjs/farjs/text/target/scala-2.13/scalajs-bundler/test/node_modules
-          D:/a/farjs/farjs/text/target/scala-2.13/scalajs-bundler/test/package-lock.json
-          D:/a/farjs/farjs/viewer/target/scala-2.13/scalajs-bundler/test/node_modules
-          D:/a/farjs/farjs/viewer/target/scala-2.13/scalajs-bundler/test/package-lock.json
-          D:/a/farjs/farjs/copymove/target/scala-2.13/scalajs-bundler/test/node_modules
-          D:/a/farjs/farjs/copymove/target/scala-2.13/scalajs-bundler/test/package-lock.json
-        key: ${{ runner.os }}-node_modules-cache-v3-${{ hashFiles('**/package-lock.json') }}
+          D:/a/farjs/farjs/node_modules
+          D:/a/farjs/farjs/package-lock.json
+        key: ${{ runner.os }}-node_modules-cache-v3-${{ hashFiles('package.json') }}
         restore-keys: |
           ${{ runner.os }}-node_modules-cache-v3-
 
     - name: Run tests
       run: |
+        npm i
         sbt test

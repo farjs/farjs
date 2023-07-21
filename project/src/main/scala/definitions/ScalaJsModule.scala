@@ -101,6 +101,15 @@ object ScalaJsModule {
     },
 
     npmExtraArgs := Seq("--install-links=true"),
+
+    //disable local npm install command to use root node_modules
+    Compile / npmUpdate := {
+      val _ = (Compile / scalaJSBundlerPackageJson).value
+      (Compile / npmUpdate / crossTarget).value
+    },
+    Test / npmUpdate := {
+      (Test / npmUpdate / crossTarget).value
+    },
     
     Test / additionalNpmConfig := Map(
       "type" -> JSON.str("module")
