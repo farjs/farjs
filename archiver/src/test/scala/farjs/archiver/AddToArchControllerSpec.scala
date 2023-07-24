@@ -11,6 +11,7 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
+import scala.scalajs.js
 
 class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -152,11 +153,11 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
 
         //then
         findComponents(renderer.root, addToArchPopup()) should be (empty)
-        inside(findComponentProps(renderer.root, statusPopupComp)) {
-          case StatusPopupProps(text, title, closable, _) =>
+        inside(findComponentProps(renderer.root, statusPopupComp, plain = true)) {
+          case StatusPopupProps(text, title, onClose) =>
             text shouldBe "Add item(s) to zip archive\n0%"
-            title shouldBe "Status"
-            closable shouldBe false
+            title shouldBe js.undefined
+            onClose shouldBe js.undefined
         }
 
         //when & then
@@ -164,15 +165,15 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
           _ <- eventually(onNextItemFunc should not be null)
           _ = onNextItemFunc()
           _ <- eventually(
-            findComponentProps(renderer.root, statusPopupComp).text shouldBe "Add item(s) to zip archive\n50%"
+            findComponentProps(renderer.root, statusPopupComp, plain = true).text shouldBe "Add item(s) to zip archive\n50%"
           )
           _ = onNextItemFunc()
           _ <- eventually(
-            findComponentProps(renderer.root, statusPopupComp).text shouldBe "Add item(s) to zip archive\n100%"
+            findComponentProps(renderer.root, statusPopupComp, plain = true).text shouldBe "Add item(s) to zip archive\n100%"
           )
           _ = onNextItemFunc()
           _ <- eventually(
-            findComponentProps(renderer.root, statusPopupComp).text shouldBe "Add item(s) to zip archive\n100%"
+            findComponentProps(renderer.root, statusPopupComp, plain = true).text shouldBe "Add item(s) to zip archive\n100%"
           )
           _ = p.success(())
           res <- eventually(

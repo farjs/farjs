@@ -87,13 +87,12 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
 
     <.>()(
       if (showPopup) Some(
-        <(statusPopupComp())(^.wrapped := StatusPopupProps(
+        <(statusPopupComp())(^.plain := StatusPopupProps(
           text = s"Scanning the folder\n${props.currItem.name}",
           title = "View Dir",
-          closable = true,
           onClose = { () =>
             setShowPopup(false)
-          }
+          }: js.Function0[Unit]
         ))()
       ) else None,
 

@@ -49,11 +49,11 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
 
     eventually {
-      assertTestComponent(renderer.root.children(0), statusPopupComp) {
-        case StatusPopupProps(text, title, closable, _) =>
+      assertTestComponent(renderer.root.children(0), statusPopupComp, plain = true) {
+        case StatusPopupProps(text, title, onClose) =>
           text shouldBe "Moving item\ndir 1"
           title shouldBe "Move"
-          closable shouldBe true
+          onClose.isDefined shouldBe true
       }
     }.flatMap { _ =>
       //then
@@ -132,15 +132,15 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
 
     eventually {
-      assertTestComponent(renderer.root.children(0), statusPopupComp) {
-        case StatusPopupProps(text, title, closable, _) =>
+      assertTestComponent(renderer.root.children(0), statusPopupComp, plain = true) {
+        case StatusPopupProps(text, title, onClose) =>
           text shouldBe "Moving item\ndir 1"
           title shouldBe "Move"
-          closable shouldBe true
+          onClose.isDefined shouldBe true
       }
     }.flatMap { _ =>
       //when
-      findComponentProps(renderer.root, statusPopupComp).onClose()
+      findComponentProps(renderer.root, statusPopupComp, plain = true).onClose.foreach(_.apply())
 
       //then
       onTopItem.expects(item1)

@@ -91,14 +91,13 @@ object MoveProcess extends FunctionComponent[MoveProcessProps] {
     }, Nil)
 
     <.>()(
-      <(statusPopupComp())(^.wrapped := StatusPopupProps(
+      <(statusPopupComp())(^.plain := StatusPopupProps(
         text = s"Moving item\n${state.currItem}",
         title = "Move",
-        closable = true,
         onClose = { () =>
           // stop
           inProgress.current = false
-        }
+        }: js.Function0[Unit]
       ))(),
 
       state.existing.map { existing =>

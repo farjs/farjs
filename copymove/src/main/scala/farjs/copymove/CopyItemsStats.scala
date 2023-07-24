@@ -72,11 +72,10 @@ object CopyItemsStats extends FunctionComponent[CopyItemsStatsProps] {
       cleanup
     }, Nil)
 
-    <(statusPopupComp())(^.wrapped := StatusPopupProps(
+    <(statusPopupComp())(^.plain := StatusPopupProps(
       text = s"Calculating total size\n$currDir",
       title = props.title,
-      closable = true,
-      onClose = props.onCancel
+      onClose = props.onCancel: js.Function0[Unit]
     ))()
   }
 }

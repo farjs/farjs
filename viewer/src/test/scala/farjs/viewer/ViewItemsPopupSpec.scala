@@ -50,7 +50,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val renderer = createTestRenderer(<(viewItemsPopup())(^.plain := props)())
     
     eventually {
-      val popup = findComponentProps(renderer.root, statusPopupComp)
+      val popup = findComponentProps(renderer.root, statusPopupComp, plain = true)
       popup.text shouldBe "Scanning the folder\ndir 1"
     }.flatMap { _ =>
       var resAction: FileListDirUpdatedAction = null
@@ -102,13 +102,13 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val renderer = createTestRenderer(<(viewItemsPopup())(^.plain := props)())
 
     eventually {
-      val popup = findComponentProps(renderer.root, statusPopupComp)
+      val popup = findComponentProps(renderer.root, statusPopupComp, plain = true)
       popup.text shouldBe "Scanning the folder\ndir 1"
     }.flatMap { _ =>
-      val popup = findComponentProps(renderer.root, statusPopupComp)
+      val popup = findComponentProps(renderer.root, statusPopupComp, plain = true)
 
       //when
-      popup.onClose()
+      popup.onClose.foreach(_.apply())
 
       //then
       onClose.expects()
@@ -132,7 +132,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).returning(p.future)
     val viewItemsPopup = new ViewItemsPopup(FileListData(dispatch, actions.actions, state))
     val renderer = createTestRenderer(<(viewItemsPopup())(^.plain := props)())
-    findComponentProps(renderer.root, statusPopupComp)
+    findComponentProps(renderer.root, statusPopupComp, plain = true)
     var resultF: Future[_] = null
     val error = new Exception("test error")
 
@@ -173,11 +173,11 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val result = testRender(<(viewItemsPopup())(^.plain := props)())
 
     //then
-    assertTestComponent(result, statusPopupComp) {
-      case StatusPopupProps(text, title, closable, _) =>
+    assertTestComponent(result, statusPopupComp, plain = true) {
+      case StatusPopupProps(text, title, onClose) =>
         text shouldBe "Scanning the folder\n"
         title shouldBe "View"
-        closable shouldBe true
+        onClose.isDefined shouldBe true
     }
   }
 }

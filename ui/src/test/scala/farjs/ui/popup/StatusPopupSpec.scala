@@ -26,17 +26,29 @@ class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils 
     override val fg = theme.fg
   }
   
-  it should "render component" in {
+  it should "render non-closable popup with default title" in {
+    //given
+    val props = StatusPopupProps(
+      text = "Toooooooooooooooooooooooooooooo looooooooooooooooooooooooong test message"
+    )
+
+    //when
+    val result = testRender(withThemeContext(<(StatusPopup())(^.plain := props)()))
+
+    //then
+    assertTaskStatusPopup(result, props)
+  }
+
+  it should "render closable popup with custom title" in {
     //given
     val props = StatusPopupProps(
       text = "Toooooooooooooooooooooooooooooo looooooooooooooooooooooooong test message",
       title = "Test Title",
-      closable = true,
-      onClose = () => ()
+      onClose = { () => () }: js.Function0[Unit]
     )
 
     //when
-    val result = testRender(withThemeContext(<(StatusPopup())(^.wrapped := props)()))
+    val result = testRender(withThemeContext(<(StatusPopup())(^.plain := props)()))
 
     //then
     assertTaskStatusPopup(result, props)
@@ -52,12 +64,12 @@ class StatusPopupSpec extends TestSpec with BaseTestSpec with TestRendererUtils 
 
     assertNativeComponent(result, <(popupComp)(^.assertPlain[PopupProps](inside(_) {
       case PopupProps(onClose, focusable, _, _) =>
-        onClose.isDefined shouldBe props.closable
+        onClose should be theSameInstanceAs props.onClose
         focusable shouldBe js.undefined
     }))(), inside(_) { case List(content) =>
       assertNativeComponent(content, <(modalContentComp)(^.assertPlain[ModalContentProps](inside(_) {
         case ModalContentProps(title, resWidth, resHeight, resStyle, padding, left, footer) =>
-          title shouldBe props.title
+          title shouldBe props.title.getOrElse("Status")
           resWidth shouldBe width
           resHeight shouldBe height
           assertObject(resStyle, style)

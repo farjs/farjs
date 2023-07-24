@@ -6,6 +6,7 @@ import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
 import scommons.react.test._
 
+import scala.scalajs.js
 import scala.scalajs.js.JavaScriptException
 import scala.util.Failure
 
@@ -150,11 +151,11 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
 
     //then
     inside(result.children.toList) { case List(status) =>
-      assertTestComponent(status, statusPopupComp) {
-        case StatusPopupProps(message, title, closable, _) =>
+      assertTestComponent(status, statusPopupComp, plain = true) {
+        case StatusPopupProps(message, title, onClose) =>
           message shouldBe props.status.getOrElse("")
-          title shouldBe "Status"
-          closable shouldBe false
+          title shouldBe js.undefined
+          onClose shouldBe js.undefined
       }
     }
   }

@@ -11,6 +11,7 @@ import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.scalajs.js
 import scala.util.{Failure, Success}
 
 object ViewItemsPopup {
@@ -77,14 +78,13 @@ class ViewItemsPopup(data: FileListData) extends FunctionComponent[FileListPlugi
       ()
     }, Nil)
     
-    <(statusPopupComp())(^.wrapped := StatusPopupProps(
+    <(statusPopupComp())(^.plain := StatusPopupProps(
       text = s"Scanning the folder\n$currDir",
       title = "View",
-      closable = true,
       onClose = { () =>
         // stop scan
         inProgress.current = false
-      }
+      }: js.Function0[Unit]
     ))()
   }
 }

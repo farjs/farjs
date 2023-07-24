@@ -6,13 +6,6 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 
-import scala.scalajs.js
-
-case class StatusPopupProps(text: String,
-                            title: String = "Status",
-                            closable: Boolean = false,
-                            onClose: () => Unit = () => ())
-
 object StatusPopup extends FunctionComponent[StatusPopupProps] {
 
   private[popup] var popupComp: ReactClass = Popup
@@ -20,7 +13,7 @@ object StatusPopup extends FunctionComponent[StatusPopupProps] {
   private[popup] var textLineComp: ReactClass = TextLine
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val width = 35
     val textWidth = width - (paddingHorizontal + 2) * 2
     val textLines = UI.splitText(props.text, textWidth)
@@ -32,13 +25,9 @@ object StatusPopup extends FunctionComponent[StatusPopupProps] {
       override val fg = theme.fg
     }
 
-    <(popupComp)(^.plain := PopupProps(
-      onClose =
-        if (props.closable) props.onClose: js.Function0[Unit]
-        else js.undefined
-    ))(
+    <(popupComp)(^.plain := PopupProps(onClose = props.onClose))(
       <(modalContentComp)(^.plain := ModalContentProps(
-        title = props.title,
+        title = props.title.getOrElse("Status"),
         width = width,
         height = height,
         style = style

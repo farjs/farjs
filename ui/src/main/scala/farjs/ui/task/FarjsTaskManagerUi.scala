@@ -45,7 +45,7 @@ object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
     
     <.>()(
       if (statusMessage.nonEmpty) Some {
-        <(statusPopupComp())(^.wrapped := StatusPopupProps(statusMessage))()
+        <(statusPopupComp())(^.plain := StatusPopupProps(statusMessage))()
       }
       else if (errors.nonEmpty) Some(
         <(messageBoxComp())(^.plain := MessageBoxProps(

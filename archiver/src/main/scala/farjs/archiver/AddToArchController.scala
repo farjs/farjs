@@ -86,7 +86,7 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
       ) else None,
 
       if (showStatusPopup) Some(
-        <(statusPopupComp())(^.wrapped := StatusPopupProps(
+        <(statusPopupComp())(^.plain := StatusPopupProps(
           text = s"${props.action} item(s) to zip archive\n$progress%"
         ))()
       ) else None

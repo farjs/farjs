@@ -62,7 +62,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)()))
     
     eventually {
-      val popup = findComponentProps(renderer.root, statusPopupComp)
+      val popup = findComponentProps(renderer.root, statusPopupComp, plain = true)
       popup.text shouldBe "Scanning the folder\ndir 1"
     }.flatMap { _ =>
       //when
@@ -71,7 +71,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       //then
       eventually {
         stackState.head.state shouldBe Some(QuickViewParams("dir 1", currDir.path, 1, 2, 123))
-        findProps(renderer.root, statusPopupComp) should be (empty)
+        findProps(renderer.root, statusPopupComp, plain = true) should be (empty)
       }
     }
   }
@@ -104,7 +104,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)()))
     
     eventually {
-      val popup = findComponentProps(renderer.root, statusPopupComp)
+      val popup = findComponentProps(renderer.root, statusPopupComp, plain = true)
       popup.text shouldBe "Scanning the folder\ndir 1"
     }.flatMap { _ =>
       //when
@@ -113,7 +113,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       //then
       eventually {
         stackState.head.state shouldBe Some(QuickViewParams("dir 1", currDir.path, 1, 2, 123))
-        findProps(renderer.root, statusPopupComp) should be (empty)
+        findProps(renderer.root, statusPopupComp, plain = true) should be (empty)
       }
     }
   }
@@ -141,14 +141,14 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       p.future
     }
     val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)()))
-    val popup = findComponentProps(renderer.root, statusPopupComp)
+    val popup = findComponentProps(renderer.root, statusPopupComp, plain = true)
 
     eventually {
-      val popup = findComponentProps(renderer.root, statusPopupComp)
+      val popup = findComponentProps(renderer.root, statusPopupComp, plain = true)
       popup.text shouldBe "Scanning the folder\ndir 1"
     }.flatMap { _ =>
       //when
-      popup.onClose()
+      popup.onClose.foreach(_.apply())
       val result = onNextDirFn("/path", List(
         FileListItem("dir 2", isDir = true),
         FileListItem("file 2", size = 122),
@@ -160,7 +160,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       result shouldBe false
       eventually {
         stackState.head.state shouldBe Some(QuickViewParams("dir 1", currDir.path))
-        findProps(renderer.root, statusPopupComp) should be (empty)
+        findProps(renderer.root, statusPopupComp, plain = true) should be (empty)
       }
     }
   }
@@ -185,7 +185,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).returning(p.future)
 
     val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)()))
-    findProps(renderer.root, statusPopupComp) should not be empty
+    findProps(renderer.root, statusPopupComp, plain = true) should not be empty
 
     //then
     var resultF: Future[_] = null
@@ -202,7 +202,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     eventually {
       resultF should not be null
     }.flatMap(_ => resultF.failed).map { _ =>
-      findProps(renderer.root, statusPopupComp) should be (empty)
+      findProps(renderer.root, statusPopupComp, plain = true) should be (empty)
     }
   }
 
