@@ -31,4 +31,8 @@ package object popup {
 
     val style: BlessedStyle = js.native
   }
+
+  @js.native
+  @JSImport("@farjs/ui/popup/StatusPopup.mjs", JSImport.Default)
+  object StatusPopup extends ReactClass
 }

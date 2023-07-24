@@ -15,7 +15,7 @@ import scala.util.{Failure, Try}
 object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
 
   private[task] var logger: String => Unit = println
-  private[task] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
+  private[task] var statusPopupComp: ReactClass = StatusPopup
   private[task] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
   
   val errorHandler: PartialFunction[Try[_], (Option[String], Option[String])] = {
@@ -45,7 +45,7 @@ object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
     
     <.>()(
       if (statusMessage.nonEmpty) Some {
-        <(statusPopupComp())(^.plain := StatusPopupProps(statusMessage))()
+        <(statusPopupComp)(^.plain := StatusPopupProps(statusMessage))()
       }
       else if (errors.nonEmpty) Some(
         <(messageBoxComp())(^.plain := MessageBoxProps(

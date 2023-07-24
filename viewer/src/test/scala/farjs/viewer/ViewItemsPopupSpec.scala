@@ -7,6 +7,7 @@ import farjs.ui.popup.StatusPopupProps
 import farjs.viewer.ViewItemsPopup._
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
@@ -14,7 +15,7 @@ import scala.concurrent.{Future, Promise}
 class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
   with TestRendererUtils {
 
-  ViewItemsPopup.statusPopupComp = mockUiComponent("StatusPopup")
+  ViewItemsPopup.statusPopupComp = "StatusPopup".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class Actions {
@@ -50,7 +51,9 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val renderer = createTestRenderer(<(viewItemsPopup())(^.plain := props)())
     
     eventually {
-      val popup = findComponentProps(renderer.root, statusPopupComp, plain = true)
+      val popup = inside(findComponents(renderer.root, statusPopupComp)) {
+        case List(p) => p.props.asInstanceOf[StatusPopupProps]
+      }
       popup.text shouldBe "Scanning the folder\ndir 1"
     }.flatMap { _ =>
       var resAction: FileListDirUpdatedAction = null
@@ -102,10 +105,14 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val renderer = createTestRenderer(<(viewItemsPopup())(^.plain := props)())
 
     eventually {
-      val popup = findComponentProps(renderer.root, statusPopupComp, plain = true)
+      val popup = inside(findComponents(renderer.root, statusPopupComp)) {
+        case List(p) => p.props.asInstanceOf[StatusPopupProps]
+      }
       popup.text shouldBe "Scanning the folder\ndir 1"
     }.flatMap { _ =>
-      val popup = findComponentProps(renderer.root, statusPopupComp, plain = true)
+      val popup = inside(findComponents(renderer.root, statusPopupComp)) {
+        case List(p) => p.props.asInstanceOf[StatusPopupProps]
+      }
 
       //when
       popup.onClose.foreach(_.apply())
@@ -132,7 +139,9 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).returning(p.future)
     val viewItemsPopup = new ViewItemsPopup(FileListData(dispatch, actions.actions, state))
     val renderer = createTestRenderer(<(viewItemsPopup())(^.plain := props)())
-    findComponentProps(renderer.root, statusPopupComp, plain = true)
+    inside(findComponents(renderer.root, statusPopupComp)) {
+      case List(_) =>
+    }
     var resultF: Future[_] = null
     val error = new Exception("test error")
 
@@ -173,11 +182,11 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val result = testRender(<(viewItemsPopup())(^.plain := props)())
 
     //then
-    assertTestComponent(result, statusPopupComp, plain = true) {
+    assertNativeComponent(result, <(statusPopupComp)(^.assertPlain[StatusPopupProps](inside(_) {
       case StatusPopupProps(text, title, onClose) =>
         text shouldBe "Scanning the folder\n"
         title shouldBe "View"
         onClose.isDefined shouldBe true
-    }
+    }))())
   }
 }

@@ -10,13 +10,14 @@ import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.Succeeded
 import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
 
 class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  MoveProcess.statusPopupComp = mockUiComponent("StatusPopup")
+  MoveProcess.statusPopupComp = "StatusPopup".asInstanceOf[ReactClass]
   MoveProcess.messageBoxComp = mockUiComponent("MessageBox")
 
   //noinspection TypeAnnotation
@@ -49,12 +50,12 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
 
     eventually {
-      assertTestComponent(renderer.root.children(0), statusPopupComp, plain = true) {
+      assertNativeComponent(renderer.root.children(0), <(statusPopupComp)(^.assertPlain[StatusPopupProps](inside(_) {
         case StatusPopupProps(text, title, onClose) =>
           text shouldBe "Moving item\ndir 1"
           title shouldBe "Move"
           onClose.isDefined shouldBe true
-      }
+      }))())
     }.flatMap { _ =>
       //then
       fs.existsSync.expects(path.join(props.toPath, "file 1")).returning(false)
@@ -132,15 +133,18 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
 
     eventually {
-      assertTestComponent(renderer.root.children(0), statusPopupComp, plain = true) {
+      assertNativeComponent(renderer.root.children(0), <(statusPopupComp)(^.assertPlain[StatusPopupProps](inside(_) {
         case StatusPopupProps(text, title, onClose) =>
           text shouldBe "Moving item\ndir 1"
           title shouldBe "Move"
           onClose.isDefined shouldBe true
-      }
+      }))())
     }.flatMap { _ =>
       //when
-      findComponentProps(renderer.root, statusPopupComp, plain = true).onClose.foreach(_.apply())
+      val popup = inside(findComponents(renderer.root, statusPopupComp)) {
+        case List(p) => p.props.asInstanceOf[StatusPopupProps]
+      }
+      popup.onClose.foreach(_.apply())
 
       //then
       onTopItem.expects(item1)

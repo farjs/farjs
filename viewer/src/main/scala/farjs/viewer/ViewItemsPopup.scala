@@ -16,7 +16,7 @@ import scala.util.{Failure, Success}
 
 object ViewItemsPopup {
 
-  private[viewer] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
+  private[viewer] var statusPopupComp: ReactClass = StatusPopup
 }
 
 class ViewItemsPopup(data: FileListData) extends FunctionComponent[FileListPluginUiProps] {
@@ -78,7 +78,7 @@ class ViewItemsPopup(data: FileListData) extends FunctionComponent[FileListPlugi
       ()
     }, Nil)
     
-    <(statusPopupComp())(^.plain := StatusPopupProps(
+    <(statusPopupComp)(^.plain := StatusPopupProps(
       text = s"Scanning the folder\n$currDir",
       title = "View",
       onClose = { () =>

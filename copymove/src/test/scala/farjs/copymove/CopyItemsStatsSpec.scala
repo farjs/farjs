@@ -7,13 +7,14 @@ import farjs.filelist.api.FileListItem
 import farjs.ui.popup.StatusPopupProps
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
 
 class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  CopyItemsStats.statusPopupComp = mockUiComponent("StatusPopup")
+  CopyItemsStats.statusPopupComp = "StatusPopup".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class Actions {
@@ -24,7 +25,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     )
   }
 
-  it should "call onClose when onClose in popup" in {
+  it should "call onCancel when onClose in popup" in {
     //given
     val onDone = mockFunction[Double, Unit]
     val onCancel = mockFunction[Unit]
@@ -36,8 +37,8 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     actions.scanDirs.expects(props.fromPath, Seq(props.items.head), *).returning(Future.successful(false))
 
     val renderer = createTestRenderer(<(CopyItemsStats())(^.wrapped := props)())
-    val statusPopup = inside(findProps(renderer.root, statusPopupComp, plain = true)) {
-      case List(p) => p
+    val statusPopup = inside(findComponents(renderer.root, statusPopupComp)) {
+      case List(p) => p.props.asInstanceOf[StatusPopupProps]
     }
 
     //then
@@ -70,12 +71,12 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val renderer = createTestRenderer(<(CopyItemsStats())(^.wrapped := props)())
 
     eventually {
-      assertTestComponent(renderer.root.children(0), statusPopupComp, plain = true) {
+      assertNativeComponent(renderer.root.children(0), <(statusPopupComp)(^.assertPlain[StatusPopupProps](inside(_) {
         case StatusPopupProps(text, title, onClose) =>
           text shouldBe "Calculating total size\ndir 1"
           title shouldBe "Move"
           onClose.isDefined shouldBe true
-      }
+      }))())
     }.flatMap { _ =>
       var done = false
       
@@ -113,7 +114,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     }
     
     val renderer = createTestRenderer(<(CopyItemsStats())(^.wrapped := props)())
-    findProps(renderer.root, statusPopupComp, plain = true) should not be empty
+    findComponents(renderer.root, statusPopupComp) should not be empty
     eventually {
       onNextDirFn should not be null
     }.flatMap { _ =>
@@ -148,7 +149,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     actions.scanDirs.expects(props.fromPath, Seq(props.items.head), *).returning(p.future)
     
     val renderer = createTestRenderer(<(CopyItemsStats())(^.wrapped := props)())
-    findProps(renderer.root, statusPopupComp, plain = true) should not be empty
+    findComponents(renderer.root, statusPopupComp) should not be empty
     var resultF: Future[_] = null
 
     //then

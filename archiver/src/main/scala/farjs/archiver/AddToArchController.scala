@@ -28,7 +28,7 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
   private[archiver] var addToArchPopup: UiComponent[AddToArchPopupProps] = AddToArchPopup
   private[archiver] var addToArchApi: (String, String, Set[String], () => Unit) => Future[Unit] =
     ZipApi.addToZip
-  private[archiver] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
+  private[archiver] var statusPopupComp: ReactClass = StatusPopup
 
   protected def render(compProps: Props): ReactElement = {
     val (showAddPopup, setShowAddPopup) = useState(true)
@@ -86,7 +86,7 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
       ) else None,
 
       if (showStatusPopup) Some(
-        <(statusPopupComp())(^.plain := StatusPopupProps(
+        <(statusPopupComp)(^.plain := StatusPopupProps(
           text = s"${props.action} item(s) to zip archive\n$progress%"
         ))()
       ) else None

@@ -25,7 +25,7 @@ case class QuickViewDirProps(dispatch: Dispatch,
 
 object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
 
-  private[quickview] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
+  private[quickview] var statusPopupComp: ReactClass = StatusPopup
   private[quickview] var textLineComp: ReactClass = TextLine
 
   protected def render(compProps: Props): ReactElement = {
@@ -87,7 +87,7 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
 
     <.>()(
       if (showPopup) Some(
-        <(statusPopupComp())(^.plain := StatusPopupProps(
+        <(statusPopupComp)(^.plain := StatusPopupProps(
           text = s"Scanning the folder\n${props.currItem.name}",
           title = "View Dir",
           onClose = { () =>

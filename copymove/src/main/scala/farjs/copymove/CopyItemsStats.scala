@@ -24,7 +24,7 @@ case class CopyItemsStatsProps(dispatch: Dispatch,
 
 object CopyItemsStats extends FunctionComponent[CopyItemsStatsProps] {
 
-  private[copymove] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
+  private[copymove] var statusPopupComp: ReactClass = StatusPopup
 
   protected def render(compProps: Props): ReactElement = {
     val (currDir, setCurrDir) = useState("")
@@ -72,7 +72,7 @@ object CopyItemsStats extends FunctionComponent[CopyItemsStatsProps] {
       cleanup
     }, Nil)
 
-    <(statusPopupComp())(^.plain := StatusPopupProps(
+    <(statusPopupComp)(^.plain := StatusPopupProps(
       text = s"Calculating total size\n$currDir",
       title = props.title,
       onClose = props.onCancel: js.Function0[Unit]

@@ -26,7 +26,7 @@ case class MoveProcessProps(dispatch: Dispatch,
 
 object MoveProcess extends FunctionComponent[MoveProcessProps] {
 
-  private[copymove] var statusPopupComp: UiComponent[StatusPopupProps] = StatusPopup
+  private[copymove] var statusPopupComp: ReactClass = StatusPopup
   private[copymove] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
   private[copymove] var fs: FS = scommons.nodejs.fs
 
@@ -91,7 +91,7 @@ object MoveProcess extends FunctionComponent[MoveProcessProps] {
     }, Nil)
 
     <.>()(
-      <(statusPopupComp())(^.plain := StatusPopupProps(
+      <(statusPopupComp)(^.plain := StatusPopupProps(
         text = s"Moving item\n${state.currItem}",
         title = "Move",
         onClose = { () =>

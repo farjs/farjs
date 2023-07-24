@@ -8,6 +8,7 @@ import farjs.ui.popup.StatusPopupProps
 import farjs.ui.task.FutureTask
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
@@ -16,7 +17,7 @@ import scala.scalajs.js
 class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   AddToArchController.addToArchPopup = mockUiComponent("AddToArchPopup")
-  AddToArchController.statusPopupComp = mockUiComponent("StatusPopup")
+  AddToArchController.statusPopupComp = "StatusPopup".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class Actions {
@@ -50,7 +51,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
     val renderer = createTestRenderer(<(AddToArchController())(^.wrapped := props)())
 
     //then
-    findComponents(renderer.root, statusPopupComp()) should be (empty)
+    findComponents(renderer.root, statusPopupComp) should be (empty)
     inside(findComponentProps(renderer.root, addToArchPopup)) {
       case AddToArchPopupProps(zipName, action, onAction, onCancel) =>
         zipName shouldBe "new.zip"
@@ -84,7 +85,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
         findComponents(renderer.root, addToArchPopup()) should be (empty)
         p.success(true)
         eventually {
-          findComponents(renderer.root, statusPopupComp()) should be (empty)
+          findComponents(renderer.root, statusPopupComp) should be (empty)
         }.flatMap { _ =>
           inside(resultAction) {
             case FileListTaskAction(FutureTask("Add item(s) to zip archive", future)) =>
@@ -117,7 +118,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
     val renderer = createTestRenderer(<(AddToArchController())(^.wrapped := props)())
 
     //then
-    findComponents(renderer.root, statusPopupComp()) should be (empty)
+    findComponents(renderer.root, statusPopupComp) should be (empty)
     inside(findComponentProps(renderer.root, addToArchPopup)) {
       case AddToArchPopupProps(zipName, action, onAction, onCancel) =>
         zipName shouldBe "new.zip"
@@ -153,31 +154,40 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
 
         //then
         findComponents(renderer.root, addToArchPopup()) should be (empty)
-        inside(findComponentProps(renderer.root, statusPopupComp, plain = true)) {
+        val statusPopup = inside(findComponents(renderer.root, statusPopupComp)) {
+          case List(p) => p
+        }
+        assertNativeComponent(statusPopup, <(statusPopupComp)(^.assertPlain[StatusPopupProps](inside(_) {
           case StatusPopupProps(text, title, onClose) =>
             text shouldBe "Add item(s) to zip archive\n0%"
             title shouldBe js.undefined
             onClose shouldBe js.undefined
-        }
+        }))())
 
         //when & then
         for {
           _ <- eventually(onNextItemFunc should not be null)
           _ = onNextItemFunc()
           _ <- eventually(
-            findComponentProps(renderer.root, statusPopupComp, plain = true).text shouldBe "Add item(s) to zip archive\n50%"
+            inside(findComponents(renderer.root, statusPopupComp)) {
+              case List(p) => p.props.asInstanceOf[StatusPopupProps].text shouldBe "Add item(s) to zip archive\n50%"
+            }
           )
           _ = onNextItemFunc()
           _ <- eventually(
-            findComponentProps(renderer.root, statusPopupComp, plain = true).text shouldBe "Add item(s) to zip archive\n100%"
+            inside(findComponents(renderer.root, statusPopupComp)) {
+              case List(p) => p.props.asInstanceOf[StatusPopupProps].text shouldBe "Add item(s) to zip archive\n100%"
+            }
           )
           _ = onNextItemFunc()
           _ <- eventually(
-            findComponentProps(renderer.root, statusPopupComp, plain = true).text shouldBe "Add item(s) to zip archive\n100%"
+            inside(findComponents(renderer.root, statusPopupComp)) {
+              case List(p) => p.props.asInstanceOf[StatusPopupProps].text shouldBe "Add item(s) to zip archive\n100%"
+            }
           )
           _ = p.success(())
           res <- eventually(
-            findComponents(renderer.root, statusPopupComp()) should be (empty)
+            findComponents(renderer.root, statusPopupComp) should be (empty)
           )
         } yield res
     }

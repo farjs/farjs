@@ -4,6 +4,7 @@ import farjs.ui.popup._
 import farjs.ui.task.FarjsTaskManagerUi._
 import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.scalajs.js
@@ -12,7 +13,7 @@ import scala.util.Failure
 
 class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
 
-  FarjsTaskManagerUi.statusPopupComp = mockUiComponent("TaskStatusPopup")
+  FarjsTaskManagerUi.statusPopupComp = "TaskStatusPopup".asInstanceOf[ReactClass]
   FarjsTaskManagerUi.messageBoxComp = mockUiComponent("MessageBox")
 
   it should "return error if JavaScriptException in errorHandler" in {
@@ -151,12 +152,12 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
 
     //then
     inside(result.children.toList) { case List(status) =>
-      assertTestComponent(status, statusPopupComp, plain = true) {
+      assertNativeComponent(status, <(statusPopupComp)(^.assertPlain[StatusPopupProps](inside(_) {
         case StatusPopupProps(message, title, onClose) =>
           message shouldBe props.status.getOrElse("")
           title shouldBe js.undefined
           onClose shouldBe js.undefined
-      }
+      }))())
     }
   }
 
