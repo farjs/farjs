@@ -5,18 +5,21 @@ import farjs.filelist.popups.HelpController._
 import farjs.ui.popup._
 import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
+import scommons.react.ReactClass
 import scommons.react.test._
 
 class HelpControllerSpec extends TestSpec with TestRendererUtils {
 
-  HelpController.messageBoxComp = mockUiComponent("MessageBox")
+  HelpController.messageBoxComp = "MessageBox".asInstanceOf[ReactClass]
 
   it should "dispatch FileListPopupHelpAction when OK action" in {
     //given
     val onClose = mockFunction[Unit]
     val props = FileListUiData(showHelpPopup = true, onClose = onClose)
     val comp = testRender(withThemeContext(<(HelpController())(^.wrapped := props)()))
-    val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
+    val msgBox = inside(findComponents(comp, messageBoxComp)) {
+      case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
+    }
 
     //then
     onClose.expects()
@@ -34,7 +37,7 @@ class HelpControllerSpec extends TestSpec with TestRendererUtils {
 
     //then
     val currTheme = DefaultTheme
-    assertTestComponent(result, messageBoxComp, plain = true) {
+    assertNativeComponent(result, <(messageBoxComp)(^.assertPlain[MessageBoxProps](inside(_) {
       case MessageBoxProps(title, message, resActions, style) =>
         title shouldBe "Help"
         message shouldBe "//TODO: show help/about info"
@@ -42,7 +45,7 @@ class HelpControllerSpec extends TestSpec with TestRendererUtils {
           case List(MessageBoxAction("OK", _, true)) =>
         }
         style shouldBe currTheme.popup.regular
-    }
+    }))())
   }
 
   it should "render empty component" in {

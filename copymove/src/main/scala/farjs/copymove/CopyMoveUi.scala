@@ -22,7 +22,7 @@ object CopyMoveUi {
   private[copymove] var copyItemsStats: UiComponent[CopyItemsStatsProps] = CopyItemsStats
   private[copymove] var copyItemsPopup: UiComponent[CopyItemsPopupProps] = CopyItemsPopup
   private[copymove] var copyProcessComp: UiComponent[CopyProcessProps] = CopyProcess
-  private[copymove] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
+  private[copymove] var messageBoxComp: ReactClass = MessageBox
   private[copymove] var moveProcessComp: UiComponent[MoveProcessProps] = MoveProcess
 }
 
@@ -147,7 +147,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
         ))()
       }
       else if (maybeError.isDefined) maybeError.map { error =>
-        <(messageBoxComp())(^.plain := MessageBoxProps(
+        <(messageBoxComp)(^.plain := MessageBoxProps(
           title = "Error",
           message = error,
           actions = js.Array(MessageBoxAction.OK(props.onClose)),

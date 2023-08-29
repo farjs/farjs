@@ -14,6 +14,7 @@ import scommons.nodejs
 import scommons.nodejs._
 import scommons.nodejs.raw.Timers
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.test._
 import scommons.react.test.raw.TestRenderer
 
@@ -25,7 +26,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   CopyProcess.copyProgressPopup = mockUiComponent("CopyProgressPopup")
   CopyProcess.fileExistsPopup = mockUiComponent("FileExistsPopup")
-  CopyProcess.messageBoxComp = mockUiComponent("MessageBox")
+  CopyProcess.messageBoxComp = "MessageBox".asInstanceOf[ReactClass]
   
   CopyProcess.timers = literal(
     "setInterval" -> ({ (_: js.Function0[Any], _: Double) =>
@@ -174,7 +175,9 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     }.flatMap { _ =>
       val progressProps = findComponentProps(renderer.root, copyProgressPopup)
       progressProps.onCancel()
-      val cancelProps = findComponentProps(renderer.root, messageBoxComp, plain = true)
+      val cancelProps = inside(findComponents(renderer.root, messageBoxComp)) {
+        case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
+      }
       val resultF = onProgressFn(123)
       
       //then
@@ -188,7 +191,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       cancelProps.actions.head.onAction()
 
       //then
-      findProps(renderer.root, messageBoxComp, plain = true) shouldBe Nil
+      findComponents(renderer.root, messageBoxComp) shouldBe Nil
       resultF.flatMap { res =>
         res shouldBe false
 
@@ -212,13 +215,15 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
     val progressProps = findComponentProps(renderer.root, copyProgressPopup)
     progressProps.onCancel()
-    val cancelProps = findComponentProps(renderer.root, messageBoxComp, plain = true)
+    val cancelProps = inside(findComponents(renderer.root, messageBoxComp)) {
+      case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
+    }
     
     //when
     cancelProps.actions.last.onAction()
     
     //then
-    findProps(renderer.root, messageBoxComp, plain = true) should be (empty)
+    findComponents(renderer.root, messageBoxComp) should be (empty)
   }
 
   it should "render cancel popup when onCancel" in {
@@ -240,7 +245,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //then
     val currTheme = DefaultTheme
     inside(renderer.root.children.toList) { case List(_, cancel) =>
-      assertTestComponent(cancel, messageBoxComp, plain = true) {
+      assertNativeComponent(cancel, <(messageBoxComp)(^.assertPlain[MessageBoxProps](inside(_) {
         case MessageBoxProps(title, message, resActions, style) =>
           title shouldBe "Operation has been interrupted"
           message shouldBe "Do you really want to cancel it?"
@@ -249,7 +254,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
             no.label shouldBe "NO"
           }
           style shouldBe currTheme.popup.error
-      }
+      }))())
     }
   }
 
@@ -701,7 +706,9 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       val resultF = eventually(progressF.isCompleted shouldBe true)
       resultF.failed.flatMap { _ =>
         //when
-        val cancelProps = findComponentProps(renderer.root, messageBoxComp, plain = true)
+        val cancelProps = inside(findComponents(renderer.root, messageBoxComp)) {
+          case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
+        }
         cancelProps.actions.last.onAction()
 
         //then

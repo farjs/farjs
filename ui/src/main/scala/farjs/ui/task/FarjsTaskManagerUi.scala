@@ -16,7 +16,7 @@ object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
 
   private[task] var logger: String => Unit = println
   private[task] var statusPopupComp: ReactClass = StatusPopup
-  private[task] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
+  private[task] var messageBoxComp: ReactClass = MessageBox
   
   val errorHandler: PartialFunction[Try[_], (Option[String], Option[String])] = {
     case Failure(ex@JavaScriptException(error)) =>
@@ -48,7 +48,7 @@ object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
         <(statusPopupComp)(^.plain := StatusPopupProps(statusMessage))()
       }
       else if (errors.nonEmpty) Some(
-        <(messageBoxComp())(^.plain := MessageBoxProps(
+        <(messageBoxComp)(^.plain := MessageBoxProps(
           title = "Error",
           message = errors.head.stripPrefix("Error:").trim,
           //message = s"$errorMessage${props.errorDetails.map(d => s"\n\n$d").getOrElse("")}",

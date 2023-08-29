@@ -30,7 +30,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
 
   private[copymove] var copyProgressPopup: UiComponent[CopyProgressPopupProps] = CopyProgressPopup
   private[copymove] var fileExistsPopup: UiComponent[FileExistsPopupProps] = FileExistsPopup
-  private[copymove] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
+  private[copymove] var messageBoxComp: ReactClass = MessageBox
   
   private[copymove] var timers: Timers = nodejs.global
   
@@ -211,7 +211,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
       },
 
       if (state.cancel) Some {
-        <(messageBoxComp())(^.plain := MessageBoxProps(
+        <(messageBoxComp)(^.plain := MessageBoxProps(
           title = "Operation has been interrupted",
           message = "Do you really want to cancel it?",
           actions = js.Array(

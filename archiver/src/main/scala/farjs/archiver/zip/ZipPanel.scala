@@ -112,7 +112,7 @@ class ZipPanel(zipPath: String,
       <(fileListPanelComp())(^.wrapped := props.copy(onKeypress = onKeypress))(),
 
       if (showWarning) Some(
-        <(messageBoxComp())(^.plain := MessageBoxProps(
+        <(messageBoxComp)(^.plain := MessageBoxProps(
           title = "Warning",
           message = "Items can only be added to zip root.",
           actions = js.Array(MessageBoxAction.OK { () =>
@@ -156,5 +156,5 @@ object ZipPanel {
 
   private[zip] var fileListPanelComp: UiComponent[FileListPanelProps] = FileListPanel
   private[zip] var addToArchController: UiComponent[AddToArchControllerProps] = AddToArchController
-  private[zip] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
+  private[zip] var messageBoxComp: ReactClass = MessageBox
 }

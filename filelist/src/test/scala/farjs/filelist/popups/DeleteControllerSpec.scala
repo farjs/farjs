@@ -11,6 +11,7 @@ import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.Future
@@ -18,7 +19,7 @@ import scala.concurrent.Future
 class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
   with TestRendererUtils {
 
-  DeleteController.messageBoxComp = mockUiComponent("MessageBox")
+  DeleteController.messageBoxComp = "MessageBox".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class Actions {
@@ -45,7 +46,9 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
       onClose = onClose
     )
     val comp = testRender(withThemeContext(<(DeleteController())(^.wrapped := props)()))
-    val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
+    val msgBox = inside(findComponents(comp, messageBoxComp)) {
+      case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
+    }
     val deleteAction = FileListTaskAction(
       FutureTask("Deleting Items", Future.successful(()))
     )
@@ -78,7 +81,9 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
       onClose = onClose
     )
     val comp = testRender(withThemeContext(<(DeleteController())(^.wrapped := props)()))
-    val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
+    val msgBox = inside(findComponents(comp, messageBoxComp)) {
+      case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
+    }
     val deleteAction = FileListTaskAction(
       FutureTask("Deleting Items", Future.successful(()))
     )
@@ -107,7 +112,9 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
       onClose = onClose
     )
     val comp = testRender(withThemeContext(<(DeleteController())(^.wrapped := props)()))
-    val msgBox = findComponentProps(comp, messageBoxComp, plain = true)
+    val msgBox = inside(findComponents(comp, messageBoxComp)) {
+      case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
+    }
 
     //then
     onClose.expects()
@@ -133,7 +140,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
 
     //then
     val currTheme = DefaultTheme
-    assertTestComponent(result, messageBoxComp, plain = true) {
+    assertNativeComponent(result, <(messageBoxComp)(^.assertPlain[MessageBoxProps](inside(_) {
       case MessageBoxProps(title, message, resActions, style) =>
         title shouldBe "Delete"
         message shouldBe "Do you really want to delete selected item(s)?"
@@ -141,7 +148,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
           case List(MessageBoxAction("YES", _, false), MessageBoxAction("NO", _, true)) =>
         }
         style shouldBe currTheme.popup.error
-    }
+    }))())
   }
 
   it should "render empty component if showDeletePopup=false" in {

@@ -23,7 +23,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
   ZipPanel.fileListPanelComp = mockUiComponent("FileListPanel")
   ZipPanel.addToArchController = mockUiComponent("AddToArchController")
-  ZipPanel.messageBoxComp = mockUiComponent("MessageBox")
+  ZipPanel.messageBoxComp = "MessageBox".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class Actions(isLocalFS: Boolean) {
@@ -546,7 +546,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     //then
     findProps(renderer.root, addToArchController) should be (empty)
-    inside(findComponentProps(renderer.root, messageBoxComp, plain = true)) {
+    val msgBox = inside(findComponents(renderer.root, messageBoxComp)) {
+      case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
+    }
+    inside(msgBox) {
       case MessageBoxProps(title, message, resActions, style) =>
         title shouldBe "Warning"
         message shouldBe "Items can only be added to zip root."
@@ -556,7 +559,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
             onAction()
 
             //then
-            findProps(renderer.root, messageBoxComp, plain = true) should be (empty)
+            findComponents(renderer.root, messageBoxComp) should be (empty)
         }
         style shouldBe DefaultTheme.popup.regular
     }

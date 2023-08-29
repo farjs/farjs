@@ -14,7 +14,7 @@ import scala.util.Failure
 class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
 
   FarjsTaskManagerUi.statusPopupComp = "TaskStatusPopup".asInstanceOf[ReactClass]
-  FarjsTaskManagerUi.messageBoxComp = mockUiComponent("MessageBox")
+  FarjsTaskManagerUi.messageBoxComp = "MessageBox".asInstanceOf[ReactClass]
 
   it should "return error if JavaScriptException in errorHandler" in {
     //given
@@ -70,7 +70,9 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
       onCloseErrorPopup = onCloseErrorPopup
     )
     val renderer = createTestRenderer(withThemeContext(<(FarjsTaskManagerUi())(^.wrapped := props)()))
-    val msgBox = findComponentProps(renderer.root, messageBoxComp, plain = true)
+    val msgBox = inside(findComponents(renderer.root, messageBoxComp)) {
+      case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
+    }
 
     //then
     onCloseErrorPopup.expects()
@@ -79,7 +81,7 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
     msgBox.actions.head.onAction()
 
     //then
-    findProps(renderer.root, messageBoxComp, plain = true) should be (empty)
+    findComponents(renderer.root, messageBoxComp) should be (empty)
   }
 
   it should "not hide previous error popup when no error in updated props" in {
@@ -90,7 +92,9 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
       onCloseErrorPopup = onCloseErrorPopup
     )
     val renderer = createTestRenderer(withThemeContext(<(FarjsTaskManagerUi())(^.wrapped := props)()))
-    findComponentProps(renderer.root, messageBoxComp, plain = true).message shouldBe "Some error"
+    inside(findComponents(renderer.root, messageBoxComp)) {
+      case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps].message shouldBe "Some error"
+    }
 
     //then
     onCloseErrorPopup.expects().never()
@@ -101,7 +105,9 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
     }
 
     //then
-    findComponentProps(renderer.root, messageBoxComp, plain = true).message shouldBe "Some error"
+    inside(findComponents(renderer.root, messageBoxComp)) {
+      case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps].message shouldBe "Some error"
+    }
   }
 
   it should "stack error popups when several failed tasks" in {
@@ -112,7 +118,9 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
       onCloseErrorPopup = onCloseErrorPopup
     )
     val renderer = createTestRenderer(withThemeContext(<(FarjsTaskManagerUi())(^.wrapped := props)()))
-    findComponentProps(renderer.root, messageBoxComp, plain = true).message shouldBe "Some error"
+    inside(findComponents(renderer.root, messageBoxComp)) {
+      case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps].message shouldBe "Some error"
+    }
 
     //when & then
     TestRenderer.act { () =>
@@ -120,21 +128,27 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
         <(FarjsTaskManagerUi())(^.wrapped := props.copy(error = Some("Test error2")))()
       ))
     }
-    findComponentProps(renderer.root, messageBoxComp, plain = true).message shouldBe "Test error2"
+    inside(findComponents(renderer.root, messageBoxComp)) {
+      case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps].message shouldBe "Test error2"
+    }
 
     //then
     onCloseErrorPopup.expects()
     
     //when & then
-    findComponentProps(renderer.root, messageBoxComp, plain = true).actions.head.onAction()
-    findComponentProps(renderer.root, messageBoxComp, plain = true).message shouldBe "Some error"
+    inside(findComponents(renderer.root, messageBoxComp)) { case List(msgBox) =>
+      msgBox.props.asInstanceOf[MessageBoxProps].actions.head.onAction()
+      msgBox.props.asInstanceOf[MessageBoxProps].message shouldBe "Some error"
+    }
 
     //then
     onCloseErrorPopup.expects()
 
     //when & then
-    findComponentProps(renderer.root, messageBoxComp, plain = true).actions.head.onAction()
-    findProps(renderer.root, messageBoxComp, plain = true) should be (empty)
+    inside(findComponents(renderer.root, messageBoxComp)) {
+      case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps].actions.head.onAction()
+    }
+    findComponents(renderer.root, messageBoxComp) should be (empty)
   }
 
   it should "render only status popup if loading and prev error" in {
@@ -175,7 +189,7 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
 
     //then
     inside(result.children.toList) { case List(msgBox) =>
-      assertTestComponent(msgBox, messageBoxComp, plain = true) {
+      assertNativeComponent(msgBox, <(messageBoxComp)(^.assertPlain[MessageBoxProps](inside(_) {
         case MessageBoxProps(title, message, resActions, style) =>
           title shouldBe "Error"
           message shouldBe "Some error"
@@ -184,7 +198,7 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
             ok.triggeredOnClose shouldBe true
           }
           style shouldBe DefaultTheme.popup.error
-      }
+      }))())
     }
   }
 

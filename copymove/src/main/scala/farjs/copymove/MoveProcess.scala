@@ -27,7 +27,7 @@ case class MoveProcessProps(dispatch: Dispatch,
 object MoveProcess extends FunctionComponent[MoveProcessProps] {
 
   private[copymove] var statusPopupComp: ReactClass = StatusPopup
-  private[copymove] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
+  private[copymove] var messageBoxComp: ReactClass = MessageBox
   private[copymove] var fs: FS = scommons.nodejs.fs
 
   private case class MoveState(currItem: String = "",
@@ -101,7 +101,7 @@ object MoveProcess extends FunctionComponent[MoveProcessProps] {
       ))(),
 
       state.existing.map { existing =>
-        <(messageBoxComp())(^.plain := MessageBoxProps(
+        <(messageBoxComp)(^.plain := MessageBoxProps(
           title = "Warning",
           message = s"File already exists.\nDo you want to overwrite it's content?\n\n$existing",
           actions = js.Array(

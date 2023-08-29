@@ -9,7 +9,7 @@ import scala.scalajs.js
 
 object DeleteController extends FunctionComponent[FileListUiData] {
 
-  private[popups] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
+  private[popups] var messageBoxComp: ReactClass = MessageBox
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -17,7 +17,7 @@ object DeleteController extends FunctionComponent[FileListUiData] {
 
     props.data match {
       case Some(data) if props.showDeletePopup =>
-        <(messageBoxComp())(^.plain := MessageBoxProps(
+        <(messageBoxComp)(^.plain := MessageBoxProps(
           title = "Delete",
           message = "Do you really want to delete selected item(s)?",
           actions = js.Array(

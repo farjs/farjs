@@ -25,7 +25,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
   CopyMoveUi.copyItemsStats = mockUiComponent("CopyItemsStats")
   CopyMoveUi.copyItemsPopup = mockUiComponent("CopyItemsPopup")
   CopyMoveUi.copyProcessComp = mockUiComponent("CopyProcess")
-  CopyMoveUi.messageBoxComp = mockUiComponent("MessageBox")
+  CopyMoveUi.messageBoxComp = "MessageBox".asInstanceOf[ReactClass]
   CopyMoveUi.moveProcessComp = mockUiComponent("MoveProcess")
 
   private val currTheme = DefaultTheme
@@ -224,7 +224,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     eventually {
-      assertTestComponent(renderer.root.children.head, messageBoxComp, plain = true) {
+      assertNativeComponent(renderer.root.children.head, <(messageBoxComp)(^.assertPlain[MessageBoxProps](inside(_) {
         case MessageBoxProps(title, message, resActions, style) =>
           title shouldBe "Error"
           message shouldBe s"Cannot copy the item\n${item.name}\nonto itself"
@@ -232,13 +232,13 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
             ok.label shouldBe "OK"
           }
           style shouldBe currTheme.popup.error
-      }
+      }))())
     }.map { _ =>
       //then
       onClose.expects()
 
       //when
-      findComponentProps(renderer.root, messageBoxComp, plain = true).actions.head.onAction()
+      findComponents(renderer.root, messageBoxComp).head.props.asInstanceOf[MessageBoxProps].actions.head.onAction()
 
       Succeeded
     }
@@ -279,7 +279,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     eventually {
-      assertTestComponent(renderer.root.children.head, messageBoxComp, plain = true) {
+      assertNativeComponent(renderer.root.children.head, <(messageBoxComp)(^.assertPlain[MessageBoxProps](inside(_) {
         case MessageBoxProps(title, message, resActions, style) =>
           title shouldBe "Error"
           message shouldBe s"Cannot move the item\n${item.name}\ninto itself"
@@ -287,13 +287,13 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
             ok.label shouldBe "OK"
           }
           style shouldBe currTheme.popup.error
-      }
+      }))())
     }.map { _ =>
       //then
       onClose.expects()
 
       //when
-      findComponentProps(renderer.root, messageBoxComp, plain = true).actions.head.onAction()
+      findComponents(renderer.root, messageBoxComp).head.props.asInstanceOf[MessageBoxProps].actions.head.onAction()
 
       Succeeded
     }
@@ -332,7 +332,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     eventually {
-      assertTestComponent(renderer.root.children.head, messageBoxComp, plain = true) {
+      assertNativeComponent(renderer.root.children.head, <(messageBoxComp)(^.assertPlain[MessageBoxProps](inside(_) {
         case MessageBoxProps(title, message, resActions, style) =>
           title shouldBe "Error"
           message shouldBe s"Cannot copy the item\n${item.name}\ninto itself"
@@ -340,13 +340,13 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
             ok.label shouldBe "OK"
           }
           style shouldBe currTheme.popup.error
-      }
+      }))())
     }.map { _ =>
       //then
       onClose.expects()
 
       //when
-      findComponentProps(renderer.root, messageBoxComp, plain = true).actions.head.onAction()
+      findComponents(renderer.root, messageBoxComp).head.props.asInstanceOf[MessageBoxProps].actions.head.onAction()
 
       Succeeded
     }

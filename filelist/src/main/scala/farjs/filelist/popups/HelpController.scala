@@ -9,14 +9,14 @@ import scala.scalajs.js
 
 object HelpController extends FunctionComponent[FileListUiData] {
 
-  private[popups] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
+  private[popups] var messageBoxComp: ReactClass = MessageBox
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val theme = Theme.useTheme().popup
 
     if (props.showHelpPopup) {
-      <(messageBoxComp())(^.plain := MessageBoxProps(
+      <(messageBoxComp)(^.plain := MessageBoxProps(
         title = "Help",
         message = "//TODO: show help/about info",
         actions = js.Array(MessageBoxAction.OK { () =>

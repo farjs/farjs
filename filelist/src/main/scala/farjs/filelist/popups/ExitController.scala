@@ -10,14 +10,14 @@ import scala.scalajs.js
 
 object ExitController extends FunctionComponent[FileListUiData] {
 
-  private[popups] var messageBoxComp: UiComponent[MessageBoxProps] = MessageBox
+  private[popups] var messageBoxComp: ReactClass = MessageBox
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val theme = Theme.useTheme().popup
 
     if (props.showExitPopup) {
-      <(messageBoxComp())(^.plain := MessageBoxProps(
+      <(messageBoxComp)(^.plain := MessageBoxProps(
         title = "Exit",
         message = "Do you really want to exit FAR.js?",
         actions = js.Array(
