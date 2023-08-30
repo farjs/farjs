@@ -31,7 +31,7 @@ object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val (errors, updateErrors) = useStateUpdater(List.empty[String])
-    val props = compProps.wrapped
+    val props = compProps.plain
     val statusMessage = props.status.filter(_ => props.showLoading).getOrElse("")
     val errorMessage = props.error.getOrElse("").trim
     val theme = Theme.useTheme().popup

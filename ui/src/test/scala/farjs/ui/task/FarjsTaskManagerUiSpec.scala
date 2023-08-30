@@ -66,10 +66,10 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
     //given
     val onCloseErrorPopup = mockFunction[Unit]
     val props = getTaskManagerUiProps(
-      error = Some("Some error"),
+      error = "Some error",
       onCloseErrorPopup = onCloseErrorPopup
     )
-    val renderer = createTestRenderer(withThemeContext(<(FarjsTaskManagerUi())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(FarjsTaskManagerUi())(^.plain := props)()))
     val msgBox = inside(findComponents(renderer.root, messageBoxComp)) {
       case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
     }
@@ -88,10 +88,10 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
     //given
     val onCloseErrorPopup = mockFunction[Unit]
     val props = getTaskManagerUiProps(
-      error = Some("Some error"),
+      error = "Some error",
       onCloseErrorPopup = onCloseErrorPopup
     )
-    val renderer = createTestRenderer(withThemeContext(<(FarjsTaskManagerUi())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(FarjsTaskManagerUi())(^.plain := props)()))
     inside(findComponents(renderer.root, messageBoxComp)) {
       case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps].message shouldBe "Some error"
     }
@@ -101,7 +101,7 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
     
     //when
     TestRenderer.act { () =>
-      renderer.update(withThemeContext(<(FarjsTaskManagerUi())(^.wrapped := props.copy(error = None))()))
+      renderer.update(withThemeContext(<(FarjsTaskManagerUi())(^.plain := TaskManagerUiProps.copy(props)(error = js.undefined))()))
     }
 
     //then
@@ -114,10 +114,10 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
     //given
     val onCloseErrorPopup = mockFunction[Unit]
     val props = getTaskManagerUiProps(
-      error = Some("Some error"),
+      error = "Some error",
       onCloseErrorPopup = onCloseErrorPopup
     )
-    val renderer = createTestRenderer(withThemeContext(<(FarjsTaskManagerUi())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(FarjsTaskManagerUi())(^.plain := props)()))
     inside(findComponents(renderer.root, messageBoxComp)) {
       case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps].message shouldBe "Some error"
     }
@@ -125,7 +125,7 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
     //when & then
     TestRenderer.act { () =>
       renderer.update(withThemeContext(
-        <(FarjsTaskManagerUi())(^.wrapped := props.copy(error = Some("Test error2")))()
+        <(FarjsTaskManagerUi())(^.plain := TaskManagerUiProps.copy(props)(error = "Test error2"))()
       ))
     }
     inside(findComponents(renderer.root, messageBoxComp)) {
@@ -155,11 +155,11 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
     //given
     val props = getTaskManagerUiProps(
       showLoading = true,
-      status = Some("Some status message"),
-      error = Some("Error: \nSome prev error "),
-      errorDetails = Some("Some prev error details")
+      status = "Some status message",
+      error = "Error: \nSome prev error ",
+      errorDetails = "Some prev error details"
     )
-    val component = <(FarjsTaskManagerUi())(^.wrapped := props)()
+    val component = <(FarjsTaskManagerUi())(^.plain := props)()
 
     //when
     val result = createTestRenderer(withThemeContext(component)).root
@@ -178,11 +178,11 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
   it should "render MessageBox if error and no status/loading" in {
     //given
     val props = getTaskManagerUiProps(
-      status = Some("Test status..."),
-      error = Some("Error: \nSome error "),
-      errorDetails = Some("Some error details")
+      status = "Test status...",
+      error = "Error: \nSome error ",
+      errorDetails = "Some error details"
     )
-    val component = <(FarjsTaskManagerUi())(^.wrapped := props)()
+    val component = <(FarjsTaskManagerUi())(^.plain := props)()
 
     //when
     val result = createTestRenderer(withThemeContext(component)).root
@@ -205,7 +205,7 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
   it should "render nothing if no loading and no error" in {
     //given
     val props = getTaskManagerUiProps()
-    val component = <(FarjsTaskManagerUi())(^.wrapped := props)()
+    val component = <(FarjsTaskManagerUi())(^.plain := props)()
 
     //when
     val result = createTestRenderer(withThemeContext(component)).root
@@ -215,18 +215,18 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
   }
 
   private def getTaskManagerUiProps(showLoading: Boolean = false,
-                                    status: Option[String] = None,
-                                    error: Option[String] = None,
-                                    errorDetails: Option[String] = None,
+                                    status: js.UndefOr[String] = js.undefined,
+                                    error: js.UndefOr[String] = js.undefined,
+                                    errorDetails: js.UndefOr[String] = js.undefined,
                                     onCloseErrorPopup: () => Unit = () => ()
                                    ): TaskManagerUiProps = {
     TaskManagerUiProps(
-      showLoading,
-      status,
+      showLoading = showLoading,
       onHideStatus = () => (),
-      error,
-      errorDetails,
-      onCloseErrorPopup
+      onCloseErrorPopup = onCloseErrorPopup,
+      status = status,
+      error = error,
+      errorDetails = errorDetails
     )
   }
 }

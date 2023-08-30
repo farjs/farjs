@@ -40,16 +40,25 @@ object TaskManager extends FunctionComponent[TaskManagerProps] {
       case Some(task) => task.asInstanceOf[js.Any]
     }))
     
-    <(uiComponent())(^.wrapped := TaskManagerUiProps(
+    <(uiComponent())(^.plain := TaskManagerUiProps(
       showLoading = state.taskCount > 0,
-      status = state.status,
       onHideStatus = { () =>
         setState(_.copy(status = None))
       },
-      error = state.error,
-      errorDetails = state.errorDetails,
       onCloseErrorPopup = { () =>
         setState(_.copy(error = None, errorDetails = None))
+      },
+      status = state.status match {
+        case None => js.undefined
+        case Some(s) => s
+      },
+      error = state.error match {
+        case None => js.undefined
+        case Some(s) => s
+      },
+      errorDetails = state.errorDetails match {
+        case None => js.undefined
+        case Some(s) => s
       }
     ))()
   }

@@ -49,15 +49,15 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val task = FutureTask("Fetching data", Promise[Unit]().future)
     val props = TaskManagerProps(Some(task))
     val renderer = createTestRenderer(<(TaskManager())(^.wrapped := props)())
-    val uiProps = findComponentProps(renderer.root, TaskManager.uiComponent)
-    assertUiProps(uiProps, expected(showLoading = true, status = Some(s"${task.message}\\.\\.\\.")))
+    val uiProps = findComponentProps(renderer.root, TaskManager.uiComponent, plain = true)
+    assertUiProps(uiProps, expected(showLoading = true, status = s"${task.message}\\.\\.\\."))
 
     //when
     uiProps.onHideStatus()
 
     //then
-    val updatedUiProps = findComponentProps(renderer.root, TaskManager.uiComponent)
-    assertUiProps(updatedUiProps, expected(showLoading = true, status = None))
+    val updatedUiProps = findComponentProps(renderer.root, TaskManager.uiComponent, plain = true)
+    assertUiProps(updatedUiProps, expected(showLoading = true))
   }
 
   it should "set error to None when onCloseErrorPopup" in {
@@ -66,31 +66,29 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val task = FutureTask("Fetching data", promise.future)
     val props = TaskManagerProps(Some(task))
     val renderer = createTestRenderer(<(TaskManager())(^.wrapped := props)())
-    val uiProps = findComponentProps(renderer.root, TaskManager.uiComponent)
-    assertUiProps(uiProps, expected(showLoading = true, status = Some(s"${task.message}\\.\\.\\.")))
+    val uiProps = findComponentProps(renderer.root, TaskManager.uiComponent, plain = true)
+    assertUiProps(uiProps, expected(showLoading = true, status = s"${task.message}\\.\\.\\."))
 
     val e = new Exception("Test error")
     promise.failure(e)
 
     eventually {
-      val uiPropsV2 = findComponentProps(renderer.root, TaskManager.uiComponent)
+      val uiPropsV2 = findComponentProps(renderer.root, TaskManager.uiComponent, plain = true)
       assertUiProps(uiPropsV2, expected(
         showLoading = false,
-        status = Some(s"${task.message}\\.\\.\\.Done \\d+\\.\\d+ sec\\."),
-        error = Some(e.toString),
-        errorDetails = Some(TaskManager.printStackTrace(e))
+        status = s"${task.message}\\.\\.\\.Done \\d+\\.\\d+ sec\\.",
+        error = e.toString,
+        errorDetails = TaskManager.printStackTrace(e)
       ))
 
       //when
       uiPropsV2.onCloseErrorPopup()
 
       //then
-      val uiPropsV3 = findComponentProps(renderer.root, TaskManager.uiComponent)
+      val uiPropsV3 = findComponentProps(renderer.root, TaskManager.uiComponent, plain = true)
       assertUiProps(uiPropsV3, expected(
         showLoading = false,
-        status = Some(s"${task.message}\\.\\.\\.Done \\d+\\.\\d+ sec\\."),
-        error = None,
-        errorDetails = None
+        status = s"${task.message}\\.\\.\\.Done \\d+\\.\\d+ sec\\."
       ))
     }
   }
@@ -105,9 +103,9 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val result = testRender(component)
 
     //then
-    assertUiProps(findComponentProps(result, TaskManager.uiComponent), expected(
+    assertUiProps(findComponentProps(result, TaskManager.uiComponent, plain = true), expected(
       showLoading = true,
-      status = Some(s"${task.message}\\.\\.\\.")
+      status = s"${task.message}\\.\\.\\."
     ))
   }
 
@@ -117,8 +115,8 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val task = FutureTask("Fetching data", promise.future)
     val props = TaskManagerProps(Some(task))
     val renderer = createTestRenderer(<(TaskManager())(^.wrapped := props)())
-    val uiProps = findComponentProps(renderer.root, TaskManager.uiComponent)
-    assertUiProps(uiProps, expected(showLoading = true, status = Some(s"${task.message}...")))
+    val uiProps = findComponentProps(renderer.root, TaskManager.uiComponent, plain = true)
+    assertUiProps(uiProps, expected(showLoading = true, status = s"${task.message}..."))
     val e = new Exception("Test error")
 
     //when
@@ -126,11 +124,11 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     //then
     eventually {
-      assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent), expected(
+      assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent, plain = true), expected(
         showLoading = false,
-        status = Some(s"${task.message}\\.\\.\\.Done \\d+\\.\\d+ sec\\."),
-        error = Some(e.toString),
-        errorDetails = Some(TaskManager.printStackTrace(e))
+        status = s"${task.message}\\.\\.\\.Done \\d+\\.\\d+ sec\\.",
+        error = e.toString,
+        errorDetails = TaskManager.printStackTrace(e)
       ))
     }
   }
@@ -141,8 +139,8 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val task = FutureTask("Fetching data", promise.future)
     val props = TaskManagerProps(Some(task))
     val renderer = createTestRenderer(<(TaskManager())(^.wrapped := props)())
-    val uiProps = findComponentProps(renderer.root, TaskManager.uiComponent)
-    assertUiProps(uiProps, expected(showLoading = true, status = Some(s"${task.message}...")))
+    val uiProps = findComponentProps(renderer.root, TaskManager.uiComponent, plain = true)
+    assertUiProps(uiProps, expected(showLoading = true, status = s"${task.message}..."))
     val resp = "Ok"
 
     //when
@@ -150,11 +148,9 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     //then
     eventually {
-      assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent), expected(
+      assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent, plain = true), expected(
         showLoading = false,
-        status = Some(s"${task.message}\\.\\.\\.Done \\d+\\.\\d+ sec\\."),
-        error = None,
-        errorDetails = None
+        status = s"${task.message}\\.\\.\\.Done \\d+\\.\\d+ sec\\."
       ))
     }
   }
@@ -164,18 +160,16 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val task = FutureTask("Fetching data", Future.successful(()))
     val props = TaskManagerProps(Some(task))
     val renderer = createTestRenderer(<(TaskManager())(^.wrapped := props)())
-    assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent), expected(
+    assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent, plain = true), expected(
       showLoading = true,
-      status = Some(s"${task.message}...")
+      status = s"${task.message}..."
     ))
 
     //when & then
     eventually {
-      assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent), expected(
+      assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent, plain = true), expected(
         showLoading = false,
-        status = Some(s"${task.message}\\.\\.\\.Done \\d+\\.\\d+ sec\\."),
-        error = None,
-        errorDetails = None
+        status = s"${task.message}\\.\\.\\.Done \\d+\\.\\d+ sec\\."
       ))
     }
   }
@@ -185,9 +179,9 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val promise1 = Promise[String]()
     val task1 = FutureTask("Fetching data 1", promise1.future)
     val renderer = createTestRenderer(<(TaskManager())(^.wrapped := TaskManagerProps(Some(task1)))())
-    assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent), expected(
+    assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent, plain = true), expected(
       showLoading = true,
-      status = Some(s"${task1.message}...")
+      status = s"${task1.message}..."
     ))
 
     val promise2 = Promise[String]()
@@ -196,9 +190,9 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     TestRenderer.act { () =>
       renderer.update(<(TaskManager())(^.wrapped := TaskManagerProps(Some(task2)))())
     }
-    assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent), expected(
+    assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent, plain = true), expected(
       showLoading = true,
-      status = Some(s"${task2.message}...")
+      status = s"${task2.message}..."
     ))
 
     //when
@@ -206,9 +200,9 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     //then
     eventually {
-      assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent), expected(
+      assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent, plain = true), expected(
         showLoading = true,
-        status = Some(s"${task1.message}\\.\\.\\.Done \\d+\\.\\d+ sec\\.")
+        status = s"${task1.message}\\.\\.\\.Done \\d+\\.\\d+ sec\\."
       ))
     }.flatMap { _ =>
       //when
@@ -216,9 +210,9 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
       //then
       eventually {
-        assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent), expected(
+        assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent, plain = true), expected(
           showLoading = false,
-          status = Some(s"${task2.message}\\.\\.\\.Done \\d+\\.\\d+ sec\\.")
+          status = s"${task2.message}\\.\\.\\.Done \\d+\\.\\d+ sec\\."
         ))
       }
     }
@@ -242,10 +236,10 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
                             expectedProps: TaskManagerUiProps
                            )(implicit pos: Position): Assertion = {
 
-    inside(uiProps) { case TaskManagerUiProps(showLoading, status, _, error, errorDetails, _) =>
+    inside(uiProps) { case TaskManagerUiProps(showLoading, _, _, status, error, errorDetails) =>
       showLoading shouldBe expectedProps.showLoading
-      expectedProps.status match {
-        case None => status shouldBe None
+      expectedProps.status.toOption match {
+        case None => status shouldBe js.undefined
         case Some(statusRegex) => status.get should fullyMatch regex statusRegex
       }
       error shouldBe expectedProps.error
@@ -253,20 +247,20 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     }
   }
 
-  def expected(showLoading: Boolean,
-               status: Option[String] = None,
-               onHideStatus: () => Unit = () => (),
-               error: Option[String] = None,
-               errorDetails: Option[String] = None,
-               onCloseErrorPopup: () => Unit = () => ()): TaskManagerUiProps = {
+  private def expected(showLoading: Boolean,
+                       status: js.UndefOr[String] = js.undefined,
+                       error: js.UndefOr[String] = js.undefined,
+                       errorDetails: js.UndefOr[String] = js.undefined,
+                       onHideStatus: () => Unit = () => (),
+                       onCloseErrorPopup: () => Unit = () => ()): TaskManagerUiProps = {
 
     TaskManagerUiProps(
-      showLoading,
-      status,
-      onHideStatus,
-      error,
-      errorDetails,
-      onCloseErrorPopup
+      showLoading = showLoading,
+      onHideStatus = onHideStatus,
+      onCloseErrorPopup = onCloseErrorPopup,
+      status = status,
+      error = error,
+      errorDetails = errorDetails
     )
   }
 }
