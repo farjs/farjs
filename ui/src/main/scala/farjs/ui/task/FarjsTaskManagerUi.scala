@@ -7,7 +7,6 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 import scala.scalajs.js.JavaScriptException
-import scala.util.{Failure, Try}
 
 /**
   * Displays status and error(s) of running tasks.
@@ -18,15 +17,19 @@ object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
   private[task] var statusPopupComp: ReactClass = StatusPopup
   private[task] var messageBoxComp: ReactClass = MessageBox
   
-  val errorHandler: PartialFunction[Try[_], (Option[String], Option[String])] = {
-    case Failure(ex@JavaScriptException(error)) =>
+  val errorHandler: js.Function1[Any, js.UndefOr[TaskError]] = {
+    case ex@JavaScriptException(error) =>
       val stackTrace = TaskManager.printStackTrace(ex, sep = " ")
       logger(stackTrace)
-      (Some(s"$error"), Some(stackTrace))
-    case Failure(ex) =>
+      TaskError(s"$error", stackTrace)
+    case ex: Throwable =>
       val stackTrace = TaskManager.printStackTrace(ex, sep = " ")
       logger(stackTrace)
-      (Some(s"$ex"), Some(stackTrace))
+      TaskError(s"$ex", stackTrace)
+    case ex =>
+      val error = s"$ex"
+      logger(error)
+      TaskError(error)
   }
 
   protected def render(compProps: Props): ReactElement = {

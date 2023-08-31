@@ -9,7 +9,6 @@ import scommons.react.test._
 
 import scala.scalajs.js
 import scala.scalajs.js.JavaScriptException
-import scala.util.Failure
 
 class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
 
@@ -22,18 +21,18 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
     val logger = mockFunction[String, Unit]
     FarjsTaskManagerUi.logger = logger
     val ex = JavaScriptException("test error")
-    val value = Failure(ex)
+    val value = ex
     val stackTrace = TaskManager.printStackTrace(ex, sep = " ")
 
     //then
     logger.expects(stackTrace)
     
     //when
-    val (error, errorDetails) = FarjsTaskManagerUi.errorHandler(value)
+    val TaskError(error, errorDetails) = FarjsTaskManagerUi.errorHandler(value).get
 
     //then
-    error shouldBe Some("test error")
-    errorDetails shouldBe Some(stackTrace)
+    error shouldBe "test error"
+    errorDetails shouldBe stackTrace
     
     //cleanup
     FarjsTaskManagerUi.logger = currLogger
@@ -45,18 +44,40 @@ class FarjsTaskManagerUiSpec extends TestSpec with TestRendererUtils {
     val logger = mockFunction[String, Unit]
     FarjsTaskManagerUi.logger = logger
     val ex = new Exception("test error")
-    val value = Failure(ex)
+    val value = ex
     val stackTrace = TaskManager.printStackTrace(ex, sep = " ")
 
     //then
     logger.expects(stackTrace)
 
     //when
-    val (error, errorDetails) = FarjsTaskManagerUi.errorHandler(value)
+    val TaskError(error, errorDetails) = FarjsTaskManagerUi.errorHandler(value).get
 
     //then
-    error shouldBe Some(s"$ex")
-    errorDetails shouldBe Some(stackTrace)
+    error shouldBe s"$ex"
+    errorDetails shouldBe stackTrace
+
+    //cleanup
+    FarjsTaskManagerUi.logger = currLogger
+  }
+
+  it should "return error without details if custom error in errorHandler" in {
+    //given
+    val currLogger = FarjsTaskManagerUi.logger
+    val logger = mockFunction[String, Unit]
+    FarjsTaskManagerUi.logger = logger
+    val ex = "test error"
+    val value = ex
+
+    //then
+    logger.expects(ex)
+
+    //when
+    val TaskError(error, errorDetails) = FarjsTaskManagerUi.errorHandler(value).get
+
+    //then
+    error shouldBe s"$ex"
+    errorDetails shouldBe js.undefined
 
     //cleanup
     FarjsTaskManagerUi.logger = currLogger

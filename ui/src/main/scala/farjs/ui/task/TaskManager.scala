@@ -16,12 +16,20 @@ object TaskManager extends FunctionComponent[TaskManagerProps] {
 
   var uiComponent: UiComponent[TaskManagerUiProps] = _
   
-  var errorHandler: PartialFunction[Try[_], (Option[String], Option[String])] = PartialFunction.empty
+  var errorHandler: js.Function1[Any, js.UndefOr[TaskError]] = _ => js.undefined
+  
+  private def defaultErrorHandler(error: Any): TaskError = {
+    val details: js.UndefOr[String] = error match {
+      case t: Throwable => TaskManager.printStackTrace(t)
+      case _ => js.undefined
+    }
+    TaskError(error.toString, details)
+  }
   
   private case class TaskManagerState(taskCount: Int = 0,
-                                      status: Option[String] = None,
-                                      error: Option[String] = None,
-                                      errorDetails: Option[String] = None)
+                                      status: js.UndefOr[String] = js.undefined,
+                                      error: js.UndefOr[String] = js.undefined,
+                                      errorDetails: js.UndefOr[String] = js.undefined)
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -43,23 +51,14 @@ object TaskManager extends FunctionComponent[TaskManagerProps] {
     <(uiComponent())(^.plain := TaskManagerUiProps(
       showLoading = state.taskCount > 0,
       onHideStatus = { () =>
-        setState(_.copy(status = None))
+        setState(_.copy(status = js.undefined))
       },
       onCloseErrorPopup = { () =>
-        setState(_.copy(error = None, errorDetails = None))
+        setState(_.copy(error = js.undefined, errorDetails = js.undefined))
       },
-      status = state.status match {
-        case None => js.undefined
-        case Some(s) => s
-      },
-      error = state.error match {
-        case None => js.undefined
-        case Some(s) => s
-      },
-      errorDetails = state.errorDetails match {
-        case None => js.undefined
-        case Some(s) => s
-      }
+      status = state.status,
+      error = state.error,
+      errorDetails = state.errorDetails
     ))()
   }
 
@@ -72,7 +71,7 @@ object TaskManager extends FunctionComponent[TaskManagerProps] {
 
     setState(s => s.copy(
       taskCount = s.taskCount + 1,
-      status = Some(s"${task.message}...")
+      status = s"${task.message}..."
     ))
   }
 
@@ -82,19 +81,16 @@ object TaskManager extends FunctionComponent[TaskManagerProps] {
 
     val durationMillis = System.currentTimeMillis() - task.startTime
     val statusMessage = s"${task.message}...Done ${formatDuration(durationMillis)} sec."
-
-    def defaultErrorHandler(value: Try[_]): (Option[String], Option[String]) = value match {
-      case Success(_) => (None, None)
-      case Failure(e) => (Some(e.toString), Some(printStackTrace(e)))
+    val error: js.UndefOr[TaskError] = value match {
+      case Success(_) => js.undefined
+      case Failure(e) => errorHandler(e).fold(defaultErrorHandler(e))(identity)
     }
-
-    val (error, errorDetails) = errorHandler.applyOrElse(value, defaultErrorHandler)
 
     setState(s => s.copy(
       taskCount = s.taskCount - 1,
-      status = Some(statusMessage),
-      error = error,
-      errorDetails = errorDetails
+      status = statusMessage,
+      error = error.map(_.error),
+      errorDetails = error.flatMap(_.errorDetails)
     ))
   }
 
