@@ -3,7 +3,6 @@ package farjs.archiver.zip
 import farjs.archiver.ArchiverPlugin
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.ui.task.FutureTask
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 
@@ -57,12 +56,12 @@ class ZipActionsSpec extends AsyncTestSpec {
     dispatch.expects(FileListDirUpdatedAction(currDir))
 
     //when
-    val FileListDirUpdateAction(FutureTask(msg, future)) =
+    val FileListDirUpdateAction(task) =
       actions.updateDir(dispatch, path)
 
     //then
     actions.api shouldBe api
-    msg shouldBe "Updating Dir"
-    future.map(_ => Succeeded)
+    task.message shouldBe "Updating Dir"
+    task.result.toFuture.map(_ => Succeeded)
   }
 }

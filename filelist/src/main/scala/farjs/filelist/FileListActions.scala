@@ -4,7 +4,7 @@ import farjs.filelist.FileListActions._
 import farjs.filelist.api._
 import farjs.filelist.sort.SortMode
 import farjs.ui.Dispatch
-import farjs.ui.task.{FutureTask, TaskAction}
+import farjs.ui.task.{Task, TaskAction}
 import scommons.nodejs.{path => nodePath}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -31,7 +31,7 @@ trait FileListActions {
       case Success(currDir) => dispatch(FileListDirChangedAction(dir, currDir))
     }
 
-    FileListDirChangeAction(FutureTask("Changing Dir", future))
+    FileListDirChangeAction(Task("Changing Dir", future))
   }
 
   def updateDir(dispatch: Dispatch, path: String): FileListDirUpdateAction = {
@@ -39,7 +39,7 @@ trait FileListActions {
       case Success(currDir) => dispatch(FileListDirUpdatedAction(currDir))
     }
 
-    FileListDirUpdateAction(FutureTask("Updating Dir", future))
+    FileListDirUpdateAction(Task("Updating Dir", future))
   }
 
   def createDir(dispatch: Dispatch,
@@ -59,7 +59,7 @@ trait FileListActions {
       ()
     }
 
-    FileListDirCreateAction(FutureTask("Creating Dir", future))
+    FileListDirCreateAction(Task("Creating Dir", future))
   }
 
   def mkDirs(dirs: List[String]): Future[Unit] = api.mkDirs(dirs)
@@ -76,7 +76,7 @@ trait FileListActions {
       case Success(_) => dispatch(updateDir(dispatch, dir))
     }
 
-    FileListTaskAction(FutureTask("Deleting Items", future))
+    FileListTaskAction(Task("Deleting Items", future))
   }
 
   def scanDirs(parent: String,
@@ -153,18 +153,18 @@ object FileListActions {
   
   private val copyBufferBytes: Int = 64 * 1024
 
-  case class FileListTaskAction(task: FutureTask[_]) extends TaskAction
+  case class FileListTaskAction(task: Task) extends TaskAction
 
   case class FileListParamsChangedAction(offset: Int,
                                          index: Int,
                                          selectedNames: Set[String])
 
-  case class FileListDirChangeAction(task: FutureTask[FileListDir]) extends TaskAction
+  case class FileListDirChangeAction(task: Task) extends TaskAction
   case class FileListDirChangedAction(dir: String, currDir: FileListDir)
   
-  case class FileListDirUpdateAction(task: FutureTask[FileListDir]) extends TaskAction
+  case class FileListDirUpdateAction(task: Task) extends TaskAction
   case class FileListDirUpdatedAction(currDir: FileListDir)
-  case class FileListDirCreateAction(task: FutureTask[Unit]) extends TaskAction
+  case class FileListDirCreateAction(task: Task) extends TaskAction
 
   case class FileListItemCreatedAction(name: String, currDir: FileListDir)
   

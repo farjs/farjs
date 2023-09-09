@@ -5,9 +5,8 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 import scala.scalajs.js.{Error, JavaScriptException}
-import scala.util.{Failure, Success, Try}
 
-case class TaskManagerProps(startTask: Option[AbstractTask])
+case class TaskManagerProps(startTask: Option[Task])
 
 /**
   * Handles status of running tasks.
@@ -63,11 +62,15 @@ object TaskManager extends FunctionComponent[TaskManagerProps] {
   }
 
   private def onTaskStart(setState: js.Function1[js.Function1[TaskManagerState, TaskManagerState], Unit],
-                          task: AbstractTask): Unit = {
+                          task: Task): Unit = {
 
-    task.onComplete { value: Try[_] =>
-      onTaskFinish(setState, task, value)
+    val onFulfilled: js.Function1[Any, Any] = { value =>
+      onTaskFinish(setState, task, js.undefined)
     }
+    val onRejected: js.Function1[Any, Any] = { reason: Any =>
+      onTaskFinish(setState, task, reason)
+    }
+    task.result.`then`[Any](onFulfilled, onRejected)
 
     setState(s => s.copy(
       taskCount = s.taskCount + 1,
@@ -76,14 +79,13 @@ object TaskManager extends FunctionComponent[TaskManagerProps] {
   }
 
   private def onTaskFinish(setState: js.Function1[js.Function1[TaskManagerState, TaskManagerState], Unit],
-                           task: AbstractTask,
-                           value: Try[_]): Unit = {
+                           task: Task,
+                           reason: js.UndefOr[Any]): Unit = {
 
-    val durationMillis = System.currentTimeMillis() - task.startTime
+    val durationMillis = js.Date.now() - task.startTime
     val statusMessage = s"${task.message}...Done ${formatDuration(durationMillis)} sec."
-    val error: js.UndefOr[TaskError] = value match {
-      case Success(_) => js.undefined
-      case Failure(e) => errorHandler(e).fold(defaultErrorHandler(e))(identity)
+    val error: js.UndefOr[TaskError] = reason.map { e =>
+      errorHandler(e).fold(defaultErrorHandler(e))(identity)
     }
 
     setState(s => s.copy(
@@ -94,7 +96,7 @@ object TaskManager extends FunctionComponent[TaskManagerProps] {
     ))
   }
 
-  private[task] def formatDuration(durationMillis: Long): String = {
+  private[task] def formatDuration(durationMillis: Double): String = {
     "%.3f".format(durationMillis / 1000.0)
   }
 

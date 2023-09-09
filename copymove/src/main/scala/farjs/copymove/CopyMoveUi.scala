@@ -4,9 +4,9 @@ import farjs.copymove.CopyMoveUi._
 import farjs.copymove.CopyMoveUiAction._
 import farjs.filelist.FileListActions._
 import farjs.filelist._
-import farjs.filelist.api.FileListItem
+import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.popup._
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import farjs.ui.theme.Theme
 import scommons.nodejs.path
 import scommons.react._
@@ -63,9 +63,9 @@ class CopyMoveUi(show: CopyMoveUiAction,
 
       val updateAction = from.actions.updateDir(from.dispatch, from.path)
       from.dispatch(updateAction)
-      updateAction.task.future.andThen {
+      updateAction.task.result.toFuture.andThen {
         case Success(updatedDir) =>
-          if (isInplace) from.dispatch(FileListItemCreatedAction(toPath, updatedDir))
+          if (isInplace) from.dispatch(FileListItemCreatedAction(toPath, updatedDir.asInstanceOf[FileListDir]))
           else maybeTo.foreach(to => to.dispatch(to.actions.updateDir(to.dispatch, to.path)))
       }
     }
@@ -115,7 +115,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
         (dir.path, sameDrive)
       }
 
-      from.dispatch(FileListTaskAction(FutureTask("Resolving target dir", dirF)))
+      from.dispatch(FileListTaskAction(Task("Resolving target dir", dirF)))
       dirF
     }
 

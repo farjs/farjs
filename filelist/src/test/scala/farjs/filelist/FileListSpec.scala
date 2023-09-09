@@ -4,7 +4,7 @@ import farjs.filelist.FileList._
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.Dispatch
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
@@ -36,7 +36,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val state2 = state1.copy(isActive = true)
     val props2 = props1.copy(state = state2)
     val action = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(state1.currDir))
+      Task("Changing dir", Future.successful(state1.currDir))
     )
     
     //then
@@ -50,7 +50,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //cleanup
     renderer.unmount()
 
-    action.task.future.map(_ => Succeeded)
+    action.task.result.toFuture.map(_ => Succeeded)
   }
 
   it should "focus item when onWheel and active" in {
@@ -304,7 +304,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val actions = new Actions
     val props = FileListProps(dispatch, actions.actions, FileListState(), (7, 2), columns = 2)
     val dirAction = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(props.state.currDir))
+      Task("Changing dir", Future.successful(props.state.currDir))
     )
     actions.changeDir.expects(dispatch, None, FileListDir.curr).returning(dirAction)
     dispatch.expects(dirAction)
@@ -313,7 +313,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val result = testRender(<(FileList())(^.wrapped := props)())
 
     //then
-    dirAction.task.future.map { _ =>
+    dirAction.task.result.toFuture.map { _ =>
       assertFileList(result, props,
         viewItems = Nil,
         focusedIndex = -1,

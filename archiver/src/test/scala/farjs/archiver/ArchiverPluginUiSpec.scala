@@ -5,7 +5,7 @@ import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.Dispatch
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
@@ -76,7 +76,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
       FileListItem("file 1")
     ))
     val updateAction = FileListDirUpdateAction(
-      FutureTask("Updating...", Future.successful(updatedDir))
+      Task("Updating...", Future.successful(updatedDir))
     )
     
     //then
@@ -89,7 +89,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     controller.onComplete(zipFile)
     
     //then
-    updateAction.task.future.map(_ => Succeeded)
+    updateAction.task.result.toFuture.map(_ => Succeeded)
   }
 
   it should "render component" in {

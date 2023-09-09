@@ -6,7 +6,7 @@ import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.popups.DeleteController._
 import farjs.ui.Dispatch
 import farjs.ui.popup._
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.Succeeded
@@ -50,7 +50,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
       case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
     }
     val deleteAction = FileListTaskAction(
-      FutureTask("Deleting Items", Future.successful(()))
+      Task("Deleting Items", Future.successful(()))
     )
     val items = List(FileListItem("file 1"))
 
@@ -62,7 +62,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     //when
     msgBox.actions.head.onAction()
 
-    deleteAction.task.future.map(_ => Succeeded)
+    deleteAction.task.result.toFuture.map(_ => Succeeded)
   }
 
   it should "call api and delete selectedItems when YES action" in {
@@ -85,7 +85,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
       case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
     }
     val deleteAction = FileListTaskAction(
-      FutureTask("Deleting Items", Future.successful(()))
+      Task("Deleting Items", Future.successful(()))
     )
     val items = List(FileListItem("file 2"))
 
@@ -97,7 +97,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     //when
     msgBox.actions.head.onAction()
 
-    deleteAction.task.future.map(_ => Succeeded)
+    deleteAction.task.result.toFuture.map(_ => Succeeded)
   }
 
   it should "call onClose when NO action" in {

@@ -2,5 +2,5 @@ package farjs.ui.task
 
 trait TaskAction {
 
-  def task: AbstractTask
+  def task: Task
 }

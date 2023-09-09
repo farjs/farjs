@@ -29,7 +29,7 @@ object MakeFolderController extends FunctionComponent[FileListUiData] {
               multiple = multiple
             )
             for {
-              _ <- action.task.future
+              _ <- action.task.result.toFuture
               _ <- services.mkDirsHistory.save(dir)
             } yield {
               setMultiple(multiple)

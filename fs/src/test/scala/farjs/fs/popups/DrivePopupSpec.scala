@@ -44,7 +44,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      disksF = action.asInstanceOf[FileListTaskAction].task.future
+      disksF = action.asInstanceOf[FileListTaskAction].task.result.toFuture
     }
     fsService.readDisks.expects().returning(Future.successful(List(
       FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
@@ -98,7 +98,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      disksF = action.asInstanceOf[FileListTaskAction].task.future
+      disksF = action.asInstanceOf[FileListTaskAction].task.result.toFuture
     }
     fsService.readDisks.expects().returning(Future.successful(List(
       FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
@@ -152,7 +152,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      disksF = action.asInstanceOf[FileListTaskAction].task.future
+      disksF = action.asInstanceOf[FileListTaskAction].task.result.toFuture
     }
     fsService.readDisks.expects().returning(Future.successful(List(
       FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
@@ -204,7 +204,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      disksF = action.asInstanceOf[FileListTaskAction].task.future
+      disksF = action.asInstanceOf[FileListTaskAction].task.result.toFuture
     }
     fsService.readDisks.expects().returning(Future.successful(List(
       FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
@@ -240,7 +240,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      disksF = action.asInstanceOf[FileListTaskAction].task.future
+      disksF = action.asInstanceOf[FileListTaskAction].task.result.toFuture
     }
     fsService.readDisks.expects().returning(Future.successful(List(
       FSDisk("/", size = 156595318784.0, free = 81697124352.0, "/"),

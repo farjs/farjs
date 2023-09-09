@@ -2,7 +2,7 @@ package farjs.app
 
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.FileListDir
-import farjs.ui.task.{AbstractTask, FutureTask}
+import farjs.ui.task.Task
 import scommons.react.test.TestSpec
 
 import scala.concurrent.Future
@@ -11,9 +11,9 @@ class FarjsStateReducerSpec extends TestSpec {
 
   it should "set currentTask when TaskAction" in {
     //given
-    val currTask = mock[AbstractTask]
+    val currTask = Task("test task1", Future.successful(FileListDir("/", isRoot = true, Seq.empty)))
     val state = FarjsState(Some(currTask))
-    val task = FutureTask("test task", Future.successful(FileListDir("/", isRoot = true, Seq.empty)))
+    val task = Task("test task2", Future.successful(FileListDir("/", isRoot = true, Seq.empty)))
     
     //when
     val result = FarjsStateReducer.apply(state, FileListDirChangeAction(task))
@@ -24,7 +24,7 @@ class FarjsStateReducerSpec extends TestSpec {
 
   it should "return currentTask when any other action" in {
     //given
-    val currTask = mock[AbstractTask]
+    val currTask = Task("test task", Future.successful(FileListDir("/", isRoot = true, Seq.empty)))
     val state = FarjsState(Some(currTask))
     val action = "some_test_action"
     

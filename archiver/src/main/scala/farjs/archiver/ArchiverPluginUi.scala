@@ -3,7 +3,7 @@ package farjs.archiver
 import farjs.archiver.ArchiverPluginUi._
 import farjs.filelist.FileListActions._
 import farjs.filelist._
-import farjs.filelist.api.FileListItem
+import farjs.filelist.api.{FileListDir, FileListItem}
 import scommons.react._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -26,8 +26,8 @@ class ArchiverPluginUi(data: FileListData, zipName: String, items: Seq[FileListI
 
         val action = data.actions.updateDir(data.dispatch, data.state.currDir.path)
         data.dispatch(action)
-        action.task.future.foreach { updatedDir =>
-          data.dispatch(FileListItemCreatedAction(zipFile, updatedDir))
+        action.task.result.toFuture.foreach { updatedDir =>
+          data.dispatch(FileListItemCreatedAction(zipFile, updatedDir.asInstanceOf[FileListDir]))
         }
       },
       onCancel = props.onClose

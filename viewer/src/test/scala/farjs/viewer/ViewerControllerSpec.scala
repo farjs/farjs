@@ -6,7 +6,7 @@ import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.theme.FileListTheme
 import farjs.filelist.theme.FileListThemeSpec.withThemeContext
 import farjs.ui.WithSizeProps
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import farjs.viewer.ViewerController._
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
@@ -61,7 +61,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     var openF: Future[_] = null
     fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).throws(expectedError)
     dispatch.expects(*).onCall { action: Any =>
-      inside(action) { case FileListTaskAction(FutureTask("Opening file", future)) =>
+      inside(action) { case FileListTaskAction(Task("Opening file", future)) =>
         openF = future
       }
     }

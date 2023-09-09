@@ -46,7 +46,7 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "set status to None when onHideStatus" in {
     //given
-    val task = FutureTask("Fetching data", Promise[Unit]().future)
+    val task = Task("Fetching data", Promise[Unit]().future)
     val props = TaskManagerProps(Some(task))
     val renderer = createTestRenderer(<(TaskManager())(^.wrapped := props)())
     val uiProps = findComponentProps(renderer.root, TaskManager.uiComponent, plain = true)
@@ -63,7 +63,7 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "set error to None when onCloseErrorPopup" in {
     //given
     val promise = Promise[Unit]()
-    val task = FutureTask("Fetching data", promise.future)
+    val task = Task("Fetching data", promise.future)
     val props = TaskManagerProps(Some(task))
     val renderer = createTestRenderer(<(TaskManager())(^.wrapped := props)())
     val uiProps = findComponentProps(renderer.root, TaskManager.uiComponent, plain = true)
@@ -95,7 +95,7 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "render loading and status" in {
     //given
-    val task = FutureTask("Fetching data", Promise[Unit]().future)
+    val task = Task("Fetching data", Promise[Unit]().future)
     val props = TaskManagerProps(Some(task))
     val component = <(TaskManager())(^.wrapped := props)()
 
@@ -112,7 +112,7 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "render error when exception" in {
     //given
     val promise = Promise[Unit]()
-    val task = FutureTask("Fetching data", promise.future)
+    val task = Task("Fetching data", promise.future)
     val props = TaskManagerProps(Some(task))
     val renderer = createTestRenderer(<(TaskManager())(^.wrapped := props)())
     val uiProps = findComponentProps(renderer.root, TaskManager.uiComponent, plain = true)
@@ -136,7 +136,7 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "render status when task completed successfully" in {
     //given
     val promise = Promise[String]()
-    val task = FutureTask("Fetching data", promise.future)
+    val task = Task("Fetching data", promise.future)
     val props = TaskManagerProps(Some(task))
     val renderer = createTestRenderer(<(TaskManager())(^.wrapped := props)())
     val uiProps = findComponentProps(renderer.root, TaskManager.uiComponent, plain = true)
@@ -157,7 +157,7 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "render status of already completed task" in {
     //given
-    val task = FutureTask("Fetching data", Future.successful(()))
+    val task = Task("Fetching data", Future.successful(()))
     val props = TaskManagerProps(Some(task))
     val renderer = createTestRenderer(<(TaskManager())(^.wrapped := props)())
     assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent, plain = true), expected(
@@ -177,7 +177,7 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "render status of concurrent tasks" in {
     //given
     val promise1 = Promise[String]()
-    val task1 = FutureTask("Fetching data 1", promise1.future)
+    val task1 = Task("Fetching data 1", promise1.future)
     val renderer = createTestRenderer(<(TaskManager())(^.wrapped := TaskManagerProps(Some(task1)))())
     assertUiProps(findComponentProps(renderer.root, TaskManager.uiComponent, plain = true), expected(
       showLoading = true,
@@ -185,7 +185,7 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ))
 
     val promise2 = Promise[String]()
-    val task2 = FutureTask("Fetching data 2", promise2.future)
+    val task2 = Task("Fetching data 2", promise2.future)
     
     TestRenderer.act { () =>
       renderer.update(<(TaskManager())(^.wrapped := TaskManagerProps(Some(task2)))())

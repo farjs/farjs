@@ -2,7 +2,7 @@ package farjs.fs
 
 import farjs.filelist.FileListActions._
 import farjs.filelist._
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import scommons.react._
 import scommons.react.blessed.BlessedScreen
 
@@ -23,7 +23,7 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
           props.state.currentItem.foreach { item =>
             val parent = props.state.currDir.path
             val future = fsService.openItem(parent, item.name)
-            props.dispatch(FileListTaskAction(FutureTask("Opening default app", future)))
+            props.dispatch(FileListTaskAction(Task("Opening default app", future)))
           }
         case _ =>
           processed = false

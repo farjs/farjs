@@ -8,7 +8,7 @@ import farjs.filelist.{FileListPluginUiProps, FileListState, MockFileListActions
 import farjs.fs.FSPluginUi._
 import farjs.fs.popups._
 import farjs.ui.Dispatch
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import scommons.react.ReactClass
 import scommons.react.test._
 
@@ -59,7 +59,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
       rightStack = otherStack
     ))
     val foldersHistoryProps = findComponentProps(renderer.root, foldersHistory)
-    val action = FileListDirChangeAction(FutureTask("Changing Dir",
+    val action = FileListDirChangeAction(Task("Changing Dir",
       Future.successful(FileListDir("/", isRoot = true, items = Nil))
     ))
     val dir = "test/dir"
@@ -96,7 +96,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
       rightStack = currStack
     ))
     val driveProps = findComponentProps(renderer.root, drive)
-    val action = FileListDirChangeAction(FutureTask("Changing Dir",
+    val action = FileListDirChangeAction(Task("Changing Dir",
       Future.successful(FileListDir("/", isRoot = true, items = Nil))
     ))
     val dir = "test/dir"

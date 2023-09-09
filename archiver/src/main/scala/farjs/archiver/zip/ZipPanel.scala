@@ -8,7 +8,7 @@ import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack.WithPanelStacks
 import farjs.ui.Dispatch
 import farjs.ui.popup.{MessageBox, MessageBoxAction, MessageBoxProps}
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed.BlessedScreen
@@ -65,7 +65,7 @@ class ZipPanel(zipPath: String,
             )))
         }
 
-        props.dispatch(FileListTaskAction(FutureTask("Reading zip archive", zipF)))
+        props.dispatch(FileListTaskAction(Task("Reading zip archive", zipF)))
       }
       ()
     }, Nil)
@@ -138,7 +138,7 @@ class ZipPanel(zipPath: String,
             val updateAction = props.actions.updateDir(props.dispatch, props.state.currDir.path)
             props.dispatch(updateAction)
             if (move) {
-              updateAction.task.future.foreach { _ =>
+              updateAction.task.result.toFuture.foreach { _ =>
                 dispatch(actions.deleteAction(dispatch, state.currDir.path, items))
               }
             }

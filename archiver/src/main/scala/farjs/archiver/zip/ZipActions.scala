@@ -4,7 +4,7 @@ import farjs.archiver.ArchiverPlugin
 import farjs.filelist.FileListActions
 import farjs.filelist.FileListActions._
 import farjs.ui.Dispatch
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -30,6 +30,6 @@ class ZipActions(protected[zip] var api: ZipApi) extends FileListActions {
       case Success(currDir) => dispatch(FileListDirUpdatedAction(currDir))
     }
 
-    FileListDirUpdateAction(FutureTask("Updating Dir", future))
+    FileListDirUpdateAction(Task("Updating Dir", future))
   }
 }

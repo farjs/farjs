@@ -6,7 +6,7 @@ import farjs.filelist.api.{FileListCapability, FileListDir, FileListItem}
 import farjs.filelist.sort.{SortMode, SortModesPopupProps}
 import farjs.filelist.stack.PanelStackSpec.withContext
 import farjs.ui.Dispatch
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs._
@@ -161,7 +161,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
       FileListItem("file 1")
     ))
-    val action = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
+    val action = FileListDirUpdateAction(Task("Updating", Future.successful(updatedDir)))
 
     //then
     actions.updateDir.expects(dispatch, "/sub-dir").returning(action)
@@ -170,7 +170,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     //when
     viewProps.onKeypress(null, "C-r")
 
-    action.task.future.map(_ => Succeeded)
+    action.task.result.toFuture.map(_ => Succeeded)
   }
 
   it should "dispatch action when onKeypress(enter)" in {
@@ -184,7 +184,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val viewProps = findComponentProps(comp, fileListPanelView)
     val changedDir = mock[FileListDir]
     val action = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(changedDir))
+      Task("Changing dir", Future.successful(changedDir))
     )
 
     //then
@@ -194,7 +194,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     //when
     viewProps.onKeypress(null, "enter")
 
-    action.task.future.map(_ => Succeeded)
+    action.task.result.toFuture.map(_ => Succeeded)
   }
 
   it should "dispatch action when onKeypress(C-pageup)" in {
@@ -208,7 +208,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val viewProps = findComponentProps(comp, fileListPanelView)
     val changedDir = mock[FileListDir]
     val action = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(changedDir))
+      Task("Changing dir", Future.successful(changedDir))
     )
 
     //then
@@ -218,7 +218,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     //when
     viewProps.onKeypress(null, "C-pageup")
 
-    action.task.future.map(_ => Succeeded)
+    action.task.result.toFuture.map(_ => Succeeded)
   }
 
   it should "emit keypress(Alt-l) if root dir when onKeypress(C-pageup) in Left panel" in {
@@ -304,7 +304,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val viewProps = findComponentProps(comp, fileListPanelView)
     val changedDir = mock[FileListDir]
     val action = FileListDirChangeAction(
-      FutureTask("Changing dir", Future.successful(changedDir))
+      Task("Changing dir", Future.successful(changedDir))
     )
 
     //then
@@ -314,7 +314,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     //when
     viewProps.onKeypress(null, "C-pagedown")
 
-    action.task.future.map(_ => Succeeded)
+    action.task.result.toFuture.map(_ => Succeeded)
   }
 
   it should "not dispatch action if file when onKeypress(C-pagedown)" in {

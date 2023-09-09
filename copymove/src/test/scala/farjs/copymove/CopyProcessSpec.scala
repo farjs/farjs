@@ -807,7 +807,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     dispatch.expects(*).onCall { action: Any =>
       inside(action) { case action: FileListTaskAction =>
         action.task.message shouldBe "Copy/Move Items"
-        resultF = action.task.future
+        resultF = action.task.result.toFuture
       }
     }
 

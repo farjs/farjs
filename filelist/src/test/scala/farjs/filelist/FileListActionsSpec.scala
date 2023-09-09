@@ -3,7 +3,7 @@ package farjs.filelist
 import farjs.filelist.FileListActions._
 import farjs.filelist.FileListActionsSpec._
 import farjs.filelist.api._
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import org.scalatest.Succeeded
 import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec
@@ -84,12 +84,12 @@ class FileListActionsSpec extends AsyncTestSpec {
     dispatch.expects(FileListDirChangedAction(dir, currDir))
     
     //when
-    val FileListDirChangeAction(FutureTask(msg, future)) =
+    val FileListDirChangeAction(task) =
       actions.changeDir(dispatch, parent, dir)
     
     //then
-    msg shouldBe "Changing Dir"
-    future.map(_ => Succeeded)
+    task.message shouldBe "Changing Dir"
+    task.result.toFuture.map(_ => Succeeded)
   }
   
   it should "dispatch FileListDirUpdatedAction when updateDir" in {
@@ -106,12 +106,12 @@ class FileListActionsSpec extends AsyncTestSpec {
     dispatch.expects(FileListDirUpdatedAction(currDir))
     
     //when
-    val FileListDirUpdateAction(FutureTask(msg, future)) =
+    val FileListDirUpdateAction(task) =
       actions.updateDir(dispatch, path)
     
     //then
-    msg shouldBe "Updating Dir"
-    future.map(_ => Succeeded)
+    task.message shouldBe "Updating Dir"
+    task.result.toFuture.map(_ => Succeeded)
   }
   
   it should "dispatch FileListItemCreatedAction when createDir(multiple=false)" in {
@@ -131,12 +131,12 @@ class FileListActionsSpec extends AsyncTestSpec {
     dispatch.expects(FileListItemCreatedAction(dir, currDir))
     
     //when
-    val FileListDirCreateAction(FutureTask(msg, future)) =
+    val FileListDirCreateAction(task) =
       actions.createDir(dispatch, parent, dir, multiple)
     
     //then
-    msg shouldBe "Creating Dir"
-    future.map(_ => Succeeded)
+    task.message shouldBe "Creating Dir"
+    task.result.toFuture.map(_ => Succeeded)
   }
   
   it should "dispatch FileListItemCreatedAction when createDir(multiple=true)" in {
@@ -156,12 +156,12 @@ class FileListActionsSpec extends AsyncTestSpec {
     dispatch.expects(FileListItemCreatedAction("test", currDir))
     
     //when
-    val FileListDirCreateAction(FutureTask(msg, future)) =
+    val FileListDirCreateAction(task) =
       actions.createDir(dispatch, parent, dir, multiple)
     
     //then
-    msg shouldBe "Creating Dir"
-    future.map(_ => Succeeded)
+    task.message shouldBe "Creating Dir"
+    task.result.toFuture.map(_ => Succeeded)
   }
   
   it should "dispatch FileListDirUpdatedAction when deleteAction" in {
@@ -184,13 +184,13 @@ class FileListActionsSpec extends AsyncTestSpec {
     }
     
     //when
-    val FileListTaskAction(FutureTask(msg, future)) =
+    val FileListTaskAction(task) =
       actions.deleteAction(dispatch, dir, items)
     
     //then
-    msg shouldBe "Deleting Items"
-    future.flatMap { _ =>
-      inside(resultAction) { case FileListDirUpdateAction(FutureTask("Updating Dir", future)) =>
+    task.message shouldBe "Deleting Items"
+    task.result.toFuture.flatMap { _ =>
+      inside(resultAction) { case FileListDirUpdateAction(Task("Updating Dir", future)) =>
         future.map(_ => Succeeded)
       }
     }

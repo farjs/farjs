@@ -7,7 +7,7 @@ import farjs.filelist.theme.FileListTheme
 import farjs.filelist.{FileListActions, FileListState}
 import farjs.ui._
 import farjs.ui.popup.{StatusPopup, StatusPopupProps}
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
@@ -64,7 +64,7 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
           stack.update[QuickViewParams](_.withState(newParams))
         case Failure(_) =>
           setShowPopup(false)
-          props.dispatch(FileListTaskAction(FutureTask("Quick view dir scan", resultF)))
+          props.dispatch(FileListTaskAction(Task("Quick view dir scan", resultF)))
       }
     }
 

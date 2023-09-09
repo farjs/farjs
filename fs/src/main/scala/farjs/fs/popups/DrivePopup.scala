@@ -6,7 +6,7 @@ import farjs.filelist.stack.WithPanelStacks
 import farjs.fs.{FSDisk, FSService}
 import farjs.ui.border.SingleChars
 import farjs.ui.menu.{MenuPopup, MenuPopupProps}
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import farjs.ui.{Dispatch, WithSize, WithSizeProps}
 import scommons.nodejs.Process.Platform
 import scommons.nodejs.process
@@ -54,7 +54,7 @@ object DrivePopup extends FunctionComponent[DrivePopupProps] {
       val disksF = fsService.readDisks().map { disks =>
         setDisks(disks)
       }
-      props.dispatch(FileListTaskAction(FutureTask("Reading disks", disksF)))
+      props.dispatch(FileListTaskAction(Task("Reading disks", disksF)))
       ()
     }, Nil)
 

@@ -200,7 +200,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     var resultF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
       inside(action) { case action: FileListTaskAction =>
-        resultF = action.task.future
+        resultF = action.task.result.toFuture
       }
     }
 

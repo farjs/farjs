@@ -9,7 +9,7 @@ import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.history.{FileListHistoryService, MockFileListHistoryService}
 import farjs.ui.Dispatch
 import farjs.ui.popup.MessageBoxProps
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.Succeeded
@@ -655,8 +655,8 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
         FileListItem("file 1")
       ))
-      val leftAction = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
-      val rightAction = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
+      val leftAction = FileListDirUpdateAction(Task("Updating", Future.successful(updatedDir)))
+      val rightAction = FileListDirUpdateAction(Task("Updating", Future.successful(updatedDir)))
 
       //then
       fromDispatch.expects(FileListParamsChangedAction(
@@ -676,8 +676,8 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
       //then
       for {
-        _ <- leftAction.task.future
-        _ <- rightAction.task.future
+        _ <- leftAction.task.result.toFuture
+        _ <- rightAction.task.result.toFuture
       } yield Succeeded
     }
   }
@@ -722,7 +722,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
         FileListItem("file 1")
       ))
-      val leftAction = FileListDirUpdateAction(FutureTask("Updating", Future.successful(updatedDir)))
+      val leftAction = FileListDirUpdateAction(Task("Updating", Future.successful(updatedDir)))
 
       //then
       onClose.expects()
@@ -735,7 +735,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       progressPopup.onDone()
 
       //then
-      leftAction.task.future.map(_ => Succeeded)
+      leftAction.task.result.toFuture.map(_ => Succeeded)
     }
   }
 

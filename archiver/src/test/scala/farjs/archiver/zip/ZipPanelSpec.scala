@@ -9,7 +9,7 @@ import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack._
 import farjs.ui.Dispatch
 import farjs.ui.popup.{MessageBoxAction, MessageBoxProps}
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.Succeeded
@@ -113,7 +113,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
       FileListItem("file 1")
     ))
-    val updateAction = FileListDirUpdateAction(FutureTask("Updating...", Future.successful(updatedDir)))
+    val updateAction = FileListDirUpdateAction(Task("Updating...", Future.successful(updatedDir)))
 
     //then
     fsActions.updateDir.expects(fsDispatch, fsState.currDir.path).returning(updateAction)
@@ -158,7 +158,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
       FileListItem("file 1")
     ))
-    val updateAction = FileListDirUpdateAction(FutureTask("Updating...", Future.successful(updatedDir)))
+    val updateAction = FileListDirUpdateAction(Task("Updating...", Future.successful(updatedDir)))
 
     //then
     fsActions.updateDir.expects(fsDispatch, fsState.currDir.path).returning(updateAction).twice()
@@ -411,7 +411,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
           FileListItem("file 1")
         ))
-        val updateAction = FileListDirUpdateAction(FutureTask("Updating...", Future.successful(updatedDir)))
+        val updateAction = FileListDirUpdateAction(Task("Updating...", Future.successful(updatedDir)))
 
         //then
         actions.updateDir.expects(dispatch, props.state.currDir.path).returning(updateAction)
@@ -422,7 +422,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
         //then
         findComponents(renderer.root, addToArchController()) should be (empty)
-        updateAction.task.future.map(_ => Succeeded)
+        updateAction.task.result.toFuture.map(_ => Succeeded)
     }
   }
 
@@ -485,8 +485,8 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
           FileListItem("file 1")
         ))
-        val updateAction = FileListDirUpdateAction(FutureTask("Updating...", Future.successful(updatedDir)))
-        val deleteAction = FileListTaskAction(FutureTask("Deleting...", Future.unit))
+        val updateAction = FileListDirUpdateAction(Task("Updating...", Future.successful(updatedDir)))
+        val deleteAction = FileListTaskAction(Task("Deleting...", Future.unit))
 
         //then
         actions.updateDir.expects(dispatch, props.state.currDir.path).returning(updateAction)
@@ -500,8 +500,8 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         //then
         findComponents(renderer.root, addToArchController()) should be (empty)
         for {
-          _ <- updateAction.task.future
-          _ <- deleteAction.task.future
+          _ <- updateAction.task.result.toFuture
+          _ <- deleteAction.task.result.toFuture
         } yield Succeeded
     }
   }
@@ -589,7 +589,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     var actionF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
       inside(action) {
-        case FileListTaskAction(FutureTask("Reading zip archive", future)) =>
+        case FileListTaskAction(Task("Reading zip archive", future)) =>
           actionF = future
       }
     }
@@ -665,7 +665,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     var actionF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
       inside(action) {
-        case FileListTaskAction(FutureTask("Reading zip archive", future)) =>
+        case FileListTaskAction(Task("Reading zip archive", future)) =>
           actionF = future
       }
     }

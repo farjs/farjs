@@ -1,13 +1,13 @@
 package farjs.app
 
-import farjs.ui.task.{AbstractTask, TaskReducer}
+import farjs.ui.task.{Task, TaskReducer}
 
 trait FarjsStateDef {
 
-  def currentTask: Option[AbstractTask]
+  def currentTask: Option[Task]
 }
 
-case class FarjsState(currentTask: Option[AbstractTask] = None) extends FarjsStateDef
+case class FarjsState(currentTask: Option[Task] = None) extends FarjsStateDef
 
 object FarjsStateReducer {
 

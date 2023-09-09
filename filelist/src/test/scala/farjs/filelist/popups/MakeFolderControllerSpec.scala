@@ -7,7 +7,7 @@ import farjs.filelist.api.FileListDir
 import farjs.filelist.history.MockFileListHistoryService
 import farjs.filelist.popups.MakeFolderController._
 import farjs.ui.Dispatch
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
@@ -55,7 +55,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     ))
     findComponentProps(renderer.root, makeFolderPopup).multiple shouldBe false
     val action = FileListDirCreateAction(
-      FutureTask("Creating...", Future.successful(()))
+      Task("Creating...", Future.successful(()))
     )
     val saveF = Future.unit
     val dir = "test dir"
@@ -72,7 +72,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     
     //then
     for {
-      _ <- action.task.future
+      _ <- action.task.result.toFuture
       _ <- saveF
     } yield {
       inside(findComponentProps(renderer.root, makeFolderPopup)) {

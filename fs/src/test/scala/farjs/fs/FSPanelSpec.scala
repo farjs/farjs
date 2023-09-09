@@ -4,7 +4,7 @@ import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.fs.FSPanel._
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import scommons.react.test._
 
 import scala.concurrent.Future
@@ -61,8 +61,8 @@ class FSPanelSpec extends TestSpec with TestRendererUtils {
     //when & then
     panelProps.onKeypress(null, "M-o") shouldBe true
 
-    inside(resultAction) { case FileListTaskAction(FutureTask("Opening default app", resFuture)) =>
-      resFuture shouldBe taskFuture
+    inside(resultAction) {
+      case FileListTaskAction(Task("Opening default app", _)) =>
     }
   }
 

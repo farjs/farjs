@@ -5,7 +5,7 @@ import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.api.FileListItem
 import farjs.ui.Dispatch
 import farjs.ui.popup.{StatusPopup, StatusPopupProps}
-import farjs.ui.task.FutureTask
+import farjs.ui.task.Task
 import scommons.react._
 import scommons.react.hooks._
 
@@ -56,7 +56,7 @@ object CopyItemsStats extends FunctionComponent[CopyItemsStatsProps] {
           props.onDone(filesSize)
         case Failure(_) =>
           props.onCancel()
-          props.dispatch(FileListTaskAction(FutureTask(s"${props.title} dir scan", resultF)))
+          props.dispatch(FileListTaskAction(Task(s"${props.title} dir scan", resultF)))
       }
     }
 

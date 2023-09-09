@@ -5,8 +5,7 @@ import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.popup.StatusPopupProps
-import farjs.ui.task.FutureTask
-import org.scalatest.Succeeded
+import farjs.ui.task.Task
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 import scommons.react.test._
@@ -70,12 +69,16 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
           ))
           p.future
         }
-        val addToZipF = Future.failed(new Exception("test error"))
+        val error = new Exception("test error")
+        val addToZipF = Future.failed(error)
         addToArchApi.expects(zipFile, props.state.currDir.path, Set("dir 3"), *).returning(addToZipF)
         onComplete.expects(*).never()
-        var resultAction: Any = null
+        var resultF: Future[_] = null
         dispatch.expects(*).onCall { action: Any =>
-          resultAction = action
+          inside(action) {
+            case FileListTaskAction(Task("Add item(s) to zip archive", future)) =>
+              resultF = future
+          }
         }
 
         //when
@@ -87,10 +90,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
         eventually {
           findComponents(renderer.root, statusPopupComp) should be (empty)
         }.flatMap { _ =>
-          inside(resultAction) {
-            case FileListTaskAction(FutureTask("Add item(s) to zip archive", future)) =>
-              future.failed.map(_ => Succeeded)
-          }
+          resultF.failed.map(_ shouldBe error)
         }
     }
   }

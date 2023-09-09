@@ -1,11 +1,11 @@
 package farjs.app
 
-import farjs.ui.task.AbstractTask
+import farjs.ui.task.Task
 
 //noinspection NotImplementedCode
 case class TestFarjsState(
-                           currentTaskMock: () => Option[AbstractTask] = () => ???
+                           currentTaskMock: () => Option[Task] = () => ???
                          ) extends FarjsStateDef {
 
-  def currentTask: Option[AbstractTask] = currentTaskMock()
+  def currentTask: Option[Task] = currentTaskMock()
 }
