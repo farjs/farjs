@@ -20,7 +20,7 @@ Good old Windows **F**ile and **AR**chive Manager
   [react-blessed](https://github.com/Yomguithereal/react-blessed),
   [blessed](https://github.com/chjj/blessed)
 
-Runs on [Node.js](https://nodejs.org/), thus cross-platform:
+Runs on [Node.js](https://nodejs.org/), [bun](https://bun.sh) and cross-platform:
 * `Mac OS X` (primary support in [iTerm2](https://iterm2.com/) and [WezTerm](https://wezfurlong.org/wezterm/))
 * `Windows` (primary support in [WezTerm](https://wezfurlong.org/wezterm/) and [Windows Terminal](https://docs.microsoft.com/en-us/windows/terminal/))
 * `Linux` (primary support in [WezTerm](https://wezfurlong.org/wezterm/))
@@ -28,15 +28,18 @@ Runs on [Node.js](https://nodejs.org/), thus cross-platform:
 ## Install
 
 To install (or upgrade) it on your computer use the following command:
-
 ``` bash
 $ npm i -g farjs-app
 ```
 
-then you can run the application from your favorite terminal:
-
+then you can run the application (using node) from your favorite terminal:
 ``` bash
 $ farjs
+```
+
+To run using [bun](https://bun.sh) use:
+``` bash
+$ bun $(which farjs)
 ```
 
 ![Screenshots](https://raw.githubusercontent.com/farjs/farjs/main/docs/images/screenshots.png)

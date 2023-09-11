@@ -27,12 +27,12 @@ object FarjsApp {
 
   @JSExport("start")
   def start(showDevTools: Boolean = false,
-            currentScreen: js.UndefOr[BlessedScreen] = js.undefined,
+            onReady: js.UndefOr[js.Function0[Unit]] = js.undefined,
             onExit: js.UndefOr[js.Function0[Unit]] = js.undefined): BlessedScreen = {
 
     def createRenderer(): BlessedRenderer = ReactBlessed.createBlessedRenderer(Blessed)
 
-    val screen = currentScreen.getOrElse {
+    val screen = {
       val screen = Blessed.screen(new BlessedScreenConfig {
         override val autoPadding = true
         override val smartCSR = true
@@ -61,6 +61,8 @@ object FarjsApp {
 
     val root = new FarjsRoot(
       loadMainUi = { dispatch =>
+        onReady.foreach(_.apply())
+        
         prepareDB().map { db =>
           val ctx = new FarjsDBContext(db)
           val fileListModule = new FileListModule(ctx)
