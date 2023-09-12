@@ -1,4 +1,5 @@
-"use strict";
+
+export default {};
 
 import https from 'https';
 import { readFile } from 'fs/promises';
@@ -7,7 +8,7 @@ const packageJson = JSON.parse(
   await readFile(new URL('../package.json', import.meta.url), 'utf8')
 );
 
-function fetchLatestVersion() {
+export function fetchLatestVersion() {
   return new Promise((resolve, reject) => {
     const httpOptions = {
       headers: {
@@ -57,14 +58,9 @@ function green(text) {
   return '\u001b[32m' + text + '\u001b[39m';
 }
 
-export default {
-
-  fetchLatestVersion: fetchLatestVersion,
-
-  checkNpmVersion: (npmVersion) => {
-
-    if (npmVersion && npmVersion != packageJson.version) {
-      console.log(green(
+export function checkNpmVersion(npmVersion) {
+  if (npmVersion && npmVersion != packageJson.version) {
+    console.log(green(
 `
   There is a newer version of ${packageJson.name} available: ${npmVersion}
   (You are currently using version: ${packageJson.version})
@@ -76,7 +72,6 @@ export default {
 
   See the changelog here: https://github.com/farjs/farjs/releases
 `
-      ));
-    }
+    ));
   }
-};
+}
