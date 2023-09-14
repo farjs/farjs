@@ -6,8 +6,6 @@ import scommons.react.hooks._
 import scala.scalajs.js
 import scala.scalajs.js.{Error, JavaScriptException}
 
-case class TaskManagerProps(startTask: Option[Task])
-
 /**
   * Handles status of running tasks.
   */
@@ -31,7 +29,7 @@ object TaskManager extends FunctionComponent[TaskManagerProps] {
                                       errorDetails: js.UndefOr[String] = js.undefined)
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val (state, setState) = useStateUpdater(() => TaskManagerState())
     
     if (uiComponent == null) {
@@ -42,10 +40,7 @@ object TaskManager extends FunctionComponent[TaskManagerProps] {
       props.startTask.foreach { task =>
         onTaskStart(setState, task)
       }
-    }, List(props.startTask match {
-      case None => js.undefined
-      case Some(task) => task.asInstanceOf[js.Any]
-    }))
+    }, List(props.startTask))
     
     <(uiComponent())(^.plain := TaskManagerUiProps(
       showLoading = state.taskCount > 0,

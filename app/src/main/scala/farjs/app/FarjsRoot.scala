@@ -57,7 +57,10 @@ class FarjsRoot(loadMainUi: js.Function1[Any, Unit] => Future[(Theme, ReactClass
           case None => <.text()("Loading...")
           case Some(mainComp) =>
             <(mainComp)()(
-              <(taskControllerComp())(^.wrapped := TaskManagerProps(state.currentTask))()
+              <(taskControllerComp())(^.plain := TaskManagerProps(state.currentTask match {
+                case None => js.undefined
+                case Some(t) => t
+              }))()
             )
         }
       ),

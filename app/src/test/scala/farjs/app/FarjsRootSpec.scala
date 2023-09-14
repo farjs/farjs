@@ -159,8 +159,8 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       assertComponents(renderer.root.children, List(
         <.box(^.rbWidth := "100%")(
           <(mainComp)()(
-            <(taskControllerComp())(^.assertWrapped(inside(_) {
-              case TaskManagerProps(currentTask) => currentTask shouldBe None
+            <(taskControllerComp())(^.assertPlain[TaskManagerProps](inside(_) {
+              case TaskManagerProps(currentTask) => currentTask shouldBe js.undefined
             }))()
           )
         ),

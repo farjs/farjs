@@ -29,17 +29,17 @@ Runs on [Node.js](https://nodejs.org/), [bun](https://bun.sh) and cross-platform
 
 To install (or upgrade) it on your computer use the following command:
 ``` bash
-$ npm i -g farjs-app
+npm i -g farjs-app
 ```
 
 then you can run the application (using node) from your favorite terminal:
 ``` bash
-$ farjs
+farjs
 ```
 
 To run using [bun](https://bun.sh) use:
 ``` bash
-$ bun $(which farjs)
+bun $(which farjs)
 ```
 
 ![Screenshots](https://raw.githubusercontent.com/farjs/farjs/main/docs/images/screenshots.png)
