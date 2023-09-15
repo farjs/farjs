@@ -17,6 +17,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   ViewerContent.viewerInput = mockUiComponent("ViewerInput")
   ViewerContent.encodingsPopup = mockUiComponent("EncodingsPopup")
+  ViewerContent.textSearchPopup = mockUiComponent("TextSearchPopup")
 
   //noinspection TypeAnnotation
   class ViewerFileReader {
@@ -137,7 +138,32 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }
   }
 
-  it should "show popup and switch encoding when onKeypress(F8)" in {
+  it should "show encodings popup when onKeypress(F7)" in {
+    //given
+    val ctx = new TestContext
+    import ctx._
+
+    eventually {
+      assertViewerContent(renderer.root, props, List(
+        "test ",
+        "file content"
+      ))
+    }.flatMap { _ =>
+      //when
+      findComponentProps(renderer.root, viewerInput).onKeypress("f7")
+      
+      //then
+      val popup = findComponentProps(renderer.root, textSearchPopup)
+
+      //when
+      popup.onCancel()
+      
+      //then
+      findProps(renderer.root, textSearchPopup) should be (empty)
+    }
+  }
+
+  it should "show encodings popup and switch encoding when onKeypress(F8)" in {
     //given
     val ctx = new TestContext
     import ctx._

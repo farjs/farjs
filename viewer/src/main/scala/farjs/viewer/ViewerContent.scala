@@ -1,6 +1,6 @@
 package farjs.viewer
 
-import farjs.file.popups.{EncodingsPopup, EncodingsPopupProps}
+import farjs.file.popups._
 import farjs.filelist.theme.FileListTheme
 import scommons.react._
 import scommons.react.blessed._
@@ -19,11 +19,13 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
   
   private[viewer] var viewerInput: UiComponent[ViewerInputProps] = ViewerInput
   private[viewer] var encodingsPopup: UiComponent[EncodingsPopupProps] = EncodingsPopup
+  private[viewer] var textSearchPopup: UiComponent[TextSearchPopupProps] = TextSearchPopup
 
   protected def render(compProps: Props): ReactElement = {
     val theme = FileListTheme.useTheme
     val readF = useRef(Future.unit)
     val (showEncodingsPopup, setShowEncodingsPopup) = useState(false)
+    val (showSearchPopup, setShowSearchPopup) = useState(false)
     val props = compProps.wrapped
     val viewport = props.viewport
     
@@ -79,6 +81,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       if (!props.onKeypress(keyFull)) {
         keyFull match {
           case "f2" => onWrap()
+          case "f7" => setShowSearchPopup(true)
           case "f8" => setShowEncodingsPopup(true)
           case "left" => onColumn(dx = -1)
           case "right" => onColumn(dx = 1)
@@ -123,6 +126,18 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
           onApply = onEncoding,
           onClose = { () =>
             setShowEncodingsPopup(false)
+          }
+        ))()
+      }
+      else None,
+
+      if (showSearchPopup) Some {
+        <(textSearchPopup())(^.wrapped := TextSearchPopupProps(
+          onSearch = { _ =>
+            //TODO: implement
+          },
+          onCancel = { () =>
+            setShowSearchPopup(false)
           }
         ))()
       }
