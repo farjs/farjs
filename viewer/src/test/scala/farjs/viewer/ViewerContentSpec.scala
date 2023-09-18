@@ -17,7 +17,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   ViewerContent.viewerInput = mockUiComponent("ViewerInput")
   ViewerContent.encodingsPopup = mockUiComponent("EncodingsPopup")
-  ViewerContent.textSearchPopup = mockUiComponent("TextSearchPopup")
+  ViewerContent.viewerSearch = mockUiComponent("ViewerSearch")
 
   //noinspection TypeAnnotation
   class ViewerFileReader {
@@ -138,7 +138,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }
   }
 
-  it should "show encodings popup when onKeypress(F7)" in {
+  it should "show search popup when onKeypress(F7)" in {
     //given
     val ctx = new TestContext
     import ctx._
@@ -149,17 +149,13 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         "file content"
       ))
     }.flatMap { _ =>
-      //when
+      //when & then
       findComponentProps(renderer.root, viewerInput).onKeypress("f7")
-      
-      //then
-      val popup = findComponentProps(renderer.root, textSearchPopup)
+      findComponentProps(renderer.root, viewerSearch).showSearchPopup shouldBe true
 
-      //when
-      popup.onCancel()
-      
-      //then
-      findProps(renderer.root, textSearchPopup) should be (empty)
+      //when & then
+      findComponentProps(renderer.root, viewerSearch).onHideSearchPopup()
+      findComponentProps(renderer.root, viewerSearch).showSearchPopup shouldBe false
     }
   }
 
@@ -615,39 +611,35 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
     val theme = FileListTheme.defaultTheme
 
-    assertNativeComponent(result.children.head,
+    assertComponents(result.children, List(
       <(viewerInput())(^.assertWrapped(inside(_) {
         case ViewerInputProps(inputRef, _, _) =>
           inputRef shouldBe props.inputRef
-      }))(), { children =>
-        val (text, maybePopup) = inside(children) {
-          case List(text) => (text, None)
-          case List(text, popup) => (text, Some(popup))
-        }
+      }))(
+        <.text(
+          ^.rbWidth := props.viewport.width,
+          ^.rbHeight := props.viewport.height,
+          ^.rbStyle := ViewerController.contentStyle(theme),
+          ^.rbWrap := false,
+          ^.content := {
+            if (content.isEmpty) ""
+            else s"${content.mkString("\n")}\n"
+          }
+        )(),
 
-        assertNativeComponent(text,
-          <.text(
-            ^.rbWidth := props.viewport.width,
-            ^.rbHeight := props.viewport.height,
-            ^.rbStyle := ViewerController.contentStyle(theme),
-            ^.rbWrap := false,
-            ^.content := {
-              if (content.isEmpty) ""
-              else s"${content.mkString("\n")}\n"
-            }
-          )()
+        if (hasEncodingsPopup) Some(
+          <(encodingsPopup())(^.assertWrapped(inside(_) {
+            case EncodingsPopupProps(encoding, _, _) =>
+              encoding shouldBe props.viewport.encoding
+          }))()
         )
-        maybePopup.isDefined shouldBe hasEncodingsPopup
-        maybePopup.foreach { popup =>
-          assertNativeComponent(popup,
-            <(encodingsPopup())(^.assertWrapped(inside(_) {
-              case EncodingsPopupProps(encoding, _, _) =>
-                encoding shouldBe props.viewport.encoding
-            }))()
-          )
-        }
-        Succeeded
-      }
-    )
+        else None,
+
+        <(viewerSearch())(^.assertWrapped(inside(_) {
+          case ViewerSearchProps(showSearchPopup, _) =>
+            showSearchPopup shouldBe false
+        }))()
+      )
+    ))
   }
 }
