@@ -19,6 +19,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
   
   private[viewer] var viewerInput: UiComponent[ViewerInputProps] = ViewerInput
   private[viewer] var encodingsPopup: UiComponent[EncodingsPopupProps] = EncodingsPopup
+  private[viewer] var textSearchPopup: UiComponent[TextSearchPopupProps] = TextSearchPopup
   private[viewer] var viewerSearch: UiComponent[ViewerSearchProps] = ViewerSearch
 
   protected def render(compProps: Props): ReactElement = {
@@ -26,6 +27,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
     val readF = useRef(Future.unit)
     val (showEncodingsPopup, setShowEncodingsPopup) = useState(false)
     val (showSearchPopup, setShowSearchPopup) = useState(false)
+    val (searchTerm, setSearchTerm) = useState("")
     val props = compProps.wrapped
     val viewport = props.viewport
     
@@ -131,12 +133,28 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       }
       else None,
 
-      <(viewerSearch())(^.wrapped := ViewerSearchProps(
-        showSearchPopup = showSearchPopup,
-        onHideSearchPopup = { () =>
-          setShowSearchPopup(false)
-        }
-      ))()
+      if (showSearchPopup) Some {
+        <(textSearchPopup())(^.wrapped := TextSearchPopupProps(
+          onSearch = { term =>
+            setShowSearchPopup(false)
+            setSearchTerm(term)
+          },
+          onCancel = { () =>
+            setShowSearchPopup(false)
+          }
+        ))()
+      }
+      else None,
+
+      if (searchTerm.nonEmpty) Some {
+        <(viewerSearch())(^.wrapped := ViewerSearchProps(
+          searchTerm = searchTerm,
+          onComplete = { () =>
+            setSearchTerm("")
+          }
+        ))()
+      }
+      else None
     )
   }
 }

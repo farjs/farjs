@@ -17,6 +17,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   ViewerContent.viewerInput = mockUiComponent("ViewerInput")
   ViewerContent.encodingsPopup = mockUiComponent("EncodingsPopup")
+  ViewerContent.textSearchPopup = mockUiComponent("TextSearchPopup")
   ViewerContent.viewerSearch = mockUiComponent("ViewerSearch")
 
   //noinspection TypeAnnotation
@@ -138,7 +139,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }
   }
 
-  it should "show search popup when onKeypress(F7)" in {
+  it should "show and close search popup when onKeypress(F7)" in {
     //given
     val ctx = new TestContext
     import ctx._
@@ -149,13 +150,36 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         "file content"
       ))
     }.flatMap { _ =>
-      //when & then
+      //when
       findComponentProps(renderer.root, viewerInput).onKeypress("f7")
-      findComponentProps(renderer.root, viewerSearch).showSearchPopup shouldBe true
+      findComponentProps(renderer.root, textSearchPopup).onCancel()
+
+      //then
+      findProps(renderer.root, textSearchPopup) should be(empty)
+    }
+  }
+
+  it should "trigger search when onKeypress(F7)" in {
+    //given
+    val ctx = new TestContext
+    import ctx._
+
+    eventually {
+      assertViewerContent(renderer.root, props, List(
+        "test ",
+        "file content"
+      ))
+    }.flatMap { _ =>
+      findComponentProps(renderer.root, viewerInput).onKeypress("f7")
+      val searchTerm = "test"
 
       //when & then
-      findComponentProps(renderer.root, viewerSearch).onHideSearchPopup()
-      findComponentProps(renderer.root, viewerSearch).showSearchPopup shouldBe false
+      findComponentProps(renderer.root, textSearchPopup).onSearch(searchTerm)
+      findProps(renderer.root, textSearchPopup) should be(empty)
+
+      //when & then
+      findComponentProps(renderer.root, viewerSearch).onComplete()
+      findProps(renderer.root, viewerSearch) should be(empty)
     }
   }
 
@@ -633,12 +657,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
               encoding shouldBe props.viewport.encoding
           }))()
         )
-        else None,
-
-        <(viewerSearch())(^.assertWrapped(inside(_) {
-          case ViewerSearchProps(showSearchPopup, _) =>
-            showSearchPopup shouldBe false
-        }))()
+        else None
       )
     ))
   }

@@ -1,41 +1,45 @@
 package farjs.viewer
 
-import farjs.file.popups.TextSearchPopupProps
 import farjs.filelist.theme.FileListThemeSpec.withThemeContext
+import farjs.ui.popup.StatusPopupProps
 import farjs.viewer.ViewerSearch._
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.test._
 
 class ViewerSearchSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  ViewerSearch.textSearchPopup = mockUiComponent("TextSearchPopup")
+  ViewerSearch.statusPopupComp = "StatusPopup".asInstanceOf[ReactClass]
 
-  it should "render search popup" in {
+  it should "render status popup" in {
     //given
-    val onHideSearchPopup = mockFunction[Unit]
-    val props = getViewerSearchProps(showSearchPopup = true, onHideSearchPopup = onHideSearchPopup)
+    val onComplete = mockFunction[Unit]
+    val props = getViewerSearchProps(searchTerm = "test", onComplete = onComplete)
     
     //when
     val result = createTestRenderer(withThemeContext(<(ViewerSearch())(^.wrapped := props)()))
 
     //then
     assertComponents(result.root.children, List(
-      <(textSearchPopup())(^.assertWrapped(inside(_) {
-        case TextSearchPopupProps(_, onCancel) =>
+      <(statusPopupComp)(^.assertPlain[StatusPopupProps](inside(_) {
+        case StatusPopupProps(text, title, onClose) =>
+          text shouldBe s"""Searching for\n"${props.searchTerm}""""
+          title shouldBe "Search"
+          
           //then
-          onHideSearchPopup.expects()
+          onComplete.expects()
           
           //when
-          onCancel()
+          onClose.foreach(_.apply())
       }))()
     ))
   }
 
-  private def getViewerSearchProps(showSearchPopup: Boolean,
-                                   onHideSearchPopup: () => Unit) = {
+  private def getViewerSearchProps(searchTerm: String,
+                                   onComplete: () => Unit) = {
     ViewerSearchProps(
-      showSearchPopup = showSearchPopup,
-      onHideSearchPopup = onHideSearchPopup
+      searchTerm = searchTerm,
+      onComplete = onComplete
     )
   }
 }

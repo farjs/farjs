@@ -1,30 +1,36 @@
 package farjs.viewer
 
-import farjs.file.popups._
 import farjs.filelist.theme.FileListTheme
+import farjs.ui.popup.{StatusPopup, StatusPopupProps}
 import scommons.react._
+import scommons.react.hooks._
 
-case class ViewerSearchProps(showSearchPopup: Boolean,
-                             onHideSearchPopup: () => Unit)
+import scala.scalajs.js
+
+case class ViewerSearchProps(searchTerm: String,
+                             onComplete: () => Unit)
 
 object ViewerSearch extends FunctionComponent[ViewerSearchProps] {
   
-  private[viewer] var textSearchPopup: UiComponent[TextSearchPopupProps] = TextSearchPopup
+  private[viewer] var statusPopupComp: ReactClass = StatusPopup
 
   protected def render(compProps: Props): ReactElement = {
     FileListTheme.useTheme
     val props = compProps.wrapped
     
-    <.>()(
-      if (props.showSearchPopup) Some {
-        <(textSearchPopup())(^.wrapped := TextSearchPopupProps(
-          onSearch = { _ =>
-            //TODO: implement
-          },
-          onCancel = props.onHideSearchPopup
-        ))()
-      }
-      else None
-    )
+    useLayoutEffect({ () =>
+      //TODO: start search
+      ()
+    }, Nil)
+
+    <(statusPopupComp)(^.plain := StatusPopupProps(
+      text = s"""Searching for\n"${props.searchTerm}"""",
+      title = "Search",
+      onClose = { () =>
+        // stop search
+        props.onComplete()
+        //inProgress.current = false
+      }: js.Function0[Unit]
+    ))()
   }
 }
