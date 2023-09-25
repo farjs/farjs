@@ -104,7 +104,7 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
       }
   }
 
-  private def doWrap(lines: Int, up: Boolean)(data: List[(String, Int)]): List[(String, Int)] = {
+  private[viewer] def doWrap(lines: Int, up: Boolean)(data: List[(String, Int)]): List[(String, Int)] = {
     if (!wrap) data
     else {
       val res = new mutable.ArrayBuffer[(String, Int)](data.size)
@@ -114,19 +114,26 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
         val (line, bytes) = data
         if (line.length <= width) res.append(data)
         else {
-          val prefix = line.take(width)
-          val prefixBytes = Encoding.byteLength(prefix, encoding)
-          res.append((prefix, prefixBytes))
+          val (wrapped, rest) =
+            if (up) (line.takeRight(width), line.dropRight(width))
+            else (line.take(width), line.drop(width))
 
-          loop((line.drop(width), math.max(bytes - prefixBytes, 0)))
+          val wrappedBytes = Encoding.byteLength(wrapped, encoding)
+          res.append((wrapped, wrappedBytes))
+
+          loop((rest, math.max(bytes - wrappedBytes, 0)))
         }
       }
       
-      data.foreach(loop)
-
       val resData =
-        if (up) res.takeRight(lines)
-        else res.take(lines)
+        if (up) {
+          data.foldRight(())((d, _) => loop(d))
+          res.reverse.takeRight(lines)
+        }
+        else {
+          data.foldLeft(())((_, d) => loop(d))
+          res.take(lines)
+        }
 
       resData.toList
     }

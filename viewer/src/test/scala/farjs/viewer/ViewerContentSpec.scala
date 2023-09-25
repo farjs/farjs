@@ -377,7 +377,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
           "ong line"
         )),
         check(key = "up", lines = 1, position = 20, "prev liiiiiiiiine 1\n", List(
-          "iiine 1",
+          "iiiiiiiine 1",
           "looooooooooo",
           "ong line"
         )),

@@ -62,4 +62,65 @@ class ViewerFileViewportSpec extends TestSpec {
     //when & then
     viewport.scrollIndicators shouldBe List(1)
   }
+
+  it should "return input data if wrap=false when doWrap" in {
+    //given
+    val viewport = ViewerFileViewport(
+      fileReader = new MockViewerFileReader,
+      encoding = "win",
+      size = 123,
+      width = 10,
+      height = 3
+    )
+    val data = List("test line 1" -> 1)
+
+    //when & then
+    viewport.doWrap(1, up = false)(data) shouldBe data
+  }
+
+  it should "return wrapped data if up=false when doWrap" in {
+    //given
+    val viewport = ViewerFileViewport(
+      fileReader = new MockViewerFileReader,
+      encoding = "utf-8",
+      size = 123,
+      width = 6,
+      height = 3,
+      wrap = true
+    )
+    val data = List(
+      "test1 2" -> 30,
+      "test3 4" -> 40
+    )
+
+    //when & then
+    viewport.doWrap(3, up = false)(data) shouldBe List(
+      "test1 " -> 6,
+      "2" -> 24,
+      "test3 " -> 6
+    )
+  }
+
+  it should "return wrapped data if up=true when doWrap" in {
+    //given
+    val viewport = ViewerFileViewport(
+      fileReader = new MockViewerFileReader,
+      encoding = "utf-8",
+      size = 123,
+      width = 6,
+      height = 3,
+      wrap = true
+    )
+    val data = List(
+      "test1 2" -> 30,
+      "test3 4" -> 40
+    )
+
+    //when & then
+    viewport.doWrap(3, up = true)(data) shouldBe List(
+      "est1 2" -> 6,
+      "t" -> 34,
+      "est3 4" -> 6
+    )
+  }
 }
