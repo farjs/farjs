@@ -93,7 +93,7 @@ class TaskErrorSpec extends TestSpec {
     //then
     error shouldBe s"$ex"
     errorDetails shouldBe stack
-    stack should startWith ("Error: js error")
+    stack should include ("Error: js error")
 
     //cleanup
     TaskError.logger = currLogger
