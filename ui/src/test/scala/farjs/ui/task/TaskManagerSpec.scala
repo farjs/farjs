@@ -78,7 +78,7 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         showLoading = false,
         status = s"${task.message}\\.\\.\\.Done \\d+\\.\\d+ sec\\.",
         error = e.toString,
-        errorDetails = TaskManager.printStackTrace(e)
+        errorDetails = js.undefined
       ))
 
       //when
@@ -128,7 +128,7 @@ class TaskManagerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         showLoading = false,
         status = s"${task.message}\\.\\.\\.Done \\d+\\.\\d+ sec\\.",
         error = e.toString,
-        errorDetails = TaskManager.printStackTrace(e)
+        errorDetails = js.undefined
       ))
     }
   }

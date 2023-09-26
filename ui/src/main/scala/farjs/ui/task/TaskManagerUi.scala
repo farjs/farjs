@@ -6,32 +6,15 @@ import scommons.react._
 import scommons.react.hooks._
 
 import scala.scalajs.js
-import scala.scalajs.js.JavaScriptException
 
 /**
   * Displays status and error(s) of running tasks.
   */
-object FarjsTaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
+object TaskManagerUi extends FunctionComponent[TaskManagerUiProps] {
 
-  private[task] var logger: String => Unit = println
   private[task] var statusPopupComp: ReactClass = StatusPopup
   private[task] var messageBoxComp: ReactClass = MessageBox
   
-  val errorHandler: js.Function1[Any, js.UndefOr[TaskError]] = {
-    case ex@JavaScriptException(error) =>
-      val stackTrace = TaskManager.printStackTrace(ex, sep = " ")
-      logger(stackTrace)
-      TaskError(s"$error", stackTrace)
-    case ex: Throwable =>
-      val stackTrace = TaskManager.printStackTrace(ex, sep = " ")
-      logger(stackTrace)
-      TaskError(s"$ex", stackTrace)
-    case ex =>
-      val error = s"$ex"
-      logger(error)
-      TaskError(error)
-  }
-
   protected def render(compProps: Props): ReactElement = {
     val (errors, updateErrors) = useStateUpdater(List.empty[String])
     val props = compProps.plain

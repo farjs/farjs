@@ -96,8 +96,8 @@ class FarjsRoot(loadMainUi: js.Function1[Any, Unit] => Future[(Theme, ReactClass
 object FarjsRoot {
 
   private[app] var taskControllerComp: UiComponent[TaskManagerProps] = {
-    TaskManager.uiComponent = FarjsTaskManagerUi
-    TaskManager.errorHandler = FarjsTaskManagerUi.errorHandler
+    TaskManager.uiComponent = TaskManagerUi
+    TaskManager.errorHandler = TaskError.errorHandler
     TaskManager
   }
   private[app] var logControllerComp: ReactClass = LogController
