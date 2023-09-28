@@ -25,7 +25,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16'
+        node-version: '20'
 #        cache: 'npm'
 #        cache-dependency-path: '**/package-lock.json'
 
@@ -43,9 +43,9 @@ jobs:
           ~/AppData/Roaming/npm
           D:/a/farjs/farjs/node_modules
           D:/a/farjs/farjs/package-lock.json
-        key: ${{ runner.os }}-node_modules-cache-v3-${{ hashFiles('package.json') }}
+        key: ${{ runner.os }}-node_modules-cache-v4-${{ hashFiles('package.json') }}
         restore-keys: |
-          ${{ runner.os }}-node_modules-cache-v3-
+          ${{ runner.os }}-node_modules-cache-v4-
 
     - name: Run tests
       run: |
