@@ -11,7 +11,7 @@ import scala.scalajs.js.{Error, JavaScriptException}
   */
 object TaskManager extends FunctionComponent[TaskManagerProps] {
 
-  var uiComponent: UiComponent[TaskManagerUiProps] = _
+  var uiComponent: ReactClass = _
   
   var errorHandler: js.UndefOr[js.Function1[Any, TaskError]] = js.undefined
   
@@ -37,7 +37,7 @@ object TaskManager extends FunctionComponent[TaskManagerProps] {
       }
     }, List(props.startTask))
     
-    <(uiComponent())(^.plain := TaskManagerUiProps(
+    <(uiComponent)(^.plain := TaskManagerUiProps(
       showLoading = state.taskCount > 0,
       onHideStatus = { () =>
         setState(_.copy(status = js.undefined))
