@@ -74,7 +74,7 @@ jobs:
 
     - name: Build SNAPSHOT artifact
       run: |
-        sbt clean "project farjs-app" npmUpdate fullOptJS
+        sbt clean "project farjs-app" copyToTargetDir fullOptJS
         cd app/target/scala-2.13/scalajs-bundler/main
         npm pack
       if: ${{ env.TAG_NAME == '' }}
@@ -90,8 +90,9 @@ jobs:
       run: |
         VERSION="$(echo "$TAG_NAME" | cut -d'v' -f 2)"
         echo "Publish a release version=$VERSION for tag $TAG_NAME"
-        version=$VERSION sbt clean "project farjs-app" npmUpdate fullOptJS
+        sbt clean "project farjs-app" copyToTargetDir fullOptJS
         cd app/target/scala-2.13/scalajs-bundler/main
+        npm --no-git-tag-version --allow-same-version version $VERSION
         npm pack
         echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
         npm publish farjs-app-${VERSION}.tgz

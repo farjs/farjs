@@ -1,7 +1,7 @@
 {
   "author": "viktor-podzigun",
   "name": "farjs-app",
-  "version": "0.0.0",
+  "version": "0.1.0-SNAPSHOT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/farjs/farjs.git"

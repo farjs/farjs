@@ -119,9 +119,6 @@ object ScalaJsModule {
     //  scalaJSModuleKind must be set to ModuleKind.CommonJSModule in projects where ScalaJSBundler plugin is enabled
     ensureModuleKindIsCommonJSModule := true,
 
-    removeUnusedDevDependencies(Compile, scalaJSBundlerPackageJson),
-    removeUnusedDevDependencies(Test, scalaJSBundlerPackageJson),
-
     clean := {
       val logger = streams.value.log
       doClean(logger, Seq(managedDirectory.value, target.value), cleanKeepFiles.value)
@@ -129,34 +126,6 @@ object ScalaJsModule {
   ) ++
     inConfig(Compile)(configSettings) ++
     inConfig(Test)(configSettings)
-
-  private def removeUnusedDevDependencies(config: ConfigKey,
-                                          packageJsonTask: TaskKey[BundlerFile.PackageJson]
-                                         ): Def.Setting[Task[BundlerFile.PackageJson]] = {
-    import com.fasterxml.jackson.databind.ObjectMapper
-    import com.fasterxml.jackson.databind.node._
-
-    import scala.collection.JavaConverters._
-
-    config / packageJsonTask := {
-      val packageJsonFile = (config / packageJsonTask).value
-      val mapper = new ObjectMapper()
-      val json = mapper.readTree(IO.read(packageJsonFile.file)).asInstanceOf[ObjectNode]
-      val devDeps = json.get("devDependencies").asInstanceOf[ObjectNode]
-      devDeps.remove(List(
-        "source-map-loader",
-        "webpack",
-        "concat-with-sourcemaps",
-        "webpack-cli",
-        "webpack-dev-server",
-        "websql"
-      ).asJava)
-
-      mapper.writerWithDefaultPrettyPrinter().writeValue(packageJsonFile.file, json)
-
-      packageJsonFile
-    }
-  }
 
   private def doClean(logger: Logger, clean: Seq[File], preserve: Seq[File]): Unit = {
     val filesToPreserve = preserve.toSet

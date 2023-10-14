@@ -16,7 +16,7 @@ sbt test
 
 To run the app use the following commands:
 ```bash
-sbt "project farjs-app" npmUpdate fastOptJS
+sbt "project farjs-app" copyToTargetDir fastOptJS
 
 node ./app/target/scala-2.13/scalajs-bundler/main/dev.loader.mjs
 ```
