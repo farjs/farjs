@@ -19,7 +19,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
 
   private val mainComp = mockUiComponent[Unit]("AppMainUIMock").apply()
   
-  FarjsRoot.taskControllerComp = mockUiComponent("TaskManager")
+  FarjsRoot.taskControllerComp = "TaskManager".asInstanceOf[ReactClass]
   FarjsRoot.logControllerComp = "LogController".asInstanceOf[ReactClass]
   FarjsRoot.devToolPanelComp = "DevToolPanel".asInstanceOf[ReactClass]
   
@@ -159,7 +159,7 @@ class FarjsRootSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUti
       assertComponents(renderer.root.children, List(
         <.box(^.rbWidth := "100%")(
           <(mainComp)()(
-            <(taskControllerComp())(^.assertPlain[TaskManagerProps](inside(_) {
+            <(taskControllerComp)(^.assertPlain[TaskManagerProps](inside(_) {
               case TaskManagerProps(currentTask) => currentTask shouldBe js.undefined
             }))()
           )

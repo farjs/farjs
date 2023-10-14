@@ -57,7 +57,7 @@ class FarjsRoot(loadMainUi: js.Function1[Any, Unit] => Future[(Theme, ReactClass
           case None => <.text()("Loading...")
           case Some(mainComp) =>
             <(mainComp)()(
-              <(taskControllerComp())(^.plain := TaskManagerProps(state.currentTask match {
+              <(taskControllerComp)(^.plain := TaskManagerProps(state.currentTask match {
                 case None => js.undefined
                 case Some(t) => t
               }))()
@@ -95,8 +95,8 @@ class FarjsRoot(loadMainUi: js.Function1[Any, Unit] => Future[(Theme, ReactClass
 
 object FarjsRoot {
 
-  private[app] var taskControllerComp: UiComponent[TaskManagerProps] = {
-    TaskManager.uiComponent = TaskManagerUi
+  private[app] var taskControllerComp: ReactClass = {
+    //overwrite default error handler to handle scala/java exceptions
     TaskManager.errorHandler = TaskError.errorHandler
     TaskManager
   }

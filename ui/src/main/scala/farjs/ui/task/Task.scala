@@ -17,7 +17,7 @@ object Task {
     create(message, result.toJSPromise)
   }
   
-  def create(message: String, result: js.Promise[Any], startTime: Double = js.Date.now()): Task = {
+  private def create(message: String, result: js.Promise[Any], startTime: Double = js.Date.now()): Task = {
     js.Dynamic.literal(
       startTime = startTime,
       message = message,
