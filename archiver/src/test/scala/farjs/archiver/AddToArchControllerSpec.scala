@@ -75,7 +75,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
         onComplete.expects(*).never()
         var resultF: Future[_] = null
         dispatch.expects(*).onCall { action: Any =>
-          inside(action) {
+          inside(action.asInstanceOf[FileListTaskAction]) {
             case FileListTaskAction(Task("Add item(s) to zip archive", future)) =>
               resultF = future
           }

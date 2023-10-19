@@ -393,7 +393,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     actions.readFile.expects(List(currDir.path), fileItem, 0.0).returning(Future.failed(expectedError))
     var openF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      inside(action) { case FileListTaskAction(Task("Opening File", future)) =>
+      inside(action.asInstanceOf[FileListTaskAction]) { case FileListTaskAction(Task("Opening File", future)) =>
         openF = future
       }
     }
@@ -584,7 +584,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     onTriggerMock.expects(keyFull, stacks, data).returning(Future.failed(expectedError))
     var openF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      inside(action) { case FileListTaskAction(Task("Opening Plugin", future)) =>
+      inside(action.asInstanceOf[FileListTaskAction]) { case FileListTaskAction(Task("Opening Plugin", future)) =>
         openF = future
       }
     }

@@ -178,9 +178,9 @@ class FileListActionsSpec extends AsyncTestSpec {
     
     //then
     dispatch.expects(FileListDirUpdatedAction(currDir))
-    var resultAction: Any = null
+    var resultAction: FileListDirUpdateAction = null
     dispatch.expects(*).onCall { action: Any =>
-      resultAction = action
+      resultAction = action.asInstanceOf[FileListDirUpdateAction]
     }
     
     //when

@@ -61,7 +61,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils {
     //when & then
     panelProps.onKeypress(null, "M-o") shouldBe true
 
-    inside(resultAction) {
+    inside(resultAction.asInstanceOf[FileListTaskAction]) {
       case FileListTaskAction(Task("Opening default app", _)) =>
     }
   }

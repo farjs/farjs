@@ -9,6 +9,7 @@ import scommons.nodejs.{path => nodePath}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.Success
 import scala.util.control.NonFatal
@@ -153,18 +154,44 @@ object FileListActions {
   
   private val copyBufferBytes: Int = 64 * 1024
 
-  case class FileListTaskAction(task: Task) extends TaskAction
+  sealed trait FileListTaskAction extends TaskAction
+  object FileListTaskAction {
+    def apply(task: Task): FileListTaskAction =
+      js.Dynamic.literal(task = task).asInstanceOf[FileListTaskAction]
+
+    def unapply(arg: FileListTaskAction): Option[Task] = Some(arg.task)
+  }
 
   case class FileListParamsChangedAction(offset: Int,
                                          index: Int,
                                          selectedNames: Set[String])
 
-  case class FileListDirChangeAction(task: Task) extends TaskAction
+  sealed trait FileListDirChangeAction extends TaskAction
+  object FileListDirChangeAction {
+    def apply(task: Task): FileListDirChangeAction =
+      js.Dynamic.literal(task = task).asInstanceOf[FileListDirChangeAction]
+
+    def unapply(arg: FileListDirChangeAction): Option[Task] = Some(arg.task)
+  }
   case class FileListDirChangedAction(dir: String, currDir: FileListDir)
   
-  case class FileListDirUpdateAction(task: Task) extends TaskAction
+  sealed trait FileListDirUpdateAction extends TaskAction
+  object FileListDirUpdateAction {
+    def apply(task: Task): FileListDirUpdateAction =
+      js.Dynamic.literal(task = task).asInstanceOf[FileListDirUpdateAction]
+
+    def unapply(arg: FileListDirUpdateAction): Option[Task] = Some(arg.task)
+  }
+
   case class FileListDirUpdatedAction(currDir: FileListDir)
-  case class FileListDirCreateAction(task: Task) extends TaskAction
+
+  sealed trait FileListDirCreateAction extends TaskAction
+  object FileListDirCreateAction {
+    def apply(task: Task): FileListDirCreateAction =
+      js.Dynamic.literal(task = task).asInstanceOf[FileListDirCreateAction]
+
+    def unapply(arg: FileListDirCreateAction): Option[Task] = Some(arg.task)
+  }
 
   case class FileListItemCreatedAction(name: String, currDir: FileListDir)
   

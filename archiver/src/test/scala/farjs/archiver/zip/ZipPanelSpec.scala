@@ -588,7 +588,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //then
     var actionF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      inside(action) {
+      inside(action.asInstanceOf[FileListTaskAction]) {
         case FileListTaskAction(Task("Reading zip archive", future)) =>
           actionF = future
       }
@@ -664,7 +664,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //then
     var actionF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      inside(action) {
+      inside(action.asInstanceOf[FileListTaskAction]) {
         case FileListTaskAction(Task("Reading zip archive", future)) =>
           actionF = future
       }

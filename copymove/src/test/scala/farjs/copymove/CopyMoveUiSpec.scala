@@ -78,9 +78,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
-    dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
-      action.task.message shouldBe "Resolving target dir"
-    })
+    dispatch.expects(*).onCall { action: Any =>
+      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+        action.task.message shouldBe "Resolving target dir"
+      }
+    }
 
     //when
     copyPopup.onAction(to)
@@ -133,9 +135,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
     actions.getDriveRoot.expects(currDir.path).returning(Future.successful(None))
     actions.getDriveRoot.expects(toDir.path).returning(Future.successful(None))
-    dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
-      action.task.message shouldBe "Resolving target dir"
-    })
+    dispatch.expects(*).onCall { action: Any =>
+      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+        action.task.message shouldBe "Resolving target dir"
+      }
+    }
     
     //when
     copyPopup.onAction(to)
@@ -215,9 +219,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
-    dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
-      action.task.message shouldBe "Resolving target dir"
-    })
+    dispatch.expects(*).onCall { action: Any =>
+      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+        action.task.message shouldBe "Resolving target dir"
+      }
+    }
 
     //when
     copyPopup.onAction(to)
@@ -270,9 +276,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
     actions.getDriveRoot.expects(currDir.path).returning(Future.successful(None))
     actions.getDriveRoot.expects(toDir.path).returning(Future.successful(None))
-    dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
-      action.task.message shouldBe "Resolving target dir"
-    })
+    dispatch.expects(*).onCall { action: Any =>
+      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+        action.task.message shouldBe "Resolving target dir"
+      }
+    }
 
     //when
     copyPopup.onAction(to)
@@ -323,9 +331,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
-    dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
-      action.task.message shouldBe "Resolving target dir"
-    })
+    dispatch.expects(*).onCall { action: Any =>
+      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+        action.task.message shouldBe "Resolving target dir"
+      }
+    }
 
     //when
     copyPopup.onAction(to)
@@ -382,9 +392,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
     actions.getDriveRoot.expects(currDir.path).returning(Future.successful(Some(driveRoot)))
     actions.getDriveRoot.expects(toDir.path).returning(Future.successful(Some(driveRoot)))
-    dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
-      action.task.message shouldBe "Resolving target dir"
-    })
+    dispatch.expects(*).onCall { action: Any =>
+      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+        action.task.message shouldBe "Resolving target dir"
+      }
+    }
 
     //when
     copyPopup.onAction(to)
@@ -521,9 +533,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
     actions.getDriveRoot.expects(currDir.path).returning(Future.successful(None))
     actions.getDriveRoot.expects(toDir.path).returning(Future.successful(None))
-    dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
-      action.task.message shouldBe "Resolving target dir"
-    })
+    dispatch.expects(*).onCall { action: Any =>
+      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+        action.task.message shouldBe "Resolving target dir"
+      }
+    }
 
     //when
     copyPopup.onAction(to)
@@ -638,9 +652,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val toDir = FileListDir("/to/path/dir 1", isRoot = false, Nil)
     val to = "test to path"
     fromActions.readDir.expects(Some(leftDir.path), to).returning(Future.successful(toDir))
-    fromDispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
-      action.task.message shouldBe "Resolving target dir"
-    })
+    fromDispatch.expects(*).onCall { action: Any =>
+      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+        action.task.message shouldBe "Resolving target dir"
+      }
+    }
     copyPopup.onAction(to)
     
     eventually {

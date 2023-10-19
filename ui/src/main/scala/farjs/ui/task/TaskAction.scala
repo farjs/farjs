@@ -1,6 +1,8 @@
 package farjs.ui.task
 
-trait TaskAction {
+import scala.scalajs.js
+
+trait TaskAction extends js.Object {
 
   def task: Task
 }

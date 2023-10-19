@@ -98,10 +98,12 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //then
     onDone.expects()
     var resultF: Future[_] = null
-    dispatch.expects(*).onCall(inside(_: Any) { case action: FileListTaskAction =>
-      resultF = action.task.result.toFuture
-      action.task.message shouldBe "Moving items"
-    })
+    dispatch.expects(*).onCall { action: Any =>
+      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+        resultF = action.task.result.toFuture
+        action.task.message shouldBe "Moving items"
+      }
+    }
 
     //when
     p.failure(new Exception("test error"))

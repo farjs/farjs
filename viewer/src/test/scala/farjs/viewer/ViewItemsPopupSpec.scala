@@ -148,7 +148,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     //then
     onClose.expects()
     dispatch.expects(*).onCall { action: Any =>
-      inside(action) { case action: FileListTaskAction =>
+      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
         resultF = action.task.result.toFuture
       }
     }

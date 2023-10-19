@@ -155,7 +155,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     //then
     onCancel.expects()
     dispatch.expects(*).onCall { action: Any =>
-      inside(action) { case action: FileListTaskAction =>
+      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
         resultF = action.task.result.toFuture
         action.task.message shouldBe "Copy dir scan"
       }

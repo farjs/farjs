@@ -22,7 +22,7 @@ class FarjsRoot(loadMainUi: js.Function1[Any, Unit] => Future[(Theme, ReactClass
     val (maybeMainUi, setMainUi) = useState(Option.empty[ReactClass])
     val elementRef = useRef[BlessedElement](null)
     val (devTool, setDevTool) = useStateUpdater(initialDevTool)
-    val (state, dispatch) = useReducer(FarjsStateReducer.apply, FarjsState())
+    val (state, dispatch) = useReducer(TaskReducer, js.undefined: js.UndefOr[Task])
 
     useLayoutEffect({ () =>
       val screen = elementRef.current.screen
@@ -57,17 +57,14 @@ class FarjsRoot(loadMainUi: js.Function1[Any, Unit] => Future[(Theme, ReactClass
           case None => <.text()("Loading...")
           case Some(mainComp) =>
             <(mainComp)()(
-              <(taskControllerComp)(^.plain := TaskManagerProps(state.currentTask match {
-                case None => js.undefined
-                case Some(t) => t
-              }))()
+              <(taskControllerComp)(^.plain := TaskManagerProps(state))()
             )
         }
       ),
       
       <(logControllerComp)(^.plain := LogControllerProps(
         onReady = { () =>
-          loadMainUi(dispatch).map { case (theme, mainUi) =>
+          loadMainUi(dispatch.asInstanceOf[js.Function1[Any, Unit]]).map { case (theme, mainUi) =>
             setCurrTheme(theme)
             setMainUi(Some(mainUi))
           }

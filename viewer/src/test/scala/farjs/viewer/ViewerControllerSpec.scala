@@ -61,7 +61,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     var openF: Future[_] = null
     fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).throws(expectedError)
     dispatch.expects(*).onCall { action: Any =>
-      inside(action) { case FileListTaskAction(Task("Opening file", future)) =>
+      inside(action.asInstanceOf[FileListTaskAction]) { case FileListTaskAction(Task("Opening file", future)) =>
         openF = future
       }
     }
