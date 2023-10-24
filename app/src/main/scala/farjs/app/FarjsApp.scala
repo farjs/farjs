@@ -5,7 +5,9 @@ import farjs.app.raw.BetterSqlite3WebSQL
 import farjs.domain.FarjsDBContext
 import farjs.filelist.theme.FileListTheme
 import farjs.fs.FSFileListActions
+import farjs.ui.app._
 import farjs.ui.portal.WithPortals
+import farjs.ui.task.{TaskError, TaskManager}
 import farjs.ui.tool.DevTool
 import scommons.nodejs.{process, global => nodeGlobal}
 import scommons.react._
@@ -16,6 +18,7 @@ import scommons.websql.Database
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 @JSExportTopLevel(name = "FarjsApp")
@@ -59,31 +62,32 @@ object FarjsApp {
       screen
     }
 
-    val root = new FarjsRoot(
-      loadMainUi = { dispatch =>
-        onReady.foreach(_.apply())
-        
-        prepareDB().map { db =>
-          val ctx = new FarjsDBContext(db)
-          val fileListModule = new FileListModule(ctx)
-          val mainUi = new FileListRoot(dispatch, fileListModule, WithPortals.create(screen)).apply()
-          val theme =
-            if (screen.terminal == TerminalName.`xterm-256color`) FileListTheme.xterm256Theme
-            else FileListTheme.defaultTheme
-
-          (theme, mainUi)
-        }
-      },
-      initialDevTool = if (showDevTools) DevTool.Logs else DevTool.Hidden,
-      defaultTheme = FileListTheme.defaultTheme
-    )
-    
     val screenObj = screen.asInstanceOf[js.Dynamic]
     val renderer = screenObj.savedRenderer.asInstanceOf[js.UndefOr[BlessedRenderer]]
       .getOrElse(createRenderer())
 
+    //overwrite default error handler to handle scala/java exceptions
+    TaskManager.errorHandler = TaskError.errorHandler
+
     renderer(
-      <(root()).empty,
+      <(AppRoot)(^.plain := AppRootProps(
+        loadMainUi = { dispatch =>
+          onReady.foreach(_.apply())
+
+          prepareDB().map { db =>
+            val ctx = new FarjsDBContext(db)
+            val fileListModule = new FileListModule(ctx)
+            val mainUi = new FileListRoot(dispatch.asInstanceOf[js.Function1[Any, Unit]], fileListModule, WithPortals.create(screen)).apply()
+            val theme =
+              if (screen.terminal == TerminalName.`xterm-256color`) FileListTheme.xterm256Theme
+              else FileListTheme.defaultTheme
+
+            LoadResult(theme, mainUi)
+          }.toJSPromise
+        },
+        initialDevTool = if (showDevTools) DevTool.Logs else DevTool.Hidden,
+        defaultTheme = FileListTheme.defaultTheme
+      ))(),
       screen
     )
     screen
