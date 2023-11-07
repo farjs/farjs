@@ -24,7 +24,7 @@ case class ViewerControllerProps(inputRef: ReactRef[BlessedElement],
 
 object ViewerController extends FunctionComponent[ViewerControllerProps] {
 
-  private[viewer] var withSizeComp: UiComponent[WithSizeProps] = WithSize
+  private[viewer] var withSizeComp: ReactClass = WithSize
   private[viewer] var viewerContent: UiComponent[ViewerContentProps] = ViewerContent
   
   protected def render(compProps: Props): ReactElement = {
@@ -71,7 +71,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
       cleanup
     }, Nil)
 
-    <(withSizeComp())(^.plain := WithSizeProps { (width, height) =>
+    <(withSizeComp)(^.plain := WithSizeProps { (width, height) =>
       <.box(
         ^.rbStyle := contentStyle(theme)
       )(

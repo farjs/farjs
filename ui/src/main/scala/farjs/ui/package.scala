@@ -23,4 +23,9 @@ package object ui {
 
     def wrapText(text: String, width: Int, prefixLen: js.UndefOr[Int] = js.undefined): String = js.native
   }
+
+  @js.native
+  @JSImport("@farjs/ui/WithSize.mjs", JSImport.Default)
+  object WithSize extends ReactClass
+
 }

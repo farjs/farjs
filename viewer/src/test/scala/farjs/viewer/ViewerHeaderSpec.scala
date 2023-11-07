@@ -12,7 +12,7 @@ import scala.scalajs.js
 
 class ViewerHeaderSpec extends TestSpec with TestRendererUtils {
 
-  ViewerHeader.withSizeComp = mockUiComponent("WithSize")
+  ViewerHeader.withSizeComp = "WithSize".asInstanceOf[ReactClass]
   ViewerHeader.textLineComp = "TextLine".asInstanceOf[ReactClass]
 
   it should "render component" in {
@@ -41,7 +41,7 @@ class ViewerHeaderSpec extends TestSpec with TestRendererUtils {
     val gapWidth = 2
 
     assertComponents(result.children, List(
-      <(withSizeComp())(^.assertPlain[WithSizeProps](inside(_) {
+      <(withSizeComp)(^.assertPlain[WithSizeProps](inside(_) {
         case WithSizeProps(render) =>
           val width = 80
           val dynamicWidth = width - encodingWidth - sizeWidth - columnWidth - percentWidth - gapWidth * 3

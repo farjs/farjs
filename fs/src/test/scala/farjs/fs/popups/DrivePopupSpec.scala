@@ -20,7 +20,7 @@ import scala.scalajs.js
 
 class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  DrivePopup.withSizeComp = mockUiComponent("WithSize")
+  DrivePopup.withSizeComp = "WithSize".asInstanceOf[ReactClass]
   DrivePopup.menuPopup = mockUiComponent("MenuPopup")
 
   //noinspection TypeAnnotation
@@ -72,7 +72,9 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       disksF should not be null
     }.flatMap(_ => disksF).map { _ =>
       //given
-      val renderContent = findComponentProps(renderer.root, withSizeComp, plain = true).render(60, 20)
+      val renderContent = inside(findComponents(renderer.root, withSizeComp)) {
+        case List(comp) => comp.props.asInstanceOf[WithSizeProps].render(60, 20)
+      }
       val resultContent = createTestRenderer(renderContent).root
       val menuProps = findComponentProps(resultContent, menuPopup)
 
@@ -126,7 +128,9 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       disksF should not be null
     }.flatMap(_ => disksF).map { _ =>
       //given
-      val renderContent = findComponentProps(renderer.root, withSizeComp, plain = true).render(60, 20)
+      val renderContent = inside(findComponents(renderer.root, withSizeComp)) {
+        case List(comp) => comp.props.asInstanceOf[WithSizeProps].render(60, 20)
+      }
       val resultContent = createTestRenderer(renderContent).root
       val menuProps = findComponentProps(resultContent, menuPopup)
 
@@ -180,7 +184,9 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       disksF should not be null
     }.flatMap(_ => disksF).map { _ =>
       //given
-      val renderContent = findComponentProps(renderer.root, withSizeComp, plain = true).render(60, 20)
+      val renderContent = inside(findComponents(renderer.root, withSizeComp)) {
+        case List(comp) => comp.props.asInstanceOf[WithSizeProps].render(60, 20)
+      }
       val resultContent = createTestRenderer(renderContent).root
       val menuProps = findComponentProps(resultContent, menuPopup)
 
@@ -298,7 +304,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val width = textWidth + 3 * 2
 
     assertComponents(result.children, List(
-      <(withSizeComp())(^.assertPlain[WithSizeProps](inside(_) {
+      <(withSizeComp)(^.assertPlain[WithSizeProps](inside(_) {
         case WithSizeProps(render) =>
           val content = createTestRenderer(render(60, 20)).root
 

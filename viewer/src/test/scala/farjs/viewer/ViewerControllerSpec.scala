@@ -21,7 +21,7 @@ import scala.scalajs.js
 
 class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  ViewerController.withSizeComp = mockUiComponent("WithSize")
+  ViewerController.withSizeComp = "WithSize".asInstanceOf[ReactClass]
   ViewerController.viewerContent = mockUiComponent("ViewerContent")
 
   //noinspection TypeAnnotation
@@ -248,7 +248,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val theme = FileListTheme.defaultTheme
 
     assertComponents(result.children, List(
-      <(withSizeComp())(^.assertPlain[WithSizeProps](inside(_) {
+      <(withSizeComp)(^.assertPlain[WithSizeProps](inside(_) {
         case WithSizeProps(render) =>
           val width = 3
           val height = 2

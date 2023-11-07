@@ -7,13 +7,13 @@ case class BottomMenuProps(items: List[String])
 
 object BottomMenu extends FunctionComponent[BottomMenuProps] {
 
-  private[menu] var withSizeComp: UiComponent[WithSizeProps] = WithSize
+  private[menu] var withSizeComp: ReactClass = WithSize
   private[menu] var bottomMenuViewComp: UiComponent[BottomMenuViewProps] = BottomMenuView
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
 
-    <(withSizeComp())(^.plain := WithSizeProps({ (width, _) =>
+    <(withSizeComp)(^.plain := WithSizeProps({ (width, _) =>
       
       <(bottomMenuViewComp())(^.wrapped := BottomMenuViewProps(
         width = width,

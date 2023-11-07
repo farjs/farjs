@@ -24,7 +24,7 @@ object DrivePopup extends FunctionComponent[DrivePopupProps] {
 
   private[popups] var platform: Platform = process.platform
   private[popups] var fsService: FSService = FSService.instance
-  private[popups] var withSizeComp: UiComponent[WithSizeProps] = WithSize
+  private[popups] var withSizeComp: ReactClass = WithSize
   private[popups] var menuPopup: UiComponent[MenuPopupProps] = MenuPopup
 
   protected def render(compProps: Props): ReactElement = {
@@ -60,7 +60,7 @@ object DrivePopup extends FunctionComponent[DrivePopupProps] {
 
     if (data.isEmpty) null
     else {
-      <(withSizeComp())(^.plain := WithSizeProps { (_, _) =>
+      <(withSizeComp)(^.plain := WithSizeProps { (_, _) =>
         <(menuPopup())(^.wrapped := MenuPopupProps(
           title = "Drive",
           items = data.map(_._2),

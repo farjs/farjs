@@ -13,7 +13,7 @@ case class ViewerHeaderProps(filePath: String,
 
 object ViewerHeader extends FunctionComponent[ViewerHeaderProps] {
 
-  private[viewer] var withSizeComp: UiComponent[WithSizeProps] = WithSize
+  private[viewer] var withSizeComp: ReactClass = WithSize
   private[viewer] var textLineComp: ReactClass = TextLine
 
   protected def render(compProps: Props): ReactElement = {
@@ -26,7 +26,7 @@ object ViewerHeader extends FunctionComponent[ViewerHeaderProps] {
     val percentWidth = 4
     val gapWidth = 2
 
-    <(withSizeComp())(^.plain := WithSizeProps({ (width, _) =>
+    <(withSizeComp)(^.plain := WithSizeProps({ (width, _) =>
       val dynamicWidth =
         width - encodingWidth - sizeWidth - columnWidth - percentWidth - gapWidth * 3
 

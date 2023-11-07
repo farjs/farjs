@@ -13,7 +13,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
 
   ListPopup.popupComp = "Popup".asInstanceOf[ReactClass]
   ListPopup.modalContentComp = "ModalContent".asInstanceOf[ReactClass]
-  ListPopup.withSizeComp = mockUiComponent("WithSize")
+  ListPopup.withSizeComp = "WithSize".asInstanceOf[ReactClass]
   ListPopup.listBoxComp = mockUiComponent("ListBox")
 
   it should "not call onAction if empty items when onAction" in {
@@ -21,7 +21,9 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
     val onAction = mockFunction[Int, Unit]
     val props = getListPopupProps(items = Nil, onAction = onAction)
     val result = createTestRenderer(withThemeContext(<(ListPopup())(^.wrapped := props)())).root
-    val renderContent = findComponentProps(result, withSizeComp, plain = true).render(60, 20)
+    val renderContent = inside(findComponents(result, withSizeComp)) {
+      case List(comp) => comp.props.asInstanceOf[WithSizeProps].render(60, 20)
+    }
     val resultContent = createTestRenderer(renderContent).root
 
     //then
@@ -36,7 +38,9 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
     val onAction = mockFunction[Int, Unit]
     val props = getListPopupProps(onAction = onAction)
     val result = createTestRenderer(withThemeContext(<(ListPopup())(^.wrapped := props)())).root
-    val renderContent = findComponentProps(result, withSizeComp, plain = true).render(60, 20)
+    val renderContent = inside(findComponents(result, withSizeComp)) {
+      case List(comp) => comp.props.asInstanceOf[WithSizeProps].render(60, 20)
+    }
     val resultContent = createTestRenderer(renderContent).root
 
     //then
@@ -127,7 +131,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
           focusable shouldBe js.undefined
           onKeypress.isDefined shouldBe true
       }))(
-        <(withSizeComp())(^.assertPlain[WithSizeProps](inside(_) {
+        <(withSizeComp)(^.assertPlain[WithSizeProps](inside(_) {
           case WithSizeProps(render) =>
             val content = createTestRenderer(render(width, height)).root
             

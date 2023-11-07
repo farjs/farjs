@@ -57,7 +57,7 @@ object PanelStack extends FunctionComponent[PanelStackProps] {
   
   val Context: ReactContext[PanelStackProps] = ReactContext[PanelStackProps](defaultValue = null)
 
-  private[stack] var withSizeComp: UiComponent[WithSizeProps] = WithSize
+  private[stack] var withSizeComp: ReactClass = WithSize
 
   def usePanelStack: PanelStackProps = {
     val ctx = useContext(Context)
@@ -74,7 +74,7 @@ object PanelStack extends FunctionComponent[PanelStackProps] {
     val props = compProps.wrapped
     val topComp = props.stack.peek.component
 
-    <(withSizeComp())(^.plain := WithSizeProps({ (width, height) =>
+    <(withSizeComp)(^.plain := WithSizeProps({ (width, height) =>
       <(PanelStack.Context.Provider)(^.contextValue := props.copy(width = width, height = height))(
         <(topComp)()(),
         compProps.children

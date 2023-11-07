@@ -3,6 +3,7 @@ package farjs.filelist.stack
 import java.util.concurrent.atomic.AtomicReference
 import farjs.filelist.stack.PanelStack._
 import farjs.filelist.stack.PanelStackSpec.TestParams
+import farjs.ui.WithSizeProps
 import scommons.react._
 import scommons.react.blessed.BlessedElement
 import scommons.react.hooks._
@@ -12,7 +13,7 @@ import scala.scalajs.js
 
 class PanelStackSpec extends TestSpec with TestRendererUtils {
 
-  PanelStack.withSizeComp = mockUiComponent("WithSize")
+  PanelStack.withSizeComp = "WithSize".asInstanceOf[ReactClass]
 
   private val (width, height) = (25, 15)
 
@@ -302,7 +303,9 @@ class PanelStackSpec extends TestSpec with TestRendererUtils {
   }
 
   private def renderWithSize(element: ReactElement): TestInstance = {
-    val withSizeProps = findComponentProps(testRender(element), withSizeComp, plain = true)
+    val withSizeProps = inside(findComponents(testRender(element), withSizeComp)) {
+      case List(comp) => comp.props.asInstanceOf[WithSizeProps]
+    }
     createTestRenderer(withSizeProps.render(width, height)).root
   }
   

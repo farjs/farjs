@@ -24,7 +24,7 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
 
   private[popup] var popupComp: ReactClass = Popup
   private[popup] var modalContentComp: ReactClass = ModalContent
-  private[popup] var withSizeComp: UiComponent[WithSizeProps] = WithSize
+  private[popup] var withSizeComp: ReactClass = WithSize
   private[popup] var listBoxComp: UiComponent[ListBoxProps] = ListBox
   
   protected def render(compProps: Props): ReactElement = {
@@ -39,7 +39,7 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
       onClose = props.onClose: js.Function0[Unit],
       onKeypress = props.onKeypress: js.Function1[String, Boolean]
     ))(
-      <(withSizeComp())(^.plain := WithSizeProps { (width, height) =>
+      <(withSizeComp)(^.plain := WithSizeProps { (width, height) =>
         val maxContentWidth = {
           if (items.isEmpty) 2 * (paddingHorizontal + 1)
           else items.maxBy(_.length).length + 2 * (paddingHorizontal + 1)
