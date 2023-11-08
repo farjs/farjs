@@ -20,12 +20,12 @@ class SubMenuSpec extends TestSpec with TestRendererUtils {
     val onClick = mockFunction[Int, Unit]
     val props = SubMenuProps(
       selected = 0,
-      items = List("item 1", SubMenu.separator, "item 2"),
+      items = js.Array("item 1", SubMenu.separator, "item 2"),
       top = 1,
       left = 2,
       onClick = onClick
     )
-    val comp = testRender(withThemeContext(<(SubMenu())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(SubMenu())(^.plain := props)()))
     val textEl = inside(findComponents(comp, <.text.name)) {
       case List(_, text) => text
     }
@@ -41,14 +41,14 @@ class SubMenuSpec extends TestSpec with TestRendererUtils {
     //given
     val props = SubMenuProps(
       selected = 0,
-      items = List("item 1", SubMenu.separator, "item 2"),
+      items = js.Array("item 1", SubMenu.separator, "item 2"),
       top = 1,
       left = 2,
       _ => ()
     )
     
     //when
-    val result = testRender(withThemeContext(<(SubMenu())(^.wrapped := props)()))
+    val result = testRender(withThemeContext(<(SubMenu())(^.plain := props)()))
     
     //then
     assertSubMenuPopup(result, props)
@@ -110,7 +110,7 @@ class SubMenuSpec extends TestSpec with TestRendererUtils {
               ^.content := text
             )()
           }
-        }
+        }.toList
       )
     )
   }

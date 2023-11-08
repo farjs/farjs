@@ -58,14 +58,14 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
     buttonsProps.actions.head.onAction()
-    findProps(renderer.root, subMenuComp) should not be empty
+    findProps(renderer.root, subMenuComp, plain = true) should not be empty
     val popupProps = findPopupProps(renderer.root)
 
     //when
     popupProps.onKeypress.map(_.apply("escape")).getOrElse(false) shouldBe true
     
     //then
-    findProps(renderer.root, subMenuComp) shouldBe Nil
+    findProps(renderer.root, subMenuComp, plain = true) shouldBe Nil
   }
 
   it should "return false if no sub-menu when onKeypress(escape)" in {
@@ -86,10 +86,10 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
     buttonsProps.actions.head.onAction()
-    inside(findComponentProps(renderer.root, subMenuComp)) {
+    inside(findComponentProps(renderer.root, subMenuComp, plain = true)) {
       case SubMenuProps(selected, items, _, _, _) =>
         selected shouldBe 0
-        items shouldBe List(
+        items.toList shouldBe List(
           "Item 1",
           SubMenu.separator,
           "Item 2",
@@ -99,31 +99,31 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
 
     //when & then
     findPopupProps(renderer.root).onKeypress.map(_.apply("up")).getOrElse(false) shouldBe true
-    findComponentProps(renderer.root, subMenuComp).selected shouldBe 3
+    findComponentProps(renderer.root, subMenuComp, plain = true).selected shouldBe 3
 
     //when & then
     findPopupProps(renderer.root).onKeypress.map(_.apply("down")).getOrElse(false) shouldBe true
-    findComponentProps(renderer.root, subMenuComp).selected shouldBe 0
+    findComponentProps(renderer.root, subMenuComp, plain = true).selected shouldBe 0
 
     //when & then
     findPopupProps(renderer.root).onKeypress.map(_.apply("down")).getOrElse(false) shouldBe true
-    findComponentProps(renderer.root, subMenuComp).selected shouldBe 2
+    findComponentProps(renderer.root, subMenuComp, plain = true).selected shouldBe 2
 
     //when & then
     findPopupProps(renderer.root).onKeypress.map(_.apply("up")).getOrElse(false) shouldBe true
-    findComponentProps(renderer.root, subMenuComp).selected shouldBe 0
+    findComponentProps(renderer.root, subMenuComp, plain = true).selected shouldBe 0
 
     //when & then
     findPopupProps(renderer.root).onKeypress.map(_.apply("down")).getOrElse(false) shouldBe true
-    findComponentProps(renderer.root, subMenuComp).selected shouldBe 2
+    findComponentProps(renderer.root, subMenuComp, plain = true).selected shouldBe 2
 
     //when & then
     findPopupProps(renderer.root).onKeypress.map(_.apply("down")).getOrElse(false) shouldBe true
-    findComponentProps(renderer.root, subMenuComp).selected shouldBe 3
+    findComponentProps(renderer.root, subMenuComp, plain = true).selected shouldBe 3
 
     //when & then
     findPopupProps(renderer.root).onKeypress.map(_.apply("down")).getOrElse(false) shouldBe true
-    findComponentProps(renderer.root, subMenuComp).selected shouldBe 0
+    findComponentProps(renderer.root, subMenuComp, plain = true).selected shouldBe 0
   }
 
   it should "emit keypress(enter) if no sub-menu when onKeypress(down)" in {
@@ -172,23 +172,23 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
     buttonsProps.actions.head.onAction()
-    findComponentProps(renderer.root, subMenuComp).left shouldBe 2
+    findComponentProps(renderer.root, subMenuComp, plain = true).left shouldBe 2
 
     //when & then
     findPopupProps(renderer.root).onKeypress.map(_.apply("left")).getOrElse(false) shouldBe false
-    findComponentProps(renderer.root, subMenuComp).left shouldBe 22
+    findComponentProps(renderer.root, subMenuComp, plain = true).left shouldBe 22
 
     //when & then
     findPopupProps(renderer.root).onKeypress.map(_.apply("right")).getOrElse(false) shouldBe false
-    findComponentProps(renderer.root, subMenuComp).left shouldBe 2
+    findComponentProps(renderer.root, subMenuComp, plain = true).left shouldBe 2
 
     //when & then
     findPopupProps(renderer.root).onKeypress.map(_.apply("right")).getOrElse(false) shouldBe false
-    findComponentProps(renderer.root, subMenuComp).left shouldBe 12
+    findComponentProps(renderer.root, subMenuComp, plain = true).left shouldBe 12
 
     //when & then
     findPopupProps(renderer.root).onKeypress.map(_.apply("left")).getOrElse(false) shouldBe false
-    findComponentProps(renderer.root, subMenuComp).left shouldBe 2
+    findComponentProps(renderer.root, subMenuComp, plain = true).left shouldBe 2
   }
 
   it should "call onAction when onKeypress(enter)" in {
@@ -201,7 +201,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     }
     buttonsProps.actions.head.onAction()
     findPopupProps(renderer.root).onKeypress.map(_.apply("down")).getOrElse(false) shouldBe true
-    findComponentProps(renderer.root, subMenuComp).selected shouldBe 2
+    findComponentProps(renderer.root, subMenuComp, plain = true).selected shouldBe 2
 
     //then
     var onActionCalled = false
@@ -245,7 +245,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
     buttonsProps.actions.head.onAction()
-    findComponentProps(renderer.root, subMenuComp).selected shouldBe 0
+    findComponentProps(renderer.root, subMenuComp, plain = true).selected shouldBe 0
 
     //then
     var onActionCalled = false
@@ -254,7 +254,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     }
 
     //when
-    findComponentProps(renderer.root, subMenuComp).onClick(2)
+    findComponentProps(renderer.root, subMenuComp, plain = true).onClick(2)
 
     //then
     eventually(onActionCalled shouldBe true)
@@ -272,10 +272,10 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     buttonsProps.actions.head.onAction()
 
     //then
-    inside(findComponentProps(renderer.root, subMenuComp)) {
+    inside(findComponentProps(renderer.root, subMenuComp, plain = true)) {
       case SubMenuProps(selected, items, top, left, _) =>
         selected shouldBe 0
-        items shouldBe List(
+        items.toList shouldBe List(
           "Item 1",
           SubMenu.separator,
           "Item 2",

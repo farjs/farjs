@@ -126,9 +126,9 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
       ),
 
       maybeSubMenu.map { case (menuIndex, subIndex) =>
-        <(subMenuComp())(^.wrapped := SubMenuProps(
+        <(subMenuComp())(^.plain := SubMenuProps(
           selected = subIndex,
-          items = props.items(menuIndex)._2,
+          items = js.Array(props.items(menuIndex)._2: _*),
           top = 1,
           left = getLeftPos(menuIndex),
           onClick = { index =>

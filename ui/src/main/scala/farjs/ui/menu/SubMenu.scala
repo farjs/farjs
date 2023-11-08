@@ -5,23 +5,17 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 
-case class SubMenuProps(selected: Int,
-                        items: List[String],
-                        top: Int,
-                        left: Int,
-                        onClick: Int => Unit)
-
 object SubMenu extends FunctionComponent[SubMenuProps] {
 
   private[menu] var doubleBorderComp: ReactClass = DoubleBorder
   private[menu] var horizontalLineComp: ReactClass = HorizontalLine
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
 
     val textWidth = props.items.maxBy(_.length).length
     val width = 2 + textWidth
-    val height = 2 + props.items.size
+    val height = 2 + props.items.length
     val theme = Theme.useTheme().popup.menu
 
     <.box(
@@ -71,7 +65,7 @@ object SubMenu extends FunctionComponent[SubMenuProps] {
             ^.content := text
           )()
         }
-      }
+      }.toList
     )
   }
   
