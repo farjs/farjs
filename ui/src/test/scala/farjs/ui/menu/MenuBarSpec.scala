@@ -20,27 +20,27 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
   MenuBar.buttonsPanel = "ButtonsPanel".asInstanceOf[ReactClass]
   MenuBar.subMenuComp = mockUiComponent("SubMenu")
   
-  private val items = List(
-    "Menu 1" -> List(
+  private val items = js.Array(
+    MenuBarItem("Menu 1", js.Array(
       "Item 1",
       SubMenu.separator,
       "Item 2",
       "Item 3"
-    ),
-    "Menu 2" -> List(
+    )),
+    MenuBarItem("Menu 2", js.Array(
       "Item 4",
       "Item 5"
-    ),
-    "Menu 3" -> List(
+    )),
+    MenuBarItem("Menu 3", js.Array(
       "Item 6"
-    )
+    ))
   )
 
   it should "call onClose when onKeypress(F10)" in {
     //given
     val onClose = mockFunction[Unit]
     val props = MenuBarProps(items, (_, _) => (), onClose)
-    val comp = testRender(withThemeContext(<(MenuBar())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(MenuBar())(^.plain := props)()))
     val popupProps = findPopupProps(comp)
 
     //then
@@ -53,7 +53,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
   it should "hide sub-menu when onKeypress(escape)" in {
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
-    val renderer = createTestRenderer(withThemeContext(<(MenuBar())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(MenuBar())(^.plain := props)()))
     val buttonsProps = inside(findComponents(renderer.root, buttonsPanel)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
@@ -71,7 +71,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
   it should "return false if no sub-menu when onKeypress(escape)" in {
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
-    val comp = testRender(withThemeContext(<(MenuBar())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(MenuBar())(^.plain := props)()))
     val popupProps = findPopupProps(comp)
 
     //when & then
@@ -81,7 +81,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
   it should "select sub-menu items when onKeypress(down/up)" in {
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
-    val renderer = createTestRenderer(withThemeContext(<(MenuBar())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(MenuBar())(^.plain := props)()))
     val buttonsProps = inside(findComponents(renderer.root, buttonsPanel)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
@@ -140,7 +140,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     process.stdin.on("keypress", listener)
 
     val props = MenuBarProps(items, (_, _) => (), () => ())
-    val comp = testRender(withThemeContext(<(MenuBar())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(MenuBar())(^.plain := props)()))
     val popupProps = findPopupProps(comp)
 
     //then
@@ -157,7 +157,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
   it should "return true if no sub-menu when onKeypress(up)" in {
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
-    val comp = testRender(withThemeContext(<(MenuBar())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(MenuBar())(^.plain := props)()))
     val popupProps = findPopupProps(comp)
 
     //when & then
@@ -167,7 +167,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
   it should "show next/prev sub-menu when onKeypress(right/left)" in {
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
-    val renderer = createTestRenderer(withThemeContext(<(MenuBar())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(MenuBar())(^.plain := props)()))
     val buttonsProps = inside(findComponents(renderer.root, buttonsPanel)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
@@ -195,7 +195,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     //given
     val onAction = mockFunction[Int, Int, Unit]
     val props = MenuBarProps(items, onAction, () => ())
-    val renderer = createTestRenderer(withThemeContext(<(MenuBar())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(MenuBar())(^.plain := props)()))
     val buttonsProps = inside(findComponents(renderer.root, buttonsPanel)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
@@ -219,7 +219,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
   it should "return false if no sub-menu when onKeypress(space)" in {
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
-    val comp = testRender(withThemeContext(<(MenuBar())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(MenuBar())(^.plain := props)()))
     val popupProps = findPopupProps(comp)
 
     //when & then
@@ -229,7 +229,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
   it should "return false when onKeypress(other)" in {
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
-    val comp = testRender(withThemeContext(<(MenuBar())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(MenuBar())(^.plain := props)()))
     val popupProps = findPopupProps(comp)
 
     //when & then
@@ -240,7 +240,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     //given
     val onAction = mockFunction[Int, Int, Unit]
     val props = MenuBarProps(items, onAction, () => ())
-    val renderer = createTestRenderer(withThemeContext(<(MenuBar())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(MenuBar())(^.plain := props)()))
     val buttonsProps = inside(findComponents(renderer.root, buttonsPanel)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
@@ -263,7 +263,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
   it should "render sub-menu" in {
     //given
     val props = MenuBarProps(items, (_, _) => (), () => ())
-    val renderer = createTestRenderer(withThemeContext(<(MenuBar())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(MenuBar())(^.plain := props)()))
     val buttonsProps = inside(findComponents(renderer.root, buttonsPanel)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
@@ -291,7 +291,7 @@ class MenuBarSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils
     val props = MenuBarProps(items, (_, _) => (), () => ())
 
     //when
-    val result = testRender(withThemeContext(<(MenuBar())(^.wrapped := props)()))
+    val result = testRender(withThemeContext(<(MenuBar())(^.plain := props)()))
 
     //then
     assertMenuBar(result)

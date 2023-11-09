@@ -16,7 +16,7 @@ object MenuController extends FunctionComponent[FileListUiData] {
     val stacks = WithPanelStacks.usePanelStacks
     val props = compProps.wrapped
 
-    def onAction(menuIndex: Int, subIndex: Int): Unit = {
+    val onAction: js.Function2[Int, Int, Unit] = { (menuIndex, subIndex) =>
       props.onClose()
 
       val action = actions(menuIndex)._2(subIndex)
@@ -36,7 +36,7 @@ object MenuController extends FunctionComponent[FileListUiData] {
     }
     
     if (props.showMenuPopup) {
-      <(menuBarComp())(^.wrapped := MenuBarProps(
+      <(menuBarComp())(^.plain := MenuBarProps(
         items = items,
         onAction = onAction,
         onClose = props.onClose
@@ -45,15 +45,15 @@ object MenuController extends FunctionComponent[FileListUiData] {
     else null
   }
 
-  private lazy val actions = List[(String, List[(String, Option[Boolean], String)])](
-    "Left" -> List(
+  private lazy val actions = js.Array[(String, js.Array[(String, Option[Boolean], String)])](
+    "Left" -> js.Array(
       ("  Quick view    Ctrl-Q    ", Some(true), "C-q"),
       (SubMenu.separator, None, ""),
       ("  Sort modes    Ctrl-F12  ", Some(false), "C-f12"),
       ("  Re-read       Ctrl-R    ", Some(false), "C-r"),
       ("  Change drive  Alt-L     ", Some(false), "M-l")
     ),
-    "Files" -> List(
+    "Files" -> js.Array(
       ("  View            F3        ", None, "f3"),
       ("  Copy            F5        ", None, "f5"),
       ("  Rename or move  F6        ", None, "f6"),
@@ -65,7 +65,7 @@ object MenuController extends FunctionComponent[FileListUiData] {
       ("  Select group    Alt-S     ", None, "M-s"),
       ("  Unselect group  Alt-D     ", None, "M-d")
     ),
-    "Commands" -> List(
+    "Commands" -> js.Array(
       ("  File view history  Alt-V   ", None, "M-v"),
       ("  Folders history    Alt-H   ", None, "M-h"),
       (SubMenu.separator, None, ""),
@@ -74,10 +74,10 @@ object MenuController extends FunctionComponent[FileListUiData] {
       (SubMenu.separator, None, ""),
       ("  Folder shortcuts   Ctrl-D  ", None, "C-d")
     ),
-    "Options" -> List(
+    "Options" -> js.Array(
       ("  DevTools    F12  ", None, "f12")
     ),
-    "Right" -> List(
+    "Right" -> js.Array(
       ("  Quick view    Ctrl-Q    ", Some(false), "C-q"),
       (SubMenu.separator, None, ""),
       ("  Sort modes    Ctrl-F12  ", Some(true), "C-f12"),
@@ -86,8 +86,8 @@ object MenuController extends FunctionComponent[FileListUiData] {
     )
   )
 
-  private[popups] lazy val items: List[(String, List[String])] =
+  private[popups] lazy val items: js.Array[MenuBarItem] =
     actions.map { case (item, subItems) =>
-      (item, subItems.map(_._1))
+      MenuBarItem(item, subItems.map(_._1))
     }
 }

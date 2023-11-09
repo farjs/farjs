@@ -12,10 +12,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
 
-case class MenuBarProps(items: List[(String, List[String])],
-                        onAction: (Int, Int) => Unit,
-                        onClose: () => Unit)
-
 object MenuBar extends FunctionComponent[MenuBarProps] {
 
   private[menu] var popupComp: ReactClass = Popup
@@ -24,15 +20,15 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val (maybeSubMenu, setSubMenu) = useState[Option[(Int, Int)]](None)
-    val props = compProps.wrapped
+    val props = compProps.plain
     val theme = Theme.useTheme().popup.menu
     val marginLeft = 2
     val padding = 2
     val width = props.items.foldLeft(0) { (res, item) =>
-      res + item._1.length + padding * 2
+      res + item.label.length + padding * 2
     }
-    val actions = props.items.zipWithIndex.map { case ((item, _), index) =>
-      ButtonsPanelAction(item, () => setSubMenu(Some(index -> 0)))
+    val actions = props.items.zipWithIndex.map { case (item, index) =>
+      ButtonsPanelAction(item.label, () => setSubMenu(Some(index -> 0)))
     }
 
     def getLeftPos(menuIndex: Int): Int = {
@@ -59,7 +55,7 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
         case "down" =>
           maybeSubMenu match {
             case Some((menuIndex, subIndex)) =>
-              val subItems = props.items(menuIndex)._2
+              val subItems = props.items(menuIndex).subItems
               val newSubIndex =
                 if (subIndex == subItems.size - 1) 0
                 else if (subItems(subIndex + 1) == SubMenu.separator) subIndex + 2
@@ -75,7 +71,7 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
           }
         case "up" =>
           maybeSubMenu.foreach { case (menuIndex, subIndex) =>
-            val subItems = props.items(menuIndex)._2
+            val subItems = props.items(menuIndex).subItems
             val newSubIndex =
               if (subIndex == 0) subItems.size - 1
               else if (subItems(subIndex - 1) == SubMenu.separator) subIndex - 2
@@ -85,13 +81,13 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
         case "tab" | "right" =>
           processed = false
           maybeSubMenu.foreach { case (menuIndex, _) =>
-            val newIndex = if (menuIndex == actions.size - 1) 0 else menuIndex + 1
+            val newIndex = if (menuIndex == actions.length - 1) 0 else menuIndex + 1
             setSubMenu(Some((newIndex, 0)))
           }
         case "S-tab" | "left" =>
           processed = false
           maybeSubMenu.foreach { case (menuIndex, _) =>
-            val newIndex = if (menuIndex == 0) actions.size - 1 else menuIndex - 1
+            val newIndex = if (menuIndex == 0) actions.length - 1 else menuIndex - 1
             setSubMenu(Some((newIndex, 0)))
           }
         case "enter" | "space" =>
@@ -117,7 +113,7 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
           )(
             <(buttonsPanel)(^.plain := ButtonsPanelProps(
               top = 0,
-              actions = js.Array(actions: _*),
+              actions = actions,
               style = theme,
               padding = padding
             ))()
@@ -128,7 +124,7 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
       maybeSubMenu.map { case (menuIndex, subIndex) =>
         <(subMenuComp())(^.plain := SubMenuProps(
           selected = subIndex,
-          items = js.Array(props.items(menuIndex)._2: _*),
+          items = props.items(menuIndex).subItems,
           top = 1,
           left = getLeftPos(menuIndex),
           onClick = { index =>

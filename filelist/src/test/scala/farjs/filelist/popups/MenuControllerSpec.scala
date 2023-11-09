@@ -36,7 +36,7 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
       leftStack = new PanelStack(isActive = true, Nil, null),
       rightStack = new PanelStack(isActive = false, Nil, null)
     ))
-    val popup = findComponentProps(comp, menuBarComp)
+    val popup = findComponentProps(comp, menuBarComp, plain = true)
 
     //then
     onClose.expects()
@@ -73,7 +73,7 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
       rightStack = new PanelStack(isActive = false, Nil, null),
       leftInput = leftInput
     ))
-    val popup = findComponentProps(comp, menuBarComp)
+    val popup = findComponentProps(comp, menuBarComp, plain = true)
 
     //then
     onClose.expects()
@@ -107,7 +107,7 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
       rightStack = new PanelStack(isActive = false, Nil, null),
       rightInput = rightInput
     ))
-    val popup = findComponentProps(comp, menuBarComp)
+    val popup = findComponentProps(comp, menuBarComp, plain = true)
 
     //then
     onClose.expects()
@@ -126,7 +126,7 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
       leftStack = new PanelStack(isActive = true, Nil, null),
       rightStack = new PanelStack(isActive = false, Nil, null)
     ))
-    val popup = findComponentProps(comp, menuBarComp)
+    val popup = findComponentProps(comp, menuBarComp, plain = true)
 
     //then
     onClose.expects()
@@ -151,9 +151,9 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     ))
 
     //then
-    assertTestComponent(result, menuBarComp) {
+    assertTestComponent(result, menuBarComp, plain = true) {
       case MenuBarProps(resItems, _, _) =>
-        resItems shouldBe items
+        resItems.toList shouldBe items.toList
     }
   }
 }
