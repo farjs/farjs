@@ -16,7 +16,7 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
 
   private[menu] var popupComp: ReactClass = Popup
   private[menu] var buttonsPanel: ReactClass = ButtonsPanel
-  private[menu] var subMenuComp: UiComponent[SubMenuProps] = SubMenu
+  private[menu] var subMenuComp: ReactClass = SubMenu
 
   protected def render(compProps: Props): ReactElement = {
     val (maybeSubMenu, setSubMenu) = useState[Option[(Int, Int)]](None)
@@ -122,7 +122,7 @@ object MenuBar extends FunctionComponent[MenuBarProps] {
       ),
 
       maybeSubMenu.map { case (menuIndex, subIndex) =>
-        <(subMenuComp())(^.plain := SubMenuProps(
+        <(subMenuComp)(^.plain := SubMenuProps(
           selected = subIndex,
           items = props.items(menuIndex).subItems,
           top = 1,
