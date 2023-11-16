@@ -6,6 +6,7 @@ import farjs.filelist.stack.PanelStack
 import farjs.filelist.stack.WithPanelStacksSpec.withContext
 import farjs.ui.menu.MenuBarProps
 import scommons.nodejs._
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -13,7 +14,7 @@ import scala.scalajs.js
 
 class MenuControllerSpec extends TestSpec with TestRendererUtils {
 
-  MenuController.menuBarComp = mockUiComponent("MenuBar")
+  MenuController.menuBarComp = "MenuBar".asInstanceOf[ReactClass]
 
   it should "emit keypress event globally when onAction" in {
     //given
@@ -36,14 +37,16 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
       leftStack = new PanelStack(isActive = true, Nil, null),
       rightStack = new PanelStack(isActive = false, Nil, null)
     ))
-    val popup = findComponentProps(comp, menuBarComp, plain = true)
+    val menuBarProps = inside(findComponents(comp, menuBarComp)) {
+      case List(menuBar) => menuBar.props.asInstanceOf[MenuBarProps]
+    }
 
     //then
     onClose.expects()
     onKey.expects("f3", "f3", false, false, false)
 
     //when
-    popup.onAction(1, 0)
+    menuBarProps.onAction(1, 0)
 
     //cleanup
     process.stdin.removeListener("keypress", listener)
@@ -73,14 +76,16 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
       rightStack = new PanelStack(isActive = false, Nil, null),
       leftInput = leftInput
     ))
-    val popup = findComponentProps(comp, menuBarComp, plain = true)
+    val menuBarProps = inside(findComponents(comp, menuBarComp)) {
+      case List(menuBar) => menuBar.props.asInstanceOf[MenuBarProps]
+    }
 
     //then
     onClose.expects()
     onKey.expects("l", "M-l", false, true, false)
 
     //when
-    popup.onAction(0, 4)
+    menuBarProps.onAction(0, 4)
   }
 
   it should "emit keypress event for right panel when onAction" in {
@@ -107,14 +112,16 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
       rightStack = new PanelStack(isActive = false, Nil, null),
       rightInput = rightInput
     ))
-    val popup = findComponentProps(comp, menuBarComp, plain = true)
+    val menuBarProps = inside(findComponents(comp, menuBarComp)) {
+      case List(menuBar) => menuBar.props.asInstanceOf[MenuBarProps]
+    }
 
     //then
     onClose.expects()
     onKey.expects("r", "M-r", false, true, false)
 
     //when
-    popup.onAction(4, 4)
+    menuBarProps.onAction(4, 4)
   }
 
   it should "call onClose when onClose" in {
@@ -126,13 +133,15 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
       leftStack = new PanelStack(isActive = true, Nil, null),
       rightStack = new PanelStack(isActive = false, Nil, null)
     ))
-    val popup = findComponentProps(comp, menuBarComp, plain = true)
+    val menuBarProps = inside(findComponents(comp, menuBarComp)) {
+      case List(menuBar) => menuBar.props.asInstanceOf[MenuBarProps]
+    }
 
     //then
     onClose.expects()
 
     //when
-    popup.onClose()
+    menuBarProps.onClose()
   }
 
   it should "render MenuBar component" in {
@@ -151,9 +160,9 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     ))
 
     //then
-    assertTestComponent(result, menuBarComp, plain = true) {
+    assertNativeComponent(result, <(menuBarComp)(^.assertPlain[MenuBarProps](inside(_) {
       case MenuBarProps(resItems, _, _) =>
         resItems.toList shouldBe items.toList
-    }
+    }))())
   }
 }

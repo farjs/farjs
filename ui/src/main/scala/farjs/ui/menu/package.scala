@@ -14,4 +14,8 @@ package object menu {
     val separator: String = js.native
   }
 
+  @js.native
+  @JSImport("@farjs/ui/menu/MenuBar.mjs", JSImport.Default)
+  object MenuBar extends ReactClass
+
 }

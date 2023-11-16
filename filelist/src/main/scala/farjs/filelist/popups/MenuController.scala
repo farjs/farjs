@@ -10,7 +10,7 @@ import scala.scalajs.js
 
 object MenuController extends FunctionComponent[FileListUiData] {
 
-  private[popups] var menuBarComp: UiComponent[MenuBarProps] = MenuBar
+  private[popups] var menuBarComp: ReactClass = MenuBar
 
   protected def render(compProps: Props): ReactElement = {
     val stacks = WithPanelStacks.usePanelStacks
@@ -36,7 +36,7 @@ object MenuController extends FunctionComponent[FileListUiData] {
     }
     
     if (props.showMenuPopup) {
-      <(menuBarComp())(^.plain := MenuBarProps(
+      <(menuBarComp)(^.plain := MenuBarProps(
         items = items,
         onAction = onAction,
         onClose = props.onClose
