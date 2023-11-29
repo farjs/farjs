@@ -3,6 +3,8 @@ package farjs.ui.menu
 import farjs.ui._
 import scommons.react._
 
+import scala.scalajs.js
+
 case class BottomMenuProps(items: List[String])
 
 object BottomMenu extends FunctionComponent[BottomMenuProps] {
@@ -15,9 +17,9 @@ object BottomMenu extends FunctionComponent[BottomMenuProps] {
 
     <(withSizeComp)(^.plain := WithSizeProps({ (width, _) =>
       
-      <(bottomMenuViewComp())(^.wrapped := BottomMenuViewProps(
+      <(bottomMenuViewComp())(^.plain := BottomMenuViewProps(
         width = width,
-        items = props.items
+        items = js.Array(props.items: _*)
       ))()
     }))()
   }

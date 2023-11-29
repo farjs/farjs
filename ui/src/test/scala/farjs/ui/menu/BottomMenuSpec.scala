@@ -26,9 +26,9 @@ class BottomMenuSpec extends TestSpec with TestRendererUtils {
       case WithSizeProps(render) =>
         val result = createTestRenderer(render(width, height)).root
 
-        assertTestComponent(result, bottomMenuViewComp) { case BottomMenuViewProps(resWidth, resItems) =>
+        assertTestComponent(result, bottomMenuViewComp, plain = true) { case BottomMenuViewProps(resWidth, resItems) =>
           resWidth shouldBe width
-          resItems shouldBe props.items
+          resItems.toList shouldBe props.items
         }
     }))())
   }

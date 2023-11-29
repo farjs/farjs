@@ -23,9 +23,9 @@ class BottomMenuViewSpec extends TestSpec with TestRendererUtils {
     }
     process.stdin.on("keypress", listener)
     
-    val props = BottomMenuViewProps(width = 80, items = List.fill(12)("item"))
-    val clickables = createTestRenderer(withThemeContext(<(BottomMenuView())(^.wrapped := props)()))
-      .root.children.head.children
+    val props = BottomMenuViewProps(width = 80, items = js.Array(List.fill(12)("item"): _*))
+    val clickables = createTestRenderer(withThemeContext(<(BottomMenuView())(^.plain := props)()))
+      .root.children
 
     //then
     inSequence {
@@ -61,60 +61,15 @@ class BottomMenuViewSpec extends TestSpec with TestRendererUtils {
     process.stdin.removeListener("keypress", listener)
   }
 
-  it should "not re-render component if the same props" in {
-    //given
-    val items = List.fill(12)("item")
-    val props = BottomMenuViewProps(width = 98, items = items)
-    val renderer = createTestRenderer(withThemeContext(<(BottomMenuView())(^.wrapped := props)(
-      <.text(^.content := "initial")()
-    )))
-    val testEl = renderer.root.children.head.children(12)
-    testEl.`type` shouldBe "text"
-    testEl.props.content shouldBe "initial"
-    val props2 = props.copy(items = items)
-    props2 shouldBe props
-    props2 should not be theSameInstanceAs(props)
-
-    //when
-    renderer.update(withThemeContext(<(BottomMenuView())(^.wrapped := props2)(
-      <.text(^.content := "update")()
-    )))
-
-    //then
-    val sameEl = renderer.root.children.head.children(12)
-    sameEl.`type` shouldBe "text"
-    sameEl.props.content shouldBe "initial"
-  }
-  
-  it should "re-render component if different props" in {
-    //given
-    val props = BottomMenuViewProps(width = 98, items = List.fill(12)("item"))
-    val renderer = createTestRenderer(withThemeContext(<(BottomMenuView())(^.wrapped := props)(
-      <.text(^.content := "initial")()
-    )))
-    val testEl = renderer.root.children.head.children(12)
-    testEl.`type` shouldBe "text"
-    testEl.props.content shouldBe "initial"
-
-    //when
-    renderer.update(withThemeContext(<(BottomMenuView())(^.wrapped := props.copy(width = 95))(
-      <.text(^.content := "update")()
-    )))
-
-    //then
-    val updatedEl = renderer.root.children.head.children(12)
-    updatedEl.`type` shouldBe "text"
-    updatedEl.props.content shouldBe "update"
-  }
-  
   it should "render component" in {
     //given
     val currTheme = XTerm256Theme
     val theme = currTheme.menu
-    val props = BottomMenuViewProps(width = 98, items = List.fill(12)("item").updated(5, "longitem"))
+    val items = js.Array(List.fill(12)("item").updated(5, "longitem"): _*)
+    val props = BottomMenuViewProps(width = 98, items = items)
 
     //when
-    val result = testRender(withThemeContext(<(BottomMenuView())(^.wrapped := props)(), currTheme))
+    val result = testRender(withThemeContext(<(BottomMenuView())(^.plain := props)(), currTheme))
 
     //then
     val itemsWithPos = List(

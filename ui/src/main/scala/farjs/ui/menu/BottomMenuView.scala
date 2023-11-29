@@ -7,21 +7,13 @@ import scommons.react.blessed._
 
 import scala.scalajs.js
 
-case class BottomMenuViewProps(width: Int, items: List[String])
-
 object BottomMenuView extends FunctionComponent[BottomMenuViewProps] {
 
-  override protected def create(): ReactClass = {
-    ReactMemo[Props](super.create(), { (prevProps, nextProps) =>
-      prevProps.wrapped == nextProps.wrapped
-    })
-  }
-
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val theme = Theme.useTheme().menu
     val width = props.width
-    val items = props.items
+    val items = props.items.toList
 
     val itemsCount = items.size
     val itemWidth = width / itemsCount
