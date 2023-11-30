@@ -145,7 +145,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       ),
 
       <.box(^.rbTop := "100%-1")(
-        <(bottomMenuComp())(^.wrapped := BottomMenuProps(menuItems))()
+        <(bottomMenuComp())(^.plain := BottomMenuProps(menuItems))()
       ),
       <(menuBarTrigger())()(),
 
@@ -160,7 +160,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     )
   }
 
-  private[filelist] val menuItems = List(
+  private[filelist] val menuItems = js.Array(
     /*  F1 */ "",
     /*  F2 */ "",
     /*  F3 */ "View",

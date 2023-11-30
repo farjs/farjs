@@ -76,7 +76,7 @@ class ViewerPluginUi(filePath: String, size: Double)
         ),
   
         <.box(^.rbTop := "100%-1")(
-          <(bottomMenuComp())(^.wrapped := BottomMenuProps(menuItems))()
+          <(bottomMenuComp())(^.plain := BottomMenuProps(menuItems))()
         )
       )
     )
@@ -90,7 +90,7 @@ object ViewerPluginUi {
   private[viewer] var viewerController: UiComponent[ViewerControllerProps] = ViewerController
   private[viewer] var bottomMenuComp: UiComponent[BottomMenuProps] = BottomMenu
 
-  private[viewer] val defaultMenuItems = List(
+  private[viewer] val defaultMenuItems = js.Array(
     /*  F1 */ "",
     /*  F2 */ "Wrap",
     /*  F3 */ "Quit",

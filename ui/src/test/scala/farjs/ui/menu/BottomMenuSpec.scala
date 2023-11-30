@@ -5,6 +5,8 @@ import farjs.ui.menu.BottomMenu._
 import scommons.react.ReactClass
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class BottomMenuSpec extends TestSpec with TestRendererUtils {
 
   BottomMenu.withSizeComp = "WithSize".asInstanceOf[ReactClass]
@@ -12,8 +14,8 @@ class BottomMenuSpec extends TestSpec with TestRendererUtils {
 
   it should "render component" in {
     //when
-    val props = BottomMenuProps(List.fill(12)("item"))
-    val result = testRender(<(BottomMenu())(^.wrapped := props)())
+    val props = BottomMenuProps(js.Array(List.fill(12)("item"): _*))
+    val result = testRender(<(BottomMenu())(^.plain := props)())
 
     //then
     assertBottomMenu(result, props)
@@ -28,7 +30,7 @@ class BottomMenuSpec extends TestSpec with TestRendererUtils {
 
         assertTestComponent(result, bottomMenuViewComp, plain = true) { case BottomMenuViewProps(resWidth, resItems) =>
           resWidth shouldBe width
-          resItems.toList shouldBe props.items
+          resItems.toList shouldBe props.items.toList
         }
     }))())
   }

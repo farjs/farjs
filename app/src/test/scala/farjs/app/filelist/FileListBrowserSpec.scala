@@ -654,7 +654,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       ),
 
       <.box(^.rbTop := "100%-1")(
-        <(bottomMenuComp())(^.wrapped := BottomMenuProps(menuItems))()
+        <(bottomMenuComp())(^.plain := BottomMenuProps(menuItems))()
       ),
       <(menuBarTrigger())()()
     ))

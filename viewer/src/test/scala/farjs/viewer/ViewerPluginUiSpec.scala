@@ -113,8 +113,8 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
         percent shouldBe 50
     }
     findComponentProps(renderer.root, viewerController).viewport shouldBe Some(viewport)
-    findComponentProps(renderer.root, bottomMenuComp).items shouldBe {
-      defaultMenuItems.updated(1, "Unwrap")
+    findComponentProps(renderer.root, bottomMenuComp, plain = true).items.toList shouldBe {
+      defaultMenuItems.updated(1, "Unwrap").toList
     }
   }
 
@@ -170,7 +170,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
           ),
   
           <.box(^.rbTop := "100%-1")(
-            <(bottomMenuComp())(^.assertWrapped(inside(_) {
+            <(bottomMenuComp())(^.assertPlain[BottomMenuProps](inside(_) {
               case BottomMenuProps(resMenuItems) =>
                 resMenuItems shouldBe defaultMenuItems
             }))()
