@@ -18,4 +18,8 @@ package object menu {
   @JSImport("@farjs/ui/menu/MenuBar.mjs", JSImport.Default)
   object MenuBar extends ReactClass
 
+  @js.native
+  @JSImport("@farjs/ui/menu/MenuBarTrigger.mjs", JSImport.Default)
+  object MenuBarTrigger extends ReactClass
+
 }
