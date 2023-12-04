@@ -1,6 +1,7 @@
 package farjs.ui
 
 import scommons.nodejs.test.TestSpec
+import scommons.react.blessed.raw.Blessed.unicode
 
 class UiStringSpec extends TestSpec {
 
@@ -13,6 +14,8 @@ class UiStringSpec extends TestSpec {
     UiString(str).strWidth shouldBe 8
     UiString("\t").strWidth shouldBe 8
     UiString("\u0000\u001b\r\n").strWidth shouldBe 0
+    "\uD83C\uDF31-".length shouldBe 3
+    UiString("\uD83C\uDF31-").strWidth shouldBe 3
   }
 
   it should "return current str when toString" in {
@@ -38,6 +41,11 @@ class UiStringSpec extends TestSpec {
   }
 
   it should "handle combining chars when slice" in {
+    //given
+    unicode.isCombining("й", 0) shouldBe false
+    unicode.isCombining("й", 1) shouldBe true
+    unicode.strWidth("й") shouldBe 1
+
     //when & then
     UiString("Валютный").slice(0, 8) shouldBe "Валютный"
     UiString("Валютный").slice(7, 8) shouldBe "й"
@@ -51,13 +59,28 @@ class UiStringSpec extends TestSpec {
   }
 
   it should "handle surrogate chars when slice" in {
+    //given
+    unicode.isSurrogate("\uD83C\uDF31", 0) shouldBe true
+    unicode.isSurrogate("\uD83C\uDF31", 1) shouldBe false
+    unicode.charWidth("\uD83C\uDF31", 0) shouldBe 2
+    unicode.charWidth("\uD83C\uDF31", 1) shouldBe 0
+    unicode.strWidth("\uD83C\uDF31") shouldBe 2
+    unicode.strWidth("\u200D") shouldBe 0
+    unicode.strWidth("♂️") shouldBe 1
+    unicode.strWidth("\uD83E\uDD26\uD83C\uDFFC\u200D♂️") shouldBe 5
+
     //when & then
-    UiString("\uD800\uDC002").slice(0, 2) shouldBe "\uD800\uDC002"
-    UiString("\uD800\uDC002").slice(0, 1) shouldBe "\uD800\uDC00"
-    UiString("\uD800\uDC002").slice(1, 2) shouldBe "2"
+    UiString("\uD800\uDC002").slice(0, 2) shouldBe "\uD800\uDC00"
+    UiString("\uD800\uDC002").slice(0, 1) shouldBe ""
+    UiString("\uD800\uDC002").slice(1, 2) shouldBe ""
+    UiString("\uD83C\uDF31-").slice(0, 1) shouldBe ""
+    UiString("\uD83C\uDF31-").slice(0, 2) shouldBe "\uD83C\uDF31"
   }
 
   it should "handle double-wide chars when slice" in {
+    //given
+    unicode.charWidth("\uff01", 0) shouldBe 2
+
     //when & then
     UiString("te\uff012").slice(0, 5) shouldBe "te\uff012"
     UiString("te\uff012").slice(0, 4) shouldBe "te\uff01"
@@ -100,7 +123,9 @@ class UiStringSpec extends TestSpec {
     UiString("Валютный").ensureWidth(7, ' ') shouldBe "Валютны"
     UiString("Валютный").ensureWidth(8, ' ') shouldBe "Валютный"
     UiString("Валютный2").ensureWidth(8, ' ') shouldBe "Валютный"
-    UiString("\uD800\uDC002").ensureWidth(1, ' ') shouldBe "\uD800\uDC00"
+    UiString("\uD800\uDC002").ensureWidth(1, ' ') shouldBe " "
+    UiString("\uD83C\uDF31-").ensureWidth(1, ' ') shouldBe " "
+    UiString("\uD83C\uDF31-").ensureWidth(2, ' ') shouldBe "\uD83C\uDF31"
   }
 
   it should "cut and pad to width if at double-width char when ensureWidth" in {
@@ -111,6 +136,7 @@ class UiStringSpec extends TestSpec {
     
     //when & then
     UiString(str).ensureWidth(6, ' ') shouldBe "te\uff01t "
+    UiString(str).ensureWidth(5, ' ') shouldBe "te\uff01t"
     UiString(str).ensureWidth(4, ' ') shouldBe "te\uff01"
     UiString(str).ensureWidth(3, ' ') shouldBe "te "
   }
