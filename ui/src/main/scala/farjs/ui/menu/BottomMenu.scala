@@ -6,14 +6,14 @@ import scommons.react._
 object BottomMenu extends FunctionComponent[BottomMenuProps] {
 
   private[menu] var withSizeComp: ReactClass = WithSize
-  private[menu] var bottomMenuViewComp: UiComponent[BottomMenuViewProps] = BottomMenuView
+  private[menu] var bottomMenuViewComp: ReactClass = BottomMenuView
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
 
     <(withSizeComp)(^.plain := WithSizeProps({ (width, _) =>
       
-      <(bottomMenuViewComp())(^.plain := BottomMenuViewProps(
+      <(bottomMenuViewComp)(^.plain := BottomMenuViewProps(
         width = width,
         items = props.items
       ))()

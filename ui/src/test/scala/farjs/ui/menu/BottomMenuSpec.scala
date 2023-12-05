@@ -10,7 +10,7 @@ import scala.scalajs.js
 class BottomMenuSpec extends TestSpec with TestRendererUtils {
 
   BottomMenu.withSizeComp = "WithSize".asInstanceOf[ReactClass]
-  BottomMenu.bottomMenuViewComp = mockUiComponent("BottomMenuView")
+  BottomMenu.bottomMenuViewComp = "BottomMenuView".asInstanceOf[ReactClass]
 
   it should "render component" in {
     //when
@@ -28,10 +28,11 @@ class BottomMenuSpec extends TestSpec with TestRendererUtils {
       case WithSizeProps(render) =>
         val result = createTestRenderer(render(width, height)).root
 
-        assertTestComponent(result, bottomMenuViewComp, plain = true) { case BottomMenuViewProps(resWidth, resItems) =>
-          resWidth shouldBe width
-          resItems.toList shouldBe props.items.toList
-        }
+        assertNativeComponent(result, <(bottomMenuViewComp)(^.assertPlain[BottomMenuViewProps](inside(_) {
+          case BottomMenuViewProps(resWidth, resItems) =>
+            resWidth shouldBe width
+            resItems.toList shouldBe props.items.toList
+        }))())
     }))())
   }
 }
