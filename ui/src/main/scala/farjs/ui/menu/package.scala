@@ -8,6 +8,10 @@ import scala.scalajs.js.annotation.JSImport
 package object menu {
 
   @js.native
+  @JSImport("@farjs/ui/menu/BottomMenu.mjs", JSImport.Default)
+  object BottomMenu extends ReactClass
+
+  @js.native
   @JSImport("@farjs/ui/menu/BottomMenuView.mjs", JSImport.Default)
   object BottomMenuView extends ReactClass
 

@@ -23,7 +23,7 @@ import scala.scalajs.js.typedarray.Uint8Array
 class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
   
   FileListBrowser.panelStackComp = mockUiComponent("PanelStack")
-  FileListBrowser.bottomMenuComp = mockUiComponent("BottomMenu")
+  FileListBrowser.bottomMenuComp = "BottomMenu".asInstanceOf[ReactClass]
   FileListBrowser.menuBarTrigger = "MenuBarTrigger".asInstanceOf[ReactClass]
   FileListBrowser.fsPlugin = new FSPlugin((s, _) => s)
   
@@ -654,7 +654,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       ),
 
       <.box(^.rbTop := "100%-1")(
-        <(bottomMenuComp())(^.plain := BottomMenuProps(menuItems))()
+        <(bottomMenuComp)(^.plain := BottomMenuProps(menuItems))()
       ),
       <(menuBarTrigger)()()
     ))

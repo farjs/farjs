@@ -15,7 +15,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
   ViewerPluginUi.popupComp = "Popup".asInstanceOf[ReactClass]
   ViewerPluginUi.viewerHeader = mockUiComponent("ViewerHeader")
   ViewerPluginUi.viewerController = mockUiComponent("ViewerController")
-  ViewerPluginUi.bottomMenuComp = mockUiComponent("BottomMenu")
+  ViewerPluginUi.bottomMenuComp = "BottomMenu".asInstanceOf[ReactClass]
 
   it should "call onClose when onClose" in {
     //given
@@ -113,7 +113,10 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
         percent shouldBe 50
     }
     findComponentProps(renderer.root, viewerController).viewport shouldBe Some(viewport)
-    findComponentProps(renderer.root, bottomMenuComp, plain = true).items.toList shouldBe {
+    val bottomMenuProps = inside(findComponents(renderer.root, bottomMenuComp)) {
+      case List(comp) => comp.props.asInstanceOf[BottomMenuProps]
+    }
+    bottomMenuProps.items.toList shouldBe {
       defaultMenuItems.updated(1, "Unwrap").toList
     }
   }
@@ -170,7 +173,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
           ),
   
           <.box(^.rbTop := "100%-1")(
-            <(bottomMenuComp())(^.assertPlain[BottomMenuProps](inside(_) {
+            <(bottomMenuComp)(^.assertPlain[BottomMenuProps](inside(_) {
               case BottomMenuProps(resMenuItems) =>
                 resMenuItems shouldBe defaultMenuItems
             }))()
