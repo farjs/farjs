@@ -8,12 +8,6 @@ import scommons.react.blessed._
 
 import scala.scalajs.js
 
-case class MenuPopupProps(title: String,
-                          items: List[String],
-                          getLeft: Int => String,
-                          onSelect: Int => Unit,
-                          onClose: () => Unit)
-
 object MenuPopup extends FunctionComponent[MenuPopupProps] {
 
   private[menu] var popupComp: ReactClass = Popup
@@ -21,11 +15,11 @@ object MenuPopup extends FunctionComponent[MenuPopupProps] {
   private[menu] var buttonComp: ReactClass = Button
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
 
     val textWidth = props.items.maxBy(_.length).length
     val width = textWidth + (paddingHorizontal + 1) * 2
-    val height = (paddingVertical + 1) * 2 + props.items.size
+    val height = (paddingVertical + 1) * 2 + props.items.length
     val theme = Theme.useTheme().popup.menu
 
     <(popupComp)(^.plain := PopupProps(onClose = props.onClose: js.Function0[Unit]))(
@@ -47,7 +41,7 @@ object MenuPopup extends FunctionComponent[MenuPopupProps] {
               props.onSelect(index)
             }
           ))()
-        }
+        }.toList
       )
     )
   }

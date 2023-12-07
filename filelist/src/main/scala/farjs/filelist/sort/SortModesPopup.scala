@@ -24,7 +24,7 @@ object SortModesPopup extends FunctionComponent[SortModesPopupProps] {
       else item
     }
 
-    def onSelect(index: Int): Unit = {
+    val onSelect: js.Function1[Int, Unit] = { index =>
       props.onClose()
 
       val key = index + 3
@@ -35,9 +35,9 @@ object SortModesPopup extends FunctionComponent[SortModesPopupProps] {
       ))
     }
 
-    <(menuPopup())(^.wrapped := MenuPopupProps(
+    <(menuPopup())(^.plain := MenuPopupProps(
       title = "Sort by",
-      items = items,
+      items = js.Array(items: _*),
       getLeft = { width =>
         MenuPopup.getLeftPos(stackProps.width, showOnLeft, width)
       },

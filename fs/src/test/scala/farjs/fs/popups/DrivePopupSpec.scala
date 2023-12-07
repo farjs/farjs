@@ -76,7 +76,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
         case List(comp) => comp.props.asInstanceOf[WithSizeProps].render(60, 20)
       }
       val resultContent = createTestRenderer(renderContent).root
-      val menuProps = findComponentProps(resultContent, menuPopup)
+      val menuProps = findComponentProps(resultContent, menuPopup, plain = true)
 
       //then
       onChangeDir.expects("C:/test")
@@ -132,7 +132,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
         case List(comp) => comp.props.asInstanceOf[WithSizeProps].render(60, 20)
       }
       val resultContent = createTestRenderer(renderContent).root
-      val menuProps = findComponentProps(resultContent, menuPopup)
+      val menuProps = findComponentProps(resultContent, menuPopup, plain = true)
 
       //then
       onChangeDir.expects("C:/test")
@@ -188,13 +188,52 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
         case List(comp) => comp.props.asInstanceOf[WithSizeProps].render(60, 20)
       }
       val resultContent = createTestRenderer(renderContent).root
-      val menuProps = findComponentProps(resultContent, menuPopup)
+      val menuProps = findComponentProps(resultContent, menuPopup, plain = true)
 
       //then
       onChangeDir.expects("C:")
       
       //when
       menuProps.onSelect(0)
+      
+      Succeeded
+    }
+  }
+
+  it should "call onClose when onClose" in {
+    //given
+    val dispatch = mockFunction[Any, Any]
+    val fsService = new FsService
+    DrivePopup.platform = Platform.win32
+    DrivePopup.fsService = fsService.fsService
+    val onClose = mockFunction[Unit]
+    val props = DrivePopupProps(dispatch, onChangeDir = _ => (), onClose = onClose, showOnLeft = true)
+
+    var disksF: Future[_] = null
+    dispatch.expects(*).onCall { action: Any =>
+      disksF = action.asInstanceOf[FileListTaskAction].task.result.toFuture
+    }
+    fsService.readDisks.expects().returning(Future.successful(List(
+      FSDisk("C:", size = 1.0, free = 2.0, "Test")
+    )))
+    val renderer = createTestRenderer(withContext(<(DrivePopup())(^.wrapped := props)()))
+    renderer.root.children.isEmpty shouldBe true
+    
+    eventually {
+      disksF should not be null
+    }.flatMap(_ => disksF).map { _ =>
+      //given
+      val renderContent = inside(findComponents(renderer.root, withSizeComp)) {
+        case List(comp) => comp.props.asInstanceOf[WithSizeProps].render(60, 20)
+      }
+      val resultContent = createTestRenderer(renderContent).root
+      val menuProps = findComponentProps(resultContent, menuPopup, plain = true)
+
+      //then
+      onClose.expects()
+      
+      //when
+      menuProps.onClose()
       
       Succeeded
     }
@@ -308,12 +347,11 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
         case WithSizeProps(render) =>
           val content = createTestRenderer(render(60, 20)).root
 
-          assertTestComponent(content, menuPopup) {
-            case MenuPopupProps(title, items, getLeft, _, onClose) =>
+          assertTestComponent(content, menuPopup, plain = true) {
+            case MenuPopupProps(title, items, getLeft, _, _) =>
               title shouldBe "Drive"
-              items shouldBe expectedItems
+              items.toList shouldBe expectedItems
               getLeft(width) shouldBe expectedLeft
-              onClose should be theSameInstanceAs props.onClose
           }
       }))()
     ))

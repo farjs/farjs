@@ -22,12 +22,12 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
     val onSelect = mockFunction[Int, Unit]
     val props = MenuPopupProps(
       title = "Test title",
-      items = List("item 1", "item 2"),
+      items = js.Array("item 1", "item 2"),
       getLeft = w => s"$w",
       onSelect = onSelect,
       onClose = () => ()
     )
-    val comp = testRender(withThemeContext(<(MenuPopup())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(MenuPopup())(^.plain := props)()))
     val button2 = inside(findComponents(comp, buttonComp)) {
       case List(_, b2) => b2
     }
@@ -43,14 +43,14 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val props = MenuPopupProps(
       title = "Test title",
-      items = List("item 1", "item 2"),
+      items = js.Array("item 1", "item 2"),
       getLeft = w => s"$w",
       onSelect = _ => (),
       onClose = () => ()
     )
     
     //when
-    val result = testRender(withThemeContext(<(MenuPopup())(^.wrapped := props)()))
+    val result = testRender(withThemeContext(<(MenuPopup())(^.plain := props)()))
     
     //then
     assertMenuPopup(result, props)
@@ -70,7 +70,7 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
   private def assertMenuPopup(result: TestInstance, props: MenuPopupProps): Unit = {
     val textWidth = props.items.maxBy(_.length).length
     val width = textWidth + 3 * 2
-    val height = 2 * 2 + props.items.size
+    val height = 2 * 2 + props.items.length
     val theme = DefaultTheme.popup.menu
 
     assertNativeComponent(result, <(popupComp)(^.assertPlain[PopupProps](inside(_) {
@@ -88,7 +88,7 @@ class MenuPopupSpec extends TestSpec with TestRendererUtils {
           left shouldBe props.getLeft(width)
           footer shouldBe js.undefined
       }))(), inside(_) { case lines =>
-        lines.size shouldBe props.items.size
+        lines.size shouldBe props.items.length
         lines.zipWithIndex.zip(props.items).foreach { case ((line, index), expected) =>
           assertNativeComponent(line, <(buttonComp)(^.assertPlain[ButtonProps](inside(_) {
             case ButtonProps(left, top, label, resStyle, _) =>

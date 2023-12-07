@@ -23,7 +23,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
     val comp = testRender(withContext(
       <(SortModesPopup())(^.wrapped := props)(), stack = stack, width = 40, panelInput = inputMock
     ))
-    val menuProps = findComponentProps(comp, menuPopup)
+    val menuProps = findComponentProps(comp, menuPopup, plain = true)
 
     //then
     onClose.expects()
@@ -36,6 +36,23 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
 
     //when
     menuProps.onSelect(0)
+  }
+  
+  it should "call onClose when onClose" in {
+    //given
+    val stack = new PanelStack(isActive = true, Nil, null)
+    val onClose = mockFunction[Unit]
+    val props = SortModesPopupProps(SortMode.Name, ascending = true, onClose)
+    val comp = testRender(withContext(
+      <(SortModesPopup())(^.wrapped := props)(), stack = stack, width = 40
+    ))
+    val menuProps = findComponentProps(comp, menuPopup, plain = true)
+
+    //then
+    onClose.expects()
+
+    //when
+    menuProps.onClose()
   }
   
   it should "render popup on left panel" in {
@@ -75,10 +92,10 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
                                    isRight: Boolean,
                                    stackWidth: Int): Unit = {
 
-    assertTestComponent(result, menuPopup) {
-      case MenuPopupProps(title, items, getLeft, _, onClose) =>
+    assertTestComponent(result, menuPopup, plain = true) {
+      case MenuPopupProps(title, items, getLeft, _, _) =>
         title shouldBe "Sort by"
-        items shouldBe List(
+        items.toList shouldBe List(
           "  Name                 Ctrl-F3  ",
           "- Extension            Ctrl-F4  ",
           "  Modification time    Ctrl-F5  ",
@@ -88,7 +105,6 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
           "  Access time          Ctrl-F9  "
         )
         getLeft(50) shouldBe MenuPopup.getLeftPos(stackWidth, !isRight, 50)
-        onClose should be theSameInstanceAs props.onClose
     }
   }
 }

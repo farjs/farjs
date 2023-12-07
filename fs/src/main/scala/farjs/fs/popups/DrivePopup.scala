@@ -14,6 +14,7 @@ import scommons.react._
 import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.scalajs.js
 
 case class DrivePopupProps(dispatch: Dispatch,
                            onChangeDir: String => Unit,
@@ -61,9 +62,9 @@ object DrivePopup extends FunctionComponent[DrivePopupProps] {
     if (data.isEmpty) null
     else {
       <(withSizeComp)(^.plain := WithSizeProps { (_, _) =>
-        <(menuPopup())(^.wrapped := MenuPopupProps(
+        <(menuPopup())(^.plain := MenuPopupProps(
           title = "Drive",
-          items = data.map(_._2),
+          items = js.Array(data.map(_._2): _*),
           getLeft = { width =>
             val panelWidth =
               if (panelInput != null) panelInput.width
