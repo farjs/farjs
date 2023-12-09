@@ -4,6 +4,7 @@ import farjs.filelist.sort.SortModesPopup._
 import farjs.filelist.stack.PanelStack
 import farjs.filelist.stack.PanelStackSpec.withContext
 import farjs.ui.menu.{MenuPopup, MenuPopupProps}
+import scommons.react.ReactClass
 import scommons.react.blessed.BlessedElement
 import scommons.react.test._
 
@@ -11,7 +12,7 @@ import scala.scalajs.js
 
 class SortModesPopupSpec extends TestSpec with TestRendererUtils {
 
-  SortModesPopup.menuPopup = mockUiComponent("MenuPopup")
+  SortModesPopup.menuPopup = "MenuPopup".asInstanceOf[ReactClass]
   
   it should "emit keypress event and call onClose when onSelect" in {
     //given
@@ -23,7 +24,9 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
     val comp = testRender(withContext(
       <(SortModesPopup())(^.wrapped := props)(), stack = stack, width = 40, panelInput = inputMock
     ))
-    val menuProps = findComponentProps(comp, menuPopup, plain = true)
+    val menuProps = inside(findComponents(comp, menuPopup)) {
+      case List(c) => c.props.asInstanceOf[MenuPopupProps]
+    }
 
     //then
     onClose.expects()
@@ -46,7 +49,9 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
     val comp = testRender(withContext(
       <(SortModesPopup())(^.wrapped := props)(), stack = stack, width = 40
     ))
-    val menuProps = findComponentProps(comp, menuPopup, plain = true)
+    val menuProps = inside(findComponents(comp, menuPopup)) {
+      case List(c) => c.props.asInstanceOf[MenuPopupProps]
+    }
 
     //then
     onClose.expects()
@@ -92,7 +97,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
                                    isRight: Boolean,
                                    stackWidth: Int): Unit = {
 
-    assertTestComponent(result, menuPopup, plain = true) {
+    assertNativeComponent(result, <(menuPopup)(^.assertPlain[MenuPopupProps](inside(_) {
       case MenuPopupProps(title, items, getLeft, _, _) =>
         title shouldBe "Sort by"
         items.toList shouldBe List(
@@ -105,6 +110,6 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
           "  Access time          Ctrl-F9  "
         )
         getLeft(50) shouldBe MenuPopup.getLeftPos(stackWidth, !isRight, 50)
-    }
+    }))())
   }
 }

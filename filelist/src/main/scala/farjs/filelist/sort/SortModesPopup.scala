@@ -12,7 +12,7 @@ case class SortModesPopupProps(mode: SortMode,
 
 object SortModesPopup extends FunctionComponent[SortModesPopupProps] {
 
-  private[sort] var menuPopup: UiComponent[MenuPopupProps] = MenuPopup
+  private[sort] var menuPopup: ReactClass = MenuPopup
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -35,7 +35,7 @@ object SortModesPopup extends FunctionComponent[SortModesPopupProps] {
       ))
     }
 
-    <(menuPopup())(^.plain := MenuPopupProps(
+    <(menuPopup)(^.plain := MenuPopupProps(
       title = "Sort by",
       items = js.Array(items: _*),
       getLeft = { width =>

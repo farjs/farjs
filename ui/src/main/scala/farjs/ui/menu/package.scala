@@ -1,6 +1,7 @@
 package farjs.ui
 
 import scommons.react.ReactClass
+import scommons.react.blessed.BlessedPadding
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport
@@ -29,5 +30,14 @@ package object menu {
   @js.native
   @JSImport("@farjs/ui/menu/MenuBarTrigger.mjs", JSImport.Default)
   object MenuBarTrigger extends ReactClass
+
+  @js.native
+  @JSImport("@farjs/ui/menu/MenuPopup.mjs", JSImport.Default)
+  object MenuPopup extends ReactClass {
+    
+    def getLeftPos(stackWidth: Int, showOnLeft: Boolean, width: Int): String = js.native
+    
+    val padding: BlessedPadding = js.native
+  }
 
 }

@@ -21,7 +21,7 @@ import scala.scalajs.js
 class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   DrivePopup.withSizeComp = "WithSize".asInstanceOf[ReactClass]
-  DrivePopup.menuPopup = mockUiComponent("MenuPopup")
+  DrivePopup.menuPopup = "MenuPopup".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class FsService {
@@ -76,7 +76,9 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
         case List(comp) => comp.props.asInstanceOf[WithSizeProps].render(60, 20)
       }
       val resultContent = createTestRenderer(renderContent).root
-      val menuProps = findComponentProps(resultContent, menuPopup, plain = true)
+      val menuProps = inside(findComponents(resultContent, menuPopup)) {
+        case List(c) => c.props.asInstanceOf[MenuPopupProps]
+      }
 
       //then
       onChangeDir.expects("C:/test")
@@ -132,7 +134,9 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
         case List(comp) => comp.props.asInstanceOf[WithSizeProps].render(60, 20)
       }
       val resultContent = createTestRenderer(renderContent).root
-      val menuProps = findComponentProps(resultContent, menuPopup, plain = true)
+      val menuProps = inside(findComponents(resultContent, menuPopup)) {
+        case List(c) => c.props.asInstanceOf[MenuPopupProps]
+      }
 
       //then
       onChangeDir.expects("C:/test")
@@ -188,7 +192,9 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
         case List(comp) => comp.props.asInstanceOf[WithSizeProps].render(60, 20)
       }
       val resultContent = createTestRenderer(renderContent).root
-      val menuProps = findComponentProps(resultContent, menuPopup, plain = true)
+      val menuProps = inside(findComponents(resultContent, menuPopup)) {
+        case List(c) => c.props.asInstanceOf[MenuPopupProps]
+      }
 
       //then
       onChangeDir.expects("C:")
@@ -227,7 +233,9 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
         case List(comp) => comp.props.asInstanceOf[WithSizeProps].render(60, 20)
       }
       val resultContent = createTestRenderer(renderContent).root
-      val menuProps = findComponentProps(resultContent, menuPopup, plain = true)
+      val menuProps = inside(findComponents(resultContent, menuPopup)) {
+        case List(c) => c.props.asInstanceOf[MenuPopupProps]
+      }
 
       //then
       onClose.expects()
@@ -267,7 +275,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       disksF should not be null
     }.flatMap(_ => disksF).map { _ =>
       //then
-      assertDrivePopup(renderer.root, props, List(
+      assertDrivePopup(renderer.root, List(
         "  C: │SYSTEM         │149341 M│ 77912 M ",
         "  D: │DATA           │803867 M│336615 M ",
         "  E: │               │        │         "
@@ -307,7 +315,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       disksF should not be null
     }.flatMap(_ => disksF).map { _ =>
       //then
-      assertDrivePopup(renderer.root, props, List(
+      assertDrivePopup(renderer.root, List(
         " /              │149341 M│ 77912 M ",
         " TestDrive      │803867 M│336615 M "
       ), expectedLeft = "0%+4")
@@ -335,7 +343,6 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
   }
 
   private def assertDrivePopup(result: TestInstance,
-                               props: DrivePopupProps,
                                expectedItems: List[String],
                                expectedLeft: String = "0%+0"): Assertion = {
     
@@ -347,12 +354,12 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
         case WithSizeProps(render) =>
           val content = createTestRenderer(render(60, 20)).root
 
-          assertTestComponent(content, menuPopup, plain = true) {
+          assertNativeComponent(content, <(menuPopup)(^.assertPlain[MenuPopupProps](inside(_) {
             case MenuPopupProps(title, items, getLeft, _, _) =>
               title shouldBe "Drive"
               items.toList shouldBe expectedItems
               getLeft(width) shouldBe expectedLeft
-          }
+          }))())
       }))()
     ))
   }
