@@ -13,6 +13,15 @@ package object popup {
   object MessageBox extends ReactClass
 
   @js.native
+  @JSImport("@farjs/ui/popup/MessageBoxAction.mjs", JSImport.Default)
+  object MessageBoxActionNative extends js.Object {
+    
+    def OK(onAction: js.Function0[Unit]): MessageBoxAction = js.native
+    def YES(onAction: js.Function0[Unit]): MessageBoxAction = js.native
+    def NO(onAction: js.Function0[Unit]): MessageBoxAction = js.native
+  }
+
+  @js.native
   @JSImport("@farjs/ui/popup/Modal.mjs", JSImport.Default)
   object Modal extends ReactClass
 

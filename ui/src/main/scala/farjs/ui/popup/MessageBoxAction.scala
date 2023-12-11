@@ -13,16 +13,13 @@ sealed trait MessageBoxAction extends js.Object {
 sealed trait MessageBoxActionExports {
 
   def OK(onAction: js.Function0[Unit]): MessageBoxAction =
-    MessageBoxAction("OK", onAction, triggeredOnClose = true)
+    MessageBoxActionNative.OK(onAction)
   
   def YES(onAction: js.Function0[Unit]): MessageBoxAction =
-    MessageBoxAction("YES", onAction)
+    MessageBoxActionNative.YES(onAction)
   
   def NO(onAction: js.Function0[Unit]): MessageBoxAction =
-    MessageBoxAction("NO", onAction, triggeredOnClose = true)
-
-  def NO_NON_CLOSABLE(onAction: js.Function0[Unit]): MessageBoxAction =
-    MessageBoxAction("NO", onAction)
+    MessageBoxActionNative.NO(onAction)
 }
 
 object MessageBoxAction extends MessageBoxActionExports {
