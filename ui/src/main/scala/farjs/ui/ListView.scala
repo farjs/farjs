@@ -6,16 +6,6 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class ListViewProps(left: Int,
-                         top: Int,
-                         width: Int,
-                         height: Int,
-                         items: js.Array[String],
-                         viewport: ListViewport,
-                         setViewport: js.Function1[ListViewport, Unit],
-                         style: BlessedStyle,
-                         onClick: js.Function1[Int, Unit])
-
 object ListView extends FunctionComponent[ListViewProps] {
 
   private def renderItems(selected: Int,
@@ -45,7 +35,7 @@ object ListView extends FunctionComponent[ListViewProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val elementRef = useRef[BlessedElement](null)
-    val props = compProps.wrapped
+    val props = compProps.plain
     val viewport@ListViewport(offset, focused, length, viewLength) = props.viewport
     val itemsContent =
       renderItems(focused, props.items.slice(offset, offset + viewLength), props.width, props.style)

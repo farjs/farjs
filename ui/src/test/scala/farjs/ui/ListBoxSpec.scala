@@ -35,7 +35,7 @@ class ListBoxSpec extends TestSpec with TestRendererUtils {
     onSelect.expects(1)
 
     val renderer = createTestRenderer(<(ListBox())(^.plain := props)())
-    val listView = findComponentProps(renderer.root, listViewComp)
+    val listView = findComponentProps(renderer.root, listViewComp, plain = true)
     listView.viewport.offset shouldBe 0
     listView.viewport.focused shouldBe 1
     val viewport = listView.viewport.copy(focused = 0)
@@ -54,7 +54,7 @@ class ListBoxSpec extends TestSpec with TestRendererUtils {
     onSelect.expects(1)
 
     val renderer = createTestRenderer(<(ListBox())(^.plain := props)())
-    val listView = findComponentProps(renderer.root, listViewComp)
+    val listView = findComponentProps(renderer.root, listViewComp, plain = true)
     listView.viewport.offset shouldBe 0
     listView.viewport.focused shouldBe 1
     val viewport = listView.viewport.copy(offset = 1, focused = 0)
@@ -160,7 +160,7 @@ class ListBoxSpec extends TestSpec with TestRendererUtils {
         ^.rbWidth := props.width,
         ^.rbHeight := props.height
       )(
-        <(listViewComp())(^.assertWrapped(inside(_) {
+        <(listViewComp())(^.assertPlain[ListViewProps](inside(_) {
           case ListViewProps(left, top, resWidth, resHeight, items, viewport, _, style, onClick) =>
             left shouldBe 0
             top shouldBe 0

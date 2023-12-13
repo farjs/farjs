@@ -129,7 +129,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
             style shouldBe theme
         }))(),
 
-        <(listViewComp())(^.assertWrapped(inside(_) {
+        <(listViewComp())(^.assertPlain[ListViewProps](inside(_) {
           case ListViewProps(left, top, resWidth, resHeight, items, viewport, setViewport, style, onClick) =>
             left shouldBe 1
             top shouldBe 1

@@ -36,7 +36,7 @@ object ListBox extends FunctionComponent[ListBoxProps] {
       ^.rbHeight := props.height,
       ^.rbOnKeypress := onKeypress
     )(
-      <(listViewComp())(^.wrapped := ListViewProps(
+      <(listViewComp())(^.plain := ListViewProps(
         left = 0,
         top = 0,
         width = props.width,

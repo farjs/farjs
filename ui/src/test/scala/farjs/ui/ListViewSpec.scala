@@ -15,12 +15,12 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
     val props = getListViewProps(index = 1, setViewport = setViewport)
     setViewport.expects(props.viewport)
 
-    val renderer = createTestRenderer(<(ListView())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(ListView())(^.plain := props)())
     assertListView(renderer.root, props, List(
       "{bold}{white-fg}{cyan-bg}  item 1            {/}",
       "{bold}{white-fg}{black-bg}  item 2            {/}"
     ))
-    val updatedProps = props.copy(height = 1)
+    val updatedProps = getListViewProps(height = 1, index = 1, setViewport = setViewport)
     val expectedViewport = props.viewport.copy(offset = 1, focused = 0, viewLength = 1)
 
     //then
@@ -28,7 +28,7 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
 
     //when
     TestRenderer.act { () =>
-      renderer.update(<(ListView())(^.wrapped := updatedProps)())
+      renderer.update(<(ListView())(^.plain := updatedProps)())
     }
   }
 
@@ -38,7 +38,7 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
     val props = getListViewProps(onClick = onAction)
     val mouseData = js.Dynamic.literal(y = 2)
     val textMock = js.Dynamic.literal(atop = 1)
-    val renderer = createTestRenderer(<(ListView())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(<(ListView())(^.plain := props)(), { el =>
       if (el.`type` == <.text.name.asInstanceOf[js.Any]) textMock
       else null
     })
@@ -62,7 +62,7 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
     val index = (mouseData.y - textMock.atop).asInstanceOf[Int]
     index should be >= props.items.length
 
-    val renderer = createTestRenderer(<(ListView())(^.wrapped := props)(), { el =>
+    val renderer = createTestRenderer(<(ListView())(^.plain := props)(), { el =>
       if (el.`type` == <.text.name.asInstanceOf[js.Any]) textMock
       else null
     })
@@ -83,7 +83,7 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
     val props = getListViewProps(index = 1, setViewport = setViewport)
     setViewport.expects(props.viewport)
 
-    val renderer = createTestRenderer(<(ListView())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(ListView())(^.plain := props)())
     assertListView(renderer.root, props, List(
       "{bold}{white-fg}{cyan-bg}  item 1            {/}",
       "{bold}{white-fg}{black-bg}  item 2            {/}"
@@ -106,7 +106,7 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
     val props = getListViewProps(setViewport = setViewport)
     setViewport.expects(props.viewport)
 
-    val renderer = createTestRenderer(<(ListView())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(ListView())(^.plain := props)())
     assertListView(renderer.root, props, List(
       "{bold}{white-fg}{black-bg}  item 1            {/}",
       "{bold}{white-fg}{cyan-bg}  item 2            {/}"
@@ -134,7 +134,7 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
     ))
     
     //when
-    val result = createTestRenderer(<(ListView())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(ListView())(^.plain := props)()).root
 
     //then
     assertListView(result, props, List(

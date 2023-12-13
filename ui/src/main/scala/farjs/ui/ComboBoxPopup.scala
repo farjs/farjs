@@ -52,7 +52,7 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
         style = theme
       ))(),
 
-      <(listViewComp())(^.wrapped := ListViewProps(
+      <(listViewComp())(^.plain := ListViewProps(
         left = 1,
         top = 1,
         width = viewWidth,
