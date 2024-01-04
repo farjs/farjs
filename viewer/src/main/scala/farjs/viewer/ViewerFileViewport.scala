@@ -39,7 +39,7 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
 
   lazy val scrollIndicators: List[Int] = {
     linesData.zipWithIndex.collect {
-      case ((line, _), index) if UiString(line).strWidth > column + width => index
+      case ((line, _), index) if UiString(line).strWidth() > column + width => index
     }
   }
 

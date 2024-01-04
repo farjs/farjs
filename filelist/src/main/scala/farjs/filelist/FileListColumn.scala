@@ -60,7 +60,7 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
           bgColor = style.bg.orNull,
           text = text.ensureWidth(width, ' ')
         )
-        val ending = if (text.strWidth > width) overlapEnd else borderEnd
+        val ending = if (text.strWidth() > width) overlapEnd else borderEnd
         s"$content$ending"
     }
 
