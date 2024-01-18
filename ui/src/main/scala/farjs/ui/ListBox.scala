@@ -59,7 +59,7 @@ object ListBox extends FunctionComponent[ListBoxProps] {
           min = 0,
           max = viewport.length - viewport.viewLength,
           onChange = { offset =>
-            setViewport(viewport.copy(offset = offset))
+            setViewport(viewport.updated(offset))
           }
         ))()
       }

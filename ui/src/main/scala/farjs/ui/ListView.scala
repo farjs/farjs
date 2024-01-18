@@ -36,7 +36,11 @@ object ListView extends FunctionComponent[ListViewProps] {
   protected def render(compProps: Props): ReactElement = {
     val elementRef = useRef[BlessedElement](null)
     val props = compProps.plain
-    val viewport@ListViewport(offset, focused, length, viewLength) = props.viewport
+    val viewport = props.viewport
+    val offset = viewport.offset
+    val focused = viewport.focused
+    val length = viewport.length
+    val viewLength = viewport.viewLength
     val itemsContent =
       renderItems(focused, props.items.slice(offset, offset + viewLength), props.width, props.style)
         .mkString("\n")
@@ -55,10 +59,10 @@ object ListView extends FunctionComponent[ListViewProps] {
       ^.rbWidth := props.width,
       ^.rbHeight := props.height,
       ^.rbOnWheelup := { _ =>
-        props.setViewport(viewport.up)
+        props.setViewport(viewport.up())
       },
       ^.rbOnWheeldown := { _ =>
-        props.setViewport(viewport.down)
+        props.setViewport(viewport.down())
       },
       ^.rbOnClick := { data =>
         val curr = elementRef.current

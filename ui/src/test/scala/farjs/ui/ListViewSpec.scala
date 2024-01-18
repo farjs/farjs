@@ -21,10 +21,11 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
       "{bold}{white-fg}{black-bg}  item 2            {/}"
     ))
     val updatedProps = getListViewProps(height = 1, index = 1, setViewport = setViewport)
-    val expectedViewport = props.viewport.copy(offset = 1, focused = 0, viewLength = 1)
 
     //then
-    setViewport.expects(expectedViewport)
+    setViewport.expects(*).onCall { vp: ListViewport =>
+      assertListViewport(vp, 1, 0, props.viewport.length, 1)
+    }
 
     //when
     TestRenderer.act { () =>
@@ -91,10 +92,13 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
     val text = inside(findComponents(renderer.root, <.text.name)) {
       case List(text) => text
     }
-    val expectedViewport = props.viewport.copy(focused = 0)
+    val focused = 0
+    props.viewport.focused should not be focused
 
     //then
-    setViewport.expects(expectedViewport)
+    setViewport.expects(*).onCall { vp: ListViewport =>
+      assertListViewport(vp, props.viewport.offset, focused, props.viewport.length, props.viewport.viewLength)
+    }
 
     //when
     text.props.onWheelup(null)
@@ -114,10 +118,13 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
     val text = inside(findComponents(renderer.root, <.text.name)) {
       case List(text) => text
     }
-    val expectedViewport = props.viewport.copy(focused = 1)
+    val focused = 1
+    props.viewport.focused should not be focused
 
     //then
-    setViewport.expects(expectedViewport)
+    setViewport.expects(*).onCall { vp: ListViewport =>
+      assertListViewport(vp, props.viewport.offset, focused, props.viewport.length, props.viewport.viewLength)
+    }
 
     //when
     text.props.onWheeldown(null)
@@ -166,6 +173,18 @@ class ListViewSpec extends TestSpec with TestRendererUtils {
       style = DefaultTheme.popup.menu,
       onClick = onClick
     )
+  }
+
+  private def assertListViewport(result: ListViewport,
+                                 offset: Int,
+                                 focused: Int,
+                                 length: Int,
+                                 viewLength: Int)(implicit position: Position): Unit = {
+
+    result.offset shouldBe offset
+    result.focused shouldBe focused
+    result.length shouldBe length
+    result.viewLength shouldBe viewLength
   }
 
   private def assertListView(result: TestInstance,

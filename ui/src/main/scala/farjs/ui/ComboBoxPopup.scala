@@ -39,10 +39,10 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
       ^.rbLeft := props.left,
       ^.rbTop := props.top,
       ^.rbOnWheelup := { _ =>
-        props.setViewport(viewport.up)
+        props.setViewport(viewport.up())
       },
       ^.rbOnWheeldown := { _ =>
-        props.setViewport(viewport.down)
+        props.setViewport(viewport.down())
       },
       ^.rbStyle := theme
     )(
@@ -75,7 +75,7 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
           min = 0,
           max = viewport.length - viewport.viewLength,
           onChange = { offset =>
-            props.setViewport(viewport.copy(offset = offset))
+            props.setViewport(viewport.updated(offset))
           }
         ))()
       }

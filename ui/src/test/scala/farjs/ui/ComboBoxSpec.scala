@@ -505,7 +505,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val popup = findComponentProps(renderer.root, comboBoxPopup)
     popup.items.toList shouldBe items
     popup.viewport.focused shouldBe 0
-    val viewport = popup.viewport.copy(focused = 1)
+    val viewport = popup.viewport.updated(popup.viewport.offset, 1)
 
     //when
     popup.setViewport(viewport)

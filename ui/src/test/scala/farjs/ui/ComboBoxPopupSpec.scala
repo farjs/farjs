@@ -3,6 +3,7 @@ package farjs.ui
 import farjs.ui.ComboBoxPopup._
 import farjs.ui.border._
 import farjs.ui.theme.DefaultTheme
+import org.scalactic.source.Position
 import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
@@ -23,10 +24,13 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     val boxEl = inside(findComponents(comp, <.box.name)) {
       case List(box) => box
     }
-    val expectedViewport = props.viewport.copy(focused = 0)
+    val focused = 0
+    props.viewport.focused should not be focused
     
     //then
-    setViewport.expects(expectedViewport)
+    setViewport.expects(*).onCall { vp: ListViewport =>
+      assertListViewport(vp, props.viewport.offset, focused, props.viewport.length, props.viewport.viewLength)
+    }
     
     //when
     boxEl.props.onWheelup(null)
@@ -40,10 +44,13 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     val boxEl = inside(findComponents(comp, <.box.name)) {
       case List(box) => box
     }
-    val expectedViewport = props.viewport.copy(focused = 1)
+    val focused = 1
+    props.viewport.focused should not be focused
     
     //then
-    setViewport.expects(expectedViewport)
+    setViewport.expects(*).onCall { vp: ListViewport =>
+      assertListViewport(vp, props.viewport.offset, focused, props.viewport.length, props.viewport.viewLength)
+    }
     
     //when
     boxEl.props.onWheeldown(null)
@@ -57,10 +64,12 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     val comp = testRender(<(ComboBoxPopup())(^.wrapped := props)())
     val scrollBarProps = findComponentProps(comp, scrollBarComp, plain = true)
     val offset = 1
-    val expectedViewport = props.viewport.copy(offset = offset)
+    props.viewport.offset should not be offset
     
     //then
-    setViewport.expects(expectedViewport)
+    setViewport.expects(*).onCall { vp: ListViewport =>
+      assertListViewport(vp, offset, props.viewport.focused, props.viewport.length, props.viewport.viewLength)
+    }
     
     //when
     scrollBarProps.onChange(offset)
@@ -102,6 +111,18 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
       style = DefaultTheme.popup.menu,
       onClick = onClick
     )
+  }
+
+  private def assertListViewport(result: ListViewport,
+                                 offset: Int,
+                                 focused: Int,
+                                 length: Int,
+                                 viewLength: Int)(implicit position: Position): Unit = {
+
+    result.offset shouldBe offset
+    result.focused shouldBe focused
+    result.length shouldBe length
+    result.viewLength shouldBe viewLength
   }
 
   private def assertComboBoxPopupPopup(result: TestInstance,

@@ -38,7 +38,7 @@ class ListBoxSpec extends TestSpec with TestRendererUtils {
     val listView = findComponentProps(renderer.root, listViewComp, plain = true)
     listView.viewport.offset shouldBe 0
     listView.viewport.focused shouldBe 1
-    val viewport = listView.viewport.copy(focused = 0)
+    val viewport = listView.viewport.updated(listView.viewport.offset, 0)
 
     //then
     onSelect.expects(0)
@@ -57,10 +57,10 @@ class ListBoxSpec extends TestSpec with TestRendererUtils {
     val listView = findComponentProps(renderer.root, listViewComp, plain = true)
     listView.viewport.offset shouldBe 0
     listView.viewport.focused shouldBe 1
-    val viewport = listView.viewport.copy(offset = 1, focused = 0)
+    val viewport = ListViewport(1, listView.viewport.length, listView.viewport.viewLength)
 
     //then
-    onSelect.expects(1).never()
+    onSelect.expects(*).never()
 
     //when
     listView.setViewport(viewport)
