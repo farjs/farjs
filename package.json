@@ -59,7 +59,7 @@
     "bun": ">=0.8"
   },
   "dependencies": {
-    "@farjs/ui": "0.5.6",
+    "@farjs/ui": "0.6.0",
     "@farjs/better-sqlite3-websql": "^1.0.1",
     "iconv-lite": "0.6.3"
   },
