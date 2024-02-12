@@ -13,7 +13,7 @@ import scala.scalajs.js
 class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
 
   ComboBoxPopup.singleBorderComp = "SingleBorder".asInstanceOf[ReactClass]
-  ComboBoxPopup.listViewComp = mockUiComponent("ListView")
+  ComboBoxPopup.listViewComp = "ListView".asInstanceOf[ReactClass]
   ComboBoxPopup.scrollBarComp = mockUiComponent("ScrollBar")
   
   it should "call setViewport when box.onWheelup" in {
@@ -150,7 +150,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
             style shouldBe theme
         }))(),
 
-        <(listViewComp())(^.assertPlain[ListViewProps](inside(_) {
+        <(listViewComp)(^.assertPlain[ListViewProps](inside(_) {
           case ListViewProps(left, top, resWidth, resHeight, items, viewport, setViewport, style, onClick) =>
             left shouldBe 1
             top shouldBe 1

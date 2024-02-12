@@ -2,6 +2,7 @@ package farjs.ui
 
 import farjs.ui.ListBox._
 import farjs.ui.theme.DefaultTheme
+import scommons.react.ReactClass
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -10,7 +11,7 @@ import scala.scalajs.js.Dynamic.literal
 
 class ListBoxSpec extends TestSpec with TestRendererUtils {
 
-  ListBox.listViewComp = mockUiComponent("ListView")
+  ListBox.listViewComp = "ListView".asInstanceOf[ReactClass]
   ListBox.scrollBarComp = mockUiComponent("ScrollBar")
 
   it should "scroll when onChange in ScrollBar" in {
@@ -35,7 +36,9 @@ class ListBoxSpec extends TestSpec with TestRendererUtils {
     onSelect.expects(1)
 
     val renderer = createTestRenderer(<(ListBox())(^.plain := props)())
-    val listView = findComponentProps(renderer.root, listViewComp, plain = true)
+    val listView = inside(findComponents(renderer.root, listViewComp)) {
+      case List(c) => c.props.asInstanceOf[ListViewProps]
+    }
     listView.viewport.offset shouldBe 0
     listView.viewport.focused shouldBe 1
     val viewport = listView.viewport.updated(listView.viewport.offset, 0)
@@ -54,7 +57,9 @@ class ListBoxSpec extends TestSpec with TestRendererUtils {
     onSelect.expects(1)
 
     val renderer = createTestRenderer(<(ListBox())(^.plain := props)())
-    val listView = findComponentProps(renderer.root, listViewComp, plain = true)
+    val listView = inside(findComponents(renderer.root, listViewComp)) {
+      case List(c) => c.props.asInstanceOf[ListViewProps]
+    }
     listView.viewport.offset shouldBe 0
     listView.viewport.focused shouldBe 1
     val viewport = ListViewport(1, listView.viewport.length, listView.viewport.viewLength)
@@ -160,7 +165,7 @@ class ListBoxSpec extends TestSpec with TestRendererUtils {
         ^.rbWidth := props.width,
         ^.rbHeight := props.height
       )(
-        <(listViewComp())(^.assertPlain[ListViewProps](inside(_) {
+        <(listViewComp)(^.assertPlain[ListViewProps](inside(_) {
           case ListViewProps(left, top, resWidth, resHeight, items, viewport, _, style, onClick) =>
             left shouldBe 0
             top shouldBe 0

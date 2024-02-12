@@ -18,6 +18,10 @@ package object ui {
   object ButtonsPanel extends ReactClass
 
   @js.native
+  @JSImport("@farjs/ui/ListView.mjs", JSImport.Default)
+  object ListView extends ReactClass
+
+  @js.native
   @JSImport("@farjs/ui/TextLine.mjs", JSImport.Default)
   object TextLine extends ReactClass {
 

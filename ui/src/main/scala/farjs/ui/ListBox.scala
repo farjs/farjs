@@ -8,7 +8,7 @@ import scala.scalajs.js
 
 object ListBox extends FunctionComponent[ListBoxProps] {
 
-  private[ui] var listViewComp: UiComponent[ListViewProps] = ListView
+  private[ui] var listViewComp: ReactClass = ListView
   private[ui] var scrollBarComp: UiComponent[ScrollBarProps] = ScrollBar
 
   protected def render(compProps: Props): ReactElement = {
@@ -36,7 +36,7 @@ object ListBox extends FunctionComponent[ListBoxProps] {
       ^.rbHeight := props.height,
       ^.rbOnKeypress := onKeypress
     )(
-      <(listViewComp())(^.plain := ListViewProps(
+      <(listViewComp)(^.plain := ListViewProps(
         left = 0,
         top = 0,
         width = props.width,

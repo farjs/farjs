@@ -18,7 +18,7 @@ case class ComboBoxPopupProps(left: Int,
 object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
   
   private[ui] var singleBorderComp: ReactClass = SingleBorder
-  private[ui] var listViewComp: UiComponent[ListViewProps] = ListView
+  private[ui] var listViewComp: ReactClass = ListView
   private[ui] var scrollBarComp: UiComponent[ScrollBarProps] = ScrollBar
 
   private[ui] val maxItems = 8
@@ -52,7 +52,7 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
         style = theme
       ))(),
 
-      <(listViewComp())(^.plain := ListViewProps(
+      <(listViewComp)(^.plain := ListViewProps(
         left = 1,
         top = 1,
         width = viewWidth,
