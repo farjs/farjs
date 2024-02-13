@@ -14,7 +14,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
 
   ComboBoxPopup.singleBorderComp = "SingleBorder".asInstanceOf[ReactClass]
   ComboBoxPopup.listViewComp = "ListView".asInstanceOf[ReactClass]
-  ComboBoxPopup.scrollBarComp = mockUiComponent("ScrollBar")
+  ComboBoxPopup.scrollBarComp = "ScrollBar".asInstanceOf[ReactClass]
   
   it should "call setViewport when box.onWheelup" in {
     //given
@@ -62,7 +62,9 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     val props = getComboBoxPopupProps(items = List.fill(15)("item"), setViewport = setViewport)
     props.items.length should be > maxItems
     val comp = testRender(<(ComboBoxPopup())(^.wrapped := props)())
-    val scrollBarProps = findComponentProps(comp, scrollBarComp, plain = true)
+    val scrollBarProps = inside(findComponents(comp, scrollBarComp)) {
+      case List(c) => c.props.asInstanceOf[ScrollBarProps]
+    }
     val offset = 1
     props.viewport.offset should not be offset
     
@@ -164,7 +166,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
         }))(),
 
         if (showScrollBar) Some {
-          <(scrollBarComp())(^.assertPlain[ScrollBarProps](inside(_) {
+          <(scrollBarComp)(^.assertPlain[ScrollBarProps](inside(_) {
             case ScrollBarProps(left, top, length, style, value, extent, min, max, _) =>
               left shouldBe (width - 1)
               top shouldBe 1

@@ -19,7 +19,7 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
   
   private[ui] var singleBorderComp: ReactClass = SingleBorder
   private[ui] var listViewComp: ReactClass = ListView
-  private[ui] var scrollBarComp: UiComponent[ScrollBarProps] = ScrollBar
+  private[ui] var scrollBarComp: ReactClass = ScrollBar
 
   private[ui] val maxItems = 8
 
@@ -65,7 +65,7 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
       ))(),
 
       if (viewport.length > viewport.viewLength) Some {
-        <(scrollBarComp())(^.plain := ScrollBarProps(
+        <(scrollBarComp)(^.plain := ScrollBarProps(
           left = width - 1,
           top = 1,
           length = viewport.viewLength,

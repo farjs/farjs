@@ -22,6 +22,10 @@ package object ui {
   object ListView extends ReactClass
 
   @js.native
+  @JSImport("@farjs/ui/ScrollBar.mjs", JSImport.Default)
+  object ScrollBar extends ReactClass
+
+  @js.native
   @JSImport("@farjs/ui/TextLine.mjs", JSImport.Default)
   object TextLine extends ReactClass {
 

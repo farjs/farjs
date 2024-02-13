@@ -12,14 +12,16 @@ import scala.scalajs.js.Dynamic.literal
 class ListBoxSpec extends TestSpec with TestRendererUtils {
 
   ListBox.listViewComp = "ListView".asInstanceOf[ReactClass]
-  ListBox.scrollBarComp = mockUiComponent("ScrollBar")
+  ListBox.scrollBarComp = "ScrollBar".asInstanceOf[ReactClass]
 
   it should "scroll when onChange in ScrollBar" in {
     //given
     val props = getListBoxProps(height = 1)
     val renderer = createTestRenderer(<(ListBox())(^.plain := props)())
     assertListBox(renderer.root, props, showScrollBar = true)
-    val scrollBarProps = findComponentProps(renderer.root, scrollBarComp, plain = true)
+    val scrollBarProps = inside(findComponents(renderer.root, scrollBarComp)) {
+      case List(c) => c.props.asInstanceOf[ScrollBarProps]
+    }
     val offset = 1
     
     //when
@@ -179,7 +181,7 @@ class ListBoxSpec extends TestSpec with TestRendererUtils {
         }))(),
 
         if (showScrollBar) Some {
-          <(scrollBarComp())(^.assertPlain[ScrollBarProps](inside(_) {
+          <(scrollBarComp)(^.assertPlain[ScrollBarProps](inside(_) {
             case ScrollBarProps(left, top, length, style, value, extent, min, max, _) =>
               left shouldBe props.width
               top shouldBe 0
