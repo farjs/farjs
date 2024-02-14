@@ -25,7 +25,7 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
   private[popup] var popupComp: ReactClass = Popup
   private[popup] var modalContentComp: ReactClass = ModalContent
   private[popup] var withSizeComp: ReactClass = WithSize
-  private[popup] var listBoxComp: UiComponent[ListBoxProps] = ListBox
+  private[popup] var listBoxComp: ReactClass = ListBox
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -63,7 +63,7 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
             case Some(footer) => footer
           }
         ))(
-          <(listBoxComp())(^.plain := ListBoxProps(
+          <(listBoxComp)(^.plain := ListBoxProps(
             left = 1,
             top = 1,
             width = contentWidth,

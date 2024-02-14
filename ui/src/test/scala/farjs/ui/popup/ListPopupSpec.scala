@@ -14,7 +14,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
   ListPopup.popupComp = "Popup".asInstanceOf[ReactClass]
   ListPopup.modalContentComp = "ModalContent".asInstanceOf[ReactClass]
   ListPopup.withSizeComp = "WithSize".asInstanceOf[ReactClass]
-  ListPopup.listBoxComp = mockUiComponent("ListBox")
+  ListPopup.listBoxComp = "ListBox".asInstanceOf[ReactClass]
 
   it should "not call onAction if empty items when onAction" in {
     //given
@@ -30,7 +30,9 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
     onAction.expects(1).never()
     
     //when
-    findComponentProps(resultContent, listBoxComp, plain = true).onAction(1)
+    inside(findComponents(resultContent, listBoxComp)) {
+      case List(c) => c.props.asInstanceOf[ListBoxProps].onAction(1)
+    }
   }
   
   it should "call onAction when onAction" in {
@@ -47,7 +49,9 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
     onAction.expects(1)
     
     //when
-    findComponentProps(resultContent, listBoxComp, plain = true).onAction(1)
+    inside(findComponents(resultContent, listBoxComp)) {
+      case List(c) => c.props.asInstanceOf[ListBoxProps].onAction(1)
+    }
   }
   
   it should "render popup with empty list" in {
@@ -145,7 +149,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
                 left shouldBe js.undefined
                 footer shouldBe props.footer.getOrElse(())
             }))(), inside(_) { case List(view) =>
-              assertTestComponent(view, listBoxComp, plain = true) {
+              assertNativeComponent(view, <(listBoxComp)(^.assertPlain[ListBoxProps](inside(_) {
                 case ListBoxProps(left, top, width, height, selected, resItems, style, _, onSelect) =>
                   left shouldBe 1
                   top shouldBe 1
@@ -155,7 +159,7 @@ class ListPopupSpec extends TestSpec with TestRendererUtils {
                   resItems.toList shouldBe items
                   style shouldBe theme
                   onSelect should be theSameInstanceAs props.onSelect
-              }
+              }))())
             })
         }))()
       )

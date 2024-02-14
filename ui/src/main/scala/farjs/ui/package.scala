@@ -18,6 +18,10 @@ package object ui {
   object ButtonsPanel extends ReactClass
 
   @js.native
+  @JSImport("@farjs/ui/ListBox.mjs", JSImport.Default)
+  object ListBox extends ReactClass
+
+  @js.native
   @JSImport("@farjs/ui/ListView.mjs", JSImport.Default)
   object ListView extends ReactClass
 
