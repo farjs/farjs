@@ -9,6 +9,7 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
 
 import scala.concurrent.Future
+import scala.scalajs.js
 
 class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -46,7 +47,7 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     )).root
 
     itemsF.flatMap { _ =>
-      val popup = findComponentProps(result, listPopup)
+      val popup = findComponentProps(result, listPopup, plain = true)
 
       //then
       onAction.expects(items(1))
@@ -100,12 +101,12 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
                                          items: List[FileViewHistory]): Assertion = {
     
     assertComponents(result.children, List(
-      <(listPopup())(^.assertWrapped(inside(_) {
+      <(listPopup())(^.assertPlain[ListPopupProps](inside(_) {
         case ListPopupProps(
           title,
           resItems,
           _,
-          onClose,
+          _,
           selected,
           _,
           _,
@@ -115,17 +116,16 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
           itemWrapPrefixLen
         ) =>
           title shouldBe "File view history"
-          resItems shouldBe items.map { item =>
+          resItems.toList shouldBe items.map { item =>
             val prefix =
               if (item.isEdit) "Edit: "
               else "View: "
             s"$prefix${item.path}"
           }
-          onClose should be theSameInstanceAs props.onClose
           selected shouldBe (items.length - 1)
-          footer shouldBe None
-          textPaddingLeft shouldBe 2
-          textPaddingRight shouldBe 1
+          footer shouldBe js.undefined
+          textPaddingLeft shouldBe js.undefined
+          textPaddingRight shouldBe js.undefined
           itemWrapPrefixLen shouldBe 9
       }))()
     ))

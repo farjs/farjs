@@ -13,6 +13,7 @@ import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.Future
+import scala.scalajs.js
 
 class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -50,7 +51,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
-      val popup = findComponentProps(result, listPopup)
+      val popup = findComponentProps(result, listPopup, plain = true)
 
       //then
       onChangeDir.expects("item")
@@ -81,7 +82,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
-      val popup = findComponentProps(result, listPopup)
+      val popup = findComponentProps(result, listPopup, plain = true)
 
       //then
       onChangeDir.expects(*).never()
@@ -123,7 +124,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
-      val popup = findComponentProps(result, listPopup)
+      val popup = findComponentProps(result, listPopup, plain = true)
 
       //then
       onChangeDir.expects("item 1")
@@ -138,16 +139,17 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
       onChangeDir.expects("item 10")
 
       //when & then
-      popup.onKeypress("0") shouldBe true
-      popup.onKeypress("1") shouldBe true
-      popup.onKeypress("2") shouldBe true
-      popup.onKeypress("3") shouldBe true
-      popup.onKeypress("4") shouldBe true
-      popup.onKeypress("5") shouldBe true
-      popup.onKeypress("6") shouldBe true
-      popup.onKeypress("7") shouldBe true
-      popup.onKeypress("8") shouldBe true
-      popup.onKeypress("9") shouldBe true
+      popup.onKeypress.foreach(_.apply("0") shouldBe true)
+      popup.onKeypress.foreach(_.apply("1") shouldBe true)
+      popup.onKeypress.foreach(_.apply("2") shouldBe true)
+      popup.onKeypress.foreach(_.apply("3") shouldBe true)
+      popup.onKeypress.foreach(_.apply("4") shouldBe true)
+      popup.onKeypress.foreach(_.apply("5") shouldBe true)
+      popup.onKeypress.foreach(_.apply("6") shouldBe true)
+      popup.onKeypress.foreach(_.apply("7") shouldBe true)
+      popup.onKeypress.foreach(_.apply("8") shouldBe true)
+      popup.onKeypress.foreach(_.apply("9") shouldBe true)
+      Succeeded
     }
   }
 
@@ -171,15 +173,15 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
-      val popup = findComponentProps(result, listPopup)
+      val popup = findComponentProps(result, listPopup, plain = true)
       popup.items.head shouldBe "0: item"
 
       //when
-      popup.onKeypress("-") shouldBe true
+      popup.onKeypress.foreach(_.apply("-") shouldBe true)
 
       //then
       deleteF.map { _ =>
-        findComponentProps(result, listPopup).items.head shouldBe "0: <none>"
+        findComponentProps(result, listPopup, plain = true).items.head shouldBe "0: <none>"
       }
     }
   }
@@ -206,16 +208,16 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
-      findComponentProps(result, listPopup).onSelect.foreach(f => f(1))
-      val popup = findComponentProps(result, listPopup)
+      findComponentProps(result, listPopup, plain = true).onSelect.foreach(f => f(1))
+      val popup = findComponentProps(result, listPopup, plain = true)
       popup.items(1) shouldBe "1: <none>"
 
       //when
-      popup.onKeypress("+") shouldBe true
+      popup.onKeypress.foreach(_.apply("+") shouldBe true)
 
       //then
       saveF.map { _ =>
-        findComponentProps(result, listPopup).items(1) shouldBe "1: /test"
+        findComponentProps(result, listPopup, plain = true).items(1) shouldBe "1: /test"
       }
     }
   }
@@ -238,10 +240,11 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
-      val popup = findComponentProps(result, listPopup)
+      val popup = findComponentProps(result, listPopup, plain = true)
 
       //when & then
-      popup.onKeypress("unknown") shouldBe false
+      popup.onKeypress.foreach(_.apply("unknown") shouldBe false)
+      Succeeded
     }
   }
   
@@ -294,12 +297,12 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
                                          items: List[String]): Assertion = {
     
     assertComponents(result.children, List(
-      <(listPopup())(^.assertWrapped(inside(_) {
+      <(listPopup())(^.assertPlain[ListPopupProps](inside(_) {
         case ListPopupProps(
           title,
           resItems,
           _,
-          onClose,
+          _,
           selected,
           _,
           _,
@@ -309,13 +312,12 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
           itemWrapPrefixLen
         ) =>
           title shouldBe "Folder shortcuts"
-          resItems shouldBe items
-          onClose should be theSameInstanceAs props.onClose
-          selected shouldBe 0
-          footer shouldBe Some("Edit: +, -")
-          textPaddingLeft shouldBe 2
-          textPaddingRight shouldBe 1
-          itemWrapPrefixLen shouldBe 3
+          resItems.toList shouldBe items
+          selected shouldBe js.undefined
+          footer shouldBe "Edit: +, -"
+          textPaddingLeft shouldBe js.undefined
+          textPaddingRight shouldBe js.undefined
+          itemWrapPrefixLen shouldBe js.undefined
       }))()
     ))
   }

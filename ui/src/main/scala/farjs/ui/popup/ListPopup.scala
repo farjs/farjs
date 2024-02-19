@@ -6,19 +6,6 @@ import scommons.react._
 import scommons.react.blessed._
 
 import scala.math.{max, min}
-import scala.scalajs.js
-
-case class ListPopupProps(title: String,
-                          items: List[String],
-                          onAction: Int => Unit,
-                          onClose: () => Unit,
-                          selected: Int = 0,
-                          onSelect: js.UndefOr[js.Function1[Int, Unit]] = js.undefined,
-                          onKeypress: String => Boolean = _ => false,
-                          footer: Option[String] = None,
-                          textPaddingLeft: Int = 2,
-                          textPaddingRight: Int = 1,
-                          itemWrapPrefixLen: Int = 3)
 
 object ListPopup extends FunctionComponent[ListPopupProps] {
 
@@ -28,25 +15,28 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
   private[popup] var listBoxComp: ReactClass = ListBox
   
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val items = props.items
     val theme = Theme.useTheme().popup.menu
-    val textPadding = props.textPaddingLeft + props.textPaddingRight
-    val textPaddingLeftStr = " " * props.textPaddingLeft
-    val textPaddingRightStr = " " * props.textPaddingRight
+    val textPaddingLeft = props.textPaddingLeft.getOrElse(2)
+    val textPaddingRight = props.textPaddingRight.getOrElse(1)
+    val itemWrapPrefixLen = props.itemWrapPrefixLen.getOrElse(3)
+    val textPaddingLen = textPaddingLeft + textPaddingRight
+    val textPaddingLeftStr = " " * textPaddingLeft
+    val textPaddingRightStr = " " * textPaddingRight
 
     <(popupComp)(^.plain := PopupProps(
-      onClose = props.onClose: js.Function0[Unit],
-      onKeypress = props.onKeypress: js.Function1[String, Boolean]
+      onClose = props.onClose,
+      onKeypress = props.onKeypress
     ))(
       <(withSizeComp)(^.plain := WithSizeProps { (width, height) =>
         val maxContentWidth = {
           if (items.isEmpty) 2 * (paddingHorizontal + 1)
           else items.maxBy(_.length).length + 2 * (paddingHorizontal + 1)
         }
-        val maxContentHeight = items.size + 2 * (paddingVertical + 1)
+        val maxContentHeight = items.length + 2 * (paddingVertical + 1)
 
-        val modalWidth = min(max(minWidth, maxContentWidth + textPadding), max(minWidth, width))
+        val modalWidth = min(max(minWidth, maxContentWidth + textPaddingLen), max(minWidth, width))
         val modalHeight = min(max(minHeight, maxContentHeight), max(minHeight, height - 4))
 
         val contentWidth = modalWidth - 2 * (paddingHorizontal + 1) // padding + border
@@ -58,22 +48,19 @@ object ListPopup extends FunctionComponent[ListPopupProps] {
           height = modalHeight,
           style = theme,
           padding = padding,
-          footer = props.footer match {
-            case None => ()
-            case Some(footer) => footer
-          }
+          footer = props.footer
         ))(
           <(listBoxComp)(^.plain := ListBoxProps(
             left = 1,
             top = 1,
             width = contentWidth,
             height = contentHeight,
-            selected = props.selected,
-            items = js.Array(items.map { item =>
+            selected = props.selected.getOrElse(0),
+            items = items.map { item =>
               textPaddingLeftStr +
-                TextLine.wrapText(item, contentWidth - textPadding, props.itemWrapPrefixLen) +
+                TextLine.wrapText(item, contentWidth - textPaddingLen, itemWrapPrefixLen) +
                 textPaddingRightStr
-            }: _*),
+            },
             style = theme,
             onAction = { index =>
               if (items.nonEmpty) {

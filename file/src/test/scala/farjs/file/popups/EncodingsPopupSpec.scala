@@ -7,6 +7,8 @@ import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   EncodingsPopup.listPopup = mockUiComponent("ListPopup")
@@ -20,7 +22,7 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val renderer = createTestRenderer(<(EncodingsPopup())(^.wrapped := props)())
 
     eventually {
-      findComponentProps(renderer.root, listPopup)
+      findComponentProps(renderer.root, listPopup, plain = true)
     }.map { popup =>
       //then
       onApply.expects("big5")
@@ -42,7 +44,7 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val result = createTestRenderer(<(EncodingsPopup())(^.wrapped := props)()).root
 
     eventually {
-      findComponentProps(result, listPopup)
+      findComponentProps(result, listPopup, plain = true)
     }.map { popup =>
       //then
       onApply.expects(*).never()
@@ -85,12 +87,12 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
                                    selected: Int): Assertion = {
 
     assertComponents(result.children, List(
-      <(listPopup())(^.assertWrapped(inside(_) {
+      <(listPopup())(^.assertPlain[ListPopupProps](inside(_) {
         case ListPopupProps(
           title,
           resItems,
           _,
-          onClose,
+          _,
           resSelected,
           _,
           _,
@@ -100,13 +102,12 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
           itemWrapPrefixLen
         ) =>
           title shouldBe "Encodings"
-          resItems shouldBe Encoding.encodings
-          onClose should be theSameInstanceAs props.onClose
+          resItems.toList shouldBe Encoding.encodings
           resSelected shouldBe selected
-          footer shouldBe None
-          textPaddingLeft shouldBe 2
-          textPaddingRight shouldBe 1
-          itemWrapPrefixLen shouldBe 3
+          footer shouldBe js.undefined
+          textPaddingLeft shouldBe js.undefined
+          textPaddingRight shouldBe js.undefined
+          itemWrapPrefixLen shouldBe js.undefined
       }))()
     ))
   }

@@ -5,6 +5,8 @@ import farjs.ui.popup._
 import scommons.react._
 import scommons.react.hooks._
 
+import scala.scalajs.js
+
 case class EncodingsPopupProps(encoding: String,
                                onApply: String => Unit,
                                onClose: () => Unit)
@@ -15,15 +17,15 @@ object EncodingsPopup extends FunctionComponent[EncodingsPopupProps] {
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val (maybeItems, setItems) = useState(Option.empty[List[String]])
+    val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
 
     useLayoutEffect({ () =>
-      setItems(Some(Encoding.encodings))
+      setItems(Some(js.Array(Encoding.encodings: _*)))
       ()
     }, Nil)
 
     maybeItems.map { items =>
-      <(listPopup())(^.wrapped := ListPopupProps(
+      <(listPopup())(^.plain := ListPopupProps(
         title = "Encodings",
         items = items,
         onAction = { index =>

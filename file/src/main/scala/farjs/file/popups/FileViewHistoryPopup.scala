@@ -6,6 +6,7 @@ import scommons.react._
 import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.scalajs.js
 
 case class FileViewHistoryPopupProps(onAction: FileViewHistory => Unit,
                                      onClose: () => Unit)
@@ -16,18 +17,18 @@ object FileViewHistoryPopup extends FunctionComponent[FileViewHistoryPopupProps]
   
   protected def render(compProps: Props): ReactElement = {
     val services = FileServices.useServices
-    val (maybeItems, setItems) = useState(Option.empty[List[FileViewHistory]])
+    val (maybeItems, setItems) = useState(Option.empty[js.Array[FileViewHistory]])
     val props = compProps.wrapped
 
     useLayoutEffect({ () =>
       services.fileViewHistory.getAll.map { items =>
-        setItems(Some(items.toList))
+        setItems(Some(js.Array(items: _*)))
       }
       ()
     }, Nil)
 
     maybeItems.map { items =>
-      <(listPopup())(^.wrapped := ListPopupProps(
+      <(listPopup())(^.plain := ListPopupProps(
         title = "File view history",
         items = items.map { item =>
           val prefix =

@@ -8,6 +8,7 @@ import scommons.react._
 import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.scalajs.js
 
 case class FolderShortcutsPopupProps(onChangeDir: String => Unit,
                                      onClose: () => Unit)
@@ -23,7 +24,7 @@ object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps]
     val (selected, setSelected) = useState(0)
     val props = compProps.wrapped
 
-    def onAction(index: Int): Unit = {
+    val onAction: js.Function1[Int, Unit] = { index =>
       maybeItems.foreach { items =>
         items(index).foreach { dir =>
           props.onChangeDir(dir)
@@ -31,7 +32,7 @@ object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps]
       }
     }
     
-    def onKeypress(key: String): Boolean = {
+    val onKeypress: js.Function1[String, Boolean] = { key =>
       var processed = true
       key match {
         case "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" =>
@@ -63,16 +64,16 @@ object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps]
     }, Nil)
 
     maybeItems.map { items =>
-      <(listPopup())(^.wrapped := ListPopupProps(
+      <(listPopup())(^.plain := ListPopupProps(
         title = "Folder shortcuts",
-        items = items.zipWithIndex.map { case (maybeItem, i) =>
+        items = js.Array(items.zipWithIndex.map { case (maybeItem, i) =>
           s"$i: ${maybeItem.getOrElse("<none>")}"
-        },
+        }: _*),
         onAction = onAction,
         onClose = props.onClose,
         onSelect = setSelected,
         onKeypress = onKeypress,
-        footer = Some("Edit: +, -")
+        footer = "Edit: +, -"
       ))()
     }.orNull
   }
