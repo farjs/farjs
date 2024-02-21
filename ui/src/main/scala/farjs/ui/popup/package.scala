@@ -9,6 +9,10 @@ import scala.scalajs.js.annotation.JSImport
 package object popup {
 
   @js.native
+  @JSImport("@farjs/ui/popup/ListPopup.mjs", JSImport.Default)
+  object ListPopup extends ReactClass
+
+  @js.native
   @JSImport("@farjs/ui/popup/MessageBox.mjs", JSImport.Default)
   object MessageBox extends ReactClass
 

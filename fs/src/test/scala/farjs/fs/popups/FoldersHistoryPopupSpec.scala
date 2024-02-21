@@ -6,6 +6,7 @@ import farjs.fs.popups.FoldersHistoryPopup._
 import farjs.ui.popup.ListPopupProps
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.Future
@@ -13,7 +14,7 @@ import scala.scalajs.js
 
 class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  FoldersHistoryPopup.listPopup = mockUiComponent("ListPopup")
+  FoldersHistoryPopup.listPopup = "ListPopup".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class HistoryService {
@@ -37,7 +38,9 @@ class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestR
     )).root
 
     itemsF.flatMap { _ =>
-      val popup = findComponentProps(result, listPopup, plain = true)
+      val popup = inside(findComponents(result, listPopup)) {
+        case List(c) => c.props.asInstanceOf[ListPopupProps]
+      }
 
       //then
       onChangeDir.expects("item 2")
@@ -81,7 +84,7 @@ class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestR
                                         items: List[String]): Assertion = {
     
     assertComponents(result.children, List(
-      <(listPopup())(^.assertPlain[ListPopupProps](inside(_) {
+      <(listPopup)(^.assertPlain[ListPopupProps](inside(_) {
         case ListPopupProps(
           title,
           resItems,

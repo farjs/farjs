@@ -13,7 +13,7 @@ case class FoldersHistoryPopupProps(onChangeDir: String => Unit,
 
 object FoldersHistoryPopup extends FunctionComponent[FoldersHistoryPopupProps] {
 
-  private[popups] var listPopup: UiComponent[ListPopupProps] = ListPopup
+  private[popups] var listPopup: ReactClass = ListPopup
   
   protected def render(compProps: Props): ReactElement = {
     val services = FileListServices.useServices
@@ -28,7 +28,7 @@ object FoldersHistoryPopup extends FunctionComponent[FoldersHistoryPopupProps] {
     }, Nil)
 
     maybeItems.map { items =>
-      <(listPopup())(^.plain := ListPopupProps(
+      <(listPopup)(^.plain := ListPopupProps(
         title = "Folders history",
         items = items,
         onAction = { index =>

@@ -13,7 +13,7 @@ case class FileViewHistoryPopupProps(onAction: FileViewHistory => Unit,
 
 object FileViewHistoryPopup extends FunctionComponent[FileViewHistoryPopupProps] {
 
-  private[popups] var listPopup: UiComponent[ListPopupProps] = ListPopup
+  private[popups] var listPopup: ReactClass = ListPopup
   
   protected def render(compProps: Props): ReactElement = {
     val services = FileServices.useServices
@@ -28,7 +28,7 @@ object FileViewHistoryPopup extends FunctionComponent[FileViewHistoryPopupProps]
     }, Nil)
 
     maybeItems.map { items =>
-      <(listPopup())(^.plain := ListPopupProps(
+      <(listPopup)(^.plain := ListPopupProps(
         title = "File view history",
         items = items.map { item =>
           val prefix =

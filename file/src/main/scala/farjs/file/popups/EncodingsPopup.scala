@@ -13,7 +13,7 @@ case class EncodingsPopupProps(encoding: String,
 
 object EncodingsPopup extends FunctionComponent[EncodingsPopupProps] {
 
-  private[file] var listPopup: UiComponent[ListPopupProps] = ListPopup
+  private[file] var listPopup: ReactClass = ListPopup
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -25,7 +25,7 @@ object EncodingsPopup extends FunctionComponent[EncodingsPopupProps] {
     }, Nil)
 
     maybeItems.map { items =>
-      <(listPopup())(^.plain := ListPopupProps(
+      <(listPopup)(^.plain := ListPopupProps(
         title = "Encodings",
         items = items,
         onAction = { index =>

@@ -15,7 +15,7 @@ case class FolderShortcutsPopupProps(onChangeDir: String => Unit,
 
 object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps] {
 
-  private[popups] var listPopup: UiComponent[ListPopupProps] = ListPopup
+  private[popups] var listPopup: ReactClass = ListPopup
   
   protected def render(compProps: Props): ReactElement = {
     val stacks = WithPanelStacks.usePanelStacks
@@ -64,7 +64,7 @@ object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps]
     }, Nil)
 
     maybeItems.map { items =>
-      <(listPopup())(^.plain := ListPopupProps(
+      <(listPopup)(^.plain := ListPopupProps(
         title = "Folder shortcuts",
         items = js.Array(items.zipWithIndex.map { case (maybeItem, i) =>
           s"$i: ${maybeItem.getOrElse("<none>")}"

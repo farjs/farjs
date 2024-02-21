@@ -5,13 +5,14 @@ import farjs.file.popups.EncodingsPopup._
 import farjs.ui.popup.ListPopupProps
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.scalajs.js
 
 class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  EncodingsPopup.listPopup = mockUiComponent("ListPopup")
+  EncodingsPopup.listPopup = "ListPopup".asInstanceOf[ReactClass]
 
   it should "call onApply with new encoding when onAction" in {
     //given
@@ -22,7 +23,9 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val renderer = createTestRenderer(<(EncodingsPopup())(^.wrapped := props)())
 
     eventually {
-      findComponentProps(renderer.root, listPopup, plain = true)
+      inside(findComponents(renderer.root, listPopup)) {
+        case List(c) => c.props.asInstanceOf[ListPopupProps]
+      }
     }.map { popup =>
       //then
       onApply.expects("big5")
@@ -44,7 +47,9 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val result = createTestRenderer(<(EncodingsPopup())(^.wrapped := props)()).root
 
     eventually {
-      findComponentProps(result, listPopup, plain = true)
+      inside(findComponents(result, listPopup)) {
+        case List(c) => c.props.asInstanceOf[ListPopupProps]
+      }
     }.map { popup =>
       //then
       onApply.expects(*).never()
@@ -87,7 +92,7 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
                                    selected: Int): Assertion = {
 
     assertComponents(result.children, List(
-      <(listPopup())(^.assertPlain[ListPopupProps](inside(_) {
+      <(listPopup)(^.assertPlain[ListPopupProps](inside(_) {
         case ListPopupProps(
           title,
           resItems,

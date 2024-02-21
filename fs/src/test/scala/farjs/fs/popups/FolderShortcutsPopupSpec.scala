@@ -17,7 +17,7 @@ import scala.scalajs.js
 
 class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  FolderShortcutsPopup.listPopup = mockUiComponent("ListPopup")
+  FolderShortcutsPopup.listPopup = "ListPopup".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class ShortcutsService {
@@ -51,7 +51,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
-      val popup = findComponentProps(result, listPopup, plain = true)
+      val popup = findListPopupProps(result)
 
       //then
       onChangeDir.expects("item")
@@ -82,7 +82,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
-      val popup = findComponentProps(result, listPopup, plain = true)
+      val popup = findListPopupProps(result)
 
       //then
       onChangeDir.expects(*).never()
@@ -124,7 +124,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
-      val popup = findComponentProps(result, listPopup, plain = true)
+      val popup = findListPopupProps(result)
 
       //then
       onChangeDir.expects("item 1")
@@ -173,7 +173,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
-      val popup = findComponentProps(result, listPopup, plain = true)
+      val popup = findListPopupProps(result)
       popup.items.head shouldBe "0: item"
 
       //when
@@ -181,7 +181,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
 
       //then
       deleteF.map { _ =>
-        findComponentProps(result, listPopup, plain = true).items.head shouldBe "0: <none>"
+        findListPopupProps(result).items.head shouldBe "0: <none>"
       }
     }
   }
@@ -208,8 +208,8 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
-      findComponentProps(result, listPopup, plain = true).onSelect.foreach(f => f(1))
-      val popup = findComponentProps(result, listPopup, plain = true)
+      findListPopupProps(result).onSelect.foreach(f => f(1))
+      val popup = findListPopupProps(result)
       popup.items(1) shouldBe "1: <none>"
 
       //when
@@ -217,7 +217,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
 
       //then
       saveF.map { _ =>
-        findComponentProps(result, listPopup, plain = true).items(1) shouldBe "1: /test"
+        findListPopupProps(result).items(1) shouldBe "1: /test"
       }
     }
   }
@@ -240,7 +240,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     ), leftStack, rightStack)).root
 
     itemsF.flatMap { _ =>
-      val popup = findComponentProps(result, listPopup, plain = true)
+      val popup = findListPopupProps(result)
 
       //when & then
       popup.onKeypress.foreach(_.apply("unknown") shouldBe false)
@@ -284,6 +284,12 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     }
   }
   
+  private def findListPopupProps(result: TestInstance): ListPopupProps = {
+    inside(findComponents(result, listPopup)) {
+      case List(c) => c.props.asInstanceOf[ListPopupProps]
+    }
+  }
+  
   private def getFolderShortcutsPopupProps(onChangeDir: String => Unit = _ => ()
                                           ): FolderShortcutsPopupProps = {
     FolderShortcutsPopupProps(
@@ -297,7 +303,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
                                          items: List[String]): Assertion = {
     
     assertComponents(result.children, List(
-      <(listPopup())(^.assertPlain[ListPopupProps](inside(_) {
+      <(listPopup)(^.assertPlain[ListPopupProps](inside(_) {
         case ListPopupProps(
           title,
           resItems,
