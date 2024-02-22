@@ -19,6 +19,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
   CopyProgressPopup.modalComp = "Modal".asInstanceOf[ReactClass]
   CopyProgressPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
   CopyProgressPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
+  CopyProgressPopup.progressBarComp = "ProgressBar".asInstanceOf[ReactClass]
 
   it should "call onCancel when onCancel in modal" in {
     //given
@@ -156,14 +157,14 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           padding shouldBe 0
       }))())
 
-      assertTestComponent(itemPercent, progressBarComp, plain = true) {
+      assertNativeComponent(itemPercent, <(progressBarComp)(^.assertPlain[ProgressBarProps](inside(_) {
         case ProgressBarProps(percent, left, top, resLength, resStyle) =>
           percent shouldBe props.itemPercent
           left shouldBe contentLeft
           top shouldBe 5
           resLength shouldBe contentWidth
           resStyle shouldBe theme
-      }
+      }))())
       assertNativeComponent(sep1, <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
         case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
           resLeft shouldBe contentLeft
@@ -185,14 +186,14 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
           focused shouldBe js.undefined
           padding shouldBe js.undefined
       }))())
-      assertTestComponent(totalPercent, progressBarComp, plain = true) {
+      assertNativeComponent(totalPercent, <(progressBarComp)(^.assertPlain[ProgressBarProps](inside(_) {
         case ProgressBarProps(percent, left, top, resLength, resStyle) =>
           percent shouldBe props.totalPercent
           left shouldBe contentLeft
           top shouldBe 7
           resLength shouldBe contentWidth
           resStyle shouldBe theme
-      }
+      }))())
 
       assertNativeComponent(sep2, <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
         case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>
