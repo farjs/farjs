@@ -22,7 +22,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
   private[popups] var textLineComp: ReactClass = TextLine
   private[popups] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
   private[popups] var horizontalLineComp: ReactClass = HorizontalLine
-  private[popups] var checkBoxComp: UiComponent[CheckBoxProps] = CheckBox
+  private[popups] var checkBoxComp: ReactClass = CheckBox
   private[popups] var buttonsPanelComp: ReactClass = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
@@ -90,7 +90,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
           startCh = DoubleChars.leftSingle,
           endCh = DoubleChars.rightSingle
         ))(),
-        <(checkBoxComp())(^.plain := CheckBoxProps(
+        <(checkBoxComp)(^.plain := CheckBoxProps(
           left = contentLeft,
           top = 4,
           value = multiple,

@@ -22,7 +22,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   MakeFolderPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
   MakeFolderPopup.comboBoxComp = mockUiComponent("ComboBox")
   MakeFolderPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
-  MakeFolderPopup.checkBoxComp = mockUiComponent("CheckBox")
+  MakeFolderPopup.checkBoxComp = "CheckBox".asInstanceOf[ReactClass]
   MakeFolderPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
@@ -95,14 +95,18 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
     ))
     itemsF.flatMap { _ =>
-      val checkbox = findComponentProps(renderer.root, checkBoxComp, plain = true)
+      val checkbox = inside(findComponents(renderer.root, checkBoxComp)) {
+        case List(c) => c.props.asInstanceOf[CheckBoxProps]
+      }
       checkbox.value shouldBe false
 
       //when
       checkbox.onChange()
 
       //then
-      findComponentProps(renderer.root, checkBoxComp, plain = true).value shouldBe true
+      inside(findComponents(renderer.root, checkBoxComp)) { case List(c) =>
+        c.props.asInstanceOf[CheckBoxProps].value shouldBe true
+      }
     }
   }
   
@@ -294,7 +298,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
             startCh shouldBe DoubleChars.leftSingle
             endCh shouldBe DoubleChars.rightSingle
         }))(),
-        <(checkBoxComp())(^.assertPlain[CheckBoxProps](inside(_) {
+        <(checkBoxComp)(^.assertPlain[CheckBoxProps](inside(_) {
           case CheckBoxProps(left, top, resValue, resLabel, resStyle, _) =>
             left shouldBe 2
             top shouldBe 4
