@@ -20,7 +20,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val setViewport = mockFunction[ListViewport, Unit]
     val props = getComboBoxPopupProps(index = 1, setViewport = setViewport)
-    val comp = testRender(<(ComboBoxPopup())(^.wrapped := props)())
+    val comp = testRender(<(ComboBoxPopup())(^.plain := props)())
     val boxEl = inside(findComponents(comp, <.box.name)) {
       case List(box) => box
     }
@@ -40,7 +40,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val setViewport = mockFunction[ListViewport, Unit]
     val props = getComboBoxPopupProps(setViewport = setViewport)
-    val comp = testRender(<(ComboBoxPopup())(^.wrapped := props)())
+    val comp = testRender(<(ComboBoxPopup())(^.plain := props)())
     val boxEl = inside(findComponents(comp, <.box.name)) {
       case List(box) => box
     }
@@ -61,7 +61,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     val setViewport = mockFunction[ListViewport, Unit]
     val props = getComboBoxPopupProps(items = List.fill(15)("item"), setViewport = setViewport)
     props.items.length should be > maxItems
-    val comp = testRender(<(ComboBoxPopup())(^.wrapped := props)())
+    val comp = testRender(<(ComboBoxPopup())(^.plain := props)())
     val scrollBarProps = inside(findComponents(comp, scrollBarComp)) {
       case List(c) => c.props.asInstanceOf[ScrollBarProps]
     }
@@ -82,7 +82,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     val props = getComboBoxPopupProps()
     
     //when
-    val result = testRender(<(ComboBoxPopup())(^.wrapped := props)())
+    val result = testRender(<(ComboBoxPopup())(^.plain := props)())
     
     //then
     assertComboBoxPopupPopup(result, props, showScrollBar = false)
@@ -93,7 +93,7 @@ class ComboBoxPopupSpec extends TestSpec with TestRendererUtils {
     val props = getComboBoxPopupProps(items = List.fill(15)("item"))
     
     //when
-    val result = testRender(<(ComboBoxPopup())(^.wrapped := props)())
+    val result = testRender(<(ComboBoxPopup())(^.plain := props)())
     
     //then
     assertComboBoxPopupPopup(result, props, showScrollBar = true)

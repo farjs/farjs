@@ -167,7 +167,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
             hidePopup()
           }
         )(
-          <(comboBoxPopup())(^.wrapped := ComboBoxPopupProps(
+          <(comboBoxPopup())(^.plain := ComboBoxPopupProps(
             left = props.left,
             top = props.top + 1,
             width = props.width,

@@ -4,17 +4,6 @@ import farjs.ui.border._
 import scommons.react._
 import scommons.react.blessed._
 
-import scala.scalajs.js
-
-case class ComboBoxPopupProps(left: Int,
-                              top: Int,
-                              width: Int,
-                              items: js.Array[String],
-                              viewport: ListViewport,
-                              setViewport: js.Function1[ListViewport, Unit],
-                              style: BlessedStyle,
-                              onClick: js.Function1[Int, Unit])
-
 object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
   
   private[ui] var singleBorderComp: ReactClass = SingleBorder
@@ -24,7 +13,7 @@ object ComboBoxPopup extends FunctionComponent[ComboBoxPopupProps] {
   private[ui] val maxItems = 8
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val width = props.width
     val height = maxItems + 2
     val viewWidth = width - 2
