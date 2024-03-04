@@ -22,6 +22,13 @@ package object ui {
   object CheckBox extends ReactClass
 
   @js.native
+  @JSImport("@farjs/ui/ComboBoxPopup.mjs", JSImport.Default)
+  object ComboBoxPopup extends ReactClass {
+    
+    val maxItems: Int = js.native
+  }
+
+  @js.native
   @JSImport("@farjs/ui/ListBox.mjs", JSImport.Default)
   object ListBox extends ReactClass
 
