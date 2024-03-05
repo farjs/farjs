@@ -9,18 +9,16 @@
 [![Downloads](https://img.shields.io/npm/dm/farjs-app.svg)](https://www.pkgstats.com/pkg:farjs-app)
 [![Publish Size](https://badgen.net/packagephobia/publish/farjs-app)](https://packagephobia.com/result?p=farjs-app)
 [![Install Size](https://badgen.net/packagephobia/install/farjs-app)](https://packagephobia.com/result?p=farjs-app)
-[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.13.0.svg)](https://www.scala-js.org)
 
 ## FAR.js
 
 Good old Windows **F**ile and **AR**chive Manager
 ([FAR](https://en.wikipedia.org/wiki/Far_Manager)) app built with:
-  [Scala.js](https://www.scala-js.org/),
   [React.js](https://reactjs.org/),
   [react-blessed](https://github.com/Yomguithereal/react-blessed),
   [blessed](https://github.com/chjj/blessed)
 
-Runs on [Node.js](https://nodejs.org/), [bun](https://bun.sh) and cross-platform:
+Runs on [Node.js](https://nodejs.org/) and [bun](https://bun.sh) on different platforms:
 * `Mac OS X` (primary support in [iTerm2](https://iterm2.com/) and [WezTerm](https://wezfurlong.org/wezterm/))
 * `Windows` (primary support in [WezTerm](https://wezfurlong.org/wezterm/) and [Windows Terminal](https://docs.microsoft.com/en-us/windows/terminal/))
 * `Linux` (primary support in [WezTerm](https://wezfurlong.org/wezterm/))

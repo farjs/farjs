@@ -1,6 +1,8 @@
 package farjs.ui
 
 import farjs.ui.TextBox._
+import org.scalactic.source.Position
+import org.scalatest.Assertion
 import scommons.react.test._
 
 import scala.scalajs.js
@@ -16,7 +18,7 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     val textInput = findComponentProps(renderer.root, textInputComp)
 
     //when
-    textInput.stateUpdater(_.copy(
+    textInput.stateUpdater(TextInputState.copy(_)(
       offset = 1,
       cursorX = 2,
       selStart = 3,
@@ -24,12 +26,12 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     ))
 
     //then
-    findComponentProps(renderer.root, textInputComp).state shouldBe TextInputState(
+    assertTextInputState(findComponentProps(renderer.root, textInputComp).state, TextInputState(
       offset = 1,
       cursorX = 2,
       selStart = 3,
       selEnd = 4
-    )
+    ))
   }
 
   it should "render component" in {
@@ -46,7 +48,7 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
         top shouldBe props.top
         width shouldBe props.width
         value shouldBe props.value
-        state shouldBe TextInputState()
+        assertTextInputState(state, TextInputState())
         onChange shouldBe props.onChange
         onEnter shouldBe props.onEnter
     }
@@ -63,4 +65,16 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     onChange = onChange,
     onEnter = onEnter
   )
+
+  private def assertTextInputState(result: TextInputState,
+                                   expected: TextInputState
+                                  )(implicit position: Position): Assertion = {
+    inside(result) {
+      case TextInputState(offset, cursorX, selStart, selEnd) =>
+        offset shouldBe expected.offset
+        cursorX shouldBe expected.cursorX
+        selStart shouldBe expected.selStart
+        selEnd shouldBe expected.selEnd
+    }
+  }
 }

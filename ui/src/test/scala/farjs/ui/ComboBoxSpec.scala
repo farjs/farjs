@@ -4,7 +4,8 @@ import farjs.ui.ComboBox._
 import farjs.ui.popup.PopupOverlay
 import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
-import org.scalatest.Succeeded
+import org.scalactic.source.Position
+import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs._
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
@@ -140,7 +141,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val props = getComboBoxProps(items = List("abc", "ac"), value = "ad", onChange = onChange)
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
     val textInput = findComponentProps(renderer.root, textInputComp)
-    textInput.stateUpdater(_.copy(selStart = 1))
+    textInput.stateUpdater(TextInputState.copy(_)(selStart = 1))
 
     //then
     onChange.expects("abc")
@@ -463,7 +464,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
           top shouldBe props.top
           width shouldBe props.width
           value shouldBe props.value
-          state shouldBe TextInputState()
+          assertTextInputState(state, TextInputState())
           onChange shouldBe props.onChange
           onEnter shouldBe props.onEnter
       }))(),
@@ -560,7 +561,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val textInput = findComponentProps(renderer.root, textInputComp)
 
     //when
-    textInput.stateUpdater(_.copy(
+    textInput.stateUpdater(TextInputState.copy(_)(
       offset = 1,
       cursorX = 2,
       selStart = 3,
@@ -568,12 +569,12 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     ))
 
     //then
-    findComponentProps(renderer.root, textInputComp).state shouldBe TextInputState(
+    assertTextInputState(findComponentProps(renderer.root, textInputComp).state, TextInputState(
       offset = 1,
       cursorX = 2,
       selStart = 3,
       selEnd = 4
-    )
+    ))
   }
 
   it should "render initial component" in {
@@ -592,7 +593,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
           top shouldBe props.top
           width shouldBe props.width
           value shouldBe props.value
-          state shouldBe TextInputState()
+          assertTextInputState(state, TextInputState())
           onChange shouldBe props.onChange
           onEnter shouldBe props.onEnter
       }))(),
@@ -624,4 +625,16 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     onChange = onChange,
     onEnter = onEnter
   )
+  
+  private def assertTextInputState(result: TextInputState,
+                                   expected: TextInputState
+                                  )(implicit position: Position): Assertion = {
+    inside(result) {
+      case TextInputState(offset, cursorX, selStart, selEnd) =>
+        offset shouldBe expected.offset
+        cursorX shouldBe expected.cursorX
+        selStart shouldBe expected.selStart
+        selEnd shouldBe expected.selEnd
+    }
+  }
 }

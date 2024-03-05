@@ -8,11 +8,6 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class TextInputState(offset: Int = 0,
-                          cursorX: Int = -1,
-                          selStart: Int = -1,
-                          selEnd: Int = -1)
-
 case class TextInputProps(inputRef: ReactRef[BlessedElement],
                           left: Int,
                           top: Int,
@@ -63,7 +58,7 @@ object TextInput extends FunctionComponent[TextInputProps] {
       }
       
       select(value, offset + cursorX, newOffset + newPos, ts)
-      props.stateUpdater(_.copy(offset = newOffset, cursorX = newPos))
+      props.stateUpdater(TextInputState.copy(_)(offset = newOffset, cursorX = newPos))
     }
     
     def select(value: String, idx: Int, newIdx: Int, ts: TextSelect): Unit = {
@@ -76,7 +71,7 @@ object TextInput extends FunctionComponent[TextInputProps] {
         case TextSelect.ToTheLeft => (newIdx, if (selEnd != -1) selEnd else idx)
         case _ => (selStart, selEnd)
       }
-      props.stateUpdater(_.copy(selStart = newStart, selEnd = newEnd))
+      props.stateUpdater(TextInputState.copy(_)(selStart = newStart, selEnd = newEnd))
     }
     
     val onClick: js.Function1[MouseData, Unit] = { data =>
