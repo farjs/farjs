@@ -1,7 +1,7 @@
 package definitions
 
 import sbt._
-import scoverage.ScoverageKeys.coverageExcludedPackages
+import scoverage.ScoverageKeys.coverageEnabled
 
 object FarjsUi extends ScalaJsModule {
 
@@ -11,10 +11,8 @@ object FarjsUi extends ScalaJsModule {
 
   override def definition: Project = super.definition
     .settings(
-      coverageExcludedPackages :=
-        "scommons.react.blessed.raw" +
-          ";farjs.ui.Exports" +
-          ";farjs.ui.raw"
+      // disable coverage for JS-facade only module
+      coverageEnabled := false
     )
 
   override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Nil

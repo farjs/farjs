@@ -15,7 +15,7 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     //given
     val props = getTextBoxProps()
     val renderer = createTestRenderer(<(TextBox())(^.plain := props)())
-    val textInput = findComponentProps(renderer.root, textInputComp)
+    val textInput = findComponentProps(renderer.root, textInputComp, plain = true)
 
     //when
     textInput.stateUpdater(TextInputState.copy(_)(
@@ -26,7 +26,7 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     ))
 
     //then
-    assertTextInputState(findComponentProps(renderer.root, textInputComp).state, TextInputState(
+    assertTextInputState(findComponentProps(renderer.root, textInputComp, plain = true).state, TextInputState(
       offset = 1,
       cursorX = 2,
       selStart = 3,
@@ -42,7 +42,7 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(TextBox())(^.plain := props)())
 
     //then
-    assertTestComponent(result, textInputComp) {
+    assertTestComponent(result, textInputComp, plain = true) {
       case TextInputProps(_, left, top, width, value, state, _, onChange, onEnter, _) =>
         left shouldBe props.left
         top shouldBe props.top

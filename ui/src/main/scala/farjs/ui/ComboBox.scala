@@ -8,6 +8,7 @@ import scommons.react._
 import scommons.react.blessed._
 import scommons.react.blessed.raw.BlessedProgram
 import scommons.react.hooks._
+import scommons.react.raw.React
 
 import scala.scalajs.js
 
@@ -18,7 +19,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
-    val inputRef = useRef[BlessedElement](null)
+    val inputRef = React.useRef(null)
     val programRef = useRef[BlessedProgram](null)
     val autoCompleteTimeoutRef = useRef[Timeout](null)
     val (maybePopup, setPopup) = useState[Option[ListViewport]](None)
@@ -96,7 +97,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
       }
     }
     
-    def onKeypress(keyFull: String): Boolean = {
+    val onKeypress: js.Function1[String, Boolean] = { keyFull =>
       var processed = maybePopup.isDefined
       keyFull match {
         case "escape" | "tab" => hidePopup()
@@ -120,7 +121,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
     }
     
     <.>()(
-      <(textInputComp())(^.wrapped := TextInputProps(
+      <(textInputComp())(^.plain := TextInputProps(
         inputRef = inputRef,
         left = props.left,
         top = props.top,
@@ -143,7 +144,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
         ^.rbAutoFocus := false,
         ^.rbStyle := arrowStyle,
         ^.rbOnClick := { _ =>
-          val el = inputRef.current
+          val el = inputRef.current.asInstanceOf[BlessedElement]
           if (el != null && el.screen.focused != el) {
             el.focus()
           }

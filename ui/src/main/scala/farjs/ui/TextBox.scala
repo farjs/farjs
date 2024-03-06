@@ -1,8 +1,8 @@
 package farjs.ui
 
 import scommons.react._
-import scommons.react.blessed._
 import scommons.react.hooks._
+import scommons.react.raw.React
 
 object TextBox extends FunctionComponent[TextBoxProps] {
 
@@ -11,9 +11,9 @@ object TextBox extends FunctionComponent[TextBoxProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
     val (state, setState) = useStateUpdater(() => TextInputState())
-    val inputRef = useRef[BlessedElement](null)
+    val inputRef = React.useRef(null)
     
-    <(textInputComp())(^.wrapped := TextInputProps(
+    <(textInputComp())(^.plain := TextInputProps(
       inputRef = inputRef,
       left = props.left,
       top = props.top,

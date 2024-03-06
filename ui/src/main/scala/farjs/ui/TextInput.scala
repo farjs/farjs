@@ -5,31 +5,24 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
+import scommons.react.raw.NativeRef
 
 import scala.scalajs.js
 
-case class TextInputProps(inputRef: ReactRef[BlessedElement],
-                          left: Int,
-                          top: Int,
-                          width: Int,
-                          value: String,
-                          state: TextInputState,
-                          stateUpdater: js.Function1[js.Function1[TextInputState, TextInputState], Unit],
-                          onChange: js.Function1[String, Unit],
-                          onEnter: js.UndefOr[js.Function0[Unit]],
-                          onKeypress: String => Boolean = _ => false)
-
 object TextInput extends FunctionComponent[TextInputProps] {
 
+  private def deref(ref: NativeRef): BlessedElement =
+    ref.current.asInstanceOf[BlessedElement]
+  
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val theme = Theme.useTheme().textBox
     val elementRef = props.inputRef
     val (offset, cursorX) = (props.state.offset, props.state.cursorX)
     val (selStart, selEnd) = (props.state.selStart, props.state.selEnd)
 
     useLayoutEffect({ () =>
-      move(elementRef.current, props.value, CursorMove.End, TextSelect.All)
+      move(deref(elementRef), props.value, CursorMove.End, TextSelect.All)
     }, Nil)
 
     def move(el: BlessedElement, value: String, cm: CursorMove, ts: TextSelect): Unit = {
@@ -75,7 +68,7 @@ object TextInput extends FunctionComponent[TextInputProps] {
     }
     
     val onClick: js.Function1[MouseData, Unit] = { data =>
-      val el = elementRef.current
+      val el = deref(elementRef)
       val screen = el.screen
       move(el, props.value, CursorMove.At(data.x - el.aleft), TextSelect.Reset)
       if (screen.focused != el) {
@@ -84,7 +77,7 @@ object TextInput extends FunctionComponent[TextInputProps] {
     }
     
     val onResize: js.Function0[Unit] = { () =>
-      val el = elementRef.current
+      val el = deref(elementRef)
       val screen = el.screen
       if (screen.focused == el) {
         screen.program.omove(el.aleft + cursorX, el.atop)
@@ -92,7 +85,7 @@ object TextInput extends FunctionComponent[TextInputProps] {
     }
     
     val onFocus: js.Function0[Unit] = { () =>
-      val el = elementRef.current
+      val el = deref(elementRef)
       val screen = el.screen
       val cursor = screen.cursor
       if (cursor.shape != "underline" || !cursor.blink) {
@@ -103,7 +96,7 @@ object TextInput extends FunctionComponent[TextInputProps] {
     }
     
     val onBlur: js.Function0[Unit] = { () =>
-      val el = elementRef.current
+      val el = deref(elementRef)
       el.screen.program.hideCursor()
     }
     
@@ -136,10 +129,10 @@ object TextInput extends FunctionComponent[TextInputProps] {
     }
 
     val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (ch, key) =>
-      val el = elementRef.current
+      val el = deref(elementRef)
 
       var processed = true
-      if (!props.onKeypress(key.full)) {
+      if (!props.onKeypress.exists(_.apply(key.full))) {
         key.full match {
           case "return" =>
             props.onEnter.foreach(_.apply())
@@ -182,7 +175,9 @@ object TextInput extends FunctionComponent[TextInputProps] {
     }
     
     <.input(
-      ^.reactRef := elementRef,
+      ^.ref := { ref: BlessedElement =>
+        elementRef.current = ref
+      },
       ^.rbAutoFocus := false,
       ^.rbClickable := true,
       ^.rbKeyable := true,

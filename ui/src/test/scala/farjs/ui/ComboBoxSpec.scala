@@ -35,7 +35,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     process.stdin.on("keypress", listener)
     val props = getComboBoxProps(onChange = onChange)
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
-    findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
+    findComponentProps(renderer.root, textInputComp, plain = true).onKeypress.foreach(_.apply("C-down") shouldBe true)
     val comboBox = inside(findComponents(renderer.root, comboBoxPopup)) {
       case List(c) => c.props.asInstanceOf[ComboBoxPopupProps]
     }
@@ -70,16 +70,16 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     process.stdin.on("keypress", listener)
     val props = getComboBoxProps(onChange = onChange)
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
-    findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
+    findComponentProps(renderer.root, textInputComp, plain = true).onKeypress.foreach(_.apply("C-down") shouldBe true)
     findComponents(renderer.root, comboBoxPopup) should not be empty
-    val textInput = findComponentProps(renderer.root, textInputComp)
+    val textInput = findComponentProps(renderer.root, textInputComp, plain = true)
 
     //then
     onChange.expects("item")
     onKey.expects("end", false, false, false)
 
     //when
-    textInput.onKeypress("return") shouldBe true
+    textInput.onKeypress.foreach(_.apply("return") shouldBe true)
 
     //then
     findComponents(renderer.root, comboBoxPopup) should be (empty)
@@ -104,16 +104,16 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     process.stdin.on("keypress", listener)
     val props = getComboBoxProps(items = Nil, onChange = onChange)
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
-    findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
+    findComponentProps(renderer.root, textInputComp, plain = true).onKeypress.foreach(_.apply("C-down") shouldBe true)
     findComponents(renderer.root, comboBoxPopup) should not be empty
-    val textInput = findComponentProps(renderer.root, textInputComp)
+    val textInput = findComponentProps(renderer.root, textInputComp, plain = true)
 
     //then
     onChange.expects(*).never()
     onKey.expects(*, *, *, *).never()
 
     //when
-    textInput.onKeypress("return") shouldBe true
+    textInput.onKeypress.foreach(_.apply("return") shouldBe true)
 
     //then
     findComponents(renderer.root, comboBoxPopup) should not be empty
@@ -140,7 +140,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     process.stdin.on("keypress", listener)
     val props = getComboBoxProps(items = List("abc", "ac"), value = "ad", onChange = onChange)
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
-    val textInput = findComponentProps(renderer.root, textInputComp)
+    val textInput = findComponentProps(renderer.root, textInputComp, plain = true)
     textInput.stateUpdater(TextInputState.copy(_)(selStart = 1))
 
     //then
@@ -148,7 +148,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     onKey.expects("end", false, false, true)
 
     //when
-    findComponentProps(renderer.root, textInputComp).onKeypress("b") shouldBe false
+    findComponentProps(renderer.root, textInputComp, plain = true).onKeypress.foreach(_.apply("b") shouldBe false)
 
     //then
     eventually {
@@ -177,14 +177,14 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     process.stdin.on("keypress", listener)
     val props = getComboBoxProps(items = List("abc", "ac"), value = "", onChange = onChange)
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
-    val textInput = findComponentProps(renderer.root, textInputComp)
+    val textInput = findComponentProps(renderer.root, textInputComp, plain = true)
 
     //then
     onChange.expects("abc")
     onKey.expects("end", false, false, true)
 
     //when
-    textInput.onKeypress("a") shouldBe false
+    textInput.onKeypress.foreach(_.apply("a") shouldBe false)
 
     //then
     eventually {
@@ -213,14 +213,14 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     process.stdin.on("keypress", listener)
     val props = getComboBoxProps(items = List("aBc", "ac"), value = "a", onChange = onChange)
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
-    val textInput = findComponentProps(renderer.root, textInputComp)
+    val textInput = findComponentProps(renderer.root, textInputComp, plain = true)
 
     //then
     onChange.expects("aBc")
     onKey.expects("end", false, false, true)
 
     //when
-    textInput.onKeypress("S-b") shouldBe false
+    textInput.onKeypress.foreach(_.apply("S-b") shouldBe false)
 
     //then
     eventually {
@@ -249,14 +249,14 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     process.stdin.on("keypress", listener)
     val props = getComboBoxProps(items = List("a c", " c"), value = "a", onChange = onChange)
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
-    val textInput = findComponentProps(renderer.root, textInputComp)
+    val textInput = findComponentProps(renderer.root, textInputComp, plain = true)
 
     //then
     onChange.expects("a c")
     onKey.expects("end", false, false, true)
 
     //when
-    textInput.onKeypress("space") shouldBe false
+    textInput.onKeypress.foreach(_.apply("space") shouldBe false)
 
     //then
     eventually {
@@ -291,11 +291,11 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     onKey.expects("end", false, false, true)
 
     //when
-    findComponentProps(renderer.root, textInputComp).onKeypress("a") shouldBe false
+    findComponentProps(renderer.root, textInputComp, plain = true).onKeypress.foreach(_.apply("a") shouldBe false)
     TestRenderer.act { () =>
       renderer.update(withThemeContext(<(ComboBox())(^.plain := ComboBoxProps.copy(props)(value = "a"))()))
     }
-    findComponentProps(renderer.root, textInputComp).onKeypress("b") shouldBe false
+    findComponentProps(renderer.root, textInputComp, plain = true).onKeypress.foreach(_.apply("b") shouldBe false)
 
     //then
     eventually {
@@ -311,12 +311,12 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val props = getComboBoxProps()
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
-    findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
+    findComponentProps(renderer.root, textInputComp, plain = true).onKeypress.foreach(_.apply("C-down") shouldBe true)
     findComponents(renderer.root, comboBoxPopup) should not be empty
-    val textInput = findComponentProps(renderer.root, textInputComp)
+    val textInput = findComponentProps(renderer.root, textInputComp, plain = true)
 
     //when
-    textInput.onKeypress("escape") shouldBe true
+    textInput.onKeypress.foreach(_.apply("escape") shouldBe true)
 
     //then
     findComponents(renderer.root, comboBoxPopup) should be (empty)
@@ -326,12 +326,12 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val props = getComboBoxProps()
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
-    findComponentProps(renderer.root, textInputComp).onKeypress("C-up") shouldBe true
+    findComponentProps(renderer.root, textInputComp, plain = true).onKeypress.foreach(_.apply("C-up") shouldBe true)
     findComponents(renderer.root, comboBoxPopup) should not be empty
-    val textInput = findComponentProps(renderer.root, textInputComp)
+    val textInput = findComponentProps(renderer.root, textInputComp, plain = true)
 
     //when
-    textInput.onKeypress("C-up") shouldBe true
+    textInput.onKeypress.foreach(_.apply("C-up") shouldBe true)
 
     //then
     findComponents(renderer.root, comboBoxPopup) should be (empty)
@@ -350,7 +350,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       if (el.`type` == <.form.name.asInstanceOf[js.Any]) formMock
       else null
     })
-    findComponentProps(renderer.root, textInputComp).onKeypress("C-up") shouldBe true
+    findComponentProps(renderer.root, textInputComp, plain = true).onKeypress.foreach(_.apply("C-up") shouldBe true)
     findComponents(renderer.root, comboBoxPopup) should not be empty
     val form = inside(findComponents(renderer.root, <.form.name)) {
       case List(form) => form
@@ -379,7 +379,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       if (el.`type` == <.form.name.asInstanceOf[js.Any]) formMock
       else null
     })
-    findComponentProps(renderer.root, textInputComp).onKeypress("C-up") shouldBe true
+    findComponentProps(renderer.root, textInputComp, plain = true).onKeypress.foreach(_.apply("C-up") shouldBe true)
     findComponents(renderer.root, comboBoxPopup) should not be empty
     val arrow = inside(findComponents(renderer.root, <.text.name)) {
       case List(arrow) => arrow
@@ -403,7 +403,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val textMock = literal(screen = screenMock, focus = focusMock)
     screenMock.focused = textMock
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
-    findComponentProps(renderer.root, textInputComp).inputRef.current =
+    findComponentProps(renderer.root, textInputComp, plain = true).inputRef.current =
       textMock.asInstanceOf[BlessedElement]
     findComponents(renderer.root, comboBoxPopup) should be (empty)
     val arrow = inside(findComponents(renderer.root, <.text.name)) {
@@ -427,7 +427,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val screenMock = literal()
     val textMock = literal(screen = screenMock, focus = focusMock)
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
-    findComponentProps(renderer.root, textInputComp).inputRef.current =
+    findComponentProps(renderer.root, textInputComp, plain = true).inputRef.current =
       textMock.asInstanceOf[BlessedElement]
     findComponents(renderer.root, comboBoxPopup) should be (empty)
     val arrow = inside(findComponents(renderer.root, <.text.name)) {
@@ -448,17 +448,17 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val props = getComboBoxProps()
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
-    val textInput = findComponentProps(renderer.root, textInputComp)
+    val textInput = findComponentProps(renderer.root, textInputComp, plain = true)
     findComponents(renderer.root, comboBoxPopup) should be (empty)
 
     //when
-    textInput.onKeypress("C-down") shouldBe true
+    textInput.onKeypress.foreach(_.apply("C-down") shouldBe true)
 
     //then
     val theme = DefaultTheme.popup.menu
     val arrowStyle = DefaultTheme.popup.regular
     assertComponents(renderer.root.children, List(
-      <(textInputComp())(^.assertWrapped(inside(_) {
+      <(textInputComp())(^.assertPlain[TextInputProps](inside(_) {
         case TextInputProps(_, left, top, width, value, state, _, onChange, onEnter, _) =>
           left shouldBe props.left
           top shouldBe props.top
@@ -505,7 +505,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val items = List("1", "2", "3")
     val props = getComboBoxProps(items = items)
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
-    findComponentProps(renderer.root, textInputComp).onKeypress("C-down") shouldBe true
+    findComponentProps(renderer.root, textInputComp, plain = true).onKeypress.foreach(_.apply("C-down") shouldBe true)
     val popup = inside(findComponents(renderer.root, comboBoxPopup)) {
       case List(c) => c.props.asInstanceOf[ComboBoxPopupProps]
     }
@@ -526,29 +526,30 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val props = getComboBoxProps()
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
-    val textInput = findComponentProps(renderer.root, textInputComp)
+    val textInput = findComponentProps(renderer.root, textInputComp, plain = true)
 
     //when & then
-    textInput.onKeypress("escape") shouldBe false
-    textInput.onKeypress("tab") shouldBe false
-    textInput.onKeypress("up") shouldBe false
-    textInput.onKeypress("down") shouldBe false
-    textInput.onKeypress("return") shouldBe false
-    textInput.onKeypress("unknown") shouldBe false
+    textInput.onKeypress.foreach(_.apply("escape") shouldBe false)
+    textInput.onKeypress.foreach(_.apply("tab") shouldBe false)
+    textInput.onKeypress.foreach(_.apply("up") shouldBe false)
+    textInput.onKeypress.foreach(_.apply("down") shouldBe false)
+    textInput.onKeypress.foreach(_.apply("return") shouldBe false)
+    textInput.onKeypress.foreach(_.apply("unknown") shouldBe false)
+    Succeeded
   }
 
   it should "return true if popup is shown when onKeypress(up/down/unknown)" in {
     //given
     val props = getComboBoxProps()
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
-    findComponentProps(renderer.root, textInputComp).onKeypress("C-up") shouldBe true
+    findComponentProps(renderer.root, textInputComp, plain = true).onKeypress.foreach(_.apply("C-up") shouldBe true)
     findComponents(renderer.root, comboBoxPopup) should not be empty
-    val textInput = findComponentProps(renderer.root, textInputComp)
+    val textInput = findComponentProps(renderer.root, textInputComp, plain = true)
 
     //when & then
-    textInput.onKeypress("up") shouldBe true
-    textInput.onKeypress("down") shouldBe true
-    textInput.onKeypress("unknown") shouldBe true
+    textInput.onKeypress.foreach(_.apply("up") shouldBe true)
+    textInput.onKeypress.foreach(_.apply("down") shouldBe true)
+    textInput.onKeypress.foreach(_.apply("unknown") shouldBe true)
 
     //then
     findComponents(renderer.root, comboBoxPopup) should not be empty
@@ -558,7 +559,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val props = getComboBoxProps()
     val renderer = createTestRenderer(withThemeContext(<(ComboBox())(^.plain := props)()))
-    val textInput = findComponentProps(renderer.root, textInputComp)
+    val textInput = findComponentProps(renderer.root, textInputComp, plain = true)
 
     //when
     textInput.stateUpdater(TextInputState.copy(_)(
@@ -569,7 +570,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     ))
 
     //then
-    assertTextInputState(findComponentProps(renderer.root, textInputComp).state, TextInputState(
+    assertTextInputState(findComponentProps(renderer.root, textInputComp, plain = true).state, TextInputState(
       offset = 1,
       cursorX = 2,
       selStart = 3,
@@ -587,7 +588,7 @@ class ComboBoxSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //then
     val arrowStyle = DefaultTheme.popup.regular
     assertComponents(renderer.root.children, List(
-      <(textInputComp())(^.assertWrapped(inside(_) {
+      <(textInputComp())(^.assertPlain[TextInputProps](inside(_) {
         case TextInputProps(_, left, top, width, value, state, _, onChange, onEnter, _) =>
           left shouldBe props.left
           top shouldBe props.top
