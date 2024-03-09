@@ -35,4 +35,4 @@ node --watch ./app/target/scala-2.13/scalajs-bundler/main/dev.loader.mjs
 
 ## Resources
 
-You can find more info about the common modules [here](https://scommons.org/)
+You can find more info about the common modules [here](https://scommons.github.io/)
