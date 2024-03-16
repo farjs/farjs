@@ -269,6 +269,48 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
     key.defaultPrevented.getOrElse(false) shouldBe true
   }
   
+  it should "cut selection to clipboard if C-x key when onKeypress" in {
+    //given
+    val onEnter = mockFunction[Unit]
+    var state = TextInputState()
+    val stateUpdater: js.Function1[js.Function1[TextInputState, TextInputState], Unit] = {
+      updater => state = updater(state)
+    }
+    val props = getTextInputProps(state, stateUpdater, onEnter = onEnter)
+    val omoveMock = mockFunction[Int, Int, Unit]
+    val programMock = literal("omove" -> omoveMock)
+    val screenMock = literal("program" -> programMock)
+    val inputMock = literal("screen" -> screenMock)
+    val width = props.width
+    val cursorX = width - 1
+    inputMock.width = width
+    inputMock.aleft = props.left
+    inputMock.atop = props.top
+    omoveMock.expects(props.left + cursorX, props.top)
+
+    val renderer = createTestRenderer(withThemeContext(<(TextInput())(^.plain := props)()), { el =>
+      if (el.`type` == "input".asInstanceOf[js.Any]) inputMock
+      else null
+    })
+    TestRenderer.act { () =>
+      renderer.update(withThemeContext(<(TextInput())(^.plain := TextInputProps.copy(props)(state = state))()))
+    }
+    val inputEl = renderer.root.children(0)
+    val key = literal("full" -> "C-x").asInstanceOf[KeyboardKey]
+
+    //then
+    val copyToClipboardMock = mockFunction[String, Boolean]
+    screenMock.copyToClipboard = copyToClipboardMock
+    copyToClipboardMock.expects(props.value)
+    omoveMock.expects(props.left, props.top)
+
+    //when
+    inputEl.props.onKeypress(null, key)
+
+    //then
+    key.defaultPrevented.getOrElse(false) shouldBe true
+  }
+  
   it should "process key and prevent default when onKeypress" in {
     //given
     val onChange = mockFunction[String, Unit]

@@ -146,6 +146,13 @@ object TextInput extends FunctionComponent[TextInputProps] {
     val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (ch, key) =>
       val el = deref(elementRef)
 
+      def delete(te: TextEdit): Unit = {
+        val (newVal, curMove) = edit(currValue, te)
+        if (currValue.toString != newVal) {
+          move(el, UiString(newVal), curMove, TextSelect.Reset)
+        }
+      }
+      
       var processed = true
       if (!props.onKeypress.exists(_.apply(key.full))) {
         key.full match {
@@ -163,20 +170,15 @@ object TextInput extends FunctionComponent[TextInputProps] {
           case "end"     => move(el, currValue, CursorMove.End, TextSelect.Reset)
           case "S-end"   => move(el, currValue, CursorMove.End, TextSelect.TillTheEnd)
           case "C-a"     => move(el, currValue, CursorMove.End, TextSelect.All)
-          case "C-c" =>
+          case "C-c" | "C-x" =>
             if (selEnd - selStart > 0) {
               el.screen.copyToClipboard(currValue.slice(selStart, selEnd))
+              if (key.full == "C-x") {
+                delete(TextEdit.Delete)
+              }
             }
-          case "delete" =>
-            val (newVal, curMove) = edit(currValue, TextEdit.Delete)
-            if (currValue.toString != newVal) {
-              move(el, UiString(newVal), curMove, TextSelect.Reset)
-            }
-          case "backspace" =>
-            val (newVal, curMove) = edit(currValue, TextEdit.Backspace)
-            if (currValue.toString != newVal) {
-              move(el, UiString(newVal), curMove, TextSelect.Reset)
-            }
+          case "delete" => delete(TextEdit.Delete)
+          case "backspace" => delete(TextEdit.Backspace)
           case _ =>
             if (ch != null && !js.isUndefined(ch)) {
               val insertChar = ch.toString
