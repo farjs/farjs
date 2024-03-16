@@ -361,12 +361,13 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
       
       val theme = currTheme.textBox
       inputEl.props.content shouldBe {
+        val currValue = UiString(newVal)
         if (selEnd - selStart > 0) {
-          val part1 = UI.renderText2(theme.regular, newVal.slice(offset, selStart))
-          val part2 = UI.renderText2(theme.selected, newVal.slice(math.max(selStart, offset), selEnd))
-          val part3 = UI.renderText2(theme.regular, newVal.substring(math.min(selEnd, newVal.length)))
+          val part1 = UI.renderText2(theme.regular, currValue.slice(offset, selStart))
+          val part2 = UI.renderText2(theme.selected, currValue.slice(math.max(selStart, offset), selEnd))
+          val part3 = UI.renderText2(theme.regular, currValue.slice(selEnd, currValue.strWidth()))
           s"$part1$part2$part3"
-        } else UI.renderText2(theme.regular, newVal.substring(math.min(offset, newVal.length)))
+        } else UI.renderText2(theme.regular, currValue.slice(offset, currValue.strWidth()))
       }
     }
 
@@ -424,6 +425,29 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
     check(defaultPrevented = true, "backspace", offset, cursorX, value)
     check(defaultPrevented = true, "delete", offset, cursorX, "nitial na2")
     check(defaultPrevented = true, "delete", offset, cursorX, "itial na2")
+    check(defaultPrevented = true, "S-end", offset, maxCursorX, value, currIdx, value.length)
+    check(defaultPrevented = true, "delete", offset, 0, "")
+
+    //when & then
+    check(defaultPrevented = true, "", offset, cursorX + 1, "и", ch = "и")
+    check(defaultPrevented = true, "", offset, cursorX, "й", ch = "й".substring(1))
+    check(defaultPrevented = true, "", offset, cursorX + 2, "й杜", ch = "杜")
+    check(defaultPrevented = true, "left", offset, cursorX - 2, value)
+    check(defaultPrevented = true, "S-left", offset, cursorX - 1, value, startIdx = 0, endIdx = 1)
+    check(defaultPrevented = true, "", offset, cursorX + 2, "杜杜", ch = "杜")
+    check(defaultPrevented = true, "", offset, cursorX, "杜杜", ch = "\uD834") //high surrogate
+    check(defaultPrevented = true, "", offset, cursorX + 1, "杜\uD834\uDF06杜", ch = "\uDF06") //low surrogate
+    check(defaultPrevented = true, "left", offset, cursorX - 1, value)
+    check(defaultPrevented = true, "backspace", offset, cursorX - 2, "\uD834\uDF06杜")
+    check(defaultPrevented = true, "right", offset, cursorX + 1, value)
+    check(defaultPrevented = true, "right", offset, cursorX + 2, value)
+    check(defaultPrevented = true, "", offset, cursorX + 1, "\uD834\uDF06杜и", ch = "и")
+    check(defaultPrevented = true, "", offset, cursorX, "\uD834\uDF06杜й", ch = "й".substring(1))
+    check(defaultPrevented = true, "left", offset, cursorX - 1, value)
+    check(defaultPrevented = true, "left", offset, cursorX - 2, value)
+    check(defaultPrevented = true, "delete", offset, cursorX, "\uD834\uDF06й")
+    check(defaultPrevented = true, "delete", offset, cursorX, "\uD834\uDF06")
+    check(defaultPrevented = true, "backspace", offset, cursorX - 1, "")
     
     //when & then
     check(defaultPrevented = false, "up", offset, cursorX, value, selStart, selEnd)
@@ -492,6 +516,8 @@ class TextInputSpec extends TestSpec with TestRendererUtils {
         ^.rbLeft := props.left,
         ^.rbTop := props.top,
         ^.rbStyle := theme.regular,
+        ^.rbWrap := false,
+        ^.rbTags := true,
         ^.content := UI.renderText2(theme.selected, selectedText)
       )()
     )

@@ -13,52 +13,65 @@ object TextInput extends FunctionComponent[TextInputProps] {
 
   private def deref(ref: NativeRef): BlessedElement =
     ref.current.asInstanceOf[BlessedElement]
+
+  private def isHighSurrogate(point: Int): Boolean =
+    point >= 0xD800 && point <= 0xDBFF 
+  
+  private def isLowSurrogate(point: Int): Boolean =
+    point >= 0xDC00 && point <= 0xDFFF 
   
   protected def render(compProps: Props): ReactElement = {
+    val insertHighSurrogate = useRef("")
     val props = compProps.plain
     val theme = Theme.useTheme().textBox
     val elementRef = props.inputRef
     val (offset, cursorX) = (props.state.offset, props.state.cursorX)
     val (selStart, selEnd) = (props.state.selStart, props.state.selEnd)
+    val currValue = UiString(props.value)
 
     useLayoutEffect({ () =>
-      move(deref(elementRef), props.value, CursorMove.End, TextSelect.All)
+      move(deref(elementRef), currValue, CursorMove.End, TextSelect.All)
     }, Nil)
 
-    def move(el: BlessedElement, value: String, cm: CursorMove, ts: TextSelect): Unit = {
+    def move(el: BlessedElement, value: UiString, cm: CursorMove, ts: TextSelect): Unit = {
+      val charStart = value.charStartPos(offset + cursorX)
       val (posX, idx) = cm match {
         case CursorMove.At(pos) => (pos, offset)
         case CursorMove.Home => (0, 0)
-        case CursorMove.End => (value.length, value.length - el.width + 1)
-        case CursorMove.Left => (cursorX - 1, if (cursorX == 0) offset - 1 else offset)
-        case CursorMove.Right => (cursorX + 1, if (cursorX == el.width - 1) offset + 1 else offset)
+        case CursorMove.End => (value.strWidth(), value.strWidth() - el.width + 1)
+        case CursorMove.Left(maybeDx) =>
+          val dx = maybeDx.getOrElse(math.max(charStart.lcw, 1))
+          (cursorX - dx, if (cursorX == 0) offset - dx else offset)
+        case CursorMove.Right(maybeDx) =>
+          val dx = maybeDx.getOrElse(math.max(charStart.rcw, 1))
+          (cursorX + dx, if (cursorX == el.width - 1) offset + dx else offset)
       }
 
       val newOffset = math.min(
         math.max(idx, 0),
-        value.length
+        value.strWidth()
       )
       
       val newPos = math.min(
         math.max(posX, 0),
         math.min(
           math.max(el.width - 1, 0),
-          math.max(value.length - newOffset, 0)
+          math.max(value.strWidth() - newOffset, 0)
         )
       )
       if (newPos != cursorX) {
         el.screen.program.omove(el.aleft + newPos, el.atop)
       }
       
-      select(value, offset + cursorX, newOffset + newPos, ts)
+      select(value, charStart.pos, newOffset + newPos, ts)
       props.stateUpdater(TextInputState.copy(_)(offset = newOffset, cursorX = newPos))
     }
     
-    def select(value: String, idx: Int, newIdx: Int, ts: TextSelect): Unit = {
+    def select(value: UiString, idx: Int, newIdx: Int, ts: TextSelect): Unit = {
       val (newStart, newEnd) = ts match {
         case TextSelect.Reset => (-1, -1)
-        case TextSelect.All => (0, value.length)
-        case TextSelect.TillTheEnd => (if (selStart != -1) selStart else idx, value.length)
+        case TextSelect.All => (0, value.strWidth())
+        case TextSelect.TillTheEnd => (if (selStart != -1) selStart else idx, value.strWidth())
         case TextSelect.ToTheRight => (if (selStart != -1) selStart else idx, newIdx)
         case TextSelect.TillTheHome => (0, if (selEnd != -1) selEnd else idx)
         case TextSelect.ToTheLeft => (newIdx, if (selEnd != -1) selEnd else idx)
@@ -70,7 +83,7 @@ object TextInput extends FunctionComponent[TextInputProps] {
     val onClick: js.Function1[MouseData, Unit] = { data =>
       val el = deref(elementRef)
       val screen = el.screen
-      move(el, props.value, CursorMove.At(data.x - el.aleft), TextSelect.Reset)
+      move(el, currValue, CursorMove.At(data.x - el.aleft), TextSelect.Reset)
       if (screen.focused != el) {
         el.focus()
       }
@@ -100,29 +113,31 @@ object TextInput extends FunctionComponent[TextInputProps] {
       el.screen.program.hideCursor()
     }
     
-    def edit(value: String, te: TextEdit): (String, CursorMove) = {
+    def edit(value: UiString, te: TextEdit): (String, CursorMove) = {
       val res@(newVal, _) = {
         if (selEnd - selStart > 0) {
           te match {
             case TextEdit.Delete | TextEdit.Backspace =>
-              (value.slice(0, selStart) + value.slice(selEnd, value.length), CursorMove.At(selStart - offset))
+              (value.slice(0, selStart) + value.slice(selEnd, value.strWidth()), CursorMove.At(selStart - offset))
             case TextEdit.Insert(s) =>
-              (value.slice(0, selStart) + s + value.slice(selEnd, value.length), CursorMove.At(selStart + s.length - offset))
+              (value.slice(0, selStart) + s + value.slice(selEnd, value.strWidth()), CursorMove.At(selStart + s.strWidth() - offset))
           }
         } else {
           val idx = offset + cursorX
           te match {
             case TextEdit.Delete =>
-              (value.slice(0, idx) + value.slice(idx + 1, value.length), CursorMove.At(cursorX))
+              val charStart = value.charStartPos(idx)
+              (value.slice(0, idx) + value.slice(idx + charStart.rcw, value.strWidth()), CursorMove.At(cursorX))
             case TextEdit.Backspace =>
-              (value.slice(0, idx - 1) + value.slice(idx, value.length), CursorMove.Left)
+              val charStart = value.charStartPos(idx)
+              (value.slice(0, idx - 1) + value.slice(idx, value.strWidth()), CursorMove.Left(Some(charStart.lcw)))
             case TextEdit.Insert(s) =>
-              (value.slice(0, idx) + s + value.slice(idx, value.length), CursorMove.Right)
+              (value.slice(0, idx) + s + value.slice(idx, value.strWidth()), CursorMove.Right(Some(s.strWidth())))
           }
         }
       }
 
-      if (value != newVal) {
+      if (value.toString != newVal) {
         props.onChange(newVal)
       }
       res
@@ -139,33 +154,43 @@ object TextInput extends FunctionComponent[TextInputProps] {
             processed = true
           case "enter" => processed = true // either enter or return is handled, not both!
           case "escape" | "tab" => processed = false
-          case "right"   => move(el, props.value, CursorMove.Right, TextSelect.Reset)
-          case "S-right" => move(el, props.value, CursorMove.Right, TextSelect.ToTheRight)
-          case "left"    => move(el, props.value, CursorMove.Left, TextSelect.Reset)
-          case "S-left"  => move(el, props.value, CursorMove.Left, TextSelect.ToTheLeft)
-          case "home"    => move(el, props.value, CursorMove.Home, TextSelect.Reset)
-          case "S-home"  => move(el, props.value, CursorMove.Home, TextSelect.TillTheHome)
-          case "end"     => move(el, props.value, CursorMove.End, TextSelect.Reset)
-          case "S-end"   => move(el, props.value, CursorMove.End, TextSelect.TillTheEnd)
-          case "C-a"     => move(el, props.value, CursorMove.End, TextSelect.All)
+          case "right"   => move(el, currValue, CursorMove.Right(None), TextSelect.Reset)
+          case "S-right" => move(el, currValue, CursorMove.Right(None), TextSelect.ToTheRight)
+          case "left"    => move(el, currValue, CursorMove.Left(None), TextSelect.Reset)
+          case "S-left"  => move(el, currValue, CursorMove.Left(None), TextSelect.ToTheLeft)
+          case "home"    => move(el, currValue, CursorMove.Home, TextSelect.Reset)
+          case "S-home"  => move(el, currValue, CursorMove.Home, TextSelect.TillTheHome)
+          case "end"     => move(el, currValue, CursorMove.End, TextSelect.Reset)
+          case "S-end"   => move(el, currValue, CursorMove.End, TextSelect.TillTheEnd)
+          case "C-a"     => move(el, currValue, CursorMove.End, TextSelect.All)
           case "C-c" =>
             if (selEnd - selStart > 0) {
-              el.screen.copyToClipboard(props.value.slice(selStart, selEnd))
+              el.screen.copyToClipboard(currValue.slice(selStart, selEnd))
             }
           case "delete" =>
-            val (newVal, curMove) = edit(props.value, TextEdit.Delete)
-            if (props.value != newVal) {
-              move(el, newVal, curMove, TextSelect.Reset)
+            val (newVal, curMove) = edit(currValue, TextEdit.Delete)
+            if (currValue.toString != newVal) {
+              move(el, UiString(newVal), curMove, TextSelect.Reset)
             }
           case "backspace" =>
-            val (newVal, curMove) = edit(props.value, TextEdit.Backspace)
-            if (props.value != newVal) {
-              move(el, newVal, curMove, TextSelect.Reset)
+            val (newVal, curMove) = edit(currValue, TextEdit.Backspace)
+            if (currValue.toString != newVal) {
+              move(el, UiString(newVal), curMove, TextSelect.Reset)
             }
           case _ =>
             if (ch != null && !js.isUndefined(ch)) {
-              val (newVal, curMove) = edit(props.value, TextEdit.Insert(ch.toString))
-              move(el, newVal, curMove, TextSelect.Reset)
+              val insertChar = ch.toString
+              val code = insertChar.asInstanceOf[js.Dynamic].charCodeAt(0).asInstanceOf[Int]
+              if (isHighSurrogate(code)) insertHighSurrogate.current = insertChar
+              else {
+                val combinedInsert =
+                  if (isLowSurrogate(code)) insertHighSurrogate.current + insertChar
+                  else insertChar
+
+                insertHighSurrogate.current = ""
+                val (newVal, curMove) = edit(currValue, TextEdit.Insert(UiString(combinedInsert)))
+                move(el, UiString(newVal), curMove, TextSelect.Reset)
+              }
             }
             else processed = false
         }
@@ -186,14 +211,15 @@ object TextInput extends FunctionComponent[TextInputProps] {
       ^.rbLeft := props.left,
       ^.rbTop := props.top,
       ^.rbStyle := theme.regular,
+      ^.rbWrap := false,
       ^.rbTags := true,
       ^.content := {
         if (selEnd - selStart > 0) {
-          val part1 = renderText2(theme.regular, props.value.slice(offset, selStart))
-          val part2 = renderText2(theme.selected, props.value.slice(math.max(selStart, offset), selEnd))
-          val part3 = renderText2(theme.regular, props.value.substring(math.min(selEnd, props.value.length)))
+          val part1 = renderText2(theme.regular, currValue.slice(offset, selStart))
+          val part2 = renderText2(theme.selected, currValue.slice(math.max(selStart, offset), selEnd))
+          val part3 = renderText2(theme.regular, currValue.slice(selEnd, currValue.strWidth()))
           s"$part1$part2$part3"
-        } else renderText2(theme.regular, props.value.substring(math.min(offset, props.value.length)))
+        } else renderText2(theme.regular, currValue.slice(offset, currValue.strWidth()))
       },
       ^.rbOnClick := onClick,
       ^.rbOnResize := onResize,
@@ -210,15 +236,15 @@ object TextInput extends FunctionComponent[TextInputProps] {
     case class At(pos: Int) extends CursorMove
     case object Home extends CursorMove
     case object End extends CursorMove
-    case object Left extends CursorMove
-    case object Right extends CursorMove
+    case class Left(dx: Option[Int]) extends CursorMove
+    case class Right(dx: Option[Int]) extends CursorMove
   }
   
   private sealed trait TextEdit
   
   private object TextEdit {
     
-    case class Insert(str: String) extends TextEdit
+    case class Insert(str: UiString) extends TextEdit
     case object Delete extends TextEdit
     case object Backspace extends TextEdit
   }
