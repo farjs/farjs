@@ -20,13 +20,13 @@ jobs:
     steps:
 
     - name: Git checkout (merge)
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       if: github.event_name != 'pull_request'
       with:
         fetch-depth: 0
 
     - name: Git checkout (PR)
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       if: github.event_name == 'pull_request'
       with:
         fetch-depth: 0
@@ -34,21 +34,21 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha }}
 
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '20'
 #        cache: 'npm'
 #        cache-dependency-path: '**/package-lock.json'
 
     - name: Set up JDK 8
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '8'
         distribution: 'adopt'
         cache: 'sbt'
 
     - name: Cache node_modules
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.npm
@@ -80,7 +80,7 @@ jobs:
       if: ${{ env.TAG_NAME == '' }}
 
     - name: Upload SNAPSHOT artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: farjs-app-0.1.0-SNAPSHOT.tgz
         path: app/target/scala-2.13/scalajs-bundler/main/farjs-app-0.1.0-SNAPSHOT.tgz
@@ -93,9 +93,8 @@ jobs:
         sbt clean "project farjs-app" copyToTargetDir fullOptJS
         cd app/target/scala-2.13/scalajs-bundler/main
         npm --no-git-tag-version --allow-same-version version $VERSION
-        npm pack
         echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
-        npm publish farjs-app-${VERSION}.tgz
+        npm publish
       if: ${{ env.TAG_NAME != '' }}
       env:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
