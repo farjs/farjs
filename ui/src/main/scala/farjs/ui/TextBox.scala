@@ -6,14 +6,14 @@ import scommons.react.raw.React
 
 object TextBox extends FunctionComponent[TextBoxProps] {
 
-  private[ui] var textInputComp: UiComponent[TextInputProps] = TextInput
+  private[ui] var textInputComp: ReactClass = TextInput
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
     val (state, setState) = useStateUpdater(() => TextInputState())
     val inputRef = React.useRef(null)
     
-    <(textInputComp())(^.plain := TextInputProps(
+    <(textInputComp)(^.plain := TextInputProps(
       inputRef = inputRef,
       left = props.left,
       top = props.top,

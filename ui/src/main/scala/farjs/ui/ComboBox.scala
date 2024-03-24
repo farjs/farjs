@@ -14,7 +14,7 @@ import scala.scalajs.js
 
 object ComboBox extends FunctionComponent[ComboBoxProps] {
 
-  private[ui] var textInputComp: UiComponent[TextInputProps] = TextInput
+  private[ui] var textInputComp: ReactClass = TextInput
   private[ui] var comboBoxPopup: ReactClass = ComboBoxPopup
 
   protected def render(compProps: Props): ReactElement = {
@@ -121,7 +121,7 @@ object ComboBox extends FunctionComponent[ComboBoxProps] {
     }
     
     <.>()(
-      <(textInputComp())(^.plain := TextInputProps(
+      <(textInputComp)(^.plain := TextInputProps(
         inputRef = inputRef,
         left = props.left,
         top = props.top,

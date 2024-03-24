@@ -3,19 +3,22 @@ package farjs.ui
 import farjs.ui.TextBox._
 import org.scalactic.source.Position
 import org.scalatest.Assertion
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.scalajs.js
 
 class TextBoxSpec extends TestSpec with TestRendererUtils {
 
-  TextBox.textInputComp = mockUiComponent("TextInput")
+  TextBox.textInputComp = "TextInput".asInstanceOf[ReactClass]
 
   it should "update state when stateUpdater" in {
     //given
     val props = getTextBoxProps()
     val renderer = createTestRenderer(<(TextBox())(^.plain := props)())
-    val textInput = findComponentProps(renderer.root, textInputComp, plain = true)
+    val textInput = inside(findComponents(renderer.root, textInputComp)) {
+      case List(ti) => ti.props.asInstanceOf[TextInputProps]
+    }
 
     //when
     textInput.stateUpdater(TextInputState.copy(_)(
@@ -26,7 +29,10 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     ))
 
     //then
-    assertTextInputState(findComponentProps(renderer.root, textInputComp, plain = true).state, TextInputState(
+    val updatedTextInput = inside(findComponents(renderer.root, textInputComp)) {
+      case List(ti) => ti.props.asInstanceOf[TextInputProps]
+    }
+    assertTextInputState(updatedTextInput.state, TextInputState(
       offset = 1,
       cursorX = 2,
       selStart = 3,
@@ -42,7 +48,7 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(TextBox())(^.plain := props)())
 
     //then
-    assertTestComponent(result, textInputComp, plain = true) {
+    assertNativeComponent(result, <(textInputComp)(^.assertPlain[TextInputProps](inside(_) {
       case TextInputProps(_, left, top, width, value, state, _, onChange, onEnter, _) =>
         left shouldBe props.left
         top shouldBe props.top
@@ -51,7 +57,7 @@ class TextBoxSpec extends TestSpec with TestRendererUtils {
         assertTextInputState(state, TextInputState())
         onChange shouldBe props.onChange
         onEnter shouldBe props.onEnter
-    }
+    }))())
   }
 
   private def getTextBoxProps(value: String = "initial name",
