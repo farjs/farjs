@@ -49,6 +49,10 @@ package object ui {
   object ScrollBar extends ReactClass
 
   @js.native
+  @JSImport("@farjs/ui/TextBox.mjs", JSImport.Default)
+  object TextBox extends ReactClass
+
+  @js.native
   @JSImport("@farjs/ui/TextInput.mjs", JSImport.Default)
   object TextInput extends ReactClass
 

@@ -19,7 +19,7 @@ object AddToArchPopup extends FunctionComponent[AddToArchPopupProps] {
 
   private[archiver] var modalComp: ReactClass = Modal
   private[archiver] var textLineComp: ReactClass = TextLine
-  private[archiver] var textBoxComp: UiComponent[TextBoxProps] = TextBox
+  private[archiver] var textBoxComp: ReactClass = TextBox
   private[archiver] var horizontalLineComp: ReactClass = HorizontalLine
   private[archiver] var buttonsPanelComp: ReactClass = ButtonsPanel
 
@@ -52,7 +52,7 @@ object AddToArchPopup extends FunctionComponent[AddToArchPopupProps] {
         style = theme,
         padding = 0
       ))(),
-      <(textBoxComp())(^.plain := TextBoxProps(
+      <(textBoxComp)(^.plain := TextBoxProps(
         left = contentLeft,
         top = 2,
         width = contentWidth,

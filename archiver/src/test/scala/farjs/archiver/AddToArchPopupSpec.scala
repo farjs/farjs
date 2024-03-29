@@ -15,7 +15,7 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
 
   AddToArchPopup.modalComp = "Modal".asInstanceOf[ReactClass]
   AddToArchPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
-  AddToArchPopup.textBoxComp = mockUiComponent("TextBox")
+  AddToArchPopup.textBoxComp = "TextBox".asInstanceOf[ReactClass]
   AddToArchPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   AddToArchPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
@@ -40,7 +40,9 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
     val zipName = "initial zip name"
     val props = AddToArchPopupProps(zipName, AddToArchAction.Add, _ => (), () => ())
     val renderer = createTestRenderer(withThemeContext(<(AddToArchPopup())(^.wrapped := props)()))
-    val textBox = findComponentProps(renderer.root, textBoxComp, plain = true)
+    val textBox = inside(findComponents(renderer.root, textBoxComp)) {
+      case List(c) => c.props.asInstanceOf[TextBoxProps]
+    }
     textBox.value shouldBe zipName
     val newZipName = "new zip name"
 
@@ -48,7 +50,9 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
     textBox.onChange(newZipName)
 
     //then
-    findComponentProps(renderer.root, textBoxComp, plain = true).value shouldBe newZipName
+    inside(findComponents(renderer.root, textBoxComp)) {
+      case List(c) => c.props.asInstanceOf[TextBoxProps].value shouldBe newZipName
+    }
   }
   
   it should "call onAction when onEnter in TextBox" in {
@@ -57,7 +61,9 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
     val onCancel = mockFunction[Unit]
     val props = AddToArchPopupProps("test", AddToArchAction.Add, onAction, onCancel)
     val comp = testRender(withThemeContext(<(AddToArchPopup())(^.wrapped := props)()))
-    val textBox = findComponentProps(comp, textBoxComp, plain = true)
+    val textBox = inside(findComponents(comp, textBoxComp)) {
+      case List(c) => c.props.asInstanceOf[TextBoxProps]
+    }
 
     //then
     onAction.expects("test")
@@ -160,7 +166,7 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
             focused shouldBe js.undefined
             padding shouldBe 0
         }))(),
-        <(textBoxComp())(^.assertPlain[TextBoxProps](inside(_) {
+        <(textBoxComp)(^.assertPlain[TextBoxProps](inside(_) {
           case TextBoxProps(left, top, resWidth, resValue, _, _) =>
             left shouldBe 2
             top shouldBe 2
