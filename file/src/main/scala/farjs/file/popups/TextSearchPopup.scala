@@ -17,7 +17,7 @@ object TextSearchPopup extends FunctionComponent[TextSearchPopupProps] {
 
   private[popups] var modalComp: ReactClass = Modal
   private[popups] var textLineComp: ReactClass = TextLine
-  private[popups] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
+  private[popups] var comboBoxComp: ReactClass = ComboBox
   private[popups] var horizontalLineComp: ReactClass = HorizontalLine
   private[popups] var buttonsPanelComp: ReactClass = ButtonsPanel
 
@@ -50,7 +50,7 @@ object TextSearchPopup extends FunctionComponent[TextSearchPopupProps] {
         style = theme,
         padding = 0
       ))(),
-      <(comboBoxComp())(^.plain := ComboBoxProps(
+      <(comboBoxComp)(^.plain := ComboBoxProps(
         left = contentLeft,
         top = 2,
         width = contentWidth,

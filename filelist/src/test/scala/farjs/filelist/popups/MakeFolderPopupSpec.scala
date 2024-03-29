@@ -20,7 +20,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
   MakeFolderPopup.modalComp = "Modal".asInstanceOf[ReactClass]
   MakeFolderPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
-  MakeFolderPopup.comboBoxComp = mockUiComponent("ComboBox")
+  MakeFolderPopup.comboBoxComp = "ComboBox".asInstanceOf[ReactClass]
   MakeFolderPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   MakeFolderPopup.checkBoxComp = "CheckBox".asInstanceOf[ReactClass]
   MakeFolderPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
@@ -72,15 +72,19 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
     ))
     itemsF.flatMap { _ =>
-      val textBox = findComponentProps(renderer.root, comboBoxComp, plain = true)
-      textBox.value shouldBe folderName
+      val comboBox = inside(findComponents(renderer.root, comboBoxComp)) {
+        case List(c) => c.props.asInstanceOf[ComboBoxProps]
+      }
+      comboBox.value shouldBe folderName
       val newFolderName = "new folder name"
 
       //when
-      textBox.onChange(newFolderName)
+      comboBox.onChange(newFolderName)
 
       //then
-      findComponentProps(renderer.root, comboBoxComp, plain = true).value shouldBe newFolderName
+      inside(findComponents(renderer.root, comboBoxComp)) {
+        case List(c) => c.props.asInstanceOf[ComboBoxProps].value shouldBe newFolderName
+      }
     }
   }
   
@@ -123,14 +127,16 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
     )).root
     itemsF.flatMap { _ =>
-      val textBox = findComponentProps(comp, comboBoxComp, plain = true)
+      val comboBox = inside(findComponents(comp, comboBoxComp)) {
+        case List(c) => c.props.asInstanceOf[ComboBoxProps]
+      }
 
       //then
       onOk.expects("test", true)
       onCancel.expects().never()
 
       //when
-      textBox.onEnter.get.apply()
+      comboBox.onEnter.get.apply()
 
       Succeeded
     }
@@ -239,7 +245,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     result.children.toList should be (empty)
     itemsF.flatMap { items =>
       result.children.toList should not be empty
-      assertMakeFolderPopup(result.children(0), props, items, List("[ OK ]", "[ Cancel ]"))
+      assertMakeFolderPopup(result.children(0), items, List("[ OK ]", "[ Cancel ]"))
     }
   }
 
@@ -254,7 +260,6 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   }
 
   private def assertMakeFolderPopup(result: TestInstance,
-                                    props: MakeFolderPopupProps,
                                     items: List[String],
                                     actions: List[String]): Assertion = {
     val (width, height) = (75, 10)
@@ -279,7 +284,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
             focused shouldBe js.undefined
             padding shouldBe 0
         }))(),
-        <(comboBoxComp())(^.assertPlain[ComboBoxProps](inside(_) {
+        <(comboBoxComp)(^.assertPlain[ComboBoxProps](inside(_) {
           case ComboBoxProps(left, top, resWidth, resItems, resValue, _, _) =>
             left shouldBe 2
             top shouldBe 2

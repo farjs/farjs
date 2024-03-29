@@ -23,7 +23,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
 
   private[copymove] var modalComp: ReactClass = Modal
   private[copymove] var textLineComp: ReactClass = TextLine
-  private[copymove] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
+  private[copymove] var comboBoxComp: ReactClass = ComboBox
   private[copymove] var horizontalLineComp: ReactClass = HorizontalLine
   private[copymove] var buttonsPanelComp: ReactClass = ButtonsPanel
 
@@ -75,7 +75,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
           style = theme,
           padding = 0
         ))(),
-        <(comboBoxComp())(^.plain := ComboBoxProps(
+        <(comboBoxComp)(^.plain := ComboBoxProps(
           left = contentLeft,
           top = 2,
           width = contentWidth,

@@ -22,7 +22,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
 
   CopyItemsPopup.modalComp = "Modal".asInstanceOf[ReactClass]
   CopyItemsPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
-  CopyItemsPopup.comboBoxComp = mockUiComponent("ComboBox")
+  CopyItemsPopup.comboBoxComp = "ComboBox".asInstanceOf[ReactClass]
   CopyItemsPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   CopyItemsPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
@@ -73,15 +73,19 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
     ))
     itemsF.flatMap { _ =>
-      val textBox = findComponentProps(renderer.root, comboBoxComp, plain = true)
-      textBox.value shouldBe path
+      val comboBox = inside(findComponents(renderer.root, comboBoxComp)) {
+        case List(c) => c.props.asInstanceOf[ComboBoxProps]
+      }
+      comboBox.value shouldBe path
       val newFolderName = "new path"
 
       //when
-      textBox.onChange(newFolderName)
+      comboBox.onChange(newFolderName)
 
       //then
-      findComponentProps(renderer.root, comboBoxComp, plain = true).value shouldBe newFolderName
+      inside(findComponents(renderer.root, comboBoxComp)) {
+        case List(c) => c.props.asInstanceOf[ComboBoxProps].value shouldBe newFolderName
+      }
     }
   }
   
@@ -98,14 +102,16 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
     )).root
     itemsF.flatMap { _ =>
-      val textBox = findComponentProps(comp, comboBoxComp, plain = true)
+      val comboBox = inside(findComponents(comp, comboBoxComp)) {
+        case List(c) => c.props.asInstanceOf[ComboBoxProps]
+      }
 
       //then
       onAction.expects("test")
       onCancel.expects().never()
 
       //when
-      textBox.onEnter.get.apply()
+      comboBox.onEnter.get.apply()
 
       Succeeded
     }
@@ -264,14 +270,14 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
           focused shouldBe js.undefined
           padding shouldBe 0
       }))())
-      assertTestComponent(input, comboBoxComp, plain = true) {
+      assertNativeComponent(input, <(comboBoxComp)(^.assertPlain[ComboBoxProps](inside(_) {
         case ComboBoxProps(left, top, resWidth, resItems, resValue, _, _) =>
           left shouldBe 2
           top shouldBe 2
           resWidth shouldBe (width - (paddingHorizontal + 2) * 2)
           resItems.toList shouldBe items.reverse
           resValue shouldBe props.path
-      }
+      }))())
 
       assertNativeComponent(sep, <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {
         case HorizontalLineProps(resLeft, resTop, resLength, lineCh, resStyle, startCh, endCh) =>

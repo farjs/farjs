@@ -18,7 +18,7 @@ case class SelectPopupProps(showSelect: Boolean,
 object SelectPopup extends FunctionComponent[SelectPopupProps] {
 
   private[popups] var modalComp: ReactClass = Modal
-  private[popups] var comboBoxComp: UiComponent[ComboBoxProps] = ComboBox
+  private[popups] var comboBoxComp: ReactClass = ComboBox
 
   protected def render(compProps: Props): ReactElement = {
     val services = FileListServices.useServices
@@ -57,7 +57,7 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
         style = theme,
         onCancel = props.onCancel
       ))(
-        <(comboBoxComp())(^.plain := ComboBoxProps(
+        <(comboBoxComp)(^.plain := ComboBoxProps(
           left = contentLeft,
           top = 1,
           width = contentWidth,

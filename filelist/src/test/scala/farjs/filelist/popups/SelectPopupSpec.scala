@@ -17,7 +17,7 @@ import scala.concurrent.Future
 class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   SelectPopup.modalComp = "Modal".asInstanceOf[ReactClass]
-  SelectPopup.comboBoxComp = mockUiComponent("ComboBox")
+  SelectPopup.comboBoxComp = "ComboBox".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class HistoryService {
@@ -67,7 +67,9 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       withThemeContext(<(SelectPopup())(^.wrapped := props)()), selectPatternsHistory = historyService.service
     ))
     itemsF.flatMap { _ =>
-      val comboBox = findComponentProps(renderer.root, comboBoxComp, plain = true)
+      val comboBox = inside(findComponents(renderer.root, comboBoxComp)) {
+        case List(c) => c.props.asInstanceOf[ComboBoxProps]
+      }
       comboBox.value shouldBe pattern
       val newPattern = "new pattern"
 
@@ -75,7 +77,9 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       comboBox.onChange(newPattern)
 
       //then
-      findComponentProps(renderer.root, comboBoxComp, plain = true).value shouldBe newPattern
+      inside(findComponents(renderer.root, comboBoxComp)) {
+        case List(c) => c.props.asInstanceOf[ComboBoxProps].value shouldBe newPattern
+      }
     }
   }
   
@@ -93,13 +97,15 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     )).root
 
     itemsF.flatMap { _ =>
-      val textBox = findComponentProps(comp, comboBoxComp, plain = true)
+      val comboBox = inside(findComponents(comp, comboBoxComp)) {
+        case List(c) => c.props.asInstanceOf[ComboBoxProps]
+      }
 
       //then
       onAction.expects("test")
 
       //when
-      textBox.onEnter.get.apply()
+      comboBox.onEnter.get.apply()
 
       Succeeded
     }
@@ -119,13 +125,15 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     )).root
 
     itemsF.flatMap { _ =>
-      val textBox = findComponentProps(comp, comboBoxComp, plain = true)
+      val comboBox = inside(findComponents(comp, comboBoxComp)) {
+        case List(c) => c.props.asInstanceOf[ComboBoxProps]
+      }
 
       //then
       onAction.expects(*).never()
 
       //when
-      textBox.onEnter.get.apply()
+      comboBox.onEnter.get.apply()
 
       Succeeded
     }
@@ -145,7 +153,7 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     //then
     itemsF.flatMap { items =>
-      assertSelectPopup(result.children(0), props, items, "Select")
+      assertSelectPopup(result.children(0), items, "Select")
     }
   }
 
@@ -163,7 +171,7 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     //then
     itemsF.flatMap { items =>
-      assertSelectPopup(result.children(0), props, items, "Deselect")
+      assertSelectPopup(result.children(0), items, "Deselect")
     }
   }
   
@@ -178,7 +186,6 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   }
 
   private def assertSelectPopup(result: TestInstance,
-                                props: SelectPopupProps,
                                 items: List[String],
                                 expectedTitle: String): Assertion = {
 
@@ -193,7 +200,7 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
           resHeight shouldBe height
           resStyle shouldBe style
       }))(
-        <(comboBoxComp())(^.assertPlain[ComboBoxProps](inside(_) {
+        <(comboBoxComp)(^.assertPlain[ComboBoxProps](inside(_) {
           case ComboBoxProps(left, top, resWidth, resItems, resValue, _, _) =>
             left shouldBe 2
             top shouldBe 1

@@ -17,7 +17,7 @@ class TextSearchPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
   TextSearchPopup.modalComp = "Modal".asInstanceOf[ReactClass]
   TextSearchPopup.textLineComp = "TextLine".asInstanceOf[ReactClass]
-  TextSearchPopup.comboBoxComp = mockUiComponent("ComboBox")
+  TextSearchPopup.comboBoxComp = "ComboBox".asInstanceOf[ReactClass]
   TextSearchPopup.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   TextSearchPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
@@ -49,14 +49,18 @@ class TextSearchPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val renderer = createTestRenderer(
       withThemeContext(<(TextSearchPopup())(^.wrapped := props)())
     )
-    val textBox = findComponentProps(renderer.root, comboBoxComp, plain = true)
+    val comboBox = inside(findComponents(renderer.root, comboBoxComp)) {
+      case List(c) => c.props.asInstanceOf[ComboBoxProps]
+    }
     val newSearchText = "new search text"
 
     //when
-    textBox.onChange(newSearchText)
+    comboBox.onChange(newSearchText)
 
     //then
-    findComponentProps(renderer.root, comboBoxComp, plain = true).value shouldBe newSearchText
+    inside(findComponents(renderer.root, comboBoxComp)) {
+      case List(c) => c.props.asInstanceOf[ComboBoxProps].value shouldBe newSearchText
+    }
   }
   
   it should "call onSearch when onEnter in ComboBox" in {
@@ -68,14 +72,18 @@ class TextSearchPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val comp = createTestRenderer(
       withThemeContext(<(TextSearchPopup())(^.wrapped := props)())
     ).root
-    findComponentProps(comp, comboBoxComp, plain = true).onChange("test")
+    inside(findComponents(comp, comboBoxComp)) {
+      case List(c) => c.props.asInstanceOf[ComboBoxProps].onChange("test")
+    }
 
     //then
     onSearch.expects("test")
     onCancel.expects().never()
 
     //when
-    findComponentProps(comp, comboBoxComp, plain = true).onEnter.get.apply()
+    inside(findComponents(comp, comboBoxComp)) {
+      case List(c) => c.props.asInstanceOf[ComboBoxProps].onEnter.get.apply()
+    }
 
     Succeeded
   }
@@ -89,8 +97,10 @@ class TextSearchPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val comp = createTestRenderer(
       withThemeContext(<(TextSearchPopup())(^.wrapped := props)())
     ).root
-    val textBox = findComponentProps(comp, comboBoxComp, plain = true)
-    textBox.onChange("test")
+    val comboBox = inside(findComponents(comp, comboBoxComp)) {
+      case List(c) => c.props.asInstanceOf[ComboBoxProps]
+    }
+    comboBox.onChange("test")
     val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
@@ -201,7 +211,7 @@ class TextSearchPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
             focused shouldBe js.undefined
             padding shouldBe 0
         }))(),
-        <(comboBoxComp())(^.assertPlain[ComboBoxProps](inside(_) {
+        <(comboBoxComp)(^.assertPlain[ComboBoxProps](inside(_) {
           case ComboBoxProps(left, top, resWidth, resItems, resValue, _, _) =>
             left shouldBe 2
             top shouldBe 2

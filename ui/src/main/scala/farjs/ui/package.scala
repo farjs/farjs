@@ -22,6 +22,10 @@ package object ui {
   object CheckBox extends ReactClass
 
   @js.native
+  @JSImport("@farjs/ui/ComboBox.mjs", JSImport.Default)
+  object ComboBox extends ReactClass
+
+  @js.native
   @JSImport("@farjs/ui/ComboBoxPopup.mjs", JSImport.Default)
   object ComboBoxPopup extends ReactClass {
     
