@@ -38,7 +38,7 @@ class FileListStateReducerSpec extends TestSpec {
       FileListItem("dir 2", isDir = true),
       FileListItem("dir 1", isDir = true)
     ))
-    val action = FileListDirChangedAction(FileListDir.curr, currDir)
+    val action = FileListDirChangedAction(FileListItem.currDir.name, currDir)
     
     //when & then
     reduce(state, action) shouldBe {

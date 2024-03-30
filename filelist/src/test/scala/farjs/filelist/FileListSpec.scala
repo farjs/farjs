@@ -40,7 +40,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     )
     
     //then
-    actions.changeDir.expects(dispatch, None, FileListDir.curr).returning(action)
+    actions.changeDir.expects(dispatch, None, FileListItem.currDir.name).returning(action)
     dispatch.expects(action)
     
     //when
@@ -306,7 +306,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val dirAction = FileListDirChangeAction(
       Task("Changing dir", Future.successful(props.state.currDir))
     )
-    actions.changeDir.expects(dispatch, None, FileListDir.curr).returning(dirAction)
+    actions.changeDir.expects(dispatch, None, FileListItem.currDir.name).returning(dirAction)
     dispatch.expects(dirAction)
 
     //when

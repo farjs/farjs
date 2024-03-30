@@ -1,7 +1,7 @@
 package farjs.filelist
 
 import farjs.filelist.FileListActions._
-import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.filelist.api.FileListItem
 import farjs.ui.Dispatch
 import scommons.react._
 import scommons.react.blessed.BlessedScreen
@@ -46,11 +46,11 @@ object FileList extends FunctionComponent[FileListProps] {
     val maxIndex = math.max(viewItems.size - 1, 0)
 
     useLayoutEffect({ () =>
-      if (props.state.currDir.isEmpty) {
+      if (props.state.currDir.path.isEmpty) {
         props.dispatch(props.actions.changeDir(
           dispatch = props.dispatch,
           parent = None,
-          dir = FileListDir.curr
+          dir = FileListItem.currDir.name
         ))
       }
       ()

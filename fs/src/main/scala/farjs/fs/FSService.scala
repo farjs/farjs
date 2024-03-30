@@ -1,6 +1,6 @@
 package farjs.fs
 
-import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.filelist.api.FileListItem
 import farjs.fs.FSService.excludeRoots
 import scommons.nodejs.Process.Platform
 import scommons.nodejs.{path => nodePath, _}
@@ -12,7 +12,7 @@ class FSService(platform: Platform, childProcess: ChildProcess) {
 
   def openItem(parent: String, item: String): Future[Unit] = {
     val name =
-      if (item == FileListItem.up.name) FileListDir.curr
+      if (item == FileListItem.up.name) FileListItem.currDir.name
       else item
 
     val (_, future) = childProcess.exec(

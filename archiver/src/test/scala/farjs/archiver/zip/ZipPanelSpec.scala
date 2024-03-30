@@ -593,7 +593,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
           actionF = future
       }
     }
-    dispatch.expects(FileListDirChangedAction(FileListDir.curr, dir))
+    dispatch.expects(FileListDirChangedAction(FileListItem.currDir.name, dir))
     
     //when
     testRender(
@@ -670,7 +670,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       }
     }
     dispatch.expects(FileListDiskSpaceUpdatedAction(7.0))
-    dispatch.expects(FileListDirChangedAction(FileListDir.curr, FileListDir(
+    dispatch.expects(FileListDirChangedAction(FileListItem.currDir.name, FileListDir(
       path = rootPath,
       isRoot = false,
       items = List(

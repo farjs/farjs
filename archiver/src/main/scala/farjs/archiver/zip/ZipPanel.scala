@@ -51,14 +51,14 @@ class ZipPanel(zipPath: String,
             total + entry._2.foldLeft(0.0)(_ + _.size)
           }
           props.dispatch(FileListDiskSpaceUpdatedAction(totalSize))
-          props.dispatch(FileListDirChangedAction(FileListDir.curr, FileListDir(
+          props.dispatch(FileListDirChangedAction(FileListItem.currDir.name, FileListDir(
             path = rootPath,
             isRoot = false,
             items = entriesByParent.getOrElse("", Nil).map(ZipApi.convertToFileListItem)
           )))
         }.andThen {
           case Failure(_) =>
-            props.dispatch(FileListDirChangedAction(FileListDir.curr, FileListDir(
+            props.dispatch(FileListDirChangedAction(FileListItem.currDir.name, FileListDir(
               path = rootPath,
               isRoot = false,
               items = Nil

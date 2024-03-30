@@ -37,7 +37,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
       override def lstatSync(path: String): Stats = lstatSyncMock(path)
     }
     val apiImp = new TestApiFS(fs)
-    val targetDir = path.resolve(FileListDir.curr)
+    val targetDir = path.resolve(FileListItem.currDir.name)
 
     readdirMock.expects(targetDir).returning(Future.successful(List("file1", "file2")))
     lstatSyncMock.expects(path.join(targetDir, "file1")).throwing(new Exception("test error"))
@@ -59,7 +59,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
   
   it should "return current dir info and files when readDir(None, .)" in {
     //when
-    apiImp.readDir(None, FileListDir.curr).map { dir =>
+    apiImp.readDir(None, FileListItem.currDir.name).map { dir =>
       //then
       inside(dir) { case FileListDir(dirPath, isRoot, items) =>
         dirPath shouldBe process.cwd()
@@ -117,7 +117,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     currRoot should not be empty
 
     //when
-    apiImp.readDir(Some(currRoot), FileListDir.curr).map { dir =>
+    apiImp.readDir(Some(currRoot), FileListItem.currDir.name).map { dir =>
       //then
       inside(dir) { case FileListDir(dirPath, isRoot, items) =>
         dirPath shouldBe currRoot
