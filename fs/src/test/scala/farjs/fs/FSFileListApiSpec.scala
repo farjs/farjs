@@ -49,7 +49,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
       inside(dir) { case FileListDir(dirPath, isRoot, items) =>
         dirPath shouldBe process.cwd()
         isRoot shouldBe false
-        items shouldBe List(
+        items.toList shouldBe List(
           FileListItem("file1"),
           FileListItem("file2")
         )
@@ -64,7 +64,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
       inside(dir) { case FileListDir(dirPath, isRoot, items) =>
         dirPath shouldBe process.cwd()
         isRoot shouldBe false
-        items should not be empty
+        items.toList should not be empty
       }
     }
   }
@@ -84,7 +84,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
       inside(dir) { case FileListDir(dirPath, isRoot, items) =>
         dirPath shouldBe parentDir
         isRoot shouldBe false
-        items should not be empty
+        items.toList should not be empty
       }
     }
   }
@@ -104,7 +104,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
       inside(dir) { case FileListDir(dirPath, isRoot, items) =>
         dirPath shouldBe curr
         isRoot shouldBe false
-        items should not be empty
+        items.toList should not be empty
       }
     }
   }
@@ -122,7 +122,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
       inside(dir) { case FileListDir(dirPath, isRoot, items) =>
         dirPath shouldBe currRoot
         isRoot shouldBe true
-        items should not be empty
+        items.toList should not be empty
       }
     }
   }

@@ -28,20 +28,21 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val props = FileListPanelViewProps(dispatch, actions, FileListState())
+    val state = FileListState()
+    val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
     val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
 
     //then
-    assertFileListPanelView(result, props, FileListState())
+    assertFileListPanelView(result, props, state)
   }
   
   it should "render component with selected one file and with diskSpace" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val state = FileListState(index = 2, currDir = FileListDir("/", isRoot = true, items = List(
+    val state = FileListState(index = 2, currDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem("dir 1", isDir = true, size = 1),
       FileListItem("dir 2", isDir = true, size = 2),
       FileListItem("file", size = 3)
@@ -60,7 +61,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val state = FileListState(index = 2, currDir = FileListDir("/", isRoot = true, items = List(
+    val state = FileListState(index = 2, currDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem("dir 1", isDir = true, size = 1),
       FileListItem("dir 2", isDir = true, size = 2),
       FileListItem("file", size = 3)
@@ -79,7 +80,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = List(
+    val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem("file 1", size = 1),
       FileListItem("file 2", size = 2, permissions = "drwxr-xr-x"),
       FileListItem("file 3", size = 3)
@@ -97,7 +98,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = List(
+    val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem("file 1", size = 1),
       FileListItem("dir 2", size = 999999999, isDir = true, permissions = "drwxr-xr-x"),
       FileListItem("file 3", size = 3)
@@ -115,7 +116,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = List(
+    val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem("file 1", size = 1),
       FileListItem("file 2", size = 1123456789, permissions = "drwxr-xr-x"),
       FileListItem("file 3", size = 3)
@@ -133,7 +134,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val state = FileListState(index = 1, currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val state = FileListState(index = 1, currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem("dir", isDir = true, size = 1, permissions = "dr--r--r--"),
       FileListItem("file", size = 2)
@@ -151,7 +152,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
-    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem("dir", isDir = true, size = 1),
       FileListItem("file", size = 2)

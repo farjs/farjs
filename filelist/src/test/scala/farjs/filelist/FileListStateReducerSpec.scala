@@ -1,9 +1,12 @@
 package farjs.filelist
 
 import farjs.filelist.FileListActions._
+import farjs.filelist.api.FileListDirSpec.assertFileListDir
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.sort.SortMode
 import scommons.react.test.TestSpec
+
+import scala.scalajs.js
 
 class FileListStateReducerSpec extends TestSpec {
   
@@ -20,7 +23,7 @@ class FileListStateReducerSpec extends TestSpec {
     
     //when & then
     reduce(state, action) shouldBe {
-      FileListState(
+      state.copy(
         offset = action.offset,
         index = action.index,
         selectedNames = action.selectedNames,
@@ -32,7 +35,7 @@ class FileListStateReducerSpec extends TestSpec {
   it should "set sorted items when FileListDirChangedAction(root)" in {
     //given
     val state = FileListState(isActive = true)
-    val currDir = FileListDir("/", isRoot = true, items = List(
+    val currDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem("file 2"),
       FileListItem("file 1"),
       FileListItem("dir 2", isDir = true),
@@ -41,25 +44,29 @@ class FileListStateReducerSpec extends TestSpec {
     val action = FileListDirChangedAction(FileListItem.currDir.name, currDir)
     
     //when & then
-    reduce(state, action) shouldBe {
-      FileListState(
-        currDir = currDir.copy(items = List(
-          FileListItem("dir 1", isDir = true),
-          FileListItem("dir 2", isDir = true),
-          FileListItem("file 1"),
-          FileListItem("file 2")
-        )),
-        selectedNames = Set.empty,
-        isActive = true
-      )
+    inside(reduce(state, action)) { case resState =>
+      val expectedCurrDir = FileListDir.copy(currDir)(items = js.Array(
+        FileListItem("dir 1", isDir = true),
+        FileListItem("dir 2", isDir = true),
+        FileListItem("file 1"),
+        FileListItem("file 2")
+      ))
+      assertFileListDir(resState.currDir, expectedCurrDir)
+      resState shouldBe {
+        FileListState(
+          currDir = resState.currDir,
+          selectedNames = Set.empty,
+          isActive = true
+        )
+      }
     }
   }
   
   it should "add .. to items and set index when FileListDirChangedAction(not root)" in {
     //given
-    val stateDir = FileListDir("/root/sub-dir/dir 2", isRoot = false, items = Seq.empty)
+    val stateDir = FileListDir("/root/sub-dir/dir 2", isRoot = false, items = js.Array())
     val state = FileListState(currDir = stateDir, selectedNames = Set("test"))
-    val currDir = FileListDir("/root/sub-dir", isRoot = false, items = List(
+    val currDir = FileListDir("/root/sub-dir", isRoot = false, items = js.Array(
       FileListItem("file 2"),
       FileListItem("file 1"),
       FileListItem("dir 2", isDir = true),
@@ -68,18 +75,22 @@ class FileListStateReducerSpec extends TestSpec {
     val action = FileListDirChangedAction(FileListItem.up.name, currDir)
     
     //when & then
-    reduce(state, action) shouldBe {
-      FileListState(
-        index = 2,
-        currDir = currDir.copy(items = List(
-          FileListItem.up,
-          FileListItem("dir 1", isDir = true),
-          FileListItem("dir 2", isDir = true),
-          FileListItem("file 1"),
-          FileListItem("file 2")
-        )),
-        selectedNames = Set.empty
-      )
+    inside(reduce(state, action)) { case resState =>
+      val expectedCurrDir = FileListDir.copy(currDir)(items = js.Array(
+        FileListItem.up,
+        FileListItem("dir 1", isDir = true),
+        FileListItem("dir 2", isDir = true),
+        FileListItem("file 1"),
+        FileListItem("file 2")
+      ))
+      assertFileListDir(resState.currDir, expectedCurrDir)
+      resState shouldBe {
+        FileListState(
+          index = 2,
+          currDir = resState.currDir,
+          selectedNames = Set.empty
+        )
+      }
     }
   }
 
@@ -88,30 +99,34 @@ class FileListStateReducerSpec extends TestSpec {
     val state = FileListState().copy(
       offset = 1,
       index = 0,
-      currDir = FileListDir("/root/sub-dir/dir 2", isRoot = false, items = List(
+      currDir = FileListDir("/root/sub-dir/dir 2", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("file 1")
       )),
       selectedNames = Set("test", "dir 1")
     )
-    val currDir = FileListDir("/root/sub-dir", isRoot = false, items = List(
+    val currDir = FileListDir("/root/sub-dir", isRoot = false, items = js.Array(
       FileListItem("file 1"),
       FileListItem("dir 1", isDir = true)
     ))
     val action = FileListDirUpdatedAction(currDir)
     
     //when & then
-    reduce(state, action) shouldBe {
-      state.copy(
-        offset = 0,
-        index = 2,
-        currDir = currDir.copy(items = List(
+    inside(reduce(state, action)) { case resState =>
+      resState shouldBe {
+        val expectedCurrDir = FileListDir.copy(currDir)(items = js.Array(
           FileListItem.up,
           FileListItem("dir 1", isDir = true),
           FileListItem("file 1")
-        )),
-        selectedNames = Set("dir 1")
-      )
+        ))
+        assertFileListDir(resState.currDir, expectedCurrDir)
+        state.copy(
+          offset = 0,
+          index = 2,
+          currDir = resState.currDir,
+          selectedNames = Set("dir 1")
+        )
+      }
     }
   }
 
@@ -120,28 +135,32 @@ class FileListStateReducerSpec extends TestSpec {
     val state = FileListState().copy(
       offset = 1,
       index = 0,
-      currDir = FileListDir("/root/sub-dir/dir 2", isRoot = false, items = List(
+      currDir = FileListDir("/root/sub-dir/dir 2", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("file 1")
       )),
       selectedNames = Set("test", "file 1")
     )
-    val currDir = FileListDir("/root/sub-dir", isRoot = false, items = List(
+    val currDir = FileListDir("/root/sub-dir", isRoot = false, items = js.Array(
       FileListItem("dir 1", isDir = true)
     ))
     val action = FileListDirUpdatedAction(currDir)
     
     //when & then
-    reduce(state, action) shouldBe {
-      state.copy(
-        offset = 1,
-        index = 0,
-        currDir = currDir.copy(items = List(
+    inside(reduce(state, action)) { case resState =>
+      resState shouldBe {
+        val expectedCurrDir = FileListDir.copy(currDir)(items = js.Array(
           FileListItem.up,
           FileListItem("dir 1", isDir = true)
-        )),
-        selectedNames = Set.empty
-      )
+        ))
+        assertFileListDir(resState.currDir, expectedCurrDir)
+        state.copy(
+          offset = 1,
+          index = 0,
+          currDir = resState.currDir,
+          selectedNames = Set.empty
+        )
+      }
     }
   }
 
@@ -150,26 +169,30 @@ class FileListStateReducerSpec extends TestSpec {
     val state = FileListState(
       offset = 1,
       index = 1,
-      currDir = FileListDir("/root/sub-dir/dir 2", isRoot = false, items = List(
+      currDir = FileListDir("/root/sub-dir/dir 2", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("file 1"),
         FileListItem("dir 1", isDir = true)
       )),
       selectedNames = Set("file 1")
     )
-    val currDir = FileListDir("/root/sub-dir", isRoot = false, items = Seq.empty)
+    val currDir = FileListDir("/root/sub-dir", isRoot = false, items = js.Array())
     val action = FileListDirUpdatedAction(currDir)
     
     //when & then
-    reduce(state, action) shouldBe {
-      state.copy(
-        offset = 0,
-        index = 0,
-        currDir = currDir.copy(items = List(
+    inside(reduce(state, action)) { case resState =>
+      resState shouldBe {
+        val expectedCurrDir = FileListDir.copy(currDir)(items = js.Array(
           FileListItem.up
-        )),
-        selectedNames = Set.empty
-      )
+        ))
+        assertFileListDir(resState.currDir, expectedCurrDir)
+        state.copy(
+          offset = 0,
+          index = 0,
+          currDir = resState.currDir,
+          selectedNames = Set.empty
+        )
+      }
     }
   }
 
@@ -178,9 +201,9 @@ class FileListStateReducerSpec extends TestSpec {
     val state = FileListState(
       offset = 1,
       index = 1,
-      currDir = FileListDir("/root/sub-dir/dir 2", isRoot = true, items = Nil)
+      currDir = FileListDir("/root/sub-dir/dir 2", isRoot = true, items = js.Array())
     )
-    val currDir = FileListDir("/root/sub-dir", isRoot = false, items = List(
+    val currDir = FileListDir("/root/sub-dir", isRoot = false, items = js.Array(
       FileListItem("file 1"),
       FileListItem("Fixes"),
       FileListItem("Food", isDir = true),
@@ -189,28 +212,32 @@ class FileListStateReducerSpec extends TestSpec {
     val action = FileListDirUpdatedAction(currDir)
     
     //when & then
-    reduce(state, action) shouldBe {
-      state.copy(
-        offset = 0,
-        index = 0,
-        currDir = currDir.copy(items = List(
+    inside(reduce(state, action)) { case resState =>
+      resState shouldBe {
+        val expectedCurrDir = FileListDir.copy(currDir)(items = js.Array(
           FileListItem.up,
           FileListItem("dir 1", isDir = true),
           FileListItem("Food", isDir = true),
           FileListItem("file 1"),
           FileListItem("Fixes")
-        )),
-        selectedNames = Set.empty
-      )
+        ))
+        assertFileListDir(resState.currDir, expectedCurrDir)
+        state.copy(
+          offset = 0,
+          index = 0,
+          currDir = resState.currDir,
+          selectedNames = Set.empty
+        )
+      }
     }
   }
 
   it should "update state when FileListItemCreatedAction" in {
     //given
-    val stateDir = FileListDir("/", isRoot = true, items = Seq.empty)
+    val stateDir = FileListDir("/", isRoot = true, items = js.Array())
     val state = FileListState(offset = 1, currDir = stateDir, selectedNames = Set("test1"))
     val dir = "dir 2"
-    val currDir = stateDir.copy(items = List(
+    val currDir = FileListDir.copy(stateDir)(items = js.Array(
       FileListItem("file 2"),
       FileListItem("File 1"),
       FileListItem(dir, isDir = true),
@@ -219,24 +246,28 @@ class FileListStateReducerSpec extends TestSpec {
     val action = FileListItemCreatedAction(dir, currDir)
 
     //when & then
-    reduce(state, action) shouldBe {
-      state.copy(
-        offset = 0,
-        index = 1,
-        currDir = currDir.copy(items = List(
+    inside(reduce(state, action)) { case resState =>
+      resState shouldBe {
+        val expectedCurrDir = FileListDir.copy(currDir)(items = js.Array(
           FileListItem("Dir 1", isDir = true),
           FileListItem("dir 2", isDir = true),
           FileListItem("File 1"),
           FileListItem("file 2")
-        )),
-        selectedNames = Set("test1")
-      )
+        ))
+        assertFileListDir(resState.currDir, expectedCurrDir)
+        state.copy(
+          offset = 0,
+          index = 1,
+          currDir = resState.currDir,
+          selectedNames = Set("test1")
+        )
+      }
     }
   }
 
   it should "keep current sate if item not found when FileListItemCreatedAction" in {
     //given
-    val stateDir = FileListDir("/", isRoot = true, items = List(
+    val stateDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem("Dir 1", isDir = true),
       FileListItem("dir 2", isDir = true),
       FileListItem("File 1"),
@@ -246,12 +277,15 @@ class FileListStateReducerSpec extends TestSpec {
     val action = FileListItemCreatedAction("non-existing", stateDir)
 
     //when & then
-    reduce(state, action) shouldBe state
+    inside(reduce(state, action)) { case resState =>
+      assertFileListDir(resState.currDir, state.currDir)
+      resState shouldBe state.copy(currDir = resState.currDir)
+    }
   }
 
   it should "update state when FileListSortByAction" in {
     //given
-    val state = FileListState(offset = 1, currDir = FileListDir("/", isRoot = false, items = List(
+    val state = FileListState(offset = 1, currDir = FileListDir("/", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem("file 2"),
       FileListItem("File 1"),
@@ -261,26 +295,29 @@ class FileListStateReducerSpec extends TestSpec {
     val action = FileListSortByAction(SortMode.Name)
 
     //when & then
-    reduce(state, action) shouldBe {
-      state.copy(offset = 0, index = 3, currDir = state.currDir.copy(items = List(
+    inside(reduce(state, action)) { case resState =>
+      val expectedCurrDir = FileListDir.copy(state.currDir)(items = js.Array(
         FileListItem.up,
         FileListItem("dir 2", isDir = true),
         FileListItem("Dir 1", isDir = true),
         FileListItem("file 2"),
         FileListItem("File 1")
-      )), sortAscending = false)
+      ))
+      assertFileListDir(resState.currDir, expectedCurrDir)
+      resState shouldBe state.copy(offset = 0, index = 3, currDir = resState.currDir, sortAscending = false)
     }
   }
 
   it should "keep current offset/index if item not found when FileListSortByAction" in {
     //given
-    val state = FileListState(offset = 1, currDir = FileListDir("/", isRoot = true, items = Nil))
+    val state = FileListState(offset = 1, currDir = FileListDir("/", isRoot = true, items = js.Array()))
     val action = FileListSortByAction(SortMode.Name)
 
     //when & then
-    reduce(state, action) shouldBe {
-      state.copy(sortAscending = false)
-    }
+    inside(reduce(state, action)) { case resState =>
+      assertFileListDir(resState.currDir, state.currDir)
+      resState shouldBe state.copy(sortAscending = false, currDir = resState.currDir)
+    } 
   }
 
   it should "update state when FileListDiskSpaceUpdatedAction" in {

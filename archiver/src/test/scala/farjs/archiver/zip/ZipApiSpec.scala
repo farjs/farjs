@@ -70,7 +70,7 @@ class ZipApiSpec extends AsyncTestSpec {
     resultF.map(inside(_) { case FileListDir(path, isRoot, items) =>
       path shouldBe rootPath
       isRoot shouldBe false
-      items shouldBe List(
+      items.toList shouldBe List(
         FileListItem("file 1", size = 2.0, mtimeMs = 3.0, permissions = "-rw-r--r--"),
         FileListItem("dir 1", isDir = true, mtimeMs = 1.0, permissions = "drwxr-xr-x")
       )
@@ -90,7 +90,7 @@ class ZipApiSpec extends AsyncTestSpec {
     resultF.map(inside(_) { case FileListDir(path, isRoot, items) =>
       path shouldBe s"$rootPath/dir 1"
       isRoot shouldBe false
-      items shouldBe List(
+      items.toList shouldBe List(
         FileListItem("dir 2", isDir = true, mtimeMs = 4.0, permissions = "drwxr-xr-x")
       )
     })
@@ -109,7 +109,7 @@ class ZipApiSpec extends AsyncTestSpec {
     resultF.map(inside(_) { case FileListDir(path, isRoot, items) =>
       path shouldBe s"$rootPath/dir 1/dir 2"
       isRoot shouldBe false
-      items shouldBe List(
+      items.toList shouldBe List(
         FileListItem("file 2", size = 5.0, mtimeMs = 6.0, permissions = "-rw-r--r--")
       )
     })
@@ -335,7 +335,7 @@ class ZipApiSpec extends AsyncTestSpec {
 
     //then
     resultF.map { res =>
-      res.items should be (empty)
+      res.items.toList should be (empty)
       commands shouldBe List(
         s"""zip -qd "$zipPath" "dir 1/dir 2/file 2" "dir 1/dir 2/dir 3/"""",
         s"""zip -qd "$zipPath" "dir 1/file 1" "dir 1/dir 2/""""

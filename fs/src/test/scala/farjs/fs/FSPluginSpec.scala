@@ -32,11 +32,14 @@ class FSPluginSpec extends AsyncTestSpec {
     plugin.init(parentDispatch, stack)
     
     //then
-    inside(stackData.head) { case PanelStackItem(component, Some(dispatch), actions, state) =>
-      val currState = FileListState(isActive = true)
+    inside(stackData.head) { case PanelStackItem(component, Some(dispatch), actions, resState) =>
       component shouldBe plugin.component
       actions shouldBe Some(FSFileListActions)
-      state shouldBe Some(currState)
+      val currState = inside(resState) {
+        case Some(state: FileListState) =>
+          state shouldBe FileListState(currDir = state.currDir, isActive = true)
+          state
+      }
       
       //given
       val action = "test action"
@@ -65,7 +68,7 @@ class FSPluginSpec extends AsyncTestSpec {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
-    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(

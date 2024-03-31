@@ -4,9 +4,11 @@ import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.sort.SortMode
 
+import scala.scalajs.js
+
 case class FileListState(offset: Int = 0,
                          index: Int = 0,
-                         currDir: FileListDir = FileListDir("", isRoot = false, Seq.empty),
+                         currDir: FileListDir = FileListDir("", isRoot = false, js.Array()),
                          selectedNames: Set[String] = Set.empty,
                          isActive: Boolean = false,
                          diskSpace: Option[Double] = None,
@@ -23,7 +25,7 @@ case class FileListState(offset: Int = 0,
   
   lazy val selectedItems: Seq[FileListItem] = {
     if (selectedNames.nonEmpty) {
-      currDir.items.filter(i => selectedNames.contains(i.name))
+      currDir.items.filter(i => selectedNames.contains(i.name)).toSeq
     }
     else Nil
   }
@@ -129,15 +131,15 @@ object FileListStateReducer {
       if (currDir.isRoot) dirsSorted :++ filesSorted
       else FileListItem.up +: dirsSorted :++ filesSorted
     }
-    
-    currDir.copy(items = items)
+
+    FileListDir.copy(currDir)(items = items)
   }
 
-  private def sortItems(items: Seq[FileListItem],
+  private def sortItems(items: js.Array[FileListItem],
                         mode: SortMode,
-                        ascending: Boolean): Seq[FileListItem] = {
+                        ascending: Boolean): js.Array[FileListItem] = {
 
-    val sorted = SortMode.sortItems(items, mode)
+    val sorted = js.Array(SortMode.sortItems(items.toSeq, mode): _*)
     
     if (ascending) sorted
     else sorted.reverse

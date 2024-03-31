@@ -54,14 +54,14 @@ class ZipPanel(zipPath: String,
           props.dispatch(FileListDirChangedAction(FileListItem.currDir.name, FileListDir(
             path = rootPath,
             isRoot = false,
-            items = entriesByParent.getOrElse("", Nil).map(ZipApi.convertToFileListItem)
+            items = js.Array(entriesByParent.getOrElse("", Nil).map(ZipApi.convertToFileListItem): _*)
           )))
         }.andThen {
           case Failure(_) =>
             props.dispatch(FileListDirChangedAction(FileListItem.currDir.name, FileListDir(
               path = rootPath,
               isRoot = false,
-              items = Nil
+              items = js.Array()
             )))
         }
 

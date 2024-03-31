@@ -30,7 +30,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
       FileListCapability.copyInplace,
       FileListCapability.moveInplace
     ))
-    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem("item 1")
     )))
@@ -90,7 +90,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
       FileListCapability.copyInplace,
       FileListCapability.moveInplace
     ))
-    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(
@@ -110,7 +110,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions(capabilitiesMock = Set(FileListCapability.copyInplace))
-    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(
@@ -132,7 +132,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val actions = new MockFileListActions(capabilitiesMock = Set(
       FileListCapability.read, FileListCapability.write, FileListCapability.delete
     ))
-    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(
@@ -154,7 +154,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val actions = new MockFileListActions(capabilitiesMock = Set(
       FileListCapability.read, FileListCapability.write, FileListCapability.delete
     ))
-    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem("item 1")
     )), selectedNames = Set("item 1"))
@@ -174,7 +174,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
   it should "return CopyMoveUiAction when onCopyMoveInplace" in {
     //given
     val currState = FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("file 1"),
         FileListItem("dir 1", isDir = true)
@@ -227,7 +227,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val toButtonMock = js.Dynamic.literal("emit" -> emitMock)
 
     val currState = FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("file 1"),
         FileListItem("dir 1", isDir = true)

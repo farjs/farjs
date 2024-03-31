@@ -3,13 +3,15 @@ package farjs.filelist
 import farjs.filelist.api.{FileListDir, FileListItem}
 import scommons.nodejs.test.TestSpec
 
+import scala.scalajs.js
+
 class FileListStateSpec extends TestSpec {
 
   it should "return current item depending on state when currentItem" in {
     //given
     val item1 = FileListItem("dir 1")
     val item2 = FileListItem("file 1")
-    val currDir = FileListDir("/folder", isRoot = false, List(item1, item2))
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(item1, item2))
     
     //when & then
     FileListState().currentItem shouldBe None
@@ -26,7 +28,7 @@ class FileListStateSpec extends TestSpec {
     //given
     val item1 = FileListItem("dir 1")
     val item2 = FileListItem("file 1")
-    val currDir = FileListDir("/folder", isRoot = false, List(item1, item2))
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(item1, item2))
     
     //when & then
     FileListState().selectedItems shouldBe Nil

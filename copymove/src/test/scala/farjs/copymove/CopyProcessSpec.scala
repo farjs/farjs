@@ -837,7 +837,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val props = CopyProcessProps(from, to, move = false, "/from/path", List(
       (dir, "newName")
     ), "/to/path", 492, onTopItem, onDone)
-    val dirList = FileListDir("/from/path/dir 1", isRoot = false, List(item))
+    val dirList = FileListDir("/from/path/dir 1", isRoot = false, js.Array(item))
     val p = Promise[Boolean]()
 
     actions.readDir.expects(Some("/from/path"), "dir 1").returning(Future.successful(dirList))
@@ -891,7 +891,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val props = CopyProcessProps(from, to, move = true, "/from/path", List(
       (dir, "newName")
     ), "/to/path", 492, onTopItem, onDone)
-    val dirList = FileListDir("/from/path/dir 1", isRoot = false, List(item))
+    val dirList = FileListDir("/from/path/dir 1", isRoot = false, js.Array(item))
     val p = Promise[Boolean]()
 
     actions.readDir.expects(Some("/from/path"), "dir 1").returning(Future.successful(dirList))

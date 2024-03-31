@@ -22,7 +22,7 @@ object FileList extends FunctionComponent[FileListProps] {
     val props = compProps.wrapped
     
     val (_, height) = props.size
-    val items = props.state.currDir.items
+    val items = props.state.currDir.items.toSeq
     val itemsLength = items.length
     val columnSize = height - 1 // excluding column header
     val viewSize = columnSize * props.columns

@@ -26,7 +26,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
-    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem("item 1")
     )))
@@ -47,7 +47,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions(isLocalFSMock = false)
-    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(
@@ -67,7 +67,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
-    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(
@@ -87,7 +87,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
-    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem("item 1")
     )), selectedNames = Set("item 1"))

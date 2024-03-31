@@ -19,6 +19,7 @@ import scommons.react._
 import scommons.react.test._
 
 import scala.concurrent.Future
+import scala.scalajs.js
 
 class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -57,7 +58,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(
       FileListItem("dir 1", isDir = true)
     ))
     val state = FileListState(currDir = currDir, isActive = true)
@@ -73,7 +74,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
-    val toDir = FileListDir("/to/path", isRoot = false, Nil)
+    val toDir = FileListDir("/to/path", isRoot = false, js.Array())
     val to = "test to path"
 
     //then
@@ -94,7 +95,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
           resDispatch shouldBe dispatch
           resActions shouldBe actions.actions
           fromPath shouldBe currDir.path
-          items shouldBe currDir.items
+          items shouldBe currDir.items.toList
           title shouldBe "Copy"
       }
     }.map { _ =>
@@ -112,7 +113,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(
       FileListItem("dir 1", isDir = true)
     ))
     val state = FileListState(currDir = currDir, isActive = true)
@@ -128,7 +129,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
-    val toDir = FileListDir("/to/path", isRoot = false, Nil)
+    val toDir = FileListDir("/to/path", isRoot = false, js.Array())
     val to = "test to path"
 
     //then
@@ -151,7 +152,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
           resDispatch shouldBe dispatch
           resActions shouldBe actions.actions
           fromPath shouldBe currDir.path
-          items shouldBe currDir.items
+          items shouldBe currDir.items.toList
           title shouldBe "Move"
       }
     }.map { _ =>
@@ -169,7 +170,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(
       FileListItem("dir 1", isDir = true)
     ))
     val state = FileListState(currDir = currDir, isActive = true)
@@ -200,7 +201,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
-    val currDir = FileListDir("/folder", isRoot = false, List(item))
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(item))
     val state = FileListState(currDir = currDir, isActive = true)
     val toDispatch = mockFunction[Any, Any]
     val toActions = new MockFileListActions
@@ -214,7 +215,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
-    val toDir = FileListDir("/folder", isRoot = false, Nil)
+    val toDir = FileListDir("/folder", isRoot = false, js.Array())
     val to = "test to path"
 
     //then
@@ -255,7 +256,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
-    val currDir = FileListDir("folder", isRoot = false, List(item))
+    val currDir = FileListDir("folder", isRoot = false, js.Array(item))
     val state = FileListState(currDir = currDir, isActive = true)
     val toDispatch = mockFunction[Any, Any]
     val toActions = new MockFileListActions
@@ -269,7 +270,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
-    val toDir = FileListDir(path.join("folder", "dir 1"), isRoot = false, Nil)
+    val toDir = FileListDir(path.join("folder", "dir 1"), isRoot = false, js.Array())
     val to = "test to path"
 
     //then
@@ -312,7 +313,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
-    val currDir = FileListDir("folder", isRoot = false, List(item))
+    val currDir = FileListDir("folder", isRoot = false, js.Array(item))
     val state = FileListState(currDir = currDir, isActive = true)
     val toDispatch = mockFunction[Any, Any]
     val toActions = new MockFileListActions
@@ -326,7 +327,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
-    val toDir = FileListDir(path.join("folder", "dir 1", "dir 2"), isRoot = false, Nil)
+    val toDir = FileListDir(path.join("folder", "dir 1", "dir 2"), isRoot = false, js.Array())
     val to = "test to path"
 
     //then
@@ -367,7 +368,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(
       item,
       FileListItem("file 1")
     ))
@@ -384,7 +385,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
-    val toDir = FileListDir("/to/path", isRoot = false, Nil)
+    val toDir = FileListDir("/to/path", isRoot = false, js.Array())
     val to = "test to path"
     val driveRoot = "same"
 
@@ -419,7 +420,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(
       item,
       FileListItem("file 1")
     ))
@@ -459,7 +460,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(
       item,
       FileListItem("file 1")
     ))
@@ -509,7 +510,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val item = FileListItem("dir", isDir = true)
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(
       item,
       FileListItem("file 1")
     ))
@@ -526,7 +527,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
-    val toDir = FileListDir("/folder/dir to", isRoot = false, Nil)
+    val toDir = FileListDir("/folder/dir to", isRoot = false, js.Array())
     val to = "test to path"
 
     //then
@@ -574,7 +575,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions(isLocalFS = false)
     val item = FileListItem("dir", isDir = true)
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(
       item,
       FileListItem("file 1")
     ))
@@ -628,12 +629,12 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val fromDispatch = mockFunction[Any, Any]
     val fromActions = new Actions
     val dir = FileListItem("dir 1", isDir = true)
-    val leftDir = FileListDir("/left/dir", isRoot = false, List(
+    val leftDir = FileListDir("/left/dir", isRoot = false, js.Array(
       FileListItem.up,
       dir,
       FileListItem("file 1")
     ))
-    val rightDir = FileListDir("/right/dir", isRoot = false, List(FileListItem("dir 2", isDir = true)))
+    val rightDir = FileListDir("/right/dir", isRoot = false, js.Array(FileListItem("dir 2", isDir = true)))
     val fromState = FileListState(index = 1, currDir = leftDir, isActive = true, selectedNames = Set(dir.name, "file 1"))
     val toDispatch = mockFunction[Any, Any]
     val toActions = new Actions
@@ -649,7 +650,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)(), historyService.service))
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
 
-    val toDir = FileListDir("/to/path/dir 1", isRoot = false, Nil)
+    val toDir = FileListDir("/to/path/dir 1", isRoot = false, js.Array())
     val to = "test to path"
     fromActions.readDir.expects(Some(leftDir.path), to).returning(Future.successful(toDir))
     fromDispatch.expects(*).onCall { action: Any =>
@@ -668,7 +669,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       val progressPopup = findComponentProps(renderer.root, copyProcessComp)
       progressPopup.onTopItem(dir)
 
-      val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
+      val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
         FileListItem("file 1")
       ))
       val leftAction = FileListDirUpdateAction(Task("Updating", Future.successful(updatedDir)))
@@ -703,12 +704,12 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val fromDispatch = mockFunction[Any, Any]
     val fromActions = new Actions
     val dir = FileListItem("dir 1", isDir = true)
-    val leftDir = FileListDir("/left/dir", isRoot = false, List(
+    val leftDir = FileListDir("/left/dir", isRoot = false, js.Array(
       FileListItem.up,
       dir,
       FileListItem("file 1")
     ))
-    val rightDir = FileListDir("/right/dir", isRoot = false, List(FileListItem("dir 2", isDir = true)))
+    val rightDir = FileListDir("/right/dir", isRoot = false, js.Array(FileListItem("dir 2", isDir = true)))
     val fromState = FileListState(index = 1, currDir = leftDir, isActive = true, selectedNames = Set("file 1"))
     val toDispatch = mockFunction[Any, Any]
     val toActions = new Actions
@@ -735,7 +736,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       val progressPopup = findComponentProps(renderer.root, copyProcessComp)
       progressPopup.onTopItem(dir)
 
-      val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
+      val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
         FileListItem("file 1")
       ))
       val leftAction = FileListDirUpdateAction(Task("Updating", Future.successful(updatedDir)))
@@ -760,10 +761,10 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
-    val state = FileListState(currDir = FileListDir("/folder", isRoot = false, List(item)), isActive = true)
+    val state = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array(item)), isActive = true)
     val toDispatch = mockFunction[Any, Any]
     val toActions = new MockFileListActions
-    val toState = FileListState(currDir = FileListDir("/test-path", isRoot = false, Nil))
+    val toState = FileListState(currDir = FileListDir("/test-path", isRoot = false, js.Array()))
     val onClose = mockFunction[Unit]
     val props = FileListPluginUiProps(dispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
@@ -791,10 +792,10 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
-    val state = FileListState(currDir = FileListDir("/folder", isRoot = false, List(item)), isActive = true)
+    val state = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array(item)), isActive = true)
     val toDispatch = mockFunction[Any, Any]
     val toActions = new MockFileListActions
-    val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, Nil))
+    val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array()))
     val onClose = mockFunction[Unit]
     val props = FileListPluginUiProps(dispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
@@ -821,7 +822,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     //given
     val fromDispatch = mockFunction[Any, Any]
     val fromActions = mock[FileListActions]
-    val items = List(
+    val items = js.Array(
       FileListItem("file 1"),
       FileListItem("dir 1", isDir = true)
     )
@@ -832,7 +833,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )
     val toDispatch = mockFunction[Any, Any]
     val toActions = new MockFileListActions
-    val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, Nil))
+    val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array()))
     val onClose = mockFunction[Unit]
     val props = FileListPluginUiProps(fromDispatch, onClose)
     val copyMoveUi = new CopyMoveUi(
@@ -850,7 +851,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
         case CopyItemsPopupProps(move, path, resItems, _, _) =>
           move shouldBe true
           path shouldBe "/folder"
-          resItems shouldBe items
+          resItems shouldBe items.toList
       }
     }
   }
@@ -859,7 +860,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     //given
     val fromDispatch = mockFunction[Any, Any]
     val fromActions = mock[FileListActions]
-    val items = List(
+    val items = js.Array(
       FileListItem("file 1"),
       FileListItem("dir 1", isDir = true)
     )
@@ -869,7 +870,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       selectedNames = Set("file 1", "dir 1")
     )
     val toDispatch = mockFunction[Any, Any]
-    val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, Nil))
+    val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array()))
     val toActions = new MockFileListActions
     val onClose = mockFunction[Unit]
     val props = FileListPluginUiProps(fromDispatch, onClose)
@@ -888,7 +889,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
         case CopyItemsPopupProps(move, path, resItems, _, _) =>
           move shouldBe true
           path shouldBe "/folder"
-          resItems shouldBe items
+          resItems shouldBe items.toList
       }
     }
   }
@@ -898,7 +899,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val fromDispatch = mockFunction[Any, Any]
     val fromActions = mock[FileListActions]
     val item = FileListItem("file 1")
-    val items = List(
+    val items = js.Array(
       item,
       FileListItem("dir 1", isDir = true)
     )
@@ -909,7 +910,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )
     val toActions = new MockFileListActions
     val toDispatch = mockFunction[Any, Any]
-    val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, Nil))
+    val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array()))
     val onClose = mockFunction[Unit]
     val props = FileListPluginUiProps(fromDispatch, onClose)
     val copyMoveUi = new CopyMoveUi(

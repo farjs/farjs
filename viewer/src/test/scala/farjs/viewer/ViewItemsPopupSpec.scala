@@ -2,6 +2,7 @@ package farjs.viewer
 
 import farjs.filelist.FileListActions.{FileListDirUpdatedAction, FileListTaskAction}
 import farjs.filelist._
+import farjs.filelist.api.FileListDirSpec.assertFileListDir
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.popup.StatusPopupProps
 import farjs.viewer.ViewItemsPopup._
@@ -11,6 +12,7 @@ import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
+import scala.scalajs.js
 
 class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
   with TestRendererUtils {
@@ -32,7 +34,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val actions = new Actions
     val dir1 = FileListItem("dir 1", isDir = true)
     val file1 = FileListItem("file 1", size = 10)
-    val currDir = FileListDir("/folder", isRoot = false, List(dir1, file1))
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(dir1, file1))
     val state = FileListState(currDir = currDir, isActive = true, selectedNames = Set("dir 1", "file 1"))
     val onClose = mockFunction[Unit]
     val props = FileListPluginUiProps(dispatch, onClose)
@@ -72,10 +74,13 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
       //then
       eventually {
         resAction should not be null
-        resAction shouldBe FileListDirUpdatedAction(currDir.copy(items = List(
-          dir1.copy(size = 123),
-          file1.copy(size = 10)
-        )))
+        inside(resAction) {
+          case FileListDirUpdatedAction(resDir) =>
+            assertFileListDir(resDir, FileListDir.copy(currDir)(items = js.Array(
+              dir1.copy(size = 123),
+              file1.copy(size = 10)
+            )))
+        }
       }
     }
   }
@@ -84,7 +89,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(
       FileListItem("dir 1", isDir = true)
     ))
     val state = FileListState(currDir = currDir, isActive = true)
@@ -129,7 +134,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(
       FileListItem("dir 1", isDir = true)
     ))
     val state = FileListState(currDir = currDir, isActive = true)
@@ -171,12 +176,16 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val state = FileListState()
     val onClose = mockFunction[Unit]
     val props = FileListPluginUiProps(dispatch, onClose)
-    val action = FileListDirUpdatedAction(state.currDir)
     val viewItemsPopup = new ViewItemsPopup(FileListData(dispatch, actions.actions, state))
 
     //then
     onClose.expects()
-    dispatch.expects(action)
+    dispatch.expects(*).onCall { action: Any =>
+      inside(action) {
+        case FileListDirUpdatedAction(resDir) =>
+          assertFileListDir(resDir, state.currDir)
+      }
+    }
 
     //when
     val result = testRender(<(viewItemsPopup())(^.plain := props)())

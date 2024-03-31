@@ -36,7 +36,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
     val onCancel = mockFunction[Unit]
     val props = AddToArchControllerProps(dispatch, actions.actions, FileListState(
       index = 1,
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("item 1"),
         FileListItem("item 2")
@@ -104,7 +104,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
     val onCancel = mockFunction[Unit]
     val props = AddToArchControllerProps(dispatch, actions.actions, FileListState(
       index = 1,
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("item 1"),
         FileListItem("item 2")

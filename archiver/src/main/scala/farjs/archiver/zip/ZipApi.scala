@@ -42,14 +42,14 @@ case class ZipApi(zipPath: String,
       FileListDir(
         path = targetDir,
         isRoot = false,
-        items = entries.map(ZipApi.convertToFileListItem)
+        items = js.Array(entries.map(ZipApi.convertToFileListItem): _*)
       )
     }
   }
 
   override def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = {
 
-    def deleteFromState(parent: String, items: Seq[FileListItem]): Unit = {
+    def deleteFromState(parent: String, items: js.Array[FileListItem]): Unit = {
       entriesByParentF = entriesByParentF.map { entriesByParent =>
         items.foldLeft(entriesByParent) { (entries, item) =>
           val res = entries.updatedWith(parent.stripPrefix(rootPath).stripPrefix("/")) {
@@ -63,7 +63,7 @@ case class ZipApi(zipPath: String,
       }
     }
     
-    def delDirItems(parent: String, items: Seq[FileListItem]): Future[Unit] = {
+    def delDirItems(parent: String, items: js.Array[FileListItem]): Future[Unit] = {
       items.foldLeft(Future.successful(())) { case (res, item) =>
         res.flatMap { _ =>
           if (item.isDir) {
@@ -73,7 +73,7 @@ case class ZipApi(zipPath: String,
                 delDirItems(dir, fileListDir.items)
               }
               else Future.successful {
-                deleteFromState(parent, Seq(item))
+                deleteFromState(parent, js.Array(item))
               }
             }
           }
@@ -97,7 +97,7 @@ case class ZipApi(zipPath: String,
       }
     }
 
-    delDirItems(parent, items)
+    delDirItems(parent, js.Array(items: _*))
   }
 
   override def readFile(parentDirs: List[String], item: FileListItem, position: Double): Future[FileSource] = {

@@ -8,6 +8,7 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 
 import scala.concurrent.Future
+import scala.scalajs.js
 
 class FilePluginSpec extends AsyncTestSpec {
 
@@ -20,7 +21,7 @@ class FilePluginSpec extends AsyncTestSpec {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
-    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(

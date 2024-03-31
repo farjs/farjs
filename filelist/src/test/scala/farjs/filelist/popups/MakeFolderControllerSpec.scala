@@ -13,6 +13,7 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
 
 import scala.concurrent.Future
+import scala.scalajs.js
 
 class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
   with TestRendererUtils {
@@ -41,7 +42,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val currDir = FileListDir("/sub-dir", isRoot = false, items = Seq.empty)
+    val currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array())
     val state = FileListState(isActive = true, currDir = currDir)
     val onClose = mockFunction[Unit]
     val props = FileListUiData(

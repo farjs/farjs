@@ -5,6 +5,7 @@ import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 
 import scala.concurrent.Future
+import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 
 class FileListApiSpec extends AsyncTestSpec {
@@ -64,9 +65,9 @@ object FileListApiSpec {
     def capabilities: Set[String] = Set.empty
 
     def readDir(parent: Option[String], dir: String): Future[FileListDir] =
-      Future.successful(FileListDir(path = "", isRoot = false, items = Nil))
+      Future.successful(FileListDir(path = "", isRoot = false, items = js.Array()))
 
     def readDir(targetDir: String): Future[FileListDir] =
-      Future.successful(FileListDir(path = "", isRoot = false, items = Nil))
+      Future.successful(FileListDir(path = "", isRoot = false, items = js.Array()))
   }
 }

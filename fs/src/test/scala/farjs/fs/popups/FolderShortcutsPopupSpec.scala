@@ -189,7 +189,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
   it should "set item to current fs path when onKeypress(+)" in {
     //given
     val props = getFolderShortcutsPopupProps()
-    val currState = FileListState(currDir = FileListDir("/test", isRoot = false, Nil))
+    val currState = FileListState(currDir = FileListDir("/test", isRoot = false, js.Array()))
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None),
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(currState))
@@ -269,7 +269,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     //then
     result.children.toList should be (empty)
     itemsF.map { _ =>
-      assertFolderShortcutsPopup(result, props, List(
+      assertFolderShortcutsPopup(result, List(
         "0: item",
         "1: <none>",
         "2: <none>",
@@ -298,10 +298,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     )
   }
 
-  private def assertFolderShortcutsPopup(result: TestInstance,
-                                         props: FolderShortcutsPopupProps,
-                                         items: List[String]): Assertion = {
-    
+  private def assertFolderShortcutsPopup(result: TestInstance, items: List[String]): Assertion = {
     assertComponents(result.children, List(
       <(listPopup)(^.assertPlain[ListPopupProps](inside(_) {
         case ListPopupProps(

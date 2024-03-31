@@ -8,6 +8,7 @@ import farjs.ui.task.Task
 import scommons.react.test._
 
 import scala.concurrent.Future
+import scala.scalajs.js
 
 class FSPanelSpec extends TestSpec with TestRendererUtils {
 
@@ -45,7 +46,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils {
     val fsService = new FsService()
     FSPanel.fsService = fsService.fsService
     val props = FileListPanelProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("item 1")))
     ))
     val comp = testRender(<(FSPanel())(^.wrapped := props)())
     val panelProps = findComponentProps(comp, fileListPanelComp)

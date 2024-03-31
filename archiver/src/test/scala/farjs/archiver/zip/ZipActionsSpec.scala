@@ -7,6 +7,7 @@ import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 
 import scala.concurrent.Future
+import scala.scalajs.js
 
 class ZipActionsSpec extends AsyncTestSpec {
 
@@ -32,7 +33,7 @@ class ZipActionsSpec extends AsyncTestSpec {
     ArchiverPlugin.createApi = createApi
     val actions = new ZipActions(ZipApi("file.zip", "root.path", Future.successful(Map.empty)))
     val dispatch = mockFunction[Any, Any]
-    val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
+    val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
     val path = "/test/path"
     val api = new ZipApi("file.zip", "root.path", Future.successful(Map.empty)) {
       override def readDir(targetDir: String): Future[FileListDir] = {

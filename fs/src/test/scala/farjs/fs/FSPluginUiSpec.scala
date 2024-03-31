@@ -36,7 +36,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val actions = new Actions
     val fsPluginUi = new FSPluginUi()
-    val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, Nil))
+    val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, js.Array()))
     val currFsItem = PanelStackItem(
       "fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(currState)
     )
@@ -48,7 +48,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
       currStackState = f(currStackState)
     }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
 
-    val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, Nil))
+    val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, js.Array()))
     val otherStack = new PanelStack(isActive = false, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(otherState))
     ), updater = null)
@@ -60,7 +60,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     ))
     val foldersHistoryProps = findComponentProps(renderer.root, foldersHistory)
     val action = FileListDirChangeAction(Task("Changing Dir",
-      Future.successful(FileListDir("/", isRoot = true, items = Nil))
+      Future.successful(FileListDir("/", isRoot = true, items = js.Array()))
     ))
     val dir = "test/dir"
 
@@ -81,11 +81,11 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val actions = new Actions
     val fsPluginUi = new FSPluginUi()
-    val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, Nil))
+    val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, js.Array()))
     val currStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(currState))
     ), updater = null)
-    val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, Nil))
+    val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, js.Array()))
     val otherStack = new PanelStack(isActive = false, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(otherState))
     ), updater = null)
@@ -97,7 +97,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     ))
     val driveProps = findComponentProps(renderer.root, drive)
     val action = FileListDirChangeAction(Task("Changing Dir",
-      Future.successful(FileListDir("/", isRoot = true, items = Nil))
+      Future.successful(FileListDir("/", isRoot = true, items = js.Array()))
     ))
     val dir = "test/dir"
 
@@ -115,7 +115,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val actions = new Actions
     val fsPluginUi = new FSPluginUi()
-    val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, Nil))
+    val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, js.Array()))
     val currFsItem = PanelStackItem(
       "fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(currState)
     )
@@ -127,7 +127,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
       currStackState = f(currStackState)
     }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
 
-    val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, Nil))
+    val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, js.Array()))
     val otherStack = new PanelStack(isActive = false, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(otherState))
     ), updater = null)

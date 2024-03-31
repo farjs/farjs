@@ -9,6 +9,7 @@ import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec
 
 import scala.concurrent.Future
+import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 
 class FileListActionsSpec extends AsyncTestSpec {
@@ -74,7 +75,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     val api = new Api
     val actions = new FileListActionsTest(api.api)
     val dispatch = mockFunction[Any, Any]
-    val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
+    val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
     val parent: Option[String] = Some("/")
     val dir = "test dir"
 
@@ -97,7 +98,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     val api = new Api
     val actions = new FileListActionsTest(api.api)
     val dispatch = mockFunction[Any, Any]
-    val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
+    val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
     val path = "/test/path"
 
     api.readDir.expects(path).returning(Future.successful(currDir))
@@ -119,7 +120,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     val api = new Api
     val actions = new FileListActionsTest(api.api)
     val dispatch = mockFunction[Any, Any]
-    val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
+    val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
     val parent = "/parent"
     val dir = "test/dir"
     val multiple = false
@@ -144,7 +145,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     val api = new Api
     val actions = new FileListActionsTest(api.api)
     val dispatch = mockFunction[Any, Any]
-    val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
+    val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
     val parent = "parent"
     val dir = path.join("test", "dir")
     val multiple = true
@@ -171,7 +172,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     val dispatch = mockFunction[Any, Any]
     val dir = "test dir"
     val items = List(FileListItem("file 1"))
-    val currDir = FileListDir("/", isRoot = true, items = List(FileListItem("file 1")))
+    val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
 
     api.delete.expects(dir, items).returning(Future.successful(()))
     api.readDir.expects(dir).returning(Future.successful(currDir))
@@ -206,7 +207,7 @@ class FileListActionsSpec extends AsyncTestSpec {
       FileListItem("dir 1", isDir = true),
       FileListItem("file 2")
     )
-    val res = FileListDir("dir1", isRoot = false, List(
+    val res = FileListDir("dir1", isRoot = false, js.Array(
       FileListItem("dir 3", isDir = true),
       FileListItem("file 4")
     ))
@@ -214,9 +215,15 @@ class FileListActionsSpec extends AsyncTestSpec {
     api.readDir2.expects(Some(parent), "dir 1")
       .returning(Future.successful(res))
     api.readDir2.expects(Some(res.path), "dir 3")
-      .returning(Future.successful(FileListDir("dir3", isRoot = false, Nil)))
-    onNextDir.expects(res.path, res.items).returning(true)
-    onNextDir.expects("dir3", Nil).returning(true)
+      .returning(Future.successful(FileListDir("dir3", isRoot = false, js.Array())))
+    onNextDir.expects(res.path, *).onCall { (_, items) =>
+      items.toList shouldBe res.items.toList
+      true
+    }
+    onNextDir.expects("dir3", *).onCall { (_, items) =>
+      items.length shouldBe 0
+      true
+    }
     
     //when
     val resultF = actions.scanDirs(parent, items, onNextDir)
@@ -237,14 +244,17 @@ class FileListActionsSpec extends AsyncTestSpec {
       FileListItem("dir 1", isDir = true),
       FileListItem("file 2")
     )
-    val res = FileListDir("dir1", isRoot = false, List(
+    val res = FileListDir("dir1", isRoot = false, js.Array(
       FileListItem("dir 3", isDir = true),
       FileListItem("file 4")
     ))
 
     api.readDir2.expects(Some(parent), "dir 1")
       .returning(Future.successful(res))
-    onNextDir.expects(res.path, res.items).returning(false)
+    onNextDir.expects(res.path, *).onCall { (_, items) =>
+      items.toList shouldBe res.items.toList
+      false
+    }
     
     //when
     val resultF = actions.scanDirs(parent, items, onNextDir)

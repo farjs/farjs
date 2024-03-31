@@ -7,6 +7,7 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
+import scala.scalajs.js
 
 class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -24,7 +25,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val dispatch = mockFunction[Any, Any]
     val fsService = new FsService
     FSFreeSpace.fsService = fsService.fsService
-    val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, Nil))
+    val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, js.Array()))
     val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
     val resultF = Future.successful(Some(disk))
     val action = FileListDiskSpaceUpdatedAction(disk.free)
@@ -46,7 +47,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val dispatch = mockFunction[Any, Any]
     val fsService = new FsService
     FSFreeSpace.fsService = fsService.fsService
-    val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, Nil))
+    val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, js.Array()))
     val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
     val resultF = Future.successful(Some(disk))
     val action = FileListDiskSpaceUpdatedAction(disk.free)
@@ -55,7 +56,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     dispatch.expects(action)
 
     val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
-    val props2 = props.copy(currDir = props.currDir.copy(path = "/2"))
+    val props2 = props.copy(currDir = FileListDir.copy(props.currDir)(path = "/2"))
     val resultF2 = Future.successful(Option.empty[FSDisk])
 
     resultF.flatMap { _ =>
@@ -79,7 +80,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val dispatch = mockFunction[Any, Any]
     val fsService = new FsService
     FSFreeSpace.fsService = fsService.fsService
-    val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, Nil))
+    val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, js.Array()))
     val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
     val resultF = Future.successful(Some(disk))
     val action = FileListDiskSpaceUpdatedAction(disk.free)
@@ -88,7 +89,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     dispatch.expects(action)
 
     val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
-    val props2 = props.copy(currDir = props.currDir.copy(path = "/2"))
+    val props2 = props.copy(currDir = FileListDir.copy(props.currDir)(path = "/2"))
     val resultF2 = Future.failed(new Exception("test error"))
 
     resultF.flatMap { _ =>
@@ -112,7 +113,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val dispatch = mockFunction[Any, Any]
     val fsService = new FsService
     FSFreeSpace.fsService = fsService.fsService
-    val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, Nil))
+    val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, js.Array()))
     val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
     val resultF = Future.successful(Some(disk))
     val action = FileListDiskSpaceUpdatedAction(disk.free)
@@ -144,8 +145,8 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val dispatch = mockFunction[Any, Any]
     val fsService = new FsService
     FSFreeSpace.fsService = fsService.fsService
-    val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, Nil))
-    val props2 = props.copy(currDir = props.currDir.copy(path = "/2"))
+    val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, js.Array()))
+    val props2 = props.copy(currDir = FileListDir.copy(props.currDir)(path = "/2"))
     val disk1 = FSDisk("/", size = 123.0, free = 456.0, "/")
     val disk2 = FSDisk("/2", size = 124.0, free = 457.0, "/")
     val p1 = Promise[Option[FSDisk]]()

@@ -47,7 +47,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val onKeypress = mockFunction[BlessedScreen, String, Boolean]
     val actions = new Actions
     val state = FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("file 1"),
         FileListItem("dir 1", isDir = true)
@@ -84,7 +84,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val props = FileListPanelProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("..")))
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("..")))
     ))
     val renderer = createTestRenderer(withContext(<(FileListPanel())(^.wrapped := props)()))
     val viewProps = findComponentProps(renderer.root, fileListPanelView)
@@ -112,7 +112,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val props = FileListPanelProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("..")))
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("..")))
     ))
     val comp = testRender(withContext(<(FileListPanel())(^.wrapped := props)()))
     val viewProps = findComponentProps(comp, fileListPanelView)
@@ -133,7 +133,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val props = FileListPanelProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("item 1")))
     ))
     val comp = testRender(withContext(<(FileListPanel())(^.wrapped := props)()))
     val viewProps = findComponentProps(comp, fileListPanelView)
@@ -154,11 +154,11 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val props = FileListPanelProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("item 1")))
     ))
     val comp = testRender(withContext(<(FileListPanel())(^.wrapped := props)()))
     val viewProps = findComponentProps(comp, fileListPanelView)
-    val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
+    val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
       FileListItem("file 1")
     ))
     val action = FileListDirUpdateAction(Task("Updating", Future.successful(updatedDir)))
@@ -178,11 +178,11 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val props = FileListPanelProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("dir 1", isDir = true)))
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("dir 1", isDir = true)))
     ))
     val comp = testRender(withContext(<(FileListPanel())(^.wrapped := props)()))
     val viewProps = findComponentProps(comp, fileListPanelView)
-    val changedDir = mock[FileListDir]
+    val changedDir = FileListDir(path = "/test", isRoot = false, js.Array())
     val action = FileListDirChangeAction(
       Task("Changing dir", Future.successful(changedDir))
     )
@@ -202,11 +202,11 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val props = FileListPanelProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("item 1")))
     ))
     val comp = testRender(withContext(<(FileListPanel())(^.wrapped := props)()))
     val viewProps = findComponentProps(comp, fileListPanelView)
-    val changedDir = mock[FileListDir]
+    val changedDir = FileListDir(path = "/test", isRoot = false, js.Array())
     val action = FileListDirChangeAction(
       Task("Changing dir", Future.successful(changedDir))
     )
@@ -237,7 +237,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions()
     val props = FileListPanelProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = true, items = List(FileListItem("item 1")))
+      currDir = FileListDir("/sub-dir", isRoot = true, items = js.Array(FileListItem("item 1")))
     ))
     val isRight = false
     val comp = testRender(withContext(
@@ -273,7 +273,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions()
     val props = FileListPanelProps(dispatch, actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = true, items = List(FileListItem("item 1")))
+      currDir = FileListDir("/sub-dir", isRoot = true, items = js.Array(FileListItem("item 1")))
     ))
     val isRight = true
     val comp = testRender(withContext(
@@ -298,11 +298,11 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val props = FileListPanelProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("dir 1", isDir = true)))
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("dir 1", isDir = true)))
     ))
     val comp = testRender(withContext(<(FileListPanel())(^.wrapped := props)()))
     val viewProps = findComponentProps(comp, fileListPanelView)
-    val changedDir = mock[FileListDir]
+    val changedDir = FileListDir(path = "/test", isRoot = false, js.Array())
     val action = FileListDirChangeAction(
       Task("Changing dir", Future.successful(changedDir))
     )
@@ -322,7 +322,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val props = FileListPanelProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("item 1")))
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("item 1")))
     ))
     val comp = testRender(withContext(<(FileListPanel())(^.wrapped := props)()))
     val viewProps = findComponentProps(comp, fileListPanelView)
@@ -413,7 +413,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val state = FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("aB 1"),
         FileListItem("aBc1"),

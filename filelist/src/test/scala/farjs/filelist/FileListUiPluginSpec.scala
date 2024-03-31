@@ -7,6 +7,7 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 
 import scala.concurrent.Future
+import scala.scalajs.js
 
 class FileListUiPluginSpec extends AsyncTestSpec {
 
@@ -21,7 +22,7 @@ class FileListUiPluginSpec extends AsyncTestSpec {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
-    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(
@@ -44,7 +45,7 @@ class FileListUiPluginSpec extends AsyncTestSpec {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
-    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up
     )))
     val someData = Some(FileListData(dispatch, actions, state))
@@ -72,7 +73,7 @@ class FileListUiPluginSpec extends AsyncTestSpec {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions(capabilitiesMock = Set(FileListCapability.mkDirs))
-    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up
     )))
     val noCapabilityData = Some(FileListData(dispatch, new MockFileListActions, state))
@@ -91,15 +92,15 @@ class FileListUiPluginSpec extends AsyncTestSpec {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions(capabilitiesMock = Set(FileListCapability.delete))
-    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
     val noCapabilityData = Some(FileListData(dispatch, new MockFileListActions, state))
-    val noItemData = Some(FileListData(dispatch, actions, state.copy(currDir = state.currDir.copy(items = List(
+    val noItemData = Some(FileListData(dispatch, actions, state.copy(currDir = FileListDir.copy(state.currDir)(items = js.Array(
       FileListItem.up,
       FileListItem("item 1")
     )))))
-    val selectedItemsData = Some(FileListData(dispatch, actions, state.copy(currDir = state.currDir.copy(items = List(
+    val selectedItemsData = Some(FileListData(dispatch, actions, state.copy(currDir = FileListDir.copy(state.currDir)(items = js.Array(
       FileListItem.up,
       FileListItem("test")
     )), selectedNames = Set("test"))))

@@ -15,6 +15,7 @@ import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.Future
+import scala.scalajs.js
 
 class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
   with TestRendererUtils {
@@ -34,7 +35,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("file 1"),
       FileListItem("file 2")
     ))
@@ -69,7 +70,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+    val currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("file 1"),
       FileListItem("file 2")
     ))

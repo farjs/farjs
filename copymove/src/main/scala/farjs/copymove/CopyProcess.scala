@@ -68,7 +68,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
                 dirList <- props.from.actions.readDir(Some(parent), item.name)
                 dstDirs = targetDirs :+ toName
                 _ <- props.to.actions.mkDirs(dstDirs)
-                res <- loop(prevCopied, dirList.path, dstDirs, dirList.items.map(i => (i, i.name)))
+                res <- loop(prevCopied, dirList.path, dstDirs, dirList.items.map(i => (i, i.name)).toSeq)
                 (isCopied, done) = res
                 _ <-
                   if (isCopied && done && props.move) props.from.actions.delete(parent, Seq(item))

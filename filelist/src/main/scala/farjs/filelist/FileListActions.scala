@@ -88,7 +88,8 @@ trait FileListActions {
       resF.flatMap {
         case true if item.isDir =>
           readDir(Some(parent), item.name).flatMap { ls =>
-            if (onNextDir(ls.path, ls.items)) scanDirs(ls.path, ls.items, onNextDir)
+            val dirItems = ls.items.toSeq
+            if (onNextDir(ls.path, dirItems)) scanDirs(ls.path, dirItems, onNextDir)
             else Future.successful(false)
           }
         case res => Future.successful(res)

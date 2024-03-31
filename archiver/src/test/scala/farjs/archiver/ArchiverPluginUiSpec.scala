@@ -12,6 +12,7 @@ import scommons.react.test._
 
 import scala.collection.immutable.ListSet
 import scala.concurrent.Future
+import scala.scalajs.js
 
 class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -33,7 +34,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val actions = new MockFileListActions
     val items = List(FileListItem("item 1"))
     val data = FileListData(dispatch, actions, FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = items)
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(items: _*))
     ))
     val pluginUi = new ArchiverPluginUi(data, "item 1.zip", items)
     val props = FileListPluginUiProps(dispatch, onClose)
@@ -60,7 +61,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     )
     val data = FileListData(dispatch, actions.actions, FileListState(
       index = 1,
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("item 1")
       ) ++ items),
@@ -72,7 +73,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val controller = findComponentProps(comp, addToArchController)
     
     val zipFile = "test.zip"
-    val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
+    val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
       FileListItem("file 1")
     ))
     val updateAction = FileListDirUpdateAction(

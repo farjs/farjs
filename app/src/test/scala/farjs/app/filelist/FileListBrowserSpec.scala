@@ -258,7 +258,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val buttonMock = literal("focus" -> focusMock)
     focusMock.expects()
     val currState = FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("dir 1", isDir = true)))
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("dir 1", isDir = true)))
     )
 
     val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
@@ -308,7 +308,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val buttonMock = literal("focus" -> focusMock)
     focusMock.expects()
     val currState = FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem("file 1")))
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("file 1")))
     )
 
     val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
@@ -367,7 +367,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val buttonMock = literal("focus" -> focusMock)
     focusMock.expects()
     val fileItem = FileListItem("file 1")
-    val currDir = FileListDir("/sub-dir", isRoot = false, items = List(fileItem))
+    val currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(fileItem))
     val currState = FileListState(currDir = currDir)
 
     val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>
@@ -438,7 +438,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val buttonMock = literal("focus" -> focusMock)
     focusMock.expects()
     val fileItem = FileListItem("file 1")
-    val currDir = FileListDir("/sub-dir", isRoot = false, items = List(fileItem))
+    val currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(fileItem))
     val currState = FileListState(currDir = currDir)
 
     val comp = testRender(<(FileListBrowser())(^.wrapped := props)(), { el =>

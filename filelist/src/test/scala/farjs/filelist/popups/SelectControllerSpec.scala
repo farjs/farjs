@@ -9,6 +9,7 @@ import farjs.filelist.{FileListData, FileListState, FileListUiData, MockFileList
 import scommons.react.test._
 
 import scala.concurrent.Future
+import scala.scalajs.js
 
 class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
@@ -27,7 +28,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
-    val state = FileListState(offset = 1, index = 2, FileListDir("/sub-dir", isRoot = false, items = List(
+    val state = FileListState(offset = 1, index = 2, FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem("file1.test"),
       FileListItem("file2.test"),
@@ -59,7 +60,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
-    val state = FileListState(offset = 1, index = 2, FileListDir("/sub-dir", isRoot = false, items = List(
+    val state = FileListState(offset = 1, index = 2, FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem("file1.test"),
       FileListItem("file2.test"),
@@ -91,7 +92,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions
-    val state = FileListState(offset = 1, index = 2, FileListDir("/sub-dir", isRoot = false, items = List(
+    val state = FileListState(offset = 1, index = 2, FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem("file1.test"),
       FileListItem("file2.test"),

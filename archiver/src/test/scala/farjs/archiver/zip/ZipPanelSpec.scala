@@ -5,6 +5,7 @@ import farjs.archiver.zip.ZipPanel._
 import farjs.archiver.zip.ZipPanelSpec.withContext
 import farjs.filelist.FileListActions._
 import farjs.filelist._
+import farjs.filelist.api.FileListDirSpec.assertFileListDir
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack._
 import farjs.ui.Dispatch
@@ -18,6 +19,7 @@ import scommons.react._
 import scommons.react.test._
 
 import scala.concurrent.Future
+import scala.scalajs.js
 
 class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -56,7 +58,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions(isLocalFSMock = false)
     val props = FileListPanelProps(dispatch, actions, FileListState(
-      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
+      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
         FileListItem.up
       ))
     ))
@@ -87,7 +89,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val actions = new MockFileListActions(isLocalFSMock = false)
     val props = FileListPanelProps(dispatch, actions, FileListState(
       index = 1,
-      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
+      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("item 1")
       ))
@@ -96,7 +98,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val zipPanel = new ZipPanel("dir/file.zip", rootPath, entriesByParentF, onClose)
     val fsDispatch = mockFunction[Any, Any]
     val fsActions = new Actions(isLocalFS = true)
-    val fsState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = Nil))
+    val fsState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array()))
     val leftStack = new PanelStack(isActive = false, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
     ), null)
@@ -110,7 +112,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
     val panelProps = findComponentProps(comp, fileListPanelComp)
-    val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
+    val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
       FileListItem("file 1")
     ))
     val updateAction = FileListDirUpdateAction(Task("Updating...", Future.successful(updatedDir)))
@@ -132,7 +134,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions(isLocalFSMock = false)
     val props = FileListPanelProps(dispatch, actions, FileListState(
-      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
+      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("item 1")
       ))
@@ -141,7 +143,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val zipPanel = new ZipPanel("dir/file.zip", rootPath, entriesByParentF, onClose)
     val fsDispatch = mockFunction[Any, Any]
     val fsActions = new Actions(isLocalFS = true)
-    val fsState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = Nil))
+    val fsState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array()))
     val leftStack = new PanelStack(isActive = false, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
     ), null)
@@ -155,7 +157,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
     val panelProps = findComponentProps(comp, fileListPanelComp)
-    val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
+    val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
       FileListItem("file 1")
     ))
     val updateAction = FileListDirUpdateAction(Task("Updating...", Future.successful(updatedDir)))
@@ -179,7 +181,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val actions = new MockFileListActions(isLocalFSMock = false)
     val props = FileListPanelProps(dispatch, actions, FileListState(
       index = 1,
-      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
+      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("dir 1", isDir = true)
       ))
@@ -219,7 +221,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val actions = new MockFileListActions(isLocalFSMock = false)
     val props = FileListPanelProps(dispatch, actions, FileListState(
       index = 1,
-      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
+      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("dir 1", isDir = true)
       ))
@@ -230,7 +232,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val fsActions = new MockFileListActions(isLocalFSMock = false)
     val fsState = FileListState(
       index = 1,
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("file 1")
       ))
@@ -262,7 +264,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val actions = new MockFileListActions(isLocalFSMock = false)
     val props = FileListPanelProps(dispatch, actions, FileListState(
       index = 1,
-      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
+      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("dir 1", isDir = true)
       ))
@@ -272,7 +274,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val fsDispatch = mockFunction[Any, Any]
     val fsActions = new MockFileListActions(isLocalFSMock = true)
     val fsState = FileListState(
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("file 1")
       ))
@@ -304,7 +306,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val actions = new MockFileListActions(isLocalFSMock = false)
     val props = FileListPanelProps(dispatch, actions, FileListState(
       index = 1,
-      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
+      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("dir 1", isDir = true)
       ))
@@ -316,7 +318,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val items = List(FileListItem("file 1"))
     val fsState = FileListState(
       index = 1,
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(FileListItem.up) ++ items)
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem.up) ++ items)
     )
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fsDispatch), Some(fsActions), Some(fsState))
@@ -359,7 +361,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val actions = new Actions(isLocalFS = false)
     val props = FileListPanelProps(dispatch, actions.actions, FileListState(
       index = 1,
-      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
+      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("dir 1", isDir = true)
       ))
@@ -374,7 +376,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     )
     val fsState = FileListState(
       index = 1,
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("item 1")
       ) ++ items),
@@ -408,7 +410,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
         //given
         val zipFile = "test.zip"
-        val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
+        val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
           FileListItem("file 1")
         ))
         val updateAction = FileListDirUpdateAction(Task("Updating...", Future.successful(updatedDir)))
@@ -433,7 +435,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val actions = new Actions(isLocalFS = false)
     val props = FileListPanelProps(dispatch, actions.actions, FileListState(
       index = 1,
-      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
+      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("dir 1", isDir = true)
       ))
@@ -448,7 +450,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     )
     val fsState = FileListState(
       index = 1,
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("item 1")
       ) ++ items),
@@ -482,7 +484,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
         //given
         val zipFile = "test.zip"
-        val updatedDir = FileListDir("/updated/dir", isRoot = false, List(
+        val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
           FileListItem("file 1")
         ))
         val updateAction = FileListDirUpdateAction(Task("Updating...", Future.successful(updatedDir)))
@@ -512,7 +514,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions(isLocalFS = false)
     val props = FileListPanelProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("zip://filePath.zip/sub-dir", isRoot = false, items = List(
+      currDir = FileListDir("zip://filePath.zip/sub-dir", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("dir 1", isDir = true)
       ))
@@ -523,7 +525,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val fsActions = new MockFileListActions(isLocalFSMock = true)
     val fsState = FileListState(
       index = 1,
-      currDir = FileListDir("/sub-dir", isRoot = false, items = List(
+      currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
         FileListItem.up,
         FileListItem("item 1")
       ))
@@ -574,7 +576,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val props = FileListPanelProps(dispatch, actions, state)
     val rootPath = "zip://filePath.zip"
     val zipPanel = new ZipPanel("dir/file.zip", rootPath, Future.failed(new Exception("test")), onClose)
-    val dir = FileListDir(rootPath, isRoot = false, Nil)
+    val dir = FileListDir(rootPath, isRoot = false, js.Array())
     val fsDispatch = mockFunction[Any, Any]
     val fsActions = new MockFileListActions(isLocalFSMock = true)
     val fsState = FileListState()
@@ -593,7 +595,12 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
           actionF = future
       }
     }
-    dispatch.expects(FileListDirChangedAction(FileListItem.currDir.name, dir))
+    dispatch.expects(*).onCall { action: Any =>
+      inside(action) {
+        case FileListDirChangedAction(FileListItem.currDir.name, resDir) =>
+          assertFileListDir(resDir, dir)
+      }
+    }
     
     //when
     testRender(
@@ -613,7 +620,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val dispatch = mockFunction[Any, Any]
     val actions = new MockFileListActions(isLocalFSMock = false)
     val state = FileListState(
-      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = List(
+      currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
         FileListItem.up
       ))
     )
@@ -670,14 +677,19 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       }
     }
     dispatch.expects(FileListDiskSpaceUpdatedAction(7.0))
-    dispatch.expects(FileListDirChangedAction(FileListItem.currDir.name, FileListDir(
-      path = rootPath,
-      isRoot = false,
-      items = List(
-        FileListItem("dir 1", isDir = true, mtimeMs = 1.0),
-        FileListItem("file 1", size = 2.0, mtimeMs = 3.0)
-      )
-    )))
+    dispatch.expects(*).onCall { action: Any =>
+      inside(action) {
+        case FileListDirChangedAction(FileListItem.currDir.name, resDir) =>
+          assertFileListDir(resDir, FileListDir(
+            path = rootPath,
+            isRoot = false,
+            items = js.Array(
+              FileListItem("dir 1", isDir = true, mtimeMs = 1.0),
+              FileListItem("file 1", size = 2.0, mtimeMs = 3.0)
+            )
+          ))
+      }
+    }
     
     //when
     val result = testRender(

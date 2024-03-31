@@ -53,7 +53,7 @@ object ArchiverPlugin extends FileListPlugin {
           dispatch = None,
           actions = Some(new ZipActions(createApi(filePath, rootPath, entriesByParentF))),
           state = Some(FileListState(
-            currDir = FileListDir(rootPath, isRoot = false, items = Nil)
+            currDir = FileListDir(rootPath, isRoot = false, items = js.Array())
           ))
         ))
       }

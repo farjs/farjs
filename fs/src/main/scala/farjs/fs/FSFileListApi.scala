@@ -7,6 +7,7 @@ import scommons.nodejs.raw.FSConstants
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.scalajs.js
 import scala.scalajs.js.JavaScriptException
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.{Failure, Success, Try}
@@ -37,7 +38,7 @@ class FSFileListApi extends FileListApi {
       FileListDir(
         path = targetDir,
         isRoot = isRoot(targetDir),
-        items = items
+        items = js.Array(items: _*)
       )
     }
   }

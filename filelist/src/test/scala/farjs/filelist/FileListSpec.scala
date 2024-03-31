@@ -58,7 +58,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val props = FileListProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("/", isRoot = true, items = List(
+      currDir = FileListDir("/", isRoot = true, items = js.Array(
         FileListItem("item 1"),
         FileListItem("item 2"),
         FileListItem("item 3"),
@@ -107,7 +107,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val props = FileListProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("/", isRoot = true, items = List(
+      currDir = FileListDir("/", isRoot = true, items = js.Array(
         FileListItem("item 1"),
         FileListItem("item 2")
       ))
@@ -132,7 +132,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val props = FileListProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("/", isRoot = true, items = List(
+      currDir = FileListDir("/", isRoot = true, items = js.Array(
         FileListItem("item 1"),
         FileListItem("item 2"),
         FileListItem("item 3")
@@ -171,7 +171,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val onKeypress = mockFunction[BlessedScreen, String, Unit]
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
-    val items = List(
+    val items = js.Array(
       FileListItem("item 1"),
       FileListItem("item 2"),
       FileListItem("item 3"),
@@ -286,7 +286,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     //given
     val nonRootProps = rootProps.copy(state = rootProps.state.copy(
-      currDir = rootProps.state.currDir.copy(items = FileListItem.up +: items)
+      currDir = FileListDir.copy(rootProps.state.currDir)(items = FileListItem.up +: items)
     ))
     renderer.update(<(FileList())(^.wrapped := nonRootProps)())
     findComponentProps(renderer.root, fileListViewComp).focusedIndex shouldBe 0
@@ -327,7 +327,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val props = FileListProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("/", isRoot = true, items = List(
+      currDir = FileListDir("/", isRoot = true, items = js.Array(
         FileListItem("item 1"),
         FileListItem("item 2"),
         FileListItem("item 3")
@@ -352,7 +352,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val actions = new Actions
     val props = FileListProps(dispatch, actions.actions, FileListState(
       index = 2,
-      currDir = FileListDir("/", isRoot = true, items = List(
+      currDir = FileListDir("/", isRoot = true, items = js.Array(
         FileListItem("item 1"),
         FileListItem("item 2"),
         FileListItem("item 3")

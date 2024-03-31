@@ -40,7 +40,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val currItem = FileListItem("dir 1", isDir = true)
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(
       currItem,
       FileListItem("file 1", size = 10)
     ))
@@ -84,7 +84,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val currItem = FileListItem("dir 1", isDir = true)
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(
       currItem,
       FileListItem("file 1", size = 10)
     ))
@@ -128,7 +128,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val currItem = FileListItem("dir 1", isDir = true)
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(
       currItem,
       FileListItem("file 1", size = 10)
     ))
@@ -179,7 +179,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val currItem = FileListItem("dir 1", isDir = true)
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(
       currItem,
       FileListItem("file 1", size = 10)
     ))
@@ -220,7 +220,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val currItem = FileListItem("dir 1", isDir = true)
-    val currDir = FileListDir("/folder", isRoot = false, List(
+    val currDir = FileListDir("/folder", isRoot = false, js.Array(
       currItem,
       FileListItem("file 1", size = 10)
     ))
