@@ -65,7 +65,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
         actions.scanDirs.expects(props.state.currDir.path, items, *).onCall { (_, _, onNextDir) =>
           onNextDir("/path", List(
             FileListItem("dir 2", isDir = true),
-            FileListItem("file 1", size = 123)
+            FileListItem.copy(FileListItem("file 1"))(size = 123)
           ))
           p.future
         }
@@ -132,7 +132,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
         actions.scanDirs.expects(props.state.currDir.path, items, *).onCall { (_, _, onNextDir) =>
           onNextDir("/path", List(
             FileListItem("dir 2", isDir = true),
-            FileListItem("file 1", size = 123)
+            FileListItem.copy(FileListItem("file 1"))(size = 123)
           ))
           Future.successful(true)
         }

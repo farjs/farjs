@@ -1,5 +1,6 @@
 package farjs.fs
 
+import farjs.filelist.api.FileListItemSpec.{assertFileListItem, assertFileListItems}
 import farjs.filelist.api._
 import farjs.fs.FSFileListApiSpec.TestApiFS
 import org.scalatest.Succeeded
@@ -49,10 +50,10 @@ class FSFileListApiSpec extends AsyncTestSpec {
       inside(dir) { case FileListDir(dirPath, isRoot, items) =>
         dirPath shouldBe process.cwd()
         isRoot shouldBe false
-        items.toList shouldBe List(
+        assertFileListItems(items.toList, List(
           FileListItem("file1"),
           FileListItem("file2")
-        )
+        ))
       }
     }
   }
@@ -354,7 +355,10 @@ class FSFileListApiSpec extends AsyncTestSpec {
     }
     
     //then
-    onExists.expects(existing).returning(Future.successful(Some(true)))
+    onExists.expects(*).onCall { resItem: FileListItem =>
+      assertFileListItem(resItem, existing)
+      Future.successful(Some(true))
+    }
     
     //when
     val resultF = for {
@@ -409,7 +413,10 @@ class FSFileListApiSpec extends AsyncTestSpec {
     }
     
     //then
-    onExists.expects(existing).returning(Future.successful(Some(false)))
+    onExists.expects(*).onCall { resItem: FileListItem =>
+      assertFileListItem(resItem, existing)
+      Future.successful(Some(false))
+    }
     
     //when
     val resultF = for {
@@ -453,7 +460,10 @@ class FSFileListApiSpec extends AsyncTestSpec {
     val existing = getFileListItem("example2.txt", fs.lstatSync(file))
 
     //then
-    onExists.expects(existing).returning(Future.successful(None))
+    onExists.expects(*).onCall { resItem: FileListItem =>
+      assertFileListItem(resItem, existing)
+      Future.successful(None)
+    }
     
     //when
     val resultF = apiImp.writeFile(List(tmpDir), "example2.txt", onExists)
@@ -512,9 +522,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
 
   private def getFileListItem(name: String, stats: Stats) = {
     val isDir = stats.isDirectory()
-    FileListItem(
-      name = name,
-      isDir = isDir,
+    FileListItem.copy(FileListItem(name, isDir))(
       isSymLink = stats.isSymbolicLink(),
       size = if (isDir) 0.0 else stats.size,
       atimeMs = stats.atimeMs,

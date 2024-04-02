@@ -182,9 +182,7 @@ class FSFileListApi extends FileListApi {
       case Failure(_) => FileListItem(name)
       case Success(stats) =>
         val isDir = stats.isDirectory()
-        FileListItem(
-          name = name,
-          isDir = isDir,
+        FileListItem.copy(FileListItem(name, isDir))(
           isSymLink = stats.isSymbolicLink(),
           size = if (isDir) 0.0 else stats.size,
           atimeMs = stats.atimeMs,

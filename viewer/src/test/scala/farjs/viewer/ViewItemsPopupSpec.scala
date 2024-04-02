@@ -33,7 +33,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val dir1 = FileListItem("dir 1", isDir = true)
-    val file1 = FileListItem("file 1", size = 10)
+    val file1 = FileListItem.copy(FileListItem("file 1"))(size = 10)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(dir1, file1))
     val state = FileListState(currDir = currDir, isActive = true, selectedNames = Set("dir 1", "file 1"))
     val onClose = mockFunction[Unit]
@@ -44,7 +44,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
         res shouldBe true
         onNextDir("/path", List(
           FileListItem("dir 2", isDir = true),
-          FileListItem("file 2", size = 123)
+          FileListItem.copy(FileListItem("file 2"))(size = 123)
         )) shouldBe true
         res
       }
@@ -77,8 +77,8 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
         inside(resAction) {
           case FileListDirUpdatedAction(resDir) =>
             assertFileListDir(resDir, FileListDir.copy(currDir)(items = js.Array(
-              dir1.copy(size = 123),
-              file1.copy(size = 10)
+              FileListItem.copy(dir1)(size = 123),
+              FileListItem.copy(file1)(size = 10)
             )))
         }
       }
@@ -101,7 +101,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
         res shouldBe false
         onNextDir("/path", List(
           FileListItem("dir 2", isDir = true),
-          FileListItem("file 2", size = 123)
+          FileListItem.copy(FileListItem("file 2"))(size = 123)
         )) shouldBe false
         res
       }

@@ -156,9 +156,10 @@ object ZipApi {
   private[zip] var childProcess: ChildProcess = child_process
   
   def convertToFileListItem(zip: ZipEntry): FileListItem = {
-    FileListItem(
+    FileListItem.copy(FileListItem(
       name = zip.name,
-      isDir = zip.isDir,
+      isDir = zip.isDir
+    ))(
       size = zip.size,
       mtimeMs = zip.datetimeMs,
       permissions = zip.permissions

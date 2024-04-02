@@ -26,13 +26,13 @@ object SortMode {
   
   def sortItems(items: Seq[FileListItem], mode: SortMode): Seq[FileListItem] = {
     mode match {
-      case Name => items.sortBy(item => (item.nameNormalized, item.name))
-      case Extension => items.sortBy(item => (item.extNormalized, item.ext, item.nameNormalized, item.name))
-      case ModificationTime => items.sortBy(item => (item.mtimeMs, item.nameNormalized, item.name))
-      case Size => items.sortBy(item => (item.size, item.nameNormalized, item.name))
+      case Name => items.sortBy(item => (item.nameNormalized(), item.name))
+      case Extension => items.sortBy(item => (item.extNormalized(), item.ext(), item.nameNormalized(), item.name))
+      case ModificationTime => items.sortBy(item => (item.mtimeMs, item.nameNormalized(), item.name))
+      case Size => items.sortBy(item => (item.size, item.nameNormalized(), item.name))
       case Unsorted => items
-      case CreationTime => items.sortBy(item => (item.ctimeMs, item.nameNormalized, item.name))
-      case AccessTime => items.sortBy(item => (item.atimeMs, item.nameNormalized, item.name))
+      case CreationTime => items.sortBy(item => (item.ctimeMs, item.nameNormalized(), item.name))
+      case AccessTime => items.sortBy(item => (item.atimeMs, item.nameNormalized(), item.name))
     }
   }
 }

@@ -317,7 +317,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     val actions = new FileListActionsTest(api.api)
     val srcDirs = List("parent-dir")
     val file = FileListItem("test_file")
-    val existing = FileListItem("existing_file", size = 12)
+    val existing = FileListItem.copy(FileListItem("existing_file"))(size = 12)
     val dstDirs = List("target-dir")
     val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
     val onProgress = mockFunction[Double, Future[Boolean]]
@@ -369,7 +369,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     val actions = new FileListActionsTest(api.api)
     val srcDirs = List("parent-dir")
     val file = FileListItem("test_file")
-    val existing = FileListItem("existing_file", size = 12)
+    val existing = FileListItem.copy(FileListItem("existing_file"))(size = 12)
     val dstDirs = List("target-dir")
     val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
     val onProgress = mockFunction[Double, Future[Boolean]]
@@ -420,8 +420,8 @@ class FileListActionsSpec extends AsyncTestSpec {
     val api = new Api
     val actions = new FileListActionsTest(api.api)
     val srcDirs = List("parent-dir")
-    val file = FileListItem("test_file", size = 123)
-    val existing = FileListItem("existing_file", size = 12)
+    val file = FileListItem.copy(FileListItem("test_file"))(size = 123)
+    val existing = FileListItem.copy(FileListItem("existing_file"))(size = 12)
     val dstDirs = List("target-dir")
     val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
     val onProgress = mockFunction[Double, Future[Boolean]]

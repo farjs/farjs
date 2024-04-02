@@ -2,6 +2,7 @@ package farjs.filelist
 
 import farjs.filelist.FileList._
 import farjs.filelist.FileListActions._
+import farjs.filelist.api.FileListItemSpec.assertFileListItems
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.Dispatch
 import farjs.ui.task.Task
@@ -214,7 +215,8 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       //then
       val res = findComponentProps(renderer.root, fileListViewComp)
       val viewItems = items.map(name => FileListItem(name, isDir = name == FileListItem.up.name))
-      (res.items, res.focusedIndex, res.selectedNames) shouldBe ((viewItems, index, selected))
+      assertFileListItems(res.items, viewItems)
+      (res.focusedIndex, res.selectedNames) shouldBe ((index, selected))
     }
 
     //when & then
@@ -381,7 +383,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       case FileListViewProps(resSize, columns, items, resFocusedIndex, resSelectedNames, _, _, _) =>
         resSize shouldBe props.size
         columns shouldBe props.columns
-        items shouldBe viewItems
+        assertFileListItems(items, viewItems)
         resFocusedIndex shouldBe focusedIndex
         resSelectedNames shouldBe selectedNames
     }

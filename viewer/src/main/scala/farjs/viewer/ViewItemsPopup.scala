@@ -2,7 +2,7 @@ package farjs.viewer
 
 import farjs.filelist.FileListActions.{FileListDirUpdatedAction, FileListTaskAction}
 import farjs.filelist._
-import farjs.filelist.api.FileListDir
+import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.Dispatch
 import farjs.ui.popup._
 import farjs.ui.task.Task
@@ -62,7 +62,7 @@ class ViewItemsPopup(data: FileListData) extends FunctionComponent[FileListPlugi
           case Success(true) =>
             val updatedItems = state.currDir.items.map { item =>
               sizes.get(item.name) match {
-                case Some(size) => item.copy(size = size)
+                case Some(size) => FileListItem.copy(item)(size = size)
                 case None => item
               }
             }

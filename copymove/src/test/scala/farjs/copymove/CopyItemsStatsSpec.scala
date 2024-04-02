@@ -58,13 +58,13 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val actions = new Actions
     val props = CopyItemsStatsProps(dispatch, actions.actions, "/folder", List(
       FileListItem("dir 1", isDir = true),
-      FileListItem("file 1", size = 10)
+      FileListItem.copy(FileListItem("file 1"))(size = 10)
     ), "Move", onDone, onCancel)
     val p = Promise[Boolean]()
     actions.scanDirs.expects(props.fromPath, Seq(props.items.head), *).onCall { (_, _, onNextDir) =>
       onNextDir("/path", List(
         FileListItem("dir 2", isDir = true),
-        FileListItem("file 2", size = 123)
+        FileListItem.copy(FileListItem("file 2"))(size = 123)
       ))
       p.future
     }
@@ -126,7 +126,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       //then
       onNextDirFn("/path", List(
         FileListItem("dir 2", isDir = true),
-        FileListItem("file 2", size = 123)
+        FileListItem.copy(FileListItem("file 2"))(size = 123)
       )) shouldBe false
 
       p.success(false)

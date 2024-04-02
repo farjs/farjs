@@ -43,9 +43,9 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val state = FileListState(index = 2, currDir = FileListDir("/", isRoot = true, items = js.Array(
-      FileListItem("dir 1", isDir = true, size = 1),
-      FileListItem("dir 2", isDir = true, size = 2),
-      FileListItem("file", size = 3)
+      FileListItem.copy(FileListItem("dir 1", isDir = true))(size = 1),
+      FileListItem.copy(FileListItem("dir 2", isDir = true))(size = 2),
+      FileListItem.copy(FileListItem("file"))(size = 3)
     )), selectedNames = Set("dir 2"), diskSpace = Some(123.45))
     val props = FileListPanelViewProps(dispatch, actions, state)
 
@@ -62,9 +62,9 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val state = FileListState(index = 2, currDir = FileListDir("/", isRoot = true, items = js.Array(
-      FileListItem("dir 1", isDir = true, size = 1),
-      FileListItem("dir 2", isDir = true, size = 2),
-      FileListItem("file", size = 3)
+      FileListItem.copy(FileListItem("dir 1", isDir = true))(size = 1),
+      FileListItem.copy(FileListItem("dir 2", isDir = true))(size = 2),
+      FileListItem.copy(FileListItem("file"))(size = 3)
     )), selectedNames = Set("dir 2", "file"))
     val props = FileListPanelViewProps(dispatch, actions, state)
 
@@ -81,9 +81,9 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = js.Array(
-      FileListItem("file 1", size = 1),
-      FileListItem("file 2", size = 2, permissions = "drwxr-xr-x"),
-      FileListItem("file 3", size = 3)
+      FileListItem.copy(FileListItem("file 1"))(size = 1),
+      FileListItem.copy(FileListItem("file 2"))(size = 2, permissions = "drwxr-xr-x"),
+      FileListItem.copy(FileListItem("file 3"))(size = 3)
     )), isActive = true)
     val props = FileListPanelViewProps(dispatch, actions, state)
 
@@ -99,9 +99,9 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = js.Array(
-      FileListItem("file 1", size = 1),
-      FileListItem("dir 2", size = 999999999, isDir = true, permissions = "drwxr-xr-x"),
-      FileListItem("file 3", size = 3)
+      FileListItem.copy(FileListItem("file 1"))(size = 1),
+      FileListItem.copy(FileListItem("dir 2", isDir = true))(size = 999999999, permissions = "drwxr-xr-x"),
+      FileListItem.copy(FileListItem("file 3"))(size = 3)
     )))
     val props = FileListPanelViewProps(dispatch, actions, state)
 
@@ -117,9 +117,9 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val dispatch = mockFunction[Any, Any]
     val actions = mock[FileListActions]
     val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = js.Array(
-      FileListItem("file 1", size = 1),
-      FileListItem("file 2", size = 1123456789, permissions = "drwxr-xr-x"),
-      FileListItem("file 3", size = 3)
+      FileListItem.copy(FileListItem("file 1"))(size = 1),
+      FileListItem.copy(FileListItem("file 2"))(size = 1123456789, permissions = "drwxr-xr-x"),
+      FileListItem.copy(FileListItem("file 3"))(size = 3)
     )))
     val props = FileListPanelViewProps(dispatch, actions, state)
 
@@ -136,8 +136,8 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val actions = mock[FileListActions]
     val state = FileListState(index = 1, currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
-      FileListItem("dir", isDir = true, size = 1, permissions = "dr--r--r--"),
-      FileListItem("file", size = 2)
+      FileListItem.copy(FileListItem("dir", isDir = true))(size = 1, permissions = "dr--r--r--"),
+      FileListItem.copy(FileListItem("file"))(size = 2)
     )))
     val props = FileListPanelViewProps(dispatch, actions, state)
 
@@ -154,8 +154,8 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val actions = mock[FileListActions]
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
-      FileListItem("dir", isDir = true, size = 1),
-      FileListItem("file", size = 2)
+      FileListItem.copy(FileListItem("dir", isDir = true))(size = 1),
+      FileListItem.copy(FileListItem("file"))(size = 2)
     )))
     val props = FileListPanelViewProps(dispatch, actions, state)
 

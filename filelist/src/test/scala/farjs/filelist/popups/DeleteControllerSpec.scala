@@ -2,6 +2,7 @@ package farjs.filelist.popups
 
 import farjs.filelist.FileListActions._
 import farjs.filelist._
+import farjs.filelist.api.FileListItemSpec.assertFileListItems
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.popups.DeleteController._
 import farjs.ui.Dispatch
@@ -56,7 +57,10 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val items = List(FileListItem("file 1"))
 
     //then
-    actions.deleteAction.expects(dispatch, currDir.path, items).returning(deleteAction)
+    actions.deleteAction.expects(dispatch, currDir.path, *).onCall { (_, _, resItems) =>
+      assertFileListItems(resItems, items)
+      deleteAction
+    }
     dispatch.expects(deleteAction)
     onClose.expects()
 
@@ -91,7 +95,10 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val items = List(FileListItem("file 2"))
 
     //then
-    actions.deleteAction.expects(dispatch, currDir.path, items).returning(deleteAction)
+    actions.deleteAction.expects(dispatch, currDir.path, *).onCall { (_, _, resItems) =>
+      assertFileListItems(resItems, items)
+      deleteAction
+    }
     dispatch.expects(deleteAction)
     onClose.expects()
 

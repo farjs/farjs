@@ -1,5 +1,6 @@
 package farjs.filelist.api
 
+import farjs.filelist.api.FileListItemSpec.assertFileListItems
 import org.scalactic.source.Position
 import org.scalatest.Assertion
 import org.scalatest.Inside.inside
@@ -12,7 +13,7 @@ object FileListDirSpec {
       case FileListDir(path, isRoot, items) =>
         path shouldBe expected.path
         isRoot shouldBe expected.isRoot
-        items.toList shouldBe expected.items.toList
+        assertFileListItems(items.toList, expected.items.toList)
     }
   }
 }

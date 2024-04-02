@@ -42,7 +42,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val currItem = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
       currItem,
-      FileListItem("file 1", size = 10)
+      FileListItem.copy(FileListItem("file 1"))(size = 10)
     ))
     var stackState = List[PanelStackItem[QuickViewParams]](
       PanelStackItem(currComp, None, None, Some(QuickViewParams(parent = currDir.path)))
@@ -55,8 +55,8 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
       onNextDir("/path", List(
         FileListItem("dir 2", isDir = true),
-        FileListItem("file 2", size = 122),
-        FileListItem("file 1", size = 1)
+        FileListItem.copy(FileListItem("file 2"))(size = 122),
+        FileListItem.copy(FileListItem("file 1"))(size = 1)
       ))
       p.future
     }
@@ -86,7 +86,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val currItem = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
       currItem,
-      FileListItem("file 1", size = 10)
+      FileListItem.copy(FileListItem("file 1"))(size = 10)
     ))
     var stackState = List[PanelStackItem[QuickViewParams]](
       PanelStackItem(currComp, None, None, Some(QuickViewParams(name = currItem.name)))
@@ -99,8 +99,8 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
       onNextDir("/path", List(
         FileListItem("dir 2", isDir = true),
-        FileListItem("file 2", size = 122),
-        FileListItem("file 1", size = 1)
+        FileListItem.copy(FileListItem("file 2"))(size = 122),
+        FileListItem.copy(FileListItem("file 1"))(size = 1)
       ))
       p.future
     }
@@ -130,7 +130,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val currItem = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
       currItem,
-      FileListItem("file 1", size = 10)
+      FileListItem.copy(FileListItem("file 1"))(size = 10)
     ))
     var stackState = List[PanelStackItem[QuickViewParams]](
       PanelStackItem(currComp, None, None, Some(QuickViewParams()))
@@ -160,8 +160,8 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       popup.onClose.foreach(_.apply())
       val result = onNextDirFn("/path", List(
         FileListItem("dir 2", isDir = true),
-        FileListItem("file 2", size = 122),
-        FileListItem("file 1", size = 1)
+        FileListItem.copy(FileListItem("file 2"))(size = 122),
+        FileListItem.copy(FileListItem("file 1"))(size = 1)
       ))
       p.success(result)
 
@@ -181,7 +181,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val currItem = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
       currItem,
-      FileListItem("file 1", size = 10)
+      FileListItem.copy(FileListItem("file 1"))(size = 10)
     ))
     var stackState = List[PanelStackItem[QuickViewParams]](
       PanelStackItem(currComp, None, None, Some(QuickViewParams()))
@@ -222,7 +222,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val currItem = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
       currItem,
-      FileListItem("file 1", size = 10)
+      FileListItem.copy(FileListItem("file 1"))(size = 10)
     ))
     val params = QuickViewParams(currItem.name, currDir.path, 1, 2, 3)
     var stackState = List[PanelStackItem[QuickViewParams]](

@@ -832,7 +832,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val toDispatch = mockFunction[Any, Any]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
-    val item = FileListItem("file 1", size = 246)
+    val item = FileListItem.copy(FileListItem("file 1"))(size = 246)
     val dir = FileListItem("dir 1", isDir = true)
     val props = CopyProcessProps(from, to, move = false, "/from/path", List(
       (dir, "newName")
@@ -886,7 +886,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val toDispatch = mockFunction[Any, Any]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
-    val item = FileListItem("file 1", size = 246)
+    val item = FileListItem.copy(FileListItem("file 1"))(size = 246)
     val dir = FileListItem("dir 1", isDir = true)
     val props = CopyProcessProps(from, to, move = true, "/from/path", List(
       (dir, "newName")
@@ -942,8 +942,8 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val toDispatch = mockFunction[Any, Any]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
-    val item1 = FileListItem("file 1", size = 246)
-    val item2 = FileListItem("file 2", size = 123)
+    val item1 = FileListItem.copy(FileListItem("file 1"))(size = 246)
+    val item2 = FileListItem.copy(FileListItem("file 2"))(size = 123)
     val props = CopyProcessProps(from, to, move = false, "/from/path", List(
       (item1, "newName1"),
       (item2, "newName2")
@@ -1018,8 +1018,8 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val toDispatch = mockFunction[Any, Any]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
-    val item1 = FileListItem("file 1", size = 246)
-    val item2 = FileListItem("file 2", size = 123)
+    val item1 = FileListItem.copy(FileListItem("file 1"))(size = 246)
+    val item2 = FileListItem.copy(FileListItem("file 2"))(size = 123)
     val props = CopyProcessProps(from, to, move = true, "/from/path", List(
       (item1, "newName1"),
       (item2, "newName2")

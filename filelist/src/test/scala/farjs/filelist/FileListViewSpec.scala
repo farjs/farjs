@@ -2,10 +2,12 @@ package farjs.filelist
 
 import farjs.filelist.FileListView._
 import farjs.filelist.api.FileListItem
+import farjs.filelist.api.FileListItemSpec.assertFileListItems
 import farjs.filelist.stack.{PanelStack, PanelStackProps}
 import farjs.filelist.theme.FileListTheme
 import farjs.filelist.theme.FileListThemeSpec.withThemeContext
 import farjs.ui.border._
+import org.scalatest.Assertion
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.test._
@@ -267,15 +269,25 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
           resSize shouldBe 2 -> 2
           left shouldBe 0
           borderCh shouldBe SingleChars.vertical
-          (items, focusedPos, selectedNames) shouldBe expectedData.head
+          assertFileListData((items, focusedPos, selectedNames), expectedData.head)
       }
       assertTestComponent(col2, fileListColumnComp) {
         case FileListColumnProps(resSize, left, borderCh, items, focusedPos, selectedNames) =>
           resSize shouldBe 4 -> 2
           left shouldBe 3
           borderCh shouldBe DoubleChars.vertical
-          (items, focusedPos, selectedNames) shouldBe expectedData(1)
+          assertFileListData((items, focusedPos, selectedNames), expectedData(1))
       }
     })
+  }
+  
+  private def assertFileListData(result: (Seq[FileListItem], Int, Set[String]),
+                                 expected: (List[FileListItem], Int, Set[String])): Assertion = {
+
+    val (resItems, resFocusedPos, resSelectedNames) = result
+    val (items, focusedPos, selectedNames) = expected
+
+    assertFileListItems(resItems, items)
+    (resFocusedPos, resSelectedNames) shouldBe (focusedPos, selectedNames)
   }
 }

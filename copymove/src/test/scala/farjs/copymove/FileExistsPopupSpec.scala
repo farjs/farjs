@@ -154,8 +154,8 @@ class FileExistsPopupSpec extends TestSpec with TestRendererUtils {
   it should "render component" in {
     //given
     val props = FileExistsPopupProps(
-      newItem = FileListItem("file 1", size = 1),
-      existing = FileListItem("file 1", size = 2),
+      newItem = FileListItem.copy(FileListItem("file 1"))(size = 1),
+      existing = FileListItem.copy(FileListItem("file 1"))(size = 2),
       onAction = _ => (),
       onCancel = () => ()
     )

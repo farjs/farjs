@@ -40,7 +40,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val fs = new FS
     MoveProcess.fs = fs.fs
     val item1 = FileListItem("dir 1", isDir = true)
-    val item2 = FileListItem("file 1", size = 10)
+    val item2 = FileListItem.copy(FileListItem("file 1"))(size = 10)
     val props = MoveProcessProps(dispatch, actions, "/from/path", List(
       (item1, "newName1"),
       (item2, item2.name)
@@ -86,7 +86,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val fs = new FS
     MoveProcess.fs = fs.fs
     val item1 = FileListItem("dir 1", isDir = true)
-    val item2 = FileListItem("file 1", size = 10)
+    val item2 = FileListItem.copy(FileListItem("file 1"))(size = 10)
     val props = MoveProcessProps(dispatch, actions, "/from/path", List(
       (item1, item1.name),
       (item2, item2.name)
@@ -125,7 +125,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val fs = new FS
     MoveProcess.fs = fs.fs
     val item1 = FileListItem("dir 1", isDir = true)
-    val item2 = FileListItem("file 1", size = 10)
+    val item2 = FileListItem.copy(FileListItem("file 1"))(size = 10)
     val props = MoveProcessProps(dispatch, actions, "/from/path", List(
       (item1, item1.name),
       (item2, item2.name)
@@ -171,8 +171,8 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val actions = new MockFileListActions
     val fs = new FS
     MoveProcess.fs = fs.fs
-    val item1 = FileListItem("file 1", size = 1)
-    val item2 = FileListItem("file 2", size = 10)
+    val item1 = FileListItem.copy(FileListItem("file 1"))(size = 1)
+    val item2 = FileListItem.copy(FileListItem("file 2"))(size = 10)
     val props = MoveProcessProps(dispatch, actions, "/from/path", List(
       (item1, item1.name),
       (item2, item2.name)
@@ -224,8 +224,8 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val actions = new MockFileListActions
     val fs = new FS
     MoveProcess.fs = fs.fs
-    val item1 = FileListItem("file 1", size = 1)
-    val item2 = FileListItem("file 2", size = 10)
+    val item1 = FileListItem.copy(FileListItem("file 1"))(size = 1)
+    val item2 = FileListItem.copy(FileListItem("file 2"))(size = 10)
     val props = MoveProcessProps(dispatch, actions, "/from/path", List(
       (item1, item1.name),
       (item2, item2.name)
@@ -291,8 +291,8 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val actions = new MockFileListActions
     val fs = new FS
     MoveProcess.fs = fs.fs
-    val item1 = FileListItem("file 1", size = 1)
-    val item2 = FileListItem("file 2", size = 10)
+    val item1 = FileListItem.copy(FileListItem("file 1"))(size = 1)
+    val item2 = FileListItem.copy(FileListItem("file 2"))(size = 10)
     val props = MoveProcessProps(dispatch, actions, "/from/path", List(
       (item1, item1.name),
       (item2, item2.name)
@@ -342,8 +342,8 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val actions = new MockFileListActions
     val fs = new FS
     MoveProcess.fs = fs.fs
-    val item1 = FileListItem("file 1", size = 1)
-    val item2 = FileListItem("file 2", size = 10)
+    val item1 = FileListItem.copy(FileListItem("file 1"))(size = 1)
+    val item2 = FileListItem.copy(FileListItem("file 2"))(size = 10)
     val props = MoveProcessProps(dispatch, actions, "/from/path", List(
       (item1, item1.name),
       (item2, item2.name)
@@ -401,9 +401,9 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val actions = new MockFileListActions
     val fs = new FS
     MoveProcess.fs = fs.fs
-    val item1 = FileListItem("file 1", size = 1)
-    val item2 = FileListItem("file 2", size = 10)
-    val item3 = FileListItem("file 3", size = 11)
+    val item1 = FileListItem.copy(FileListItem("file 1"))(size = 1)
+    val item2 = FileListItem.copy(FileListItem("file 2"))(size = 10)
+    val item3 = FileListItem.copy(FileListItem("file 3"))(size = 11)
     val props = MoveProcessProps(dispatch, actions, "/from/path", List(
       (item1, item1.name),
       (item2, item2.name),

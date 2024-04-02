@@ -1,6 +1,7 @@
 package farjs.archiver.zip
 
 import farjs.filelist.MockChildProcess
+import farjs.filelist.api.FileListItemSpec.assertFileListItems
 import farjs.filelist.api._
 import org.scalatest.Succeeded
 import scommons.nodejs.ChildProcess.ChildProcessOptions
@@ -70,10 +71,10 @@ class ZipApiSpec extends AsyncTestSpec {
     resultF.map(inside(_) { case FileListDir(path, isRoot, items) =>
       path shouldBe rootPath
       isRoot shouldBe false
-      items.toList shouldBe List(
-        FileListItem("file 1", size = 2.0, mtimeMs = 3.0, permissions = "-rw-r--r--"),
-        FileListItem("dir 1", isDir = true, mtimeMs = 1.0, permissions = "drwxr-xr-x")
-      )
+      assertFileListItems(items.toList, List(
+        FileListItem.copy(FileListItem("file 1"))(size = 2.0, mtimeMs = 3.0, permissions = "-rw-r--r--"),
+        FileListItem.copy(FileListItem("dir 1", isDir = true))(mtimeMs = 1.0, permissions = "drwxr-xr-x")
+      ))
     })
   }
 
@@ -90,9 +91,9 @@ class ZipApiSpec extends AsyncTestSpec {
     resultF.map(inside(_) { case FileListDir(path, isRoot, items) =>
       path shouldBe s"$rootPath/dir 1"
       isRoot shouldBe false
-      items.toList shouldBe List(
-        FileListItem("dir 2", isDir = true, mtimeMs = 4.0, permissions = "drwxr-xr-x")
-      )
+      assertFileListItems(items.toList, List(
+        FileListItem.copy(FileListItem("dir 2", isDir = true))(mtimeMs = 4.0, permissions = "drwxr-xr-x")
+      ))
     })
   }
 
@@ -109,9 +110,9 @@ class ZipApiSpec extends AsyncTestSpec {
     resultF.map(inside(_) { case FileListDir(path, isRoot, items) =>
       path shouldBe s"$rootPath/dir 1/dir 2"
       isRoot shouldBe false
-      items.toList shouldBe List(
-        FileListItem("file 2", size = 5.0, mtimeMs = 6.0, permissions = "-rw-r--r--")
-      )
+      assertFileListItems(items.toList, List(
+        FileListItem.copy(FileListItem("file 2"))(size = 5.0, mtimeMs = 6.0, permissions = "-rw-r--r--")
+      ))
     })
   }
 
@@ -135,7 +136,7 @@ class ZipApiSpec extends AsyncTestSpec {
         Future.successful(subProcess)
       }
     }
-    val item = FileListItem("example.txt", size = expectedOutput.length)
+    val item = FileListItem.copy(FileListItem("example.txt"))(size = expectedOutput.length)
     val buff = new Uint8Array(5)
 
     def loop(source: FileSource, result: StringBuilder): Future[String] = {
@@ -188,7 +189,7 @@ class ZipApiSpec extends AsyncTestSpec {
         Future.successful(subProcess)
       }
     }
-    val item = FileListItem("example.txt", size = expectedOutput.length * 2)
+    val item = FileListItem.copy(FileListItem("example.txt"))(size = expectedOutput.length * 2)
     val buff = new Uint8Array(5)
 
     //when
@@ -234,7 +235,7 @@ class ZipApiSpec extends AsyncTestSpec {
         Future.successful(subProcess)
       }
     }
-    val item = FileListItem("example.txt", size = 5)
+    val item = FileListItem.copy(FileListItem("example.txt"))(size = 5)
     val buff = new Uint8Array(5)
 
     //when
