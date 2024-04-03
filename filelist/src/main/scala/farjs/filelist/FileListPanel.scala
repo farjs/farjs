@@ -45,13 +45,13 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
     def onKeypress(screen: BlessedScreen, key: String): Unit = {
       if (!props.onKeypress(screen, key)) {
         key match {
-          case "C-f3" => props.dispatch(FileListSortByAction(SortMode.Name))
-          case "C-f4" => props.dispatch(FileListSortByAction(SortMode.Extension))
-          case "C-f5" => props.dispatch(FileListSortByAction(SortMode.ModificationTime))
-          case "C-f6" => props.dispatch(FileListSortByAction(SortMode.Size))
-          case "C-f7" => props.dispatch(FileListSortByAction(SortMode.Unsorted))
-          case "C-f8" => props.dispatch(FileListSortByAction(SortMode.CreationTime))
-          case "C-f9" => props.dispatch(FileListSortByAction(SortMode.AccessTime))
+          case "C-f3" => props.dispatch(FileListSortAction(SortMode.Name))
+          case "C-f4" => props.dispatch(FileListSortAction(SortMode.Extension))
+          case "C-f5" => props.dispatch(FileListSortAction(SortMode.ModificationTime))
+          case "C-f6" => props.dispatch(FileListSortAction(SortMode.Size))
+          case "C-f7" => props.dispatch(FileListSortAction(SortMode.Unsorted))
+          case "C-f8" => props.dispatch(FileListSortAction(SortMode.CreationTime))
+          case "C-f9" => props.dispatch(FileListSortAction(SortMode.AccessTime))
           case "C-f12" =>
             setShowSortModes(true)
           case "C-c" =>
@@ -126,8 +126,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
 
       if (showSortModes) Some(
         <(sortModesPopup())(^.wrapped := SortModesPopupProps(
-          mode = props.state.sortMode,
-          ascending = props.state.sortAscending,
+          sort = props.state.sort,
           onClose = { () =>
             setShowSortModes(false)
           }

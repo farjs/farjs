@@ -197,5 +197,5 @@ object FileListActions {
   case class FileListItemCreatedAction(name: String, currDir: FileListDir)
   
   case class FileListDiskSpaceUpdatedAction(diskSpace: Double)
-  case class FileListSortByAction(mode: SortMode)
+  case class FileListSortAction(mode: SortMode)
 }

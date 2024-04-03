@@ -2,7 +2,7 @@ package farjs.filelist
 
 import farjs.filelist.FileListPanelView._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.sort.SortIndicatorProps
+import farjs.filelist.sort.{FileListSort, SortIndicatorProps}
 import farjs.filelist.stack.{PanelStack, PanelStackProps}
 import farjs.filelist.theme.FileListTheme
 import farjs.filelist.theme.FileListThemeSpec.withThemeContext
@@ -233,9 +233,9 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           padding shouldBe js.undefined
       }))(),
       <(sortIndicator())(^.assertWrapped(inside(_) {
-        case SortIndicatorProps(mode, ascending) =>
-          mode shouldBe props.state.sortMode
-          ascending shouldBe props.state.sortAscending
+        case SortIndicatorProps(FileListSort(mode, asc)) =>
+          mode shouldBe props.state.sort.mode
+          asc shouldBe props.state.sort.asc
       }))(),
       
       selected.map { selectedText =>

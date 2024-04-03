@@ -63,8 +63,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         focused = props.state.isActive
       ))(),
       <(sortIndicator())(^.wrapped := SortIndicatorProps(
-        mode = props.state.sortMode,
-        ascending = props.state.sortAscending
+        sort = props.state.sort
       ))(),
 
       if (selectedItems.nonEmpty) Some(

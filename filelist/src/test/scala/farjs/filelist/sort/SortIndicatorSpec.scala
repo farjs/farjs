@@ -28,7 +28,7 @@ class SortIndicatorSpec extends TestSpec with TestRendererUtils {
 
     val isRight = false
     val stack = new PanelStack(isActive = true, Nil, null)
-    val props = SortIndicatorProps(SortMode.Name, ascending = true)
+    val props = SortIndicatorProps(FileListSort(SortMode.Name, asc = true))
     val textElem = testRender(withContext(
       withThemeContext(<(SortIndicator())(^.wrapped := props)()), stack = stack, isRight = isRight
     ))
@@ -58,7 +58,7 @@ class SortIndicatorSpec extends TestSpec with TestRendererUtils {
 
     val isRight = true
     val stack = new PanelStack(isActive = false, Nil, null)
-    val props = SortIndicatorProps(SortMode.Name, ascending = true)
+    val props = SortIndicatorProps(FileListSort(SortMode.Name, asc = true))
     val textElem = testRender(withContext(
       withThemeContext(<(SortIndicator())(^.wrapped := props)()), stack = stack, isRight = isRight
     ))
@@ -76,7 +76,7 @@ class SortIndicatorSpec extends TestSpec with TestRendererUtils {
   it should "render component" in {
     //given
     val stack = new PanelStack(isActive = true, Nil, null)
-    val props = SortIndicatorProps(SortMode.Name, ascending = true)
+    val props = SortIndicatorProps(FileListSort(SortMode.Name, asc = true))
 
     //when
     val result = testRender(withContext(
@@ -102,19 +102,19 @@ class SortIndicatorSpec extends TestSpec with TestRendererUtils {
 
   it should "return indicator name when getIndicator" in {
     //when & then
-    getIndicator(SortMode.Name, ascending = true) shouldBe "n"
-    getIndicator(SortMode.Name, ascending = false) shouldBe "N"
-    getIndicator(SortMode.Extension, ascending = true) shouldBe "x"
-    getIndicator(SortMode.Extension, ascending = false) shouldBe "X"
-    getIndicator(SortMode.ModificationTime, ascending = true) shouldBe "m"
-    getIndicator(SortMode.ModificationTime, ascending = false) shouldBe "M"
-    getIndicator(SortMode.Size, ascending = true) shouldBe "s"
-    getIndicator(SortMode.Size, ascending = false) shouldBe "S"
-    getIndicator(SortMode.Unsorted, ascending = true) shouldBe "u"
-    getIndicator(SortMode.Unsorted, ascending = false) shouldBe "U"
-    getIndicator(SortMode.CreationTime, ascending = true) shouldBe "c"
-    getIndicator(SortMode.CreationTime, ascending = false) shouldBe "C"
-    getIndicator(SortMode.AccessTime, ascending = true) shouldBe "a"
-    getIndicator(SortMode.AccessTime, ascending = false) shouldBe "A"
+    getIndicator(FileListSort(SortMode.Name, asc = true)) shouldBe "n"
+    getIndicator(FileListSort(SortMode.Name, asc = false)) shouldBe "N"
+    getIndicator(FileListSort(SortMode.Extension, asc = true)) shouldBe "x"
+    getIndicator(FileListSort(SortMode.Extension, asc = false)) shouldBe "X"
+    getIndicator(FileListSort(SortMode.ModificationTime, asc = true)) shouldBe "m"
+    getIndicator(FileListSort(SortMode.ModificationTime, asc = false)) shouldBe "M"
+    getIndicator(FileListSort(SortMode.Size, asc = true)) shouldBe "s"
+    getIndicator(FileListSort(SortMode.Size, asc = false)) shouldBe "S"
+    getIndicator(FileListSort(SortMode.Unsorted, asc = true)) shouldBe "u"
+    getIndicator(FileListSort(SortMode.Unsorted, asc = false)) shouldBe "U"
+    getIndicator(FileListSort(SortMode.CreationTime, asc = true)) shouldBe "c"
+    getIndicator(FileListSort(SortMode.CreationTime, asc = false)) shouldBe "C"
+    getIndicator(FileListSort(SortMode.AccessTime, asc = true)) shouldBe "a"
+    getIndicator(FileListSort(SortMode.AccessTime, asc = false)) shouldBe "A"
   }
 }

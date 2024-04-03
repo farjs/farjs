@@ -6,8 +6,7 @@ import scommons.react._
 
 import scala.scalajs.js
 
-case class SortModesPopupProps(mode: SortMode,
-                               ascending: Boolean,
+case class SortModesPopupProps(sort: FileListSort,
                                onClose: () => Unit)
 
 object SortModesPopup extends FunctionComponent[SortModesPopupProps] {
@@ -20,7 +19,7 @@ object SortModesPopup extends FunctionComponent[SortModesPopupProps] {
     val showOnLeft = !stackProps.isRight
 
     val items = itemsAndModes.map { case (item, mode) =>
-      if (mode == props.mode) item.updated(0, if (props.ascending) '+' else '-')
+      if (mode == props.sort.mode) item.updated(0, if (props.sort.asc) '+' else '-')
       else item
     }
 

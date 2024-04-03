@@ -1,6 +1,11 @@
 package farjs.filelist
 
+import farjs.filelist.api.FileListDirSpec.assertFileListDir
 import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.filelist.sort.FileListSortSpec.assertFileListSort
+import org.scalatest.Assertion
+import org.scalatest.Inside.inside
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import scommons.nodejs.test.TestSpec
 
 import scala.scalajs.js
@@ -37,4 +42,20 @@ class FileListStateSpec extends TestSpec {
     FileListState(currDir = currDir, selectedNames = Set("file 1")).selectedItems shouldBe List(item2)
     FileListState(currDir = currDir, selectedNames = Set("file 123")).selectedItems shouldBe Nil
   }
+}
+
+object FileListStateSpec {
+
+  def assertFileListState(result: FileListState, expected: FileListState): Assertion = {
+    inside(result) {
+      case FileListState(offset, index, currDir, selectedNames, isActive, diskSpace, sort) =>
+        offset shouldBe expected.offset
+        index shouldBe expected.index
+        assertFileListDir(currDir, expected.currDir)
+        selectedNames shouldBe expected.selectedNames
+        isActive shouldBe expected.isActive
+        diskSpace shouldBe expected.diskSpace
+        assertFileListSort(sort, expected.sort)
+    }
+  }  
 }

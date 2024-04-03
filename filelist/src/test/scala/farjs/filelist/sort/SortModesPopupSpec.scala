@@ -20,7 +20,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val emitMock = mockFunction[String, js.Any, js.Dynamic, Boolean]
     val inputMock = js.Dynamic.literal("emit" -> emitMock).asInstanceOf[BlessedElement]
-    val props = SortModesPopupProps(SortMode.Name, ascending = true, onClose)
+    val props = SortModesPopupProps(FileListSort(SortMode.Name, asc = true), onClose)
     val comp = testRender(withContext(
       <(SortModesPopup())(^.wrapped := props)(), stack = stack, width = 40, panelInput = inputMock
     ))
@@ -45,7 +45,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val stack = new PanelStack(isActive = true, Nil, null)
     val onClose = mockFunction[Unit]
-    val props = SortModesPopupProps(SortMode.Name, ascending = true, onClose)
+    val props = SortModesPopupProps(FileListSort(SortMode.Name, asc = true), onClose)
     val comp = testRender(withContext(
       <(SortModesPopup())(^.wrapped := props)(), stack = stack, width = 40
     ))
@@ -65,7 +65,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
     val isRight = false
     val stack = new PanelStack(isActive = true, Nil, null)
     val width = 40
-    val props = SortModesPopupProps(SortMode.Extension, ascending = false, () => ())
+    val props = SortModesPopupProps(FileListSort(SortMode.Extension, asc = false), () => ())
 
     //when
     val result = testRender(withContext(
@@ -73,7 +73,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
     ))
 
     //then
-    assertSortModesPopup(result, props, isRight, width)
+    assertSortModesPopup(result, isRight, width)
   }
   
   it should "render popup on right panel" in {
@@ -81,7 +81,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
     val isRight = true
     val stack = new PanelStack(isActive = false, Nil, null)
     val width = 40
-    val props = SortModesPopupProps(SortMode.Extension, ascending = false, () => ())
+    val props = SortModesPopupProps(FileListSort(SortMode.Extension, asc = false), () => ())
 
     //when
     val result = testRender(withContext(
@@ -89,11 +89,10 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
     ))
 
     //then
-    assertSortModesPopup(result, props, isRight, width)
+    assertSortModesPopup(result, isRight, width)
   }
   
   private def assertSortModesPopup(result: TestInstance,
-                                   props: SortModesPopupProps,
                                    isRight: Boolean,
                                    stackWidth: Int): Unit = {
 

@@ -3,7 +3,7 @@ package farjs.filelist
 import farjs.filelist.FileListActions._
 import farjs.filelist.FileListPanel._
 import farjs.filelist.api.{FileListCapability, FileListDir, FileListItem}
-import farjs.filelist.sort.{SortMode, SortModesPopupProps}
+import farjs.filelist.sort.{FileListSort, SortMode, SortModesPopupProps}
 import farjs.filelist.stack.PanelStackSpec.withContext
 import farjs.ui.Dispatch
 import farjs.ui.task.Task
@@ -68,13 +68,13 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }
 
     //when & then
-    check("C-f3", FileListSortByAction(SortMode.Name))
-    check("C-f4", FileListSortByAction(SortMode.Extension))
-    check("C-f5", FileListSortByAction(SortMode.ModificationTime))
-    check("C-f6", FileListSortByAction(SortMode.Size))
-    check("C-f7", FileListSortByAction(SortMode.Unsorted))
-    check("C-f8", FileListSortByAction(SortMode.CreationTime))
-    check("C-f9", FileListSortByAction(SortMode.AccessTime))
+    check("C-f3", FileListSortAction(SortMode.Name))
+    check("C-f4", FileListSortAction(SortMode.Extension))
+    check("C-f5", FileListSortAction(SortMode.ModificationTime))
+    check("C-f6", FileListSortAction(SortMode.Size))
+    check("C-f7", FileListSortAction(SortMode.Unsorted))
+    check("C-f8", FileListSortAction(SortMode.CreationTime))
+    check("C-f9", FileListSortAction(SortMode.AccessTime))
 
     Succeeded
   }
@@ -95,9 +95,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
     //then
     inside(findComponentProps(renderer.root, sortModesPopup)) {
-      case SortModesPopupProps(mode, ascending, onClose) =>
+      case SortModesPopupProps(FileListSort(mode, asc), onClose) =>
         mode shouldBe SortMode.Name
-        ascending shouldBe true
+        asc shouldBe true
         
         //when
         onClose()

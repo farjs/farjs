@@ -1,10 +1,14 @@
 package farjs.filelist.sort
 
 import farjs.filelist.api.FileListItem
+import farjs.filelist.sort.FileListSort.{nextOrdering, sortItems}
 import farjs.filelist.sort.SortMode._
+import org.scalatest.Assertion
+import org.scalatest.Inside.inside
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import scommons.react.test.TestSpec
 
-class SortModeSpec extends TestSpec {
+class FileListSortSpec extends TestSpec {
 
   private val item0 = FileListItem.copy(FileListItem("item.bin"))(size = 2, atimeMs = 1, mtimeMs = 4, ctimeMs = 2)
   private val item1 = FileListItem.copy(FileListItem("Item.bin"))(size = 1, atimeMs = 1, mtimeMs = 3, ctimeMs = 2)
@@ -16,22 +20,22 @@ class SortModeSpec extends TestSpec {
   
   it should "return next ordering when nextOrdering" in {
     //when & then
-    nextOrdering(Name, ascending = false, Name) shouldBe true
-    nextOrdering(Name, ascending = true, Name) shouldBe false
-    nextOrdering(Unsorted, ascending = false, Name) shouldBe true
-    nextOrdering(Unsorted, ascending = true, Name) shouldBe true
-    nextOrdering(Name, ascending = false, Extension) shouldBe true
-    nextOrdering(Name, ascending = true, Extension) shouldBe true
-    nextOrdering(Name, ascending = false, Unsorted) shouldBe true
-    nextOrdering(Name, ascending = true, Unsorted) shouldBe true
-    nextOrdering(Extension, ascending = false, ModificationTime) shouldBe false
-    nextOrdering(Extension, ascending = true, ModificationTime) shouldBe false
-    nextOrdering(Name, ascending = false, Size) shouldBe false
-    nextOrdering(Name, ascending = true, Size) shouldBe false
-    nextOrdering(ModificationTime, ascending = false, CreationTime) shouldBe false
-    nextOrdering(ModificationTime, ascending = true, CreationTime) shouldBe false
-    nextOrdering(Unsorted, ascending = false, AccessTime) shouldBe false
-    nextOrdering(Unsorted, ascending = true, AccessTime) shouldBe false
+    nextOrdering(FileListSort(Name, asc = false), Name) shouldBe true
+    nextOrdering(FileListSort(Name, asc = true), Name) shouldBe false
+    nextOrdering(FileListSort(Unsorted, asc = false), Name) shouldBe true
+    nextOrdering(FileListSort(Unsorted, asc = true), Name) shouldBe true
+    nextOrdering(FileListSort(Name, asc = false), Extension) shouldBe true
+    nextOrdering(FileListSort(Name, asc = true), Extension) shouldBe true
+    nextOrdering(FileListSort(Name, asc = false), Unsorted) shouldBe true
+    nextOrdering(FileListSort(Name, asc = true), Unsorted) shouldBe true
+    nextOrdering(FileListSort(Extension, asc = false), ModificationTime) shouldBe false
+    nextOrdering(FileListSort(Extension, asc = true), ModificationTime) shouldBe false
+    nextOrdering(FileListSort(Name, asc = false), Size) shouldBe false
+    nextOrdering(FileListSort(Name, asc = true), Size) shouldBe false
+    nextOrdering(FileListSort(ModificationTime, asc = false), CreationTime) shouldBe false
+    nextOrdering(FileListSort(ModificationTime, asc = true), CreationTime) shouldBe false
+    nextOrdering(FileListSort(Unsorted, asc = false), AccessTime) shouldBe false
+    nextOrdering(FileListSort(Unsorted, asc = true), AccessTime) shouldBe false
   }
 
   it should "sort items when sortItems" in {
@@ -57,4 +61,15 @@ class SortModeSpec extends TestSpec {
     sortItems(items, AccessTime) shouldBe List(item1, item0, item2, item4, item3)
     sortItems(itemsR, AccessTime) shouldBe List(item1, item0, item2, item4, item3)
   }
+}
+
+object FileListSortSpec {
+
+  def assertFileListSort(result: FileListSort, expected: FileListSort): Assertion = {
+    inside(result) {
+      case FileListSort(mode, asc) =>
+        mode shouldBe expected.mode
+        asc shouldBe expected.asc
+    }
+  }  
 }

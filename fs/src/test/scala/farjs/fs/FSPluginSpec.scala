@@ -1,5 +1,6 @@
 package farjs.fs
 
+import farjs.filelist.FileListStateSpec.assertFileListState
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack._
 import farjs.filelist.{FileListState, MockFileListActions}
@@ -37,7 +38,7 @@ class FSPluginSpec extends AsyncTestSpec {
       actions shouldBe Some(FSFileListActions)
       val currState = inside(resState) {
         case Some(state: FileListState) =>
-          state shouldBe FileListState(currDir = state.currDir, isActive = true)
+          assertFileListState(state, FileListState(currDir = state.currDir, isActive = true))
           state
       }
       

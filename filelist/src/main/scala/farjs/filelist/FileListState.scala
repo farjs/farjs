@@ -2,7 +2,7 @@ package farjs.filelist
 
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.sort.SortMode
+import farjs.filelist.sort.{FileListSort, SortMode}
 
 import scala.scalajs.js
 
@@ -12,8 +12,7 @@ case class FileListState(offset: Int = 0,
                          selectedNames: Set[String] = Set.empty,
                          isActive: Boolean = false,
                          diskSpace: Option[Double] = None,
-                         sortMode: SortMode = SortMode.Name,
-                         sortAscending: Boolean = true) {
+                         sort: FileListSort = FileListSort(SortMode.Name, asc = true)) {
 
   lazy val currentItem: Option[FileListItem] = {
     val itemIndex = offset + index
@@ -41,7 +40,7 @@ object FileListStateReducer {
         selectedNames = selectedNames
       )
     case FileListDirChangedAction(dir, currDir) =>
-      val processed = processDir(currDir, state.sortMode, state.sortAscending)
+      val processed = processDir(currDir, state.sort)
       val index =
         if (dir == FileListItem.up.name) {
           val focusedDir = state.currDir.path
@@ -60,7 +59,7 @@ object FileListStateReducer {
         selectedNames = Set.empty
       )
     case FileListDirUpdatedAction(currDir) =>
-      val processed = processDir(currDir, state.sortMode, state.sortAscending)
+      val processed = processDir(currDir, state.sort)
       val currIndex = state.offset + state.index
       val newIndex = state.currentItem.map { currItem =>
         val index = processed.items.indexWhere(_.name == currItem.name)
@@ -85,7 +84,7 @@ object FileListStateReducer {
           else state.selectedNames
       )
     case FileListItemCreatedAction(name, currDir) =>
-      val processed = processDir(currDir, state.sortMode, state.sortAscending)
+      val processed = processDir(currDir, state.sort)
       val newIndex = processed.items.indexWhere(_.name == name)
       val (offset, index) =
         if (newIndex < 0) (state.offset, state.index)
@@ -96,9 +95,9 @@ object FileListStateReducer {
         index = index,
         currDir = processed
       )
-    case FileListSortByAction(mode) =>
-      val ascending = SortMode.nextOrdering(state.sortMode, state.sortAscending, mode)
-      val processed = processDir(state.currDir, mode, ascending)
+    case FileListSortAction(mode) =>
+      val sort = FileListSort(mode, FileListSort.nextOrdering(state.sort, mode))
+      val processed = processDir(state.currDir, sort)
       val newIndex = state.currentItem.map { item =>
         processed.items.indexWhere(_.name == item.name)
       }.getOrElse(-1)
@@ -110,8 +109,7 @@ object FileListStateReducer {
         offset = offset,
         index = index,
         currDir = processed,
-        sortMode = mode,
-        sortAscending = ascending
+        sort = sort
       )
     case FileListDiskSpaceUpdatedAction(diskSpace) =>
       state.copy(
@@ -121,12 +119,11 @@ object FileListStateReducer {
   }
   
   private def processDir(currDir: FileListDir,
-                         mode: SortMode,
-                         ascending: Boolean): FileListDir = {
+                         sort: FileListSort): FileListDir = {
     val items = {
       val (dirs, files) = currDir.items.filter(_ != FileListItem.up).partition(_.isDir)
-      val dirsSorted = sortItems(dirs, mode, ascending)
-      val filesSorted = sortItems(files, mode, ascending)
+      val dirsSorted = sortItems(dirs, sort)
+      val filesSorted = sortItems(files, sort)
 
       if (currDir.isRoot) dirsSorted :++ filesSorted
       else FileListItem.up +: dirsSorted :++ filesSorted
@@ -136,12 +133,11 @@ object FileListStateReducer {
   }
 
   private def sortItems(items: js.Array[FileListItem],
-                        mode: SortMode,
-                        ascending: Boolean): js.Array[FileListItem] = {
+                        sort: FileListSort): js.Array[FileListItem] = {
 
-    val sorted = js.Array(SortMode.sortItems(items.toSeq, mode): _*)
+    val sorted = js.Array(FileListSort.sortItems(items.toSeq, sort.mode): _*)
     
-    if (ascending) sorted
+    if (sort.asc) sorted
     else sorted.reverse
   }
 }
