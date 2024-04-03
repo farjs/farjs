@@ -33,14 +33,17 @@ object FileListSort {
     )
   }
 
-  def nextOrdering(sort: FileListSort, nextMode: SortMode): Boolean = {
-    if (sort.mode == nextMode) !sort.asc
-    else {
-      nextMode match {
-        case Name | Extension | Unsorted => true
-        case ModificationTime | Size | CreationTime | AccessTime => false
+  def nextSort(sort: FileListSort, nextMode: SortMode): FileListSort = {
+    val nextAsc =
+      if (sort.mode == nextMode) !sort.asc
+      else {
+        nextMode match {
+          case Name | Extension | Unsorted => true
+          case ModificationTime | Size | CreationTime | AccessTime => false
+        }
       }
-    }
+
+    FileListSort(nextMode, nextAsc)
   }
 
   def sortItems(items: Seq[FileListItem], mode: SortMode): Seq[FileListItem] = {

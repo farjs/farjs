@@ -96,8 +96,8 @@ object FileListStateReducer {
         currDir = processed
       )
     case FileListSortAction(mode) =>
-      val sort = FileListSort(mode, FileListSort.nextOrdering(state.sort, mode))
-      val processed = processDir(state.currDir, sort)
+      val nextSort = FileListSort.nextSort(state.sort, mode)
+      val processed = processDir(state.currDir, nextSort)
       val newIndex = state.currentItem.map { item =>
         processed.items.indexWhere(_.name == item.name)
       }.getOrElse(-1)
@@ -109,7 +109,7 @@ object FileListStateReducer {
         offset = offset,
         index = index,
         currDir = processed,
-        sort = sort
+        sort = nextSort
       )
     case FileListDiskSpaceUpdatedAction(diskSpace) =>
       state.copy(

@@ -3,6 +3,7 @@ package farjs.filelist
 import farjs.filelist.api.FileListDirSpec.assertFileListDir
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.sort.FileListSortSpec.assertFileListSort
+import org.scalactic.source.Position
 import org.scalatest.Assertion
 import org.scalatest.Inside.inside
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
@@ -46,7 +47,7 @@ class FileListStateSpec extends TestSpec {
 
 object FileListStateSpec {
 
-  def assertFileListState(result: FileListState, expected: FileListState): Assertion = {
+  def assertFileListState(result: FileListState, expected: FileListState)(implicit position: Position): Assertion = {
     inside(result) {
       case FileListState(offset, index, currDir, selectedNames, isActive, diskSpace, sort) =>
         offset shouldBe expected.offset
