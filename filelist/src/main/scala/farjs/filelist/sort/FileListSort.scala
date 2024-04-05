@@ -1,13 +1,22 @@
 package farjs.filelist.sort
 
 import farjs.filelist.api.FileListItem
-import farjs.filelist.sort.SortMode._
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
 sealed trait FileListSort extends js.Object {
   val mode: SortMode
   val asc: Boolean
+}
+
+@js.native
+@JSImport("@farjs/filelist/sort/FileListSort.mjs", JSImport.Default)
+object NativeFileListSort extends js.Object {
+
+  def nextSort(sort: FileListSort, nextMode: SortMode): FileListSort = js.native
+
+  def sortItems(items: js.Array[FileListItem], mode: SortMode): js.Array[FileListItem] = js.native
 }
 
 object FileListSort {
@@ -33,28 +42,9 @@ object FileListSort {
     )
   }
 
-  def nextSort(sort: FileListSort, nextMode: SortMode): FileListSort = {
-    val nextAsc =
-      if (sort.mode == nextMode) !sort.asc
-      else {
-        nextMode match {
-          case Name | Extension | Unsorted => true
-          case ModificationTime | Size | CreationTime | AccessTime => false
-        }
-      }
+  def nextSort(sort: FileListSort, nextMode: SortMode): FileListSort =
+    NativeFileListSort.nextSort(sort, nextMode)
 
-    FileListSort(nextMode, nextAsc)
-  }
-
-  def sortItems(items: Seq[FileListItem], mode: SortMode): Seq[FileListItem] = {
-    mode match {
-      case Name => items.sortBy(item => (item.nameNormalized(), item.name))
-      case Extension => items.sortBy(item => (item.extNormalized(), item.ext(), item.nameNormalized(), item.name))
-      case ModificationTime => items.sortBy(item => (item.mtimeMs, item.nameNormalized(), item.name))
-      case Size => items.sortBy(item => (item.size, item.nameNormalized(), item.name))
-      case Unsorted => items
-      case CreationTime => items.sortBy(item => (item.ctimeMs, item.nameNormalized(), item.name))
-      case AccessTime => items.sortBy(item => (item.atimeMs, item.nameNormalized(), item.name))
-    }
-  }
+  def sortItems(items: js.Array[FileListItem], mode: SortMode): js.Array[FileListItem] =
+    NativeFileListSort.sortItems(items, mode)
 }

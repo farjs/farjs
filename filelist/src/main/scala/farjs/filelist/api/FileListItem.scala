@@ -15,10 +15,6 @@ sealed trait FileListItem extends js.Object {
   val ctimeMs: Double = js.native
   val birthtimeMs: Double = js.native
   val permissions: String = js.native //optional, format: drwx---rwx
-  
-  def nameNormalized(): String = js.native
-  def ext(): String = js.native
-  def extNormalized(): String = js.native
 }
 
 @js.native

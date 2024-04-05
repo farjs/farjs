@@ -135,7 +135,7 @@ object FileListStateReducer {
   private def sortItems(items: js.Array[FileListItem],
                         sort: FileListSort): js.Array[FileListItem] = {
 
-    val sorted = js.Array(FileListSort.sortItems(items.toSeq, sort.mode): _*)
+    val sorted = FileListSort.sortItems(items, sort.mode)
     
     if (sort.asc) sorted
     else sorted.reverse
