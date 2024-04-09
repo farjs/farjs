@@ -84,9 +84,11 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           val stack = getStack(isRightActive)
           val stackItem = stack.peek[js.Any]
           stackItem.actions.zip(stackItem.state).collect {
-            case (actions, state: FileListState)
-              if actions.isLocalFS && state.currentItem.exists(!_.isDir) =>
-              openCurrItem(props.plugins, props.dispatch, stack, actions, state)
+            case (actions, state)
+              if actions.isLocalFS
+                && FileListState.isFileListState(state)
+                && FileListState.currentItem(state.asInstanceOf[FileListState]).exists(!_.isDir) =>
+              openCurrItem(props.plugins, props.dispatch, stack, actions, state.asInstanceOf[FileListState])
           }
         case keyFull =>
           props.plugins.find(_.triggerKeys.contains(keyFull)).foreach { plugin =>
@@ -181,7 +183,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
                            actions: FileListActions,
                            state: FileListState): Unit = {
 
-    state.currentItem.foreach { item =>
+    FileListState.currentItem(state).foreach { item =>
       def onClose: () => Unit = { () =>
         stack.pop()
       }

@@ -157,7 +157,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem("item 1")
-    )), selectedNames = Set("item 1"))
+    )), selectedNames = js.Set("item 1"))
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
     ), updater = null)
@@ -186,12 +186,12 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     def check(fullKey: String,
               action: CopyMoveUiAction,
               index: Int = 0,
-              selectedNames: Set[String] = Set.empty,
+              selectedNames: js.Set[String] = js.Set.empty,
               never: Boolean = false,
               capabilities: Set[String] = capabilities)(implicit pos: Position): Unit = {
       //given
       val actions = new MockFileListActions(capabilitiesMock = capabilities)
-      val from = FileListData(dispatch, actions, currState.copy(
+      val from = FileListData(dispatch, actions, FileListState.copy(currState)(
         index = index,
         selectedNames = selectedNames
       ))
@@ -206,14 +206,14 @@ class CopyMovePluginSpec extends AsyncTestSpec {
 
     //when & then
     check("S-f5", ShowCopyInplace, never = true)
-    check("S-f5", ShowCopyInplace, never = true, selectedNames = Set("file 1"))
+    check("S-f5", ShowCopyInplace, never = true, selectedNames = js.Set("file 1"))
     check("S-f5", ShowCopyInplace, index = 1, never = true, capabilities = Set(FileListCapability.moveInplace))
     check("S-f5", ShowCopyInplace, index = 1, capabilities = Set(FileListCapability.copyInplace))
     check("S-f5", ShowCopyInplace, index = 2)
 
     //when & then
     check("S-f6", ShowMoveInplace, never = true)
-    check("S-f6", ShowMoveInplace, never = true, selectedNames = Set("file 1"))
+    check("S-f6", ShowMoveInplace, never = true, selectedNames = js.Set("file 1"))
     check("S-f6", ShowMoveInplace, index = 1, never = true, capabilities = Set(FileListCapability.copyInplace))
     check("S-f6", ShowMoveInplace, index = 1, capabilities = Set(FileListCapability.moveInplace))
     check("S-f6", ShowMoveInplace, index = 2)
@@ -243,7 +243,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     def check(fullKey: String,
               action: CopyMoveUiAction,
               index: Int = 0,
-              selectedNames: Set[String] = Set.empty,
+              selectedNames: js.Set[String] = js.Set.empty,
               never: Boolean = false,
               fromCapabilities: Set[String] = capabilities,
               toCapabilities: Set[String] = capabilities,
@@ -251,7 +251,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
       //given
       val fromActions = new MockFileListActions(capabilitiesMock = fromCapabilities)
       val toActions = new MockFileListActions(capabilitiesMock = toCapabilities)
-      val from = FileListData(dispatch, fromActions, currState.copy(
+      val from = FileListData(dispatch, fromActions, FileListState.copy(currState)(
         index = index,
         selectedNames = selectedNames
       ))
@@ -283,7 +283,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
       FileListCapability.read
     ))
     check("f5", ShowCopyToTarget, index = 2)
-    check("f5", ShowCopyToTarget, selectedNames = Set("file 1"))
+    check("f5", ShowCopyToTarget, selectedNames = js.Set("file 1"))
 
     //when & then
     check("f6", ShowMoveToTarget, never = true)
@@ -294,7 +294,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
       emit = Some(FileListEvent.onFileListMove))
     check("f6", ShowMoveToTarget, index = 1)
     check("f6", ShowMoveToTarget, index = 2)
-    check("f6", ShowMoveToTarget, selectedNames = Set("file 1"))
+    check("f6", ShowMoveToTarget, selectedNames = js.Set("file 1"))
     
     Succeeded
   }

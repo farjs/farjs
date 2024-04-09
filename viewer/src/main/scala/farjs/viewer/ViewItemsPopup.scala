@@ -29,9 +29,10 @@ class ViewItemsPopup(data: FileListData) extends FunctionComponent[FileListPlugi
 
     def viewItems(dispatch: Dispatch, actions: FileListActions, state: FileListState): Unit = {
       val parent = state.currDir.path
+      val currSelected = FileListState.selectedItems(state).toList
       val currItems =
-        if (state.selectedItems.nonEmpty) state.selectedItems
-        else state.currentItem.toList
+        if (currSelected.nonEmpty) currSelected
+        else FileListState.currentItem(state).toList
       
       var sizes = currItems.map {
         case i if i.isDir => (i.name, 0d)

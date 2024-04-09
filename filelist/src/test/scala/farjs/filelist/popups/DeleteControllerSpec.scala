@@ -78,7 +78,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem("file 1"),
       FileListItem("file 2")
     ))
-    val state = FileListState(isActive = true, currDir = currDir, selectedNames = Set("file 2"))
+    val state = FileListState(isActive = true, currDir = currDir, selectedNames = js.Set("file 2"))
     val onClose = mockFunction[Unit]
     val props = FileListUiData(
       showDeletePopup = true,

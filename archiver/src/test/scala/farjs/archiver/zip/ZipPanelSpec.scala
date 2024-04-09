@@ -380,7 +380,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         FileListItem.up,
         FileListItem("item 1")
       ) ++ items),
-      selectedNames = Set("item 3", "item 2")
+      selectedNames = js.Set("item 3", "item 2")
     )
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fsDispatch), Some(fsActions), Some(fsState))
@@ -454,7 +454,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         FileListItem.up,
         FileListItem("item 1")
       ) ++ items),
-      selectedNames = Set("item 3", "item 2")
+      selectedNames = js.Set("item 3", "item 2")
     )
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(fsDispatch), Some(fsActions.actions), Some(fsState))

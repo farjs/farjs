@@ -76,7 +76,7 @@ class ZipPanel(zipPath: String,
         case "C-pageup" if props.state.currDir.path == rootPath =>
           onClosePanel()
         case "enter" | "C-pagedown" if (
-          props.state.currentItem.exists(i => i.isDir && i.name == FileListItem.up.name)
+          FileListState.currentItem(props.state).exists(i => i.isDir && i.name == FileListItem.up.name)
             && props.state.currDir.path == rootPath
           ) =>
           onClosePanel()
@@ -88,13 +88,10 @@ class ZipPanel(zipPath: String,
               stackItem.getActions.zip(stackItem.state)
             }
             stackData.foreach { case ((dispatch, actions), state) =>
-              val items = {
-                if (state.selectedNames.nonEmpty) state.selectedItems
-                else {
-                  val currItem = state.currentItem.filter(_ != FileListItem.up)
-                  currItem.toList
-                }
-              }
+              val items =
+                if (state.selectedNames.nonEmpty) FileListState.selectedItems(state).toList
+                else FileListState.currentItem(state).filter(_ != FileListItem.up).toList
+
               if (actions.isLocalFS && items.nonEmpty) {
                 setZipData(Some((dispatch, actions, state, items, k == FileListEvent.onFileListMove)))
               }

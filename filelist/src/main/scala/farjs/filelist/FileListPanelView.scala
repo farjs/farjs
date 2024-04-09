@@ -31,8 +31,8 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
     val height = panelStack.height
     val theme = FileListTheme.useTheme.fileList
     
-    val currItem = props.state.currentItem
-    val selectedItems = props.state.selectedItems
+    val currItem = FileListState.currentItem(props.state)
+    val selectedItems = FileListState.selectedItems(props.state)
 
     <.box(^.rbStyle := theme.regularItem)(
       <(doubleBorderComp)(^.plain := DoubleBorderProps(width, height, theme.regularItem))(),

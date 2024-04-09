@@ -47,8 +47,9 @@ class CopyMoveUi(show: CopyMoveUiAction,
     def onTopItem(item: FileListItem): Unit = copied.current += item.name
 
     def onDone(path: String, toPath: String): () => Unit = { () =>
-      val updatedSelection = from.state.selectedNames -- copied.current
-      if (updatedSelection != from.state.selectedNames) {
+      val currSelected = from.state.selectedNames.toSet
+      val updatedSelection = currSelected -- copied.current
+      if (updatedSelection != currSelected) {
         from.dispatch(FileListParamsChangedAction(
           offset = from.state.offset,
           index = from.state.index,
@@ -79,12 +80,13 @@ class CopyMoveUi(show: CopyMoveUiAction,
       inplace ||
         show == ShowCopyInplace ||
         show == ShowMoveInplace ||
-        maybeTo.forall(_.path == from.path) && from.state.selectedItems.isEmpty
+        maybeTo.forall(_.path == from.path) && FileListState.selectedItems(from.state).isEmpty
     }
 
+    val fromSelected = FileListState.selectedItems(from.state).toList
     val items =
-      if (!isInplace && from.state.selectedItems.nonEmpty) from.state.selectedItems
-      else from.state.currentItem.toList
+      if (!isInplace && fromSelected.nonEmpty) fromSelected
+      else FileListState.currentItem(from.state).toList
 
     def onAction(path: String): Unit = {
       val move = isMove
@@ -140,7 +142,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
           move = isMove,
           path =
             if (!isInplace) maybeTo.map(_.path).getOrElse("")
-            else from.state.currentItem.map(_.name).getOrElse(""),
+            else FileListState.currentItem(from.state).map(_.name).getOrElse(""),
           items = items,
           onAction = onAction,
           onCancel = props.onClose

@@ -37,7 +37,8 @@ class FSPluginSpec extends AsyncTestSpec {
       component shouldBe plugin.component
       actions shouldBe Some(FSFileListActions)
       val currState = inside(resState) {
-        case Some(state: FileListState) =>
+        case Some(s) =>
+          val state = s.asInstanceOf[FileListState]
           assertFileListState(state, FileListState(currDir = state.currDir, isActive = true))
           state
       }

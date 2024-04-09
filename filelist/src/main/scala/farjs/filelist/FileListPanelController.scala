@@ -18,7 +18,7 @@ class FileListPanelController(
 
     useLayoutEffect({ () =>
       stack.update[FileListState](
-        _.updateState(_.copy(isActive = stack.isActive))
+        _.updateState(FileListState.copy(_)(isActive = stack.isActive))
       )
       ()
     }, List(stack.isActive))

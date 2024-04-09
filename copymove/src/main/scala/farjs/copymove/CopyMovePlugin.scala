@@ -45,13 +45,13 @@ object CopyMovePlugin extends FileListPlugin {
   private def getData(stack: PanelStack): Option[FileListData] = {
     val item = stack.peek[js.Any]
     item.getActions.zip(item.state).collect {
-      case ((dispatch, actions), state: FileListState) =>
-        FileListData(dispatch, actions, state)
+      case ((dispatch, actions), state) if FileListState.isFileListState(state) =>
+        FileListData(dispatch, actions, state.asInstanceOf[FileListState])
     }
   }
 
   private[copymove] def onCopyMoveInplace(move: Boolean, from: FileListData): Option[CopyMoveUiAction] = {
-    from.state.currentItem.filter(_ != FileListItem.up).flatMap { _ =>
+    FileListState.currentItem(from.state).filter(_ != FileListItem.up).toOption.flatMap { _ =>
       if (move && from.actions.capabilities.contains(FileListCapability.moveInplace)) {
         Some(ShowMoveInplace)
       }
@@ -67,7 +67,7 @@ object CopyMovePlugin extends FileListPlugin {
                                    to: FileListData,
                                    toInput: BlessedElement): Option[CopyMoveUiAction] = {
 
-    val currItem = from.state.currentItem.filter(_ != FileListItem.up)
+    val currItem = FileListState.currentItem(from.state).filter(_ != FileListItem.up)
 
     if ((from.state.selectedNames.nonEmpty || currItem.nonEmpty) &&
       from.actions.capabilities.contains(FileListCapability.read) &&

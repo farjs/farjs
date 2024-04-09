@@ -10,7 +10,6 @@ import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
 
-import scala.collection.immutable.ListSet
 import scala.concurrent.Future
 import scala.scalajs.js
 
@@ -65,7 +64,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
         FileListItem.up,
         FileListItem("item 1")
       ) ++ items),
-      selectedNames = ListSet("item 3", "item 2")
+      selectedNames = js.Set("item 3", "item 2")
     ))
     val pluginUi = new ArchiverPluginUi(data, "item 1.zip", items)
     val props = FileListPluginUiProps(dispatch, onClose)

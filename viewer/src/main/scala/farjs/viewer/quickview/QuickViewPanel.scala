@@ -32,7 +32,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
 
     val maybeCurrData = stackItem.getActions.zip(stackItem.state).flatMap {
       case ((dispatch, actions), state) =>
-        state.currentItem.map {
+        FileListState.currentItem(state).toOption.map {
           case i if i == FileListItem.up => (dispatch, actions, state, FileListItem.currDir)
           case i => (dispatch, actions, state, i)
         }

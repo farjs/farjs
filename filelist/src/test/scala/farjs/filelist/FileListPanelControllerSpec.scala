@@ -1,5 +1,6 @@
 package farjs.filelist
 
+import farjs.filelist.FileListStateSpec.assertFileListState
 import farjs.filelist.stack.PanelStackSpec.withContext
 import farjs.filelist.stack.{PanelStack, PanelStackItem}
 import scommons.react.ReactClass
@@ -39,10 +40,10 @@ class FileListPanelControllerSpec extends TestSpec with TestRendererUtils {
     }
 
     //then
-    inside(stackState.head) { case PanelStackItem(_, resDispatch, resActions, resState) =>
+    inside(stackState.head) { case PanelStackItem(_, resDispatch, resActions, Some(resState)) =>
       resDispatch shouldBe Some(dispatch)
       resActions shouldBe Some(actions)
-      resState shouldBe Some(state.copy(isActive = true))
+      assertFileListState(resState, FileListState.copy(state)(isActive = true))
     }
     val updaterMock = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
     updaterMock.expects(*).never()
@@ -57,14 +58,14 @@ class FileListPanelControllerSpec extends TestSpec with TestRendererUtils {
       case FileListPanelProps(resDispatch, resActions, resState, _) =>
         resDispatch shouldBe dispatch
         resActions shouldBe actions
-        resState shouldBe state.copy(isActive = true)
+        assertFileListState(resState, FileListState.copy(state)(isActive = true))
     }
 
     //then
-    inside(stackState.head) { case PanelStackItem(_, resDispatch, resActions, resState) =>
+    inside(stackState.head) { case PanelStackItem(_, resDispatch, resActions, Some(resState)) =>
       resDispatch shouldBe Some(dispatch)
       resActions shouldBe Some(actions)
-      resState shouldBe Some(state.copy(isActive = true))
+      assertFileListState(resState, FileListState.copy(state)(isActive = true))
     }
   }
 }

@@ -383,7 +383,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     TestRenderer.act { () =>
       renderer.update(withContext(
         <(FileListPanel())(^.wrapped := props.copy(
-          state = props.state.copy(isActive = false)
+          state = FileListState.copy(props.state)(isActive = false)
         ))()
       ))
     }
@@ -435,7 +435,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         dispatch.expects(FileListParamsChangedAction(
           offset = 0,
           index = index,
-          selectedNames = props.state.selectedNames
+          selectedNames = props.state.selectedNames.toSet
         ))
       }
 

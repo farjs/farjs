@@ -74,7 +74,7 @@ object FileList extends FunctionComponent[FileListProps] {
       val newOffset = math.min(math.max(offset, 0), maxOffset)
       val newIndex = math.min(math.max(index, 0), maxIndex)
       
-      val currSelected = props.state.selectedNames
+      val currSelected = props.state.selectedNames.toSet
       val newSelected =
         if (select && items.nonEmpty) {
           val currIndex = viewOffset + math.min(math.max(focusedIndex, 0), maxIndex)
@@ -104,7 +104,7 @@ object FileList extends FunctionComponent[FileListProps] {
 
       if (props.state.offset != newOffset
         || props.state.index != newIndex
-        || props.state.selectedNames != newSelected) {
+        || currSelected != newSelected) {
         
         props.dispatch(FileListParamsChangedAction(
           offset = newOffset,
@@ -119,7 +119,7 @@ object FileList extends FunctionComponent[FileListProps] {
       columns = props.columns,
       items = viewItems,
       focusedIndex = if (props.state.isActive) focusedIndex else -1,
-      selectedNames = props.state.selectedNames,
+      selectedNames = props.state.selectedNames.toSet,
       onWheel = { up =>
         if (props.state.isActive) {
           if (up) {

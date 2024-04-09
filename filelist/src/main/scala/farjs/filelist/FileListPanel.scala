@@ -35,7 +35,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
         props.dispatch(FileListParamsChangedAction(
           offset = 0,
           index = index,
-          selectedNames = props.state.selectedNames
+          selectedNames = props.state.selectedNames.toSet
         ))
         
         setMaybeQuickSearch(Some(text))
@@ -55,7 +55,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           case "C-f12" =>
             setShowSortModes(true)
           case "C-c" =>
-            props.state.currentItem.foreach { item =>
+            FileListState.currentItem(props.state).foreach { item =>
               val text =
                 if (item.name == FileListItem.up.name) props.state.currDir.path
                 else path.join(props.state.currDir.path, item.name)
@@ -64,7 +64,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
           case "C-r" =>
             props.dispatch(props.actions.updateDir(props.dispatch, props.state.currDir.path))
           case k@("enter" | "C-pageup" | "C-pagedown") =>
-            val targetDir = k match {
+            val targetDir: js.UndefOr[FileListItem] = k match {
               case "C-pageup" =>
                 if (props.state.currDir.isRoot) {
                   process.stdin.emit("keypress", js.undefined, js.Dynamic.literal(
@@ -75,10 +75,10 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
                     meta = true,
                     shift = false
                   ))
-                  None
+                  js.undefined
                 }
-                else Some(FileListItem.up)
-              case _ => props.state.currentItem.filter(_.isDir)
+                else FileListItem.up
+              case _ => FileListState.currentItem(props.state).filter(_.isDir)
             }
             targetDir.foreach { dir =>
               props.dispatch(props.actions.changeDir(

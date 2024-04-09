@@ -20,7 +20,7 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
       var processed = true
       key match {
         case "M-o" =>
-          props.state.currentItem.foreach { item =>
+          FileListState.currentItem(props.state).foreach { item =>
             val parent = props.state.currDir.path
             val future = fsService.openItem(parent, item.name)
             props.dispatch(FileListTaskAction(Task("Opening default app", future)))

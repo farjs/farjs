@@ -36,7 +36,7 @@ object FileListUiPlugin extends FileListPlugin {
       }
       case "f8" | "delete" => data.flatMap {
         case d if d.actions.capabilities.contains(FileListCapability.delete) &&
-          (d.state.selectedItems.nonEmpty || d.state.currentItem.exists(_ != FileListItem.up)) =>
+          (FileListState.selectedItems(d.state).nonEmpty || FileListState.currentItem(d.state).exists(_ != FileListItem.up)) =>
           Some(FileListUiData(showDeletePopup = true, data = data))
         case _ => None
       }

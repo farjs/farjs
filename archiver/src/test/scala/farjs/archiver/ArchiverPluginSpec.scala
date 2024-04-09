@@ -90,7 +90,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem("item 1")
-    )), selectedNames = Set("item 1"))
+    )), selectedNames = js.Set("item 1"))
     val leftStack = new PanelStack(isActive = true, List(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
     ), updater = null)

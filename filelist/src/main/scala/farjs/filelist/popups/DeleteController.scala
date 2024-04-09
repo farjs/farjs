@@ -1,6 +1,6 @@
 package farjs.filelist.popups
 
-import farjs.filelist.FileListUiData
+import farjs.filelist.{FileListState, FileListUiData}
 import farjs.ui.popup.{MessageBox, MessageBoxAction, MessageBoxProps}
 import farjs.ui.theme.Theme
 import scommons.react._
@@ -23,8 +23,8 @@ object DeleteController extends FunctionComponent[FileListUiData] {
           actions = js.Array(
             MessageBoxAction.YES { () =>
               val items =
-                if (data.state.selectedItems.nonEmpty) data.state.selectedItems
-                else data.state.currentItem.toList
+                if (FileListState.selectedItems(data.state).nonEmpty) FileListState.selectedItems(data.state).toList
+                else FileListState.currentItem(data.state).toList
 
               props.onClose()
               data.dispatch(data.actions.deleteAction(

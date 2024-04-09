@@ -96,14 +96,14 @@ class FileListUiPluginSpec extends AsyncTestSpec {
       FileListItem("item 1")
     )))
     val noCapabilityData = Some(FileListData(dispatch, new MockFileListActions, state))
-    val noItemData = Some(FileListData(dispatch, actions, state.copy(currDir = FileListDir.copy(state.currDir)(items = js.Array(
+    val noItemData = Some(FileListData(dispatch, actions, FileListState.copy(state)(currDir = FileListDir.copy(state.currDir)(items = js.Array(
       FileListItem.up,
       FileListItem("item 1")
     )))))
-    val selectedItemsData = Some(FileListData(dispatch, actions, state.copy(currDir = FileListDir.copy(state.currDir)(items = js.Array(
+    val selectedItemsData = Some(FileListData(dispatch, actions, FileListState.copy(state)(currDir = FileListDir.copy(state.currDir)(items = js.Array(
       FileListItem.up,
       FileListItem("test")
-    )), selectedNames = Set("test"))))
+    )), selectedNames = js.Set("test"))))
     val currItemData = Some(FileListData(dispatch, actions, state))
 
     //when & then

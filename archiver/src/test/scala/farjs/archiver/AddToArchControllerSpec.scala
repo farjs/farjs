@@ -41,7 +41,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
         FileListItem("item 1"),
         FileListItem("item 2")
       ) ++ items),
-      selectedNames = Set("dir 3")
+      selectedNames = js.Set("dir 3")
     ), zipName = "new.zip", items, AddToArchAction.Add, onComplete, onCancel)
     val addToArchApi = mockFunction[String, String, Set[String], () => Unit, Future[Unit]]
     AddToArchController.addToArchApi = addToArchApi
@@ -109,7 +109,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
         FileListItem("item 1"),
         FileListItem("item 2")
       ) ++ items),
-      selectedNames = Set("dir 3")
+      selectedNames = js.Set("dir 3")
     ), zipName = "new.zip", items, AddToArchAction.Add, onComplete, onCancel)
     val addToArchApi = mockFunction[String, String, Set[String], () => Unit, Future[Unit]]
     AddToArchController.addToArchApi = addToArchApi

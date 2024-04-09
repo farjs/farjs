@@ -25,8 +25,8 @@ object ArchiverPlugin extends FileListPlugin {
     val stackItem = stacks.activeStack.peek[FileListState]
     val res = stackItem.getActions.zip(stackItem.state).flatMap { case ((dispatch, actions), state) =>
       val items =
-        if (state.selectedNames.nonEmpty) state.selectedItems
-        else state.currentItem.filter(_ != FileListItem.up).toList
+        if (state.selectedNames.nonEmpty) FileListState.selectedItems(state).toList
+        else FileListState.currentItem(state).filter(_ != FileListItem.up).toList
       
       if (actions.isLocalFS && items.nonEmpty) {
         val zipName = s"${items.head.name}.zip"

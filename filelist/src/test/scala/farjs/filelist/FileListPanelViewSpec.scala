@@ -46,7 +46,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
       FileListItem.copy(FileListItem("dir 1", isDir = true))(size = 1),
       FileListItem.copy(FileListItem("dir 2", isDir = true))(size = 2),
       FileListItem.copy(FileListItem("file"))(size = 3)
-    )), selectedNames = Set("dir 2"), diskSpace = Some(123.45))
+    )), selectedNames = js.Set("dir 2"), diskSpace = 123.45)
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
@@ -65,7 +65,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
       FileListItem.copy(FileListItem("dir 1", isDir = true))(size = 1),
       FileListItem.copy(FileListItem("dir 2", isDir = true))(size = 2),
       FileListItem.copy(FileListItem("file"))(size = 3)
-    )), selectedNames = Set("dir 2", "file"))
+    )), selectedNames = js.Set("dir 2", "file"))
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when

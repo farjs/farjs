@@ -27,13 +27,15 @@ object SelectController extends FunctionComponent[FileListUiData] {
             val matchedNames = data.state.currDir.items
               .filter(i => i != FileListItem.up && regexes.exists(_.matcher(i.name).matches()))
               .map(_.name)
+
+            val currSelected = data.state.selectedNames.toSet
             val updatedSelection =
               if (showSelectPopup) {
-                data.state.selectedNames ++ matchedNames
+                currSelected ++ matchedNames
               }
-              else data.state.selectedNames -- matchedNames
+              else currSelected -- matchedNames
 
-            if (updatedSelection != data.state.selectedNames) {
+            if (updatedSelection != currSelected) {
               data.dispatch(FileListParamsChangedAction(
                 offset = data.state.offset,
                 index = data.state.index,

@@ -33,7 +33,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
       FileListItem("file1.test"),
       FileListItem("file2.test"),
       FileListItem("file.test3")
-    )), selectedNames = Set("file.test3"), isActive = true)
+    )), selectedNames = js.Set("file.test3"), isActive = true)
     val onClose = mockFunction[Unit]
     val props = FileListUiData(
       showSelectPopup = Some(true),
@@ -65,7 +65,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
       FileListItem("file1.test"),
       FileListItem("file2.test"),
       FileListItem("file.test3")
-    )), selectedNames = Set("file.test3"), isActive = true)
+    )), selectedNames = js.Set("file.test3"), isActive = true)
     val onClose = mockFunction[Unit]
     val props = FileListUiData(
       showSelectPopup = Some(true),
@@ -97,7 +97,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
       FileListItem("file1.test"),
       FileListItem("file2.test"),
       FileListItem("file.test3")
-    )), selectedNames = Set("file1.test", "file2.test", "file.test3"), isActive = true)
+    )), selectedNames = js.Set("file1.test", "file2.test", "file.test3"), isActive = true)
     val onClose = mockFunction[Unit]
     val props = FileListUiData(
       showSelectPopup = Some(false),
