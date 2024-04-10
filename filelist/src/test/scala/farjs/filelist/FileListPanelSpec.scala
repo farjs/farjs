@@ -1,6 +1,7 @@
 package farjs.filelist
 
 import farjs.filelist.FileListActions._
+import farjs.filelist.FileListActionsSpec.assertFileListParamsChangedAction
 import farjs.filelist.FileListPanel._
 import farjs.filelist.api.{FileListCapability, FileListDir, FileListItem}
 import farjs.filelist.sort.{FileListSort, SortMode, SortModesPopupProps}
@@ -432,11 +433,15 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       
       if (dispatchAction) {
         //then
-        dispatch.expects(FileListParamsChangedAction(
-          offset = 0,
-          index = index,
-          selectedNames = props.state.selectedNames.toSet
-        ))
+        dispatch.expects(*).onCall { action: Any =>
+          assertFileListParamsChangedAction(action,
+            FileListParamsChangedAction(
+              offset = 0,
+              index = index,
+              selectedNames = props.state.selectedNames
+            )
+          )
+        }
       }
 
       //when

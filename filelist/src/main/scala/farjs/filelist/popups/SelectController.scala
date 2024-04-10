@@ -6,6 +6,7 @@ import farjs.filelist.{FileListServices, FileListUiData}
 import scommons.react._
 
 import java.util.regex.Pattern
+import scala.scalajs.js
 
 object SelectController extends FunctionComponent[FileListUiData] {
 
@@ -39,7 +40,7 @@ object SelectController extends FunctionComponent[FileListUiData] {
               data.dispatch(FileListParamsChangedAction(
                 offset = data.state.offset,
                 index = data.state.index,
-                selectedNames = updatedSelection
+                selectedNames = js.Set[String](updatedSelection.toSeq: _*)
               ))
             }
             props.onClose()

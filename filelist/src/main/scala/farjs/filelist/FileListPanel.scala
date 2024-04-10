@@ -35,7 +35,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
         props.dispatch(FileListParamsChangedAction(
           offset = 0,
           index = index,
-          selectedNames = props.state.selectedNames.toSet
+          selectedNames = props.state.selectedNames
         ))
         
         setMaybeQuickSearch(Some(text))

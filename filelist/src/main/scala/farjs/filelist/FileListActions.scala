@@ -163,9 +163,33 @@ object FileListActions {
     def unapply(arg: FileListTaskAction): Option[Task] = Some(arg.task)
   }
 
-  case class FileListParamsChangedAction(offset: Int,
-                                         index: Int,
-                                         selectedNames: Set[String])
+  sealed trait FileListParamsChangedAction extends js.Object {
+    val action: String
+    val offset: Int
+    val index: Int
+    val selectedNames: js.Set[String]
+  }
+  object FileListParamsChangedAction {
+    val name = "FileListParamsChangedAction"
+
+    def apply(offset: Int,
+              index: Int,
+              selectedNames: js.Set[String]): FileListParamsChangedAction = {
+      js.Dynamic.literal(
+        action = name,
+        offset = offset,
+        index = index,
+        selectedNames = selectedNames
+      ).asInstanceOf[FileListParamsChangedAction]
+    }
+
+    def unapply(arg: FileListParamsChangedAction): Option[(Int, Int, js.Set[String])] =
+      Some((
+        arg.offset,
+        arg.index,
+        arg.selectedNames
+      ))
+  }
 
   sealed trait FileListDirChangeAction extends TaskAction
   object FileListDirChangeAction {

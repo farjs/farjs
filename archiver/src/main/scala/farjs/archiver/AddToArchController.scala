@@ -12,6 +12,7 @@ import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.scalajs.js
 import scala.util.{Failure, Success}
 
 case class AddToArchControllerProps(dispatch: Dispatch,
@@ -58,7 +59,7 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
           props.dispatch(FileListParamsChangedAction(
             offset = props.state.offset,
             index = props.state.index,
-            selectedNames = Set.empty
+            selectedNames = js.Set.empty
           ))
         }
 

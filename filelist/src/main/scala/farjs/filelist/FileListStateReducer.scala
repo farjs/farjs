@@ -9,11 +9,12 @@ import scala.scalajs.js
 object FileListStateReducer {
   
   def apply(state: FileListState, action: Any): FileListState = action match {
-    case FileListParamsChangedAction(offset, index, selectedNames) =>
+    case a if a.asInstanceOf[js.Dynamic].action.asInstanceOf[js.UndefOr[String]].exists(_ == FileListParamsChangedAction.name) =>
+      val FileListParamsChangedAction(offset, index, selectedNames) = a.asInstanceOf[FileListParamsChangedAction]
       FileListState.copy(state)(
         offset = offset,
         index = index,
-        selectedNames = js.Set[String](selectedNames.toSeq: _*)
+        selectedNames = selectedNames
       )
     case FileListDirChangedAction(dir, currDir) =>
       val processed = processDir(currDir, state.sort)

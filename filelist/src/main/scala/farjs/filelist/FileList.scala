@@ -7,6 +7,8 @@ import scommons.react._
 import scommons.react.blessed.BlessedScreen
 import scommons.react.hooks._
 
+import scala.scalajs.js
+
 case class FileListProps(dispatch: Dispatch,
                          actions: FileListActions,
                          state: FileListState,
@@ -109,7 +111,7 @@ object FileList extends FunctionComponent[FileListProps] {
         props.dispatch(FileListParamsChangedAction(
           offset = newOffset,
           index = newIndex,
-          selectedNames = newSelected
+          selectedNames = js.Set[String](newSelected.toSeq: _*)
         ))
       }
     }

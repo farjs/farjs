@@ -2,6 +2,7 @@ package farjs.filelist
 
 import farjs.filelist.FileList._
 import farjs.filelist.FileListActions._
+import farjs.filelist.FileListActionsSpec.assertFileListParamsChangedAction
 import farjs.filelist.api.FileListItemSpec.assertFileListItems
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.Dispatch
@@ -76,7 +77,9 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       val state = FileListState.copy(props.state)(offset = offset, index = index)
       if (changed) {
         //then
-        dispatch.expects(FileListParamsChangedAction(offset, index, Set.empty))
+        dispatch.expects(*).onCall { action: Any =>
+          assertFileListParamsChangedAction(action, FileListParamsChangedAction(offset, index, js.Set.empty))
+        }
       }
       
       //when
@@ -148,7 +151,9 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       val state = FileListState.copy(props.state)(offset = 0, index = index)
       if (changed) {
         //then
-        dispatch.expects(FileListParamsChangedAction(0, index, Set.empty))
+        dispatch.expects(*).onCall { action: Any =>
+          assertFileListParamsChangedAction(action, FileListParamsChangedAction(0, index, js.Set.empty))
+        }
       }
 
       //when
@@ -202,7 +207,9 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       val state = FileListState.copy(props.state)(offset = offset, index = index, selectedNames = selected)
       if (changed) {
         //then
-        dispatch.expects(FileListParamsChangedAction(offset, index, selected.toSet))
+        dispatch.expects(*).onCall { action: Any =>
+          assertFileListParamsChangedAction(action, FileListParamsChangedAction(offset, index, selected))
+        }
       }
       
       //then

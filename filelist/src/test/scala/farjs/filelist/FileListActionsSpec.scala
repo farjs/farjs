@@ -4,7 +4,10 @@ import farjs.filelist.FileListActions._
 import farjs.filelist.FileListActionsSpec._
 import farjs.filelist.api._
 import farjs.ui.task.Task
-import org.scalatest.Succeeded
+import org.scalactic.source.Position
+import org.scalatest.Inside.inside
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.path
 import scommons.nodejs.test.AsyncTestSpec
 
@@ -529,7 +532,6 @@ class FileListActionsSpec extends AsyncTestSpec {
   }
 }
 
-//noinspection NotImplementedCode
 object FileListActionsSpec {
 
   private class FileListActionsTest(apiMock: FileListApi)
@@ -539,6 +541,16 @@ object FileListActionsSpec {
 
     val isLocalFS: Boolean = true
 
+    //noinspection NotImplementedCode
     def getDriveRoot(path: String): Future[Option[String]] = ???
+  }
+
+  def assertFileListParamsChangedAction(action: Any, expected: FileListParamsChangedAction)(implicit position: Position): Assertion = {
+    inside(action.asInstanceOf[FileListParamsChangedAction]) {
+      case FileListParamsChangedAction(offset, index, selectedNames) =>
+        offset shouldBe expected.offset
+        index shouldBe expected.index
+        selectedNames.toSet shouldBe expected.selectedNames.toSet
+    }
   }
 }

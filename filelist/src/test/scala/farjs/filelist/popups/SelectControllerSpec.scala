@@ -1,6 +1,7 @@
 package farjs.filelist.popups
 
 import farjs.filelist.FileListActions.FileListParamsChangedAction
+import farjs.filelist.FileListActionsSpec.assertFileListParamsChangedAction
 import farjs.filelist.FileListServicesSpec.withServicesContext
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.history.MockFileListHistoryService
@@ -48,8 +49,11 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
     //then
     historyService.save.expects(pattern).returning(Future.unit)
-    dispatch.expects(FileListParamsChangedAction(state.offset, state.index,
-      Set("file1.test", "file2.test", "file.test3")))
+    dispatch.expects(*).onCall { action: Any =>
+      assertFileListParamsChangedAction(action,
+        FileListParamsChangedAction(state.offset, state.index,
+          js.Set("file1.test", "file2.test", "file.test3")))
+    }
     onClose.expects()
 
     //when
@@ -80,8 +84,11 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
     //then
     historyService.save.expects(pattern).returning(Future.unit)
-    dispatch.expects(FileListParamsChangedAction(state.offset, state.index,
-      Set("file1.test", "file2.test", "file.test3")))
+    dispatch.expects(*).onCall { action: Any =>
+      assertFileListParamsChangedAction(action,
+        FileListParamsChangedAction(state.offset, state.index,
+          js.Set("file1.test", "file2.test", "file.test3")))
+    }
     onClose.expects()
 
     //when
@@ -112,11 +119,15 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
     //then
     historyService.save.expects(pattern).returning(Future.unit)
-    dispatch.expects(FileListParamsChangedAction(
-      offset = state.offset,
-      index = state.index,
-      selectedNames = Set("file.test3")
-    ))
+    dispatch.expects(*).onCall { action: Any =>
+      assertFileListParamsChangedAction(action,
+        FileListParamsChangedAction(
+          offset = state.offset,
+          index = state.index,
+          selectedNames = js.Set("file.test3")
+        )
+      )
+    }
     onClose.expects()
 
     //when

@@ -2,6 +2,7 @@ package farjs.archiver
 
 import farjs.archiver.AddToArchController._
 import farjs.filelist.FileListActions._
+import farjs.filelist.FileListActionsSpec.assertFileListParamsChangedAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.popup.StatusPopupProps
@@ -142,11 +143,15 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
           onNextItemFunc = onNextItem
           p.future
         }
-        dispatch.expects(FileListParamsChangedAction(
-          offset = 0,
-          index = 1,
-          selectedNames = Set.empty
-        ))
+        dispatch.expects(*).onCall { action: Any =>
+          assertFileListParamsChangedAction(action,
+            FileListParamsChangedAction(
+              offset = 0,
+              index = 1,
+              selectedNames = js.Set.empty
+            )
+          )
+        }
         onComplete.expects(zipFile)
 
         //when

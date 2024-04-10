@@ -18,7 +18,7 @@ class FileListStateReducerSpec extends TestSpec {
     val action = FileListParamsChangedAction(
       offset = 1,
       index = 2,
-      selectedNames = Set("test")
+      selectedNames = js.Set("test")
     )
     
     //when

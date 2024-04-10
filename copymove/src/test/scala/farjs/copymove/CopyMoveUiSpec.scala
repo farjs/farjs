@@ -4,6 +4,7 @@ import farjs.copymove.CopyMoveUi._
 import farjs.copymove.CopyMoveUiAction._
 import farjs.copymove.CopyMoveUiSpec._
 import farjs.filelist.FileListActions._
+import farjs.filelist.FileListActionsSpec.assertFileListParamsChangedAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.history.{FileListHistoryService, MockFileListHistoryService}
@@ -676,11 +677,15 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       val rightAction = FileListDirUpdateAction(Task("Updating", Future.successful(updatedDir)))
 
       //then
-      fromDispatch.expects(FileListParamsChangedAction(
-        offset = 0,
-        index = 1,
-        selectedNames = Set("file 1")
-      ))
+      fromDispatch.expects(*).onCall { action: Any =>
+        assertFileListParamsChangedAction(action,
+          FileListParamsChangedAction(
+            offset = 0,
+            index = 1,
+            selectedNames = js.Set("file 1")
+          )
+        )
+      }
       onClose.expects()
       historyService.save.expects(to).returning(Future.unit)
       fromActions.updateDir.expects(fromDispatch, leftDir.path).returning(leftAction)

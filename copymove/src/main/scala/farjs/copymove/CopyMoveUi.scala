@@ -53,7 +53,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
         from.dispatch(FileListParamsChangedAction(
           offset = from.state.offset,
           index = from.state.index,
-          selectedNames = updatedSelection
+          selectedNames = js.Set[String](updatedSelection.toSeq: _*)
         ))
       }
 
