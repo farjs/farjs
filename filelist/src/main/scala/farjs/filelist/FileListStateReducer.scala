@@ -65,7 +65,8 @@ object FileListStateReducer {
             }
             else state.selectedNames
         )
-      case FileListItemCreatedAction(name, currDir) =>
+      case a if actionName.exists(_ == FileListItemCreatedAction.name) =>
+        val FileListItemCreatedAction(name, currDir) = a.asInstanceOf[FileListItemCreatedAction]
         val processed = processDir(currDir, state.sort)
         val newIndex = processed.items.indexWhere(_.name == name)
         val (offset, index) =

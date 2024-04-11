@@ -4,7 +4,7 @@ import farjs.copymove.CopyMoveUi._
 import farjs.copymove.CopyMoveUiAction._
 import farjs.copymove.CopyMoveUiSpec._
 import farjs.filelist.FileListActions._
-import farjs.filelist.FileListActionsSpec.assertFileListParamsChangedAction
+import farjs.filelist.FileListActionsSpec.{assertFileListItemCreatedAction, assertFileListParamsChangedAction}
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.history.{FileListHistoryService, MockFileListHistoryService}
@@ -751,7 +751,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       historyService.save.expects(to).returning(Future.unit)
       fromActions.updateDir.expects(fromDispatch, leftDir.path).returning(leftAction)
       fromDispatch.expects(leftAction)
-      fromDispatch.expects(FileListItemCreatedAction(to, updatedDir))
+      fromDispatch.expects(*).onCall { action: Any =>
+        assertFileListItemCreatedAction(action, FileListItemCreatedAction(to, updatedDir))
+      }
 
       //when
       progressPopup.onDone()

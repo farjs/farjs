@@ -137,7 +137,9 @@ class FileListActionsSpec extends AsyncTestSpec {
     api.readDir.expects(parent).returning(Future.successful(currDir))
     
     //then
-    dispatch.expects(FileListItemCreatedAction(dir, currDir))
+    dispatch.expects(*).onCall { action: Any =>
+      assertFileListItemCreatedAction(action, FileListItemCreatedAction(dir, currDir))
+    }
     
     //when
     val FileListDirCreateAction(task) =
@@ -162,7 +164,9 @@ class FileListActionsSpec extends AsyncTestSpec {
     api.readDir.expects(parent).returning(Future.successful(currDir))
     
     //then
-    dispatch.expects(FileListItemCreatedAction("test", currDir))
+    dispatch.expects(*).onCall { action: Any =>
+      assertFileListItemCreatedAction(action, FileListItemCreatedAction("test", currDir))
+    }
     
     //when
     val FileListDirCreateAction(task) =
@@ -572,6 +576,14 @@ object FileListActionsSpec {
   def assertFileListDirUpdatedAction(action: Any, expected: FileListDirUpdatedAction)(implicit position: Position): Assertion = {
     inside(action.asInstanceOf[FileListDirUpdatedAction]) {
       case FileListDirUpdatedAction(currDir) =>
+        assertFileListDir(currDir, expected.currDir)
+    }
+  }
+
+  def assertFileListItemCreatedAction(action: Any, expected: FileListItemCreatedAction)(implicit position: Position): Assertion = {
+    inside(action.asInstanceOf[FileListItemCreatedAction]) {
+      case FileListItemCreatedAction(name, currDir) =>
+        name shouldBe expected.name
         assertFileListDir(currDir, expected.currDir)
     }
   }

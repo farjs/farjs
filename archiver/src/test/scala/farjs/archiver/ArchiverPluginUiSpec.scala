@@ -2,6 +2,7 @@ package farjs.archiver
 
 import farjs.archiver.ArchiverPluginUi._
 import farjs.filelist.FileListActions._
+import farjs.filelist.FileListActionsSpec.assertFileListItemCreatedAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.Dispatch
@@ -82,8 +83,10 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     //then
     onClose.expects()
     actions.updateDir.expects(dispatch, data.state.currDir.path).returning(updateAction)
-    dispatch.expects(FileListItemCreatedAction(zipFile, updatedDir))
     dispatch.expects(updateAction)
+    dispatch.expects(*).onCall { action: Any =>
+      assertFileListItemCreatedAction(action, FileListItemCreatedAction(zipFile, updatedDir))
+    }
     
     //when
     controller.onComplete(zipFile)
