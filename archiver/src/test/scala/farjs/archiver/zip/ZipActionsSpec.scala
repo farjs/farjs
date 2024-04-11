@@ -2,6 +2,7 @@ package farjs.archiver.zip
 
 import farjs.archiver.ArchiverPlugin
 import farjs.filelist.FileListActions._
+import farjs.filelist.FileListActionsSpec.assertFileListDirUpdatedAction
 import farjs.filelist.api.{FileListDir, FileListItem}
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
@@ -54,7 +55,9 @@ class ZipActionsSpec extends AsyncTestSpec {
     dispatch.expects(FileListDiskSpaceUpdatedAction(123.0))
     readZip.expects("file.zip").returning(entriesByParent)
     createApi.expects("file.zip", "root.path", *).returning(api)
-    dispatch.expects(FileListDirUpdatedAction(currDir))
+    dispatch.expects(*).onCall { action: Any =>
+      assertFileListDirUpdatedAction(action, FileListDirUpdatedAction(currDir))
+    }
 
     //when
     val FileListDirUpdateAction(task) =

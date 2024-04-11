@@ -1,6 +1,7 @@
 package farjs.viewer
 
 import farjs.filelist.FileListActions.{FileListDirUpdatedAction, FileListTaskAction}
+import farjs.filelist.FileListActionsSpec.assertFileListDirUpdatedAction
 import farjs.filelist._
 import farjs.filelist.api.FileListDirSpec.assertFileListDir
 import farjs.filelist.api.{FileListDir, FileListItem}
@@ -63,9 +64,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
       //then
       onClose.expects()
       dispatch.expects(*).onCall { action: Any =>
-        inside(action) { case action: FileListDirUpdatedAction =>
-          resAction = action
-        }
+        resAction = action.asInstanceOf[FileListDirUpdatedAction]
       }
 
       //when
@@ -181,10 +180,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     //then
     onClose.expects()
     dispatch.expects(*).onCall { action: Any =>
-      inside(action) {
-        case FileListDirUpdatedAction(resDir) =>
-          assertFileListDir(resDir, state.currDir)
-      }
+      assertFileListDirUpdatedAction(action, FileListDirUpdatedAction(state.currDir))
     }
 
     //when

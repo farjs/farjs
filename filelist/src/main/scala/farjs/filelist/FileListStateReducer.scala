@@ -38,7 +38,8 @@ object FileListStateReducer {
           currDir = processed,
           selectedNames = js.Set[String]()
         )
-      case FileListDirUpdatedAction(currDir) =>
+      case a if actionName.exists(_ == FileListDirUpdatedAction.name) =>
+        val FileListDirUpdatedAction(currDir) = a.asInstanceOf[FileListDirUpdatedAction]
         val processed = processDir(currDir, state.sort)
         val currIndex = state.offset + state.index
         val newIndex = FileListState.currentItem(state).map { currItem =>
