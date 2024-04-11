@@ -4,8 +4,8 @@ import farjs.archiver._
 import farjs.archiver.zip.ZipPanel._
 import farjs.archiver.zip.ZipPanelSpec.withContext
 import farjs.filelist.FileListActions._
+import farjs.filelist.FileListActionsSpec.assertFileListDirChangedAction
 import farjs.filelist._
-import farjs.filelist.api.FileListDirSpec.assertFileListDir
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack._
 import farjs.ui.Dispatch
@@ -596,10 +596,8 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       }
     }
     dispatch.expects(*).onCall { action: Any =>
-      inside(action) {
-        case FileListDirChangedAction(FileListItem.currDir.name, resDir) =>
-          assertFileListDir(resDir, dir)
-      }
+      assertFileListDirChangedAction(action,
+        FileListDirChangedAction(FileListItem.currDir.name, dir))
     }
     
     //when
@@ -678,17 +676,16 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     }
     dispatch.expects(FileListDiskSpaceUpdatedAction(7.0))
     dispatch.expects(*).onCall { action: Any =>
-      inside(action) {
-        case FileListDirChangedAction(FileListItem.currDir.name, resDir) =>
-          assertFileListDir(resDir, FileListDir(
-            path = rootPath,
-            isRoot = false,
-            items = js.Array(
-              FileListItem.copy(FileListItem("dir 1", isDir = true))(mtimeMs = 1.0),
-              FileListItem.copy(FileListItem("file 1"))(size = 2.0, mtimeMs = 3.0)
-            )
-          ))
-      }
+      assertFileListDirChangedAction(action,
+        FileListDirChangedAction(FileListItem.currDir.name, FileListDir(
+          path = rootPath,
+          isRoot = false,
+          items = js.Array(
+            FileListItem.copy(FileListItem("dir 1", isDir = true))(mtimeMs = 1.0),
+            FileListItem.copy(FileListItem("file 1"))(size = 2.0, mtimeMs = 3.0)
+          )
+        ))
+      )
     }
     
     //when

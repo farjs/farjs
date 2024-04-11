@@ -8,92 +8,96 @@ import scala.scalajs.js
 
 object FileListStateReducer {
   
-  def apply(state: FileListState, action: Any): FileListState = action match {
-    case a if a.asInstanceOf[js.Dynamic].action.asInstanceOf[js.UndefOr[String]].exists(_ == FileListParamsChangedAction.name) =>
-      val FileListParamsChangedAction(offset, index, selectedNames) = a.asInstanceOf[FileListParamsChangedAction]
-      FileListState.copy(state)(
-        offset = offset,
-        index = index,
-        selectedNames = selectedNames
-      )
-    case FileListDirChangedAction(dir, currDir) =>
-      val processed = processDir(currDir, state.sort)
-      val index =
-        if (dir == FileListItem.up.name) {
-          val focusedDir = state.currDir.path
-            .stripPrefix(currDir.path)
-            .stripPrefix("/")
-            .stripPrefix("\\")
+  def apply(state: FileListState, action: Any): FileListState = {
+    val actionName = action.asInstanceOf[js.Dynamic].action.asInstanceOf[js.UndefOr[String]]
+    action match {
+      case a if actionName.exists(_ == FileListParamsChangedAction.name) =>
+        val FileListParamsChangedAction(offset, index, selectedNames) = a.asInstanceOf[FileListParamsChangedAction]
+        FileListState.copy(state)(
+          offset = offset,
+          index = index,
+          selectedNames = selectedNames
+        )
+      case a if actionName.exists(_ == FileListDirChangedAction.name) =>
+        val FileListDirChangedAction(dir, currDir) = a.asInstanceOf[FileListDirChangedAction]
+        val processed = processDir(currDir, state.sort)
+        val index =
+          if (dir == FileListItem.up.name) {
+            val focusedDir = state.currDir.path
+              .stripPrefix(currDir.path)
+              .stripPrefix("/")
+              .stripPrefix("\\")
 
-          math.max(processed.items.indexWhere(_.name == focusedDir), 0)
-        }
-        else 0
-
-      FileListState.copy(state)(
-        offset = 0,
-        index = index,
-        currDir = processed,
-        selectedNames = js.Set[String]()
-      )
-    case FileListDirUpdatedAction(currDir) =>
-      val processed = processDir(currDir, state.sort)
-      val currIndex = state.offset + state.index
-      val newIndex = FileListState.currentItem(state).map { currItem =>
-        val index = processed.items.indexWhere(_.name == currItem.name)
-        if (index < 0) {
-          math.min(currIndex, currDir.items.size)
-        }
-        else index
-      }.getOrElse(0)
-      
-      val (offset, index) =
-        if (newIndex == currIndex) (state.offset, state.index)
-        else (0, newIndex)
-
-      FileListState.copy(state)(
-        offset = offset,
-        index = index,
-        currDir = processed,
-        selectedNames =
-          if (state.selectedNames.nonEmpty) {
-            val res = state.selectedNames.toSet.intersect(processed.items.map(_.name).toSet)
-            js.Set[String](res.toSeq: _*)
+            math.max(processed.items.indexWhere(_.name == focusedDir), 0)
           }
-          else state.selectedNames
-      )
-    case FileListItemCreatedAction(name, currDir) =>
-      val processed = processDir(currDir, state.sort)
-      val newIndex = processed.items.indexWhere(_.name == name)
-      val (offset, index) =
-        if (newIndex < 0) (state.offset, state.index)
-        else (0, newIndex)
+          else 0
 
-      FileListState.copy(state)(
-        offset = offset,
-        index = index,
-        currDir = processed
-      )
-    case FileListSortAction(mode) =>
-      val nextSort = FileListSort.nextSort(state.sort, mode)
-      val processed = processDir(state.currDir, nextSort)
-      val newIndex = FileListState.currentItem(state).map { item =>
-        processed.items.indexWhere(_.name == item.name)
-      }.getOrElse(-1)
-      val (offset, index) =
-        if (newIndex < 0) (state.offset, state.index)
-        else (0, newIndex)
+        FileListState.copy(state)(
+          offset = 0,
+          index = index,
+          currDir = processed,
+          selectedNames = js.Set[String]()
+        )
+      case FileListDirUpdatedAction(currDir) =>
+        val processed = processDir(currDir, state.sort)
+        val currIndex = state.offset + state.index
+        val newIndex = FileListState.currentItem(state).map { currItem =>
+          val index = processed.items.indexWhere(_.name == currItem.name)
+          if (index < 0) {
+            math.min(currIndex, currDir.items.size)
+          }
+          else index
+        }.getOrElse(0)
 
-      FileListState.copy(state)(
-        offset = offset,
-        index = index,
-        currDir = processed,
-        sort = nextSort
-      )
-    case FileListDiskSpaceUpdatedAction(diskSpace) =>
-      FileListState.copy(state)(
-        diskSpace = diskSpace
-      )
-    case _ => state
+        val (offset, index) =
+          if (newIndex == currIndex) (state.offset, state.index)
+          else (0, newIndex)
+
+        FileListState.copy(state)(
+          offset = offset,
+          index = index,
+          currDir = processed,
+          selectedNames =
+            if (state.selectedNames.nonEmpty) {
+              val res = state.selectedNames.toSet.intersect(processed.items.map(_.name).toSet)
+              js.Set[String](res.toSeq: _*)
+            }
+            else state.selectedNames
+        )
+      case FileListItemCreatedAction(name, currDir) =>
+        val processed = processDir(currDir, state.sort)
+        val newIndex = processed.items.indexWhere(_.name == name)
+        val (offset, index) =
+          if (newIndex < 0) (state.offset, state.index)
+          else (0, newIndex)
+
+        FileListState.copy(state)(
+          offset = offset,
+          index = index,
+          currDir = processed
+        )
+      case FileListSortAction(mode) =>
+        val nextSort = FileListSort.nextSort(state.sort, mode)
+        val processed = processDir(state.currDir, nextSort)
+        val newIndex = FileListState.currentItem(state).map { item =>
+          processed.items.indexWhere(_.name == item.name)
+        }.getOrElse(-1)
+        val (offset, index) =
+          if (newIndex < 0) (state.offset, state.index)
+          else (0, newIndex)
+
+        FileListState.copy(state)(
+          offset = offset,
+          index = index,
+          currDir = processed,
+          sort = nextSort
+        )
+      case FileListDiskSpaceUpdatedAction(diskSpace) =>
+        FileListState.copy(state)(
+          diskSpace = diskSpace
+        )
+      case _ => state
+    }
   }
   
   private def processDir(currDir: FileListDir,

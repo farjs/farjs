@@ -2,6 +2,7 @@ package farjs.filelist
 
 import farjs.filelist.FileListActions._
 import farjs.filelist.FileListActionsSpec._
+import farjs.filelist.api.FileListDirSpec.assertFileListDir
 import farjs.filelist.api._
 import farjs.ui.task.Task
 import org.scalactic.source.Position
@@ -85,7 +86,9 @@ class FileListActionsSpec extends AsyncTestSpec {
     api.readDir2.expects(parent, dir).returning(Future.successful(currDir))
     
     //then
-    dispatch.expects(FileListDirChangedAction(dir, currDir))
+    dispatch.expects(*).onCall { action: Any =>
+      assertFileListDirChangedAction(action, FileListDirChangedAction(dir, currDir))
+    }
     
     //when
     val FileListDirChangeAction(task) =
@@ -551,6 +554,14 @@ object FileListActionsSpec {
         offset shouldBe expected.offset
         index shouldBe expected.index
         selectedNames.toSet shouldBe expected.selectedNames.toSet
+    }
+  }
+
+  def assertFileListDirChangedAction(action: Any, expected: FileListDirChangedAction)(implicit position: Position): Assertion = {
+    inside(action.asInstanceOf[FileListDirChangedAction]) {
+      case FileListDirChangedAction(dir, currDir) =>
+        dir shouldBe expected.dir
+        assertFileListDir(currDir, expected.currDir)
     }
   }
 }

@@ -198,7 +198,30 @@ object FileListActions {
 
     def unapply(arg: FileListDirChangeAction): Option[Task] = Some(arg.task)
   }
-  case class FileListDirChangedAction(dir: String, currDir: FileListDir)
+
+  sealed trait FileListDirChangedAction extends js.Object {
+    val action: String
+    val dir: String
+    val currDir: FileListDir
+  }
+  object FileListDirChangedAction {
+    val name = "FileListDirChangedAction"
+
+    def apply(dir: String,
+              currDir: FileListDir): FileListDirChangedAction = {
+      js.Dynamic.literal(
+        action = name,
+        dir = dir,
+        currDir = currDir
+      ).asInstanceOf[FileListDirChangedAction]
+    }
+
+    def unapply(arg: FileListDirChangedAction): Option[(String, FileListDir)] =
+      Some((
+        arg.dir,
+        arg.currDir
+      ))
+  }
   
   sealed trait FileListDirUpdateAction extends TaskAction
   object FileListDirUpdateAction {
