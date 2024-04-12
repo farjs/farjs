@@ -78,7 +78,8 @@ object FileListStateReducer {
           index = index,
           currDir = processed
         )
-      case FileListSortAction(mode) =>
+      case a if actionName.exists(_ == FileListSortAction.name) =>
+        val FileListSortAction(mode) = a.asInstanceOf[FileListSortAction]
         val nextSort = FileListSort.nextSort(state.sort, mode)
         val processed = processDir(state.currDir, nextSort)
         val newIndex = FileListState.currentItem(state).map { item =>

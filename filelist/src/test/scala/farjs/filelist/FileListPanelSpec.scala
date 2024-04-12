@@ -1,7 +1,7 @@
 package farjs.filelist
 
 import farjs.filelist.FileListActions._
-import farjs.filelist.FileListActionsSpec.assertFileListParamsChangedAction
+import farjs.filelist.FileListActionsSpec.{assertFileListParamsChangedAction, assertFileListSortAction}
 import farjs.filelist.FileListPanel._
 import farjs.filelist.api.{FileListCapability, FileListDir, FileListItem}
 import farjs.filelist.sort.{FileListSort, SortMode, SortModesPopupProps}
@@ -59,10 +59,12 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
     val renderer = createTestRenderer(withContext(<(FileListPanel())(^.wrapped := props)()))
 
-    def check(fullKey: String, action: Any): Unit = {
+    def check(fullKey: String, expected: FileListSortAction): Unit = {
       //then
       onKeypress.expects(screen, fullKey).returning(false)
-      dispatch.expects(action)
+      dispatch.expects(*).onCall { action: Any =>
+        assertFileListSortAction(action, expected)
+      }
 
       //when
       findComponentProps(renderer.root, fileListPanelView).onKeypress(screen, fullKey)

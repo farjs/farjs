@@ -594,4 +594,11 @@ object FileListActionsSpec {
         diskSpace shouldBe expected.diskSpace
     }
   }
+
+  def assertFileListSortAction(action: Any, expected: FileListSortAction)(implicit position: Position): Assertion = {
+    inside(action.asInstanceOf[FileListSortAction]) {
+      case FileListSortAction(mode) =>
+        mode shouldBe expected.mode
+    }
+  }
 }

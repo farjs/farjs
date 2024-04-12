@@ -303,5 +303,23 @@ object FileListActions {
       )
   }
 
-  case class FileListSortAction(mode: SortMode)
+  sealed trait FileListSortAction extends js.Object {
+    val action: String
+    val mode: SortMode
+  }
+  object FileListSortAction {
+    val name = "FileListSortAction"
+
+    def apply(mode: SortMode): FileListSortAction = {
+      js.Dynamic.literal(
+        action = name,
+        mode = mode
+      ).asInstanceOf[FileListSortAction]
+    }
+
+    def unapply(arg: FileListSortAction): Option[SortMode] =
+      Some(
+        arg.mode
+      )
+  }
 }
