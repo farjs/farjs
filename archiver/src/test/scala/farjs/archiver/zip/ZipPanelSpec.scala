@@ -4,7 +4,7 @@ import farjs.archiver._
 import farjs.archiver.zip.ZipPanel._
 import farjs.archiver.zip.ZipPanelSpec.withContext
 import farjs.filelist.FileListActions._
-import farjs.filelist.FileListActionsSpec.assertFileListDirChangedAction
+import farjs.filelist.FileListActionsSpec.{assertFileListDirChangedAction, assertFileListDiskSpaceUpdatedAction}
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack._
@@ -674,7 +674,9 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
           actionF = future
       }
     }
-    dispatch.expects(FileListDiskSpaceUpdatedAction(7.0))
+    dispatch.expects(*).onCall { action: Any =>
+      assertFileListDiskSpaceUpdatedAction(action, FileListDiskSpaceUpdatedAction(7.0))
+    }
     dispatch.expects(*).onCall { action: Any =>
       assertFileListDirChangedAction(action,
         FileListDirChangedAction(FileListItem.currDir.name, FileListDir(

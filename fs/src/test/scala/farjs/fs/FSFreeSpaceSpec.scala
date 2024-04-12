@@ -1,6 +1,7 @@
 package farjs.fs
 
 import farjs.filelist.FileListActions.FileListDiskSpaceUpdatedAction
+import farjs.filelist.FileListActionsSpec.assertFileListDiskSpaceUpdatedAction
 import farjs.filelist.api.FileListDir
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
@@ -28,11 +29,12 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, js.Array()))
     val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
     val resultF = Future.successful(Some(disk))
-    val action = FileListDiskSpaceUpdatedAction(disk.free)
 
     //then
     fsService.readDisk.expects(props.currDir.path).returning(resultF)
-    dispatch.expects(action)
+    dispatch.expects(*).onCall { action: Any =>
+      assertFileListDiskSpaceUpdatedAction(action, FileListDiskSpaceUpdatedAction(disk.free))
+    }
     
     //when
     val result = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)()).root
@@ -50,10 +52,11 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, js.Array()))
     val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
     val resultF = Future.successful(Some(disk))
-    val action = FileListDiskSpaceUpdatedAction(disk.free)
 
     fsService.readDisk.expects(props.currDir.path).returning(resultF)
-    dispatch.expects(action)
+    dispatch.expects(*).onCall { action: Any =>
+      assertFileListDiskSpaceUpdatedAction(action, FileListDiskSpaceUpdatedAction(disk.free))
+    }
 
     val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
     val props2 = props.copy(currDir = FileListDir.copy(props.currDir)(path = "/2"))
@@ -83,10 +86,11 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, js.Array()))
     val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
     val resultF = Future.successful(Some(disk))
-    val action = FileListDiskSpaceUpdatedAction(disk.free)
 
     fsService.readDisk.expects(props.currDir.path).returning(resultF)
-    dispatch.expects(action)
+    dispatch.expects(*).onCall { action: Any =>
+      assertFileListDiskSpaceUpdatedAction(action, FileListDiskSpaceUpdatedAction(disk.free))
+    }
 
     val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
     val props2 = props.copy(currDir = FileListDir.copy(props.currDir)(path = "/2"))
@@ -116,11 +120,12 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, js.Array()))
     val disk = FSDisk("/", size = 123.0, free = 456.0, "/")
     val resultF = Future.successful(Some(disk))
-    val action = FileListDiskSpaceUpdatedAction(disk.free)
 
     //then
     fsService.readDisk.expects(props.currDir.path).returning(resultF)
-    dispatch.expects(action)
+    dispatch.expects(*).onCall { action: Any =>
+      assertFileListDiskSpaceUpdatedAction(action, FileListDiskSpaceUpdatedAction(disk.free))
+    }
 
     val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
     val props2 = props.copy(currDir = props.currDir)
@@ -153,12 +158,13 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val resultF1 = p1.future
     val p2 = Promise[Option[FSDisk]]()
     val resultF2 = p2.future
-    val action = FileListDiskSpaceUpdatedAction(disk2.free)
 
     //then
     fsService.readDisk.expects(props.currDir.path).returning(resultF1)
     fsService.readDisk.expects(props2.currDir.path).returning(resultF2)
-    dispatch.expects(action)
+    dispatch.expects(*).onCall { action: Any =>
+      assertFileListDiskSpaceUpdatedAction(action, FileListDiskSpaceUpdatedAction(disk2.free))
+    }
 
     //when
     val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())

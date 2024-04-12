@@ -283,6 +283,25 @@ object FileListActions {
       ))
   }
   
-  case class FileListDiskSpaceUpdatedAction(diskSpace: Double)
+  sealed trait FileListDiskSpaceUpdatedAction extends js.Object {
+    val action: String
+    val diskSpace: Double
+  }
+  object FileListDiskSpaceUpdatedAction {
+    val name = "FileListDiskSpaceUpdatedAction"
+
+    def apply(diskSpace: Double): FileListDiskSpaceUpdatedAction = {
+      js.Dynamic.literal(
+        action = name,
+        diskSpace = diskSpace
+      ).asInstanceOf[FileListDiskSpaceUpdatedAction]
+    }
+
+    def unapply(arg: FileListDiskSpaceUpdatedAction): Option[Double] =
+      Some(
+        arg.diskSpace
+      )
+  }
+
   case class FileListSortAction(mode: SortMode)
 }

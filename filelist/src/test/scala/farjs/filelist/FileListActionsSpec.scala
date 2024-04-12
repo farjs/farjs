@@ -587,4 +587,11 @@ object FileListActionsSpec {
         assertFileListDir(currDir, expected.currDir)
     }
   }
+
+  def assertFileListDiskSpaceUpdatedAction(action: Any, expected: FileListDiskSpaceUpdatedAction)(implicit position: Position): Assertion = {
+    inside(action.asInstanceOf[FileListDiskSpaceUpdatedAction]) {
+      case FileListDiskSpaceUpdatedAction(diskSpace) =>
+        diskSpace shouldBe expected.diskSpace
+    }
+  }
 }

@@ -94,7 +94,8 @@ object FileListStateReducer {
           currDir = processed,
           sort = nextSort
         )
-      case FileListDiskSpaceUpdatedAction(diskSpace) =>
+      case a if actionName.exists(_ == FileListDiskSpaceUpdatedAction.name) =>
+        val FileListDiskSpaceUpdatedAction(diskSpace) = a.asInstanceOf[FileListDiskSpaceUpdatedAction]
         FileListState.copy(state)(
           diskSpace = diskSpace
         )
