@@ -1,9 +1,8 @@
 package farjs.viewer
 
 import farjs.file.{Encoding, FileServices, FileViewHistory}
-import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.theme.FileListTheme
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import farjs.ui.{Dispatch, WithSize, WithSizeProps}
 import scommons.react._
 import scommons.react.blessed._
@@ -52,7 +51,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
         )))
       }
       openF.andThen { case Failure(NonFatal(_)) =>
-        props.dispatch(FileListTaskAction(Task("Opening file", openF)))
+        props.dispatch(TaskAction(Task("Opening file", openF)))
       }
 
       val cleanup: js.Function0[Unit] = { () =>

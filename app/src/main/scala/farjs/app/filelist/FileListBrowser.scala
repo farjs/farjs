@@ -1,12 +1,11 @@
 package farjs.app.filelist
 
-import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.stack._
 import farjs.fs.FSPlugin
 import farjs.ui.Dispatch
 import farjs.ui.menu._
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import scommons.nodejs.path
 import scommons.react._
 import scommons.react.blessed._
@@ -99,7 +98,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
               }
             }
             pluginRes.andThen { case Failure(_) =>
-              props.dispatch(FileListTaskAction(Task("Opening Plugin", pluginRes)))
+              props.dispatch(TaskAction(Task("Opening Plugin", pluginRes)))
             }
           }
       }
@@ -212,7 +211,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       }
 
       openF.andThen {
-        case Failure(_) => dispatch(FileListTaskAction(Task("Opening File", openF)))
+        case Failure(_) => dispatch(TaskAction(Task("Opening File", openF)))
       }
     }
   }

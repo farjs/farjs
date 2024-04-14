@@ -6,7 +6,7 @@ import farjs.filelist.FileListActionsSpec.assertFileListParamsChangedAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.popup.StatusPopupProps
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 import scommons.react.test._
@@ -76,8 +76,8 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
         onComplete.expects(*).never()
         var resultF: Future[_] = null
         dispatch.expects(*).onCall { action: Any =>
-          inside(action.asInstanceOf[FileListTaskAction]) {
-            case FileListTaskAction(Task("Add item(s) to zip archive", future)) =>
+          inside(action.asInstanceOf[TaskAction]) {
+            case TaskAction(Task("Add item(s) to zip archive", future)) =>
               resultF = future
           }
         }

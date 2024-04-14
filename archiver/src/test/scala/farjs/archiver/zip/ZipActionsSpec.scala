@@ -4,6 +4,7 @@ import farjs.archiver.ArchiverPlugin
 import farjs.filelist.FileListActions._
 import farjs.filelist.FileListActionsSpec.{assertFileListDirUpdatedAction, assertFileListDiskSpaceUpdatedAction}
 import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.ui.task.TaskAction
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 
@@ -62,7 +63,7 @@ class ZipActionsSpec extends AsyncTestSpec {
     }
 
     //when
-    val FileListDirUpdateAction(task) =
+    val TaskAction(task) =
       actions.updateDir(dispatch, path)
 
     //then

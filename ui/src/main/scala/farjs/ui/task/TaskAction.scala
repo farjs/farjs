@@ -2,7 +2,19 @@ package farjs.ui.task
 
 import scala.scalajs.js
 
-trait TaskAction extends js.Object {
+sealed trait TaskAction extends js.Object {
 
-  def task: Task
+  val task: Task
+}
+
+object TaskAction {
+
+  def apply(task: Task): TaskAction = {
+    js.Dynamic.literal(
+      task = task
+    ).asInstanceOf[TaskAction]
+  }
+
+  def unapply(arg: TaskAction): Option[Task] =
+    Some(arg.task)
 }

@@ -1,10 +1,10 @@
 package farjs.copymove
 
 import farjs.copymove.CopyItemsStats._
-import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.FileListItem
 import farjs.ui.popup.StatusPopupProps
+import farjs.ui.task.TaskAction
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
@@ -155,7 +155,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     //then
     onCancel.expects()
     dispatch.expects(*).onCall { action: Any =>
-      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+      inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         resultF = action.task.result.toFuture
         action.task.message shouldBe "Copy dir scan"
       }

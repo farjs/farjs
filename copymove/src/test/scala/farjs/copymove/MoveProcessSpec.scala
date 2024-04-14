@@ -1,10 +1,10 @@
 package farjs.copymove
 
 import farjs.copymove.MoveProcess._
-import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist._
 import farjs.filelist.api.FileListItem
 import farjs.ui.popup.{MessageBoxProps, StatusPopupProps}
+import farjs.ui.task.TaskAction
 import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.Succeeded
@@ -99,7 +99,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     onDone.expects()
     var resultF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+      inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         resultF = action.task.result.toFuture
         action.task.message shouldBe "Moving items"
       }

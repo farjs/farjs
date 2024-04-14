@@ -1,10 +1,9 @@
 package farjs.copymove
 
-import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.FileListData
 import farjs.filelist.api.FileListItem
 import farjs.ui.popup._
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import farjs.ui.theme.Theme
 import scommons.nodejs
 import scommons.nodejs.raw.Timers
@@ -140,7 +139,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
         case Success(_) => props.onDone()
         case Failure(_) =>
           props.onDone()
-          props.from.dispatch(FileListTaskAction(Task("Copy/Move Items", resultF)))
+          props.from.dispatch(TaskAction(Task("Copy/Move Items", resultF)))
       }
     }
 

@@ -10,7 +10,7 @@ import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.history.{FileListHistoryService, MockFileListHistoryService}
 import farjs.ui.Dispatch
 import farjs.ui.popup.MessageBoxProps
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.Succeeded
@@ -35,7 +35,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
   //noinspection TypeAnnotation
   class Actions(isLocalFS: Boolean = true) {
     val getDriveRoot = mockFunction[String, Future[Option[String]]]
-    val updateDir = mockFunction[Dispatch, String, FileListDirUpdateAction]
+    val updateDir = mockFunction[Dispatch, String, TaskAction]
     val readDir = mockFunction[Option[String], String, Future[FileListDir]]
 
     val actions = new MockFileListActions(
@@ -81,7 +81,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     //then
     actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
     dispatch.expects(*).onCall { action: Any =>
-      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+      inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
       }
     }
@@ -138,7 +138,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     actions.getDriveRoot.expects(currDir.path).returning(Future.successful(None))
     actions.getDriveRoot.expects(toDir.path).returning(Future.successful(None))
     dispatch.expects(*).onCall { action: Any =>
-      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+      inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
       }
     }
@@ -222,7 +222,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     //then
     actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
     dispatch.expects(*).onCall { action: Any =>
-      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+      inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
       }
     }
@@ -279,7 +279,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     actions.getDriveRoot.expects(currDir.path).returning(Future.successful(None))
     actions.getDriveRoot.expects(toDir.path).returning(Future.successful(None))
     dispatch.expects(*).onCall { action: Any =>
-      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+      inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
       }
     }
@@ -334,7 +334,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     //then
     actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
     dispatch.expects(*).onCall { action: Any =>
-      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+      inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
       }
     }
@@ -395,7 +395,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     actions.getDriveRoot.expects(currDir.path).returning(Future.successful(Some(driveRoot)))
     actions.getDriveRoot.expects(toDir.path).returning(Future.successful(Some(driveRoot)))
     dispatch.expects(*).onCall { action: Any =>
-      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+      inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
       }
     }
@@ -536,7 +536,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     actions.getDriveRoot.expects(currDir.path).returning(Future.successful(None))
     actions.getDriveRoot.expects(toDir.path).returning(Future.successful(None))
     dispatch.expects(*).onCall { action: Any =>
-      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+      inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
       }
     }
@@ -655,7 +655,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val to = "test to path"
     fromActions.readDir.expects(Some(leftDir.path), to).returning(Future.successful(toDir))
     fromDispatch.expects(*).onCall { action: Any =>
-      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+      inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
       }
     }
@@ -673,8 +673,8 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
         FileListItem("file 1")
       ))
-      val leftAction = FileListDirUpdateAction(Task("Updating", Future.successful(updatedDir)))
-      val rightAction = FileListDirUpdateAction(Task("Updating", Future.successful(updatedDir)))
+      val leftAction = TaskAction(Task("Updating", Future.successful(updatedDir)))
+      val rightAction = TaskAction(Task("Updating", Future.successful(updatedDir)))
 
       //then
       fromDispatch.expects(*).onCall { action: Any =>
@@ -744,7 +744,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
         FileListItem("file 1")
       ))
-      val leftAction = FileListDirUpdateAction(Task("Updating", Future.successful(updatedDir)))
+      val leftAction = TaskAction(Task("Updating", Future.successful(updatedDir)))
 
       //then
       onClose.expects()

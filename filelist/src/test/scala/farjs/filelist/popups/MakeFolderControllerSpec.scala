@@ -1,13 +1,12 @@
 package farjs.filelist.popups
 
-import farjs.filelist.FileListActions._
 import farjs.filelist.FileListServicesSpec.withServicesContext
 import farjs.filelist._
 import farjs.filelist.api.FileListDir
 import farjs.filelist.history.MockFileListHistoryService
 import farjs.filelist.popups.MakeFolderController._
 import farjs.ui.Dispatch
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
@@ -22,7 +21,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   //noinspection TypeAnnotation
   class Actions {
-    val createDir = mockFunction[Dispatch, String, String, Boolean, FileListDirCreateAction]
+    val createDir = mockFunction[Dispatch, String, String, Boolean, TaskAction]
 
     val actions = new MockFileListActions(
       createDirMock = createDir
@@ -55,7 +54,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
       <(MakeFolderController())(^.wrapped := props)(), mkDirsHistory = historyService.service
     ))
     findComponentProps(renderer.root, makeFolderPopup).multiple shouldBe false
-    val action = FileListDirCreateAction(
+    val action = TaskAction(
       Task("Creating...", Future.successful(()))
     )
     val saveF = Future.unit

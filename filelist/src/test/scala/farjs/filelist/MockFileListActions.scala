@@ -1,8 +1,8 @@
 package farjs.filelist
 
-import farjs.filelist.FileListActions._
 import farjs.filelist.api._
 import farjs.ui.Dispatch
+import farjs.ui.task.TaskAction
 
 import scala.concurrent.Future
 
@@ -11,13 +11,13 @@ class MockFileListActions(
   isLocalFSMock: Boolean = true,
   capabilitiesMock: Set[String] = Set.empty,
   getDriveRootMock: String => Future[Option[String]] = _ => ???,
-  changeDirMock: (Dispatch, Option[String], String) => FileListDirChangeAction = (_, _, _) => ???,
-  updateDirMock: (Dispatch, String) => FileListDirUpdateAction = (_, _) => ???,
-  createDirMock: (Dispatch, String, String, Boolean) => FileListDirCreateAction = (_, _, _, _) => ???,
+  changeDirMock: (Dispatch, Option[String], String) => TaskAction = (_, _, _) => ???,
+  updateDirMock: (Dispatch, String) => TaskAction = (_, _) => ???,
+  createDirMock: (Dispatch, String, String, Boolean) => TaskAction = (_, _, _, _) => ???,
   mkDirsMock: List[String] => Future[Unit] = _ => ???,
   readDirMock: (Option[String], String) => Future[FileListDir] = (_, _) => ???,
   deleteMock: (String, Seq[FileListItem]) => Future[Unit] = (_, _) => ???,
-  deleteActionMock: (Dispatch, String, Seq[FileListItem]) => FileListTaskAction = (_, _, _) => ???,
+  deleteActionMock: (Dispatch, String, Seq[FileListItem]) => TaskAction = (_, _, _) => ???,
   scanDirsMock: (String, Seq[FileListItem], (String, Seq[FileListItem]) => Boolean) => Future[Boolean] = (_, _, _) => ???,
   writeFileMock: (List[String], String,
     FileListItem => Future[Option[Boolean]]) => Future[Option[FileTarget]] = (_, _, _) => ???,
@@ -37,19 +37,19 @@ class MockFileListActions(
 
   override def changeDir(dispatch: Dispatch,
                          parent: Option[String],
-                         dir: String): FileListDirChangeAction = {
+                         dir: String): TaskAction = {
 
     changeDirMock(dispatch, parent, dir)
   }
   
-  override def updateDir(dispatch: Dispatch, path: String): FileListDirUpdateAction = {
+  override def updateDir(dispatch: Dispatch, path: String): TaskAction = {
     updateDirMock(dispatch, path)
   }
 
   override def createDir(dispatch: Dispatch,
                          parent: String,
                          dir: String,
-                         multiple: Boolean): FileListDirCreateAction = {
+                         multiple: Boolean): TaskAction = {
 
     createDirMock(dispatch, parent, dir, multiple)
   }
@@ -62,7 +62,7 @@ class MockFileListActions(
 
   override def deleteAction(dispatch: Dispatch,
                             dir: String,
-                            items: Seq[FileListItem]): FileListTaskAction = {
+                            items: Seq[FileListItem]): TaskAction = {
 
     deleteActionMock(dispatch, dir, items)
   }

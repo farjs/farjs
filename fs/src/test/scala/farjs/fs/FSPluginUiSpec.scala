@@ -1,6 +1,5 @@
 package farjs.fs
 
-import farjs.filelist.FileListActions.FileListDirChangeAction
 import farjs.filelist.api.FileListDir
 import farjs.filelist.stack.WithPanelStacksSpec.withContext
 import farjs.filelist.stack.{PanelStack, PanelStackItem}
@@ -8,7 +7,7 @@ import farjs.filelist.{FileListPluginUiProps, FileListState, MockFileListActions
 import farjs.fs.FSPluginUi._
 import farjs.fs.popups._
 import farjs.ui.Dispatch
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import scommons.react.ReactClass
 import scommons.react.test._
 
@@ -23,14 +22,14 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
 
   //noinspection TypeAnnotation
   class Actions {
-    val changeDir = mockFunction[Dispatch, Option[String], String, FileListDirChangeAction]
+    val changeDir = mockFunction[Dispatch, Option[String], String, TaskAction]
 
     val actions = new MockFileListActions(
       changeDirMock = changeDir
     )
   }
 
-  it should "dispatch FileListDirChangeAction when onChangeDir in active panel" in {
+  it should "dispatch TaskAction when onChangeDir in active panel" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
@@ -59,7 +58,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
       rightStack = otherStack
     ))
     val foldersHistoryProps = findComponentProps(renderer.root, foldersHistory)
-    val action = FileListDirChangeAction(Task("Changing Dir",
+    val action = TaskAction(Task("Changing Dir",
       Future.successful(FileListDir("/", isRoot = true, items = js.Array()))
     ))
     val dir = "test/dir"
@@ -75,7 +74,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     currStackState shouldBe List(currFsItem)
   }
 
-  it should "dispatch FileListDirChangeAction when onChangeDir in Drive popup" in {
+  it should "dispatch TaskAction when onChangeDir in Drive popup" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]
@@ -96,7 +95,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
       rightStack = currStack
     ))
     val driveProps = findComponentProps(renderer.root, drive)
-    val action = FileListDirChangeAction(Task("Changing Dir",
+    val action = TaskAction(Task("Changing Dir",
       Future.successful(FileListDir("/", isRoot = true, items = js.Array()))
     ))
     val dir = "test/dir"
@@ -109,7 +108,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     driveProps.onChangeDir(dir, false)
   }
 
-  it should "not dispatch FileListDirChangeAction if same dir when onChangeDir" in {
+  it should "not dispatch TaskAction if same dir when onChangeDir" in {
     //given
     val dispatch = mockFunction[Any, Any]
     val onClose = mockFunction[Unit]

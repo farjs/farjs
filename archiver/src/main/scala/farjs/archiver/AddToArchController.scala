@@ -6,7 +6,7 @@ import farjs.filelist.api.FileListItem
 import farjs.filelist.{FileListActions, FileListState}
 import farjs.ui.Dispatch
 import farjs.ui.popup.{StatusPopup, StatusPopupProps}
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import scommons.react._
 import scommons.react.hooks._
 
@@ -70,7 +70,7 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
         case Success(_) =>
         case Failure(_) =>
           setShowStatusPopup(false)
-          props.dispatch(FileListTaskAction(
+          props.dispatch(TaskAction(
             Task(s"${props.action} item(s) to zip archive", resultF)
           ))
       }

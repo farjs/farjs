@@ -1,11 +1,11 @@
 package farjs.viewer
 
-import farjs.filelist.FileListActions.{FileListDirUpdatedAction, FileListTaskAction}
+import farjs.filelist.FileListActions.FileListDirUpdatedAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.Dispatch
 import farjs.ui.popup._
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import farjs.viewer.ViewItemsPopup._
 import scommons.react._
 import scommons.react.hooks._
@@ -69,7 +69,7 @@ class ViewItemsPopup(data: FileListData) extends FunctionComponent[FileListPlugi
             }
             dispatch(FileListDirUpdatedAction(FileListDir.copy(state.currDir)(items = updatedItems)))
           case Failure(_) =>
-            dispatch(FileListTaskAction(Task("Viewing Items", resultF)))
+            dispatch(TaskAction(Task("Viewing Items", resultF)))
         }
       }
     }

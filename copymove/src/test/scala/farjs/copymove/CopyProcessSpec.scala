@@ -1,11 +1,11 @@
 package farjs.copymove
 
 import farjs.copymove.CopyProcess._
-import farjs.filelist.FileListActions.{FileListDirUpdateAction, FileListTaskAction}
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem, FileTarget}
 import farjs.ui.Dispatch
 import farjs.ui.popup.MessageBoxProps
+import farjs.ui.task.TaskAction
 import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -39,7 +39,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   //noinspection TypeAnnotation
   class Actions {
-    val updateDir = mockFunction[Dispatch, Boolean, String, FileListDirUpdateAction]
+    val updateDir = mockFunction[Dispatch, Boolean, String, TaskAction]
     val mkDirs = mockFunction[List[String], Future[Unit]]
     val readDir = mockFunction[Option[String], String, Future[FileListDir]]
     val delete = mockFunction[String, Seq[FileListItem], Future[Unit]]
@@ -805,7 +805,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     onDone.expects()
     var resultF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+      inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Copy/Move Items"
         resultF = action.task.result.toFuture
       }

@@ -7,7 +7,7 @@ import farjs.filelist.api.{FileListCapability, FileListDir, FileListItem}
 import farjs.filelist.sort.{FileListSort, SortMode, SortModesPopupProps}
 import farjs.filelist.stack.PanelStackSpec.withContext
 import farjs.ui.Dispatch
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs._
@@ -27,8 +27,8 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   //noinspection TypeAnnotation
   class Actions {
-    val changeDir = mockFunction[Dispatch, Option[String], String, FileListDirChangeAction]
-    val updateDir = mockFunction[Dispatch, String, FileListDirUpdateAction]
+    val changeDir = mockFunction[Dispatch, Option[String], String, TaskAction]
+    val updateDir = mockFunction[Dispatch, String, TaskAction]
 
     val actions = new MockFileListActions(
       capabilitiesMock = Set(
@@ -164,7 +164,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
       FileListItem("file 1")
     ))
-    val action = FileListDirUpdateAction(Task("Updating", Future.successful(updatedDir)))
+    val action = TaskAction(Task("Updating", Future.successful(updatedDir)))
 
     //then
     actions.updateDir.expects(dispatch, "/sub-dir").returning(action)
@@ -186,7 +186,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val comp = testRender(withContext(<(FileListPanel())(^.wrapped := props)()))
     val viewProps = findComponentProps(comp, fileListPanelView)
     val changedDir = FileListDir(path = "/test", isRoot = false, js.Array())
-    val action = FileListDirChangeAction(
+    val action = TaskAction(
       Task("Changing dir", Future.successful(changedDir))
     )
 
@@ -210,7 +210,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val comp = testRender(withContext(<(FileListPanel())(^.wrapped := props)()))
     val viewProps = findComponentProps(comp, fileListPanelView)
     val changedDir = FileListDir(path = "/test", isRoot = false, js.Array())
-    val action = FileListDirChangeAction(
+    val action = TaskAction(
       Task("Changing dir", Future.successful(changedDir))
     )
 
@@ -306,7 +306,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val comp = testRender(withContext(<(FileListPanel())(^.wrapped := props)()))
     val viewProps = findComponentProps(comp, fileListPanelView)
     val changedDir = FileListDir(path = "/test", isRoot = false, js.Array())
-    val action = FileListDirChangeAction(
+    val action = TaskAction(
       Task("Changing dir", Future.successful(changedDir))
     )
 

@@ -10,7 +10,7 @@ import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack._
 import farjs.ui.Dispatch
 import farjs.ui.popup.{MessageBoxAction, MessageBoxProps}
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.Succeeded
@@ -29,8 +29,8 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
   //noinspection TypeAnnotation
   class Actions(isLocalFS: Boolean) {
-    val updateDir = mockFunction[Dispatch, String, FileListDirUpdateAction]
-    val deleteAction = mockFunction[Dispatch, String, Seq[FileListItem], FileListTaskAction]
+    val updateDir = mockFunction[Dispatch, String, TaskAction]
+    val deleteAction = mockFunction[Dispatch, String, Seq[FileListItem], TaskAction]
 
     val actions = new MockFileListActions(
       isLocalFSMock = isLocalFS,
@@ -115,7 +115,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
       FileListItem("file 1")
     ))
-    val updateAction = FileListDirUpdateAction(Task("Updating...", Future.successful(updatedDir)))
+    val updateAction = TaskAction(Task("Updating...", Future.successful(updatedDir)))
 
     //then
     fsActions.updateDir.expects(fsDispatch, fsState.currDir.path).returning(updateAction)
@@ -160,7 +160,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
       FileListItem("file 1")
     ))
-    val updateAction = FileListDirUpdateAction(Task("Updating...", Future.successful(updatedDir)))
+    val updateAction = TaskAction(Task("Updating...", Future.successful(updatedDir)))
 
     //then
     fsActions.updateDir.expects(fsDispatch, fsState.currDir.path).returning(updateAction).twice()
@@ -413,7 +413,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
           FileListItem("file 1")
         ))
-        val updateAction = FileListDirUpdateAction(Task("Updating...", Future.successful(updatedDir)))
+        val updateAction = TaskAction(Task("Updating...", Future.successful(updatedDir)))
 
         //then
         actions.updateDir.expects(dispatch, props.state.currDir.path).returning(updateAction)
@@ -487,8 +487,8 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
           FileListItem("file 1")
         ))
-        val updateAction = FileListDirUpdateAction(Task("Updating...", Future.successful(updatedDir)))
-        val deleteAction = FileListTaskAction(Task("Deleting...", Future.unit))
+        val updateAction = TaskAction(Task("Updating...", Future.successful(updatedDir)))
+        val deleteAction = TaskAction(Task("Deleting...", Future.unit))
 
         //then
         actions.updateDir.expects(dispatch, props.state.currDir.path).returning(updateAction)
@@ -590,8 +590,8 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //then
     var actionF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      inside(action.asInstanceOf[FileListTaskAction]) {
-        case FileListTaskAction(Task("Reading zip archive", future)) =>
+      inside(action.asInstanceOf[TaskAction]) {
+        case TaskAction(Task("Reading zip archive", future)) =>
           actionF = future
       }
     }
@@ -669,8 +669,8 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //then
     var actionF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      inside(action.asInstanceOf[FileListTaskAction]) {
-        case FileListTaskAction(Task("Reading zip archive", future)) =>
+      inside(action.asInstanceOf[TaskAction]) {
+        case TaskAction(Task("Reading zip archive", future)) =>
           actionF = future
       }
     }

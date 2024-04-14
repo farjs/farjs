@@ -6,7 +6,7 @@ import farjs.filelist.FileListActionsSpec.assertFileListParamsChangedAction
 import farjs.filelist.api.FileListItemSpec.assertFileListItems
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.Dispatch
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
@@ -22,7 +22,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
   //noinspection TypeAnnotation
   class Actions {
-    val changeDir = mockFunction[Dispatch, Option[String], String, FileListDirChangeAction]
+    val changeDir = mockFunction[Dispatch, Option[String], String, TaskAction]
 
     val actions = new MockFileListActions(
       changeDirMock = changeDir
@@ -37,7 +37,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val props1 = FileListProps(dispatch, actions.actions, state1, (7, 2), columns = 2)
     val state2 = FileListState.copy(state1)(isActive = true)
     val props2 = props1.copy(state = state2)
-    val action = FileListDirChangeAction(
+    val action = TaskAction(
       Task("Changing dir", Future.successful(state1.currDir))
     )
     
@@ -312,7 +312,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val dispatch = mockFunction[Any, Any]
     val actions = new Actions
     val props = FileListProps(dispatch, actions.actions, FileListState(), (7, 2), columns = 2)
-    val dirAction = FileListDirChangeAction(
+    val dirAction = TaskAction(
       Task("Changing dir", Future.successful(props.state.currDir))
     )
     actions.changeDir.expects(dispatch, None, FileListItem.currDir.name).returning(dirAction)

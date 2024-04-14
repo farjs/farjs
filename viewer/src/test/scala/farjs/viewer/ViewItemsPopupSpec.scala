@@ -1,11 +1,12 @@
 package farjs.viewer
 
-import farjs.filelist.FileListActions.{FileListDirUpdatedAction, FileListTaskAction}
+import farjs.filelist.FileListActions.FileListDirUpdatedAction
 import farjs.filelist.FileListActionsSpec.assertFileListDirUpdatedAction
 import farjs.filelist._
 import farjs.filelist.api.FileListDirSpec.assertFileListDir
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.popup.StatusPopupProps
+import farjs.ui.task.TaskAction
 import farjs.viewer.ViewItemsPopup._
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
@@ -152,7 +153,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     //then
     onClose.expects()
     dispatch.expects(*).onCall { action: Any =>
-      inside(action.asInstanceOf[FileListTaskAction]) { case action: FileListTaskAction =>
+      inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         resultF = action.task.result.toFuture
       }
     }

@@ -4,7 +4,7 @@ import farjs.archiver.ArchiverPlugin
 import farjs.filelist.FileListActions
 import farjs.filelist.FileListActions._
 import farjs.ui.Dispatch
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -16,7 +16,7 @@ class ZipActions(protected[zip] var api: ZipApi) extends FileListActions {
 
   def getDriveRoot(path: String): Future[Option[String]] = Future.successful(None)
 
-  override def updateDir(dispatch: Dispatch, path: String): FileListDirUpdateAction = {
+  override def updateDir(dispatch: Dispatch, path: String): TaskAction = {
     val entriesByParentF = ArchiverPlugin.readZip(api.zipPath).andThen {
       case Success(entries) =>
         val totalSize = entries.foldLeft(0.0) { (total, entry) =>
@@ -30,6 +30,6 @@ class ZipActions(protected[zip] var api: ZipApi) extends FileListActions {
       case Success(currDir) => dispatch(FileListDirUpdatedAction(currDir))
     }
 
-    FileListDirUpdateAction(Task("Updating Dir", future))
+    TaskAction(Task("Updating Dir", future))
   }
 }

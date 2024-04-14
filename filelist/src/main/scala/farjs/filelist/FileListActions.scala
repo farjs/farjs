@@ -26,27 +26,27 @@ trait FileListActions {
 
   def changeDir(dispatch: Dispatch,
                 parent: Option[String],
-                dir: String): FileListDirChangeAction = {
+                dir: String): TaskAction = {
     
     val future = readDir(parent, dir).andThen {
       case Success(currDir) => dispatch(FileListDirChangedAction(dir, currDir))
     }
 
-    FileListDirChangeAction(Task("Changing Dir", future))
+    TaskAction(Task("Changing Dir", future))
   }
 
-  def updateDir(dispatch: Dispatch, path: String): FileListDirUpdateAction = {
+  def updateDir(dispatch: Dispatch, path: String): TaskAction = {
     val future = api.readDir(path).andThen {
       case Success(currDir) => dispatch(FileListDirUpdatedAction(currDir))
     }
 
-    FileListDirUpdateAction(Task("Updating Dir", future))
+    TaskAction(Task("Updating Dir", future))
   }
 
   def createDir(dispatch: Dispatch,
                 parent: String,
                 dir: String,
-                multiple: Boolean): FileListDirCreateAction = {
+                multiple: Boolean): TaskAction = {
 
     val names =
       if (multiple) dir.split(nodePath.sep.head).toList
@@ -60,7 +60,7 @@ trait FileListActions {
       ()
     }
 
-    FileListDirCreateAction(Task("Creating Dir", future))
+    TaskAction(Task("Creating Dir", future))
   }
 
   def mkDirs(dirs: List[String]): Future[Unit] = api.mkDirs(dirs)
@@ -71,13 +71,13 @@ trait FileListActions {
 
   def deleteAction(dispatch: Dispatch,
                    dir: String,
-                   items: Seq[FileListItem]): FileListTaskAction = {
+                   items: Seq[FileListItem]): TaskAction = {
     
     val future = delete(dir, items).andThen {
       case Success(_) => dispatch(updateDir(dispatch, dir))
     }
 
-    FileListTaskAction(Task("Deleting Items", future))
+    TaskAction(Task("Deleting Items", future))
   }
 
   def scanDirs(parent: String,
@@ -155,14 +155,6 @@ object FileListActions {
   
   private val copyBufferBytes: Int = 64 * 1024
 
-  sealed trait FileListTaskAction extends TaskAction
-  object FileListTaskAction {
-    def apply(task: Task): FileListTaskAction =
-      js.Dynamic.literal(task = task).asInstanceOf[FileListTaskAction]
-
-    def unapply(arg: FileListTaskAction): Option[Task] = Some(arg.task)
-  }
-
   sealed trait FileListParamsChangedAction extends js.Object {
     val action: String
     val offset: Int
@@ -191,14 +183,6 @@ object FileListActions {
       ))
   }
 
-  sealed trait FileListDirChangeAction extends TaskAction
-  object FileListDirChangeAction {
-    def apply(task: Task): FileListDirChangeAction =
-      js.Dynamic.literal(task = task).asInstanceOf[FileListDirChangeAction]
-
-    def unapply(arg: FileListDirChangeAction): Option[Task] = Some(arg.task)
-  }
-
   sealed trait FileListDirChangedAction extends js.Object {
     val action: String
     val dir: String
@@ -223,14 +207,6 @@ object FileListActions {
       ))
   }
   
-  sealed trait FileListDirUpdateAction extends TaskAction
-  object FileListDirUpdateAction {
-    def apply(task: Task): FileListDirUpdateAction =
-      js.Dynamic.literal(task = task).asInstanceOf[FileListDirUpdateAction]
-
-    def unapply(arg: FileListDirUpdateAction): Option[Task] = Some(arg.task)
-  }
-
   sealed trait FileListDirUpdatedAction extends js.Object {
     val action: String
     val currDir: FileListDir
@@ -249,14 +225,6 @@ object FileListActions {
       Some(
         arg.currDir
       )
-  }
-
-  sealed trait FileListDirCreateAction extends TaskAction
-  object FileListDirCreateAction {
-    def apply(task: Task): FileListDirCreateAction =
-      js.Dynamic.literal(task = task).asInstanceOf[FileListDirCreateAction]
-
-    def unapply(arg: FileListDirCreateAction): Option[Task] = Some(arg.task)
   }
 
   sealed trait FileListItemCreatedAction extends js.Object {

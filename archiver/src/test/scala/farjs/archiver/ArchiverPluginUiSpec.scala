@@ -6,7 +6,7 @@ import farjs.filelist.FileListActionsSpec.assertFileListItemCreatedAction
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.Dispatch
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
@@ -20,7 +20,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
 
   //noinspection TypeAnnotation
   class Actions {
-    val updateDir = mockFunction[Dispatch, String, FileListDirUpdateAction]
+    val updateDir = mockFunction[Dispatch, String, TaskAction]
 
     val actions = new MockFileListActions(
       updateDirMock = updateDir
@@ -76,7 +76,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
       FileListItem("file 1")
     ))
-    val updateAction = FileListDirUpdateAction(
+    val updateAction = TaskAction(
       Task("Updating...", Future.successful(updatedDir))
     )
     

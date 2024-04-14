@@ -1,13 +1,12 @@
 package farjs.filelist.popups
 
-import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.FileListItemSpec.assertFileListItems
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.popups.DeleteController._
 import farjs.ui.Dispatch
 import farjs.ui.popup._
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
 import org.scalatest.Succeeded
@@ -25,7 +24,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   //noinspection TypeAnnotation
   class Actions {
-    val deleteAction = mockFunction[Dispatch, String, Seq[FileListItem], FileListTaskAction]
+    val deleteAction = mockFunction[Dispatch, String, Seq[FileListItem], TaskAction]
 
     val actions = new MockFileListActions(
       deleteActionMock = deleteAction
@@ -51,7 +50,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val msgBox = inside(findComponents(comp, messageBoxComp)) {
       case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
     }
-    val deleteAction = FileListTaskAction(
+    val deleteAction = TaskAction(
       Task("Deleting Items", Future.successful(()))
     )
     val items = List(FileListItem("file 1"))
@@ -89,7 +88,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val msgBox = inside(findComponents(comp, messageBoxComp)) {
       case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
     }
-    val deleteAction = FileListTaskAction(
+    val deleteAction = TaskAction(
       Task("Deleting Items", Future.successful(()))
     )
     val items = List(FileListItem("file 2"))

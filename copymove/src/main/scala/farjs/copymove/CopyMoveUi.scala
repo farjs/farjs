@@ -6,7 +6,7 @@ import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.popup._
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import farjs.ui.theme.Theme
 import scommons.nodejs.path
 import scommons.react._
@@ -117,7 +117,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
         (dir.path, sameDrive)
       }
 
-      from.dispatch(FileListTaskAction(Task("Resolving target dir", dirF)))
+      from.dispatch(TaskAction(Task("Resolving target dir", dirF)))
       dirF
     }
 

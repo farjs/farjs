@@ -1,11 +1,10 @@
 package farjs.copymove
 
 import farjs.filelist.FileListActions
-import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.api.FileListItem
 import farjs.ui.Dispatch
 import farjs.ui.popup._
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import farjs.ui.theme.Theme
 import scommons.nodejs.{FS, path}
 import scommons.react._
@@ -69,7 +68,7 @@ object MoveProcess extends FunctionComponent[MoveProcessProps] {
         case Success(_) => props.onDone()
         case Failure(_) =>
           props.onDone()
-          props.dispatch(FileListTaskAction(Task("Moving items", resultF)))
+          props.dispatch(TaskAction(Task("Moving items", resultF)))
       }
     }
 

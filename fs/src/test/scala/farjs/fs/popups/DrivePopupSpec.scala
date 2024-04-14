@@ -1,6 +1,5 @@
 package farjs.fs.popups
 
-import farjs.filelist.FileListActions.FileListTaskAction
 import farjs.filelist.FileListState
 import farjs.filelist.api.FileListDir
 import farjs.filelist.stack._
@@ -8,6 +7,7 @@ import farjs.fs.popups.DrivePopup._
 import farjs.fs.{FSDisk, MockFSService}
 import farjs.ui.WithSizeProps
 import farjs.ui.menu.MenuPopupProps
+import farjs.ui.task.TaskAction
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.Process.Platform
 import scommons.nodejs.test.AsyncTestSpec
@@ -44,7 +44,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      disksF = action.asInstanceOf[FileListTaskAction].task.result.toFuture
+      disksF = action.asInstanceOf[TaskAction].task.result.toFuture
     }
     fsService.readDisks.expects().returning(Future.successful(List(
       FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
@@ -102,7 +102,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      disksF = action.asInstanceOf[FileListTaskAction].task.result.toFuture
+      disksF = action.asInstanceOf[TaskAction].task.result.toFuture
     }
     fsService.readDisks.expects().returning(Future.successful(List(
       FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
@@ -160,7 +160,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      disksF = action.asInstanceOf[FileListTaskAction].task.result.toFuture
+      disksF = action.asInstanceOf[TaskAction].task.result.toFuture
     }
     fsService.readDisks.expects().returning(Future.successful(List(
       FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
@@ -217,7 +217,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      disksF = action.asInstanceOf[FileListTaskAction].task.result.toFuture
+      disksF = action.asInstanceOf[TaskAction].task.result.toFuture
     }
     fsService.readDisks.expects().returning(Future.successful(List(
       FSDisk("C:", size = 1.0, free = 2.0, "Test")
@@ -257,7 +257,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      disksF = action.asInstanceOf[FileListTaskAction].task.result.toFuture
+      disksF = action.asInstanceOf[TaskAction].task.result.toFuture
     }
     fsService.readDisks.expects().returning(Future.successful(List(
       FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
@@ -293,7 +293,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     var disksF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
-      disksF = action.asInstanceOf[FileListTaskAction].task.result.toFuture
+      disksF = action.asInstanceOf[TaskAction].task.result.toFuture
     }
     fsService.readDisks.expects().returning(Future.successful(List(
       FSDisk("/", size = 156595318784.0, free = 81697124352.0, "/"),

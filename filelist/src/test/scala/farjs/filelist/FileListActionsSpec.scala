@@ -4,7 +4,7 @@ import farjs.filelist.FileListActions._
 import farjs.filelist.FileListActionsSpec._
 import farjs.filelist.api.FileListDirSpec.assertFileListDir
 import farjs.filelist.api._
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import org.scalactic.source.Position
 import org.scalatest.Inside.inside
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
@@ -91,7 +91,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     }
     
     //when
-    val FileListDirChangeAction(task) =
+    val TaskAction(task) =
       actions.changeDir(dispatch, parent, dir)
     
     //then
@@ -115,7 +115,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     }
     
     //when
-    val FileListDirUpdateAction(task) =
+    val TaskAction(task) =
       actions.updateDir(dispatch, path)
     
     //then
@@ -142,7 +142,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     }
     
     //when
-    val FileListDirCreateAction(task) =
+    val TaskAction(task) =
       actions.createDir(dispatch, parent, dir, multiple)
     
     //then
@@ -169,7 +169,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     }
     
     //when
-    val FileListDirCreateAction(task) =
+    val TaskAction(task) =
       actions.createDir(dispatch, parent, dir, multiple)
     
     //then
@@ -190,22 +190,22 @@ class FileListActionsSpec extends AsyncTestSpec {
     api.readDir.expects(dir).returning(Future.successful(currDir))
     
     //then
-    var resultAction: FileListDirUpdateAction = null
+    var resultAction: TaskAction = null
     dispatch.expects(*).onCall { action: Any =>
-      resultAction = action.asInstanceOf[FileListDirUpdateAction]
+      resultAction = action.asInstanceOf[TaskAction]
     }
     dispatch.expects(*).onCall { action: Any =>
       assertFileListDirUpdatedAction(action, FileListDirUpdatedAction(currDir))
     }
     
     //when
-    val FileListTaskAction(task) =
+    val TaskAction(task) =
       actions.deleteAction(dispatch, dir, items)
     
     //then
     task.message shouldBe "Deleting Items"
     task.result.toFuture.flatMap { _ =>
-      inside(resultAction) { case FileListDirUpdateAction(Task("Updating Dir", future)) =>
+      inside(resultAction) { case TaskAction(Task("Updating Dir", future)) =>
         future.map(_ => Succeeded)
       }
     }

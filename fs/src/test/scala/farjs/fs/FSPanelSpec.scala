@@ -1,10 +1,9 @@
 package farjs.fs
 
-import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.fs.FSPanel._
-import farjs.ui.task.Task
+import farjs.ui.task.{Task, TaskAction}
 import scommons.react.test._
 
 import scala.concurrent.Future
@@ -62,8 +61,8 @@ class FSPanelSpec extends TestSpec with TestRendererUtils {
     //when & then
     panelProps.onKeypress(null, "M-o") shouldBe true
 
-    inside(resultAction.asInstanceOf[FileListTaskAction]) {
-      case FileListTaskAction(Task("Opening default app", _)) =>
+    inside(resultAction.asInstanceOf[TaskAction]) {
+      case TaskAction(Task("Opening default app", _)) =>
     }
   }
 
