@@ -1,6 +1,7 @@
 package farjs.filelist.api
 
 import scala.concurrent.Future
+import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 
 trait FileListApi {
@@ -17,11 +18,11 @@ trait FileListApi {
 
   def readFile(parentDirs: List[String], item: FileListItem, position: Double): Future[FileSource] = {
     Future.successful(new FileSource {
-      val file: String = item.name
+      override val file: String = item.name
 
-      def readNextBytes(buff: Uint8Array): Future[Int] = Future.successful(0)
+      override def readNextBytes(buff: Uint8Array): js.Promise[Int] = js.Promise.resolve[Int](0)
 
-      def close(): Future[Unit] = Future.unit
+      override def close(): js.Promise[Unit] = js.Promise.resolve[Unit](())
     })
   }
 

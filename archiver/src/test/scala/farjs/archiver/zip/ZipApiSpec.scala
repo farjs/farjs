@@ -140,7 +140,7 @@ class ZipApiSpec extends AsyncTestSpec {
     val buff = new Uint8Array(5)
 
     def loop(source: FileSource, result: StringBuilder): Future[String] = {
-      source.readNextBytes(buff).flatMap { bytesRead =>
+      source.readNextBytes(buff).toFuture.flatMap { bytesRead =>
         if (bytesRead == 0) Future.successful(result.toString())
         else loop(source, result.addAll(buff.subarray(0, bytesRead).map(_.toChar)))
       }
@@ -153,7 +153,7 @@ class ZipApiSpec extends AsyncTestSpec {
     (for {
       source <- resultF
       output <- loop(source, new StringBuilder)
-      _ <- source.close()
+      _ <- source.close().toFuture
     } yield {
       source.file shouldBe expectedFilePath
       output shouldBe expectedOutput
@@ -198,13 +198,13 @@ class ZipApiSpec extends AsyncTestSpec {
     //then
     (for {
       source <- resultF
-      _ <- source.readNextBytes(buff).map { bytesRead =>
+      _ <- source.readNextBytes(buff).toFuture.map { bytesRead =>
         bytesRead shouldBe expectedOutput.length
       }
-      _ <- source.readNextBytes(buff).map { bytesRead =>
+      _ <- source.readNextBytes(buff).toFuture.map { bytesRead =>
         bytesRead shouldBe 0
       }
-      _ <- source.close()
+      _ <- source.close().toFuture
       maybeContent <- stdout.readNextBytes(5)
     } yield {
       source.file shouldBe expectedFilePath
@@ -244,8 +244,8 @@ class ZipApiSpec extends AsyncTestSpec {
     //then
     for {
       source <- resultF
-      error <- source.readNextBytes(buff).failed
-      _ <- source.close()
+      error <- source.readNextBytes(buff).toFuture.failed
+      _ <- source.close().toFuture
     } yield {
       source.file shouldBe expectedFilePath
       error.getMessage shouldBe "test error"

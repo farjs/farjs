@@ -5,9 +5,10 @@ import scommons.nodejs.util.{StreamReader, SubProcess}
 import scommons.nodejs.{Buffer, ChildProcess, child_process, raw}
 
 import scala.collection.mutable
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.control.NonFatal
 
@@ -108,9 +109,9 @@ case class ZipApi(zipPath: String,
       new FileSource {
         private var pos = 0
 
-        val file: String = filePath
+        override val file: String = filePath
 
-        def readNextBytes(buff: Uint8Array): Future[Int] = {
+        override def readNextBytes(buff: Uint8Array): js.Promise[Int] = {
           stdout.readNextBytes(buff.length).flatMap {
             case None =>
               if (pos != item.size) exitF.map(_ => 0)
@@ -124,17 +125,17 @@ case class ZipApi(zipPath: String,
               pos += bytesRead
               bytesRead
             }
-          }
+          }.toJSPromise
         }
 
-        def close(): Future[Unit] = {
+        override def close(): js.Promise[Unit] = {
           if (pos != item.size) {
             stdout.readable.destroy(js.undefined)
           }
 
           exitF.recover {
             case NonFatal(_) => ()
-          }
+          }.toJSPromise
         }
       }
     }

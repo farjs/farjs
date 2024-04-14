@@ -292,9 +292,9 @@ class FSFileListApiSpec extends AsyncTestSpec {
     val buff = new Uint8Array(5)
 
     def loop(source: FileSource, target: FileTarget): Future[Unit] = {
-      source.readNextBytes(buff).flatMap { bytesRead =>
-        if (bytesRead == 0) target.setAttributes(getFileListItem("example.txt", stats1))
-        else target.writeNextBytes(buff, bytesRead).flatMap(_ => loop(source, target))
+      source.readNextBytes(buff).toFuture.flatMap { bytesRead =>
+        if (bytesRead == 0) target.setAttributes(getFileListItem("example.txt", stats1)).toFuture
+        else target.writeNextBytes(buff, bytesRead).toFuture.flatMap(_ => loop(source, target))
       }
     }
     
@@ -307,8 +307,8 @@ class FSFileListApiSpec extends AsyncTestSpec {
       _ = source.file shouldBe file1
       maybeTarget <- apiImp.writeFile(List(tmpDir), "example2.txt", onExists)
       _ <- maybeTarget.map(loop(source, _)).getOrElse(Future.unit)
-      _ <- maybeTarget.map(_.close()).getOrElse(Future.unit)
-      _ <- source.close()
+      _ <- maybeTarget.map(_.close().toFuture).getOrElse(Future.unit)
+      _ <- source.close().toFuture
     } yield ()
 
     resultF.map { _ =>
@@ -348,9 +348,9 @@ class FSFileListApiSpec extends AsyncTestSpec {
     val buff = new Uint8Array(5)
 
     def loop(source: FileSource, target: FileTarget): Future[Unit] = {
-      source.readNextBytes(buff).flatMap { bytesRead =>
-        if (bytesRead == 0) target.setAttributes(srcItem)
-        else target.writeNextBytes(buff, bytesRead).flatMap(_ => loop(source, target))
+      source.readNextBytes(buff).toFuture.flatMap { bytesRead =>
+        if (bytesRead == 0) target.setAttributes(srcItem).toFuture
+        else target.writeNextBytes(buff, bytesRead).toFuture.flatMap(_ => loop(source, target))
       }
     }
     
@@ -365,8 +365,8 @@ class FSFileListApiSpec extends AsyncTestSpec {
       source <- apiImp.readFile(List(tmpDir), FileListItem("example.txt"), 0.0)
       maybeTarget <- apiImp.writeFile(List(tmpDir), "example2.txt", onExists)
       _ <- maybeTarget.map(loop(source, _)).getOrElse(Future.unit)
-      _ <- maybeTarget.map(_.close()).getOrElse(Future.unit)
-      _ <- source.close()
+      _ <- maybeTarget.map(_.close().toFuture).getOrElse(Future.unit)
+      _ <- source.close().toFuture
     } yield ()
 
     resultF.map { _ =>
@@ -406,9 +406,9 @@ class FSFileListApiSpec extends AsyncTestSpec {
     val buff = new Uint8Array(5)
 
     def loop(source: FileSource, target: FileTarget): Future[Unit] = {
-      source.readNextBytes(buff).flatMap { bytesRead =>
-        if (bytesRead == 0) target.setAttributes(srcItem)
-        else target.writeNextBytes(buff, bytesRead).flatMap(_ => loop(source, target))
+      source.readNextBytes(buff).toFuture.flatMap { bytesRead =>
+        if (bytesRead == 0) target.setAttributes(srcItem).toFuture
+        else target.writeNextBytes(buff, bytesRead).toFuture.flatMap(_ => loop(source, target))
       }
     }
     
@@ -423,8 +423,8 @@ class FSFileListApiSpec extends AsyncTestSpec {
       source <- apiImp.readFile(List(tmpDir), FileListItem("example.txt"), 0)
       maybeTarget <- apiImp.writeFile(List(tmpDir), "example2.txt", onExists)
       _ <- maybeTarget.map(loop(source, _)).getOrElse(Future.unit)
-      _ <- maybeTarget.map(_.close()).getOrElse(Future.unit)
-      _ <- source.close()
+      _ <- maybeTarget.map(_.close().toFuture).getOrElse(Future.unit)
+      _ <- source.close().toFuture
     } yield maybeTarget
 
     resultF.flatMap { maybeTarget =>
@@ -440,7 +440,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
 
       //cleanup
       fs.unlinkSync(file1)
-      maybeTarget.map(_.delete()).getOrElse(Future.unit).map { _ =>
+      maybeTarget.map(_.delete().toFuture).getOrElse(Future.unit).map { _ =>
         fs.rmdirSync(tmpDir)
         Succeeded
       }

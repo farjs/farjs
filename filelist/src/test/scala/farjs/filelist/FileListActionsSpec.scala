@@ -43,7 +43,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     val readNextBytes = mockFunction[Uint8Array, Future[Int]]
     val close = mockFunction[Future[Unit]]
 
-    val source = new MockFileSource(
+    val source = MockFileSource(
       readNextBytesMock = readNextBytes,
       closeMock = close
     )
@@ -56,7 +56,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     val close = mockFunction[Future[Unit]]
     val delete = mockFunction[Future[Unit]]
 
-    val target = new MockFileTarget(
+    val target = MockFileTarget(
       writeNextBytesMock = writeNextBytes,
       setAttributesMock = setAttributes,
       closeMock = close,

@@ -1,17 +1,17 @@
 package farjs.filelist.api
 
-import scala.concurrent.Future
+import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 
-trait FileTarget {
+trait FileTarget extends js.Object {
 
-  def file: String
+  val file: String
   
-  def writeNextBytes(buff: Uint8Array, length: Int): Future[Double]
+  def writeNextBytes(buff: Uint8Array, length: Int): js.Promise[Double]
   
-  def setAttributes(src: FileListItem): Future[Unit]
+  def setAttributes(src: FileListItem): js.Promise[Unit]
 
-  def close(): Future[Unit]
+  def close(): js.Promise[Unit]
 
-  def delete(): Future[Unit]
+  def delete(): js.Promise[Unit]
 }

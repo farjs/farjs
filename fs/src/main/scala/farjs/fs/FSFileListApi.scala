@@ -1,13 +1,14 @@
 package farjs.fs
 
-import FSFileListApi._
 import farjs.filelist.api._
+import farjs.fs.FSFileListApi._
 import scommons.nodejs._
 import scommons.nodejs.raw.FSConstants
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.JavaScriptException
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.{Failure, Success, Try}
@@ -104,16 +105,16 @@ class FSFileListApi extends FileListApi {
     new FileSource {
       private var pos = position
 
-      val file: String = filePath
-      
-      def readNextBytes(buff: Uint8Array): Future[Int] = {
+      override val file: String = filePath
+
+      override def readNextBytes(buff: Uint8Array): js.Promise[Int] = {
         fs.read(fd, buff, 0, buff.length, pos).map { bytesRead =>
           pos += bytesRead
           bytesRead
-        }
+        }.toJSPromise
       }
 
-      def close(): Future[Unit] = Future(fs.closeSync(fd))
+      override def close(): js.Promise[Unit] = Future(fs.closeSync(fd)).toJSPromise
     }
   }
 
@@ -142,9 +143,9 @@ class FSFileListApi extends FileListApi {
         new FileTarget {
           private var pos = position
           
-          val file: String = filePath
+          override val file: String = filePath
 
-          def writeNextBytes(buff: Uint8Array, length: Int): Future[Double] = {
+          override def writeNextBytes(buff: Uint8Array, length: Int): js.Promise[Double] = {
             fs.write(fd, buff, 0, length, pos).map { bytesWritten =>
               if (bytesWritten != length) {
                 throw new IllegalStateException(
@@ -153,18 +154,18 @@ class FSFileListApi extends FileListApi {
               }
               pos += bytesWritten
               pos
-            }
+            }.toJSPromise
           }
 
-          def setAttributes(src: FileListItem): Future[Unit] = {
+          override def setAttributes(src: FileListItem): js.Promise[Unit] = {
             fs.ftruncate(fd, pos).map { _ =>
               fs.futimesSync(fd, src.atimeMs / 1000, src.mtimeMs / 1000)
-            }
+            }.toJSPromise
           }
 
-          def close(): Future[Unit] = Future(fs.closeSync(fd))
-          
-          def delete(): Future[Unit] = Future(fs.unlinkSync(file))
+          override def close(): js.Promise[Unit] = Future(fs.closeSync(fd)).toJSPromise
+
+          override def delete(): js.Promise[Unit] = Future(fs.unlinkSync(file)).toJSPromise
         }
       }
     }

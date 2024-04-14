@@ -40,7 +40,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val readNextBytes = mockFunction[Uint8Array, Future[Int]]
     val close = mockFunction[Future[Unit]]
 
-    val source = new MockFileSource(
+    val source = MockFileSource(
       readNextBytesMock = readNextBytes,
       closeMock = close
     )

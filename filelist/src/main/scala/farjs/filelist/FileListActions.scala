@@ -120,10 +120,10 @@ trait FileListActions {
           val buff = new Uint8Array(copyBufferBytes)
 
           def loop(): Future[Boolean] = {
-            source.readNextBytes(buff).flatMap { bytesRead =>
-              if (bytesRead == 0) target.setAttributes(srcItem).map(_ => true)
+            source.readNextBytes(buff).toFuture.flatMap { bytesRead =>
+              if (bytesRead == 0) target.setAttributes(srcItem).toFuture.map(_ => true)
               else {
-                target.writeNextBytes(buff, bytesRead).flatMap { position =>
+                target.writeNextBytes(buff, bytesRead).toFuture.flatMap { position =>
                   onProgress(position).flatMap {
                     case true => loop()
                     case false => Future.successful(false)
@@ -134,17 +134,17 @@ trait FileListActions {
           }
 
           loop().transformWith { res =>
-            source.close().recover {
+            source.close().toFuture.recover {
               case NonFatal(ex) => println(s"Failed to close srcFile: ${source.file}, error: $ex")
             }.flatMap(_ => Future.fromTry(res))
           }
         }.transformWith { res =>
-          target.close().recover {
+          target.close().toFuture.recover {
             case NonFatal(ex) => println(s"Failed to close dstFile: ${target.file}, error: $ex")
           }.flatMap(_ => Future.fromTry(res))
         }.transformWith { tryRes =>
           val res = tryRes.getOrElse(false)
-          if (!res) target.delete().flatMap(_ => Future.fromTry(tryRes))
+          if (!res) target.delete().toFuture.flatMap(_ => Future.fromTry(tryRes))
           else Future.fromTry(tryRes)
         }
     }

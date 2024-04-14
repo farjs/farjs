@@ -191,8 +191,8 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       val openF = (for {
         source <- actions.readFile(List(state.currDir.path), item, 0.0)
         buff = new Uint8Array(64 * 1024)
-        bytesRead <- source.readNextBytes(buff)
-        _ <- source.close()
+        bytesRead <- source.readNextBytes(buff).toFuture
+        _ <- source.close().toFuture
       } yield {
         buff.subarray(0, bytesRead)
       }).flatMap { fileHeader =>

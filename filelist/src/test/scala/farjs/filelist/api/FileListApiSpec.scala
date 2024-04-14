@@ -32,8 +32,8 @@ class FileListApiSpec extends AsyncTestSpec {
     //when
     val resultF = for {
       source <- api.readFile(List("parent"), FileListItem("test"), 0)
-      bytes <- source.readNextBytes(new Uint8Array(1))
-      _ <- source.close()
+      bytes <- source.readNextBytes(new Uint8Array(1)).toFuture
+      _ <- source.close().toFuture
     } yield (source, bytes)
 
     //then

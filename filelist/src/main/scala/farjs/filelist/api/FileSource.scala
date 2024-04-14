@@ -1,13 +1,13 @@
 package farjs.filelist.api
 
-import scala.concurrent.Future
+import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 
-trait FileSource {
+trait FileSource extends js.Object {
   
-  def file: String
+  val file: String
   
-  def readNextBytes(buff: Uint8Array): Future[Int]
+  def readNextBytes(buff: Uint8Array): js.Promise[Int]
 
-  def close(): Future[Unit]
+  def close(): js.Promise[Unit]
 }
