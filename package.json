@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@farjs/better-sqlite3-websql": "^1.0.1",
-    "@farjs/filelist": "0.1.1",
+    "@farjs/filelist": "0.1.2",
     "@farjs/ui": "0.7.0",
     "iconv-lite": "0.6.3"
   },

@@ -4,6 +4,8 @@ import farjs.filelist.{FileListActions, FileListState}
 import farjs.ui.Dispatch
 import scommons.react.ReactClass
 
+import scala.scalajs.js
+
 case class PanelStackItem[T](
   component: ReactClass,
   dispatch: Option[Dispatch],
@@ -23,7 +25,7 @@ case class PanelStackItem[T](
 object PanelStackItem {
 
   def initDispatch(parentDispatch: Dispatch,
-                   reducer: (FileListState, Any) => FileListState,
+                   reducer: js.Function2[FileListState, js.Any, FileListState],
                    stack: PanelStack,
                    item: PanelStackItem[FileListState]
                   ): PanelStackItem[FileListState] = {
@@ -31,7 +33,7 @@ object PanelStackItem {
     val dispatch: Any => Any = { action =>
       stack.updateFor[FileListState](item.component) { item =>
         item.updateState { state =>
-          reducer(state, action)
+          reducer(state, action.asInstanceOf[js.Any])
         }
       }
       parentDispatch(action)

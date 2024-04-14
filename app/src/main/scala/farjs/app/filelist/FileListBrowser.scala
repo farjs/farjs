@@ -206,7 +206,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         }
         pluginRes.map { maybePluginItem =>
           maybePluginItem.foreach { item =>
-            stack.push(PanelStackItem.initDispatch(dispatch, FileListStateReducer.apply, stack, item))
+            stack.push(PanelStackItem.initDispatch(dispatch, FileListStateReducer, stack, item))
           }
         }
       }

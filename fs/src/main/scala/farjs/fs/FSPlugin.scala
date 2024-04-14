@@ -8,7 +8,7 @@ import scommons.react.ReactClass
 import scala.concurrent.Future
 import scala.scalajs.js
 
-class FSPlugin(reducer: (FileListState, Any) => FileListState) extends FileListPlugin {
+class FSPlugin(reducer: js.Function2[FileListState, js.Any, FileListState]) extends FileListPlugin {
 
   override val triggerKeys: js.Array[String] = js.Array("M-l", "M-r", "M-h", "C-d")
 
@@ -41,4 +41,4 @@ class FSPlugin(reducer: (FileListState, Any) => FileListState) extends FileListP
   }
 }
 
-object FSPlugin extends FSPlugin(FileListStateReducer.apply)
+object FSPlugin extends FSPlugin(FileListStateReducer)
