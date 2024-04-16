@@ -13,11 +13,9 @@ import scala.scalajs.js.JavaScriptException
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.{Failure, Success, Try}
 
-class FSFileListApi extends FileListApi {
+class FSFileListApi(fs: FS = scommons.nodejs.fs) extends FileListApi {
 
-  private[fs] def fs: FS = scommons.nodejs.fs
-
-  val capabilities: Set[String] = Set(
+  override val capabilities: js.Set[FileListCapability] = js.Set[FileListCapability](
     FileListCapability.read,
     FileListCapability.write,
     FileListCapability.delete,
@@ -26,11 +24,11 @@ class FSFileListApi extends FileListApi {
     FileListCapability.moveInplace
   )
 
-  def readDir(parent: Option[String], dir: String): Future[FileListDir] = {
+  override def readDir(parent: js.UndefOr[String], dir: String): js.Promise[FileListDir] = {
     readDir(path.resolve(parent.toList :+ dir: _*))
   }
   
-  def readDir(targetDir: String): Future[FileListDir] = {
+  override def readDir(targetDir: String): js.Promise[FileListDir] = {
     fs.readdir(targetDir).map { files =>
       val items = files.map { name =>
         toFileListItem(targetDir, name)
@@ -41,10 +39,10 @@ class FSFileListApi extends FileListApi {
         isRoot = isRoot(targetDir),
         items = js.Array(items: _*)
       )
-    }
+    }.toJSPromise
   }
 
-  override def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = {
+  override def delete(parent: String, items: js.Array[FileListItem]): js.Promise[Unit] = {
     
     def delDirItems(parent: String, items: Seq[(String, Boolean)]): Future[Unit] = {
       items.foldLeft(Future.successful(())) { case (res, (name, isDir)) =>
@@ -68,10 +66,10 @@ class FSFileListApi extends FileListApi {
       }
     }
 
-    delDirItems(parent, items.map(i => (i.name, i.isDir)))
+    delDirItems(parent, items.map(i => (i.name, i.isDir)).toSeq).toJSPromise
   }
 
-  override def mkDirs(dirs: List[String]): Future[Unit] = {
+  override def mkDirs(dirs: js.Array[String]): js.Promise[Unit] = {
 
     def loop(parent: String, names: List[String]): Future[Unit] = names match {
       case Nil => Future.unit
@@ -95,11 +93,11 @@ class FSFileListApi extends FileListApi {
       }
     }
 
-    loop("", dirs)
+    loop("", dirs.toList).toJSPromise
   }
   
-  override def readFile(parentDirs: List[String], file: FileListItem, position: Double): Future[FileSource] = Future {
-    val filePath = path.join(path.join(parentDirs: _*), file.name)
+  override def readFile(parentDirs: js.Array[String], file: FileListItem, position: Double): js.Promise[FileSource] = Future {
+    val filePath = path.join(path.join(parentDirs.toList: _*), file.name)
     val fd = fs.openSync(filePath, FSConstants.O_RDONLY)
     
     new FileSource {
@@ -116,28 +114,29 @@ class FSFileListApi extends FileListApi {
 
       override def close(): js.Promise[Unit] = Future(fs.closeSync(fd)).toJSPromise
     }
-  }
+  }.toJSPromise
 
-  override def writeFile(parentDirs: List[String],
+  override def writeFile(parentDirs: js.Array[String],
                          fileName: String,
-                         onExists: FileListItem => Future[Option[Boolean]]): Future[Option[FileTarget]] = {
+                         onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]
+                        ): js.Promise[js.UndefOr[FileTarget]] = {
 
-    val targetDir = path.join(parentDirs: _*)
+    val targetDir = path.join(parentDirs.toList: _*)
     val filePath = path.join(targetDir, fileName)
 
-    Future[(Option[Int], Double)] {
+    Future[(js.UndefOr[Int], Double)] {
       val fd = fs.openSync(filePath, FSConstants.O_CREAT | FSConstants.O_WRONLY | FSConstants.O_EXCL)
-      (Some(fd), 0.0)
-    }.recoverWith {
+      (fd, 0.0)
+    }.recoverWith[(js.UndefOr[Int], Double)] {
       case JavaScriptException(error: raw.Error) if error.code == "EEXIST" =>
         val existing = toFileListItem(targetDir, fileName)
-        onExists(existing).map {
-          case None => (None, 0.0)
+        onExists(existing).toFuture.map(_.toOption match {
+          case None => (js.undefined, 0.0)
           case Some(overwrite) =>
             val fd = fs.openSync(filePath, FSConstants.O_WRONLY)
             val position = if (overwrite) 0.0 else existing.size
-            (Some(fd), position)
-        }
+            (fd, position)
+        })
     }.map { case (maybeFd, position) =>
       maybeFd.map { fd =>
         new FileTarget {
@@ -169,14 +168,7 @@ class FSFileListApi extends FileListApi {
         }
       }
     }
-  }
-  
-  private def isRoot(dir: String): Boolean = {
-    val pathObj = path.parse(dir)
-
-    pathObj.root == pathObj.dir &&
-      pathObj.base.getOrElse("").isEmpty
-  }
+  }.toJSPromise
 
   private def toFileListItem(targetDir: String, name: String): FileListItem = {
     Try(fs.lstatSync(path.join(targetDir, name))) match {
@@ -193,6 +185,16 @@ class FSFileListApi extends FileListApi {
           permissions = getPermissions(stats.mode)
         )
     }
+  }
+}
+
+object FSFileListApi {
+  
+  private def isRoot(dir: String): Boolean = {
+    val pathObj = path.parse(dir)
+
+    pathObj.root == pathObj.dir &&
+      pathObj.base.getOrElse("").isEmpty
   }
 
   private[fs] def getPermissions(mode: Int): String = {
@@ -213,9 +215,6 @@ class FSFileListApi extends FileListApi {
     
     new String(chars)
   }
-}
-
-object FSFileListApi {
 
   private val S_IFDIR: Int = FSConstants.S_IFDIR
   private val S_IRUSR: Int = FSConstants.S_IRUSR.getOrElse(0)

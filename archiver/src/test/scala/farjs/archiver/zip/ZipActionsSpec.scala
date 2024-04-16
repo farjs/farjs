@@ -15,7 +15,7 @@ class ZipActionsSpec extends AsyncTestSpec {
 
   it should "return None when getDriveRoot" in {
     //given
-    val api = ZipApi("file.zip", "root.path", Future.successful(Map.empty))
+    val api = new ZipApi("file.zip", "root.path", Future.successful(Map.empty))
     val actions = new ZipActions(api)
     
     //when
@@ -33,13 +33,13 @@ class ZipActionsSpec extends AsyncTestSpec {
     val createApi = mockFunction[String, String, Future[Map[String, List[ZipEntry]]], ZipApi]
     ArchiverPlugin.readZip = readZip
     ArchiverPlugin.createApi = createApi
-    val actions = new ZipActions(ZipApi("file.zip", "root.path", Future.successful(Map.empty)))
+    val actions = new ZipActions(new ZipApi("file.zip", "root.path", Future.successful(Map.empty)))
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
     val path = "/test/path"
     val api = new ZipApi("file.zip", "root.path", Future.successful(Map.empty)) {
-      override def readDir(targetDir: String): Future[FileListDir] = {
-        Future.successful(currDir)
+      override def readDir(targetDir: String): js.Promise[FileListDir] = {
+        js.Promise.resolve[FileListDir](currDir)
       }
     }
     val entriesByParent = Future.successful(Map(

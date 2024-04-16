@@ -13,6 +13,7 @@ import scommons.react.hooks._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 import scala.util.{Failure, Success}
 
 case class CopyProcessProps(from: FileListData,
@@ -48,7 +49,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
     val (state, setState) = useStateUpdater(() => CopyState())
     val inProgress = useRef(false)
     val cancelPromise = useRef(Promise.successful(()))
-    val existsPromise = useRef(Promise.successful[Option[Boolean]](None))
+    val existsPromise = useRef(Promise.successful[js.UndefOr[Boolean]](js.undefined))
     val data = useRef(CopyInfo())
     val currTheme = Theme.useTheme()
     val props = compProps.wrapped
@@ -88,14 +89,14 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
                   dstFileF = props.to.actions.writeFile(targetDirs, toName, onExists = { existing =>
                     if (inProgress.current && data.current.askWhenExists) {
                       setState(_.copy(existing = Some(existing)))
-                      existsPromise.current = Promise[Option[Boolean]]()
+                      existsPromise.current = Promise[js.UndefOr[Boolean]]()
                     }
                     existsPromise.current.future.map { maybeOverwrite =>
                       if (maybeOverwrite.isEmpty) {
                         isCopied = false
                       }
                       maybeOverwrite
-                    }
+                    }.toJSPromise
                   }),
                   onProgress = { position =>
                     data.current = data.current.copy(
@@ -194,17 +195,17 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
             }
             action match {
               case FileExistsAction.Overwrite | FileExistsAction.All =>
-                existsPromise.current.trySuccess(Some(true))
+                existsPromise.current.trySuccess(true)
               case FileExistsAction.Skip | FileExistsAction.SkipAll =>
-                existsPromise.current.trySuccess(None)
+                existsPromise.current.trySuccess(js.undefined)
               case FileExistsAction.Append =>
-                existsPromise.current.trySuccess(Some(false))
+                existsPromise.current.trySuccess(false)
             }
           },
           onCancel = { () =>
             setState(_.copy(existing = None))
             inProgress.current = false
-            existsPromise.current.trySuccess(None)
+            existsPromise.current.trySuccess(js.undefined)
           }
         ))()
       },

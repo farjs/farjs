@@ -52,7 +52,7 @@ class ZipApiSpec extends AsyncTestSpec {
     val api = new ZipApi(zipPath, rootPath, entriesByParentF)
     
     //when & then
-    api.capabilities shouldBe Set(
+    api.capabilities.toSet shouldBe Set(
       FileListCapability.read,
       FileListCapability.delete
     )
@@ -65,7 +65,7 @@ class ZipApiSpec extends AsyncTestSpec {
     val api = new ZipApi(zipPath, rootPath, entriesByParentF)
     
     //when
-    val resultF = api.readDir(None, FileListItem.currDir.name)
+    val resultF = api.readDir(js.undefined, FileListItem.currDir.name).toFuture
 
     //then
     resultF.map(inside(_) { case FileListDir(path, isRoot, items) =>
@@ -85,7 +85,7 @@ class ZipApiSpec extends AsyncTestSpec {
     val api = new ZipApi(zipPath, rootPath, entriesByParentF)
     
     //when
-    val resultF = api.readDir(Some(s"$rootPath/dir 1/dir 2"), FileListItem.up.name)
+    val resultF = api.readDir(s"$rootPath/dir 1/dir 2", FileListItem.up.name).toFuture
 
     //then
     resultF.map(inside(_) { case FileListDir(path, isRoot, items) =>
@@ -104,7 +104,7 @@ class ZipApiSpec extends AsyncTestSpec {
     val api = new ZipApi(zipPath, rootPath, entriesByParentF)
 
     //when
-    val resultF = api.readDir(Some(s"$rootPath/dir 1"), "dir 2")
+    val resultF = api.readDir(s"$rootPath/dir 1", "dir 2").toFuture
 
     //then
     resultF.map(inside(_) { case FileListDir(path, isRoot, items) =>
@@ -147,7 +147,7 @@ class ZipApiSpec extends AsyncTestSpec {
     }
 
     //when
-    val resultF = api.readFile(List(rootPath, "dir 1"), item, 0.0)
+    val resultF = api.readFile(js.Array(rootPath, "dir 1"), item, 0.0).toFuture
 
     //then
     (for {
@@ -193,7 +193,7 @@ class ZipApiSpec extends AsyncTestSpec {
     val buff = new Uint8Array(5)
 
     //when
-    val resultF = api.readFile(List(rootPath, "dir 1"), item, 0.0)
+    val resultF = api.readFile(js.Array(rootPath, "dir 1"), item, 0.0).toFuture
 
     //then
     (for {
@@ -239,7 +239,7 @@ class ZipApiSpec extends AsyncTestSpec {
     val buff = new Uint8Array(5)
 
     //when
-    val resultF = api.readFile(List(rootPath, "dir 1"), item, 0.0)
+    val resultF = api.readFile(js.Array(rootPath, "dir 1"), item, 0.0).toFuture
 
     //then
     for {
@@ -312,7 +312,7 @@ class ZipApiSpec extends AsyncTestSpec {
       )
     )))
     val parent = s"$rootPath/dir 1"
-    val items = List(
+    val items = js.Array(
       FileListItem("file 1"),
       FileListItem("dir 2", isDir = true)
     )
@@ -330,8 +330,8 @@ class ZipApiSpec extends AsyncTestSpec {
 
     //when
     val resultF = for {
-      _ <- api.delete(parent, items)
-      res <- api.readDir(parent)
+      _ <- api.delete(parent, items).toFuture
+      res <- api.readDir(parent).toFuture
     } yield res
 
     //then

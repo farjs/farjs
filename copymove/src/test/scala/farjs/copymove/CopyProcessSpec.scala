@@ -44,8 +44,8 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val readDir = mockFunction[Option[String], String, Future[FileListDir]]
     val delete = mockFunction[String, Seq[FileListItem], Future[Unit]]
     val writeFile = mockFunction[List[String], String,
-      FileListItem => Future[Option[Boolean]], Future[Option[FileTarget]]]
-    val copyFile = mockFunction[List[String], FileListItem, Future[Option[FileTarget]],
+      FileListItem => js.Promise[js.UndefOr[Boolean]], Future[js.UndefOr[FileTarget]]]
+    val copyFile = mockFunction[List[String], FileListItem, Future[js.UndefOr[FileTarget]],
       Double => Future[Boolean], Future[Boolean]]
 
     val actions = new MockFileListActions(
@@ -163,7 +163,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val p = Promise[Boolean]()
 
     var onProgressFn: Double => Future[Boolean] = null
-    toActions.writeFile.expects(List("/to/path"), "newName", *).returning(Future.successful(None))
+    toActions.writeFile.expects(List("/to/path"), "newName", *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
     actions.copyFile.expects(List("/from/path"), item, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn = onProgress
@@ -274,11 +274,11 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", 12345, onTopItem, onDone)
     val p = Promise[Boolean]()
 
-    var onExistsFn: FileListItem => Future[Option[Boolean]] = null
+    var onExistsFn: FileListItem => js.Promise[js.UndefOr[Boolean]] = null
     toActions.writeFile.expects(List("/to/path"), "newName", *).onCall {
       (_, _, onExists) =>
         onExistsFn = onExists
-        Future.successful(None)
+        Future.successful(js.undefined: js.UndefOr[FileTarget])
     }
     actions.copyFile.expects(List("/from/path"), item, *, *).returning(p.future)
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
@@ -299,8 +299,8 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       
       //then
       findProps(renderer.root, fileExistsPopup) should be (empty)
-      existsF.flatMap { res =>
-        res shouldBe None
+      existsF.toFuture.flatMap { res =>
+        res shouldBe js.undefined
 
         //complete
         p.success(false)
@@ -325,11 +325,11 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", 12345, onTopItem, onDone)
     val p = Promise[Boolean]()
 
-    var onExistsFn: FileListItem => Future[Option[Boolean]] = null
+    var onExistsFn: FileListItem => js.Promise[js.UndefOr[Boolean]] = null
     toActions.writeFile.expects(List("/to/path"), "newName", *).onCall {
       (_, _, onExists) =>
         onExistsFn = onExists
-        Future.successful(None)
+        Future.successful(js.undefined: js.UndefOr[FileTarget])
     }
     actions.copyFile.expects(List("/from/path"), item, *, *).returning(p.future)
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
@@ -345,8 +345,8 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
       //then
       findProps(renderer.root, fileExistsPopup) should be (empty)
-      existsF.flatMap { res =>
-        res shouldBe None
+      existsF.toFuture.flatMap { res =>
+        res shouldBe js.undefined
 
         //then
         onTopItem.expects(*).never()
@@ -377,11 +377,11 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", 12345, _ => (), onDone)
     val p = Promise[Boolean]()
 
-    var onExistsFn: FileListItem => Future[Option[Boolean]] = null
+    var onExistsFn: FileListItem => js.Promise[js.UndefOr[Boolean]] = null
     toActions.writeFile.expects(List("/to/path"), "newName", *).onCall {
       (_, _, onExists) =>
         onExistsFn = onExists
-        Future.successful(None)
+        Future.successful(js.undefined: js.UndefOr[FileTarget])
     }
     actions.copyFile.expects(List("/from/path"), item, *, *).returning(p.future)
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
@@ -397,8 +397,8 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
       //then
       findProps(renderer.root, fileExistsPopup) should be (empty)
-      existsF.flatMap { res =>
-        res shouldBe Some(false)
+      existsF.toFuture.flatMap { res =>
+        res shouldBe false
 
         //then
         var onDoneCalled = false
@@ -428,11 +428,11 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", 12345, _ => (), onDone)
     val p = Promise[Boolean]()
 
-    var onExistsFn: FileListItem => Future[Option[Boolean]] = null
+    var onExistsFn: FileListItem => js.Promise[js.UndefOr[Boolean]] = null
     toActions.writeFile.expects(List("/to/path"), "newName", *).onCall {
       (_, _, onExists) =>
         onExistsFn = onExists
-        Future.successful(None)
+        Future.successful(js.undefined: js.UndefOr[FileTarget])
     }
     actions.copyFile.expects(List("/from/path"), item, *, *).returning(p.future)
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
@@ -441,7 +441,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       onExistsFn should not be null
     }.flatMap { _ =>
       //when
-      val existsF = onExistsFn(FileListItem("existing.file"))
+      val existsF = onExistsFn(FileListItem("existing.file")).toFuture
       
       //then
       implicit val patienceConfig: PatienceConfig = PatienceConfig(
@@ -459,7 +459,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
         //then
         existsF.flatMap { res =>
-          res shouldBe Some(true)
+          res shouldBe true
 
           //then
           var onDoneCalled = false
@@ -490,11 +490,11 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", 12345, _ => (), onDone)
     val p = Promise[Boolean]()
 
-    var onExistsFn: FileListItem => Future[Option[Boolean]] = null
+    var onExistsFn: FileListItem => js.Promise[js.UndefOr[Boolean]] = null
     toActions.writeFile.expects(List("/to/path"), "newName", *).onCall {
       (_, _, onExists) =>
         onExistsFn = onExists
-        Future.successful(None)
+        Future.successful(js.undefined: js.UndefOr[FileTarget])
     }
     actions.copyFile.expects(List("/from/path"), item, *, *).returning(p.future)
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
@@ -508,9 +508,9 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       }
       
       //then
-      val existsF = onExistsFn(FileListItem("existing.file"))
+      val existsF = onExistsFn(FileListItem("existing.file")).toFuture
       existsF.flatMap { res =>
-        res shouldBe None
+        res shouldBe js.undefined
         
         //then
         var onDoneCalled = false
@@ -542,43 +542,43 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", 12345, _ => (), onDone)
 
     val p1 = Promise[Boolean]()
-    var onExistsFn1: FileListItem => Future[Option[Boolean]] = null
+    var onExistsFn1: FileListItem => js.Promise[js.UndefOr[Boolean]] = null
     toActions.writeFile.expects(List("/to/path"), "newName1", *).onCall {
       (_, _, onExists) =>
         onExistsFn1 = onExists
-        Future.successful(None)
+        Future.successful(js.undefined: js.UndefOr[FileTarget])
     }
     actions.copyFile.expects(List("/from/path"), item1, *, *).returning(p1.future)
     val p2 = Promise[Boolean]()
-    var onExistsFn2: FileListItem => Future[Option[Boolean]] = null
+    var onExistsFn2: FileListItem => js.Promise[js.UndefOr[Boolean]] = null
     toActions.writeFile.expects(List("/to/path"), "newName2", *).onCall {
       (_, _, onExists) =>
         onExistsFn2 = onExists
-        Future.successful(None)
+        Future.successful(js.undefined: js.UndefOr[FileTarget])
     }
     actions.copyFile.expects(List("/from/path"), item2, *, *).returning(p2.future)
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
 
     eventually(onExistsFn1 should not be null).flatMap { _ =>
       //given
-      val existsF1 = onExistsFn1(FileListItem("existing.file1"))
+      val existsF1 = onExistsFn1(FileListItem("existing.file1")).toFuture
       val existsProps = findComponentProps(renderer.root, fileExistsPopup)
       TestRenderer.act { () =>
         existsProps.onAction(FileExistsAction.All)
       }
       findProps(renderer.root, fileExistsPopup) should be (empty)
       existsF1.flatMap { res =>
-        res shouldBe Some(true)
+        res shouldBe true
         p1.success(true)
 
         eventually(onExistsFn2 should not be null).flatMap { _ =>
           //when
-          val existsF2 = onExistsFn2(FileListItem("existing.file2"))
+          val existsF2 = onExistsFn2(FileListItem("existing.file2")).toFuture
 
           //then
           findProps(renderer.root, fileExistsPopup) should be (empty)
           existsF2.flatMap { res =>
-            res shouldBe Some(true)
+            res shouldBe true
             
             //then
             var onDoneCalled = false
@@ -612,43 +612,43 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", 12345, _ => (), onDone)
 
     val p1 = Promise[Boolean]()
-    var onExistsFn1: FileListItem => Future[Option[Boolean]] = null
+    var onExistsFn1: FileListItem => js.Promise[js.UndefOr[Boolean]] = null
     toActions.writeFile.expects(List("/to/path"), "newName1", *).onCall {
       (_, _, onExists) =>
         onExistsFn1 = onExists
-        Future.successful(None)
+        Future.successful(js.undefined: js.UndefOr[FileTarget])
     }
     actions.copyFile.expects(List("/from/path"), item1, *, *).returning(p1.future)
     val p2 = Promise[Boolean]()
-    var onExistsFn2: FileListItem => Future[Option[Boolean]] = null
+    var onExistsFn2: FileListItem => js.Promise[js.UndefOr[Boolean]] = null
     toActions.writeFile.expects(List("/to/path"), "newName2", *).onCall {
       (_, _, onExists) =>
         onExistsFn2 = onExists
-        Future.successful(None)
+        Future.successful(js.undefined: js.UndefOr[FileTarget])
     }
     actions.copyFile.expects(List("/from/path"), item2, *, *).returning(p2.future)
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
 
     eventually(onExistsFn1 should not be null).flatMap { _ =>
       //given
-      val existsF1 = onExistsFn1(FileListItem("existing.file1"))
+      val existsF1 = onExistsFn1(FileListItem("existing.file1")).toFuture
       val existsProps = findComponentProps(renderer.root, fileExistsPopup)
       TestRenderer.act { () =>
         existsProps.onAction(FileExistsAction.SkipAll)
       }
       findProps(renderer.root, fileExistsPopup) should be (empty)
       existsF1.flatMap { res =>
-        res shouldBe None
+        res shouldBe js.undefined
         p1.success(true)
 
         eventually(onExistsFn2 should not be null).flatMap { _ =>
           //when
-          val existsF2 = onExistsFn2(FileListItem("existing.file2"))
+          val existsF2 = onExistsFn2(FileListItem("existing.file2")).toFuture
 
           //then
           findProps(renderer.root, fileExistsPopup) should be (empty)
           existsF2.flatMap { res =>
-            res shouldBe None
+            res shouldBe js.undefined
             
             //then
             var onDoneCalled = false
@@ -682,7 +682,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val p = Promise[Boolean]()
 
     var onProgressFn: Double => Future[Boolean] = null
-    toActions.writeFile.expects(List("/to/path"), "newName", *).returning(Future.successful(None))
+    toActions.writeFile.expects(List("/to/path"), "newName", *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
     actions.copyFile.expects(List("/from/path"), item, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn = onProgress
@@ -748,7 +748,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val p = Promise[Boolean]()
 
     var onProgressFn: Double => Future[Boolean] = null
-    toActions.writeFile.expects(List("/to/path"), "newName1", *).returning(Future.successful(None))
+    toActions.writeFile.expects(List("/to/path"), "newName1", *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
     actions.copyFile.expects(List("/from/path"), item, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn = onProgress
@@ -796,7 +796,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", 12345, onTopItem, onDone)
 
     val p = Promise[Boolean]()
-    toActions.writeFile.expects(List("/to/path"), "newName", *).returning(Future.successful(None))
+    toActions.writeFile.expects(List("/to/path"), "newName", *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
     actions.copyFile.expects(List("/from/path"), item, *, *).returning(p.future)
     testRender(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
 
@@ -844,7 +844,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     toActions.mkDirs.expects(List("/to/path", "newName")).returning(Future.unit)
     
     var onProgressFn: Double => Future[Boolean] = null
-    toActions.writeFile.expects(List("/to/path", "newName"), item.name, *).returning(Future.successful(None))
+    toActions.writeFile.expects(List("/to/path", "newName"), item.name, *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
     actions.copyFile.expects(List("/from/path/dir 1"), item, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn = onProgress
@@ -898,7 +898,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     toActions.mkDirs.expects(List("/to/path", "newName")).returning(Future.unit)
     
     var onProgressFn: Double => Future[Boolean] = null
-    toActions.writeFile.expects(List("/to/path", "newName"), item.name, *).returning(Future.successful(None))
+    toActions.writeFile.expects(List("/to/path", "newName"), item.name, *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
     actions.copyFile.expects(List("/from/path/dir 1"), item, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn = onProgress
@@ -951,7 +951,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     
     val p1 = Promise[Boolean]()
     var onProgressFn1: Double => Future[Boolean] = null
-    toActions.writeFile.expects(List("/to/path"), "newName1", *).returning(Future.successful(None))
+    toActions.writeFile.expects(List("/to/path"), "newName1", *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
     actions.copyFile.expects(List("/from/path"), item1, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn1 = onProgress
@@ -959,7 +959,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     }
     val p2 = Promise[Boolean]()
     var onProgressFn2: Double => Future[Boolean] = null
-    toActions.writeFile.expects(List("/to/path"), "newName2", *).returning(Future.successful(None))
+    toActions.writeFile.expects(List("/to/path"), "newName2", *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
     actions.copyFile.expects(List("/from/path"), item2, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn2 = onProgress
@@ -1027,7 +1027,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     
     val p1 = Promise[Boolean]()
     var onProgressFn1: Double => Future[Boolean] = null
-    toActions.writeFile.expects(List("/to/path"), "newName1", *).returning(Future.successful(None))
+    toActions.writeFile.expects(List("/to/path"), "newName1", *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
     actions.copyFile.expects(List("/from/path"), item1, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn1 = onProgress
@@ -1035,7 +1035,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     }
     val p2 = Promise[Boolean]()
     var onProgressFn2: Double => Future[Boolean] = null
-    toActions.writeFile.expects(List("/to/path"), "newName2", *).returning(Future.successful(None))
+    toActions.writeFile.expects(List("/to/path"), "newName2", *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
     actions.copyFile.expects(List("/from/path"), item2, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn2 = onProgress

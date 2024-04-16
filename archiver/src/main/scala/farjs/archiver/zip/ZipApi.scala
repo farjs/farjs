@@ -12,17 +12,17 @@ import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.control.NonFatal
 
-case class ZipApi(zipPath: String,
-                  rootPath: String,
-                  private var entriesByParentF: Future[Map[String, List[ZipEntry]]]
-                 ) extends FileListApi {
+class ZipApi(val zipPath: String,
+             val rootPath: String,
+             private var entriesByParentF: Future[Map[String, List[ZipEntry]]]
+            ) extends FileListApi {
 
-  val capabilities: Set[String] = Set(
+  override val capabilities: js.Set[FileListCapability] = js.Set(
     FileListCapability.read,
     FileListCapability.delete
   )
 
-  def readDir(parent: Option[String], dir: String): Future[FileListDir] = {
+  override def readDir(parent: js.UndefOr[String], dir: String): js.Promise[FileListDir] = {
     val path = parent.getOrElse(rootPath)
     val targetDir =
       if (dir == FileListItem.up.name) {
@@ -35,7 +35,7 @@ case class ZipApi(zipPath: String,
     readDir(targetDir)
   }
 
-  def readDir(targetDir: String): Future[FileListDir] = {
+  override def readDir(targetDir: String): js.Promise[FileListDir] = {
     entriesByParentF.map { entriesByParent =>
       val path = targetDir.stripPrefix(rootPath).stripPrefix("/")
       val entries = entriesByParent.getOrElse(path, Nil)
@@ -45,10 +45,10 @@ case class ZipApi(zipPath: String,
         isRoot = false,
         items = js.Array(entries.map(ZipApi.convertToFileListItem): _*)
       )
-    }
+    }.toJSPromise
   }
 
-  override def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = {
+  override def delete(parent: String, items: js.Array[FileListItem]): js.Promise[Unit] = {
 
     def deleteFromState(parent: String, items: js.Array[FileListItem]): Unit = {
       entriesByParentF = entriesByParentF.map { entriesByParent =>
@@ -69,7 +69,7 @@ case class ZipApi(zipPath: String,
         res.flatMap { _ =>
           if (item.isDir) {
             val dir = s"$parent/${item.name}"
-            readDir(dir).flatMap { fileListDir =>
+            readDir(dir).toFuture.flatMap { fileListDir =>
               if (fileListDir.items.nonEmpty) {
                 delDirItems(dir, fileListDir.items)
               }
@@ -98,10 +98,12 @@ case class ZipApi(zipPath: String,
       }
     }
 
-    delDirItems(parent, js.Array(items: _*))
+    delDirItems(parent, items).toJSPromise
   }
 
-  override def readFile(parentDirs: List[String], item: FileListItem, position: Double): Future[FileSource] = {
+  override def mkDirs(dirs: js.Array[String]): js.Promise[Unit] = js.Promise.resolve[Unit](())
+
+  override def readFile(parentDirs: js.Array[String], item: FileListItem, position: Double): js.Promise[FileSource] = {
     val filePath = s"${parentDirs.mkString("/")}/${item.name}".stripPrefix(rootPath).stripPrefix("/")
     val subprocessF = extract(zipPath, filePath)
 
@@ -138,10 +140,18 @@ case class ZipApi(zipPath: String,
           }.toJSPromise
         }
       }
-    }
+    }.toJSPromise
   }
 
-  private[zip] def extract(zipPath: String, filePath: String): Future[SubProcess] = {
+  override def writeFile(parentDirs: js.Array[String],
+                         fileName: String,
+                         onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]
+                        ): js.Promise[js.UndefOr[FileTarget]] = {
+
+    js.Promise.resolve[js.UndefOr[FileTarget]](js.undefined)
+  }
+
+  def extract(zipPath: String, filePath: String): Future[SubProcess] = {
     ZipApi.childProcess.spawn(
       command = "unzip",
       args = List("-p", zipPath, filePath),

@@ -15,7 +15,10 @@ import scala.scalajs.js.typedarray.Uint8Array
 class ArchiverPluginSpec extends AsyncTestSpec {
 
   ArchiverPlugin.readZip = _ => Future.successful(Map.empty)
-  ArchiverPlugin.createApi = ZipApi.apply
+  ArchiverPlugin.createApi = { // replace potential mock from prev test with default impl
+    (zipPath, rootPath, entriesByParentF) =>
+      new ZipApi(zipPath, rootPath, entriesByParentF)
+  }
 
   it should "define triggerKeys" in {
     //when & then

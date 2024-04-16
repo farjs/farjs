@@ -14,7 +14,10 @@ import scala.scalajs.js.typedarray.Uint8Array
 object ArchiverPlugin extends FileListPlugin {
 
   private[archiver] var readZip: String => Future[Map[String, List[ZipEntry]]] = ZipApi.readZip
-  private[archiver] var createApi: (String, String, Future[Map[String, List[ZipEntry]]]) => ZipApi = ZipApi.apply
+  private[archiver] var createApi: (String, String, Future[Map[String, List[ZipEntry]]]) => ZipApi = {
+    (zipPath, rootPath, entriesByParentF) =>
+      new ZipApi(zipPath, rootPath, entriesByParentF)
+  }
 
   override val triggerKeys: js.Array[String] = js.Array("S-f7")
 

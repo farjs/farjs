@@ -1,35 +1,25 @@
 package farjs.filelist.api
 
-import scala.concurrent.Future
 import scala.scalajs.js
-import scala.scalajs.js.typedarray.Uint8Array
 
-trait FileListApi {
+trait FileListApi extends js.Object {
 
-  def capabilities: Set[String]
+  def capabilities: js.Set[FileListCapability]
 
-  def readDir(parent: Option[String], dir: String): Future[FileListDir]
-
-  def readDir(targetDir: String): Future[FileListDir]
+  def readDir(parent: js.UndefOr[String], dir: String): js.Promise[FileListDir]
   
-  def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = Future.unit
+  def readDir(targetDir: String): js.Promise[FileListDir]
 
-  def mkDirs(dirs: List[String]): Future[Unit] = Future.unit
+  def delete(parent: String, items: js.Array[FileListItem]): js.Promise[Unit]
 
-  def readFile(parentDirs: List[String], item: FileListItem, position: Double): Future[FileSource] = {
-    Future.successful(new FileSource {
-      override val file: String = item.name
+  def mkDirs(dirs: js.Array[String]): js.Promise[Unit]
 
-      override def readNextBytes(buff: Uint8Array): js.Promise[Int] = js.Promise.resolve[Int](0)
+  def readFile(parentDirs: js.Array[String],
+               item: FileListItem,
+               position: Double): js.Promise[FileSource]
 
-      override def close(): js.Promise[Unit] = js.Promise.resolve[Unit](())
-    })
-  }
-
-  def writeFile(parentDirs: List[String],
+  def writeFile(parentDirs: js.Array[String],
                 fileName: String,
-                onExists: FileListItem => Future[Option[Boolean]]): Future[Option[FileTarget]] = {
-
-    Future.successful(None)
-  }
+                onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]
+               ): js.Promise[js.UndefOr[FileTarget]]
 }

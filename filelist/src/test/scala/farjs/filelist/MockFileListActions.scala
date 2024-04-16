@@ -5,11 +5,12 @@ import farjs.ui.Dispatch
 import farjs.ui.task.TaskAction
 
 import scala.concurrent.Future
+import scala.scalajs.js
 
 //noinspection NotImplementedCode
 class MockFileListActions(
   isLocalFSMock: Boolean = true,
-  capabilitiesMock: Set[String] = Set.empty,
+  capabilitiesMock: js.Set[FileListCapability] = js.Set.empty,
   getDriveRootMock: String => Future[Option[String]] = _ => ???,
   changeDirMock: (Dispatch, Option[String], String) => TaskAction = (_, _, _) => ???,
   updateDirMock: (Dispatch, String) => TaskAction = (_, _) => ???,
@@ -20,9 +21,9 @@ class MockFileListActions(
   deleteActionMock: (Dispatch, String, Seq[FileListItem]) => TaskAction = (_, _, _) => ???,
   scanDirsMock: (String, Seq[FileListItem], (String, Seq[FileListItem]) => Boolean) => Future[Boolean] = (_, _, _) => ???,
   writeFileMock: (List[String], String,
-    FileListItem => Future[Option[Boolean]]) => Future[Option[FileTarget]] = (_, _, _) => ???,
+    FileListItem => js.Promise[js.UndefOr[Boolean]]) => Future[js.UndefOr[FileTarget]] = (_, _, _) => ???,
   readFileMock: (List[String], FileListItem, Double) => Future[FileSource] = (_, _, _) => ???,
-  copyFileMock: (List[String], FileListItem, Future[Option[FileTarget]],
+  copyFileMock: (List[String], FileListItem, Future[js.UndefOr[FileTarget]],
     Double => Future[Boolean]) => Future[Boolean] = (_, _, _, _) => ???
 ) extends FileListActions {
 
@@ -30,7 +31,7 @@ class MockFileListActions(
 
   val isLocalFS: Boolean = isLocalFSMock
 
-  override val capabilities: Set[String] = capabilitiesMock
+  override val capabilities: js.Set[FileListCapability] = capabilitiesMock
 
   override def getDriveRoot(path: String): Future[Option[String]] =
     getDriveRootMock(path)
@@ -76,7 +77,7 @@ class MockFileListActions(
   
   override def writeFile(parentDirs: List[String],
                          fileName: String,
-                         onExists: FileListItem => Future[Option[Boolean]]): Future[Option[FileTarget]] = {
+                         onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]): Future[js.UndefOr[FileTarget]] = {
 
     writeFileMock(parentDirs, fileName, onExists)
   }
@@ -86,7 +87,7 @@ class MockFileListActions(
   
   override def copyFile(srcDirs: List[String],
                         srcItem: FileListItem,
-                        dstFileF: Future[Option[FileTarget]],
+                        dstFileF: Future[js.UndefOr[FileTarget]],
                         onProgress: Double => Future[Boolean]): Future[Boolean] = {
 
     copyFileMock(srcDirs, srcItem, dstFileF, onProgress)

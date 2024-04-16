@@ -22,7 +22,7 @@ trait FileListActions {
 
   def getDriveRoot(path: String): Future[Option[String]]
 
-  def capabilities: Set[String] = api.capabilities
+  def capabilities: js.Set[FileListCapability] = api.capabilities
 
   def changeDir(dispatch: Dispatch,
                 parent: Option[String],
@@ -36,7 +36,7 @@ trait FileListActions {
   }
 
   def updateDir(dispatch: Dispatch, path: String): TaskAction = {
-    val future = api.readDir(path).andThen {
+    val future = api.readDir(path).toFuture.andThen {
       case Success(currDir) => dispatch(FileListDirUpdatedAction(currDir))
     }
 
@@ -54,7 +54,7 @@ trait FileListActions {
     
     val future = for {
       _ <- mkDirs(parent :: names)
-      currDir <- api.readDir(parent)
+      currDir <- api.readDir(parent).toFuture
     } yield {
       dispatch(FileListItemCreatedAction(names.head, currDir))
       ()
@@ -63,11 +63,17 @@ trait FileListActions {
     TaskAction(Task("Creating Dir", future))
   }
 
-  def mkDirs(dirs: List[String]): Future[Unit] = api.mkDirs(dirs)
+  def mkDirs(dirs: List[String]): Future[Unit] = api.mkDirs(js.Array(dirs: _*)).toFuture
 
-  def readDir(parent: Option[String], dir: String): Future[FileListDir] = api.readDir(parent, dir)
+  def readDir(parent: Option[String], dir: String): Future[FileListDir] = {
+    api.readDir(parent match {
+      case None => js.undefined
+      case Some(x) => x
+    }, dir).toFuture
+  }
 
-  def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = api.delete(parent, items)
+  def delete(parent: String, items: Seq[FileListItem]): Future[Unit] =
+    api.delete(parent, js.Array(items: _*)).toFuture
 
   def deleteAction(dispatch: Dispatch,
                    dir: String,
@@ -99,21 +105,21 @@ trait FileListActions {
 
   def writeFile(parentDirs: List[String],
                 fileName: String,
-                onExists: FileListItem => Future[Option[Boolean]]): Future[Option[FileTarget]] = {
+                onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]): Future[js.UndefOr[FileTarget]] = {
 
-    api.writeFile(parentDirs, fileName, onExists)
+    api.writeFile(js.Array(parentDirs: _*), fileName, onExists).toFuture
   }
 
   def readFile(parentDirs: List[String], file: FileListItem, position: Double): Future[FileSource] = {
-    api.readFile(parentDirs, file, position)
+    api.readFile(js.Array(parentDirs: _*), file, position).toFuture
   }
 
   def copyFile(srcDirs: List[String],
                srcItem: FileListItem,
-               dstFileF: Future[Option[FileTarget]],
+               dstFileF: Future[js.UndefOr[FileTarget]],
                onProgress: Double => Future[Boolean]): Future[Boolean] = {
 
-    dstFileF.flatMap {
+    dstFileF.flatMap(_.toOption match {
       case None => onProgress(srcItem.size)
       case Some(target) =>
         readFile(srcDirs, srcItem, 0.0).flatMap { source =>
@@ -147,7 +153,7 @@ trait FileListActions {
           if (!res) target.delete().toFuture.flatMap(_ => Future.fromTry(tryRes))
           else Future.fromTry(tryRes)
         }
-    }
+    })
   }
 }
 

@@ -2,7 +2,6 @@ package farjs.fs
 
 import farjs.filelist.api.FileListItemSpec.{assertFileListItem, assertFileListItems}
 import farjs.filelist.api._
-import farjs.fs.FSFileListApiSpec.TestApiFS
 import org.scalatest.Succeeded
 import scommons.nodejs.Process.Platform
 import scommons.nodejs._
@@ -19,7 +18,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
 
   it should "return supported capabilities" in {
     //when & then
-    apiImp.capabilities shouldBe Set(
+    apiImp.capabilities.toSet shouldBe Set(
       FileListCapability.read,
       FileListCapability.write,
       FileListCapability.delete,
@@ -37,7 +36,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
       override def readdir(path: String): Future[Seq[String]] = readdirMock(path)
       override def lstatSync(path: String): Stats = lstatSyncMock(path)
     }
-    val apiImp = new TestApiFS(fs)
+    val apiImp = new FSFileListApi(fs)
     val targetDir = path.resolve(FileListItem.currDir.name)
 
     readdirMock.expects(targetDir).returning(Future.successful(List("file1", "file2")))
@@ -45,7 +44,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     lstatSyncMock.expects(path.join(targetDir, "file2")).throwing(new Exception("test error"))
     
     //when
-    apiImp.readDir(targetDir).map { dir =>
+    apiImp.readDir(targetDir).toFuture.map { dir =>
       //then
       inside(dir) { case FileListDir(dirPath, isRoot, items) =>
         dirPath shouldBe process.cwd()
@@ -60,7 +59,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
   
   it should "return current dir info and files when readDir(None, .)" in {
     //when
-    apiImp.readDir(None, FileListItem.currDir.name).map { dir =>
+    apiImp.readDir(js.undefined, FileListItem.currDir.name).toFuture.map { dir =>
       //then
       inside(dir) { case FileListDir(dirPath, isRoot, items) =>
         dirPath shouldBe process.cwd()
@@ -80,7 +79,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     currDir should not be empty
 
     //when
-    apiImp.readDir(Some(curr), FileListItem.up.name).map { dir =>
+    apiImp.readDir(curr, FileListItem.up.name).toFuture.map { dir =>
       //then
       inside(dir) { case FileListDir(dirPath, isRoot, items) =>
         dirPath shouldBe parentDir
@@ -100,7 +99,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     subDir should not be empty
 
     //when
-    apiImp.readDir(Some(parentDir), subDir).map { dir =>
+    apiImp.readDir(parentDir, subDir).toFuture.map { dir =>
       //then
       inside(dir) { case FileListDir(dirPath, isRoot, items) =>
         dirPath shouldBe curr
@@ -118,7 +117,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     currRoot should not be empty
 
     //when
-    apiImp.readDir(Some(currRoot), FileListItem.currDir.name).map { dir =>
+    apiImp.readDir(currRoot, FileListItem.currDir.name).toFuture.map { dir =>
       //then
       inside(dir) { case FileListDir(dirPath, isRoot, items) =>
         dirPath shouldBe currRoot
@@ -146,13 +145,13 @@ class FSFileListApiSpec extends AsyncTestSpec {
     val (f2, _) = create(d1, "file2.txt", isDir = false)
     val (d3, _) = create(d2, "dir3", isDir = true)
     val (f3, _) = create(d2, "file3.txt", isDir = false)
-    val items = List(
+    val items = js.Array(
       FileListItem(d1Name, isDir = true),
       FileListItem(f1Name)
     )
 
     //when
-    val resultF = apiImp.delete(tmpDir, items)
+    val resultF = apiImp.delete(tmpDir, items).toFuture
 
     //then
     val resCheckF = resultF.map { _ =>
@@ -184,7 +183,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     val dirs = List("test1", "test2", "", "test3", "")
 
     //when
-    val resultF = apiImp.mkDirs(tmpDir :: dirs)
+    val resultF = apiImp.mkDirs(js.Array(tmpDir :: dirs: _*)).toFuture
 
     //then
     val resCheckF = resultF.map { _ =>
@@ -211,7 +210,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     fs.existsSync(path.join(tmpDir, topDir)) shouldBe true
 
     //when
-    val resultF = apiImp.mkDirs(tmpDir :: dirs)
+    val resultF = apiImp.mkDirs(js.Array(tmpDir :: dirs: _*)).toFuture
 
     //then
     val resCheckF = resultF.map { _ =>
@@ -235,7 +234,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     val dir = "test123"
 
     //when
-    val resultF = apiImp.mkDirs(List(path.join(tmpDir, dir)))
+    val resultF = apiImp.mkDirs(js.Array(path.join(tmpDir, dir))).toFuture
 
     //then
     val resCheckF = resultF.map { _ =>
@@ -262,7 +261,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     fs.existsSync(path.join(tmpRoot, tmpRest, dir)) shouldBe false
 
     //when
-    val resultF = apiImp.mkDirs(List(tmpRoot, tmpRest, dir))
+    val resultF = apiImp.mkDirs(js.Array(tmpRoot, tmpRest, dir)).toFuture
 
     //then
     val resCheckF = resultF.map { _ =>
@@ -287,7 +286,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     fs.writeFileSync(file1, "hello, World!!!")
     fs.existsSync(file1) shouldBe true
 
-    val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
+    val onExists = mockFunction[FileListItem, js.Promise[js.UndefOr[Boolean]]]
     val stats1 = fs.lstatSync(file1)
     val buff = new Uint8Array(5)
 
@@ -303,9 +302,9 @@ class FSFileListApiSpec extends AsyncTestSpec {
     
     //when
     val resultF = for {
-      source <- apiImp.readFile(List(tmpDir), FileListItem("example.txt"), 0.0)
+      source <- apiImp.readFile(js.Array(tmpDir), FileListItem("example.txt"), 0.0).toFuture
       _ = source.file shouldBe file1
-      maybeTarget <- apiImp.writeFile(List(tmpDir), "example2.txt", onExists)
+      maybeTarget <- apiImp.writeFile(js.Array(tmpDir), "example2.txt", onExists).toFuture
       _ <- maybeTarget.map(loop(source, _)).getOrElse(Future.unit)
       _ <- maybeTarget.map(_.close().toFuture).getOrElse(Future.unit)
       _ <- source.close().toFuture
@@ -342,7 +341,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     fs.existsSync(file1) shouldBe true
     fs.existsSync(file2) shouldBe true
 
-    val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
+    val onExists = mockFunction[FileListItem, js.Promise[js.UndefOr[Boolean]]]
     val srcItem = getFileListItem("example.txt", fs.lstatSync(file1))
     val existing = getFileListItem("example2.txt", fs.lstatSync(file2))
     val buff = new Uint8Array(5)
@@ -357,13 +356,13 @@ class FSFileListApiSpec extends AsyncTestSpec {
     //then
     onExists.expects(*).onCall { resItem: FileListItem =>
       assertFileListItem(resItem, existing)
-      Future.successful(Some(true))
+      js.Promise.resolve[js.UndefOr[Boolean]](true)
     }
     
     //when
     val resultF = for {
-      source <- apiImp.readFile(List(tmpDir), FileListItem("example.txt"), 0.0)
-      maybeTarget <- apiImp.writeFile(List(tmpDir), "example2.txt", onExists)
+      source <- apiImp.readFile(js.Array(tmpDir), FileListItem("example.txt"), 0.0).toFuture
+      maybeTarget <- apiImp.writeFile(js.Array(tmpDir), "example2.txt", onExists).toFuture
       _ <- maybeTarget.map(loop(source, _)).getOrElse(Future.unit)
       _ <- maybeTarget.map(_.close().toFuture).getOrElse(Future.unit)
       _ <- source.close().toFuture
@@ -400,7 +399,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     fs.existsSync(file1) shouldBe true
     fs.existsSync(file2) shouldBe true
 
-    val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
+    val onExists = mockFunction[FileListItem, js.Promise[js.UndefOr[Boolean]]]
     val srcItem = getFileListItem("example.txt", fs.lstatSync(file1))
     val existing = getFileListItem("example2.txt", fs.lstatSync(file2))
     val buff = new Uint8Array(5)
@@ -415,13 +414,13 @@ class FSFileListApiSpec extends AsyncTestSpec {
     //then
     onExists.expects(*).onCall { resItem: FileListItem =>
       assertFileListItem(resItem, existing)
-      Future.successful(Some(false))
+      js.Promise.resolve[js.UndefOr[Boolean]](false)
     }
     
     //when
     val resultF = for {
-      source <- apiImp.readFile(List(tmpDir), FileListItem("example.txt"), 0)
-      maybeTarget <- apiImp.writeFile(List(tmpDir), "example2.txt", onExists)
+      source <- apiImp.readFile(js.Array(tmpDir), FileListItem("example.txt"), 0).toFuture
+      maybeTarget <- apiImp.writeFile(js.Array(tmpDir), "example2.txt", onExists).toFuture
       _ <- maybeTarget.map(loop(source, _)).getOrElse(Future.unit)
       _ <- maybeTarget.map(_.close().toFuture).getOrElse(Future.unit)
       _ <- source.close().toFuture
@@ -447,7 +446,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     }
   }
 
-  it should "return None if skip existing file when writeFile" in {
+  it should "return undefined if skip existing file when writeFile" in {
     //given
     val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"))
     fs.existsSync(tmpDir) shouldBe true
@@ -456,21 +455,21 @@ class FSFileListApiSpec extends AsyncTestSpec {
     fs.writeFileSync(file, "hello")
     fs.existsSync(file) shouldBe true
 
-    val onExists = mockFunction[FileListItem, Future[Option[Boolean]]]
+    val onExists = mockFunction[FileListItem, js.Promise[js.UndefOr[Boolean]]]
     val existing = getFileListItem("example2.txt", fs.lstatSync(file))
 
     //then
     onExists.expects(*).onCall { resItem: FileListItem =>
       assertFileListItem(resItem, existing)
-      Future.successful(None)
+      js.Promise.resolve[js.UndefOr[Boolean]](js.undefined)
     }
     
     //when
-    val resultF = apiImp.writeFile(List(tmpDir), "example2.txt", onExists)
+    val resultF = apiImp.writeFile(js.Array(tmpDir), "example2.txt", onExists).toFuture
 
     resultF.flatMap { maybeTarget =>
       //then
-      maybeTarget shouldBe None
+      maybeTarget shouldBe js.undefined
 
       //cleanup
       fs.unlinkSync(file)
@@ -504,18 +503,18 @@ class FSFileListApiSpec extends AsyncTestSpec {
     }
     
     //when & then
-    apiImp.getPermissions(0) shouldBe "----------"
-    apiImp.getPermissions(of("d---------")) shouldBe expected("d---------")
-    apiImp.getPermissions(of("-r--------")) shouldBe expected("-r--------")
-    apiImp.getPermissions(of("--w-------")) shouldBe expected("--w-------")
-    apiImp.getPermissions(of("---x------")) shouldBe expected("---x------")
-    apiImp.getPermissions(of("----r-----")) shouldBe expected("----r-----")
-    apiImp.getPermissions(of("-----w----")) shouldBe expected("-----w----")
-    apiImp.getPermissions(of("------x---")) shouldBe expected("------x---")
-    apiImp.getPermissions(of("-------r--")) shouldBe expected("-------r--")
-    apiImp.getPermissions(of("--------w-")) shouldBe expected("--------w-")
-    apiImp.getPermissions(of("---------x")) shouldBe expected("---------x")
-    apiImp.getPermissions(of("drwxrwxrwx")) shouldBe expected("drwxrwxrwx")
+    FSFileListApi.getPermissions(0) shouldBe "----------"
+    FSFileListApi.getPermissions(of("d---------")) shouldBe expected("d---------")
+    FSFileListApi.getPermissions(of("-r--------")) shouldBe expected("-r--------")
+    FSFileListApi.getPermissions(of("--w-------")) shouldBe expected("--w-------")
+    FSFileListApi.getPermissions(of("---x------")) shouldBe expected("---x------")
+    FSFileListApi.getPermissions(of("----r-----")) shouldBe expected("----r-----")
+    FSFileListApi.getPermissions(of("-----w----")) shouldBe expected("-----w----")
+    FSFileListApi.getPermissions(of("------x---")) shouldBe expected("------x---")
+    FSFileListApi.getPermissions(of("-------r--")) shouldBe expected("-------r--")
+    FSFileListApi.getPermissions(of("--------w-")) shouldBe expected("--------w-")
+    FSFileListApi.getPermissions(of("---------x")) shouldBe expected("---------x")
+    FSFileListApi.getPermissions(of("drwxrwxrwx")) shouldBe expected("drwxrwxrwx")
     
     Succeeded
   }
@@ -529,7 +528,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
       mtimeMs = stats.mtimeMs,
       ctimeMs = stats.ctimeMs,
       birthtimeMs = stats.birthtimeMs,
-      permissions = apiImp.getPermissions(stats.mode)
+      permissions = FSFileListApi.getPermissions(stats.mode)
     )
   }
 
@@ -543,13 +542,5 @@ class FSFileListApiSpec extends AsyncTestSpec {
       if (isDir) fs.rmdirSync(path)
       else fs.unlinkSync(path)
     }
-  }
-}
-
-object FSFileListApiSpec {
-
-  class TestApiFS(fsMock: FS) extends FSFileListApi {
-    
-    override private[fs] val fs = fsMock
   }
 }

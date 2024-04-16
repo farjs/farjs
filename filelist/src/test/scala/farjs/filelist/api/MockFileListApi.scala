@@ -1,39 +1,50 @@
 package farjs.filelist.api
 
-import scala.concurrent.Future
+import scala.scalajs.js
 
-//noinspection NotImplementedCode
-class MockFileListApi(
-  capabilitiesMock: Set[String] = Set.empty,
-  readDir2Mock: (Option[String], String) => Future[FileListDir] = (_, _) => ???,
-  readDirMock: String => Future[FileListDir] = _ => ???,
-  deleteMock: (String, Seq[FileListItem]) => Future[Unit] = (_, _) => ???,
-  mkDirsMock: List[String] => Future[Unit] = _ => ???,
-  readFileMock: (List[String], FileListItem, Double) => Future[FileSource] = (_, _, _) => ???,
-  writeFileMock: (List[String], String, FileListItem => Future[Option[Boolean]]) => Future[Option[FileTarget]] = (_, _, _) => ???
-) extends FileListApi {
+object MockFileListApi {
 
-  val capabilities: Set[String] = capabilitiesMock
-  
-  override def readDir(parent: Option[String], dir: String): Future[FileListDir] =
-    readDir2Mock(parent, dir)
+  //noinspection NotImplementedCode
+  def apply(
+             capabilitiesMock: js.Set[FileListCapability] = js.Set.empty,
+             readDir2Mock: (js.UndefOr[String], String) => js.Promise[FileListDir] = (_, _) => ???,
+             readDirMock: String => js.Promise[FileListDir] = _ => ???,
+             deleteMock: (String, js.Array[FileListItem]) => js.Promise[Unit] = (_, _) => ???,
+             mkDirsMock: js.Array[String] => js.Promise[Unit] = _ => ???,
+             readFileMock: (js.Array[String], FileListItem, Double) => js.Promise[FileSource] = (_, _, _) => ???,
+             writeFileMock: (js.Array[String], String, FileListItem => js.Promise[js.UndefOr[Boolean]]) => js.Promise[js.UndefOr[FileTarget]] = (_, _, _) => ???
+           ): FileListApi = {
 
-  override def readDir(targetDir: String): Future[FileListDir] =
-    readDirMock(targetDir)
+    new FileListApi {
 
-  override def delete(parent: String, items: Seq[FileListItem]): Future[Unit] =
-    deleteMock(parent, items)
+      override val capabilities: js.Set[FileListCapability] = capabilitiesMock
 
-  override def mkDirs(dirs: List[String]): Future[Unit] =
-    mkDirsMock(dirs)
+      override def readDir(parent: js.UndefOr[String], dir: String): js.Promise[FileListDir] =
+        readDir2Mock(parent, dir)
 
-  override def readFile(parentDirs: List[String], file: FileListItem, position: Double): Future[FileSource] =
-    readFileMock(parentDirs, file, position)
+      override def readDir(targetDir: String): js.Promise[FileListDir] =
+        readDirMock(targetDir)
 
-  override def writeFile(parentDirs: List[String],
-                         fileName: String,
-                         onExists: FileListItem => Future[Option[Boolean]]): Future[Option[FileTarget]] = {
+      override def delete(parent: String, items: js.Array[FileListItem]): js.Promise[Unit] =
+        deleteMock(parent, items)
 
-    writeFileMock(parentDirs, fileName, onExists)
+      override def mkDirs(dirs: js.Array[String]): js.Promise[Unit] =
+        mkDirsMock(dirs)
+
+      override def readFile(parentDirs: js.Array[String],
+                            file: FileListItem,
+                            position: Double): js.Promise[FileSource] = {
+        
+        readFileMock(parentDirs, file, position)
+      }
+
+      override def writeFile(parentDirs: js.Array[String],
+                             fileName: String,
+                             onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]
+                            ): js.Promise[js.UndefOr[FileTarget]] = {
+
+        writeFileMock(parentDirs, fileName, onExists)
+      }
+    }
   }
 }

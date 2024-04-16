@@ -26,7 +26,7 @@ class ZipActions(protected[zip] var api: ZipApi) extends FileListActions {
     }
     api = ArchiverPlugin.createApi(api.zipPath, api.rootPath, entriesByParentF)
     
-    val future = entriesByParentF.flatMap(_ => api.readDir(path)).andThen {
+    val future = entriesByParentF.flatMap(_ => api.readDir(path).toFuture).andThen {
       case Success(currDir) => dispatch(FileListDirUpdatedAction(currDir))
     }
 

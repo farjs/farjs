@@ -37,8 +37,8 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
   //noinspection TypeAnnotation
   class Source {
-    val readNextBytes = mockFunction[Uint8Array, Future[Int]]
-    val close = mockFunction[Future[Unit]]
+    val readNextBytes = mockFunction[Uint8Array, js.Promise[Int]]
+    val close = mockFunction[js.Promise[Unit]]
 
     val source = MockFileSource(
       readNextBytesMock = readNextBytes,
@@ -465,9 +465,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     actions.readFile.expects(List(currDir.path), fileItem, 0.0).returning(Future.successful(source.source))
     source.readNextBytes.expects(*).onCall { buff: Uint8Array =>
       buff.length shouldBe (64 * 1024)
-      Future.successful(123)
+      js.Promise.resolve[Int](123)
     }
-    source.close.expects().returning(Future.unit)
+    source.close.expects().returning(js.Promise.resolve[Unit](()))
     var onCloseCapture: () => Unit = null
     onTrigger2Mock.expects(filePath, *, *).onCall { (_, fileHeader, onClose) =>
       fileHeader.length shouldBe 123
