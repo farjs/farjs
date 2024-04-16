@@ -15,7 +15,7 @@ class MockFileListActions(
   changeDirMock: (Dispatch, Option[String], String) => TaskAction = (_, _, _) => ???,
   updateDirMock: (Dispatch, String) => TaskAction = (_, _) => ???,
   createDirMock: (Dispatch, String, String, Boolean) => TaskAction = (_, _, _, _) => ???,
-  mkDirsMock: List[String] => Future[Unit] = _ => ???,
+  mkDirsMock: List[String] => Future[String] = _ => ???,
   readDirMock: (Option[String], String) => Future[FileListDir] = (_, _) => ???,
   deleteMock: (String, Seq[FileListItem]) => Future[Unit] = (_, _) => ???,
   deleteActionMock: (Dispatch, String, Seq[FileListItem]) => TaskAction = (_, _, _) => ???,
@@ -55,7 +55,7 @@ class MockFileListActions(
     createDirMock(dispatch, parent, dir, multiple)
   }
   
-  override def mkDirs(dirs: List[String]): Future[Unit] = mkDirsMock(dirs)
+  override def mkDirs(dirs: List[String]): Future[String] = mkDirsMock(dirs)
 
   override def readDir(parent: Option[String], dir: String): Future[FileListDir] = readDirMock(parent, dir)
 

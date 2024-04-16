@@ -12,7 +12,7 @@ trait FileListApi extends js.Object {
 
   def delete(parent: String, items: js.Array[FileListItem]): js.Promise[Unit]
 
-  def mkDirs(dirs: js.Array[String]): js.Promise[Unit]
+  def mkDirs(dirs: js.Array[String]): js.Promise[String]
 
   def readFile(parentDirs: js.Array[String],
                item: FileListItem,

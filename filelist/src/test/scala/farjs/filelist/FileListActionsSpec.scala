@@ -25,7 +25,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     val readDir2 = mockFunction[js.UndefOr[String], String, js.Promise[FileListDir]]
     val readDir = mockFunction[String, js.Promise[FileListDir]]
     val delete = mockFunction[String, js.Array[FileListItem], js.Promise[Unit]]
-    val mkDirs = mockFunction[js.Array[String], js.Promise[Unit]]
+    val mkDirs = mockFunction[js.Array[String], js.Promise[String]]
     val readFile = mockFunction[js.Array[String], FileListItem, Double, js.Promise[FileSource]]
     val writeFile = mockFunction[js.Array[String], String, FileListItem => js.Promise[js.UndefOr[Boolean]], js.Promise[js.UndefOr[FileTarget]]]
     
@@ -137,7 +137,7 @@ class FileListActionsSpec extends AsyncTestSpec {
 
     api.mkDirs.expects(*).onCall { dirs: js.Array[String] =>
       dirs.toList shouldBe List(parent, dir)
-      js.Promise.resolve[Unit](())
+      js.Promise.resolve[String]("")
     }
     api.readDir.expects(parent).returning(js.Promise.resolve[FileListDir](currDir))
     
@@ -167,7 +167,7 @@ class FileListActionsSpec extends AsyncTestSpec {
 
     api.mkDirs.expects(*).onCall { dirs: js.Array[String] =>
       dirs.toList shouldBe List(parent, "test", "dir")
-      js.Promise.resolve[Unit](())
+      js.Promise.resolve[String]("")
     }
     api.readDir.expects(parent).returning(js.Promise.resolve[FileListDir](currDir))
     

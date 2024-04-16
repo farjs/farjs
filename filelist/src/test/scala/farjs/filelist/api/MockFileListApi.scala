@@ -10,7 +10,7 @@ object MockFileListApi {
              readDir2Mock: (js.UndefOr[String], String) => js.Promise[FileListDir] = (_, _) => ???,
              readDirMock: String => js.Promise[FileListDir] = _ => ???,
              deleteMock: (String, js.Array[FileListItem]) => js.Promise[Unit] = (_, _) => ???,
-             mkDirsMock: js.Array[String] => js.Promise[Unit] = _ => ???,
+             mkDirsMock: js.Array[String] => js.Promise[String] = _ => ???,
              readFileMock: (js.Array[String], FileListItem, Double) => js.Promise[FileSource] = (_, _, _) => ???,
              writeFileMock: (js.Array[String], String, FileListItem => js.Promise[js.UndefOr[Boolean]]) => js.Promise[js.UndefOr[FileTarget]] = (_, _, _) => ???
            ): FileListApi = {
@@ -28,7 +28,7 @@ object MockFileListApi {
       override def delete(parent: String, items: js.Array[FileListItem]): js.Promise[Unit] =
         deleteMock(parent, items)
 
-      override def mkDirs(dirs: js.Array[String]): js.Promise[Unit] =
+      override def mkDirs(dirs: js.Array[String]): js.Promise[String] =
         mkDirsMock(dirs)
 
       override def readFile(parentDirs: js.Array[String],

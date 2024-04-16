@@ -101,7 +101,7 @@ class ZipApi(val zipPath: String,
     delDirItems(parent, items).toJSPromise
   }
 
-  override def mkDirs(dirs: js.Array[String]): js.Promise[Unit] = js.Promise.resolve[Unit](())
+  override def mkDirs(dirs: js.Array[String]): js.Promise[String] = js.Promise.resolve[String]("")
 
   override def readFile(parentDirs: js.Array[String], item: FileListItem, position: Double): js.Promise[FileSource] = {
     val filePath = s"${parentDirs.mkString("/")}/${item.name}".stripPrefix(rootPath).stripPrefix("/")

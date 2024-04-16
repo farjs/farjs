@@ -40,7 +40,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   //noinspection TypeAnnotation
   class Actions {
     val updateDir = mockFunction[Dispatch, Boolean, String, TaskAction]
-    val mkDirs = mockFunction[List[String], Future[Unit]]
+    val mkDirs = mockFunction[List[String], Future[String]]
     val readDir = mockFunction[Option[String], String, Future[FileListDir]]
     val delete = mockFunction[String, Seq[FileListItem], Future[Unit]]
     val writeFile = mockFunction[List[String], String,
@@ -841,7 +841,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val p = Promise[Boolean]()
 
     actions.readDir.expects(Some("/from/path"), "dir 1").returning(Future.successful(dirList))
-    toActions.mkDirs.expects(List("/to/path", "newName")).returning(Future.unit)
+    toActions.mkDirs.expects(List("/to/path", "newName")).returning(Future.successful("/to/path/newName"))
     
     var onProgressFn: Double => Future[Boolean] = null
     toActions.writeFile.expects(List("/to/path", "newName"), item.name, *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
@@ -895,7 +895,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val p = Promise[Boolean]()
 
     actions.readDir.expects(Some("/from/path"), "dir 1").returning(Future.successful(dirList))
-    toActions.mkDirs.expects(List("/to/path", "newName")).returning(Future.unit)
+    toActions.mkDirs.expects(List("/to/path", "newName")).returning(Future.successful("/to/path/newName"))
     
     var onProgressFn: Double => Future[Boolean] = null
     toActions.writeFile.expects(List("/to/path", "newName"), item.name, *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))

@@ -63,7 +63,7 @@ trait FileListActions {
     TaskAction(Task("Creating Dir", future))
   }
 
-  def mkDirs(dirs: List[String]): Future[Unit] = api.mkDirs(js.Array(dirs: _*)).toFuture
+  def mkDirs(dirs: List[String]): Future[String] = api.mkDirs(js.Array(dirs: _*)).toFuture
 
   def readDir(parent: Option[String], dir: String): Future[FileListDir] = {
     api.readDir(parent match {

@@ -69,10 +69,10 @@ class FSFileListApi(fs: FS = scommons.nodejs.fs) extends FileListApi {
     delDirItems(parent, items.map(i => (i.name, i.isDir)).toSeq).toJSPromise
   }
 
-  override def mkDirs(dirs: js.Array[String]): js.Promise[Unit] = {
+  override def mkDirs(dirs: js.Array[String]): js.Promise[String] = {
 
-    def loop(parent: String, names: List[String]): Future[Unit] = names match {
-      case Nil => Future.unit
+    def loop(parent: String, names: List[String]): Future[String] = names match {
+      case Nil => Future.successful(parent)
       case name :: tail => Future.unit.flatMap { _ =>
         val dir =
           if (name.isEmpty) parent

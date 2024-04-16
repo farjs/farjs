@@ -181,18 +181,20 @@ class FSFileListApiSpec extends AsyncTestSpec {
     val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"))
     fs.existsSync(tmpDir) shouldBe true
     val dirs = List("test1", "test2", "", "test3", "")
+    val resPath = path.join(tmpDir :: dirs: _*)
 
     //when
     val resultF = apiImp.mkDirs(js.Array(tmpDir :: dirs: _*)).toFuture
 
     //then
-    val resCheckF = resultF.map { _ =>
-      fs.existsSync(path.join(tmpDir :: dirs: _*)) shouldBe true
+    val resCheckF = resultF.map { res =>
+      res shouldBe resPath
+      fs.existsSync(resPath) shouldBe true
     }
 
     //cleanup
     resCheckF.map { _ =>
-      del(path.join(tmpDir :: dirs: _*), isDir = true)
+      del(resPath, isDir = true)
       del(path.join(tmpDir, "test1", "test2"), isDir = true)
       del(path.join(tmpDir, "test1"), isDir = true)
       del(tmpDir, isDir = true)
@@ -206,6 +208,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     fs.existsSync(tmpDir) shouldBe true
     val topDir = "test1"
     val dirs = List(topDir, "test2", "", "test3", "")
+    val resPath = path.join(tmpDir :: dirs: _*)
     fs.mkdirSync(path.join(tmpDir, topDir))
     fs.existsSync(path.join(tmpDir, topDir)) shouldBe true
 
@@ -213,13 +216,14 @@ class FSFileListApiSpec extends AsyncTestSpec {
     val resultF = apiImp.mkDirs(js.Array(tmpDir :: dirs: _*)).toFuture
 
     //then
-    val resCheckF = resultF.map { _ =>
-      fs.existsSync(path.join(tmpDir :: dirs: _*)) shouldBe true
+    val resCheckF = resultF.map { res =>
+      res shouldBe resPath
+      fs.existsSync(resPath) shouldBe true
     }
 
     //cleanup
     resCheckF.map { _ =>
-      del(path.join(tmpDir :: dirs: _*), isDir = true)
+      del(resPath, isDir = true)
       del(path.join(tmpDir, "test1", "test2"), isDir = true)
       del(path.join(tmpDir, "test1"), isDir = true)
       del(tmpDir, isDir = true)
@@ -232,18 +236,20 @@ class FSFileListApiSpec extends AsyncTestSpec {
     val tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"))
     fs.existsSync(tmpDir) shouldBe true
     val dir = "test123"
+    val resPath = path.join(tmpDir, dir)
 
     //when
-    val resultF = apiImp.mkDirs(js.Array(path.join(tmpDir, dir))).toFuture
+    val resultF = apiImp.mkDirs(js.Array(resPath)).toFuture
 
     //then
-    val resCheckF = resultF.map { _ =>
-      fs.existsSync(path.join(tmpDir, dir)) shouldBe true
+    val resCheckF = resultF.map { res =>
+      res shouldBe resPath
+      fs.existsSync(resPath) shouldBe true
     }
 
     //cleanup
     resCheckF.map { _ =>
-      del(path.join(tmpDir, dir), isDir = true)
+      del(resPath, isDir = true)
       del(tmpDir, isDir = true)
       Succeeded
     }
@@ -258,21 +264,23 @@ class FSFileListApiSpec extends AsyncTestSpec {
     tmpRoot should not be empty
     val tmpRest = tmpDir.stripPrefix(tmpRoot).stripPrefix(path.sep)
     val dir = "skip_root_dir_creation_test"
-    fs.existsSync(path.join(tmpRoot, tmpRest, dir)) shouldBe false
+    val resPath = path.join(tmpRoot, tmpRest, dir)
+    fs.existsSync(resPath) shouldBe false
 
     //when
     val resultF = apiImp.mkDirs(js.Array(tmpRoot, tmpRest, dir)).toFuture
 
     //then
-    val resCheckF = resultF.map { _ =>
-      fs.existsSync(path.join(tmpRoot, tmpRest, dir)) shouldBe true
+    val resCheckF = resultF.map { res =>
+      res shouldBe resPath
+      fs.existsSync(resPath) shouldBe true
     }
 
     //cleanup
     resCheckF.map { _ =>
-      del(path.join(tmpRoot, tmpRest, dir), isDir = true)
+      del(resPath, isDir = true)
       del(tmpDir, isDir = true)
-      fs.existsSync(path.join(tmpRoot, tmpRest, dir)) shouldBe false
+      fs.existsSync(resPath) shouldBe false
     }
   }
   
