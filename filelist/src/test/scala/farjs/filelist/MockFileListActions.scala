@@ -20,10 +20,10 @@ class MockFileListActions(
   deleteMock: (String, Seq[FileListItem]) => Future[Unit] = (_, _) => ???,
   deleteActionMock: (Dispatch, String, Seq[FileListItem]) => TaskAction = (_, _, _) => ???,
   scanDirsMock: (String, Seq[FileListItem], (String, Seq[FileListItem]) => Boolean) => Future[Boolean] = (_, _, _) => ???,
-  writeFileMock: (List[String], String,
+  writeFileMock: (String, String,
     FileListItem => js.Promise[js.UndefOr[Boolean]]) => Future[js.UndefOr[FileTarget]] = (_, _, _) => ???,
-  readFileMock: (List[String], FileListItem, Double) => Future[FileSource] = (_, _, _) => ???,
-  copyFileMock: (List[String], FileListItem, Future[js.UndefOr[FileTarget]],
+  readFileMock: (String, FileListItem, Double) => Future[FileSource] = (_, _, _) => ???,
+  copyFileMock: (String, FileListItem, Future[js.UndefOr[FileTarget]],
     Double => Future[Boolean]) => Future[Boolean] = (_, _, _, _) => ???
 ) extends FileListActions {
 
@@ -75,21 +75,21 @@ class MockFileListActions(
     scanDirsMock(parent, items, onNextDir)
   }
   
-  override def writeFile(parentDirs: List[String],
+  override def writeFile(parent: String,
                          fileName: String,
                          onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]): Future[js.UndefOr[FileTarget]] = {
 
-    writeFileMock(parentDirs, fileName, onExists)
+    writeFileMock(parent, fileName, onExists)
   }
 
-  override def readFile(parentDirs: List[String], file: FileListItem, position: Double): Future[FileSource] =
-    readFileMock(parentDirs, file, position)
+  override def readFile(parent: String, file: FileListItem, position: Double): Future[FileSource] =
+    readFileMock(parent, file, position)
   
-  override def copyFile(srcDirs: List[String],
+  override def copyFile(srcDir: String,
                         srcItem: FileListItem,
                         dstFileF: Future[js.UndefOr[FileTarget]],
                         onProgress: Double => Future[Boolean]): Future[Boolean] = {
 
-    copyFileMock(srcDirs, srcItem, dstFileF, onProgress)
+    copyFileMock(srcDir, srcItem, dstFileF, onProgress)
   }
 }

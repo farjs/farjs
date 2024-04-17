@@ -96,18 +96,18 @@ trait FileListActions {
     }
   }
 
-  def writeFile(parentDirs: List[String],
+  def writeFile(parent: String,
                 fileName: String,
                 onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]): Future[js.UndefOr[FileTarget]] = {
 
-    api.writeFile(js.Array(parentDirs: _*), fileName, onExists).toFuture
+    api.writeFile(parent, fileName, onExists).toFuture
   }
 
-  def readFile(parentDirs: List[String], file: FileListItem, position: Double): Future[FileSource] = {
-    api.readFile(js.Array(parentDirs: _*), file, position).toFuture
+  def readFile(parent: String, file: FileListItem, position: Double): Future[FileSource] = {
+    api.readFile(parent, file, position).toFuture
   }
 
-  def copyFile(srcDirs: List[String],
+  def copyFile(srcDir: String,
                srcItem: FileListItem,
                dstFileF: Future[js.UndefOr[FileTarget]],
                onProgress: Double => Future[Boolean]): Future[Boolean] = {
@@ -115,7 +115,7 @@ trait FileListActions {
     dstFileF.flatMap(_.toOption match {
       case None => onProgress(srcItem.size)
       case Some(target) =>
-        readFile(srcDirs, srcItem, 0.0).flatMap { source =>
+        readFile(srcDir, srcItem, 0.0).flatMap { source =>
           val buff = new Uint8Array(copyBufferBytes)
 
           def loop(): Future[Boolean] = {

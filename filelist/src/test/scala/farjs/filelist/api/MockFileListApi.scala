@@ -10,8 +10,8 @@ object MockFileListApi {
              readDirMock: (String, js.UndefOr[String]) => js.Promise[FileListDir] = (_, _) => ???,
              deleteMock: (String, js.Array[FileListItem]) => js.Promise[Unit] = (_, _) => ???,
              mkDirsMock: js.Array[String] => js.Promise[String] = _ => ???,
-             readFileMock: (js.Array[String], FileListItem, Double) => js.Promise[FileSource] = (_, _, _) => ???,
-             writeFileMock: (js.Array[String], String, FileListItem => js.Promise[js.UndefOr[Boolean]]) => js.Promise[js.UndefOr[FileTarget]] = (_, _, _) => ???
+             readFileMock: (String, FileListItem, Double) => js.Promise[FileSource] = (_, _, _) => ???,
+             writeFileMock: (String, String, FileListItem => js.Promise[js.UndefOr[Boolean]]) => js.Promise[js.UndefOr[FileTarget]] = (_, _, _) => ???
            ): FileListApi = {
 
     new FileListApi {
@@ -27,19 +27,19 @@ object MockFileListApi {
       override def mkDirs(dirs: js.Array[String]): js.Promise[String] =
         mkDirsMock(dirs)
 
-      override def readFile(parentDirs: js.Array[String],
+      override def readFile(parent: String,
                             file: FileListItem,
                             position: Double): js.Promise[FileSource] = {
         
-        readFileMock(parentDirs, file, position)
+        readFileMock(parent, file, position)
       }
 
-      override def writeFile(parentDirs: js.Array[String],
+      override def writeFile(parent: String,
                              fileName: String,
                              onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]
                             ): js.Promise[js.UndefOr[FileTarget]] = {
 
-        writeFileMock(parentDirs, fileName, onExists)
+        writeFileMock(parent, fileName, onExists)
       }
     }
   }

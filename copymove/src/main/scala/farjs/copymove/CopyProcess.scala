@@ -58,7 +58,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
 
       def loop(copied: Boolean,
                parent: String,
-               targetDirs: List[String],
+               targetDir: String,
                items: Seq[(FileListItem, String)]): Future[(Boolean, Boolean)] = {
         
         items.foldLeft(Future.successful((copied, inProgress.current))) { case (resF, (item, toName)) =>
@@ -66,9 +66,8 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
             case (prevCopied, true) if item.isDir && inProgress.current =>
               for {
                 dirList <- props.from.actions.readDir(parent, item.name)
-                dstDirs = targetDirs :+ toName
-                _ <- props.to.actions.mkDirs(dstDirs)
-                res <- loop(prevCopied, dirList.path, dstDirs, dirList.items.map(i => (i, i.name)).toSeq)
+                dstDir <- props.to.actions.mkDirs(List(targetDir, toName))
+                res <- loop(prevCopied, dirList.path, dstDir, dirList.items.map(i => (i, i.name)).toSeq)
                 (isCopied, done) = res
                 _ <-
                   if (isCopied && done && props.move) props.from.actions.delete(parent, Seq(item))
@@ -77,16 +76,16 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
             case (prevCopied, true) if !item.isDir && inProgress.current =>
               data.current = data.current.copy(
                 item = item,
-                to = nodejs.path.join(targetDirs :+ toName: _*),
+                to = nodejs.path.join(targetDir, toName),
                 itemPercent = 0,
                 itemBytes = 0.0
               )
               var isCopied = true
               for {
                 done <- props.from.actions.copyFile(
-                  srcDirs = List(parent),
+                  srcDir = parent,
                   srcItem = item,
-                  dstFileF = props.to.actions.writeFile(targetDirs, toName, onExists = { existing =>
+                  dstFileF = props.to.actions.writeFile(targetDir, toName, onExists = { existing =>
                     if (inProgress.current && data.current.askWhenExists) {
                       setState(_.copy(existing = Some(existing)))
                       existsPromise.current = Promise[js.UndefOr[Boolean]]()
@@ -127,7 +126,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
       val resultF = props.items.foldLeft(Future.successful(true)) { case (resF, topItem@(item, _)) =>
         resF.flatMap {
           case true if inProgress.current =>
-            loop(copied = true, props.fromPath, List(props.toPath), Seq(topItem)).map { case (isCopied, done) =>
+            loop(copied = true, props.fromPath, props.toPath, Seq(topItem)).map { case (isCopied, done) =>
               if (isCopied && done) {
                 props.onTopItem(item)
               }

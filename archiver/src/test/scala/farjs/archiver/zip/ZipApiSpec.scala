@@ -147,7 +147,7 @@ class ZipApiSpec extends AsyncTestSpec {
     }
 
     //when
-    val resultF = api.readFile(js.Array(rootPath, "dir 1"), item, 0.0).toFuture
+    val resultF = api.readFile(s"$rootPath/dir 1", item, 0.0).toFuture
 
     //then
     (for {
@@ -193,7 +193,7 @@ class ZipApiSpec extends AsyncTestSpec {
     val buff = new Uint8Array(5)
 
     //when
-    val resultF = api.readFile(js.Array(rootPath, "dir 1"), item, 0.0).toFuture
+    val resultF = api.readFile(s"$rootPath/dir 1", item, 0.0).toFuture
 
     //then
     (for {
@@ -239,7 +239,7 @@ class ZipApiSpec extends AsyncTestSpec {
     val buff = new Uint8Array(5)
 
     //when
-    val resultF = api.readFile(js.Array(rootPath, "dir 1"), item, 0.0).toFuture
+    val resultF = api.readFile(s"$rootPath/dir 1", item, 0.0).toFuture
 
     //then
     for {

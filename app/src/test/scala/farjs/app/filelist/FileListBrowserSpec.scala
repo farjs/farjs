@@ -28,7 +28,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   
   //noinspection TypeAnnotation
   class Actions {
-    val readFile = mockFunction[List[String], FileListItem, Double, Future[FileSource]]
+    val readFile = mockFunction[String, FileListItem, Double, Future[FileSource]]
 
     val actions = new MockFileListActions(
       readFileMock = readFile
@@ -389,7 +389,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val expectedError = new Exception("test error")
     
     //then
-    actions.readFile.expects(List(currDir.path), fileItem, 0.0).returning(Future.failed(expectedError))
+    actions.readFile.expects(currDir.path, fileItem, 0.0).returning(Future.failed(expectedError))
     var openF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
       inside(action.asInstanceOf[TaskAction]) { case TaskAction(Task("Opening File", future)) =>
@@ -462,7 +462,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val keyFull = "enter"
     
     //then
-    actions.readFile.expects(List(currDir.path), fileItem, 0.0).returning(Future.successful(source.source))
+    actions.readFile.expects(currDir.path, fileItem, 0.0).returning(Future.successful(source.source))
     source.readNextBytes.expects(*).onCall { buff: Uint8Array =>
       buff.length shouldBe (64 * 1024)
       js.Promise.resolve[Int](123)

@@ -310,9 +310,9 @@ class FSFileListApiSpec extends AsyncTestSpec {
     
     //when
     val resultF = for {
-      source <- apiImp.readFile(js.Array(tmpDir), FileListItem("example.txt"), 0.0).toFuture
+      source <- apiImp.readFile(tmpDir, FileListItem("example.txt"), 0.0).toFuture
       _ = source.file shouldBe file1
-      maybeTarget <- apiImp.writeFile(js.Array(tmpDir), "example2.txt", onExists).toFuture
+      maybeTarget <- apiImp.writeFile(tmpDir, "example2.txt", onExists).toFuture
       _ <- maybeTarget.map(loop(source, _)).getOrElse(Future.unit)
       _ <- maybeTarget.map(_.close().toFuture).getOrElse(Future.unit)
       _ <- source.close().toFuture
@@ -369,8 +369,8 @@ class FSFileListApiSpec extends AsyncTestSpec {
     
     //when
     val resultF = for {
-      source <- apiImp.readFile(js.Array(tmpDir), FileListItem("example.txt"), 0.0).toFuture
-      maybeTarget <- apiImp.writeFile(js.Array(tmpDir), "example2.txt", onExists).toFuture
+      source <- apiImp.readFile(tmpDir, FileListItem("example.txt"), 0.0).toFuture
+      maybeTarget <- apiImp.writeFile(tmpDir, "example2.txt", onExists).toFuture
       _ <- maybeTarget.map(loop(source, _)).getOrElse(Future.unit)
       _ <- maybeTarget.map(_.close().toFuture).getOrElse(Future.unit)
       _ <- source.close().toFuture
@@ -427,8 +427,8 @@ class FSFileListApiSpec extends AsyncTestSpec {
     
     //when
     val resultF = for {
-      source <- apiImp.readFile(js.Array(tmpDir), FileListItem("example.txt"), 0).toFuture
-      maybeTarget <- apiImp.writeFile(js.Array(tmpDir), "example2.txt", onExists).toFuture
+      source <- apiImp.readFile(tmpDir, FileListItem("example.txt"), 0).toFuture
+      maybeTarget <- apiImp.writeFile(tmpDir, "example2.txt", onExists).toFuture
       _ <- maybeTarget.map(loop(source, _)).getOrElse(Future.unit)
       _ <- maybeTarget.map(_.close().toFuture).getOrElse(Future.unit)
       _ <- source.close().toFuture
@@ -473,7 +473,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     }
     
     //when
-    val resultF = apiImp.writeFile(js.Array(tmpDir), "example2.txt", onExists).toFuture
+    val resultF = apiImp.writeFile(tmpDir, "example2.txt", onExists).toFuture
 
     resultF.flatMap { maybeTarget =>
       //then

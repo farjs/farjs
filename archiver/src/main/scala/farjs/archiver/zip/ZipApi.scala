@@ -100,8 +100,8 @@ class ZipApi(val zipPath: String,
 
   override def mkDirs(dirs: js.Array[String]): js.Promise[String] = js.Promise.resolve[String]("")
 
-  override def readFile(parentDirs: js.Array[String], item: FileListItem, position: Double): js.Promise[FileSource] = {
-    val filePath = s"${parentDirs.mkString("/")}/${item.name}".stripPrefix(rootPath).stripPrefix("/")
+  override def readFile(parent: String, item: FileListItem, position: Double): js.Promise[FileSource] = {
+    val filePath = s"$parent/${item.name}".stripPrefix(rootPath).stripPrefix("/")
     val subprocessF = extract(zipPath, filePath)
 
     subprocessF.map { case SubProcess(_, stdout, exitF) =>
@@ -140,7 +140,7 @@ class ZipApi(val zipPath: String,
     }.toJSPromise
   }
 
-  override def writeFile(parentDirs: js.Array[String],
+  override def writeFile(parent: String,
                          fileName: String,
                          onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]
                         ): js.Promise[js.UndefOr[FileTarget]] = {

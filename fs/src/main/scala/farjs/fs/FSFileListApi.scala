@@ -94,8 +94,8 @@ class FSFileListApi(fs: FS = scommons.nodejs.fs) extends FileListApi {
     loop("", dirs.toList).toJSPromise
   }
   
-  override def readFile(parentDirs: js.Array[String], file: FileListItem, position: Double): js.Promise[FileSource] = Future {
-    val filePath = path.join(path.join(parentDirs.toList: _*), file.name)
+  override def readFile(parent: String, file: FileListItem, position: Double): js.Promise[FileSource] = Future {
+    val filePath = path.join(parent, file.name)
     val fd = fs.openSync(filePath, FSConstants.O_RDONLY)
     
     new FileSource {
@@ -114,20 +114,19 @@ class FSFileListApi(fs: FS = scommons.nodejs.fs) extends FileListApi {
     }
   }.toJSPromise
 
-  override def writeFile(parentDirs: js.Array[String],
+  override def writeFile(parent: String,
                          fileName: String,
                          onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]
                         ): js.Promise[js.UndefOr[FileTarget]] = {
 
-    val targetDir = path.join(parentDirs.toList: _*)
-    val filePath = path.join(targetDir, fileName)
+    val filePath = path.join(parent, fileName)
 
     Future[(js.UndefOr[Int], Double)] {
       val fd = fs.openSync(filePath, FSConstants.O_CREAT | FSConstants.O_WRONLY | FSConstants.O_EXCL)
       (fd, 0.0)
     }.recoverWith[(js.UndefOr[Int], Double)] {
       case JavaScriptException(error: raw.Error) if error.code == "EEXIST" =>
-        val existing = toFileListItem(targetDir, fileName)
+        val existing = toFileListItem(parent, fileName)
         onExists(existing).toFuture.map(_.toOption match {
           case None => (js.undefined, 0.0)
           case Some(overwrite) =>

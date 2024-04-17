@@ -25,8 +25,8 @@ class FileListActionsSpec extends AsyncTestSpec {
     val readDir = mockFunction[String, js.UndefOr[String], js.Promise[FileListDir]]
     val delete = mockFunction[String, js.Array[FileListItem], js.Promise[Unit]]
     val mkDirs = mockFunction[js.Array[String], js.Promise[String]]
-    val readFile = mockFunction[js.Array[String], FileListItem, Double, js.Promise[FileSource]]
-    val writeFile = mockFunction[js.Array[String], String, FileListItem => js.Promise[js.UndefOr[Boolean]], js.Promise[js.UndefOr[FileTarget]]]
+    val readFile = mockFunction[String, FileListItem, Double, js.Promise[FileSource]]
+    val writeFile = mockFunction[String, String, FileListItem => js.Promise[js.UndefOr[Boolean]], js.Promise[js.UndefOr[FileTarget]]]
     
     val api = MockFileListApi(
       capabilitiesMock = capabilities,
@@ -292,9 +292,9 @@ class FileListActionsSpec extends AsyncTestSpec {
     //given
     val api = new Api
     val actions = new FileListActionsTest(api.api)
-    val srcDirs = List("parent-dir")
+    val srcDir = "parent-dir"
     val file = FileListItem("test_file")
-    val dstDirs = List("target-dir")
+    val dstDir = "target-dir"
     val onExists = mockFunction[FileListItem, js.Promise[js.UndefOr[Boolean]]]
     val onProgress = mockFunction[Double, Future[Boolean]]
     val position = 1234.0
@@ -320,19 +320,19 @@ class FileListActionsSpec extends AsyncTestSpec {
     val dstName = "newName"
 
     //then
-    api.writeFile.expects(*, dstName, *).onCall { (resDirs, _, _) =>
-      resDirs.toList shouldBe dstDirs
+    api.writeFile.expects(*, dstName, *).onCall { (resDir, _, _) =>
+      resDir shouldBe dstDir
       js.Promise.resolve[FileTarget](target.target)
     }
-    api.readFile.expects(*, file, 0.0).onCall { (resDirs, _, _) =>
-      resDirs.toList shouldBe srcDirs
+    api.readFile.expects(*, file, 0.0).onCall { (resDir, _, _) =>
+      resDir shouldBe srcDir
       js.Promise.resolve[FileSource](source.source)
     }
     onExists.expects(*).never()
     onProgress.expects(position).returning(Future.successful(true))
     
     //when
-    val resultF = actions.copyFile(srcDirs, file, actions.writeFile(dstDirs, dstName, onExists), onProgress)
+    val resultF = actions.copyFile(srcDir, file, actions.writeFile(dstDir, dstName, onExists), onProgress)
     
     //then
     resultF.map { res =>
@@ -344,10 +344,10 @@ class FileListActionsSpec extends AsyncTestSpec {
     //given
     val api = new Api
     val actions = new FileListActionsTest(api.api)
-    val srcDirs = List("parent-dir")
+    val srcDir = "parent-dir"
     val file = FileListItem("test_file")
     val existing = FileListItem.copy(FileListItem("existing_file"))(size = 12)
-    val dstDirs = List("target-dir")
+    val dstDir = "target-dir"
     val onExists = mockFunction[FileListItem, js.Promise[js.UndefOr[Boolean]]]
     val onProgress = mockFunction[Double, Future[Boolean]]
     val position = 1234.0
@@ -377,21 +377,21 @@ class FileListActionsSpec extends AsyncTestSpec {
       assertFileListItem(item, existing)
       js.Promise.resolve[js.UndefOr[Boolean]](true)
     }
-    api.writeFile.expects(*, dstName, *).onCall { (dirs, _, onExists) =>
-      dirs.toList shouldBe dstDirs
+    api.writeFile.expects(*, dstName, *).onCall { (dir, _, onExists) =>
+      dir shouldBe dstDir
       onExists(existing).toFuture.map { res =>
         res shouldBe true
         target.target
       }.toJSPromise
     }
-    api.readFile.expects(*, file, 0.0).onCall { (dirs, _, _) =>
-      dirs.toList shouldBe srcDirs
+    api.readFile.expects(*, file, 0.0).onCall { (dir, _, _) =>
+      dir shouldBe srcDir
       js.Promise.resolve[FileSource](source.source)
     }
     onProgress.expects(position).returning(Future.successful(true))
     
     //when
-    val resultF = actions.copyFile(srcDirs, file, actions.writeFile(dstDirs, dstName, onExists), onProgress)
+    val resultF = actions.copyFile(srcDir, file, actions.writeFile(dstDir, dstName, onExists), onProgress)
     
     //then
     resultF.map { res =>
@@ -403,10 +403,10 @@ class FileListActionsSpec extends AsyncTestSpec {
     //given
     val api = new Api
     val actions = new FileListActionsTest(api.api)
-    val srcDirs = List("parent-dir")
+    val srcDir = "parent-dir"
     val file = FileListItem("test_file")
     val existing = FileListItem.copy(FileListItem("existing_file"))(size = 12)
-    val dstDirs = List("target-dir")
+    val dstDir = "target-dir"
     val onExists = mockFunction[FileListItem, js.Promise[js.UndefOr[Boolean]]]
     val onProgress = mockFunction[Double, Future[Boolean]]
     val position = 1234.0
@@ -433,21 +433,21 @@ class FileListActionsSpec extends AsyncTestSpec {
 
     //then
     onExists.expects(existing).returning(js.Promise.resolve[js.UndefOr[Boolean]](false))
-    api.writeFile.expects(*, dstName, *).onCall { (dirs, _, onExists) =>
-      dirs.toList shouldBe dstDirs
+    api.writeFile.expects(*, dstName, *).onCall { (dir, _, onExists) =>
+      dir shouldBe dstDir
       onExists(existing).toFuture.map { res =>
         res shouldBe false
         target.target
       }.toJSPromise
     }
-    api.readFile.expects(*, file, 0.0).onCall { (dirs, _, _) =>
-      dirs.toList shouldBe srcDirs
+    api.readFile.expects(*, file, 0.0).onCall { (dir, _, _) =>
+      dir shouldBe srcDir
       js.Promise.resolve[FileSource](source.source)
     }
     onProgress.expects(position).returning(Future.successful(true))
     
     //when
-    val resultF = actions.copyFile(srcDirs, file, actions.writeFile(dstDirs, dstName, onExists), onProgress)
+    val resultF = actions.copyFile(srcDir, file, actions.writeFile(dstDir, dstName, onExists), onProgress)
     
     //then
     resultF.map { res =>
@@ -459,18 +459,18 @@ class FileListActionsSpec extends AsyncTestSpec {
     //given
     val api = new Api
     val actions = new FileListActionsTest(api.api)
-    val srcDirs = List("parent-dir")
+    val srcDir = "parent-dir"
     val file = FileListItem.copy(FileListItem("test_file"))(size = 123)
     val existing = FileListItem.copy(FileListItem("existing_file"))(size = 12)
-    val dstDirs = List("target-dir")
+    val dstDir = "target-dir"
     val onExists = mockFunction[FileListItem, js.Promise[js.UndefOr[Boolean]]]
     val onProgress = mockFunction[Double, Future[Boolean]]
     val dstName = "newName"
     
     //then
     onExists.expects(existing).returning(js.Promise.resolve[js.UndefOr[Boolean]](js.undefined))
-    api.writeFile.expects(*, dstName, *).onCall { (dirs, _, onExists) =>
-      dirs.toList shouldBe dstDirs
+    api.writeFile.expects(*, dstName, *).onCall { (dir, _, onExists) =>
+      dir shouldBe dstDir
       onExists(existing).toFuture.map { res =>
         res shouldBe js.undefined
         js.undefined
@@ -479,7 +479,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     onProgress.expects(file.size).returning(Future.successful(false))
     
     //when
-    val resultF = actions.copyFile(srcDirs, file, actions.writeFile(dstDirs, dstName, onExists), onProgress)
+    val resultF = actions.copyFile(srcDir, file, actions.writeFile(dstDir, dstName, onExists), onProgress)
     
     //then
     resultF.map { res =>
@@ -491,9 +491,9 @@ class FileListActionsSpec extends AsyncTestSpec {
     //given
     val api = new Api
     val actions = new FileListActionsTest(api.api)
-    val srcDirs = List("parent-dir")
+    val srcDir = "parent-dir"
     val file = FileListItem("test_file")
-    val dstDirs = List("target-dir")
+    val dstDir = "target-dir"
     val onExists = mockFunction[FileListItem, js.Promise[js.UndefOr[Boolean]]]
     val onProgress = mockFunction[Double, Future[Boolean]]
     val position = 1234.0
@@ -516,19 +516,19 @@ class FileListActionsSpec extends AsyncTestSpec {
     val dstName = "newName"
 
     //then
-    api.writeFile.expects(*, dstName, *).onCall { (dirs, _, _) =>
-      dirs.toList shouldBe dstDirs
+    api.writeFile.expects(*, dstName, *).onCall { (dir, _, _) =>
+      dir shouldBe dstDir
       js.Promise.resolve[FileTarget](target.target)
     }
-    api.readFile.expects(*, file, 0.0).onCall { (dirs, _, _) =>
-      dirs.toList shouldBe srcDirs
+    api.readFile.expects(*, file, 0.0).onCall { (dir, _, _) =>
+      dir shouldBe srcDir
       js.Promise.resolve[FileSource](source.source)
     }
     onExists.expects(*).never()
     onProgress.expects(position).returning(Future.successful(false))
     
     //when
-    val resultF = actions.copyFile(srcDirs, file, actions.writeFile(dstDirs, dstName, onExists), onProgress)
+    val resultF = actions.copyFile(srcDir, file, actions.writeFile(dstDir, dstName, onExists), onProgress)
     
     //then
     resultF.map { res =>
@@ -540,9 +540,9 @@ class FileListActionsSpec extends AsyncTestSpec {
     //given
     val api = new Api
     val actions = new FileListActionsTest(api.api)
-    val srcDirs = List("parent-dir")
+    val srcDir = "parent-dir"
     val file = FileListItem("test_file")
-    val dstDirs = List("target-dir")
+    val dstDir = "target-dir"
     val onExists = mockFunction[FileListItem, js.Promise[js.UndefOr[Boolean]]]
     val onProgress = mockFunction[Double, Future[Boolean]]
     val error = js.Error("test error")
@@ -561,19 +561,19 @@ class FileListActionsSpec extends AsyncTestSpec {
     val dstName = "newName"
 
     //then
-    api.writeFile.expects(*, dstName, *).onCall { (dirs, _, _) =>
-      dirs.toList shouldBe dstDirs
+    api.writeFile.expects(*, dstName, *).onCall { (dir, _, _) =>
+      dir shouldBe dstDir
       js.Promise.resolve[FileTarget](target.target)
     }
-    api.readFile.expects(*, file, 0.0).onCall { (dirs, _, _) =>
-      dirs.toList shouldBe srcDirs
+    api.readFile.expects(*, file, 0.0).onCall { (dir, _, _) =>
+      dir shouldBe srcDir
       js.Promise.resolve[FileSource](source.source)
     }
     onExists.expects(*).never()
     onProgress.expects(*).never()
     
     //when
-    val resultF = actions.copyFile(srcDirs, file, actions.writeFile(dstDirs, dstName, onExists), onProgress)
+    val resultF = actions.copyFile(srcDir, file, actions.writeFile(dstDir, dstName, onExists), onProgress)
     
     //then
     resultF.failed.map(inside(_) {

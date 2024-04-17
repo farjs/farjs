@@ -12,11 +12,11 @@ trait FileListApi extends js.Object {
 
   def mkDirs(dirs: js.Array[String]): js.Promise[String]
 
-  def readFile(parentDirs: js.Array[String],
+  def readFile(parent: String,
                item: FileListItem,
                position: Double): js.Promise[FileSource]
 
-  def writeFile(parentDirs: js.Array[String],
+  def writeFile(parent: String,
                 fileName: String,
                 onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]
                ): js.Promise[js.UndefOr[FileTarget]]
