@@ -22,20 +22,17 @@ class ZipApi(val zipPath: String,
     FileListCapability.delete
   )
 
-  override def readDir(parent: js.UndefOr[String], dir: String): js.Promise[FileListDir] = {
-    val path = parent.getOrElse(rootPath)
-    val targetDir =
+  override def readDir(parent: String, maybeDir: js.UndefOr[String]): js.Promise[FileListDir] = {
+    val path = if (parent == "") rootPath else parent
+    val targetDir = maybeDir.map { dir =>
       if (dir == FileListItem.up.name) {
         val lastSlash = path.lastIndexOf('/')
         path.take(lastSlash)
       }
       else if (dir == FileListItem.currDir.name) path
       else s"$path/$dir"
+    }.getOrElse(path)
     
-    readDir(targetDir)
-  }
-
-  override def readDir(targetDir: String): js.Promise[FileListDir] = {
     entriesByParentF.map { entriesByParent =>
       val path = targetDir.stripPrefix(rootPath).stripPrefix("/")
       val entries = entriesByParent.getOrElse(path, Nil)
@@ -69,7 +66,7 @@ class ZipApi(val zipPath: String,
         res.flatMap { _ =>
           if (item.isDir) {
             val dir = s"$parent/${item.name}"
-            readDir(dir).toFuture.flatMap { fileListDir =>
+            readDir(dir, js.undefined).toFuture.flatMap { fileListDir =>
               if (fileListDir.items.nonEmpty) {
                 delDirItems(dir, fileListDir.items)
               }

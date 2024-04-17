@@ -38,7 +38,7 @@ class ZipActionsSpec extends AsyncTestSpec {
     val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
     val path = "/test/path"
     val api = new ZipApi("file.zip", "root.path", Future.successful(Map.empty)) {
-      override def readDir(targetDir: String): js.Promise[FileListDir] = {
+      override def readDir(path: String, dir: js.UndefOr[String]): js.Promise[FileListDir] = {
         js.Promise.resolve[FileListDir](currDir)
       }
     }

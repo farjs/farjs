@@ -44,7 +44,7 @@ class FSPluginUi(val showDrivePopupOnLeft: Option[Boolean] = None,
         if (dir != state.currDir.path) {
           dispatch(actions.changeDir(
             dispatch = dispatch,
-            parent = None,
+            path = "",
             dir = dir
           ))
         }

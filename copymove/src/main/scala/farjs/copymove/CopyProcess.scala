@@ -65,7 +65,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
           resF.flatMap {
             case (prevCopied, true) if item.isDir && inProgress.current =>
               for {
-                dirList <- props.from.actions.readDir(Some(parent), item.name)
+                dirList <- props.from.actions.readDir(parent, item.name)
                 dstDirs = targetDirs :+ toName
                 _ <- props.to.actions.mkDirs(dstDirs)
                 res <- loop(prevCopied, dirList.path, dstDirs, dirList.items.map(i => (i, i.name)).toSeq)

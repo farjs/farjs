@@ -36,7 +36,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
   class Actions(isLocalFS: Boolean = true) {
     val getDriveRoot = mockFunction[String, Future[Option[String]]]
     val updateDir = mockFunction[Dispatch, String, TaskAction]
-    val readDir = mockFunction[Option[String], String, Future[FileListDir]]
+    val readDir = mockFunction[String, js.UndefOr[String], Future[FileListDir]]
 
     val actions = new MockFileListActions(
       isLocalFSMock = isLocalFS,
@@ -79,7 +79,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val to = "test to path"
 
     //then
-    actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
+    actions.readDir.expects(currDir.path, to: js.UndefOr[String]).returning(Future.successful(toDir))
     dispatch.expects(*).onCall { action: Any =>
       inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
@@ -134,7 +134,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val to = "test to path"
 
     //then
-    actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
+    actions.readDir.expects(currDir.path, to: js.UndefOr[String]).returning(Future.successful(toDir))
     actions.getDriveRoot.expects(currDir.path).returning(Future.successful(None))
     actions.getDriveRoot.expects(toDir.path).returning(Future.successful(None))
     dispatch.expects(*).onCall { action: Any =>
@@ -220,7 +220,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val to = "test to path"
 
     //then
-    actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
+    actions.readDir.expects(currDir.path, to: js.UndefOr[String]).returning(Future.successful(toDir))
     dispatch.expects(*).onCall { action: Any =>
       inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
@@ -275,7 +275,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val to = "test to path"
 
     //then
-    actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
+    actions.readDir.expects(currDir.path, to: js.UndefOr[String]).returning(Future.successful(toDir))
     actions.getDriveRoot.expects(currDir.path).returning(Future.successful(None))
     actions.getDriveRoot.expects(toDir.path).returning(Future.successful(None))
     dispatch.expects(*).onCall { action: Any =>
@@ -332,7 +332,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val to = "test to path"
 
     //then
-    actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
+    actions.readDir.expects(currDir.path, to: js.UndefOr[String]).returning(Future.successful(toDir))
     dispatch.expects(*).onCall { action: Any =>
       inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
@@ -391,7 +391,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val driveRoot = "same"
 
     //then
-    actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
+    actions.readDir.expects(currDir.path, to: js.UndefOr[String]).returning(Future.successful(toDir))
     actions.getDriveRoot.expects(currDir.path).returning(Future.successful(Some(driveRoot)))
     actions.getDriveRoot.expects(toDir.path).returning(Future.successful(Some(driveRoot)))
     dispatch.expects(*).onCall { action: Any =>
@@ -532,7 +532,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val to = "test to path"
 
     //then
-    actions.readDir.expects(Some(currDir.path), to).returning(Future.successful(toDir))
+    actions.readDir.expects(currDir.path, to: js.UndefOr[String]).returning(Future.successful(toDir))
     actions.getDriveRoot.expects(currDir.path).returning(Future.successful(None))
     actions.getDriveRoot.expects(toDir.path).returning(Future.successful(None))
     dispatch.expects(*).onCall { action: Any =>
@@ -653,7 +653,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     val toDir = FileListDir("/to/path/dir 1", isRoot = false, js.Array())
     val to = "test to path"
-    fromActions.readDir.expects(Some(leftDir.path), to).returning(Future.successful(toDir))
+    fromActions.readDir.expects(leftDir.path, to: js.UndefOr[String]).returning(Future.successful(toDir))
     fromDispatch.expects(*).onCall { action: Any =>
       inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"

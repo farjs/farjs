@@ -41,7 +41,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   class Actions {
     val updateDir = mockFunction[Dispatch, Boolean, String, TaskAction]
     val mkDirs = mockFunction[List[String], Future[String]]
-    val readDir = mockFunction[Option[String], String, Future[FileListDir]]
+    val readDir = mockFunction[String, js.UndefOr[String], Future[FileListDir]]
     val delete = mockFunction[String, Seq[FileListItem], Future[Unit]]
     val writeFile = mockFunction[List[String], String,
       FileListItem => js.Promise[js.UndefOr[Boolean]], Future[js.UndefOr[FileTarget]]]
@@ -840,7 +840,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val dirList = FileListDir("/from/path/dir 1", isRoot = false, js.Array(item))
     val p = Promise[Boolean]()
 
-    actions.readDir.expects(Some("/from/path"), "dir 1").returning(Future.successful(dirList))
+    actions.readDir.expects("/from/path", "dir 1": js.UndefOr[String]).returning(Future.successful(dirList))
     toActions.mkDirs.expects(List("/to/path", "newName")).returning(Future.successful("/to/path/newName"))
     
     var onProgressFn: Double => Future[Boolean] = null
@@ -894,7 +894,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val dirList = FileListDir("/from/path/dir 1", isRoot = false, js.Array(item))
     val p = Promise[Boolean]()
 
-    actions.readDir.expects(Some("/from/path"), "dir 1").returning(Future.successful(dirList))
+    actions.readDir.expects("/from/path", "dir 1": js.UndefOr[String]).returning(Future.successful(dirList))
     toActions.mkDirs.expects(List("/to/path", "newName")).returning(Future.successful("/to/path/newName"))
     
     var onProgressFn: Double => Future[Boolean] = null

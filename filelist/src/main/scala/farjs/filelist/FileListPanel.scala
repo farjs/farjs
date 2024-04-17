@@ -83,7 +83,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
             targetDir.foreach { dir =>
               props.dispatch(props.actions.changeDir(
                 dispatch = props.dispatch,
-                parent = Some(props.state.currDir.path),
+                path = props.state.currDir.path,
                 dir = dir.name
               ))
             }

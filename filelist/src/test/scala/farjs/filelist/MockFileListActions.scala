@@ -12,11 +12,11 @@ class MockFileListActions(
   isLocalFSMock: Boolean = true,
   capabilitiesMock: js.Set[FileListCapability] = js.Set.empty,
   getDriveRootMock: String => Future[Option[String]] = _ => ???,
-  changeDirMock: (Dispatch, Option[String], String) => TaskAction = (_, _, _) => ???,
+  changeDirMock: (Dispatch, String, String) => TaskAction = (_, _, _) => ???,
   updateDirMock: (Dispatch, String) => TaskAction = (_, _) => ???,
   createDirMock: (Dispatch, String, String, Boolean) => TaskAction = (_, _, _, _) => ???,
   mkDirsMock: List[String] => Future[String] = _ => ???,
-  readDirMock: (Option[String], String) => Future[FileListDir] = (_, _) => ???,
+  readDirMock: (String, js.UndefOr[String]) => Future[FileListDir] = (_, _) => ???,
   deleteMock: (String, Seq[FileListItem]) => Future[Unit] = (_, _) => ???,
   deleteActionMock: (Dispatch, String, Seq[FileListItem]) => TaskAction = (_, _, _) => ???,
   scanDirsMock: (String, Seq[FileListItem], (String, Seq[FileListItem]) => Boolean) => Future[Boolean] = (_, _, _) => ???,
@@ -37,10 +37,10 @@ class MockFileListActions(
     getDriveRootMock(path)
 
   override def changeDir(dispatch: Dispatch,
-                         parent: Option[String],
+                         path: String,
                          dir: String): TaskAction = {
 
-    changeDirMock(dispatch, parent, dir)
+    changeDirMock(dispatch, path, dir)
   }
   
   override def updateDir(dispatch: Dispatch, path: String): TaskAction = {
@@ -57,7 +57,7 @@ class MockFileListActions(
   
   override def mkDirs(dirs: List[String]): Future[String] = mkDirsMock(dirs)
 
-  override def readDir(parent: Option[String], dir: String): Future[FileListDir] = readDirMock(parent, dir)
+  override def readDir(path: String, dir: js.UndefOr[String]): Future[FileListDir] = readDirMock(path, dir)
 
   override def delete(parent: String, items: Seq[FileListItem]): Future[Unit] = deleteMock(parent, items)
 

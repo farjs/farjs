@@ -22,7 +22,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
 
   //noinspection TypeAnnotation
   class Actions {
-    val changeDir = mockFunction[Dispatch, Option[String], String, TaskAction]
+    val changeDir = mockFunction[Dispatch, String, String, TaskAction]
 
     val actions = new MockFileListActions(
       changeDirMock = changeDir
@@ -64,7 +64,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     val dir = "test/dir"
 
     //then
-    actions.changeDir.expects(dispatch, None, dir).returning(action)
+    actions.changeDir.expects(dispatch, "", dir).returning(action)
     dispatch.expects(action)
 
     //when
@@ -101,7 +101,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     val dir = "test/dir"
 
     //then
-    actions.changeDir.expects(dispatch, None, dir).returning(action)
+    actions.changeDir.expects(dispatch, "", dir).returning(action)
     dispatch.expects(action)
 
     //when

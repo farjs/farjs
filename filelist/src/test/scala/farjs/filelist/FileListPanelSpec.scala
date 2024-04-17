@@ -27,7 +27,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   //noinspection TypeAnnotation
   class Actions {
-    val changeDir = mockFunction[Dispatch, Option[String], String, TaskAction]
+    val changeDir = mockFunction[Dispatch, String, String, TaskAction]
     val updateDir = mockFunction[Dispatch, String, TaskAction]
 
     val actions = new MockFileListActions(
@@ -191,7 +191,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     )
 
     //then
-    actions.changeDir.expects(dispatch, Some("/sub-dir"), "dir 1").returning(action)
+    actions.changeDir.expects(dispatch, "/sub-dir", "dir 1").returning(action)
     dispatch.expects(action)
 
     //when
@@ -215,7 +215,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     )
 
     //then
-    actions.changeDir.expects(dispatch, Some("/sub-dir"), "..").returning(action)
+    actions.changeDir.expects(dispatch, "/sub-dir", "..").returning(action)
     dispatch.expects(action)
 
     //when
@@ -311,7 +311,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     )
 
     //then
-    actions.changeDir.expects(dispatch, Some("/sub-dir"), "dir 1").returning(action)
+    actions.changeDir.expects(dispatch, "/sub-dir", "dir 1").returning(action)
     dispatch.expects(action)
 
     //when

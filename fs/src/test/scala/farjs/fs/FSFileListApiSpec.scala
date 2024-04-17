@@ -44,7 +44,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     lstatSyncMock.expects(path.join(targetDir, "file2")).throwing(new Exception("test error"))
     
     //when
-    apiImp.readDir(targetDir).toFuture.map { dir =>
+    apiImp.readDir(targetDir, js.undefined).toFuture.map { dir =>
       //then
       inside(dir) { case FileListDir(dirPath, isRoot, items) =>
         dirPath shouldBe process.cwd()
@@ -57,9 +57,9 @@ class FSFileListApiSpec extends AsyncTestSpec {
     }
   }
   
-  it should "return current dir info and files when readDir(None, .)" in {
+  it should "return current dir info and files when readDir('', .)" in {
     //when
-    apiImp.readDir(js.undefined, FileListItem.currDir.name).toFuture.map { dir =>
+    apiImp.readDir("", FileListItem.currDir.name).toFuture.map { dir =>
       //then
       inside(dir) { case FileListDir(dirPath, isRoot, items) =>
         dirPath shouldBe process.cwd()
@@ -69,7 +69,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     }
   }
   
-  it should "return parent dir info and files when readDir(Some(dir), ..)" in {
+  it should "return parent dir info and files when readDir(dir, ..)" in {
     //given
     val curr = process.cwd()
     val currDirObj = path.parse(curr)
@@ -89,7 +89,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     }
   }
   
-  it should "return target dir info and files when readDir(Some(dir), sub-dir)" in {
+  it should "return target dir info and files when readDir(dir, sub-dir)" in {
     //given
     val curr = process.cwd()
     val currDirObj = path.parse(curr)
@@ -109,7 +109,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     }
   }
   
-  it should "return root dir info and files when readDir(Some(root), .)" in {
+  it should "return root dir info and files when readDir(root, .)" in {
     //given
     val curr = process.cwd()
     val currDirObj = path.parse(curr)

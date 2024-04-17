@@ -8,6 +8,7 @@ import farjs.ui.task.{Task, TaskAction}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.scalajs.js
 import scala.util.Success
 
 class ZipActions(protected[zip] var api: ZipApi) extends FileListActions {
@@ -26,7 +27,7 @@ class ZipActions(protected[zip] var api: ZipApi) extends FileListActions {
     }
     api = ArchiverPlugin.createApi(api.zipPath, api.rootPath, entriesByParentF)
     
-    val future = entriesByParentF.flatMap(_ => api.readDir(path).toFuture).andThen {
+    val future = entriesByParentF.flatMap(_ => api.readDir(path, js.undefined).toFuture).andThen {
       case Success(currDir) => dispatch(FileListDirUpdatedAction(currDir))
     }
 

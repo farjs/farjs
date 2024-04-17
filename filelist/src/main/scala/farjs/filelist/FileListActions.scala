@@ -24,11 +24,8 @@ trait FileListActions {
 
   def capabilities: js.Set[FileListCapability] = api.capabilities
 
-  def changeDir(dispatch: Dispatch,
-                parent: Option[String],
-                dir: String): TaskAction = {
-    
-    val future = readDir(parent, dir).andThen {
+  def changeDir(dispatch: Dispatch, path: String, dir: String): TaskAction = {
+    val future = readDir(path, dir).andThen {
       case Success(currDir) => dispatch(FileListDirChangedAction(dir, currDir))
     }
 
@@ -36,7 +33,7 @@ trait FileListActions {
   }
 
   def updateDir(dispatch: Dispatch, path: String): TaskAction = {
-    val future = api.readDir(path).toFuture.andThen {
+    val future = api.readDir(path, js.undefined).toFuture.andThen {
       case Success(currDir) => dispatch(FileListDirUpdatedAction(currDir))
     }
 
@@ -54,7 +51,7 @@ trait FileListActions {
     
     val future = for {
       _ <- mkDirs(parent :: names)
-      currDir <- api.readDir(parent).toFuture
+      currDir <- api.readDir(parent, js.undefined).toFuture
     } yield {
       dispatch(FileListItemCreatedAction(names.head, currDir))
       ()
@@ -65,12 +62,8 @@ trait FileListActions {
 
   def mkDirs(dirs: List[String]): Future[String] = api.mkDirs(js.Array(dirs: _*)).toFuture
 
-  def readDir(parent: Option[String], dir: String): Future[FileListDir] = {
-    api.readDir(parent match {
-      case None => js.undefined
-      case Some(x) => x
-    }, dir).toFuture
-  }
+  def readDir(path: String, dir: js.UndefOr[String]): Future[FileListDir] =
+    api.readDir(path, dir).toFuture
 
   def delete(parent: String, items: Seq[FileListItem]): Future[Unit] =
     api.delete(parent, js.Array(items: _*)).toFuture
@@ -93,7 +86,7 @@ trait FileListActions {
     items.foldLeft(Future.successful(true)) { case (resF, item) =>
       resF.flatMap {
         case true if item.isDir =>
-          readDir(Some(parent), item.name).flatMap { ls =>
+          readDir(parent, item.name).flatMap { ls =>
             val dirItems = ls.items.toSeq
             if (onNextDir(ls.path, dirItems)) scanDirs(ls.path, dirItems, onNextDir)
             else Future.successful(false)

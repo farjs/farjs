@@ -24,11 +24,9 @@ class FSFileListApi(fs: FS = scommons.nodejs.fs) extends FileListApi {
     FileListCapability.moveInplace
   )
 
-  override def readDir(parent: js.UndefOr[String], dir: String): js.Promise[FileListDir] = {
-    readDir(path.resolve(parent.toList :+ dir: _*))
-  }
+  override def readDir(parent: String, dir: js.UndefOr[String]): js.Promise[FileListDir] = {
+    val targetDir = path.resolve(parent, dir.getOrElse(""))
   
-  override def readDir(targetDir: String): js.Promise[FileListDir] = {
     fs.readdir(targetDir).map { files =>
       val items = files.map { name =>
         toFileListItem(targetDir, name)

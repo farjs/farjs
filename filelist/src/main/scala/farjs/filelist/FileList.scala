@@ -51,7 +51,7 @@ object FileList extends FunctionComponent[FileListProps] {
       if (props.state.currDir.path.isEmpty) {
         props.dispatch(props.actions.changeDir(
           dispatch = props.dispatch,
-          parent = None,
+          path = "",
           dir = FileListItem.currDir.name
         ))
       }

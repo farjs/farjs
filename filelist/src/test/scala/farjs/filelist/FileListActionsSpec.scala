@@ -22,8 +22,7 @@ class FileListActionsSpec extends AsyncTestSpec {
 
   //noinspection TypeAnnotation
   class Api(capabilities: js.Set[FileListCapability] = js.Set.empty) {
-    val readDir2 = mockFunction[js.UndefOr[String], String, js.Promise[FileListDir]]
-    val readDir = mockFunction[String, js.Promise[FileListDir]]
+    val readDir = mockFunction[String, js.UndefOr[String], js.Promise[FileListDir]]
     val delete = mockFunction[String, js.Array[FileListItem], js.Promise[Unit]]
     val mkDirs = mockFunction[js.Array[String], js.Promise[String]]
     val readFile = mockFunction[js.Array[String], FileListItem, Double, js.Promise[FileSource]]
@@ -31,7 +30,6 @@ class FileListActionsSpec extends AsyncTestSpec {
     
     val api = MockFileListApi(
       capabilitiesMock = capabilities,
-      readDir2Mock = readDir2,
       readDirMock = readDir,
       deleteMock = delete,
       mkDirsMock = mkDirs,
@@ -82,10 +80,10 @@ class FileListActionsSpec extends AsyncTestSpec {
     val actions = new FileListActionsTest(api.api)
     val dispatch = mockFunction[Any, Any]
     val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
-    val parent: js.UndefOr[String] = "/"
+    val parent = "/"
     val dir = "test dir"
 
-    api.readDir2.expects(parent, dir).returning(js.Promise.resolve[FileListDir](currDir))
+    api.readDir.expects(parent, dir: js.UndefOr[String]).returning(js.Promise.resolve[FileListDir](currDir))
     
     //then
     dispatch.expects(*).onCall { action: Any =>
@@ -94,7 +92,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     
     //when
     val TaskAction(task) =
-      actions.changeDir(dispatch, parent.toOption, dir)
+      actions.changeDir(dispatch, parent, dir)
     
     //then
     task.message shouldBe "Changing Dir"
@@ -109,7 +107,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
     val path = "/test/path"
 
-    api.readDir.expects(path).returning(js.Promise.resolve[FileListDir](currDir))
+    api.readDir.expects(path, js.undefined).returning(js.Promise.resolve[FileListDir](currDir))
     
     //then
     dispatch.expects(*).onCall { action: Any =>
@@ -139,7 +137,7 @@ class FileListActionsSpec extends AsyncTestSpec {
       dirs.toList shouldBe List(parent, dir)
       js.Promise.resolve[String]("")
     }
-    api.readDir.expects(parent).returning(js.Promise.resolve[FileListDir](currDir))
+    api.readDir.expects(parent, js.undefined).returning(js.Promise.resolve[FileListDir](currDir))
     
     //then
     dispatch.expects(*).onCall { action: Any =>
@@ -169,7 +167,7 @@ class FileListActionsSpec extends AsyncTestSpec {
       dirs.toList shouldBe List(parent, "test", "dir")
       js.Promise.resolve[String]("")
     }
-    api.readDir.expects(parent).returning(js.Promise.resolve[FileListDir](currDir))
+    api.readDir.expects(parent, js.undefined).returning(js.Promise.resolve[FileListDir](currDir))
     
     //then
     dispatch.expects(*).onCall { action: Any =>
@@ -198,7 +196,7 @@ class FileListActionsSpec extends AsyncTestSpec {
       resItems.toList shouldBe items
       js.Promise.resolve[Unit](())
     }
-    api.readDir.expects(dir).returning(js.Promise.resolve[FileListDir](currDir))
+    api.readDir.expects(dir, js.undefined).returning(js.Promise.resolve[FileListDir](currDir))
     
     //then
     var resultAction: TaskAction = null
@@ -237,9 +235,9 @@ class FileListActionsSpec extends AsyncTestSpec {
       FileListItem("file 4")
     ))
 
-    api.readDir2.expects(parent: js.UndefOr[String], "dir 1")
+    api.readDir.expects(parent, "dir 1": js.UndefOr[String])
       .returning(js.Promise.resolve[FileListDir](res))
-    api.readDir2.expects(res.path: js.UndefOr[String], "dir 3")
+    api.readDir.expects(res.path, "dir 3": js.UndefOr[String])
       .returning(js.Promise.resolve[FileListDir](FileListDir("dir3", isRoot = false, js.Array())))
     onNextDir.expects(res.path, *).onCall { (_, items) =>
       items.toList shouldBe res.items.toList
@@ -274,7 +272,7 @@ class FileListActionsSpec extends AsyncTestSpec {
       FileListItem("file 4")
     ))
 
-    api.readDir2.expects(parent: js.UndefOr[String], "dir 1")
+    api.readDir.expects(parent, "dir 1": js.UndefOr[String])
       .returning(js.Promise.resolve[FileListDir](res))
     onNextDir.expects(res.path, *).onCall { (_, items) =>
       items.toList shouldBe res.items.toList

@@ -6,9 +6,7 @@ trait FileListApi extends js.Object {
 
   def capabilities: js.Set[FileListCapability]
 
-  def readDir(parent: js.UndefOr[String], dir: String): js.Promise[FileListDir]
-  
-  def readDir(targetDir: String): js.Promise[FileListDir]
+  def readDir(path: String, dir: js.UndefOr[String]): js.Promise[FileListDir]
 
   def delete(parent: String, items: js.Array[FileListItem]): js.Promise[Unit]
 

@@ -58,14 +58,14 @@ class ZipApiSpec extends AsyncTestSpec {
     )
   }
 
-  it should "return root dir content when readDir(.)" in {
+  it should "return root dir content when readDir('', .)" in {
     //given
     val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
     val api = new ZipApi(zipPath, rootPath, entriesByParentF)
     
     //when
-    val resultF = api.readDir(js.undefined, FileListItem.currDir.name).toFuture
+    val resultF = api.readDir("", FileListItem.currDir.name).toFuture
 
     //then
     resultF.map(inside(_) { case FileListDir(path, isRoot, items) =>
@@ -331,7 +331,7 @@ class ZipApiSpec extends AsyncTestSpec {
     //when
     val resultF = for {
       _ <- api.delete(parent, items).toFuture
-      res <- api.readDir(parent).toFuture
+      res <- api.readDir(parent, js.undefined).toFuture
     } yield res
 
     //then
