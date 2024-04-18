@@ -189,7 +189,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
 
       val filePath = path.join(state.currDir.path, item.name)
       val openF = (for {
-        source <- actions.readFile(state.currDir.path, item, 0.0)
+        source <- actions.api.readFile(state.currDir.path, item, 0.0).toFuture
         buff = new Uint8Array(64 * 1024)
         bytesRead <- source.readNextBytes(buff).toFuture
         _ <- source.close().toFuture

@@ -30,12 +30,12 @@ object FileListUiPlugin extends FileListPlugin {
     key match {
       case "f1" => Some(FileListUiData(showHelpPopup = true, data = data))
       case "f7" => data.flatMap {
-        case d if d.actions.capabilities.contains(FileListCapability.mkDirs) =>
+        case d if d.actions.api.capabilities.contains(FileListCapability.mkDirs) =>
           Some(FileListUiData(showMkFolderPopup = true, data = data))
         case _ => None
       }
       case "f8" | "delete" => data.flatMap {
-        case d if d.actions.capabilities.contains(FileListCapability.delete) &&
+        case d if d.actions.api.capabilities.contains(FileListCapability.delete) &&
           (FileListState.selectedItems(d.state).nonEmpty || FileListState.currentItem(d.state).exists(_ != FileListItem.up)) =>
           Some(FileListUiData(showDeletePopup = true, data = data))
         case _ => None

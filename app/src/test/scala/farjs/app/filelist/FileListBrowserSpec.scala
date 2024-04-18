@@ -28,10 +28,12 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   
   //noinspection TypeAnnotation
   class Actions {
-    val readFile = mockFunction[String, FileListItem, Double, Future[FileSource]]
+    val readFile = mockFunction[String, FileListItem, Double, js.Promise[FileSource]]
 
     val actions = new MockFileListActions(
-      readFileMock = readFile
+      MockFileListApi(
+        readFileMock = readFile
+      )
     )
   }
 
@@ -314,7 +316,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
-    val nonFSActions = new MockFileListActions(isLocalFSMock = false)
+    val nonFSActions = new MockFileListActions(isLocalFS = false)
     val nonFSItem = PanelStackItem[FileListState](
       component = "nonFSItem".asInstanceOf[ReactClass],
       dispatch = None,
@@ -386,10 +388,10 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       case List(button, _) => button
     }
     val keyFull = "enter"
-    val expectedError = new Exception("test error")
+    val expectedError = js.Error("test error")
     
     //then
-    actions.readFile.expects(currDir.path, fileItem, 0.0).returning(Future.failed(expectedError))
+    actions.readFile.expects(currDir.path, fileItem, 0.0).returning(js.Promise.reject(expectedError))
     var openF: Future[_] = null
     dispatch.expects(*).onCall { action: Any =>
       inside(action.asInstanceOf[TaskAction]) { case TaskAction(Task("Opening File", future)) =>
@@ -405,7 +407,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     eventually {
       openF should not be null
     }.flatMap(_ => openF.failed).map { ex =>
-      ex shouldBe expectedError
+      ex shouldBe js.JavaScriptException(expectedError)
       inside(findComponentProps(comp, WithPanelStacks)) { case WithPanelStacksProps(leftStack, _, _, _) =>
         leftStack.peek[FileListState] shouldBe fsItem
       }
@@ -462,7 +464,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val keyFull = "enter"
     
     //then
-    actions.readFile.expects(currDir.path, fileItem, 0.0).returning(Future.successful(source.source))
+    actions.readFile.expects(currDir.path, fileItem, 0.0).returning(js.Promise.resolve[FileSource](source.source))
     source.readNextBytes.expects(*).onCall { buff: Uint8Array =>
       buff.length shouldBe (64 * 1024)
       js.Promise.resolve[Int](123)

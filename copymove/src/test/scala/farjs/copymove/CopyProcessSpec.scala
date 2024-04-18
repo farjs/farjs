@@ -2,8 +2,7 @@ package farjs.copymove
 
 import farjs.copymove.CopyProcess._
 import farjs.filelist._
-import farjs.filelist.api.{FileListDir, FileListItem, FileTarget}
-import farjs.ui.Dispatch
+import farjs.filelist.api.{FileListDir, FileListItem, FileTarget, MockFileListApi}
 import farjs.ui.popup.MessageBoxProps
 import farjs.ui.task.TaskAction
 import farjs.ui.theme.DefaultTheme
@@ -21,6 +20,7 @@ import scommons.react.test.raw.TestRenderer
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
+import scala.scalajs.js.UndefOr
 
 class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -39,23 +39,27 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   //noinspection TypeAnnotation
   class Actions {
-    val updateDir = mockFunction[Dispatch, Boolean, String, TaskAction]
-    val mkDirs = mockFunction[List[String], Future[String]]
-    val readDir = mockFunction[String, js.UndefOr[String], Future[FileListDir]]
-    val delete = mockFunction[String, Seq[FileListItem], Future[Unit]]
-    val writeFile = mockFunction[String, String,
-      FileListItem => js.Promise[js.UndefOr[Boolean]], Future[js.UndefOr[FileTarget]]]
+    val readDir = mockFunction[String, js.UndefOr[String], js.Promise[FileListDir]]
+    val delete = mockFunction[String, js.Array[FileListItem], js.Promise[Unit]]
+    val mkDirs = mockFunction[js.Array[String], js.Promise[String]]
+    val writeFile = mockFunction[String, String, FileListItem => js.Promise[js.UndefOr[Boolean]],
+      js.Promise[js.UndefOr[FileTarget]]]
     val copyFile = mockFunction[String, FileListItem, Future[js.UndefOr[FileTarget]],
       Double => Future[Boolean], Future[Boolean]]
 
     val actions = new MockFileListActions(
-      mkDirsMock = mkDirs,
-      readDirMock = readDir,
-      deleteMock = delete,
-      writeFileMock = writeFile,
+      MockFileListApi(
+        readDirMock = readDir,
+        deleteMock = delete,
+        mkDirsMock = mkDirs,
+        writeFileMock = writeFile
+      ),
       copyFileMock = copyFile
     )
   }
+  
+  private val resolvedWriteRes: js.Promise[UndefOr[FileTarget]] =
+    js.Promise.resolve[js.UndefOr[FileTarget]](js.undefined)
   
   it should "increment time100ms every 100 ms." in {
     //given
@@ -163,7 +167,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val p = Promise[Boolean]()
 
     var onProgressFn: Double => Future[Boolean] = null
-    toActions.writeFile.expects("/to/path", "newName", *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
+    toActions.writeFile.expects("/to/path", "newName", *).returning(resolvedWriteRes)
     actions.copyFile.expects("/from/path", item, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn = onProgress
@@ -278,7 +282,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     toActions.writeFile.expects("/to/path", "newName", *).onCall {
       (_, _, onExists) =>
         onExistsFn = onExists
-        Future.successful(js.undefined: js.UndefOr[FileTarget])
+        resolvedWriteRes
     }
     actions.copyFile.expects("/from/path", item, *, *).returning(p.future)
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
@@ -329,7 +333,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     toActions.writeFile.expects("/to/path", "newName", *).onCall {
       (_, _, onExists) =>
         onExistsFn = onExists
-        Future.successful(js.undefined: js.UndefOr[FileTarget])
+        resolvedWriteRes
     }
     actions.copyFile.expects("/from/path", item, *, *).returning(p.future)
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
@@ -381,7 +385,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     toActions.writeFile.expects("/to/path", "newName", *).onCall {
       (_, _, onExists) =>
         onExistsFn = onExists
-        Future.successful(js.undefined: js.UndefOr[FileTarget])
+        resolvedWriteRes
     }
     actions.copyFile.expects("/from/path", item, *, *).returning(p.future)
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
@@ -432,7 +436,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     toActions.writeFile.expects("/to/path", "newName", *).onCall {
       (_, _, onExists) =>
         onExistsFn = onExists
-        Future.successful(js.undefined: js.UndefOr[FileTarget])
+        resolvedWriteRes
     }
     actions.copyFile.expects("/from/path", item, *, *).returning(p.future)
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
@@ -494,7 +498,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     toActions.writeFile.expects("/to/path", "newName", *).onCall {
       (_, _, onExists) =>
         onExistsFn = onExists
-        Future.successful(js.undefined: js.UndefOr[FileTarget])
+        resolvedWriteRes
     }
     actions.copyFile.expects("/from/path", item, *, *).returning(p.future)
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
@@ -546,7 +550,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     toActions.writeFile.expects("/to/path", "newName1", *).onCall {
       (_, _, onExists) =>
         onExistsFn1 = onExists
-        Future.successful(js.undefined: js.UndefOr[FileTarget])
+        resolvedWriteRes
     }
     actions.copyFile.expects("/from/path", item1, *, *).returning(p1.future)
     val p2 = Promise[Boolean]()
@@ -554,7 +558,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     toActions.writeFile.expects("/to/path", "newName2", *).onCall {
       (_, _, onExists) =>
         onExistsFn2 = onExists
-        Future.successful(js.undefined: js.UndefOr[FileTarget])
+        resolvedWriteRes
     }
     actions.copyFile.expects("/from/path", item2, *, *).returning(p2.future)
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
@@ -616,7 +620,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     toActions.writeFile.expects("/to/path", "newName1", *).onCall {
       (_, _, onExists) =>
         onExistsFn1 = onExists
-        Future.successful(js.undefined: js.UndefOr[FileTarget])
+        resolvedWriteRes
     }
     actions.copyFile.expects("/from/path", item1, *, *).returning(p1.future)
     val p2 = Promise[Boolean]()
@@ -624,7 +628,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     toActions.writeFile.expects("/to/path", "newName2", *).onCall {
       (_, _, onExists) =>
         onExistsFn2 = onExists
-        Future.successful(js.undefined: js.UndefOr[FileTarget])
+        resolvedWriteRes
     }
     actions.copyFile.expects("/from/path", item2, *, *).returning(p2.future)
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
@@ -682,7 +686,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val p = Promise[Boolean]()
 
     var onProgressFn: Double => Future[Boolean] = null
-    toActions.writeFile.expects("/to/path", "newName", *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
+    toActions.writeFile.expects("/to/path", "newName", *).returning(resolvedWriteRes)
     actions.copyFile.expects("/from/path", item, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn = onProgress
@@ -748,7 +752,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val p = Promise[Boolean]()
 
     var onProgressFn: Double => Future[Boolean] = null
-    toActions.writeFile.expects("/to/path", "newName1", *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
+    toActions.writeFile.expects("/to/path", "newName1", *).returning(resolvedWriteRes)
     actions.copyFile.expects("/from/path", item, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn = onProgress
@@ -796,7 +800,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     ), "/to/path", 12345, onTopItem, onDone)
 
     val p = Promise[Boolean]()
-    toActions.writeFile.expects("/to/path", "newName", *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
+    toActions.writeFile.expects("/to/path", "newName", *).returning(resolvedWriteRes)
     actions.copyFile.expects("/from/path", item, *, *).returning(p.future)
     testRender(withThemeContext(<(CopyProcess())(^.wrapped := props)()))
 
@@ -840,11 +844,14 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val dirList = FileListDir("/from/path/dir 1", isRoot = false, js.Array(item))
     val p = Promise[Boolean]()
 
-    actions.readDir.expects("/from/path", "dir 1": js.UndefOr[String]).returning(Future.successful(dirList))
-    toActions.mkDirs.expects(List("/to/path", "newName")).returning(Future.successful("/to/path/newName"))
+    actions.readDir.expects("/from/path", "dir 1": js.UndefOr[String]).returning(js.Promise.resolve[FileListDir](dirList))
+    toActions.mkDirs.expects(*).onCall { resDirs: js.Array[String] =>
+      resDirs.toList shouldBe List("/to/path", "newName")
+      js.Promise.resolve[String]("/to/path/newName")
+    }
     
     var onProgressFn: Double => Future[Boolean] = null
-    toActions.writeFile.expects("/to/path/newName", item.name, *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
+    toActions.writeFile.expects("/to/path/newName", item.name, *).returning(resolvedWriteRes)
     actions.copyFile.expects("/from/path/dir 1", item, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn = onProgress
@@ -894,11 +901,14 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val dirList = FileListDir("/from/path/dir 1", isRoot = false, js.Array(item))
     val p = Promise[Boolean]()
 
-    actions.readDir.expects("/from/path", "dir 1": js.UndefOr[String]).returning(Future.successful(dirList))
-    toActions.mkDirs.expects(List("/to/path", "newName")).returning(Future.successful("/to/path/newName"))
+    actions.readDir.expects("/from/path", "dir 1": js.UndefOr[String]).returning(js.Promise.resolve[FileListDir](dirList))
+    toActions.mkDirs.expects(*).onCall { resDirs: js.Array[String] =>
+      resDirs.toList shouldBe List("/to/path", "newName")
+      js.Promise.resolve[String]("/to/path/newName")
+    }
     
     var onProgressFn: Double => Future[Boolean] = null
-    toActions.writeFile.expects("/to/path/newName", item.name, *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
+    toActions.writeFile.expects("/to/path/newName", item.name, *).returning(resolvedWriteRes)
     actions.copyFile.expects("/from/path/dir 1", item, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn = onProgress
@@ -913,8 +923,14 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         //then
         res shouldBe true
         assertCopyProgressPopup(renderer, props, "/newName", "file 1", "file 1", itemPercent = 50, totalPercent = 25)
-        actions.delete.expects("/from/path/dir 1", Seq(item)).returning(Future.unit)
-        actions.delete.expects("/from/path", Seq(dir)).returning(Future.unit)
+        actions.delete.expects("/from/path/dir 1", *).onCall { (_, resItems) =>
+          resItems.toList shouldBe Seq(item)
+          js.Promise.resolve[Unit](())
+        }
+        actions.delete.expects("/from/path", *).onCall { (_, resItems) =>
+          resItems.toList shouldBe Seq(dir)
+          js.Promise.resolve[Unit](())
+        }
   
         //then
         onTopItem.expects(dir)
@@ -951,7 +967,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     
     val p1 = Promise[Boolean]()
     var onProgressFn1: Double => Future[Boolean] = null
-    toActions.writeFile.expects("/to/path", "newName1", *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
+    toActions.writeFile.expects("/to/path", "newName1", *).returning(resolvedWriteRes)
     actions.copyFile.expects("/from/path", item1, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn1 = onProgress
@@ -959,7 +975,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     }
     val p2 = Promise[Boolean]()
     var onProgressFn2: Double => Future[Boolean] = null
-    toActions.writeFile.expects("/to/path", "newName2", *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
+    toActions.writeFile.expects("/to/path", "newName2", *).returning(resolvedWriteRes)
     actions.copyFile.expects("/from/path", item2, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn2 = onProgress
@@ -1027,7 +1043,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     
     val p1 = Promise[Boolean]()
     var onProgressFn1: Double => Future[Boolean] = null
-    toActions.writeFile.expects("/to/path", "newName1", *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
+    toActions.writeFile.expects("/to/path", "newName1", *).returning(resolvedWriteRes)
     actions.copyFile.expects("/from/path", item1, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn1 = onProgress
@@ -1035,7 +1051,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     }
     val p2 = Promise[Boolean]()
     var onProgressFn2: Double => Future[Boolean] = null
-    toActions.writeFile.expects("/to/path", "newName2", *).returning(Future.successful(js.undefined: js.UndefOr[FileTarget]))
+    toActions.writeFile.expects("/to/path", "newName2", *).returning(resolvedWriteRes)
     actions.copyFile.expects("/from/path", item2, *, *).onCall {
       (_, _, _, onProgress) =>
         onProgressFn2 = onProgress
@@ -1053,7 +1069,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         //then
         res shouldBe true
         assertCopyProgressPopup(renderer, props, "", "file 1", "newName1", itemPercent = 50, totalPercent = 25)
-        actions.delete.expects("/from/path", Seq(item1)).returning(Future.unit)
+        actions.delete.expects("/from/path", *).onCall { (_, resItems) =>
+          resItems.toList shouldBe Seq(item1)
+          js.Promise.resolve[Unit](())
+        }
 
         p1.success(res)
         p1.future.flatMap(_ => eventually {
@@ -1067,7 +1086,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
             //then
             res shouldBe true
             assertCopyProgressPopup(renderer, props, "", "file 2", "newName2", itemPercent = 100, totalPercent = 50)
-            actions.delete.expects("/from/path", Seq(item2)).returning(Future.unit)
+            actions.delete.expects("/from/path", *).onCall { (_, resItems) =>
+              resItems.toList shouldBe Seq(item2)
+              js.Promise.resolve[Unit](())
+            }
             
             //then
             var onDoneCalled = false

@@ -11,7 +11,7 @@ import scala.concurrent.Future
 import scala.scalajs.js
 import scala.util.Success
 
-class ZipActions(protected[zip] var api: ZipApi) extends FileListActions {
+class ZipActions(var api: ZipApi) extends FileListActions {
 
   val isLocalFS: Boolean = false
 

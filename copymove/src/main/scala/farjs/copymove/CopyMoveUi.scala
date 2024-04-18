@@ -109,7 +109,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
 
     def resolveTargetDir(move: Boolean, path: String): Future[(String, Boolean)] = {
       val dirF = for {
-        dir <- from.actions.readDir(from.path, path)
+        dir <- from.actions.api.readDir(from.path, path).toFuture
         sameDrive <-
           if (move) checkSameDrive(from, dir.path)
           else Future.successful(false)

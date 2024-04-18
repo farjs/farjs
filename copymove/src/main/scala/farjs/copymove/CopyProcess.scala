@@ -65,12 +65,12 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
           resF.flatMap {
             case (prevCopied, true) if item.isDir && inProgress.current =>
               for {
-                dirList <- props.from.actions.readDir(parent, item.name)
-                dstDir <- props.to.actions.mkDirs(List(targetDir, toName))
+                dirList <- props.from.actions.api.readDir(parent, item.name).toFuture
+                dstDir <- props.to.actions.api.mkDirs(js.Array(targetDir, toName)).toFuture
                 res <- loop(prevCopied, dirList.path, dstDir, dirList.items.map(i => (i, i.name)).toSeq)
                 (isCopied, done) = res
                 _ <-
-                  if (isCopied && done && props.move) props.from.actions.delete(parent, Seq(item))
+                  if (isCopied && done && props.move) props.from.actions.api.delete(parent, js.Array(item)).toFuture
                   else Future.unit
               } yield res
             case (prevCopied, true) if !item.isDir && inProgress.current =>
@@ -85,7 +85,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
                 done <- props.from.actions.copyFile(
                   srcDir = parent,
                   srcItem = item,
-                  dstFileF = props.to.actions.writeFile(targetDir, toName, onExists = { existing =>
+                  dstFileF = props.to.actions.api.writeFile(targetDir, toName, onExists = { existing =>
                     if (inProgress.current && data.current.askWhenExists) {
                       setState(_.copy(existing = Some(existing)))
                       existsPromise.current = Promise[js.UndefOr[Boolean]]()
@@ -96,7 +96,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
                       }
                       maybeOverwrite
                     }.toJSPromise
-                  }),
+                  }).toFuture,
                   onProgress = { position =>
                     data.current = data.current.copy(
                       itemPercent = (divide(position, item.size) * 100).toInt,
@@ -106,7 +106,9 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
                   }
                 )
                 _ <-
-                  if (isCopied && done && props.move) props.from.actions.delete(parent, Seq(item))
+                  if (isCopied && done && props.move) {
+                    props.from.actions.api.delete(parent, js.Array(item)).toFuture
+                  }
                   else Future.unit
               } yield {
                 if (done) {

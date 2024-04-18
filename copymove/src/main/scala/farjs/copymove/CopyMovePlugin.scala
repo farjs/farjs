@@ -52,10 +52,10 @@ object CopyMovePlugin extends FileListPlugin {
 
   private[copymove] def onCopyMoveInplace(move: Boolean, from: FileListData): Option[CopyMoveUiAction] = {
     FileListState.currentItem(from.state).filter(_ != FileListItem.up).toOption.flatMap { _ =>
-      if (move && from.actions.capabilities.contains(FileListCapability.moveInplace)) {
+      if (move && from.actions.api.capabilities.contains(FileListCapability.moveInplace)) {
         Some(ShowMoveInplace)
       }
-      else if (!move && from.actions.capabilities.contains(FileListCapability.copyInplace)) {
+      else if (!move && from.actions.api.capabilities.contains(FileListCapability.copyInplace)) {
         Some(ShowCopyInplace)
       }
       else None
@@ -70,10 +70,10 @@ object CopyMovePlugin extends FileListPlugin {
     val currItem = FileListState.currentItem(from.state).filter(_ != FileListItem.up)
 
     if ((from.state.selectedNames.nonEmpty || currItem.nonEmpty) &&
-      from.actions.capabilities.contains(FileListCapability.read) &&
-      (!move || from.actions.capabilities.contains(FileListCapability.delete))) {
+      from.actions.api.capabilities.contains(FileListCapability.read) &&
+      (!move || from.actions.api.capabilities.contains(FileListCapability.delete))) {
 
-      if (to.actions.capabilities.contains(FileListCapability.write)) {
+      if (to.actions.api.capabilities.contains(FileListCapability.write)) {
         if (move) Some(ShowMoveToTarget)
         else Some(ShowCopyToTarget)
       }

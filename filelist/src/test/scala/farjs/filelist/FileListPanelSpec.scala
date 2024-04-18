@@ -3,7 +3,7 @@ package farjs.filelist
 import farjs.filelist.FileListActions._
 import farjs.filelist.FileListActionsSpec.{assertFileListParamsChangedAction, assertFileListSortAction}
 import farjs.filelist.FileListPanel._
-import farjs.filelist.api.{FileListCapability, FileListDir, FileListItem}
+import farjs.filelist.api.{FileListCapability, FileListDir, FileListItem, MockFileListApi}
 import farjs.filelist.sort.{FileListSort, SortMode, SortModesPopupProps}
 import farjs.filelist.stack.PanelStackSpec.withContext
 import farjs.ui.Dispatch
@@ -31,12 +31,12 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val updateDir = mockFunction[Dispatch, String, TaskAction]
 
     val actions = new MockFileListActions(
-      capabilitiesMock = js.Set(
+      MockFileListApi(capabilitiesMock = js.Set(
         FileListCapability.delete,
         FileListCapability.mkDirs,
         FileListCapability.copyInplace,
         FileListCapability.moveInplace
-      ),
+      )),
       changeDirMock = changeDir,
       updateDirMock = updateDir
     )

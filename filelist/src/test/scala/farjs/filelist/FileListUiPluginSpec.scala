@@ -72,7 +72,7 @@ class FileListUiPluginSpec extends AsyncTestSpec {
   it should "return None/Some if trigger key=f7 when createUi" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(capabilitiesMock = js.Set(FileListCapability.mkDirs))
+    val actions = new MockFileListActions(MockFileListApi(capabilitiesMock = js.Set(FileListCapability.mkDirs)))
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up
     )))
@@ -91,7 +91,7 @@ class FileListUiPluginSpec extends AsyncTestSpec {
   it should "return None/Some if trigger key=f8/delete when createUi" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(capabilitiesMock = js.Set(FileListCapability.delete))
+    val actions = new MockFileListActions(MockFileListApi(capabilitiesMock = js.Set(FileListCapability.delete)))
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))

@@ -95,7 +95,7 @@ object FarjsApp {
 
   private def prepareDB(): Future[Database] = {
     val dbF = for {
-      _ <- FSFileListActions.mkDirs(FarjsData.getDataDir)
+      _ <- FSFileListActions.api.mkDirs(js.Array(FarjsData.getDataDir: _*)).toFuture
       db = BetterSqlite3WebSQL.openDatabase(FarjsData.getDBFilePath)
       _ <- FarjsDBMigrations.apply(db)
     } yield db

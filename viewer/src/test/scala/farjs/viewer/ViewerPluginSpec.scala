@@ -101,7 +101,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
   it should "return None if non-local fs when onKeyTrigger(f3)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(isLocalFSMock = false)
+    val actions = new MockFileListActions(isLocalFS = false)
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))

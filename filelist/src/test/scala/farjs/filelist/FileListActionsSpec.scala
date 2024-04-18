@@ -64,16 +64,6 @@ class FileListActionsSpec extends AsyncTestSpec {
     )
   }
 
-  it should "return api capabilities" in {
-    //given
-    val capabilities = js.Set(FileListCapability.read)
-    val api = new Api(capabilities)
-    val actions = new FileListActionsTest(api.api)
-    
-    //when & then
-    actions.capabilities shouldBe capabilities
-  }
-
   it should "dispatch FileListDirChangedAction when changeDir" in {
     //given
     val api = new Api
@@ -332,7 +322,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     onProgress.expects(position).returning(Future.successful(true))
     
     //when
-    val resultF = actions.copyFile(srcDir, file, actions.writeFile(dstDir, dstName, onExists), onProgress)
+    val resultF = actions.copyFile(srcDir, file, api.writeFile(dstDir, dstName, onExists).toFuture, onProgress)
     
     //then
     resultF.map { res =>
@@ -391,7 +381,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     onProgress.expects(position).returning(Future.successful(true))
     
     //when
-    val resultF = actions.copyFile(srcDir, file, actions.writeFile(dstDir, dstName, onExists), onProgress)
+    val resultF = actions.copyFile(srcDir, file, api.writeFile(dstDir, dstName, onExists).toFuture, onProgress)
     
     //then
     resultF.map { res =>
@@ -447,7 +437,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     onProgress.expects(position).returning(Future.successful(true))
     
     //when
-    val resultF = actions.copyFile(srcDir, file, actions.writeFile(dstDir, dstName, onExists), onProgress)
+    val resultF = actions.copyFile(srcDir, file, api.writeFile(dstDir, dstName, onExists).toFuture, onProgress)
     
     //then
     resultF.map { res =>
@@ -479,7 +469,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     onProgress.expects(file.size).returning(Future.successful(false))
     
     //when
-    val resultF = actions.copyFile(srcDir, file, actions.writeFile(dstDir, dstName, onExists), onProgress)
+    val resultF = actions.copyFile(srcDir, file, api.writeFile(dstDir, dstName, onExists).toFuture, onProgress)
     
     //then
     resultF.map { res =>
@@ -528,7 +518,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     onProgress.expects(position).returning(Future.successful(false))
     
     //when
-    val resultF = actions.copyFile(srcDir, file, actions.writeFile(dstDir, dstName, onExists), onProgress)
+    val resultF = actions.copyFile(srcDir, file, api.writeFile(dstDir, dstName, onExists).toFuture, onProgress)
     
     //then
     resultF.map { res =>
@@ -573,7 +563,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     onProgress.expects(*).never()
     
     //when
-    val resultF = actions.copyFile(srcDir, file, actions.writeFile(dstDir, dstName, onExists), onProgress)
+    val resultF = actions.copyFile(srcDir, file, api.writeFile(dstDir, dstName, onExists).toFuture, onProgress)
     
     //then
     resultF.failed.map(inside(_) {
@@ -585,10 +575,7 @@ class FileListActionsSpec extends AsyncTestSpec {
 
 object FileListActionsSpec {
 
-  private class FileListActionsTest(apiMock: FileListApi)
-    extends FileListActions {
-
-    protected def api: FileListApi = apiMock
+  private class FileListActionsTest(val api: FileListApi) extends FileListActions {
 
     val isLocalFS: Boolean = true
 

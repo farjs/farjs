@@ -16,16 +16,14 @@ import scala.util.control.NonFatal
 
 trait FileListActions {
 
-  protected def api: FileListApi
+  def api: FileListApi
 
   def isLocalFS: Boolean
 
   def getDriveRoot(path: String): Future[Option[String]]
 
-  def capabilities: js.Set[FileListCapability] = api.capabilities
-
   def changeDir(dispatch: Dispatch, path: String, dir: String): TaskAction = {
-    val future = readDir(path, dir).andThen {
+    val future = api.readDir(path, dir).toFuture.andThen {
       case Success(currDir) => dispatch(FileListDirChangedAction(dir, currDir))
     }
 
@@ -50,7 +48,7 @@ trait FileListActions {
       else List(dir)
     
     val future = for {
-      _ <- mkDirs(parent :: names)
+      _ <- api.mkDirs(js.Array((parent :: names): _*)).toFuture
       currDir <- api.readDir(parent, js.undefined).toFuture
     } yield {
       dispatch(FileListItemCreatedAction(names.head, currDir))
@@ -60,19 +58,11 @@ trait FileListActions {
     TaskAction(Task("Creating Dir", future))
   }
 
-  def mkDirs(dirs: List[String]): Future[String] = api.mkDirs(js.Array(dirs: _*)).toFuture
-
-  def readDir(path: String, dir: js.UndefOr[String]): Future[FileListDir] =
-    api.readDir(path, dir).toFuture
-
-  def delete(parent: String, items: Seq[FileListItem]): Future[Unit] =
-    api.delete(parent, js.Array(items: _*)).toFuture
-
   def deleteAction(dispatch: Dispatch,
                    dir: String,
                    items: Seq[FileListItem]): TaskAction = {
     
-    val future = delete(dir, items).andThen {
+    val future = api.delete(dir, js.Array(items: _*)).toFuture.andThen {
       case Success(_) => dispatch(updateDir(dispatch, dir))
     }
 
@@ -86,7 +76,7 @@ trait FileListActions {
     items.foldLeft(Future.successful(true)) { case (resF, item) =>
       resF.flatMap {
         case true if item.isDir =>
-          readDir(parent, item.name).flatMap { ls =>
+          api.readDir(parent, item.name).toFuture.flatMap { ls =>
             val dirItems = ls.items.toSeq
             if (onNextDir(ls.path, dirItems)) scanDirs(ls.path, dirItems, onNextDir)
             else Future.successful(false)
@@ -94,17 +84,6 @@ trait FileListActions {
         case res => Future.successful(res)
       }
     }
-  }
-
-  def writeFile(parent: String,
-                fileName: String,
-                onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]): Future[js.UndefOr[FileTarget]] = {
-
-    api.writeFile(parent, fileName, onExists).toFuture
-  }
-
-  def readFile(parent: String, file: FileListItem, position: Double): Future[FileSource] = {
-    api.readFile(parent, file, position).toFuture
   }
 
   def copyFile(srcDir: String,
@@ -115,7 +94,7 @@ trait FileListActions {
     dstFileF.flatMap(_.toOption match {
       case None => onProgress(srcItem.size)
       case Some(target) =>
-        readFile(srcDir, srcItem, 0.0).flatMap { source =>
+        api.readFile(srcDir, srcItem, 0.0).toFuture.flatMap { source =>
           val buff = new Uint8Array(copyBufferBytes)
 
           def loop(): Future[Boolean] = {

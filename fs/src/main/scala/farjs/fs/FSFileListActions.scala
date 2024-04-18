@@ -7,7 +7,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class FSFileListActions private[fs](
-  protected val api: FileListApi,
+  val api: FileListApi,
   fsService: FSService
 ) extends FileListActions {
 
