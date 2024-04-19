@@ -4,6 +4,8 @@ import scala.scalajs.js
 
 trait FileListApi extends js.Object {
 
+  def isLocal: Boolean
+
   def capabilities: js.Set[FileListCapability]
 
   def readDir(path: String, dir: js.UndefOr[String]): js.Promise[FileListDir]
@@ -20,4 +22,6 @@ trait FileListApi extends js.Object {
                 fileName: String,
                 onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]
                ): js.Promise[js.UndefOr[FileTarget]]
+
+  def getDriveRoot(path: String): js.Promise[js.UndefOr[String]]
 }

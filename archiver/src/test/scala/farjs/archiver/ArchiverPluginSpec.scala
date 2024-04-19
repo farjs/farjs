@@ -1,7 +1,7 @@
 package farjs.archiver
 
 import farjs.archiver.zip.ZipApi
-import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.filelist.api.{FileListDir, FileListItem, MockFileListApi}
 import farjs.filelist.stack._
 import farjs.filelist.{FileListState, MockFileListActions}
 import org.scalatest.Succeeded
@@ -49,7 +49,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
   it should "return None if non-local fs when onKeyTrigger" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(isLocalFS = false)
+    val actions = new MockFileListActions(MockFileListApi(isLocalMock = false))
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))

@@ -43,7 +43,7 @@ object ViewerPlugin extends FileListPlugin {
       stackItem.getActions.zip(stackItem.state).flatMap { case ((dispatch, actions), state) =>
         val data = FileListData(dispatch, actions, state)
         FileListState.currentItem(state).filter(_ != FileListItem.up).toOption match {
-          case Some(item) if actions.isLocalFS && !item.isDir =>
+          case Some(item) if actions.api.isLocal && !item.isDir =>
             val filePath = path.join(state.currDir.path, item.name)
             val size = fs.lstatSync(filePath).size
             val ui = new ViewerPluginUi(filePath, size)

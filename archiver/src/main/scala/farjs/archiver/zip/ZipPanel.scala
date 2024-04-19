@@ -92,7 +92,7 @@ class ZipPanel(zipPath: String,
                 if (state.selectedNames.nonEmpty) FileListState.selectedItems(state).toList
                 else FileListState.currentItem(state).filter(_ != FileListItem.up).toList
 
-              if (actions.isLocalFS && items.nonEmpty) {
+              if (actions.api.isLocal && items.nonEmpty) {
                 setZipData(Some((dispatch, actions, state, items, k == FileListEvent.onFileListMove)))
               }
               else processed = false

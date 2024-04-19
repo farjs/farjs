@@ -16,6 +16,15 @@ class FSFileListApiSpec extends AsyncTestSpec {
   
   private val apiImp = new FSFileListApi
 
+  //noinspection TypeAnnotation
+  class FsService {
+    val readDisk = mockFunction[String, Future[Option[FSDisk]]]
+
+    val fsService = new MockFSService(
+      readDiskMock = readDisk
+    )
+  }
+
   it should "return supported capabilities" in {
     //when & then
     apiImp.capabilities.toSet shouldBe Set(
@@ -483,6 +492,25 @@ class FSFileListApiSpec extends AsyncTestSpec {
       fs.unlinkSync(file)
       fs.rmdirSync(tmpDir)
       Succeeded
+    }
+  }
+
+  it should "call fsService.readDisk when getDriveRoot" in {
+    //given
+    val fsService = new FsService
+    val apiImp = new FSFileListApi(fsService = fsService.fsService)
+    val path = "test path"
+    val drive = FSDisk("/some/path", 0, 0, "SomeDrive")
+
+    //then
+    fsService.readDisk.expects(path).returning(Future.successful(Some(drive)))
+
+    //when
+    val resultF = apiImp.getDriveRoot(path).toFuture
+
+    //then
+    resultF.map { result =>
+      result shouldBe drive.root
     }
   }
 

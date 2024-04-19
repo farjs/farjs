@@ -13,7 +13,11 @@ import scala.scalajs.js.JavaScriptException
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.{Failure, Success, Try}
 
-class FSFileListApi(fs: FS = scommons.nodejs.fs) extends FileListApi {
+class FSFileListApi(fs: FS = scommons.nodejs.fs,
+                    fsService: FSService = FSService.instance
+                   ) extends FileListApi {
+
+  override val isLocal: Boolean = true
 
   override val capabilities: js.Set[FileListCapability] = js.Set[FileListCapability](
     FileListCapability.read,
@@ -166,6 +170,13 @@ class FSFileListApi(fs: FS = scommons.nodejs.fs) extends FileListApi {
       }
     }
   }.toJSPromise
+
+  override def getDriveRoot(path: String): js.Promise[js.UndefOr[String]] = {
+    fsService.readDisk(path).map {
+      case None => js.undefined: js.UndefOr[String]
+      case Some(d) => d.root: js.UndefOr[String]
+    }.toJSPromise
+  }
 
   private def toFileListItem(targetDir: String, name: String): FileListItem = {
     Try(fs.lstatSync(path.join(targetDir, name))) match {

@@ -31,7 +31,7 @@ object ArchiverPlugin extends FileListPlugin {
         if (state.selectedNames.nonEmpty) FileListState.selectedItems(state).toList
         else FileListState.currentItem(state).filter(_ != FileListItem.up).toList
       
-      if (actions.isLocalFS && items.nonEmpty) {
+      if (actions.api.isLocal && items.nonEmpty) {
         val zipName = s"${items.head.name}.zip"
         val ui = new ArchiverPluginUi(FileListData(dispatch, actions, state), zipName, items)
         Some(ui.apply())

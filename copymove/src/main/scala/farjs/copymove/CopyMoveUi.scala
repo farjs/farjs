@@ -92,7 +92,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
       val move = isMove
       val inplace = isInplace
       val resolveF =
-        if (!from.actions.isLocalFS) Future.successful((path, false))
+        if (!from.actions.api.isLocal) Future.successful((path, false))
         else if (!inplace) resolveTargetDir(move, path)
         else Future.successful((path, true))
 
@@ -214,8 +214,8 @@ class CopyMoveUi(show: CopyMoveUiAction,
   
   private def checkSameDrive(from: FileListData, toPath: String): Future[Boolean] = {
     for {
-      maybeFromRoot <- from.actions.getDriveRoot(from.path)
-      maybeToRoot <- from.actions.getDriveRoot(toPath)
+      maybeFromRoot <- from.actions.api.getDriveRoot(from.path).toFuture
+      maybeToRoot <- from.actions.api.getDriveRoot(toPath).toFuture
     } yield {
       val maybeSameDrive = for {
         fromRoot <- maybeFromRoot

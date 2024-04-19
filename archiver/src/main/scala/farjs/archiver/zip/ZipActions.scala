@@ -7,15 +7,10 @@ import farjs.ui.Dispatch
 import farjs.ui.task.{Task, TaskAction}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.scalajs.js
 import scala.util.Success
 
 class ZipActions(var api: ZipApi) extends FileListActions {
-
-  val isLocalFS: Boolean = false
-
-  def getDriveRoot(path: String): Future[Option[String]] = Future.successful(None)
 
   override def updateDir(dispatch: Dispatch, path: String): TaskAction = {
     val entriesByParentF = ArchiverPlugin.readZip(api.zipPath).andThen {

@@ -2,7 +2,7 @@ package farjs.viewer
 
 import farjs.file.FileEvent.onFileView
 import farjs.file.FileViewHistory
-import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.filelist.api.{FileListDir, FileListItem, MockFileListApi}
 import farjs.filelist.stack._
 import farjs.filelist.{FileListState, MockFileListActions}
 import farjs.viewer.ViewerEvent._
@@ -101,7 +101,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
   it should "return None if non-local fs when onKeyTrigger(f3)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(isLocalFS = false)
+    val actions = new MockFileListActions(MockFileListApi(isLocalMock = false))
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))

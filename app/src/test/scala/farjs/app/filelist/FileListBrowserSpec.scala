@@ -316,7 +316,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
-    val nonFSActions = new MockFileListActions(isLocalFS = false)
+    val nonFSActions = new MockFileListActions(MockFileListApi(isLocalMock = false))
     val nonFSItem = PanelStackItem[FileListState](
       component = "nonFSItem".asInstanceOf[ReactClass],
       dispatch = None,
@@ -331,7 +331,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       leftStack.peek[FileListState] shouldBe nonFSItem
     }
     inside(nonFSItem.actions) { case Some(actions) =>
-      actions.isLocalFS shouldBe false
+      actions.api.isLocal shouldBe false
     }
     val button = inside(findComponents(comp, <.button.name)) {
       case List(button, _) => button

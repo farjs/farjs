@@ -17,6 +17,8 @@ class ZipApi(val zipPath: String,
              private var entriesByParentF: Future[Map[String, List[ZipEntry]]]
             ) extends FileListApi {
 
+  override val isLocal: Boolean = false
+  
   override val capabilities: js.Set[FileListCapability] = js.Set(
     FileListCapability.read,
     FileListCapability.delete
@@ -147,6 +149,9 @@ class ZipApi(val zipPath: String,
 
     js.Promise.resolve[js.UndefOr[FileTarget]](js.undefined)
   }
+
+  override def getDriveRoot(path: String): js.Promise[js.UndefOr[String]] =
+    js.Promise.resolve[js.UndefOr[String]](js.undefined)
 
   def extract(zipPath: String, filePath: String): Future[SubProcess] = {
     ZipApi.childProcess.spawn(

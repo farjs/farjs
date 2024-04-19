@@ -6,15 +6,19 @@ object MockFileListApi {
 
   //noinspection NotImplementedCode
   def apply(
+             isLocalMock: Boolean = true,
              capabilitiesMock: js.Set[FileListCapability] = js.Set.empty,
              readDirMock: (String, js.UndefOr[String]) => js.Promise[FileListDir] = (_, _) => ???,
              deleteMock: (String, js.Array[FileListItem]) => js.Promise[Unit] = (_, _) => ???,
              mkDirsMock: js.Array[String] => js.Promise[String] = _ => ???,
              readFileMock: (String, FileListItem, Double) => js.Promise[FileSource] = (_, _, _) => ???,
-             writeFileMock: (String, String, FileListItem => js.Promise[js.UndefOr[Boolean]]) => js.Promise[js.UndefOr[FileTarget]] = (_, _, _) => ???
+             writeFileMock: (String, String, FileListItem => js.Promise[js.UndefOr[Boolean]]) => js.Promise[js.UndefOr[FileTarget]] = (_, _, _) => ???,
+             getDriveRootMock: String => js.Promise[js.UndefOr[String]] = _ => ???
            ): FileListApi = {
 
     new FileListApi {
+
+      override val isLocal: Boolean = isLocalMock
 
       override val capabilities: js.Set[FileListCapability] = capabilitiesMock
 
@@ -41,6 +45,9 @@ object MockFileListApi {
 
         writeFileMock(parent, fileName, onExists)
       }
+
+      override def getDriveRoot(path: String): js.Promise[js.UndefOr[String]] =
+        getDriveRootMock(path)
     }
   }
 }

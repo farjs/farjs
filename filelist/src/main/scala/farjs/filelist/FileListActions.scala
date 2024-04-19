@@ -18,10 +18,6 @@ trait FileListActions {
 
   def api: FileListApi
 
-  def isLocalFS: Boolean
-
-  def getDriveRoot(path: String): Future[Option[String]]
-
   def changeDir(dispatch: Dispatch, path: String, dir: String): TaskAction = {
     val future = api.readDir(path, dir).toFuture.andThen {
       case Success(currDir) => dispatch(FileListDirChangedAction(dir, currDir))

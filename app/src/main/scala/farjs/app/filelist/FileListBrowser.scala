@@ -84,7 +84,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           val stackItem = stack.peek[js.Any]
           stackItem.actions.zip(stackItem.state).collect {
             case (actions, state)
-              if actions.isLocalFS
+              if actions.api.isLocal
                 && FileListState.isFileListState(state)
                 && FileListState.currentItem(state.asInstanceOf[FileListState]).exists(!_.isDir) =>
               openCurrItem(props.plugins, props.dispatch, stack, actions, state.asInstanceOf[FileListState])

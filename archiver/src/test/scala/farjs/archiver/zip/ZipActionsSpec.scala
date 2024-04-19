@@ -13,20 +13,6 @@ import scala.scalajs.js
 
 class ZipActionsSpec extends AsyncTestSpec {
 
-  it should "return None when getDriveRoot" in {
-    //given
-    val api = new ZipApi("file.zip", "root.path", Future.successful(Map.empty))
-    val actions = new ZipActions(api)
-    
-    //when
-    val resultF = actions.getDriveRoot("path")
-
-    //then
-    resultF.map { res =>
-      res shouldBe None
-    }
-  }
-
   it should "re-create ZipApi when updateDir" in {
     //given
     val readZip = mockFunction[String, Future[Map[String, List[ZipEntry]]]]

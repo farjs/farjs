@@ -10,8 +10,6 @@ import scala.scalajs.js
 //noinspection NotImplementedCode
 class MockFileListActions(
   val api: FileListApi = MockFileListApi(),
-  val isLocalFS: Boolean = true,
-  getDriveRootMock: String => Future[Option[String]] = _ => ???,
   changeDirMock: (Dispatch, String, String) => TaskAction = (_, _, _) => ???,
   updateDirMock: (Dispatch, String) => TaskAction = (_, _) => ???,
   createDirMock: (Dispatch, String, String, Boolean) => TaskAction = (_, _, _, _) => ???,
@@ -20,9 +18,6 @@ class MockFileListActions(
   copyFileMock: (String, FileListItem, Future[js.UndefOr[FileTarget]],
     Double => Future[Boolean]) => Future[Boolean] = (_, _, _, _) => ???
 ) extends FileListActions {
-
-  override def getDriveRoot(path: String): Future[Option[String]] =
-    getDriveRootMock(path)
 
   override def changeDir(dispatch: Dispatch,
                          path: String,
