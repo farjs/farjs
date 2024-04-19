@@ -24,10 +24,10 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   //noinspection TypeAnnotation
   class Actions {
-    val deleteAction = mockFunction[Dispatch, String, Seq[FileListItem], TaskAction]
+    val deleteItems = mockFunction[Dispatch, String, Seq[FileListItem], TaskAction]
 
     val actions = new MockFileListActions(
-      deleteActionMock = deleteAction
+      deleteItemsMock = deleteItems
     )
   }
 
@@ -56,7 +56,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val items = List(FileListItem("file 1"))
 
     //then
-    actions.deleteAction.expects(dispatch, currDir.path, *).onCall { (_, _, resItems) =>
+    actions.deleteItems.expects(dispatch, currDir.path, *).onCall { (_, _, resItems) =>
       assertFileListItems(resItems, items)
       deleteAction
     }
@@ -94,7 +94,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val items = List(FileListItem("file 2"))
 
     //then
-    actions.deleteAction.expects(dispatch, currDir.path, *).onCall { (_, _, resItems) =>
+    actions.deleteItems.expects(dispatch, currDir.path, *).onCall { (_, _, resItems) =>
       assertFileListItems(resItems, items)
       deleteAction
     }

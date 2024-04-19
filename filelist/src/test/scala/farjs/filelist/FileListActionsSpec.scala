@@ -173,7 +173,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     task.result.toFuture.map(_ => Succeeded)
   }
   
-  it should "dispatch FileListDirUpdatedAction when deleteAction" in {
+  it should "dispatch FileListDirUpdatedAction when deleteItems" in {
     //given
     val api = new Api
     val actions = new FileListActionsTest(api.api)
@@ -199,7 +199,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     
     //when
     val TaskAction(task) =
-      actions.deleteAction(dispatch, dir, items)
+      actions.deleteItems(dispatch, dir, items)
     
     //then
     task.message shouldBe "Deleting Items"

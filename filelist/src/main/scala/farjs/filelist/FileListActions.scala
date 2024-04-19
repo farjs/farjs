@@ -54,12 +54,12 @@ trait FileListActions {
     TaskAction(Task("Creating Dir", future))
   }
 
-  def deleteAction(dispatch: Dispatch,
-                   dir: String,
-                   items: Seq[FileListItem]): TaskAction = {
+  def deleteItems(dispatch: Dispatch,
+                  parent: String,
+                  items: Seq[FileListItem]): TaskAction = {
     
-    val future = api.delete(dir, js.Array(items: _*)).toFuture.andThen {
-      case Success(_) => dispatch(updateDir(dispatch, dir))
+    val future = api.delete(parent, js.Array(items: _*)).toFuture.andThen {
+      case Success(_) => dispatch(updateDir(dispatch, parent))
     }
 
     TaskAction(Task("Deleting Items", future))

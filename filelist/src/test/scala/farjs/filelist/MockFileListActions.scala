@@ -13,7 +13,7 @@ class MockFileListActions(
   changeDirMock: (Dispatch, String, String) => TaskAction = (_, _, _) => ???,
   updateDirMock: (Dispatch, String) => TaskAction = (_, _) => ???,
   createDirMock: (Dispatch, String, String, Boolean) => TaskAction = (_, _, _, _) => ???,
-  deleteActionMock: (Dispatch, String, Seq[FileListItem]) => TaskAction = (_, _, _) => ???,
+  deleteItemsMock: (Dispatch, String, Seq[FileListItem]) => TaskAction = (_, _, _) => ???,
   scanDirsMock: (String, Seq[FileListItem], (String, Seq[FileListItem]) => Boolean) => Future[Boolean] = (_, _, _) => ???,
   copyFileMock: (String, FileListItem, Future[js.UndefOr[FileTarget]],
     Double => Future[Boolean]) => Future[Boolean] = (_, _, _, _) => ???
@@ -38,11 +38,11 @@ class MockFileListActions(
     createDirMock(dispatch, parent, dir, multiple)
   }
   
-  override def deleteAction(dispatch: Dispatch,
-                            dir: String,
-                            items: Seq[FileListItem]): TaskAction = {
+  override def deleteItems(dispatch: Dispatch,
+                           parent: String,
+                           items: Seq[FileListItem]): TaskAction = {
 
-    deleteActionMock(dispatch, dir, items)
+    deleteItemsMock(dispatch, parent, items)
   }
   
   override def scanDirs(parent: String,

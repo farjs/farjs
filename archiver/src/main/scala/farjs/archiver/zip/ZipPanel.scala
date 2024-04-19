@@ -136,7 +136,7 @@ class ZipPanel(zipPath: String,
             props.dispatch(updateAction)
             if (move) {
               updateAction.task.result.toFuture.foreach { _ =>
-                dispatch(actions.deleteAction(dispatch, state.currDir.path, items))
+                dispatch(actions.deleteItems(dispatch, state.currDir.path, items))
               }
             }
           },

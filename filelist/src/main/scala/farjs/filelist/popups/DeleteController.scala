@@ -27,9 +27,9 @@ object DeleteController extends FunctionComponent[FileListUiData] {
                 else FileListState.currentItem(data.state).toList
 
               props.onClose()
-              data.dispatch(data.actions.deleteAction(
+              data.dispatch(data.actions.deleteItems(
                 dispatch = data.dispatch,
-                dir = data.state.currDir.path,
+                parent = data.state.currDir.path,
                 items = items
               ))
             },
