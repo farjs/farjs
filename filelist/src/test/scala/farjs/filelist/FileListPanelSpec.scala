@@ -31,7 +31,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val updateDir = mockFunction[Dispatch, String, TaskAction]
 
     val actions = new MockFileListActions(
-      MockFileListApi(capabilitiesMock = js.Set(
+      new MockFileListApi(capabilitiesMock = js.Set(
         FileListCapability.delete,
         FileListCapability.mkDirs,
         FileListCapability.copyInplace,

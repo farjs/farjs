@@ -9,7 +9,7 @@ import scala.scalajs.js
 
 //noinspection NotImplementedCode
 class MockFileListActions(
-  val api: FileListApi = MockFileListApi(),
+  val api: FileListApi = new MockFileListApi(),
   changeDirMock: (Dispatch, String, String) => TaskAction = (_, _, _) => ???,
   updateDirMock: (Dispatch, String) => TaskAction = (_, _) => ???,
   createDirMock: (Dispatch, String, String, Boolean) => TaskAction = (_, _, _, _) => ???,

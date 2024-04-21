@@ -23,7 +23,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
   it should "return None if .. when onKeyTrigger" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(capabilitiesMock = js.Set(
+    val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(
       FileListCapability.read,
       FileListCapability.write,
       FileListCapability.delete,
@@ -55,7 +55,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
   it should "return None if other state type when onKeyTrigger" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(capabilitiesMock = js.Set(
+    val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(
       FileListCapability.read,
       FileListCapability.write,
       FileListCapability.delete,
@@ -83,7 +83,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
   it should "return None when onKeyTrigger(unknown)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(capabilitiesMock = js.Set(
+    val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(
       FileListCapability.read,
       FileListCapability.write,
       FileListCapability.delete,
@@ -109,7 +109,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
   it should "return Some(ui) when onKeyTrigger(Shift-F5)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(capabilitiesMock = js.Set(FileListCapability.copyInplace)))
+    val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(FileListCapability.copyInplace)))
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
@@ -129,7 +129,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
   it should "return Some(ui) when onKeyTrigger(F5)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(capabilitiesMock = js.Set(
+    val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(
       FileListCapability.read, FileListCapability.write, FileListCapability.delete
     )))
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
@@ -151,7 +151,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
   it should "return Some(ui) if selected items when onKeyTrigger(F6)" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(capabilitiesMock = js.Set(
+    val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(
       FileListCapability.read, FileListCapability.write, FileListCapability.delete
     )))
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
@@ -190,7 +190,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
               never: Boolean = false,
               capabilities: js.Set[FileListCapability] = capabilities)(implicit pos: Position): Unit = {
       //given
-      val actions = new MockFileListActions(MockFileListApi(capabilitiesMock = capabilities))
+      val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = capabilities))
       val from = FileListData(dispatch, actions, FileListState.copy(currState)(
         index = index,
         selectedNames = selectedNames
@@ -249,8 +249,8 @@ class CopyMovePluginSpec extends AsyncTestSpec {
               toCapabilities: js.Set[FileListCapability] = capabilities,
               emit: Option[String] = None)(implicit pos: Position): Unit = {
       //given
-      val fromActions = new MockFileListActions(MockFileListApi(capabilitiesMock = fromCapabilities))
-      val toActions = new MockFileListActions(MockFileListApi(capabilitiesMock = toCapabilities))
+      val fromActions = new MockFileListActions(new MockFileListApi(capabilitiesMock = fromCapabilities))
+      val toActions = new MockFileListActions(new MockFileListApi(capabilitiesMock = toCapabilities))
       val from = FileListData(dispatch, fromActions, FileListState.copy(currState)(
         index = index,
         selectedNames = selectedNames

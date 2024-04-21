@@ -33,7 +33,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val deleteItems = mockFunction[Dispatch, String, Seq[FileListItem], TaskAction]
 
     val actions = new MockFileListActions(
-      MockFileListApi(isLocalMock = isLocal),
+      new MockFileListApi(isLocalMock = isLocal),
       updateDirMock = updateDir,
       deleteItemsMock = deleteItems
     )
@@ -56,7 +56,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(isLocalMock = false))
+    val actions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val props = FileListPanelProps(dispatch, actions, FileListState(
       currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
         FileListItem.up
@@ -86,7 +86,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(isLocalMock = false))
+    val actions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val props = FileListPanelProps(dispatch, actions, FileListState(
       index = 1,
       currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
@@ -132,7 +132,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(isLocalMock = false))
+    val actions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val props = FileListPanelProps(dispatch, actions, FileListState(
       currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
         FileListItem.up,
@@ -178,7 +178,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(isLocalMock = false))
+    val actions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val props = FileListPanelProps(dispatch, actions, FileListState(
       index = 1,
       currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
@@ -218,7 +218,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(isLocalMock = false))
+    val actions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val props = FileListPanelProps(dispatch, actions, FileListState(
       index = 1,
       currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
@@ -229,7 +229,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val rootPath = "zip://filePath.zip"
     val zipPanel = new ZipPanel("dir/file.zip", rootPath, entriesByParentF, onClose)
     val fsDispatch = mockFunction[Any, Any]
-    val fsActions = new MockFileListActions(MockFileListApi(isLocalMock = false))
+    val fsActions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val fsState = FileListState(
       index = 1,
       currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
@@ -261,7 +261,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(isLocalMock = false))
+    val actions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val props = FileListPanelProps(dispatch, actions, FileListState(
       index = 1,
       currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
@@ -303,7 +303,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(isLocalMock = false))
+    val actions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val props = FileListPanelProps(dispatch, actions, FileListState(
       index = 1,
       currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
@@ -571,7 +571,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(isLocalMock = false))
+    val actions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val state = FileListState()
     val props = FileListPanelProps(dispatch, actions, state)
     val rootPath = "zip://filePath.zip"
@@ -616,7 +616,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(isLocalMock = false))
+    val actions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val state = FileListState(
       currDir = FileListDir("zip://filePath.zip", isRoot = false, items = js.Array(
         FileListItem.up
@@ -651,7 +651,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(isLocalMock = false))
+    val actions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val state = FileListState()
     val props = FileListPanelProps(dispatch, actions, state)
     val rootPath = "zip://filePath.zip"

@@ -13,20 +13,17 @@ import scala.scalajs.js.JavaScriptException
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.{Failure, Success, Try}
 
-class FSFileListApi(fs: FS = scommons.nodejs.fs,
-                    fsService: FSService = FSService.instance
-                   ) extends FileListApi {
-
-  override val isLocal: Boolean = true
-
-  override val capabilities: js.Set[FileListCapability] = js.Set[FileListCapability](
-    FileListCapability.read,
-    FileListCapability.write,
-    FileListCapability.delete,
-    FileListCapability.mkDirs,
-    FileListCapability.copyInplace,
-    FileListCapability.moveInplace
-  )
+class FSFileListApi(
+  fs: FS = scommons.nodejs.fs,
+  fsService: FSService = FSService.instance
+) extends FileListApi(true, js.Set[FileListCapability](
+  FileListCapability.read,
+  FileListCapability.write,
+  FileListCapability.delete,
+  FileListCapability.mkDirs,
+  FileListCapability.copyInplace,
+  FileListCapability.moveInplace
+)) {
 
   override def readDir(parent: String, dir: js.UndefOr[String]): js.Promise[FileListDir] = {
     val targetDir = path.resolve(parent, dir.getOrElse(""))

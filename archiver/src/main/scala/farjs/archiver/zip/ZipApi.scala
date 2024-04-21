@@ -12,17 +12,14 @@ import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.control.NonFatal
 
-class ZipApi(val zipPath: String,
-             val rootPath: String,
-             private var entriesByParentF: Future[Map[String, List[ZipEntry]]]
-            ) extends FileListApi {
-
-  override val isLocal: Boolean = false
-  
-  override val capabilities: js.Set[FileListCapability] = js.Set(
-    FileListCapability.read,
-    FileListCapability.delete
-  )
+class ZipApi(
+  val zipPath: String,
+  val rootPath: String,
+  private var entriesByParentF: Future[Map[String, List[ZipEntry]]]
+) extends FileListApi(false, js.Set(
+  FileListCapability.read,
+  FileListCapability.delete
+)) {
 
   override def readDir(parent: String, maybeDir: js.UndefOr[String]): js.Promise[FileListDir] = {
     val path = if (parent == "") rootPath else parent

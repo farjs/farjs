@@ -39,7 +39,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val readDir = mockFunction[String, js.UndefOr[String], js.Promise[FileListDir]]
 
     val actions = new MockFileListActions(
-      MockFileListApi(
+      new MockFileListApi(
         isLocalMock = isLocal,
         readDirMock = readDir,
         getDriveRootMock = getDriveRoot,
@@ -56,6 +56,8 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       saveMock = save
     )
   }
+  
+  private val driveRootRes = js.Promise.resolve[js.UndefOr[String]](js.undefined: js.UndefOr[String])
 
   it should "show CopyItemsStats when copy" in {
     //given
@@ -137,8 +139,8 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     actions.readDir.expects(currDir.path, to: js.UndefOr[String]).returning(js.Promise.resolve[FileListDir](toDir))
-    actions.getDriveRoot.expects(currDir.path).returning(js.Promise.resolve[js.UndefOr[String]](js.undefined))
-    actions.getDriveRoot.expects(toDir.path).returning(js.Promise.resolve[js.UndefOr[String]](js.undefined))
+    actions.getDriveRoot.expects(currDir.path).returning(driveRootRes)
+    actions.getDriveRoot.expects(toDir.path).returning(driveRootRes)
     dispatch.expects(*).onCall { action: Any =>
       inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
@@ -278,8 +280,8 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     actions.readDir.expects(currDir.path, to: js.UndefOr[String]).returning(js.Promise.resolve[FileListDir](toDir))
-    actions.getDriveRoot.expects(currDir.path).returning(js.Promise.resolve[js.UndefOr[String]](js.undefined))
-    actions.getDriveRoot.expects(toDir.path).returning(js.Promise.resolve[js.UndefOr[String]](js.undefined))
+    actions.getDriveRoot.expects(currDir.path).returning(driveRootRes)
+    actions.getDriveRoot.expects(toDir.path).returning(driveRootRes)
     dispatch.expects(*).onCall { action: Any =>
       inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
@@ -535,8 +537,8 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     actions.readDir.expects(currDir.path, to: js.UndefOr[String]).returning(js.Promise.resolve[FileListDir](toDir))
-    actions.getDriveRoot.expects(currDir.path).returning(js.Promise.resolve[js.UndefOr[String]](js.undefined))
-    actions.getDriveRoot.expects(toDir.path).returning(js.Promise.resolve[js.UndefOr[String]](js.undefined))
+    actions.getDriveRoot.expects(currDir.path).returning(driveRootRes)
+    actions.getDriveRoot.expects(toDir.path).returning(driveRootRes)
     dispatch.expects(*).onCall { action: Any =>
       inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"

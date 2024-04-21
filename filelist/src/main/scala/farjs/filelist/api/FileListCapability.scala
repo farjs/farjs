@@ -1,15 +1,19 @@
 package farjs.filelist.api
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
+@js.native
 sealed trait FileListCapability extends js.Object
 
-object FileListCapability {
+@js.native
+@JSImport("@farjs/filelist/api/FileListCapability.mjs", JSImport.Default)
+object FileListCapability extends js.Object {
 
-  val read: FileListCapability = "read".asInstanceOf[FileListCapability]
-  val write: FileListCapability = "write".asInstanceOf[FileListCapability]
-  val delete: FileListCapability = "delete".asInstanceOf[FileListCapability]
-  val mkDirs: FileListCapability = "mkDirs".asInstanceOf[FileListCapability]
-  val copyInplace: FileListCapability = "copyInplace".asInstanceOf[FileListCapability]
-  val moveInplace: FileListCapability = "moveInplace".asInstanceOf[FileListCapability]
+  val read: FileListCapability = js.native
+  val write: FileListCapability = js.native
+  val delete: FileListCapability = js.native
+  val mkDirs: FileListCapability = js.native
+  val copyInplace: FileListCapability = js.native
+  val moveInplace: FileListCapability = js.native
 }

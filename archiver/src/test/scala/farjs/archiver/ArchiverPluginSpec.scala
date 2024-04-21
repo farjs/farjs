@@ -49,7 +49,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
   it should "return None if non-local fs when onKeyTrigger" in {
     //given
     val dispatch = mockFunction[Any, Any]
-    val actions = new MockFileListActions(MockFileListApi(isLocalMock = false))
+    val actions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))

@@ -31,7 +31,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val readFile = mockFunction[String, FileListItem, Double, js.Promise[FileSource]]
 
     val actions = new MockFileListActions(
-      MockFileListApi(
+      new MockFileListApi(
         readFileMock = readFile
       )
     )
@@ -316,7 +316,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
-    val nonFSActions = new MockFileListActions(MockFileListApi(isLocalMock = false))
+    val nonFSActions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val nonFSItem = PanelStackItem[FileListState](
       component = "nonFSItem".asInstanceOf[ReactClass],
       dispatch = None,

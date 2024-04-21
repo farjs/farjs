@@ -48,7 +48,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       Double => Future[Boolean], Future[Boolean]]
 
     val actions = new MockFileListActions(
-      MockFileListApi(
+      new MockFileListApi(
         readDirMock = readDir,
         deleteMock = delete,
         mkDirsMock = mkDirs,
