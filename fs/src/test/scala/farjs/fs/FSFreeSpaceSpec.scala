@@ -23,7 +23,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "dispatch action when readDisk returns Some(...)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val fsService = new FsService
     FSFreeSpace.fsService = fsService.fsService
     val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, js.Array()))
@@ -34,6 +34,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     fsService.readDisk.expects(props.currDir.path).returning(resultF)
     dispatch.expects(*).onCall { action: Any =>
       assertFileListDiskSpaceUpdatedAction(action, FileListDiskSpaceUpdatedAction(disk.free))
+      ()
     }
     
     //when
@@ -46,7 +47,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "not dispatch action when readDisk returns None" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val fsService = new FsService
     FSFreeSpace.fsService = fsService.fsService
     val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, js.Array()))
@@ -56,6 +57,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     fsService.readDisk.expects(props.currDir.path).returning(resultF)
     dispatch.expects(*).onCall { action: Any =>
       assertFileListDiskSpaceUpdatedAction(action, FileListDiskSpaceUpdatedAction(disk.free))
+      ()
     }
 
     val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
@@ -80,7 +82,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "not dispatch action when readDisk fails" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val fsService = new FsService
     FSFreeSpace.fsService = fsService.fsService
     val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, js.Array()))
@@ -90,6 +92,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     fsService.readDisk.expects(props.currDir.path).returning(resultF)
     dispatch.expects(*).onCall { action: Any =>
       assertFileListDiskSpaceUpdatedAction(action, FileListDiskSpaceUpdatedAction(disk.free))
+      ()
     }
 
     val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
@@ -114,7 +117,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "not call readDisk if currDir is not changed when re-render" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val fsService = new FsService
     FSFreeSpace.fsService = fsService.fsService
     val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, js.Array()))
@@ -125,6 +128,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     fsService.readDisk.expects(props.currDir.path).returning(resultF)
     dispatch.expects(*).onCall { action: Any =>
       assertFileListDiskSpaceUpdatedAction(action, FileListDiskSpaceUpdatedAction(disk.free))
+      ()
     }
 
     val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
@@ -147,7 +151,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "dispatch action only for the same (current) dir instance" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val fsService = new FsService
     FSFreeSpace.fsService = fsService.fsService
     val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, js.Array()))
@@ -164,6 +168,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     fsService.readDisk.expects(props2.currDir.path).returning(resultF2)
     dispatch.expects(*).onCall { action: Any =>
       assertFileListDiskSpaceUpdatedAction(action, FileListDiskSpaceUpdatedAction(disk2.free))
+      ()
     }
 
     //when

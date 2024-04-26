@@ -63,10 +63,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   
   it should "increment time100ms every 100 ms." in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = mock[FileListActions]
     val from = FileListData(dispatch, actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val to = FileListData(toDispatch, toActions, FileListState())
     val setIntervalMock = mockFunction[js.Function0[Any], Double, Timeout]
@@ -112,10 +112,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "not increment time100ms when cancel" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = mock[FileListActions]
     val from = FileListData(dispatch, actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val to = FileListData(toDispatch, toActions, FileListState())
     val setIntervalMock = mockFunction[js.Function0[Any], Double, Timeout]
@@ -153,10 +153,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
     val item = FileListItem("file 1")
@@ -208,10 +208,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "hide cancel popup when NO action" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val to = FileListData(toDispatch, toActions, FileListState())
     val props = CopyProcessProps(from, to, move = false,
@@ -232,10 +232,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
   it should "render cancel popup when onCancel" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val to = FileListData(toDispatch, toActions, FileListState())
     val props = CopyProcessProps(from, to, move = false,
@@ -266,10 +266,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
     val item = FileListItem("file 1")
@@ -317,10 +317,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
     val item = FileListItem("file 1")
@@ -369,10 +369,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "append to existing file when append action" in {
     //given
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
     val item = FileListItem("file 1")
@@ -420,10 +420,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "pause copy process when asking for existing file action" in {
     //given
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
     val item = FileListItem("file 1")
@@ -482,10 +482,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "do not ask for existing file action when canceled(unmount)" in {
     //given
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
     val item = FileListItem("file 1")
@@ -532,10 +532,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "do not ask for existing file action again if applied all action" in {
     //given
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
     val item1 = FileListItem("file 1")
@@ -602,10 +602,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "do not ask for existing file action again if applied skip all action" in {
     //given
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
     val item1 = FileListItem("file 1")
@@ -673,10 +673,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
     val item = FileListItem("file 1")
@@ -738,10 +738,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
     val item = FileListItem("file 1")
@@ -788,10 +788,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
     val item = FileListItem("file 1")
@@ -830,10 +830,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
     val item = FileListItem.copy(FileListItem("file 1"))(size = 246)
@@ -887,10 +887,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
     val item = FileListItem.copy(FileListItem("file 1"))(size = 246)
@@ -952,10 +952,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
     val item1 = FileListItem.copy(FileListItem("file 1"))(size = 246)
@@ -1028,10 +1028,10 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val from = FileListData(dispatch, actions.actions, FileListState())
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val to = FileListData(toDispatch, toActions.actions, FileListState())
     val item1 = FileListItem.copy(FileListItem("file 1"))(size = 246)

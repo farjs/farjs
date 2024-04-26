@@ -32,7 +32,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "dispatch action with calculated items sizes" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val dir1 = FileListItem("dir 1", isDir = true)
     val file1 = FileListItem.copy(FileListItem("file 1"))(size = 10)
@@ -87,7 +87,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "handle cancel action when onClose" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
       FileListItem("dir 1", isDir = true)
@@ -132,7 +132,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "dispatch actions when failure" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
       FileListItem("dir 1", isDir = true)
@@ -171,7 +171,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "render StatusPopup component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val state = FileListState()
     val onClose = mockFunction[Unit]
@@ -182,6 +182,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     onClose.expects()
     dispatch.expects(*).onCall { action: Any =>
       assertFileListDirUpdatedAction(action, FileListDirUpdatedAction(state.currDir))
+      ()
     }
 
     //when

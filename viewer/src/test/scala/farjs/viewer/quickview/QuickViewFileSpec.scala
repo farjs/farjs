@@ -15,7 +15,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
 
   it should "update viewport when setViewport" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val panelStack = PanelStackProps(
       isRight = false,
       panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
@@ -50,7 +50,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
 
   it should "emit onViewerOpenLeft event when onKeypress(F3)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val emitMock = mockFunction[String, js.Any, js.Dynamic, Boolean]
     val panelStack = PanelStackProps(
       isRight = true,
@@ -76,7 +76,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
 
   it should "emit onViewerOpenRight event when onKeypress(F3)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val emitMock = mockFunction[String, js.Any, js.Dynamic, Boolean]
     val panelStack = PanelStackProps(
       isRight = false,
@@ -102,7 +102,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
 
   it should "return false if unknown key when onKeypress" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val panelStack = PanelStackProps(
       isRight = false,
       panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
@@ -120,7 +120,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
 
   it should "render component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val panelStack = PanelStackProps(
       isRight = false,
       panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],

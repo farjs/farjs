@@ -37,7 +37,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "update params with calculated stats when item name changes" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val currItem = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
@@ -81,7 +81,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "update params with calculated stats when curr path changes" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val currItem = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
@@ -125,7 +125,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "handle cancel action and hide StatusPopup when onClose" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val currItem = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
@@ -176,7 +176,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "dispatch action when failure" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val currItem = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
@@ -217,7 +217,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "render component with existing params" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val currItem = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(

@@ -19,7 +19,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
   it should "call onClose when onClose" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onClose = mockFunction[Unit]
     val pluginUi = new ViewerPluginUi("item 1", 123)
     val props = FileListPluginUiProps(dispatch, onClose)
@@ -43,7 +43,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
   it should "call onClose when onKeypress(F10)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onClose = mockFunction[Unit]
     val pluginUi = new ViewerPluginUi("item 1", 0)
     val props = FileListPluginUiProps(dispatch, onClose)
@@ -67,7 +67,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
   it should "do nothing when onKeypress(unknown)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onClose = mockFunction[Unit]
     val pluginUi = new ViewerPluginUi("item 1", 0)
     val props = FileListPluginUiProps(dispatch, onClose)
@@ -83,7 +83,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
   it should "update props when setViewport" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onClose = mockFunction[Unit]
     val pluginUi = new ViewerPluginUi("item 1", 0)
     val props = FileListPluginUiProps(dispatch, onClose)
@@ -123,7 +123,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
   it should "render initial component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val onClose = mockFunction[Unit]
     val filePath = "item 1"
     val size = 123

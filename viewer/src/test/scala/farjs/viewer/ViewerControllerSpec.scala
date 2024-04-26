@@ -50,7 +50,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val fs = new FSMocks
     ViewerFileReader.fs = fs.fs
     val inputRef = ReactRef.create[BlessedElement]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None)
     val expectedError = new Exception("test error")
     val historyService = new FileViewHistoryService
@@ -85,7 +85,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val fs = new FSMocks
     ViewerFileReader.fs = fs.fs
     val inputRef = ReactRef.create[BlessedElement]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None, setViewport)
     val fd = 123
@@ -137,7 +137,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val fs = new FSMocks
     ViewerFileReader.fs = fs.fs
     val inputRef = ReactRef.create[BlessedElement]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None, setViewport)
     val fd = 123
@@ -205,7 +205,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val fs = new FSMocks
     ViewerFileReader.fs = fs.fs
     val inputRef = ReactRef.create[BlessedElement]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None)
     fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).returning(123)
     val historyService = new FileViewHistoryService

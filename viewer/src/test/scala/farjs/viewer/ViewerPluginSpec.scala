@@ -79,7 +79,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
 
   it should "return None if .. when onKeyTrigger(f3)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
@@ -100,7 +100,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
 
   it should "return None if non-local fs when onKeyTrigger(f3)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
@@ -122,7 +122,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     //given
     val fs = new FS
     ViewerPlugin.fs = fs.fs
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val item = FileListItem("item 1")
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(item)))
@@ -150,7 +150,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     //given
     val fs = new FS
     ViewerPlugin.fs = fs.fs
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val item = FileListItem("item 1")
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(item)))
@@ -175,7 +175,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     //given
     val fs = new FS
     ViewerPlugin.fs = fs.fs
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val item = FileListItem("item 1")
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(item)))
@@ -200,7 +200,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     //given
     val fs = new FS
     ViewerPlugin.fs = fs.fs
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val item = FileListItem("item 1")
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(item)))
@@ -223,7 +223,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
 
   it should "return Some(ViewItemsPopup) if dir when onKeyTrigger(f3)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1", isDir = true)

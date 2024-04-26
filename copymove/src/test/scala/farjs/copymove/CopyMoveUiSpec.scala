@@ -61,13 +61,13 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "show CopyItemsStats when copy" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
       FileListItem("dir 1", isDir = true)
     ))
     val state = FileListState(currDir = currDir, isActive = true)
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
@@ -88,6 +88,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
       }
+      ()
     }
 
     //when
@@ -96,8 +97,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     //then
     eventually {
       assertTestComponent(renderer.root.children(0), copyItemsStats) {
-        case CopyItemsStatsProps(resDispatch, resActions, fromPath, items, title, _, _) =>
-          resDispatch shouldBe dispatch
+        case CopyItemsStatsProps(_, resActions, fromPath, items, title, _, _) =>
           resActions shouldBe actions.actions
           fromPath shouldBe currDir.path
           items shouldBe currDir.items.toList
@@ -116,13 +116,13 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "show CopyItemsStats when move" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
       FileListItem("dir 1", isDir = true)
     ))
     val state = FileListState(currDir = currDir, isActive = true)
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
@@ -145,6 +145,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
       }
+      ()
     }
     
     //when
@@ -153,8 +154,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     //then
     eventually {
       assertTestComponent(renderer.root.children(0), copyItemsStats) {
-        case CopyItemsStatsProps(resDispatch, resActions, fromPath, items, title, _, _) =>
-          resDispatch shouldBe dispatch
+        case CopyItemsStatsProps(_, resActions, fromPath, items, title, _, _) =>
           resActions shouldBe actions.actions
           fromPath shouldBe currDir.path
           items shouldBe currDir.items.toList
@@ -173,13 +173,13 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "call onClose when onCancel in copyItemsPopup" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
       FileListItem("dir 1", isDir = true)
     ))
     val state = FileListState(currDir = currDir, isActive = true)
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
@@ -203,12 +203,12 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "render error popup if same path" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(item))
     val state = FileListState(currDir = currDir, isActive = true)
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
@@ -229,6 +229,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
       }
+      ()
     }
 
     //when
@@ -258,12 +259,12 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "render error popup when move into itself" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("folder", isRoot = false, js.Array(item))
     val state = FileListState(currDir = currDir, isActive = true)
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
@@ -286,6 +287,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
       }
+      ()
     }
 
     //when
@@ -315,12 +317,12 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "render error popup when copy into itself in sub-folder" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("folder", isRoot = false, js.Array(item))
     val state = FileListState(currDir = currDir, isActive = true)
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
@@ -341,6 +343,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
       }
+      ()
     }
 
     //when
@@ -370,7 +373,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "render MoveProcess when move within same drive" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
@@ -378,7 +381,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       FileListItem("file 1")
     ))
     val state = FileListState(currDir = currDir, isActive = true)
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
@@ -402,6 +405,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
       }
+      ()
     }
 
     //when
@@ -410,8 +414,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     //then
     eventually {
       assertTestComponent(renderer.root.children(0), moveProcessComp) {
-        case MoveProcessProps(resDispatch, resActions, fromPath, items, toPath, _, _) =>
-          resDispatch shouldBe dispatch
+        case MoveProcessProps(_, resActions, fromPath, items, toPath, _, _) =>
           resActions shouldBe actions.actions
           fromPath shouldBe currDir.path
           items shouldBe List((item, item.name))
@@ -422,7 +425,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "render MoveProcess when move inplace" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
@@ -430,7 +433,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       FileListItem("file 1")
     ))
     val state = FileListState(currDir = currDir, isActive = true)
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
@@ -462,7 +465,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "render CopyProcess when copy inplace" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
@@ -470,7 +473,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       FileListItem("file 1")
     ))
     val state = FileListState(currDir = currDir, isActive = true)
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
@@ -512,7 +515,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "render CopyProcess when move" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val item = FileListItem("dir", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
@@ -520,7 +523,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       FileListItem("file 1")
     ))
     val state = FileListState(currDir = currDir, isActive = true)
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
@@ -543,6 +546,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
       }
+      ()
     }
 
     //when
@@ -556,8 +560,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
       assertTestComponent(renderer.root.children.head, copyProcessComp) {
         case CopyProcessProps(resFrom, resTo, move, fromPath, items, resToPath, resTotal, _, _) =>
-          inside(resFrom) { case FileListData(resDispatch, resActions, resState) =>
-            resDispatch shouldBe dispatch
+          inside(resFrom) { case FileListData(_, resActions, resState) =>
             resActions shouldBe actions.actions
             resState shouldBe state
           }
@@ -577,7 +580,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "render CopyProcess when move from virtual FS" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new Actions(isLocal = false)
     val item = FileListItem("dir", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
@@ -585,7 +588,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       FileListItem("file 1")
     ))
     val state = FileListState(currDir = currDir, isActive = true)
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
     val onClose = mockFunction[Unit]
@@ -631,7 +634,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "dispatch FileListParamsChangedAction if selected when onDone" in {
     //given
-    val fromDispatch = mockFunction[Any, Any]
+    val fromDispatch = mockFunction[js.Any, Unit]
     val fromActions = new Actions
     val dir = FileListItem("dir 1", isDir = true)
     val leftDir = FileListDir("/left/dir", isRoot = false, js.Array(
@@ -641,7 +644,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     ))
     val rightDir = FileListDir("/right/dir", isRoot = false, js.Array(FileListItem("dir 2", isDir = true)))
     val fromState = FileListState(index = 1, currDir = leftDir, isActive = true, selectedNames = js.Set(dir.name, "file 1"))
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val toState = FileListState(currDir = rightDir)
     val onClose = mockFunction[Unit]
@@ -662,6 +665,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       inside(action.asInstanceOf[TaskAction]) { case action: TaskAction =>
         action.task.message shouldBe "Resolving target dir"
       }
+      ()
     }
     copyPopup.onAction(to)
     
@@ -689,11 +693,12 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
             selectedNames = js.Set("file 1")
           )
         )
+        ()
       }
       onClose.expects()
       historyService.save.expects(to).returning(Future.unit)
-      fromActions.updateDir.expects(fromDispatch, leftDir.path).returning(leftAction)
-      toActions.updateDir.expects(toDispatch, rightDir.path).returning(rightAction)
+      fromActions.updateDir.expects(*, leftDir.path).returning(leftAction)
+      toActions.updateDir.expects(*, rightDir.path).returning(rightAction)
       fromDispatch.expects(leftAction)
       toDispatch.expects(rightAction)
 
@@ -710,7 +715,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "dispatch FileListItemCreatedAction if inplace when onDone" in {
     //given
-    val fromDispatch = mockFunction[Any, Any]
+    val fromDispatch = mockFunction[js.Any, Unit]
     val fromActions = new Actions
     val dir = FileListItem("dir 1", isDir = true)
     val leftDir = FileListDir("/left/dir", isRoot = false, js.Array(
@@ -720,7 +725,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     ))
     val rightDir = FileListDir("/right/dir", isRoot = false, js.Array(FileListItem("dir 2", isDir = true)))
     val fromState = FileListState(index = 1, currDir = leftDir, isActive = true, selectedNames = js.Set("file 1"))
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val toState = FileListState(currDir = rightDir)
     val onClose = mockFunction[Unit]
@@ -753,10 +758,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       //then
       onClose.expects()
       historyService.save.expects(to).returning(Future.unit)
-      fromActions.updateDir.expects(fromDispatch, leftDir.path).returning(leftAction)
+      fromActions.updateDir.expects(*, leftDir.path).returning(leftAction)
       fromDispatch.expects(leftAction)
       fromDispatch.expects(*).onCall { action: Any =>
         assertFileListItemCreatedAction(action, FileListItemCreatedAction(to, updatedDir))
+        ()
       }
 
       //when
@@ -769,11 +775,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "render CopyItemsPopup(items=single) when copy to different dir" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
     val state = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array(item)), isActive = true)
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState(currDir = FileListDir("/test-path", isRoot = false, js.Array()))
     val onClose = mockFunction[Unit]
@@ -800,11 +806,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "render CopyItemsPopup(items=single) when copy to the same dir" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
     val state = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array(item)), isActive = true)
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array()))
     val onClose = mockFunction[Unit]
@@ -831,7 +837,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "render CopyItemsPopup(items=multi) when move to different dir" in {
     //given
-    val fromDispatch = mockFunction[Any, Any]
+    val fromDispatch = mockFunction[js.Any, Unit]
     val fromActions = mock[FileListActions]
     val items = js.Array(
       FileListItem("file 1"),
@@ -842,7 +848,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       isActive = true,
       selectedNames = js.Set("file 1", "dir 1")
     )
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array()))
     val onClose = mockFunction[Unit]
@@ -869,7 +875,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "render CopyItemsPopup(items=multi) when move to the same dir" in {
     //given
-    val fromDispatch = mockFunction[Any, Any]
+    val fromDispatch = mockFunction[js.Any, Unit]
     val fromActions = mock[FileListActions]
     val items = js.Array(
       FileListItem("file 1"),
@@ -880,7 +886,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       isActive = true,
       selectedNames = js.Set("file 1", "dir 1")
     )
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array()))
     val toActions = new MockFileListActions
     val onClose = mockFunction[Unit]
@@ -907,7 +913,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "render CopyItemsPopup when move inplace" in {
     //given
-    val fromDispatch = mockFunction[Any, Any]
+    val fromDispatch = mockFunction[js.Any, Unit]
     val fromActions = mock[FileListActions]
     val item = FileListItem("file 1")
     val items = js.Array(
@@ -920,7 +926,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       selectedNames = js.Set("file 1", "dir 1")
     )
     val toActions = new MockFileListActions
-    val toDispatch = mockFunction[Any, Any]
+    val toDispatch = mockFunction[js.Any, Unit]
     val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array()))
     val onClose = mockFunction[Unit]
     val props = FileListPluginUiProps(fromDispatch, onClose)

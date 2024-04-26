@@ -22,7 +22,7 @@ class FSPluginSpec extends AsyncTestSpec {
     //given
     val reducer = mockFunction[FileListState, Any, FileListState]
     val plugin = new FSPlugin(reducer)
-    val parentDispatch = mockFunction[Any, Any]
+    val parentDispatch = mockFunction[js.Any, Unit]
     val item = PanelStackItem[FileListState](plugin.component, None, None, None)
     var stackData = List[PanelStackItem[_]](item)
     val stack = new PanelStack(isActive = true, stackData, { f =>
@@ -50,7 +50,7 @@ class FSPluginSpec extends AsyncTestSpec {
       
       //then
       reducer.expects(currState, action).returning(updatedState)
-      parentDispatch.expects(action)
+      parentDispatch.expects(action.asInstanceOf[js.Any])
       
       //when
       dispatch(action)
@@ -68,7 +68,7 @@ class FSPluginSpec extends AsyncTestSpec {
 
   it should "return None/Some if non-/trigger key when onKeyTrigger" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")

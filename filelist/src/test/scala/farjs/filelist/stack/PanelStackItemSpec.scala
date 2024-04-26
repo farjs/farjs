@@ -10,7 +10,7 @@ class PanelStackItemSpec extends TestSpec {
 
   it should "initialize dispatch when initDispatch" in {
     //given
-    val parentDispatch = mockFunction[Any, Any]
+    val parentDispatch = mockFunction[js.Any, Unit]
     val reducer = mockFunction[FileListState, Any, FileListState]
     val currState = FileListState(isActive = true)
     val item = PanelStackItem[FileListState]("test".asInstanceOf[ReactClass], None, None, Some(currState))
@@ -33,7 +33,7 @@ class PanelStackItemSpec extends TestSpec {
 
       //then
       reducer.expects(currState, action).returning(updatedState)
-      parentDispatch.expects(action)
+      parentDispatch.expects(action.asInstanceOf[js.Any])
 
       //when
       dispatch(action)

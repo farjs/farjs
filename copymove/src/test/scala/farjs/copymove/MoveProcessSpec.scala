@@ -14,6 +14,7 @@ import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
+import scala.scalajs.js
 
 class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -35,7 +36,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val fs = new FS
     MoveProcess.fs = fs.fs
@@ -81,7 +82,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val fs = new FS
     MoveProcess.fs = fs.fs
@@ -103,6 +104,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         resultF = action.task.result.toFuture
         action.task.message shouldBe "Moving items"
       }
+      ()
     }
 
     //when
@@ -120,7 +122,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val fs = new FS
     MoveProcess.fs = fs.fs
@@ -167,7 +169,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val fs = new FS
     MoveProcess.fs = fs.fs
@@ -220,7 +222,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val fs = new FS
     MoveProcess.fs = fs.fs
@@ -287,7 +289,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val fs = new FS
     MoveProcess.fs = fs.fs
@@ -338,7 +340,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val fs = new FS
     MoveProcess.fs = fs.fs
@@ -397,7 +399,7 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onTopItem = mockFunction[FileListItem, Unit]
     val onDone = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val fs = new FS
     MoveProcess.fs = fs.fs

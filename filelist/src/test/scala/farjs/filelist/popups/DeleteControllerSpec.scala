@@ -33,7 +33,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "call api and delete currItem when YES action" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("file 1"),
@@ -56,7 +56,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val items = List(FileListItem("file 1"))
 
     //then
-    actions.deleteItems.expects(dispatch, currDir.path, *).onCall { (_, _, resItems) =>
+    actions.deleteItems.expects(*, currDir.path, *).onCall { (_, _, resItems) =>
       assertFileListItems(resItems, items)
       deleteAction
     }
@@ -71,7 +71,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "call api and delete selectedItems when YES action" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("file 1"),
@@ -94,7 +94,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val items = List(FileListItem("file 2"))
 
     //then
-    actions.deleteItems.expects(dispatch, currDir.path, *).onCall { (_, _, resItems) =>
+    actions.deleteItems.expects(*, currDir.path, *).onCall { (_, _, resItems) =>
       assertFileListItems(resItems, items)
       deleteAction
     }
@@ -109,7 +109,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "call onClose when NO action" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val state = FileListState()
     val onClose = mockFunction[Unit]
@@ -134,7 +134,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "render popup component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val state = FileListState()
     val props = FileListUiData(
@@ -160,7 +160,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "render empty component if showDeletePopup=false" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState()
     val props = FileListUiData(data = Some(FileListData(dispatch, actions, state)))

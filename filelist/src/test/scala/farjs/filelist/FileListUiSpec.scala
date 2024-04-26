@@ -19,7 +19,7 @@ class FileListUiSpec extends TestSpec with TestRendererUtils {
 
   it should "render component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState()
     val onClose: js.Function0[Unit] = mockFunction[Unit]

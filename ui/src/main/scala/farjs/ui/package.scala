@@ -7,7 +7,7 @@ import scala.scalajs.js.annotation.JSImport
 
 package object ui {
 
-  type Dispatch = Any => Any
+  type Dispatch = js.Function1[js.Any, Unit]
 
   @js.native
   @JSImport("@farjs/ui/Button.mjs", JSImport.Default)

@@ -26,7 +26,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   
   it should "render empty component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = mock[FileListActions]
     val state = FileListState()
     val props = FileListPanelViewProps(dispatch, actions, state)
@@ -40,7 +40,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   
   it should "render component with selected one file and with diskSpace" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = mock[FileListActions]
     val state = FileListState(index = 2, currDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem.copy(FileListItem("dir 1", isDir = true))(size = 1),
@@ -59,7 +59,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   
   it should "render component with selected more than one file" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = mock[FileListActions]
     val state = FileListState(index = 2, currDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem.copy(FileListItem("dir 1", isDir = true))(size = 1),
@@ -78,7 +78,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   
   it should "render active component with root dir and focused file" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = mock[FileListActions]
     val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem.copy(FileListItem("file 1"))(size = 1),
@@ -96,7 +96,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   
   it should "render component with root dir and focused dir" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = mock[FileListActions]
     val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem.copy(FileListItem("file 1"))(size = 1),
@@ -114,7 +114,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   
   it should "render component with root dir and focused file of big size" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = mock[FileListActions]
     val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem.copy(FileListItem("file 1"))(size = 1),
@@ -132,7 +132,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   
   it should "render component with sub-dir and focused dir" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = mock[FileListActions]
     val state = FileListState(index = 1, currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
@@ -150,7 +150,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   
   it should "render component with sub-dir and focused .." in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = mock[FileListActions]
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,

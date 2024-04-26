@@ -30,7 +30,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
   it should "call onClose when onCancel" in {
     //given
     val onClose = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val items = List(FileListItem("item 1"))
     val data = FileListData(dispatch, actions, FileListState(
@@ -53,7 +53,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
   it should "dispatch actions when onComplete" in {
     //given
     val onClose = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val items = List(
       FileListItem("item 2"),
@@ -82,10 +82,11 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     
     //then
     onClose.expects()
-    actions.updateDir.expects(dispatch, data.state.currDir.path).returning(updateAction)
+    actions.updateDir.expects(*, data.state.currDir.path).returning(updateAction)
     dispatch.expects(updateAction)
     dispatch.expects(*).onCall { action: Any =>
       assertFileListItemCreatedAction(action, FileListItemCreatedAction(zipFile, updatedDir))
+      ()
     }
     
     //when
@@ -98,7 +99,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
   it should "render component" in {
     //given
     val onClose = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState()
     val data = FileListData(dispatch, actions, state)

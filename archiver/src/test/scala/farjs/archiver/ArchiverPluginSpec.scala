@@ -27,7 +27,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
 
   it should "return None if .. when onKeyTrigger" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
@@ -48,7 +48,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
 
   it should "return None if non-local fs when onKeyTrigger" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
@@ -68,7 +68,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
 
   it should "return Some(ui) if not .. when onKeyTrigger" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
@@ -88,7 +88,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
 
   it should "return Some(ui) if selected items when onKeyTrigger" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,

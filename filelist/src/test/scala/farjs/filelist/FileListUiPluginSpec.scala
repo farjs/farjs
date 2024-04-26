@@ -20,7 +20,7 @@ class FileListUiPluginSpec extends AsyncTestSpec {
 
   it should "return None/Some if non-/trigger key when onKeyTrigger" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
@@ -43,7 +43,7 @@ class FileListUiPluginSpec extends AsyncTestSpec {
 
   it should "return Some(ui) if trigger key=f1/f9/f10/Alt-S/Alt-D when createUi" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up
@@ -71,7 +71,7 @@ class FileListUiPluginSpec extends AsyncTestSpec {
 
   it should "return None/Some if trigger key=f7 when createUi" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(FileListCapability.mkDirs)))
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up
@@ -90,7 +90,7 @@ class FileListUiPluginSpec extends AsyncTestSpec {
 
   it should "return None/Some if trigger key=f8/delete when createUi" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(FileListCapability.delete)))
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")

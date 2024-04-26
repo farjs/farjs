@@ -39,7 +39,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "call api and update state when OK action" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array())
     val state = FileListState(isActive = true, currDir = currDir)
@@ -62,7 +62,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val multiple = true
 
     //then
-    actions.createDir.expects(dispatch, currDir.path, dir, multiple).returning(action)
+    actions.createDir.expects(*, currDir.path, dir, multiple).returning(action)
     historyService.save.expects(dir).returning(saveF)
     dispatch.expects(action)
     onClose.expects()
@@ -84,7 +84,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "call onClose when Cancel action" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val state = FileListState()
     val onClose = mockFunction[Unit]
@@ -110,7 +110,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "render popup component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val state = FileListState()
     val props = FileListUiData(
@@ -133,7 +133,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "render empty component if showMkFolderPopup=false" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState()
     val props = FileListUiData(data = Some(FileListData(dispatch, actions, state)))

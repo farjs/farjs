@@ -11,6 +11,7 @@ import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
+import scala.scalajs.js
 
 class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -29,7 +30,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     //given
     val onDone = mockFunction[Double, Unit]
     val onCancel = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val props = CopyItemsStatsProps(dispatch, actions.actions, "/folder", List(
       FileListItem("dir 1", isDir = true)
@@ -54,7 +55,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     //given
     val onDone = mockFunction[Double, Unit]
     val onCancel = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val props = CopyItemsStatsProps(dispatch, actions.actions, "/folder", List(
       FileListItem("dir 1", isDir = true),
@@ -100,7 +101,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     //given
     val onDone = mockFunction[Double, Unit]
     val onCancel = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val props = CopyItemsStatsProps(dispatch, actions.actions, "/folder", List(
       FileListItem("dir 1", isDir = true)
@@ -140,7 +141,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     //given
     val onDone = mockFunction[Double, Unit]
     val onCancel = mockFunction[Unit]
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val props = CopyItemsStatsProps(dispatch, actions.actions, "/folder", List(
       FileListItem("dir 1", isDir = true)
@@ -159,6 +160,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
         resultF = action.task.result.toFuture
         action.task.message shouldBe "Copy dir scan"
       }
+      ()
     }
 
     //when

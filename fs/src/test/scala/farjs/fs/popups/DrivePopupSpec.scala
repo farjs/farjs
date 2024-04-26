@@ -34,7 +34,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "call onChangeDir(curr panel path) when onSelect" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onChangeDir = mockFunction[String, Unit]
     val onClose = mockFunction[Unit]
     val fsService = new FsService
@@ -92,7 +92,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "call onChangeDir(other panel path) when onSelect" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onChangeDir = mockFunction[String, Unit]
     val onClose = mockFunction[Unit]
     val fsService = new FsService
@@ -150,7 +150,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "call onChangeDir(new root dir) when onSelect" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onChangeDir = mockFunction[String, Unit]
     val onClose = mockFunction[Unit]
     val fsService = new FsService
@@ -208,7 +208,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "call onClose when onClose" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val fsService = new FsService
     DrivePopup.platform = Platform.win32
     DrivePopup.fsService = fsService.fsService
@@ -249,7 +249,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "render component on Windows" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val fsService = new FsService
     DrivePopup.platform = Platform.win32
     DrivePopup.fsService = fsService.fsService
@@ -285,7 +285,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   it should "render component on Mac OS/Linux" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val fsService = new FsService
     DrivePopup.platform = Platform.darwin
     DrivePopup.fsService = fsService.fsService

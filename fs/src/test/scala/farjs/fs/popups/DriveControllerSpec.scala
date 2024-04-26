@@ -3,13 +3,15 @@ package farjs.fs.popups
 import farjs.fs.popups.DriveController._
 import scommons.react.test._
 
+import scala.scalajs.js
+
 class DriveControllerSpec extends TestSpec with TestRendererUtils {
 
   DriveController.drivePopup = mockUiComponent("DrivePopup")
 
   it should "call onChangeDir when onChangeDir on the left" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onChangeDir = mockFunction[String, Boolean, Unit]
     val onClose = mockFunction[Unit]
     val props = DriveControllerProps(dispatch, showDrivePopupOnLeft = Some(true), onChangeDir, onClose)
@@ -26,7 +28,7 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "call onChangeDir when onChangeDir on the right" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onChangeDir = mockFunction[String, Boolean, Unit]
     val onClose = mockFunction[Unit]
     val props = DriveControllerProps(dispatch, showDrivePopupOnLeft = Some(false), onChangeDir, onClose)
@@ -43,7 +45,7 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "call onClose when onClose" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onChangeDir = mockFunction[String, Boolean, Unit]
     val onClose = mockFunction[Unit]
     val props = DriveControllerProps(dispatch, showDrivePopupOnLeft = Some(true), onChangeDir, onClose)
@@ -60,7 +62,7 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "render popup on the left" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val props = DriveControllerProps(dispatch, showDrivePopupOnLeft = Some(true), (_, _) => (), () => ())
 
     //when
@@ -76,7 +78,7 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "render popup on the right" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val props = DriveControllerProps(dispatch, showDrivePopupOnLeft = Some(false), (_, _) => (), () => ())
 
     //when
@@ -92,7 +94,7 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "render empty component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val props = DriveControllerProps(dispatch, showDrivePopupOnLeft = None, (_, _) => (), () => ())
 
     //when

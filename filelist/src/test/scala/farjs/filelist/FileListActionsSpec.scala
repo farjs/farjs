@@ -68,7 +68,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     //given
     val api = new Api
     val actions = new FileListActionsTest(api.api)
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
     val parent = "/"
     val dir = "test dir"
@@ -76,8 +76,9 @@ class FileListActionsSpec extends AsyncTestSpec {
     api.readDir.expects(parent, dir: js.UndefOr[String]).returning(js.Promise.resolve[FileListDir](currDir))
     
     //then
-    dispatch.expects(*).onCall { action: Any =>
+    dispatch.expects(*).onCall { action: js.Any =>
       assertFileListDirChangedAction(action, FileListDirChangedAction(dir, currDir))
+      ()
     }
     
     //when
@@ -93,15 +94,16 @@ class FileListActionsSpec extends AsyncTestSpec {
     //given
     val api = new Api
     val actions = new FileListActionsTest(api.api)
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
     val path = "/test/path"
 
     api.readDir.expects(path, js.undefined).returning(js.Promise.resolve[FileListDir](currDir))
     
     //then
-    dispatch.expects(*).onCall { action: Any =>
+    dispatch.expects(*).onCall { action: js.Any =>
       assertFileListDirUpdatedAction(action, FileListDirUpdatedAction(currDir))
+      ()
     }
     
     //when
@@ -117,7 +119,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     //given
     val api = new Api
     val actions = new FileListActionsTest(api.api)
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
     val parent = "/parent"
     val dir = "test/dir"
@@ -132,6 +134,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     //then
     dispatch.expects(*).onCall { action: Any =>
       assertFileListItemCreatedAction(action, FileListItemCreatedAction(dir, currDir))
+      ()
     }
     
     //when
@@ -147,7 +150,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     //given
     val api = new Api
     val actions = new FileListActionsTest(api.api)
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
     val parent = "parent"
     val dir = path.join("test", "dir")
@@ -162,6 +165,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     //then
     dispatch.expects(*).onCall { action: Any =>
       assertFileListItemCreatedAction(action, FileListItemCreatedAction("test", currDir))
+      ()
     }
     
     //when
@@ -177,7 +181,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     //given
     val api = new Api
     val actions = new FileListActionsTest(api.api)
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val dir = "test dir"
     val items = List(FileListItem("file 1"))
     val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
@@ -195,6 +199,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     }
     dispatch.expects(*).onCall { action: Any =>
       assertFileListDirUpdatedAction(action, FileListDirUpdatedAction(currDir))
+      ()
     }
     
     //when
@@ -575,13 +580,7 @@ class FileListActionsSpec extends AsyncTestSpec {
 
 object FileListActionsSpec {
 
-  private class FileListActionsTest(val api: FileListApi) extends FileListActions {
-
-    val isLocalFS: Boolean = true
-
-    //noinspection NotImplementedCode
-    def getDriveRoot(path: String): Future[Option[String]] = ???
-  }
+  private class FileListActionsTest(val api: FileListApi) extends FileListActions
 
   def assertFileListParamsChangedAction(action: Any, expected: FileListParamsChangedAction)(implicit position: Position): Assertion = {
     inside(action.asInstanceOf[FileListParamsChangedAction]) {

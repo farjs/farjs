@@ -22,7 +22,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
 
   it should "return None if .. when onKeyTrigger" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(
       FileListCapability.read,
       FileListCapability.write,
@@ -54,7 +54,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
 
   it should "return None if other state type when onKeyTrigger" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(
       FileListCapability.read,
       FileListCapability.write,
@@ -82,7 +82,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
 
   it should "return None when onKeyTrigger(unknown)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(
       FileListCapability.read,
       FileListCapability.write,
@@ -108,7 +108,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
 
   it should "return Some(ui) when onKeyTrigger(Shift-F5)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(FileListCapability.copyInplace)))
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
@@ -128,7 +128,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
 
   it should "return Some(ui) when onKeyTrigger(F5)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(
       FileListCapability.read, FileListCapability.write, FileListCapability.delete
     )))
@@ -150,7 +150,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
 
   it should "return Some(ui) if selected items when onKeyTrigger(F6)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(
       FileListCapability.read, FileListCapability.write, FileListCapability.delete
     )))
@@ -180,7 +180,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
         FileListItem("dir 1", isDir = true)
       ))
     )
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val capabilities = js.Set(FileListCapability.copyInplace, FileListCapability.moveInplace)
 
     def check(fullKey: String,
@@ -233,7 +233,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
         FileListItem("dir 1", isDir = true)
       ))
     )
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val capabilities = js.Set(
       FileListCapability.read,
       FileListCapability.write,

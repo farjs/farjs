@@ -20,7 +20,7 @@ class ZipActionsSpec extends AsyncTestSpec {
     ArchiverPlugin.readZip = readZip
     ArchiverPlugin.createApi = createApi
     val actions = new ZipActions(new ZipApi("file.zip", "root.path", Future.successful(Map.empty)))
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
     val path = "/test/path"
     val api = new ZipApi("file.zip", "root.path", Future.successful(Map.empty)) {
@@ -43,9 +43,11 @@ class ZipActionsSpec extends AsyncTestSpec {
     createApi.expects("file.zip", "root.path", *).returning(api)
     dispatch.expects(*).onCall { action: Any =>
       assertFileListDiskSpaceUpdatedAction(action, FileListDiskSpaceUpdatedAction(123.0))
+      ()
     }
     dispatch.expects(*).onCall { action: Any =>
       assertFileListDirUpdatedAction(action, FileListDirUpdatedAction(currDir))
+      ()
     }
 
     //when

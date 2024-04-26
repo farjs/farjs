@@ -50,7 +50,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
   it should "not activate left stack if already active when onFocus in left panel" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val props = FileListBrowserProps(dispatch)
     val focusMock = mockFunction[Unit]
     val leftButtonMock = literal("focus" -> focusMock)
@@ -89,7 +89,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
   it should "activate left stack when onFocus in left panel" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val props = FileListBrowserProps(dispatch, isRightInitiallyActive = true)
     val leftButtonMock = literal()
     val focusMock = mockFunction[Unit]
@@ -128,7 +128,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
   it should "activate right stack when onFocus in right panel" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val props = FileListBrowserProps(dispatch)
     val focusMock = mockFunction[Unit]
     val leftButtonMock = literal("focus" -> focusMock)
@@ -167,7 +167,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
   it should "focus next panel when onKeypress(tab|S-tab)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val props = FileListBrowserProps(dispatch)
     val focusNextMock = mockFunction[Unit]
     val screen = literal("focusNext" -> focusNextMock).asInstanceOf[BlessedScreen]
@@ -203,7 +203,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
   it should "swap the panels when onKeypress(Ctrl+U)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val props = FileListBrowserProps(dispatch)
     val focusNextMock = mockFunction[Unit]
     val screen = literal("focusNext" -> focusNextMock).asInstanceOf[BlessedScreen]
@@ -245,7 +245,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
   it should "not trigger plugin if dir when onKeypress(enter)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onTriggerMock = mockFunction[String, Uint8Array, () => Unit, Future[Option[PanelStackItem[FileListState]]]]
     val plugin = new FileListPlugin {
       override def onFileTrigger(filePath: String,
@@ -295,7 +295,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
   it should "not trigger plugin if not local FS when onKeypress(enter)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onTriggerMock = mockFunction[String, Uint8Array, () => Unit, Future[Option[PanelStackItem[FileListState]]]]
     val plugin = new FileListPlugin {
       override def onFileTrigger(filePath: String,
@@ -354,7 +354,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
   it should "dispatch error task if failed open file when onKeypress(enter)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onTriggerMock = mockFunction[String, Uint8Array, () => Unit, Future[Option[PanelStackItem[FileListState]]]]
     val plugin = new FileListPlugin {
       override def onFileTrigger(filePath: String,
@@ -397,6 +397,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       inside(action.asInstanceOf[TaskAction]) { case TaskAction(Task("Opening File", future)) =>
         openF = future
       }
+      ()
     }
     onTriggerMock.expects(*, *, *).never()
 
@@ -416,7 +417,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
   it should "trigger plugin if file when onKeypress(enter)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onTrigger2Mock = mockFunction[String, Uint8Array, () => Unit, Future[Option[PanelStackItem[FileListState]]]]
     val onTrigger3Mock = mockFunction[String, Uint8Array, () => Unit, Future[Option[PanelStackItem[FileListState]]]]
     val plugin1 = new FileListPlugin {}
@@ -503,7 +504,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
   it should "trigger and render plugin ui when onKeypress(triggerKey)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val onTriggerMock = mockFunction[String, WithPanelStacksProps, js.UndefOr[js.Dynamic], Future[Option[ReactClass]]]
     val keyFull = "C-p"
     val plugin = new FileListPlugin {
@@ -556,7 +557,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
   it should "dispatch error task if failed open plugin when onKeypress(triggerKey)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onTriggerMock = mockFunction[String, WithPanelStacksProps, js.UndefOr[js.Dynamic], Future[Option[ReactClass]]]
     val keyFull = "C-p"
     val plugin = new FileListPlugin {
@@ -588,6 +589,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       inside(action.asInstanceOf[TaskAction]) { case TaskAction(Task("Opening Plugin", future)) =>
         openF = future
       }
+      ()
     }
 
     //when
@@ -603,7 +605,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
   it should "render initial component and focus active panel" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val props = FileListBrowserProps(dispatch, isRightInitiallyActive = true)
     val leftButtonMock = literal()
     val focusMock = mockFunction[Unit]

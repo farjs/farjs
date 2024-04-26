@@ -27,7 +27,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils {
 
   it should "return false when onKeypress(unknown key)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     FSPanel.fsService = new FsService().fsService
     val props = FileListPanelProps(dispatch, actions, FileListState())
@@ -40,7 +40,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils {
 
   it should "dispatch action when onKeypress(M-o)" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val fsService = new FsService()
     FSPanel.fsService = fsService.fsService
@@ -68,7 +68,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils {
 
   it should "render initial component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch: js.Function1[js.Any, Unit] = _ => ()
     val actions = new MockFileListActions
     val state = FileListState()
     val props = FileListPanelProps(dispatch, actions, state)

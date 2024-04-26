@@ -27,7 +27,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "not select .. when onAction" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState(offset = 1, index = 2, FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
@@ -53,6 +53,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
       assertFileListParamsChangedAction(action,
         FileListParamsChangedAction(state.offset, state.index,
           js.Set("file1.test", "file2.test", "file.test3")))
+      ()
     }
     onClose.expects()
 
@@ -62,7 +63,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "dispatch actions and update state when Select" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState(offset = 1, index = 2, FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
@@ -88,6 +89,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
       assertFileListParamsChangedAction(action,
         FileListParamsChangedAction(state.offset, state.index,
           js.Set("file1.test", "file2.test", "file.test3")))
+      ()
     }
     onClose.expects()
 
@@ -97,7 +99,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "dispatch actions and update state when Deselect" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState(offset = 1, index = 2, FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
@@ -127,6 +129,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
           selectedNames = js.Set("file.test3")
         )
       )
+      ()
     }
     onClose.expects()
 
@@ -136,7 +139,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "call onClose when Cancel" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState()
     val onClose = mockFunction[Unit]
@@ -160,7 +163,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "render Select popup" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState()
     val props = FileListUiData(
@@ -183,7 +186,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "render Deselect popup" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState()
     val props = FileListUiData(
@@ -206,7 +209,7 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "render empty component when showSelectPopup is None" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState()
     val props = FileListUiData(data = Some(FileListData(dispatch, actions, state)))

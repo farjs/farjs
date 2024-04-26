@@ -31,7 +31,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
 
   it should "dispatch TaskAction when onChangeDir in active panel" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onClose = mockFunction[Unit]
     val actions = new Actions
     val fsPluginUi = new FSPluginUi()
@@ -64,7 +64,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     val dir = "test/dir"
 
     //then
-    actions.changeDir.expects(dispatch, "", dir).returning(action)
+    actions.changeDir.expects(*, "", dir).returning(action)
     dispatch.expects(action)
 
     //when
@@ -76,7 +76,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
 
   it should "dispatch TaskAction when onChangeDir in Drive popup" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onClose = mockFunction[Unit]
     val actions = new Actions
     val fsPluginUi = new FSPluginUi()
@@ -101,7 +101,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     val dir = "test/dir"
 
     //then
-    actions.changeDir.expects(dispatch, "", dir).returning(action)
+    actions.changeDir.expects(*, "", dir).returning(action)
     dispatch.expects(action)
 
     //when
@@ -110,7 +110,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
 
   it should "not dispatch TaskAction if same dir when onChangeDir" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val onClose = mockFunction[Unit]
     val actions = new Actions
     val fsPluginUi = new FSPluginUi()
@@ -152,7 +152,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
 
   it should "render component" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val onClose: js.Function0[Unit] = mockFunction[Unit]
     val fsPluginUi = new FSPluginUi()
     val leftStack = new PanelStack(isActive = true, List(

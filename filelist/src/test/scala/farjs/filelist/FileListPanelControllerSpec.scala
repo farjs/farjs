@@ -16,7 +16,7 @@ class FileListPanelControllerSpec extends TestSpec with TestRendererUtils {
 
   it should "render component and update isActive" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch: js.Function1[js.Any, Unit] = _ => ()
     val actions = new MockFileListActions
     val state = FileListState()
     state.isActive shouldBe false

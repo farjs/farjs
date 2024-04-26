@@ -8,6 +8,7 @@ import scommons.react.hooks._
 import scommons.react.test._
 
 import java.util.concurrent.atomic.AtomicReference
+import scala.scalajs.js
 
 class FileListRootSpec extends TestSpec with TestRendererUtils {
 
@@ -17,7 +18,7 @@ class FileListRootSpec extends TestSpec with TestRendererUtils {
     //given
     val (fileListCtx, fsCtx, fileCtx, servicesComp) = getServicesCtxHook
     FileListRoot.fileListComp = servicesComp
-    val dispatch = mockFunction[Any, Any]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val module = mock[FileListModule]
     val rootComp = new FileListRoot(dispatch, module, withPortalsComp)
     

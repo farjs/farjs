@@ -19,7 +19,7 @@ class FilePluginSpec extends AsyncTestSpec {
 
   it should "return None/Some if non-/trigger key when onKeyTrigger" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")

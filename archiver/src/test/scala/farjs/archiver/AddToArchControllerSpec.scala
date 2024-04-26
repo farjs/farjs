@@ -30,7 +30,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
 
   it should "dispatch failed task action when api failed" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val items = List(FileListItem("dir 3", isDir = true))
     val onComplete = mockFunction[String, Unit]
@@ -98,7 +98,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
 
   it should "render add popup and status popup when api succeeded" in {
     //given
-    val dispatch = mockFunction[Any, Any]
+    val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val items = List(FileListItem("dir 3", isDir = true))
     val onComplete = mockFunction[String, Unit]
@@ -151,6 +151,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
               selectedNames = js.Set.empty
             )
           )
+          ()
         }
         onComplete.expects(zipFile)
 

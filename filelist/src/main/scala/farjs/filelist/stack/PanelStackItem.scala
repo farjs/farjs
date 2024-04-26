@@ -30,10 +30,10 @@ object PanelStackItem {
                    item: PanelStackItem[FileListState]
                   ): PanelStackItem[FileListState] = {
 
-    val dispatch: Any => Any = { action =>
+    val dispatch: js.Function1[js.Any, Unit] = { action =>
       stack.updateFor[FileListState](item.component) { item =>
         item.updateState { state =>
-          reducer(state, action.asInstanceOf[js.Any])
+          reducer(state, action)
         }
       }
       parentDispatch(action)
