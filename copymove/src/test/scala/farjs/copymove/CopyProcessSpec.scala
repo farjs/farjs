@@ -43,7 +43,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val readDir = mockFunction[String, js.UndefOr[String], js.Promise[FileListDir]]
     val delete = mockFunction[String, js.Array[FileListItem], js.Promise[Unit]]
     val mkDirs = mockFunction[js.Array[String], js.Promise[String]]
-    val writeFile = mockFunction[String, String, FileListItem => js.Promise[js.UndefOr[Boolean]],
+    val writeFile = mockFunction[String, String, js.Function1[FileListItem, js.Promise[js.UndefOr[Boolean]]],
       js.Promise[js.UndefOr[FileTarget]]]
     val copyFile = mockFunction[String, FileListItem, js.Promise[js.UndefOr[FileTarget]],
       js.Function1[Double, js.Promise[Boolean]], js.Promise[Boolean]]

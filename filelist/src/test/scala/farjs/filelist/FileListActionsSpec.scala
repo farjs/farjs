@@ -25,7 +25,7 @@ class FileListActionsSpec extends AsyncTestSpec {
     val delete = mockFunction[String, js.Array[FileListItem], js.Promise[Unit]]
     val mkDirs = mockFunction[js.Array[String], js.Promise[String]]
     val readFile = mockFunction[String, FileListItem, Double, js.Promise[FileSource]]
-    val writeFile = mockFunction[String, String, FileListItem => js.Promise[js.UndefOr[Boolean]], js.Promise[js.UndefOr[FileTarget]]]
+    val writeFile = mockFunction[String, String, js.Function1[FileListItem, js.Promise[js.UndefOr[Boolean]]], js.Promise[js.UndefOr[FileTarget]]]
     
     val api = new MockFileListApi(
       capabilitiesMock = capabilities,

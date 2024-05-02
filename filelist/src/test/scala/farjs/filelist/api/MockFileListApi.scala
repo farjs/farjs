@@ -11,7 +11,7 @@ class MockFileListApi(
   mkDirsMock: js.Array[String] => js.Promise[String] = _ => ???,
   readFileMock: (String, FileListItem, Double) => js.Promise[FileSource] = (_, _, _) => ???,
   writeFileMock: (String, String,
-    FileListItem => js.Promise[js.UndefOr[Boolean]]) => js.Promise[js.UndefOr[FileTarget]] = (_, _, _) => ???,
+    js.Function1[FileListItem, js.Promise[js.UndefOr[Boolean]]]) => js.Promise[js.UndefOr[FileTarget]] = (_, _, _) => ???,
   getDriveRootMock: String => js.Promise[js.UndefOr[String]] = _ => ???
 ) extends FileListApi(isLocalMock, capabilitiesMock) {
 
@@ -33,7 +33,7 @@ class MockFileListApi(
 
   override def writeFile(parent: String,
                          fileName: String,
-                         onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]
+                         onExists: js.Function1[FileListItem, js.Promise[js.UndefOr[Boolean]]]
                         ): js.Promise[js.UndefOr[FileTarget]] = {
 
     writeFileMock(parent, fileName, onExists)

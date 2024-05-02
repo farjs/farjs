@@ -20,7 +20,7 @@ class FileListApi(val isLocal: Boolean,
 
   def writeFile(parent: String,
                 fileName: String,
-                onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]
+                onExists: js.Function1[FileListItem, js.Promise[js.UndefOr[Boolean]]]
                ): js.Promise[js.UndefOr[FileTarget]] = js.native
 
   def getDriveRoot(path: String): js.Promise[js.UndefOr[String]] = js.native

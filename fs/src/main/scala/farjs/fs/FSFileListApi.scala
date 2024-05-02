@@ -117,7 +117,7 @@ class FSFileListApi(
 
   override def writeFile(parent: String,
                          fileName: String,
-                         onExists: FileListItem => js.Promise[js.UndefOr[Boolean]]
+                         onExists: js.Function1[FileListItem, js.Promise[js.UndefOr[Boolean]]]
                         ): js.Promise[js.UndefOr[FileTarget]] = {
 
     val filePath = path.join(parent, fileName)
