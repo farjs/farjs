@@ -23,8 +23,8 @@ object DeleteController extends FunctionComponent[FileListUiData] {
           actions = js.Array(
             MessageBoxAction.YES { () =>
               val items =
-                if (FileListState.selectedItems(data.state).nonEmpty) FileListState.selectedItems(data.state).toList
-                else FileListState.currentItem(data.state).toList
+                if (FileListState.selectedItems(data.state).nonEmpty) FileListState.selectedItems(data.state)
+                else js.Array(FileListState.currentItem(data.state).toList: _*)
 
               props.onClose()
               data.dispatch(data.actions.deleteItems(

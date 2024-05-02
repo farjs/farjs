@@ -10,17 +10,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.util.Success
 
-class ZipActions(var api: ZipApi) extends FileListActions {
+class ZipActions(zipApi: ZipApi) extends FileListActions(zipApi) {
 
   override def updateDir(dispatch: Dispatch, path: String): TaskAction = {
-    val entriesByParentF = ArchiverPlugin.readZip(api.zipPath).andThen {
+    val entriesByParentF = ArchiverPlugin.readZip(zipApi.zipPath).andThen {
       case Success(entries) =>
         val totalSize = entries.foldLeft(0.0) { (total, entry) =>
           total + entry._2.foldLeft(0.0)(_ + _.size)
         }
         dispatch(FileListDiskSpaceUpdatedAction(totalSize))
     }
-    api = ArchiverPlugin.createApi(api.zipPath, api.rootPath, entriesByParentF)
+    api = ArchiverPlugin.createApi(zipApi.zipPath, zipApi.rootPath, entriesByParentF)
     
     val future = entriesByParentF.flatMap(_ => api.readDir(path, js.undefined).toFuture).andThen {
       case Success(currDir) => dispatch(FileListDirUpdatedAction(currDir))

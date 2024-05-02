@@ -46,10 +46,10 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
       var totalItems = 0
       var addedItems = 0.0
       val resultF = for {
-        _ <- props.actions.scanDirs(parent, currItems, onNextDir = { (_, items) =>
+        _ <- props.actions.scanDirs(parent, js.Array(currItems: _*), onNextDir = { (_, items) =>
           totalItems += items.size
           true
-        })
+        }).toFuture
         _ <- addToArchApi(zipFile, parent, currItems.map(_.name).toSet, { () =>
           addedItems += 1
           setProgress(math.min((addedItems / totalItems) * 100, 100).toInt)

@@ -8,13 +8,13 @@ import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.ui.popup.StatusPopupProps
 import farjs.ui.task.TaskAction
 import farjs.viewer.ViewItemsPopup._
-import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 
 class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
   with TestRendererUtils {
@@ -23,7 +23,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
 
   //noinspection TypeAnnotation
   class Actions {
-    val scanDirs = mockFunction[String, Seq[FileListItem], (String, Seq[FileListItem]) => Boolean, Future[Boolean]]
+    val scanDirs = mockFunction[String, js.Array[FileListItem], js.Function2[String, js.Array[FileListItem], Boolean], js.Promise[Boolean]]
 
     val actions = new MockFileListActions(
       scanDirsMock = scanDirs
@@ -41,15 +41,16 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val onClose = mockFunction[Unit]
     val props = FileListPluginUiProps(dispatch, onClose)
     val p = Promise[Boolean]()
-    actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
+    actions.scanDirs.expects(currDir.path, *, *).onCall { (_, resItems, onNextDir) =>
+      resItems.toList shouldBe Seq(currDir.items.head)
       p.future.map { res =>
         res shouldBe true
-        onNextDir("/path", List(
+        onNextDir("/path", js.Array(
           FileListItem("dir 2", isDir = true),
           FileListItem.copy(FileListItem("file 2"))(size = 123)
         )) shouldBe true
         res
-      }
+      }.toJSPromise
     }
     val viewItemsPopup = new ViewItemsPopup(FileListData(dispatch, actions.actions, state))
     val renderer = createTestRenderer(<(viewItemsPopup())(^.plain := props)())
@@ -96,15 +97,16 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val onClose = mockFunction[Unit]
     val props = FileListPluginUiProps(dispatch, onClose)
     val p = Promise[Boolean]()
-    actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
+    actions.scanDirs.expects(currDir.path, *, *).onCall { (_, resItems, onNextDir) =>
+      resItems.toList shouldBe Seq(currDir.items.head)
       p.future.map { res =>
         res shouldBe false
-        onNextDir("/path", List(
+        onNextDir("/path", js.Array(
           FileListItem("dir 2", isDir = true),
           FileListItem.copy(FileListItem("file 2"))(size = 123)
         )) shouldBe false
         res
-      }
+      }.toJSPromise
     }
     val viewItemsPopup = new ViewItemsPopup(FileListData(dispatch, actions.actions, state))
     val renderer = createTestRenderer(<(viewItemsPopup())(^.plain := props)())
@@ -119,14 +121,19 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
         case List(p) => p.props.asInstanceOf[StatusPopupProps]
       }
 
+      //then
+      var onCloseCalled = false
+      onClose.expects().onCall { () =>
+        onCloseCalled = true
+      }
+      dispatch.expects(*).never()
+
       //when
       popup.onClose.foreach(_.apply())
+      p.success(false)
 
       //then
-      onClose.expects()
-      dispatch.expects(*).never()
-      p.success(false)
-      p.future.map(_ => Succeeded)
+      eventually(onCloseCalled shouldBe true)
     }
   }
 
@@ -141,7 +148,10 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val onClose = mockFunction[Unit]
     val props = FileListPluginUiProps(dispatch, onClose)
     val p = Promise[Boolean]()
-    actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).returning(p.future)
+    actions.scanDirs.expects(currDir.path, *, *).onCall { (_, resItems, _) =>
+      resItems.toList shouldBe Seq(currDir.items.head)
+      p.future.toJSPromise
+    }
     val viewItemsPopup = new ViewItemsPopup(FileListData(dispatch, actions.actions, state))
     val renderer = createTestRenderer(<(viewItemsPopup())(^.plain := props)())
     inside(findComponents(renderer.root, statusPopupComp)) {

@@ -838,7 +838,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
   it should "render CopyItemsPopup(items=multi) when move to different dir" in {
     //given
     val fromDispatch = mockFunction[js.Any, Unit]
-    val fromActions = mock[FileListActions]
+    val fromActions = new MockFileListActions
     val items = js.Array(
       FileListItem("file 1"),
       FileListItem("dir 1", isDir = true)
@@ -876,7 +876,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
   it should "render CopyItemsPopup(items=multi) when move to the same dir" in {
     //given
     val fromDispatch = mockFunction[js.Any, Unit]
-    val fromActions = mock[FileListActions]
+    val fromActions = new MockFileListActions
     val items = js.Array(
       FileListItem("file 1"),
       FileListItem("dir 1", isDir = true)
@@ -914,7 +914,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
   it should "render CopyItemsPopup when move inplace" in {
     //given
     val fromDispatch = mockFunction[js.Any, Unit]
-    val fromActions = mock[FileListActions]
+    val fromActions = new MockFileListActions
     val item = FileListItem("file 1")
     val items = js.Array(
       item,

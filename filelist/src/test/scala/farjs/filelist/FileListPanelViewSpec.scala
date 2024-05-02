@@ -27,7 +27,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   it should "render empty component" in {
     //given
     val dispatch = mockFunction[js.Any, Unit]
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val state = FileListState()
     val props = FileListPanelViewProps(dispatch, actions, state)
 
@@ -41,7 +41,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   it should "render component with selected one file and with diskSpace" in {
     //given
     val dispatch = mockFunction[js.Any, Unit]
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val state = FileListState(index = 2, currDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem.copy(FileListItem("dir 1", isDir = true))(size = 1),
       FileListItem.copy(FileListItem("dir 2", isDir = true))(size = 2),
@@ -60,7 +60,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   it should "render component with selected more than one file" in {
     //given
     val dispatch = mockFunction[js.Any, Unit]
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val state = FileListState(index = 2, currDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem.copy(FileListItem("dir 1", isDir = true))(size = 1),
       FileListItem.copy(FileListItem("dir 2", isDir = true))(size = 2),
@@ -79,7 +79,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   it should "render active component with root dir and focused file" in {
     //given
     val dispatch = mockFunction[js.Any, Unit]
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem.copy(FileListItem("file 1"))(size = 1),
       FileListItem.copy(FileListItem("file 2"))(size = 2, permissions = "drwxr-xr-x"),
@@ -97,7 +97,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   it should "render component with root dir and focused dir" in {
     //given
     val dispatch = mockFunction[js.Any, Unit]
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem.copy(FileListItem("file 1"))(size = 1),
       FileListItem.copy(FileListItem("dir 2", isDir = true))(size = 999999999, permissions = "drwxr-xr-x"),
@@ -115,7 +115,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   it should "render component with root dir and focused file of big size" in {
     //given
     val dispatch = mockFunction[js.Any, Unit]
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val state = FileListState(index = 1, currDir = FileListDir("/", isRoot = true, items = js.Array(
       FileListItem.copy(FileListItem("file 1"))(size = 1),
       FileListItem.copy(FileListItem("file 2"))(size = 1123456789, permissions = "drwxr-xr-x"),
@@ -133,7 +133,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   it should "render component with sub-dir and focused dir" in {
     //given
     val dispatch = mockFunction[js.Any, Unit]
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val state = FileListState(index = 1, currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem.copy(FileListItem("dir", isDir = true))(size = 1, permissions = "dr--r--r--"),
@@ -151,7 +151,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   it should "render component with sub-dir and focused .." in {
     //given
     val dispatch = mockFunction[js.Any, Unit]
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem.copy(FileListItem("dir", isDir = true))(size = 1),

@@ -30,7 +30,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
   //noinspection TypeAnnotation
   class Actions(isLocal: Boolean) {
     val updateDir = mockFunction[Dispatch, String, TaskAction]
-    val deleteItems = mockFunction[Dispatch, String, Seq[FileListItem], TaskAction]
+    val deleteItems = mockFunction[Dispatch, String, js.Array[FileListItem], TaskAction]
 
     val actions = new MockFileListActions(
       new MockFileListApi(isLocalMock = isLocal),
@@ -492,7 +492,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         //then
         actions.updateDir.expects(*, props.state.currDir.path).returning(updateAction)
         dispatch.expects(updateAction)
-        fsActions.deleteItems.expects(*, fsState.currDir.path, items).returning(deleteAction)
+        fsActions.deleteItems.expects(*, fsState.currDir.path, *).onCall { (_, _, resItems) =>
+          resItems.toList shouldBe items
+          deleteAction
+        }
         fsDispatch.expects(deleteAction)
 
         //when

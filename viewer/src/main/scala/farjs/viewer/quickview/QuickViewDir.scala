@@ -38,7 +38,7 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
 
     def scanDir(): Unit = {
       val parent = props.state.currDir.path
-      val currItems = List(props.currItem)
+      val currItems = js.Array(props.currItem)
       val params = QuickViewParams(props.currItem.name, parent)
       stack.update[QuickViewParams](_.withState(params))
 
@@ -54,7 +54,7 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
           }
         }
         inProgress.current
-      })
+      }).toFuture
       resultF.onComplete {
         case Success(false) => // already cancelled
         case Success(true) =>

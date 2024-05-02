@@ -17,6 +17,7 @@ import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 
 class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
   with TestRendererUtils {
@@ -28,7 +29,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
 
   //noinspection TypeAnnotation
   class Actions {
-    val scanDirs = mockFunction[String, Seq[FileListItem], (String, Seq[FileListItem]) => Boolean, Future[Boolean]]
+    val scanDirs = mockFunction[String, js.Array[FileListItem], js.Function2[String, js.Array[FileListItem], Boolean], js.Promise[Boolean]]
 
     val actions = new MockFileListActions(
       scanDirsMock = scanDirs
@@ -52,13 +53,14 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
     val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
     val p = Promise[Boolean]()
-    actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
-      onNextDir("/path", List(
+    actions.scanDirs.expects(currDir.path, *, *).onCall { (_, resItems, onNextDir) =>
+      resItems.toList shouldBe Seq(currDir.items.head)
+      onNextDir("/path", js.Array(
         FileListItem("dir 2", isDir = true),
         FileListItem.copy(FileListItem("file 2"))(size = 122),
         FileListItem.copy(FileListItem("file 1"))(size = 1)
       ))
-      p.future
+      p.future.toJSPromise
     }
     val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)()))
     
@@ -96,13 +98,14 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
     val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
     val p = Promise[Boolean]()
-    actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
-      onNextDir("/path", List(
+    actions.scanDirs.expects(currDir.path, *, *).onCall { (_, resItems, onNextDir) =>
+      resItems.toList shouldBe Seq(currDir.items.head)
+      onNextDir("/path", js.Array(
         FileListItem("dir 2", isDir = true),
         FileListItem.copy(FileListItem("file 2"))(size = 122),
         FileListItem.copy(FileListItem("file 1"))(size = 1)
       ))
-      p.future
+      p.future.toJSPromise
     }
     val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)()))
     
@@ -140,10 +143,11 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
     val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
     val p = Promise[Boolean]()
-    var onNextDirFn: (String, Seq[FileListItem]) => Boolean = null
-    actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).onCall { (_, _, onNextDir) =>
+    var onNextDirFn: js.Function2[String, js.Array[FileListItem], Boolean] = null
+    actions.scanDirs.expects(currDir.path, *, *).onCall { (_, resItems, onNextDir) =>
+      resItems.toList shouldBe Seq(currDir.items.head)
       onNextDirFn = onNextDir
-      p.future
+      p.future.toJSPromise
     }
     val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)()))
     val popup = inside(findComponents(renderer.root, statusPopupComp)) {
@@ -158,7 +162,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     }.flatMap { _ =>
       //when
       popup.onClose.foreach(_.apply())
-      val result = onNextDirFn("/path", List(
+      val result = onNextDirFn("/path", js.Array(
         FileListItem("dir 2", isDir = true),
         FileListItem.copy(FileListItem("file 2"))(size = 122),
         FileListItem.copy(FileListItem("file 1"))(size = 1)
@@ -191,7 +195,10 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
     val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
     val p = Promise[Boolean]()
-    actions.scanDirs.expects(currDir.path, Seq(currDir.items.head), *).returning(p.future)
+    actions.scanDirs.expects(currDir.path, *, *).onCall { (_, resItems, _) =>
+      resItems.toList shouldBe Seq(currDir.items.head)
+      p.future.toJSPromise
+    }
 
     val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)()))
     findComponents(renderer.root, statusPopupComp) should not be empty

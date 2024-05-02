@@ -10,13 +10,12 @@ import scommons.nodejs.{path => nodePath}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.Success
 import scala.util.control.NonFatal
 
-trait FileListActions {
-
-  def api: FileListApi
+class FileListActions(var api: FileListApi) extends js.Object {
 
   def changeDir(dispatch: Dispatch, path: String, dir: String): TaskAction = {
     val future = api.readDir(path, dir).toFuture.andThen {
@@ -56,9 +55,9 @@ trait FileListActions {
 
   def deleteItems(dispatch: Dispatch,
                   parent: String,
-                  items: Seq[FileListItem]): TaskAction = {
+                  items: js.Array[FileListItem]): TaskAction = {
     
-    val future = api.delete(parent, js.Array(items: _*)).toFuture.andThen {
+    val future = api.delete(parent, items).toFuture.andThen {
       case Success(_) => dispatch(updateDir(dispatch, parent))
     }
 
@@ -66,29 +65,29 @@ trait FileListActions {
   }
 
   def scanDirs(parent: String,
-               items: Seq[FileListItem],
-               onNextDir: (String, Seq[FileListItem]) => Boolean): Future[Boolean] = {
+               items: js.Array[FileListItem],
+               onNextDir: js.Function2[String, js.Array[FileListItem], Boolean]): js.Promise[Boolean] = {
 
     items.foldLeft(Future.successful(true)) { case (resF, item) =>
       resF.flatMap {
         case true if item.isDir =>
           api.readDir(parent, item.name).toFuture.flatMap { ls =>
-            val dirItems = ls.items.toSeq
-            if (onNextDir(ls.path, dirItems)) scanDirs(ls.path, dirItems, onNextDir)
+            val dirItems = ls.items
+            if (onNextDir(ls.path, dirItems)) scanDirs(ls.path, dirItems, onNextDir).toFuture
             else Future.successful(false)
           }
         case res => Future.successful(res)
       }
-    }
+    }.toJSPromise
   }
 
   def copyFile(srcDir: String,
                srcItem: FileListItem,
-               dstFileF: Future[js.UndefOr[FileTarget]],
-               onProgress: Double => Future[Boolean]): Future[Boolean] = {
+               dstFileF: js.Promise[js.UndefOr[FileTarget]],
+               onProgress: js.Function1[Double, js.Promise[Boolean]]): js.Promise[Boolean] = {
 
-    dstFileF.flatMap(_.toOption match {
-      case None => onProgress(srcItem.size)
+    dstFileF.toFuture.flatMap(_.toOption match {
+      case None => onProgress(srcItem.size).toFuture
       case Some(target) =>
         api.readFile(srcDir, srcItem, 0.0).toFuture.flatMap { source =>
           val buff = new Uint8Array(copyBufferBytes)
@@ -98,7 +97,7 @@ trait FileListActions {
               if (bytesRead == 0) target.setAttributes(srcItem).toFuture.map(_ => true)
               else {
                 target.writeNextBytes(buff, bytesRead).toFuture.flatMap { position =>
-                  onProgress(position).flatMap {
+                  onProgress(position).toFuture.flatMap {
                     case true => loop()
                     case false => Future.successful(false)
                   }
@@ -121,7 +120,7 @@ trait FileListActions {
           if (!res) target.delete().toFuture.flatMap(_ => Future.fromTry(tryRes))
           else Future.fromTry(tryRes)
         }
-    })
+    }).toJSPromise
   }
 }
 

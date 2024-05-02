@@ -37,12 +37,12 @@ object CopyItemsStats extends FunctionComponent[CopyItemsStatsProps] {
         resF.flatMap {
           case true if currItem.isDir && inProgress.current =>
             setCurrDir(currItem.name)
-            props.actions.scanDirs(parent, Seq(currItem), onNextDir = { (_, items) =>
+            props.actions.scanDirs(parent, js.Array(currItem), onNextDir = { (_, items) =>
               filesSize += items.foldLeft(0d) { case (res, i) =>
                 res + (if (i.isDir) 0d else i.size)
               }
               inProgress.current
-            })
+            }).toFuture
           case true if !currItem.isDir =>
             filesSize += currItem.size
             Future.successful(true)

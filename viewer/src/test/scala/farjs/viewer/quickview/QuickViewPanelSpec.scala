@@ -30,7 +30,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
   it should "render dir view" in {
     //given
     val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem.copy(FileListItem("file"))(size = 2),
@@ -70,7 +70,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
   it should "render file view" in {
     //given
     val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
-    val actions = mock[FileListActions]
+    val actions = new MockFileListActions
     val file = FileListItem.copy(FileListItem("file"))(size = 2)
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,

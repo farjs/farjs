@@ -96,15 +96,15 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
                       }
                       maybeOverwrite
                     }.toJSPromise
-                  }).toFuture,
+                  }),
                   onProgress = { position =>
                     data.current = data.current.copy(
                       itemPercent = (divide(position, item.size) * 100).toInt,
                       itemBytes = position
                     )
-                    cancelPromise.current.future.map(_ => inProgress.current)
+                    cancelPromise.current.future.map(_ => inProgress.current).toJSPromise
                   }
-                )
+                ).toFuture
                 _ <-
                   if (isCopied && done && props.move) {
                     props.from.actions.api.delete(parent, js.Array(item)).toFuture

@@ -13,6 +13,7 @@ import scommons.react.test._
 
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 
 class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -21,7 +22,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
 
   //noinspection TypeAnnotation
   class Actions {
-    val scanDirs = mockFunction[String, Seq[FileListItem], (String, Seq[FileListItem]) => Boolean, Future[Boolean]]
+    val scanDirs = mockFunction[String, js.Array[FileListItem], js.Function2[String, js.Array[FileListItem], Boolean], js.Promise[Boolean]]
 
     val actions = new MockFileListActions(
       scanDirsMock = scanDirs
@@ -63,12 +64,13 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
 
         //then
         val p = Promise[Boolean]()
-        actions.scanDirs.expects(props.state.currDir.path, items, *).onCall { (_, _, onNextDir) =>
-          onNextDir("/path", List(
+        actions.scanDirs.expects(props.state.currDir.path, *, *).onCall { (_, resItems, onNextDir) =>
+          resItems.toList shouldBe items
+          onNextDir("/path", js.Array(
             FileListItem("dir 2", isDir = true),
             FileListItem.copy(FileListItem("file 1"))(size = 123)
           ))
-          p.future
+          p.future.toJSPromise
         }
         val error = new Exception("test error")
         val addToZipF = Future.failed(error)
@@ -130,12 +132,13 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
         val zipFile = "test.zip"
 
         //then
-        actions.scanDirs.expects(props.state.currDir.path, items, *).onCall { (_, _, onNextDir) =>
-          onNextDir("/path", List(
+        actions.scanDirs.expects(props.state.currDir.path, *, *).onCall { (_, resItems, onNextDir) =>
+          resItems.toList shouldBe items
+          onNextDir("/path", js.Array(
             FileListItem("dir 2", isDir = true),
             FileListItem.copy(FileListItem("file 1"))(size = 123)
           ))
-          Future.successful(true)
+          js.Promise.resolve[Boolean](true)
         }
         val p = Promise[Unit]()
         var onNextItemFunc: () => Unit = null

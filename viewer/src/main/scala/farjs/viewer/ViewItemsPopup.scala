@@ -44,12 +44,12 @@ class ViewItemsPopup(data: FileListData) extends FunctionComponent[FileListPlugi
           case true if currItem.isDir =>
             setCurrDir(currItem.name)
             var s = 0d
-            actions.scanDirs(parent, Seq(currItem), onNextDir = { (_, items) =>
+            actions.scanDirs(parent, js.Array(currItem), onNextDir = { (_, items) =>
               s += items.foldLeft(0d) { case (res, i) =>
                 res + (if (i.isDir) 0d else i.size)
               }
               inProgress.current
-            }).map { res =>
+            }).toFuture.map { res =>
               sizes = sizes.updated(currItem.name, s + sizes.getOrElse(currItem.name, 0d))
               res
             }
