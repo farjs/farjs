@@ -1,133 +1,42 @@
 package farjs.filelist
 
-import farjs.filelist.FileListActions._
 import farjs.filelist.api._
 import farjs.filelist.sort.SortMode
 import farjs.ui.Dispatch
-import farjs.ui.task.{Task, TaskAction}
-import scommons.nodejs.{path => nodePath}
+import farjs.ui.task.TaskAction
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.typedarray.Uint8Array
-import scala.util.Success
-import scala.util.control.NonFatal
+import scala.scalajs.js.annotation.JSImport
 
+@js.native
+@JSImport("@farjs/filelist/FileListActions.mjs", JSImport.Default)
 class FileListActions(var api: FileListApi) extends js.Object {
 
-  def changeDir(dispatch: Dispatch, path: String, dir: String): TaskAction = {
-    val future = api.readDir(path, dir).toFuture.andThen {
-      case Success(currDir) => dispatch(FileListDirChangedAction(dir, currDir))
-    }
+  def changeDir(dispatch: Dispatch, path: String, dir: String): TaskAction = js.native
 
-    TaskAction(Task("Changing Dir", future))
-  }
-
-  def updateDir(dispatch: Dispatch, path: String): TaskAction = {
-    val future = api.readDir(path, js.undefined).toFuture.andThen {
-      case Success(currDir) => dispatch(FileListDirUpdatedAction(currDir))
-    }
-
-    TaskAction(Task("Updating Dir", future))
-  }
+  def updateDir(dispatch: Dispatch, path: String): TaskAction = js.native
 
   def createDir(dispatch: Dispatch,
                 parent: String,
                 dir: String,
-                multiple: Boolean): TaskAction = {
-
-    val names =
-      if (multiple) dir.split(nodePath.sep.head).toList
-      else List(dir)
-    
-    val future = for {
-      _ <- api.mkDirs(js.Array((parent :: names): _*)).toFuture
-      currDir <- api.readDir(parent, js.undefined).toFuture
-    } yield {
-      dispatch(FileListItemCreatedAction(names.head, currDir))
-      ()
-    }
-
-    TaskAction(Task("Creating Dir", future))
-  }
+                multiple: Boolean): TaskAction = js.native
 
   def deleteItems(dispatch: Dispatch,
                   parent: String,
-                  items: js.Array[FileListItem]): TaskAction = {
-    
-    val future = api.delete(parent, items).toFuture.andThen {
-      case Success(_) => dispatch(updateDir(dispatch, parent))
-    }
-
-    TaskAction(Task("Deleting Items", future))
-  }
+                  items: js.Array[FileListItem]): TaskAction = js.native
 
   def scanDirs(parent: String,
                items: js.Array[FileListItem],
-               onNextDir: js.Function2[String, js.Array[FileListItem], Boolean]): js.Promise[Boolean] = {
-
-    items.foldLeft(Future.successful(true)) { case (resF, item) =>
-      resF.flatMap {
-        case true if item.isDir =>
-          api.readDir(parent, item.name).toFuture.flatMap { ls =>
-            val dirItems = ls.items
-            if (onNextDir(ls.path, dirItems)) scanDirs(ls.path, dirItems, onNextDir).toFuture
-            else Future.successful(false)
-          }
-        case res => Future.successful(res)
-      }
-    }.toJSPromise
-  }
+               onNextDir: js.Function2[String, js.Array[FileListItem], Boolean]): js.Promise[Boolean] = js.native
 
   def copyFile(srcDir: String,
                srcItem: FileListItem,
                dstFileF: js.Promise[js.UndefOr[FileTarget]],
-               onProgress: js.Function1[Double, js.Promise[Boolean]]): js.Promise[Boolean] = {
-
-    dstFileF.toFuture.flatMap(_.toOption match {
-      case None => onProgress(srcItem.size).toFuture
-      case Some(target) =>
-        api.readFile(srcDir, srcItem, 0.0).toFuture.flatMap { source =>
-          val buff = new Uint8Array(copyBufferBytes)
-
-          def loop(): Future[Boolean] = {
-            source.readNextBytes(buff).toFuture.flatMap { bytesRead =>
-              if (bytesRead == 0) target.setAttributes(srcItem).toFuture.map(_ => true)
-              else {
-                target.writeNextBytes(buff, bytesRead).toFuture.flatMap { position =>
-                  onProgress(position).toFuture.flatMap {
-                    case true => loop()
-                    case false => Future.successful(false)
-                  }
-                }
-              }
-            }
-          }
-
-          loop().transformWith { res =>
-            source.close().toFuture.recover {
-              case NonFatal(ex) => println(s"Failed to close srcFile: ${source.file}, error: $ex")
-            }.flatMap(_ => Future.fromTry(res))
-          }
-        }.transformWith { res =>
-          target.close().toFuture.recover {
-            case NonFatal(ex) => println(s"Failed to close dstFile: ${target.file}, error: $ex")
-          }.flatMap(_ => Future.fromTry(res))
-        }.transformWith { tryRes =>
-          val res = tryRes.getOrElse(false)
-          if (!res) target.delete().toFuture.flatMap(_ => Future.fromTry(tryRes))
-          else Future.fromTry(tryRes)
-        }
-    }).toJSPromise
-  }
+               onProgress: js.Function1[Double, js.Promise[Boolean]]): js.Promise[Boolean] = js.native
 }
 
 object FileListActions {
   
-  private val copyBufferBytes: Int = 64 * 1024
-
   sealed trait FileListParamsChangedAction extends js.Object {
     val action: String
     val offset: Int
