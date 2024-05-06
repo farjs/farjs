@@ -29,7 +29,7 @@ object WithPanelStacks extends FunctionComponent[WithPanelStacksProps] {
     if (ctx == null) {
       throw js.JavaScriptException(js.Error(
         "WithPanelStacks.Context is not found." +
-          "\nPlease, make sure you use WithPanelStacks and not creating nested stacks."
+          "\nPlease, make sure you use WithPanelStacks.Context.Provider in parent component."
       ))
     }
     ctx

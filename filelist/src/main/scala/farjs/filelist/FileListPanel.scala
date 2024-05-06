@@ -3,7 +3,7 @@ package farjs.filelist
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.FileListItem
 import farjs.filelist.sort._
-import farjs.filelist.stack.PanelStack
+import farjs.filelist.stack.PanelStackComp
 import farjs.ui.Dispatch
 import scommons.nodejs._
 import scommons.react._
@@ -24,7 +24,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
   private[filelist] var sortModesPopup: UiComponent[SortModesPopupProps] = SortModesPopup
 
   protected def render(compProps: Props): ReactElement = {
-    val stackProps = PanelStack.usePanelStack
+    val stackProps = PanelStackComp.usePanelStack
     val (maybeQuickSearch, setMaybeQuickSearch) = useState(Option.empty[String])
     val (showSortModes, setShowSortModes) = useState(false)
     val props = compProps.wrapped

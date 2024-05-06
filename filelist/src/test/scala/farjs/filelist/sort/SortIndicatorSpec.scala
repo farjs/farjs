@@ -2,7 +2,7 @@ package farjs.filelist.sort
 
 import farjs.filelist.sort.SortIndicator._
 import farjs.filelist.stack.PanelStack
-import farjs.filelist.stack.PanelStackSpec.withContext
+import farjs.filelist.stack.PanelStackCompSpec.withContext
 import farjs.filelist.theme.FileListTheme
 import farjs.filelist.theme.FileListThemeSpec.withThemeContext
 import scommons.nodejs._

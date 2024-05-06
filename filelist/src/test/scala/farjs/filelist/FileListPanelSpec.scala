@@ -5,7 +5,7 @@ import farjs.filelist.FileListActionsSpec.{assertFileListParamsChangedAction, as
 import farjs.filelist.FileListPanel._
 import farjs.filelist.api.{FileListCapability, FileListDir, FileListItem, MockFileListApi}
 import farjs.filelist.sort.{FileListSort, SortMode, SortModesPopupProps}
-import farjs.filelist.stack.PanelStackSpec.withContext
+import farjs.filelist.stack.PanelStackCompSpec.withContext
 import farjs.ui.Dispatch
 import farjs.ui.task.{Task, TaskAction}
 import org.scalactic.source.Position

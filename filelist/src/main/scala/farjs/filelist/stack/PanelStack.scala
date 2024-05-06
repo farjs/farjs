@@ -1,9 +1,6 @@
 package farjs.filelist.stack
 
-import farjs.ui.{WithSize, WithSizeProps}
 import scommons.react._
-import scommons.react.blessed.BlessedElement
-import scommons.react.hooks._
 
 import scala.scalajs.js
 
@@ -45,40 +42,4 @@ class PanelStack(val isActive: Boolean,
   def peekLast[T]: PanelStackItem[T] = data.last.asInstanceOf[PanelStackItem[T]]
   
   def params[T]: T = peek[T].state.asInstanceOf[Option[js.Any]].orNull.asInstanceOf[T]
-}
-
-case class PanelStackProps(isRight: Boolean,
-                           panelInput: BlessedElement,
-                           stack: PanelStack,
-                           width: Int = 0,
-                           height: Int = 0)
-
-object PanelStack extends FunctionComponent[PanelStackProps] {
-  
-  val Context: ReactContext[PanelStackProps] = ReactContext[PanelStackProps](defaultValue = null)
-
-  private[stack] var withSizeComp: ReactClass = WithSize
-
-  def usePanelStack: PanelStackProps = {
-    val ctx = useContext(Context)
-    if (ctx == null) {
-      throw js.JavaScriptException(js.Error(
-        "PanelStack.Context is not found." +
-          "\nPlease, make sure you use PanelStack and not creating nested stacks."
-      ))
-    }
-    ctx
-  }
-
-  protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
-    val topComp = props.stack.peek.component
-
-    <(withSizeComp)(^.plain := WithSizeProps({ (width, height) =>
-      <(PanelStack.Context.Provider)(^.contextValue := props.copy(width = width, height = height))(
-        <(topComp)()(),
-        compProps.children
-      )
-    }))()
-  }
 }

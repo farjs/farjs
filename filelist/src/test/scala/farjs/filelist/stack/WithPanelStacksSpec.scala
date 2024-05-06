@@ -36,7 +36,7 @@ class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
     assertNativeComponent(result,
       <.div()(
         "Error: WithPanelStacks.Context is not found." +
-          "\nPlease, make sure you use WithPanelStacks and not creating nested stacks."
+          "\nPlease, make sure you use WithPanelStacks.Context.Provider in parent component."
       )
     )
   }

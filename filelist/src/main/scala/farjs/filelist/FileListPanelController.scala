@@ -1,6 +1,6 @@
 package farjs.filelist
 
-import farjs.filelist.stack.PanelStack
+import farjs.filelist.stack.PanelStackComp
 import scommons.react._
 import scommons.react.hooks._
 
@@ -9,7 +9,7 @@ class FileListPanelController(
 ) extends FunctionComponent[Unit] {
 
   protected def render(compProps: Props): ReactElement = {
-    val stackProps = PanelStack.usePanelStack
+    val stackProps = PanelStackComp.usePanelStack
     val stack = stackProps.stack
     val maybeCurrData = {
       val stackItem = stack.peek[FileListState]

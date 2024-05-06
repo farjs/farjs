@@ -23,7 +23,7 @@ case class FileListBrowserProps(dispatch: Dispatch,
 
 object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
 
-  private[filelist] var panelStackComp: UiComponent[PanelStackProps] = PanelStack
+  private[filelist] var panelStackComp: UiComponent[PanelStackProps] = PanelStackComp
   private[filelist] var bottomMenuComp: ReactClass = BottomMenu
   private[filelist] var menuBarTrigger: ReactClass = MenuBarTrigger
   private[filelist] var fsPlugin: FSPlugin = FSPlugin

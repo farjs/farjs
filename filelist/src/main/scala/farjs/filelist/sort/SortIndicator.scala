@@ -1,6 +1,6 @@
 package farjs.filelist.sort
 
-import farjs.filelist.stack.PanelStack
+import farjs.filelist.stack.PanelStackComp
 import farjs.filelist.theme.FileListTheme
 import scommons.nodejs._
 import scommons.react._
@@ -13,7 +13,7 @@ case class SortIndicatorProps(sort: FileListSort)
 object SortIndicator extends FunctionComponent[SortIndicatorProps] {
 
   protected def render(compProps: Props): ReactElement = {
-    val stackProps = PanelStack.usePanelStack
+    val stackProps = PanelStackComp.usePanelStack
     val props = compProps.wrapped
     val text = s"${getIndicator(props.sort)} "
     val theme = FileListTheme.useTheme.fileList

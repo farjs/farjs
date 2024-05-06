@@ -2,7 +2,7 @@ package farjs.filelist
 
 import farjs.filelist.api.FileListItem
 import farjs.filelist.sort.{SortIndicator, SortIndicatorProps}
-import farjs.filelist.stack.PanelStack
+import farjs.filelist.stack.PanelStackComp
 import farjs.filelist.theme.FileListTheme
 import farjs.ui._
 import farjs.ui.border._
@@ -26,7 +26,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val panelStack = PanelStack.usePanelStack
+    val panelStack = PanelStackComp.usePanelStack
     val width = panelStack.width
     val height = panelStack.height
     val theme = FileListTheme.useTheme.fileList

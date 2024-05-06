@@ -1,7 +1,7 @@
 package farjs.filelist
 
 import farjs.filelist.FileListStateSpec.assertFileListState
-import farjs.filelist.stack.PanelStackSpec.withContext
+import farjs.filelist.stack.PanelStackCompSpec.withContext
 import farjs.filelist.stack.{PanelStack, PanelStackItem}
 import scommons.react.ReactClass
 import scommons.react.test._

@@ -1,6 +1,6 @@
 package farjs.filelist.sort
 
-import farjs.filelist.stack.PanelStack
+import farjs.filelist.stack.PanelStackComp
 import farjs.ui.menu.{MenuPopup, MenuPopupProps}
 import scommons.react._
 
@@ -15,7 +15,7 @@ object SortModesPopup extends FunctionComponent[SortModesPopupProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
-    val stackProps = PanelStack.usePanelStack
+    val stackProps = PanelStackComp.usePanelStack
     val showOnLeft = !stackProps.isRight
 
     val items = itemsAndModes.map { case (item, mode) =>

@@ -114,7 +114,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
                           element: ReactElement): ReactElement = {
 
     WithPanelStacksSpec.withContext(
-      <(PanelStack.Context.Provider)(^.contextValue := {
+      <(PanelStackComp.Context.Provider)(^.contextValue := {
         if (isRight) rightPanelStack else leftPanelStack
       })(
         element
