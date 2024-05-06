@@ -1,10 +1,8 @@
 package farjs.filelist.stack
 
-import farjs.filelist.{FileListActions, FileListState}
+import farjs.filelist.FileListActions
 import farjs.ui.Dispatch
 import scommons.react.ReactClass
-
-import scala.scalajs.js
 
 case class PanelStackItem[T](
   component: ReactClass,
@@ -19,26 +17,5 @@ case class PanelStackItem[T](
   def getActions: Option[(Dispatch, FileListActions)] = (dispatch, actions) match {
     case (Some(dispatch), Some(actions)) => Some((dispatch, actions))
     case _ => None
-  }
-}
-
-object PanelStackItem {
-
-  def initDispatch(parentDispatch: Dispatch,
-                   reducer: js.Function2[FileListState, js.Any, FileListState],
-                   stack: PanelStack,
-                   item: PanelStackItem[FileListState]
-                  ): PanelStackItem[FileListState] = {
-
-    val dispatch: js.Function1[js.Any, Unit] = { action =>
-      stack.updateFor[FileListState](item.component) { item =>
-        item.updateState { state =>
-          reducer(state, action)
-        }
-      }
-      parentDispatch(action)
-    }
-
-    item.copy(dispatch = Some(dispatch))
   }
 }

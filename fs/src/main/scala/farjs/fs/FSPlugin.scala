@@ -16,11 +16,29 @@ class FSPlugin(reducer: js.Function2[FileListState, js.Any, FileListState]) exte
 
   def init(parentDispatch: Dispatch, stack: PanelStack): Unit = {
     stack.updateFor[FileListState](component) { item =>
-      PanelStackItem.initDispatch(parentDispatch, reducer, stack, item).copy(
+      initDispatch(parentDispatch, reducer, stack, item).copy(
         actions = Some(FSFileListActions),
         state = Some(FileListState(isActive = stack.isActive))
       )
     }
+  }
+
+  def initDispatch(parentDispatch: Dispatch,
+                   reducer: js.Function2[FileListState, js.Any, FileListState],
+                   stack: PanelStack,
+                   item: PanelStackItem[FileListState]
+                  ): PanelStackItem[FileListState] = {
+
+    val dispatch: js.Function1[js.Any, Unit] = { action =>
+      stack.updateFor[FileListState](item.component) { item =>
+        item.updateState { state =>
+          reducer(state, action)
+        }
+      }
+      parentDispatch(action)
+    }
+
+    item.copy(dispatch = Some(dispatch))
   }
 
   override def onKeyTrigger(key: String,
