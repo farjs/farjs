@@ -1,6 +1,6 @@
 package farjs.viewer.quickview
 
-import farjs.filelist.FileListState
+import farjs.filelist.{FileListData, FileListState}
 import farjs.filelist.api.FileListItem
 import farjs.filelist.stack.{PanelStackComp, WithPanelStacks}
 import farjs.filelist.theme.FileListTheme
@@ -30,8 +30,8 @@ object QuickViewPanel extends FunctionComponent[Unit] {
       else stacks.leftStack
     val stackItem = stack.peek[FileListState]
 
-    val maybeCurrData = stackItem.getActions.zip(stackItem.state).flatMap {
-      case ((dispatch, actions), state) =>
+    val maybeCurrData = stackItem.getData.flatMap {
+      case FileListData(dispatch, actions, state) =>
         FileListState.currentItem(state).toOption.map {
           case i if i == FileListItem.up => (dispatch, actions, state, FileListItem.currDir)
           case i => (dispatch, actions, state, i)

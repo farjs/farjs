@@ -13,7 +13,7 @@ class FileListPanelController(
     val stack = stackProps.stack
     val maybeCurrData = {
       val stackItem = stack.peek[FileListState]
-      stackItem.getActions.zip(stackItem.state)
+      stackItem.getData
     }
 
     useLayoutEffect({ () =>
@@ -23,7 +23,7 @@ class FileListPanelController(
       ()
     }, List(stack.isActive))
     
-    maybeCurrData.map { case ((dispatch, actions), state) =>
+    maybeCurrData.map { case FileListData(dispatch, actions, state) =>
       <(fileListPanelComp())(^.wrapped := FileListPanelProps(dispatch, actions, state))()
     }.orNull
   }

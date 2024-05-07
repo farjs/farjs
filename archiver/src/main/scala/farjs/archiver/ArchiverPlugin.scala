@@ -26,7 +26,7 @@ object ArchiverPlugin extends FileListPlugin {
                             data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
 
     val stackItem = stacks.activeStack.peek[FileListState]
-    val res = stackItem.getActions.zip(stackItem.state).flatMap { case ((dispatch, actions), state) =>
+    val res = stackItem.getData.flatMap { case FileListData(dispatch, actions, state) =>
       val items =
         if (state.selectedNames.nonEmpty) FileListState.selectedItems(state).toList
         else FileListState.currentItem(state).filter(_ != FileListItem.up).toList

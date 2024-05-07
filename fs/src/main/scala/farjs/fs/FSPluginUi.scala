@@ -1,7 +1,7 @@
 package farjs.fs
 
 import farjs.filelist.stack.WithPanelStacks
-import farjs.filelist.{FileListPluginUiProps, FileListState}
+import farjs.filelist.{FileListData, FileListPluginUiProps, FileListState}
 import farjs.fs.FSPluginUi._
 import farjs.fs.popups._
 import scommons.react._
@@ -40,7 +40,7 @@ class FSPluginUi(val showDrivePopupOnLeft: Option[Boolean] = None,
       }
 
       val stackItem = currStack.peekLast[FileListState]
-      stackItem.getActions.zip(stackItem.state).foreach { case ((dispatch, actions), state) =>
+      stackItem.getData.foreach { case FileListData(dispatch, actions, state) =>
         if (dir != state.currDir.path) {
           dispatch(actions.changeDir(
             dispatch = dispatch,
