@@ -62,12 +62,12 @@ class CopyMoveUi(show: CopyMoveUiAction,
 
       services.copyItemsHistory.save(path)
 
-      val updateAction = from.actions.updateDir(from.dispatch, from.path)
+      val updateAction = from.actions.updateDir(from.dispatch, from.state.currDir.path)
       from.dispatch(updateAction)
       updateAction.task.result.toFuture.andThen {
         case Success(updatedDir) =>
           if (isInplace) from.dispatch(FileListItemCreatedAction(toPath, updatedDir.asInstanceOf[FileListDir]))
-          else maybeTo.foreach(to => to.dispatch(to.actions.updateDir(to.dispatch, to.path)))
+          else maybeTo.foreach(to => to.dispatch(to.actions.updateDir(to.dispatch, to.state.currDir.path)))
       }
     }
 
@@ -80,7 +80,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
       inplace ||
         show == ShowCopyInplace ||
         show == ShowMoveInplace ||
-        maybeTo.forall(_.path == from.path) && FileListState.selectedItems(from.state).isEmpty
+        maybeTo.forall(_.state.currDir.path == from.state.currDir.path) && FileListState.selectedItems(from.state).isEmpty
     }
 
     val fromSelected = FileListState.selectedItems(from.state).toList
@@ -109,7 +109,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
 
     def resolveTargetDir(move: Boolean, path: String): Future[(String, Boolean)] = {
       val dirF = for {
-        dir <- from.actions.api.readDir(from.path, path).toFuture
+        dir <- from.actions.api.readDir(from.state.currDir.path, path).toFuture
         sameDrive <-
           if (move) checkSameDrive(from, dir.path)
           else Future.successful(false)
@@ -123,11 +123,11 @@ class CopyMoveUi(show: CopyMoveUiAction,
 
     val maybeError = maybeToPath.filter(_ => !inplace).flatMap { case (_, toPath) =>
       val op = if (move) "move" else "copy"
-      if (from.path == toPath) Some {
+      if (from.state.currDir.path == toPath) Some {
         s"Cannot $op the item\n${items.head.name}\nonto itself"
       }
-      else if (toPath.startsWith(from.path + path.sep)) {
-        val toSuffix = toPath.stripPrefix(from.path + path.sep)
+      else if (toPath.startsWith(from.state.currDir.path + path.sep)) {
+        val toSuffix = toPath.stripPrefix(from.state.currDir.path + path.sep)
         val maybeSelf = items.find(i => toSuffix == i.name || toSuffix.startsWith(i.name + path.sep))
         maybeSelf.map { self =>
           s"Cannot $op the item\n${self.name}\ninto itself"
@@ -141,7 +141,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
         <(copyItemsPopup())(^.wrapped := CopyItemsPopupProps(
           move = isMove,
           path =
-            if (!isInplace) maybeTo.map(_.path).getOrElse("")
+            if (!isInplace) maybeTo.map(_.state.currDir.path).getOrElse("")
             else FileListState.currentItem(from.state).map(_.name).getOrElse(""),
           items = items,
           onAction = onAction,
@@ -160,7 +160,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
         <(copyItemsStats())(^.wrapped := CopyItemsStatsProps(
           dispatch = from.dispatch,
           actions = from.actions,
-          fromPath = from.path,
+          fromPath = from.state.currDir.path,
           items = items,
           title = if (move) "Move" else "Copy",
           onDone = { total =>
@@ -174,13 +174,13 @@ class CopyMoveUi(show: CopyMoveUiAction,
         <(moveProcessComp())(^.wrapped := MoveProcessProps(
           dispatch = from.dispatch,
           actions = from.actions,
-          fromPath = from.path,
+          fromPath = from.state.currDir.path,
           items =
             if (!inplace) items.map(i => (i, i.name))
             else items.map(i => (i, toPath)),
           toPath =
             if (!inplace) toPath
-            else from.path,
+            else from.state.currDir.path,
           onTopItem = onTopItem,
           onDone = onDone(path, toPath)
         ))()
@@ -196,13 +196,13 @@ class CopyMoveUi(show: CopyMoveUiAction,
               if (!inplace) maybeTo.getOrElse(from)
               else from,
             move = move,
-            fromPath = from.path,
+            fromPath = from.state.currDir.path,
             items =
               if (!inplace) items.map(i => (i, i.name))
               else items.map(i => (i, toPath)),
             toPath =
               if (!inplace) toPath
-              else from.path,
+              else from.state.currDir.path,
             total = total,
             onTopItem = onTopItem,
             onDone = onDone(path, toPath)
@@ -214,7 +214,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
   
   private def checkSameDrive(from: FileListData, toPath: String): Future[Boolean] = {
     for {
-      maybeFromRoot <- from.actions.api.getDriveRoot(from.path).toFuture
+      maybeFromRoot <- from.actions.api.getDriveRoot(from.state.currDir.path).toFuture
       maybeToRoot <- from.actions.api.getDriveRoot(toPath).toFuture
     } yield {
       val maybeSameDrive = for {
