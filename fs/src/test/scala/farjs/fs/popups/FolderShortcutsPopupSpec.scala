@@ -37,10 +37,10 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     val onChangeDir = mockFunction[String, Unit]
     val props = getFolderShortcutsPopupProps(onChangeDir = onChangeDir)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val shortcutsService = new ShortcutsService
     val itemsF = Future.successful(List.fill(10)(Option("item")))
@@ -68,10 +68,10 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     val onChangeDir = mockFunction[String, Unit]
     val props = getFolderShortcutsPopupProps(onChangeDir = onChangeDir)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val shortcutsService = new ShortcutsService
     val itemsF = Future.successful(List.fill(10)(None))
@@ -99,10 +99,10 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     val onChangeDir = mockFunction[String, Unit]
     val props = getFolderShortcutsPopupProps(onChangeDir = onChangeDir)
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val shortcutsService = new ShortcutsService
     val itemsF = Future.successful(List(
@@ -157,10 +157,10 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     //given
     val props = getFolderShortcutsPopupProps()
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val shortcutsService = new ShortcutsService
     val itemsF = Future.successful(List(Option("item")))
@@ -191,11 +191,11 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     val props = getFolderShortcutsPopupProps()
     val currState = FileListState(currDir = FileListDir("/test", isRoot = false, js.Array()))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None),
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(currState))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass]),
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, currState)
     ), null)
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val shortcutsService = new ShortcutsService
     val itemsF = Future.successful(List.fill(10)(None))
@@ -226,10 +226,10 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     //given
     val props = getFolderShortcutsPopupProps()
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val shortcutsService = new ShortcutsService
     val itemsF = Future.successful(List(Option("item")))
@@ -252,10 +252,10 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     //given
     val props = getFolderShortcutsPopupProps()
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val shortcutsService = new ShortcutsService
     val itemsF = Future.successful(Option("item") :: List.fill(9)(None))

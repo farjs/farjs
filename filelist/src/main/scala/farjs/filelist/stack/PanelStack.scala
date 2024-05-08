@@ -41,5 +41,5 @@ class PanelStack(val isActive: Boolean,
   
   def peekLast[T]: PanelStackItem[T] = data.last.asInstanceOf[PanelStackItem[T]]
   
-  def params[T]: T = peek[T].state.asInstanceOf[Option[js.Any]].orNull.asInstanceOf[T]
+  def params[T]: T = peek[T].state.asInstanceOf[js.UndefOr[js.Any]].orNull.asInstanceOf[T]
 }

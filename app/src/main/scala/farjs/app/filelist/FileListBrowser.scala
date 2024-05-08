@@ -37,10 +37,10 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     val (currPluginUi, setCurrPluginUi) = useState(Option.empty[ReactClass])
     
     val (leftStackData, setLeftStackData) = useStateUpdater(() => List[PanelStackItem[_]](
-      PanelStackItem[FileListState](fsPlugin.component, None, None, None)
+      PanelStackItem[FileListState](fsPlugin.component)
     ))
     val (rightStackData, setRightStackData) = useStateUpdater(() => List[PanelStackItem[_]](
-      PanelStackItem[FileListState](fsPlugin.component, None, None, None)
+      PanelStackItem[FileListState](fsPlugin.component)
     ))
     val leftStack = new PanelStack(!isRightActive, leftStackData, setLeftStackData)
     val rightStack = new PanelStack(isRightActive, rightStackData, setRightStackData)
@@ -82,12 +82,10 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         case "enter" | "C-pagedown" =>
           val stack = getStack(isRightActive)
           val stackItem = stack.peek[js.Any]
-          stackItem.actions.zip(stackItem.state).collect {
-            case (actions, state)
-              if actions.api.isLocal
-                && FileListState.isFileListState(state)
-                && FileListState.currentItem(state.asInstanceOf[FileListState]).exists(!_.isDir) =>
-              openCurrItem(props.plugins, props.dispatch, stack, actions, state.asInstanceOf[FileListState])
+          stackItem.getData.collect {
+            case FileListData(_, actions, state) if actions.api.isLocal
+                && FileListState.currentItem(state).exists(!_.isDir) =>
+              openCurrItem(props.plugins, props.dispatch, stack, actions, state)
           }
         case keyFull =>
           props.plugins.find(_.triggerKeys.contains(keyFull)).foreach { plugin =>

@@ -46,7 +46,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem.copy(FileListItem("file 1"))(size = 10)
     ))
     var stackState = List[PanelStackItem[QuickViewParams]](
-      PanelStackItem(currComp, None, None, Some(QuickViewParams(parent = currDir.path)))
+      PanelStackItem(currComp, js.undefined, js.undefined, QuickViewParams(parent = currDir.path))
     )
     val stack = new PanelStack(isActive = false, stackState, { f =>
       stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]
@@ -75,7 +75,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
 
       //then
       eventually {
-        stackState.head.state shouldBe Some(QuickViewParams("dir 1", currDir.path, 1, 2, 123))
+        stackState.head.state shouldBe QuickViewParams("dir 1", currDir.path, 1, 2, 123)
         findComponents(renderer.root, statusPopupComp) should be (empty)
       }
     }
@@ -91,7 +91,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem.copy(FileListItem("file 1"))(size = 10)
     ))
     var stackState = List[PanelStackItem[QuickViewParams]](
-      PanelStackItem(currComp, None, None, Some(QuickViewParams(name = currItem.name)))
+      PanelStackItem(currComp, js.undefined, js.undefined, QuickViewParams(name = currItem.name))
     )
     val stack = new PanelStack(isActive = false, stackState, { f =>
       stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]
@@ -120,7 +120,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
 
       //then
       eventually {
-        stackState.head.state shouldBe Some(QuickViewParams("dir 1", currDir.path, 1, 2, 123))
+        stackState.head.state shouldBe QuickViewParams("dir 1", currDir.path, 1, 2, 123)
         findComponents(renderer.root, statusPopupComp) should be (empty)
       }
     }
@@ -136,7 +136,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem.copy(FileListItem("file 1"))(size = 10)
     ))
     var stackState = List[PanelStackItem[QuickViewParams]](
-      PanelStackItem(currComp, None, None, Some(QuickViewParams()))
+      PanelStackItem(currComp, js.undefined, js.undefined, QuickViewParams())
     )
     val stack = new PanelStack(isActive = false, stackState, { f =>
       stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]
@@ -172,7 +172,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       //then
       result shouldBe false
       eventually {
-        stackState.head.state shouldBe Some(QuickViewParams("dir 1", currDir.path))
+        stackState.head.state shouldBe QuickViewParams("dir 1", currDir.path)
         findComponents(renderer.root, statusPopupComp) should be (empty)
       }
     }
@@ -188,7 +188,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       FileListItem.copy(FileListItem("file 1"))(size = 10)
     ))
     var stackState = List[PanelStackItem[QuickViewParams]](
-      PanelStackItem(currComp, None, None, Some(QuickViewParams()))
+      PanelStackItem(currComp, js.undefined, js.undefined, QuickViewParams())
     )
     val stack = new PanelStack(isActive = false, stackState, { f =>
       stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]
@@ -233,7 +233,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     ))
     val params = QuickViewParams(currItem.name, currDir.path, 1, 2, 3)
     var stackState = List[PanelStackItem[QuickViewParams]](
-      PanelStackItem(currComp, None, None, Some(params))
+      PanelStackItem(currComp, js.undefined, js.undefined, params)
     )
     val stack = new PanelStack(isActive = false, stackState, { f =>
       stackState = f(stackState).asInstanceOf[List[PanelStackItem[QuickViewParams]]]

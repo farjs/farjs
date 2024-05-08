@@ -37,7 +37,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
       FileListItem.copy(FileListItem("dir", isDir = true))(size = 1)
     )))
     var stackState = List[PanelStackItem[QuickViewParams]](
-      PanelStackItem(currComp, None, None, Some(QuickViewParams()))
+      PanelStackItem(currComp, js.undefined, js.undefined, QuickViewParams())
     )
     val leftPanelStack = PanelStackProps(
       isRight = false,
@@ -52,7 +52,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
       isRight = true,
       panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
       stack = new PanelStack(isActive = true, List(
-        PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
+        PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
       ), null),
       width = width,
       height = height
@@ -78,13 +78,13 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
       FileListItem.copy(FileListItem("dir", isDir = true))(size = 1)
     )), index = 1, isActive = true)
     var stackState = List[PanelStackItem[QuickViewParams]](
-      PanelStackItem(currComp, None, None, Some(QuickViewParams()))
+      PanelStackItem(currComp, js.undefined, js.undefined, QuickViewParams())
     )
     val leftPanelStack = PanelStackProps(
       isRight = false,
       panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
       stack = new PanelStack(isActive = true, List(
-        PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
+        PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
       ), null),
       width = width,
       height = height

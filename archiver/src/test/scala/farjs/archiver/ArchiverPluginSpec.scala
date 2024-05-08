@@ -27,18 +27,18 @@ class ArchiverPluginSpec extends AsyncTestSpec {
 
   it should "return None if .. when onKeyTrigger" in {
     //given
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
@@ -48,17 +48,17 @@ class ArchiverPluginSpec extends AsyncTestSpec {
 
   it should "return None if non-local fs when onKeyTrigger" in {
     //given
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
@@ -68,17 +68,17 @@ class ArchiverPluginSpec extends AsyncTestSpec {
 
   it should "return Some(ui) if not .. when onKeyTrigger" in {
     //given
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
@@ -88,18 +88,18 @@ class ArchiverPluginSpec extends AsyncTestSpec {
 
   it should "return Some(ui) if selected items when onKeyTrigger" in {
     //given
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem("item 1")
     )), selectedNames = js.Set("item 1"))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 

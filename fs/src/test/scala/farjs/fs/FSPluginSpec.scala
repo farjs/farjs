@@ -4,14 +4,14 @@ import farjs.filelist.FileListStateSpec.assertFileListState
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.stack._
 import farjs.filelist.{FileListState, MockFileListActions}
-import org.scalatest.Succeeded
+import org.scalatest.{OptionValues, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 
 import scala.concurrent.Future
 import scala.scalajs.js
 
-class FSPluginSpec extends AsyncTestSpec {
+class FSPluginSpec extends AsyncTestSpec with OptionValues {
 
   it should "define triggerKeys" in {
     //when & then
@@ -23,7 +23,7 @@ class FSPluginSpec extends AsyncTestSpec {
     val reducer = mockFunction[FileListState, Any, FileListState]
     val plugin = new FSPlugin(reducer)
     val parentDispatch = mockFunction[js.Any, Unit]
-    val item = PanelStackItem[FileListState](plugin.component, None, None, None)
+    val item = PanelStackItem[FileListState](plugin.component)
     var stackData = List[PanelStackItem[_]](item)
     val stack = new PanelStack(isActive = true, stackData, { f =>
       stackData = f(stackData)
@@ -33,10 +33,10 @@ class FSPluginSpec extends AsyncTestSpec {
     plugin.init(parentDispatch, stack)
     
     //then
-    inside(stackData.head) { case PanelStackItem(component, Some(dispatch), actions, resState) =>
+    inside(stackData.head) { case PanelStackItem(component, dispatch, actions, resState) =>
       component shouldBe plugin.component
-      actions shouldBe Some(FSFileListActions)
-      val currState = inside(resState) {
+      actions shouldBe FSFileListActions
+      val currState = inside(resState.toOption) {
         case Some(s) =>
           val state = s.asInstanceOf[FileListState]
           assertFileListState(state, FileListState(currDir = state.currDir, isActive = true))
@@ -53,32 +53,32 @@ class FSPluginSpec extends AsyncTestSpec {
       parentDispatch.expects(action.asInstanceOf[js.Any])
       
       //when
-      dispatch(action)
+      dispatch.toOption.value(action)
       
       //then
       inside(stackData.head) {
-        case PanelStackItem(component, Some(resDispatch), resActions, resState) =>
+        case PanelStackItem(component, resDispatch, resActions, resState) =>
           component shouldBe plugin.component
           resDispatch should be theSameInstanceAs dispatch
           resActions should be theSameInstanceAs actions
-          resState shouldBe Some(updatedState)
+          resState shouldBe updatedState
       }
     }
   }
 
   it should "return None/Some if non-/trigger key when onKeyTrigger" in {
     //given
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 

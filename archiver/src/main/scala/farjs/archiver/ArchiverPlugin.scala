@@ -26,7 +26,7 @@ object ArchiverPlugin extends FileListPlugin {
                             data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
 
     val stackItem = stacks.activeStack.peek[FileListState]
-    val res = stackItem.getData.flatMap { case FileListData(dispatch, actions, state) =>
+    val res = stackItem.getData.toOption.flatMap { case FileListData(dispatch, actions, state) =>
       val items =
         if (state.selectedNames.nonEmpty) FileListState.selectedItems(state).toList
         else FileListState.currentItem(state).filter(_ != FileListItem.up).toList
@@ -51,13 +51,13 @@ object ArchiverPlugin extends FileListPlugin {
         val rootPath = s"zip://$fileName"
         val entriesByParentF = readZip(filePath)
         
-        Some(PanelStackItem(
+        Some(PanelStackItem[FileListState](
           component = new FileListPanelController(new ZipPanel(filePath, rootPath, entriesByParentF, onClose)).apply(),
-          dispatch = None,
-          actions = Some(new ZipActions(createApi(filePath, rootPath, entriesByParentF))),
-          state = Some(FileListState(
+          dispatch = js.undefined,
+          actions = new ZipActions(createApi(filePath, rootPath, entriesByParentF)),
+          state = FileListState(
             currDir = FileListDir(rootPath, isRoot = false, items = js.Array())
-          ))
+          )
         ))
       }
       else None

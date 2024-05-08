@@ -51,8 +51,8 @@ class PanelStackCompSpec extends TestSpec with TestRendererUtils {
   it should "render top component and children" in {
     //given
     val (stackCtx, stackComp) = getStackCtxHook
-    val top = PanelStackItem[TestParams]("TopComp".asInstanceOf[ReactClass], None, None, None)
-    val other = PanelStackItem[TestParams]("OtherComp".asInstanceOf[ReactClass], None, None, None)
+    val top = PanelStackItem[TestParams]("TopComp".asInstanceOf[ReactClass])
+    val other = PanelStackItem[TestParams]("OtherComp".asInstanceOf[ReactClass])
     val stack = new PanelStack(isActive = false, List(top, other), null)
     val props = PanelStackProps(isRight = true, panelInput = null, stack)
 

@@ -18,7 +18,7 @@ object FileListUiPlugin extends FileListPlugin {
                             data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
     val maybeCurrData = {
       val stackItem = stacks.activeStack.peek[FileListState]
-      stackItem.getData
+      stackItem.getData.toOption
     }
     val res = createUiData(key, maybeCurrData).map(uiData => new FileListUi(uiData).apply())
     Future.successful(res)

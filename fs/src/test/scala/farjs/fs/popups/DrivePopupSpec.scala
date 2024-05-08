@@ -54,12 +54,12 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, js.Array()))
     val currStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), None, Some(currState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch: js.Function1[js.Any, Unit], js.undefined, currState)
     ), updater = null)
 
     val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, js.Array()))
     val otherStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(otherState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, otherState)
     ), updater = null)
 
     //when & then
@@ -112,12 +112,12 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     val currState = FileListState(currDir = FileListDir("/test2", isRoot = false, js.Array()))
     val currStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), None, Some(currState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch: js.Function1[js.Any, Unit], js.undefined, currState)
     ), updater = null)
 
     val otherState = FileListState(currDir = FileListDir("C:/test", isRoot = false, js.Array()))
     val otherStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(otherState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, otherState)
     ), updater = null)
 
     //when & then
@@ -170,12 +170,12 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     val currState = FileListState(currDir = FileListDir("/test", isRoot = false, js.Array()))
     val currStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), None, Some(currState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch: js.Function1[js.Any, Unit], js.undefined, currState)
     ), updater = null)
 
     val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, js.Array()))
     val otherStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(otherState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, otherState)
     ), updater = null)
 
     //when & then

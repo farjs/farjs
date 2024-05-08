@@ -79,18 +79,18 @@ class ViewerPluginSpec extends AsyncTestSpec {
 
   it should "return None if .. when onKeyTrigger(f3)" in {
     //given
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up,
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
@@ -100,17 +100,17 @@ class ViewerPluginSpec extends AsyncTestSpec {
 
   it should "return None if non-local fs when onKeyTrigger(f3)" in {
     //given
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(isLocalMock = false))
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
@@ -122,16 +122,16 @@ class ViewerPluginSpec extends AsyncTestSpec {
     //given
     val fs = new FS
     ViewerPlugin.fs = fs.fs
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val item = FileListItem("item 1")
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(item)))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
     val filePath = path.join(leftState.currDir.path, item.name)
@@ -150,16 +150,16 @@ class ViewerPluginSpec extends AsyncTestSpec {
     //given
     val fs = new FS
     ViewerPlugin.fs = fs.fs
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val item = FileListItem("item 1")
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(item)))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
     val filePath = path.join(leftState.currDir.path, item.name)
@@ -175,16 +175,16 @@ class ViewerPluginSpec extends AsyncTestSpec {
     //given
     val fs = new FS
     ViewerPlugin.fs = fs.fs
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val item = FileListItem("item 1")
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(item)))
     val leftStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
     val filePath = path.join(leftState.currDir.path, item.name)
@@ -200,16 +200,16 @@ class ViewerPluginSpec extends AsyncTestSpec {
     //given
     val fs = new FS
     ViewerPlugin.fs = fs.fs
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val item = FileListItem("item 1")
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(item)))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
     val filePath = path.join(leftState.currDir.path, item.name)
@@ -223,17 +223,17 @@ class ViewerPluginSpec extends AsyncTestSpec {
 
   it should "return Some(ViewItemsPopup) if dir when onKeyTrigger(f3)" in {
     //given
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1", isDir = true)
     )))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 

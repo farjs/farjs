@@ -44,7 +44,7 @@ object CopyMovePlugin extends FileListPlugin {
 
   private def getData(stack: PanelStack): Option[FileListData] = {
     val item = stack.peek[js.Any]
-    item.getData
+    item.getData.toOption
   }
 
   private[copymove] def onCopyMoveInplace(move: Boolean, from: FileListData): Option[CopyMoveUiAction] = {

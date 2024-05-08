@@ -32,11 +32,11 @@ object QuickViewPlugin extends FileListPlugin {
         if (stacks.leftStack.isActive) stacks.rightStack
         else stacks.leftStack
 
-      stack.push(PanelStackItem(
+      stack.push(PanelStackItem[QuickViewParams](
         component = panelComp,
-        dispatch = None,
-        actions = None,
-        state = Some(QuickViewParams())
+        dispatch = js.undefined,
+        actions = js.undefined,
+        state = QuickViewParams()
       ))
     }
     

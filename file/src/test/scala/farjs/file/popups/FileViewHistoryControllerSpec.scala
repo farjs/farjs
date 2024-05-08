@@ -16,11 +16,11 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
   FileViewHistoryController.fileViewHistoryPopup = mockUiComponent("FileViewHistoryPopup")
 
   private val currStack = new PanelStack(isActive = true, List(
-    PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+    PanelStackItem("fsComp".asInstanceOf[ReactClass])
   ), updater = null)
 
   private val otherStack = new PanelStack(isActive = false, List(
-    PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, None)
+    PanelStackItem("fsComp".asInstanceOf[ReactClass])
   ), updater = null)
 
   it should "emit onFileView event when onAction" in {

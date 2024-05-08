@@ -4,6 +4,8 @@ import farjs.filelist.stack._
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 
+import scala.scalajs.js
+
 class QuickViewPluginSpec extends AsyncTestSpec {
   
   //noinspection TypeAnnotation
@@ -30,7 +32,7 @@ class QuickViewPluginSpec extends AsyncTestSpec {
     val leftStack = new Stack(isActive = true)
     val rightStack = new Stack
     val stacks = WithPanelStacksProps(leftStack.stack, null, rightStack.stack, null)
-    leftStack.peek.expects().returning(PanelStackItem(QuickViewPanel(), None, None, None))
+    leftStack.peek.expects().returning(PanelStackItem(QuickViewPanel()))
     
     //then
     leftStack.pop.expects()
@@ -44,8 +46,8 @@ class QuickViewPluginSpec extends AsyncTestSpec {
     val leftStack = new Stack(isActive = true)
     val rightStack = new Stack
     val stacks = WithPanelStacksProps(leftStack.stack, null, rightStack.stack, null)
-    leftStack.peek.expects().returning(PanelStackItem("other".asInstanceOf[ReactClass], None, None, None))
-    rightStack.peek.expects().returning(PanelStackItem(QuickViewPanel(), None, None, None))
+    leftStack.peek.expects().returning(PanelStackItem("other".asInstanceOf[ReactClass]))
+    rightStack.peek.expects().returning(PanelStackItem(QuickViewPanel()))
     
     //then
     rightStack.pop.expects()
@@ -59,11 +61,14 @@ class QuickViewPluginSpec extends AsyncTestSpec {
     val leftStack = new Stack
     val rightStack = new Stack(isActive = true)
     val stacks = WithPanelStacksProps(leftStack.stack, null, rightStack.stack, null)
-    leftStack.peek.expects().returning(PanelStackItem("other1".asInstanceOf[ReactClass], None, None, None))
-    rightStack.peek.expects().returning(PanelStackItem("other2".asInstanceOf[ReactClass], None, None, None))
+    leftStack.peek.expects().returning(PanelStackItem("other1".asInstanceOf[ReactClass]))
+    rightStack.peek.expects().returning(PanelStackItem("other2".asInstanceOf[ReactClass]))
     
     //then
-    leftStack.push.expects(PanelStackItem(QuickViewPanel(), None, None, Some(QuickViewParams())))
+    leftStack.push.expects(*).onCall { resItem: PanelStackItem[_] =>
+      PanelStackSpec.assertPanelStackItem(resItem, PanelStackItem(QuickViewPanel(), js.undefined, js.undefined, QuickViewParams()))
+      ()
+    }
 
     //when
     QuickViewPlugin.onKeyTrigger("", stacks).map(_ shouldBe None)
@@ -74,11 +79,14 @@ class QuickViewPluginSpec extends AsyncTestSpec {
     val leftStack = new Stack(isActive = true)
     val rightStack = new Stack
     val stacks = WithPanelStacksProps(leftStack.stack, null, rightStack.stack, null)
-    leftStack.peek.expects().returning(PanelStackItem("other1".asInstanceOf[ReactClass], None, None, None))
-    rightStack.peek.expects().returning(PanelStackItem("other2".asInstanceOf[ReactClass], None, None, None))
+    leftStack.peek.expects().returning(PanelStackItem("other1".asInstanceOf[ReactClass]))
+    rightStack.peek.expects().returning(PanelStackItem("other2".asInstanceOf[ReactClass]))
     
     //then
-    rightStack.push.expects(PanelStackItem(QuickViewPanel(), None, None, Some(QuickViewParams())))
+    rightStack.push.expects(*).onCall { resItem: PanelStackItem[_] =>
+      PanelStackSpec.assertPanelStackItem(resItem, PanelStackItem(QuickViewPanel(), js.undefined, js.undefined, QuickViewParams()))
+      ()
+    }
 
     //when
     QuickViewPlugin.onKeyTrigger("", stacks).map(_ shouldBe None)

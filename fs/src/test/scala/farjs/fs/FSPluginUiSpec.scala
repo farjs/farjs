@@ -37,10 +37,10 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     val fsPluginUi = new FSPluginUi()
     val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, js.Array()))
     val currFsItem = PanelStackItem(
-      "fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(currState)
+      "fsComp".asInstanceOf[ReactClass], dispatch: js.Function1[js.Any, Unit], actions.actions, currState
     )
     var currStackState: List[PanelStackItem[_]] = List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None),
+      PanelStackItem("otherComp".asInstanceOf[ReactClass]),
       currFsItem
     )
     val currStack = new PanelStack(isActive = true, currStackState, { f =>
@@ -49,7 +49,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
 
     val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, js.Array()))
     val otherStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(otherState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, otherState)
     ), updater = null)
 
     val renderer = createTestRenderer(withContext(
@@ -82,11 +82,11 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     val fsPluginUi = new FSPluginUi()
     val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, js.Array()))
     val currStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(currState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch: js.Function1[js.Any, Unit], actions.actions, currState)
     ), updater = null)
     val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, js.Array()))
     val otherStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(otherState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, otherState)
     ), updater = null)
 
     val renderer = createTestRenderer(withContext(
@@ -116,10 +116,10 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     val fsPluginUi = new FSPluginUi()
     val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, js.Array()))
     val currFsItem = PanelStackItem(
-      "fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions.actions), Some(currState)
+      "fsComp".asInstanceOf[ReactClass], dispatch: js.Function1[js.Any, Unit], actions.actions, currState
     )
     var currStackState: List[PanelStackItem[_]] = List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None),
+      PanelStackItem("otherComp".asInstanceOf[ReactClass]),
       currFsItem
     )
     val currStack = new PanelStack(isActive = true, currStackState, { f =>
@@ -128,7 +128,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
 
     val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, js.Array()))
     val otherStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], None, None, Some(otherState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, otherState)
     ), updater = null)
 
     val renderer = createTestRenderer(withContext(
@@ -156,10 +156,10 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     val onClose: js.Function0[Unit] = mockFunction[Unit]
     val fsPluginUi = new FSPluginUi()
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), None, None)
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, js.undefined, js.undefined)
     ), null)
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("otherComp".asInstanceOf[ReactClass])
     ), null)
 
     //when

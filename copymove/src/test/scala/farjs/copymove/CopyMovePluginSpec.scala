@@ -22,7 +22,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
 
   it should "return None if .. when onKeyTrigger" in {
     //given
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(
       FileListCapability.read,
       FileListCapability.write,
@@ -35,11 +35,11 @@ class CopyMovePluginSpec extends AsyncTestSpec {
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
@@ -54,7 +54,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
 
   it should "return None if other state type when onKeyTrigger" in {
     //given
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(
       FileListCapability.read,
       FileListCapability.write,
@@ -63,11 +63,11 @@ class CopyMovePluginSpec extends AsyncTestSpec {
       FileListCapability.moveInplace
     )))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some("otherState"))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], dispatch, actions, "otherState")
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some("otherState"))
+      PanelStackItem("otherComp".asInstanceOf[ReactClass], dispatch, actions, "otherState")
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
@@ -82,7 +82,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
 
   it should "return None when onKeyTrigger(unknown)" in {
     //given
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(
       FileListCapability.read,
       FileListCapability.write,
@@ -94,11 +94,11 @@ class CopyMovePluginSpec extends AsyncTestSpec {
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
@@ -108,17 +108,17 @@ class CopyMovePluginSpec extends AsyncTestSpec {
 
   it should "return Some(ui) when onKeyTrigger(Shift-F5)" in {
     //given
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(FileListCapability.copyInplace)))
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(leftState))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("otherComp".asInstanceOf[ReactClass], None, None, None)
+      PanelStackItem("otherComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
@@ -128,7 +128,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
 
   it should "return Some(ui) when onKeyTrigger(F5)" in {
     //given
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(
       FileListCapability.read, FileListCapability.write, FileListCapability.delete
     )))
@@ -136,11 +136,11 @@ class CopyMovePluginSpec extends AsyncTestSpec {
       FileListItem("item 1")
     )))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass],Some(dispatch), Some(actions), Some(state))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 
@@ -150,7 +150,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
 
   it should "return Some(ui) if selected items when onKeyTrigger(F6)" in {
     //given
-    val dispatch = mockFunction[js.Any, Unit]
+    val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions(new MockFileListApi(capabilitiesMock = js.Set(
       FileListCapability.read, FileListCapability.write, FileListCapability.delete
     )))
@@ -159,11 +159,11 @@ class CopyMovePluginSpec extends AsyncTestSpec {
       FileListItem("item 1")
     )), selectedNames = js.Set("item 1"))
     val leftStack = new PanelStack(isActive = true, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
 
     val rightStack = new PanelStack(isActive = false, List(
-      PanelStackItem("fsComp".asInstanceOf[ReactClass], Some(dispatch), Some(actions), Some(state))
+      PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
 

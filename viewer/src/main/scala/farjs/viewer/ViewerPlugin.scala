@@ -40,7 +40,7 @@ object ViewerPlugin extends FileListPlugin {
         case _ => stacks.activeStack
       }
       val stackItem = stack.peek[FileListState]
-      stackItem.getData.flatMap { data =>
+      stackItem.getData.toOption.flatMap { data =>
         val FileListData(_, actions, state) = data
         FileListState.currentItem(state).filter(_ != FileListItem.up).toOption match {
           case Some(item) if actions.api.isLocal && !item.isDir =>
