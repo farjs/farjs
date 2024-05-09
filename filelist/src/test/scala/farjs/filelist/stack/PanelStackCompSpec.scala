@@ -53,7 +53,7 @@ class PanelStackCompSpec extends TestSpec with TestRendererUtils {
     val (stackCtx, stackComp) = getStackCtxHook
     val top = PanelStackItem[TestParams]("TopComp".asInstanceOf[ReactClass])
     val other = PanelStackItem[TestParams]("OtherComp".asInstanceOf[ReactClass])
-    val stack = new PanelStack(isActive = false, List(top, other), null)
+    val stack = new PanelStack(isActive = false, js.Array(top, other), null)
     val props = PanelStackProps(isRight = true, panelInput = null, stack)
 
     //when

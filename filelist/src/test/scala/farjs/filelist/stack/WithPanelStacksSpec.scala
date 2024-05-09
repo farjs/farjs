@@ -44,12 +44,12 @@ class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
   it should "render component with context provider" in {
     //given
     val (stacksCtx, stacksComp) = getStacksCtxHook
-    val updater: js.Function1[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit] = { _ =>
+    val updater: js.Function1[js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]], Unit] = { _ =>
     }
     val props = WithPanelStacksProps(
-      new PanelStack(isActive = true, Nil, updater),
+      new PanelStack(isActive = true, js.Array(), updater),
       null,
-      new PanelStack(isActive = false, Nil, updater),
+      new PanelStack(isActive = false, js.Array(), updater),
       null
     )
 

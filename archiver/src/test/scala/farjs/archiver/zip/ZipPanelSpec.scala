@@ -67,10 +67,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val fsDispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val fsActions = new MockFileListActions
     val fsState = FileListState()
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], fsDispatch, fsActions, fsState)
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("zipComp".asInstanceOf[ReactClass])
     ), null)
     val comp = testRender(
@@ -99,10 +99,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val fsDispatch = mockFunction[js.Any, Unit]
     val fsActions = new Actions(isLocal = true)
     val fsState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array()))
-    val leftStack = new PanelStack(isActive = false, List(
+    val leftStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
-    val rightStack = new PanelStack(isActive = true, List(
+    val rightStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("zipComp".asInstanceOf[ReactClass]),
       PanelStackItem("fsComp".asInstanceOf[ReactClass], fsDispatch: js.Function1[js.Any, Unit], fsActions.actions, fsState)
     ), null)
@@ -144,10 +144,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val fsDispatch = mockFunction[js.Any, Unit]
     val fsActions = new Actions(isLocal = true)
     val fsState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array()))
-    val leftStack = new PanelStack(isActive = false, List(
+    val leftStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
-    val rightStack = new PanelStack(isActive = true, List(
+    val rightStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("zipComp".asInstanceOf[ReactClass]),
       PanelStackItem("fsComp".asInstanceOf[ReactClass], fsDispatch: js.Function1[js.Any, Unit], fsActions.actions, fsState)
     ), null)
@@ -191,10 +191,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val fsDispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val fsActions = new MockFileListActions
     val fsState = FileListState()
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], fsDispatch, fsActions, fsState)
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("zipComp".asInstanceOf[ReactClass])
     ), null)
 
@@ -237,10 +237,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         FileListItem("file 1")
       ))
     )
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], fsDispatch, fsActions, fsState)
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("zipComp".asInstanceOf[ReactClass])
     ), null)
 
@@ -279,10 +279,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         FileListItem("file 1")
       ))
     )
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], fsDispatch, fsActions, fsState)
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("zipComp".asInstanceOf[ReactClass])
     ), null)
 
@@ -320,10 +320,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       index = 1,
       currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem.up) ++ items)
     )
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], fsDispatch, fsActions, fsState)
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("zipComp".asInstanceOf[ReactClass])
     ), null)
 
@@ -382,10 +382,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       ) ++ items),
       selectedNames = js.Set("item 3", "item 2")
     )
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], fsDispatch, fsActions, fsState)
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("zipComp".asInstanceOf[ReactClass])
     ), null)
 
@@ -456,10 +456,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       ) ++ items),
       selectedNames = js.Set("item 3", "item 2")
     )
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], fsDispatch: js.Function1[js.Any, Unit], fsActions.actions, fsState)
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("zipComp".asInstanceOf[ReactClass])
     ), null)
 
@@ -532,10 +532,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         FileListItem("item 1")
       ))
     )
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], fsDispatch, fsActions, fsState)
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("zipComp".asInstanceOf[ReactClass])
     ), null)
 
@@ -582,10 +582,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val fsDispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val fsActions = new MockFileListActions
     val fsState = FileListState()
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], fsDispatch, fsActions, fsState)
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("zipComp".asInstanceOf[ReactClass])
     ), null)
     
@@ -632,10 +632,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val fsDispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val fsActions = new MockFileListActions
     val fsState = FileListState()
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], fsDispatch, fsActions, fsState)
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("zipComp".asInstanceOf[ReactClass])
     ), null)
     
@@ -663,10 +663,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val fsDispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val fsActions = new MockFileListActions
     val fsState = FileListState()
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], fsDispatch, fsActions, fsState)
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("zipComp".asInstanceOf[ReactClass])
     ), null)
     

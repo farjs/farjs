@@ -24,11 +24,11 @@ class FilePluginSpec extends AsyncTestSpec {
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
 
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)

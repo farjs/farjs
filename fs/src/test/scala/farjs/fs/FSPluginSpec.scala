@@ -24,10 +24,10 @@ class FSPluginSpec extends AsyncTestSpec with OptionValues {
     val plugin = new FSPlugin(reducer)
     val parentDispatch = mockFunction[js.Any, Unit]
     val item = PanelStackItem[FileListState](plugin.component)
-    var stackData = List[PanelStackItem[_]](item)
+    var stackData = js.Array[PanelStackItem[_]](item)
     val stack = new PanelStack(isActive = true, stackData, { f =>
       stackData = f(stackData)
-    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
+    }: js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]] => Unit)
     
     //when
     plugin.init(parentDispatch, stack)
@@ -73,11 +73,11 @@ class FSPluginSpec extends AsyncTestSpec with OptionValues {
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
 
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)

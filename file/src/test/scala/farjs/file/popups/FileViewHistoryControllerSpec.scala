@@ -15,11 +15,11 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
 
   FileViewHistoryController.fileViewHistoryPopup = mockUiComponent("FileViewHistoryPopup")
 
-  private val currStack = new PanelStack(isActive = true, List(
+  private val currStack = new PanelStack(isActive = true, js.Array(
     PanelStackItem("fsComp".asInstanceOf[ReactClass])
   ), updater = null)
 
-  private val otherStack = new PanelStack(isActive = false, List(
+  private val otherStack = new PanelStack(isActive = false, js.Array(
     PanelStackItem("fsComp".asInstanceOf[ReactClass])
   ), updater = null)
 

@@ -16,7 +16,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
   
   it should "emit keypress event and call onClose when onSelect" in {
     //given
-    val stack = new PanelStack(isActive = true, Nil, null)
+    val stack = new PanelStack(isActive = true, js.Array(), null)
     val onClose = mockFunction[Unit]
     val emitMock = mockFunction[String, js.Any, js.Dynamic, Boolean]
     val inputMock = js.Dynamic.literal("emit" -> emitMock).asInstanceOf[BlessedElement]
@@ -43,7 +43,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
   
   it should "call onClose when onClose" in {
     //given
-    val stack = new PanelStack(isActive = true, Nil, null)
+    val stack = new PanelStack(isActive = true, js.Array(), null)
     val onClose = mockFunction[Unit]
     val props = SortModesPopupProps(FileListSort(SortMode.Name, asc = true), onClose)
     val comp = testRender(withContext(
@@ -63,7 +63,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
   it should "render popup on left panel" in {
     //given
     val isRight = false
-    val stack = new PanelStack(isActive = true, Nil, null)
+    val stack = new PanelStack(isActive = true, js.Array(), null)
     val width = 40
     val props = SortModesPopupProps(FileListSort(SortMode.Extension, asc = false), () => ())
 
@@ -79,7 +79,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
   it should "render popup on right panel" in {
     //given
     val isRight = true
-    val stack = new PanelStack(isActive = false, Nil, null)
+    val stack = new PanelStack(isActive = false, js.Array(), null)
     val width = 40
     val props = SortModesPopupProps(FileListSort(SortMode.Extension, asc = false), () => ())
 

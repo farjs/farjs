@@ -39,16 +39,16 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     val currFsItem = PanelStackItem(
       "fsComp".asInstanceOf[ReactClass], dispatch: js.Function1[js.Any, Unit], actions.actions, currState
     )
-    var currStackState: List[PanelStackItem[_]] = List(
+    var currStackState: js.Array[PanelStackItem[_]] = js.Array(
       PanelStackItem("otherComp".asInstanceOf[ReactClass]),
       currFsItem
     )
     val currStack = new PanelStack(isActive = true, currStackState, { f =>
       currStackState = f(currStackState)
-    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
+    }: js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]] => Unit)
 
     val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, js.Array()))
-    val otherStack = new PanelStack(isActive = false, List(
+    val otherStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, otherState)
     ), updater = null)
 
@@ -71,7 +71,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     foldersHistoryProps.onChangeDir(dir)
 
     //then
-    currStackState shouldBe List(currFsItem)
+    currStackState.toList shouldBe List(currFsItem)
   }
 
   it should "dispatch TaskAction when onChangeDir in Drive popup" in {
@@ -81,11 +81,11 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     val actions = new Actions
     val fsPluginUi = new FSPluginUi()
     val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, js.Array()))
-    val currStack = new PanelStack(isActive = true, List(
+    val currStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch: js.Function1[js.Any, Unit], actions.actions, currState)
     ), updater = null)
     val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, js.Array()))
-    val otherStack = new PanelStack(isActive = false, List(
+    val otherStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, otherState)
     ), updater = null)
 
@@ -118,16 +118,16 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     val currFsItem = PanelStackItem(
       "fsComp".asInstanceOf[ReactClass], dispatch: js.Function1[js.Any, Unit], actions.actions, currState
     )
-    var currStackState: List[PanelStackItem[_]] = List(
+    var currStackState = js.Array[PanelStackItem[_]](
       PanelStackItem("otherComp".asInstanceOf[ReactClass]),
       currFsItem
     )
     val currStack = new PanelStack(isActive = true, currStackState, { f =>
       currStackState = f(currStackState)
-    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
+    }: js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]] => Unit)
 
     val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, js.Array()))
-    val otherStack = new PanelStack(isActive = false, List(
+    val otherStack = new PanelStack(isActive = false, js.Array[PanelStackItem[_]](
       PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, otherState)
     ), updater = null)
 
@@ -147,7 +147,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     foldersHistoryProps.onChangeDir(dir)
 
     //then
-    currStackState shouldBe List(currFsItem)
+    currStackState.toList shouldBe List(currFsItem)
   }
 
   it should "render component" in {
@@ -155,10 +155,10 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val onClose: js.Function0[Unit] = mockFunction[Unit]
     val fsPluginUi = new FSPluginUi()
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, js.undefined, js.undefined)
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("otherComp".asInstanceOf[ReactClass])
     ), null)
 

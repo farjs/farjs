@@ -34,8 +34,8 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListUiData(showMenuPopup = true, onClose = onClose)
     val comp = testRender(withContext(
       <(MenuController())(^.wrapped := props)(),
-      leftStack = new PanelStack(isActive = true, Nil, null),
-      rightStack = new PanelStack(isActive = false, Nil, null)
+      leftStack = new PanelStack(isActive = true, js.Array(), null),
+      rightStack = new PanelStack(isActive = false, js.Array(), null)
     ))
     val menuBarProps = inside(findComponents(comp, menuBarComp)) {
       case List(menuBar) => menuBar.props.asInstanceOf[MenuBarProps]
@@ -72,8 +72,8 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListUiData(showMenuPopup = true, onClose = onClose)
     val comp = testRender(withContext(
       <(MenuController())(^.wrapped := props)(),
-      leftStack = new PanelStack(isActive = true, Nil, null),
-      rightStack = new PanelStack(isActive = false, Nil, null),
+      leftStack = new PanelStack(isActive = true, js.Array(), null),
+      rightStack = new PanelStack(isActive = false, js.Array(), null),
       leftInput = leftInput
     ))
     val menuBarProps = inside(findComponents(comp, menuBarComp)) {
@@ -108,8 +108,8 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListUiData(showMenuPopup = true, onClose = onClose)
     val comp = testRender(withContext(
       <(MenuController())(^.wrapped := props)(),
-      leftStack = new PanelStack(isActive = true, Nil, null),
-      rightStack = new PanelStack(isActive = false, Nil, null),
+      leftStack = new PanelStack(isActive = true, js.Array(), null),
+      rightStack = new PanelStack(isActive = false, js.Array(), null),
       rightInput = rightInput
     ))
     val menuBarProps = inside(findComponents(comp, menuBarComp)) {
@@ -130,8 +130,8 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListUiData(showMenuPopup = true, onClose = onClose)
     val comp = testRender(withContext(
       <(MenuController())(^.wrapped := props)(),
-      leftStack = new PanelStack(isActive = true, Nil, null),
-      rightStack = new PanelStack(isActive = false, Nil, null)
+      leftStack = new PanelStack(isActive = true, js.Array(), null),
+      rightStack = new PanelStack(isActive = false, js.Array(), null)
     ))
     val menuBarProps = inside(findComponents(comp, menuBarComp)) {
       case List(menuBar) => menuBar.props.asInstanceOf[MenuBarProps]
@@ -153,8 +153,8 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     //when
     val result = testRender(withContext(
       <(MenuController())(^.wrapped := props)(),
-      leftStack = new PanelStack(isActive = true, Nil, null),
-      rightStack = new PanelStack(isActive = false, Nil, null),
+      leftStack = new PanelStack(isActive = true, js.Array(), null),
+      rightStack = new PanelStack(isActive = false, js.Array(), null),
       leftInput = leftInput,
       rightInput = rightInput
     ))

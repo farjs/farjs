@@ -13,15 +13,15 @@ class PanelStackSpec extends TestSpec {
 
   it should "push new component when push" in {
     //given
-    val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
-    val stack = new PanelStack(isActive = false, Nil, updater)
-    val data = List(
-      PanelStackItem[TestParams]("existing comp".asInstanceOf[ReactClass])
+    val updater = mockFunction[js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]], Unit]
+    val stack = new PanelStack(isActive = false, js.Array(), updater)
+    val data = js.Array[PanelStackItem[_]](
+      PanelStackItem("existing comp".asInstanceOf[ReactClass])
     )
     val newItem = new PanelStackItem("new comp".asInstanceOf[ReactClass], js.undefined, js.undefined, TestParams("test name"))
     
-    var result: List[PanelStackItem[_]] = null
-    updater.expects(*).onCall { updateFn: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] =>
+    var result: js.Array[PanelStackItem[_]] = null
+    updater.expects(*).onCall { updateFn: js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]] =>
       //when
       result = updateFn(data)
     }
@@ -30,18 +30,18 @@ class PanelStackSpec extends TestSpec {
     stack.push(newItem)
     
     //then
-    result shouldBe newItem :: data
+    result.toList shouldBe newItem :: data.toList
   }
   
   it should "do nothing if empty stack data when update" in {
     //given
-    val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
-    val stack = new PanelStack(isActive = false, Nil, updater)
+    val updater = mockFunction[js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]], Unit]
+    val stack = new PanelStack(isActive = false, js.Array(), updater)
     val params = TestParams("test name")
-    val data = List.empty[PanelStackItem[TestParams]]
+    val data = js.Array[PanelStackItem[_]]()
     
-    var result: List[PanelStackItem[_]] = null
-    updater.expects(*).onCall { updateFn: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] =>
+    var result: js.Array[PanelStackItem[_]] = null
+    updater.expects(*).onCall { updateFn: js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]] =>
       //when
       result = updateFn(data)
     }
@@ -55,15 +55,15 @@ class PanelStackSpec extends TestSpec {
   
   it should "update top item when update" in {
     //given
-    val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
-    val stack = new PanelStack(isActive = false, Nil, updater)
+    val updater = mockFunction[js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]], Unit]
+    val stack = new PanelStack(isActive = false, js.Array(), updater)
     val params = TestParams("test name")
     val top = PanelStackItem[TestParams]("top comp".asInstanceOf[ReactClass])
     val other = PanelStackItem("other comp".asInstanceOf[ReactClass])
-    val data = List(top, other)
+    val data = js.Array[PanelStackItem[_]](top, other)
     
-    var result: List[PanelStackItem[_]] = null
-    updater.expects(*).onCall { updateFn: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] =>
+    var result: js.Array[PanelStackItem[_]] = null
+    updater.expects(*).onCall { updateFn: js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]] =>
       //when
       result = updateFn(data)
     }
@@ -72,21 +72,21 @@ class PanelStackSpec extends TestSpec {
     stack.update[TestParams](_.withState(params))
     
     //then
-    assertPanelStackItems(result, List(PanelStackItem.copy(top)(state = params), other))
+    assertPanelStackItems(result.toList, List(PanelStackItem.copy(top)(state = params), other))
   }
   
   it should "update item when updateFor" in {
     //given
-    val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
-    val stack = new PanelStack(isActive = false, Nil, updater)
+    val updater = mockFunction[js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]], Unit]
+    val stack = new PanelStack(isActive = false, js.Array(), updater)
     val params = TestParams("test name")
     val top = PanelStackItem[TestParams]("top comp".asInstanceOf[ReactClass])
     val component = "other comp".asInstanceOf[ReactClass]
     val other = PanelStackItem[TestParams](component)
-    val data = List(top, other)
+    val data = js.Array[PanelStackItem[_]](top, other)
     
-    var result: List[PanelStackItem[_]] = null
-    updater.expects(*).onCall { updateFn: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] =>
+    var result: js.Array[PanelStackItem[_]] = null
+    updater.expects(*).onCall { updateFn: js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]] =>
       //when
       result = updateFn(data)
     }
@@ -95,21 +95,21 @@ class PanelStackSpec extends TestSpec {
     stack.updateFor[TestParams](component)(_.withState(params))
     
     //then
-    assertPanelStackItems(result, List(top, PanelStackItem.copy(other)(state = params)))
+    assertPanelStackItems(result.toList, List(top, PanelStackItem.copy(other)(state = params)))
   }
   
   it should "remove top component when pop" in {
     //given
-    val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
-    val stack = new PanelStack(isActive = false, Nil, updater)
-    val other = PanelStackItem[Unit]("other comp".asInstanceOf[ReactClass])
-    val data = List(
+    val updater = mockFunction[js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]], Unit]
+    val stack = new PanelStack(isActive = false, js.Array(), updater)
+    val other = PanelStackItem("other comp".asInstanceOf[ReactClass])
+    val data = js.Array[PanelStackItem[_]](
       PanelStackItem[TestParams]("top comp".asInstanceOf[ReactClass]),
       other
     )
     
-    var result: List[PanelStackItem[_]] = null
-    updater.expects(*).onCall { updateFn: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] =>
+    var result: js.Array[PanelStackItem[_]] = null
+    updater.expects(*).onCall { updateFn: js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]] =>
       //when
       result = updateFn(data)
     }
@@ -118,19 +118,19 @@ class PanelStackSpec extends TestSpec {
     stack.pop()
     
     //then
-    assertPanelStackItems(result, List(other))
+    assertPanelStackItems(result.toList, List(other))
   }
   
   it should "not remove last item when pop" in {
     //given
-    val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
-    val stack = new PanelStack(isActive = false, Nil, updater)
-    val data = List(
-      PanelStackItem[TestParams]("top comp".asInstanceOf[ReactClass])
+    val updater = mockFunction[js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]], Unit]
+    val stack = new PanelStack(isActive = false, js.Array(), updater)
+    val data = js.Array[PanelStackItem[_]](
+      PanelStackItem("top comp".asInstanceOf[ReactClass])
     )
     
-    var result: List[PanelStackItem[_]] = null
-    updater.expects(*).onCall { updateFn: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] =>
+    var result: js.Array[PanelStackItem[_]] = null
+    updater.expects(*).onCall { updateFn: js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]] =>
       //when
       result = updateFn(data)
     }
@@ -139,22 +139,22 @@ class PanelStackSpec extends TestSpec {
     stack.pop()
     
     //then
-    assertPanelStackItems(result, data)
+    assertPanelStackItems(result.toList, data.toList)
   }
   
   it should "remove all except last item when clear" in {
     //given
-    val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
-    val stack = new PanelStack(isActive = false, Nil, updater)
-    val other = PanelStackItem[Unit]("other comp".asInstanceOf[ReactClass])
-    val data = List(
+    val updater = mockFunction[js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]], Unit]
+    val stack = new PanelStack(isActive = false, js.Array(), updater)
+    val other = PanelStackItem("other comp".asInstanceOf[ReactClass])
+    val data = js.Array[PanelStackItem[_]](
       PanelStackItem[TestParams]("top comp1".asInstanceOf[ReactClass]),
       PanelStackItem[TestParams]("top comp2".asInstanceOf[ReactClass]),
       other
     )
     
-    var result: List[PanelStackItem[_]] = null
-    updater.expects(*).onCall { updateFn: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] =>
+    var result: js.Array[PanelStackItem[_]] = null
+    updater.expects(*).onCall { updateFn: js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]] =>
       //when
       result = updateFn(data)
     }
@@ -163,19 +163,19 @@ class PanelStackSpec extends TestSpec {
     stack.clear()
     
     //then
-    assertPanelStackItems(result, List(other))
+    assertPanelStackItems(result.toList, List(other))
   }
 
   it should "not remove last item when clear" in {
     //given
-    val updater = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
-    val stack = new PanelStack(isActive = false, Nil, updater)
-    val data = List(
-      PanelStackItem[TestParams]("top comp".asInstanceOf[ReactClass])
+    val updater = mockFunction[js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]], Unit]
+    val stack = new PanelStack(isActive = false, js.Array(), updater)
+    val data = js.Array[PanelStackItem[_]](
+      PanelStackItem("top comp".asInstanceOf[ReactClass])
     )
 
-    var result: List[PanelStackItem[_]] = null
-    updater.expects(*).onCall { updateFn: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] =>
+    var result: js.Array[PanelStackItem[_]] = null
+    updater.expects(*).onCall { updateFn: js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]] =>
       //when
       result = updateFn(data)
     }
@@ -184,7 +184,7 @@ class PanelStackSpec extends TestSpec {
     stack.clear()
 
     //then
-    assertPanelStackItems(result, data)
+    assertPanelStackItems(result.toList, data.toList)
   }
 
   it should "return top item when peek" in {
@@ -192,7 +192,7 @@ class PanelStackSpec extends TestSpec {
     val params = TestParams(name = "test")
     val top = PanelStackItem("top comp".asInstanceOf[ReactClass], js.undefined, js.undefined, params)
     val other = PanelStackItem("other comp".asInstanceOf[ReactClass])
-    val stack = new PanelStack(isActive = false, List(top, other), null)
+    val stack = new PanelStack(isActive = false, js.Array(top, other), null)
     
     //when
     val result = stack.peek
@@ -206,7 +206,7 @@ class PanelStackSpec extends TestSpec {
     val params = TestParams(name = "test")
     val top = PanelStackItem("top comp".asInstanceOf[ReactClass], js.undefined, js.undefined, params)
     val other = PanelStackItem("other comp".asInstanceOf[ReactClass])
-    val stack = new PanelStack(isActive = false, List(top, other), null)
+    val stack = new PanelStack(isActive = false, js.Array(top, other), null)
     
     //when
     val result = stack.peekLast
@@ -220,7 +220,7 @@ class PanelStackSpec extends TestSpec {
     val params = TestParams(name = "test")
     val top = PanelStackItem("top comp".asInstanceOf[ReactClass], js.undefined, js.undefined, params)
     val other = PanelStackItem("other comp".asInstanceOf[ReactClass])
-    val stack = new PanelStack(isActive = false, List(top, other), null)
+    val stack = new PanelStack(isActive = false, js.Array(top, other), null)
     
     //when
     val result = stack.params[TestParams]
@@ -232,7 +232,7 @@ class PanelStackSpec extends TestSpec {
   it should "return null if None when params" in {
     //given
     val top = PanelStackItem[TestParams]("top comp".asInstanceOf[ReactClass])
-    val stack = new PanelStack(isActive = false, List(top), null)
+    val stack = new PanelStack(isActive = false, js.Array(top), null)
     
     //when
     val result = stack.params[TestParams]

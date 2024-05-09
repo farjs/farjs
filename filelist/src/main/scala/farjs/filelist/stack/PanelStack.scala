@@ -5,18 +5,21 @@ import scommons.react._
 import scala.scalajs.js
 
 class PanelStack(val isActive: Boolean,
-                 data: List[PanelStackItem[_]],
-                 updater: js.Function1[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]) {
+                 data: js.Array[PanelStackItem[_]],
+                 updater: js.Function1[js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]], Unit]
+                ) extends js.Object {
 
-  def push[T](item: PanelStackItem[T]): Unit = updater(item :: _)
+  def push[T](item: PanelStackItem[T]): Unit = updater(a => js.Array(item :: a.toList: _*))
 
-  def update[T](f: PanelStackItem[T] => PanelStackItem[T]): Unit =
+  def update[T](f: js.Function1[PanelStackItem[T], PanelStackItem[T]]): Unit =
     updater { stack =>
       if (stack.isEmpty) stack
-      else f(stack.head.asInstanceOf[PanelStackItem[T]]) :: stack.tail
+      else {
+        js.Array(f(stack.head.asInstanceOf[PanelStackItem[T]]) :: stack.tail.toList: _*)
+      }
     }
 
-  def updateFor[T](component: ReactClass)(f: PanelStackItem[T] => PanelStackItem[T]): Unit =
+  def updateFor[T](component: ReactClass)(f: js.Function1[PanelStackItem[T], PanelStackItem[T]]): Unit =
     updater { stack =>
       stack.collect {
         case item if item.component == component =>
@@ -27,13 +30,13 @@ class PanelStack(val isActive: Boolean,
 
   def pop(): Unit =
     updater {
-      case _ :: tail if tail.nonEmpty => tail
+      case a if a.length > 1 => js.Array(a.tail.toList: _*)
       case stack => stack
     }
 
   def clear(): Unit =
     updater {
-      case _ :: tail if tail.nonEmpty => tail.last :: Nil
+      case a if a.length > 1 => js.Array(a.last)
       case stack => stack
     }
 

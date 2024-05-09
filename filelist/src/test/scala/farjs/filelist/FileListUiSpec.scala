@@ -24,10 +24,10 @@ class FileListUiSpec extends TestSpec with TestRendererUtils {
     val state = FileListState()
     val onClose: js.Function0[Unit] = mockFunction[Unit]
     val props = FileListPluginUiProps(dispatch, onClose)
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("otherComp".asInstanceOf[ReactClass])
     ), null)
     val fileListUi = new FileListUi(FileListUiData(data = Some(FileListData(dispatch, actions, state))))

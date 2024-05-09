@@ -85,11 +85,11 @@ class ViewerPluginSpec extends AsyncTestSpec {
       FileListItem.up,
       FileListItem("item 1")
     )))
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
@@ -105,11 +105,11 @@ class ViewerPluginSpec extends AsyncTestSpec {
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
@@ -126,11 +126,11 @@ class ViewerPluginSpec extends AsyncTestSpec {
     val actions = new MockFileListActions
     val item = FileListItem("item 1")
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(item)))
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
@@ -154,11 +154,11 @@ class ViewerPluginSpec extends AsyncTestSpec {
     val actions = new MockFileListActions
     val item = FileListItem("item 1")
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(item)))
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
@@ -179,11 +179,11 @@ class ViewerPluginSpec extends AsyncTestSpec {
     val actions = new MockFileListActions
     val item = FileListItem("item 1")
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(item)))
-    val leftStack = new PanelStack(isActive = false, List(
+    val leftStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
-    val rightStack = new PanelStack(isActive = true, List(
+    val rightStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
@@ -204,11 +204,11 @@ class ViewerPluginSpec extends AsyncTestSpec {
     val actions = new MockFileListActions
     val item = FileListItem("item 1")
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(item)))
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
 
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
@@ -228,11 +228,11 @@ class ViewerPluginSpec extends AsyncTestSpec {
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1", isDir = true)
     )))
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)

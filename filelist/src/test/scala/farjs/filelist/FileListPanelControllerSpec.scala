@@ -22,12 +22,12 @@ class FileListPanelControllerSpec extends TestSpec with TestRendererUtils with O
     val state = FileListState()
     state.isActive shouldBe false
     
-    var stackState = List[PanelStackItem[FileListState]](
+    var stackState = js.Array[PanelStackItem[_]](
       new PanelStackItem[FileListState]("fsPanel".asInstanceOf[ReactClass], dispatch, actions, state)
     )
     val stack = new PanelStack(isActive = true, stackState, { f =>
-      stackState = f(stackState).asInstanceOf[List[PanelStackItem[FileListState]]]
-    }: js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]] => Unit)
+      stackState = f(stackState)
+    }: js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]] => Unit)
 
     //when & then
     val renderer = createTestRenderer(
@@ -46,7 +46,7 @@ class FileListPanelControllerSpec extends TestSpec with TestRendererUtils with O
       resActions shouldBe actions
       assertFileListState(resState.toOption.value.asInstanceOf[FileListState], FileListState.copy(state)(isActive = true))
     }
-    val updaterMock = mockFunction[js.Function1[List[PanelStackItem[_]], List[PanelStackItem[_]]], Unit]
+    val updaterMock = mockFunction[js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]], Unit]
     updaterMock.expects(*).never()
     
     //when & then

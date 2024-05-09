@@ -34,11 +34,11 @@ class CopyMovePluginSpec extends AsyncTestSpec {
       FileListItem.up,
       FileListItem("item 1")
     )))
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
 
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
@@ -62,11 +62,11 @@ class CopyMovePluginSpec extends AsyncTestSpec {
       FileListCapability.copyInplace,
       FileListCapability.moveInplace
     )))
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("otherComp".asInstanceOf[ReactClass], dispatch, actions, "otherState")
     ), updater = null)
 
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("otherComp".asInstanceOf[ReactClass], dispatch, actions, "otherState")
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
@@ -93,11 +93,11 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
 
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
@@ -113,11 +113,11 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val leftState = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
 
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("otherComp".asInstanceOf[ReactClass])
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
@@ -135,11 +135,11 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
 
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
@@ -158,11 +158,11 @@ class CopyMovePluginSpec extends AsyncTestSpec {
       FileListItem.up,
       FileListItem("item 1")
     )), selectedNames = js.Set("item 1"))
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
 
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
     val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)

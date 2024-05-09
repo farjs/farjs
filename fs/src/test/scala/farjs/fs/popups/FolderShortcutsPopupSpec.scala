@@ -36,10 +36,10 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     //given
     val onChangeDir = mockFunction[String, Unit]
     val props = getFolderShortcutsPopupProps(onChangeDir = onChangeDir)
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val shortcutsService = new ShortcutsService
@@ -67,10 +67,10 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     //given
     val onChangeDir = mockFunction[String, Unit]
     val props = getFolderShortcutsPopupProps(onChangeDir = onChangeDir)
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val shortcutsService = new ShortcutsService
@@ -98,10 +98,10 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     //given
     val onChangeDir = mockFunction[String, Unit]
     val props = getFolderShortcutsPopupProps(onChangeDir = onChangeDir)
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val shortcutsService = new ShortcutsService
@@ -156,10 +156,10 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
   it should "set item to <none> when onKeypress(-)" in {
     //given
     val props = getFolderShortcutsPopupProps()
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val shortcutsService = new ShortcutsService
@@ -190,11 +190,11 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     //given
     val props = getFolderShortcutsPopupProps()
     val currState = FileListState(currDir = FileListDir("/test", isRoot = false, js.Array()))
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("otherComp".asInstanceOf[ReactClass]),
       PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, currState)
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val shortcutsService = new ShortcutsService
@@ -225,10 +225,10 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
   it should "return false if unknown key when onKeypress" in {
     //given
     val props = getFolderShortcutsPopupProps()
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val shortcutsService = new ShortcutsService
@@ -251,10 +251,10 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
   it should "render popup" in {
     //given
     val props = getFolderShortcutsPopupProps()
-    val leftStack = new PanelStack(isActive = true, List(
+    val leftStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
-    val rightStack = new PanelStack(isActive = false, List(
+    val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), null)
     val shortcutsService = new ShortcutsService

@@ -27,7 +27,7 @@ class SortIndicatorSpec extends TestSpec with TestRendererUtils {
     process.stdin.on("keypress", listener)
 
     val isRight = false
-    val stack = new PanelStack(isActive = true, Nil, null)
+    val stack = new PanelStack(isActive = true, js.Array(), null)
     val props = SortIndicatorProps(FileListSort(SortMode.Name, asc = true))
     val textElem = testRender(withContext(
       withThemeContext(<(SortIndicator())(^.wrapped := props)()), stack = stack, isRight = isRight
@@ -57,7 +57,7 @@ class SortIndicatorSpec extends TestSpec with TestRendererUtils {
     process.stdin.on("keypress", listener)
 
     val isRight = true
-    val stack = new PanelStack(isActive = false, Nil, null)
+    val stack = new PanelStack(isActive = false, js.Array(), null)
     val props = SortIndicatorProps(FileListSort(SortMode.Name, asc = true))
     val textElem = testRender(withContext(
       withThemeContext(<(SortIndicator())(^.wrapped := props)()), stack = stack, isRight = isRight
@@ -75,7 +75,7 @@ class SortIndicatorSpec extends TestSpec with TestRendererUtils {
 
   it should "render component" in {
     //given
-    val stack = new PanelStack(isActive = true, Nil, null)
+    val stack = new PanelStack(isActive = true, js.Array(), null)
     val props = SortIndicatorProps(FileListSort(SortMode.Name, asc = true))
 
     //when

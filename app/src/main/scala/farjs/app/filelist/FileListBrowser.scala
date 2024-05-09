@@ -36,10 +36,10 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     val (isRightActive, setIsRightActive) = useState(props.isRightInitiallyActive)
     val (currPluginUi, setCurrPluginUi) = useState(Option.empty[ReactClass])
     
-    val (leftStackData, setLeftStackData) = useStateUpdater(() => List[PanelStackItem[_]](
+    val (leftStackData, setLeftStackData) = useStateUpdater(() => js.Array[PanelStackItem[_]](
       PanelStackItem[FileListState](fsPlugin.component)
     ))
-    val (rightStackData, setRightStackData) = useStateUpdater(() => List[PanelStackItem[_]](
+    val (rightStackData, setRightStackData) = useStateUpdater(() => js.Array[PanelStackItem[_]](
       PanelStackItem[FileListState](fsPlugin.component)
     ))
     val leftStack = new PanelStack(!isRightActive, leftStackData, setLeftStackData)

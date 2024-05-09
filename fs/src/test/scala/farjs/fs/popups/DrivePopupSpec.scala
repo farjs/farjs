@@ -53,12 +53,12 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )))
 
     val currState = FileListState(currDir = FileListDir("C:/test", isRoot = false, js.Array()))
-    val currStack = new PanelStack(isActive = true, List(
+    val currStack = new PanelStack(isActive = true, js.Array[PanelStackItem[_]](
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch: js.Function1[js.Any, Unit], js.undefined, currState)
     ), updater = null)
 
     val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, js.Array()))
-    val otherStack = new PanelStack(isActive = false, List(
+    val otherStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, otherState)
     ), updater = null)
 
@@ -111,12 +111,12 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )))
 
     val currState = FileListState(currDir = FileListDir("/test2", isRoot = false, js.Array()))
-    val currStack = new PanelStack(isActive = true, List(
+    val currStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch: js.Function1[js.Any, Unit], js.undefined, currState)
     ), updater = null)
 
     val otherState = FileListState(currDir = FileListDir("C:/test", isRoot = false, js.Array()))
-    val otherStack = new PanelStack(isActive = false, List(
+    val otherStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, otherState)
     ), updater = null)
 
@@ -169,12 +169,12 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )))
 
     val currState = FileListState(currDir = FileListDir("/test", isRoot = false, js.Array()))
-    val currStack = new PanelStack(isActive = true, List(
+    val currStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch: js.Function1[js.Any, Unit], js.undefined, currState)
     ), updater = null)
 
     val otherState = FileListState(currDir = FileListDir("/test2", isRoot = false, js.Array()))
-    val otherStack = new PanelStack(isActive = false, List(
+    val otherStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, otherState)
     ), updater = null)
 
@@ -335,8 +335,8 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   private def withContext(element: ReactElement,
                           panelInput: BlessedElement = null,
-                          leftStack: PanelStack = new PanelStack(isActive = true, Nil, null),
-                          rightStack: PanelStack = new PanelStack(isActive = false, Nil, null)
+                          leftStack: PanelStack = new PanelStack(isActive = true, js.Array(), null),
+                          rightStack: PanelStack = new PanelStack(isActive = false, js.Array(), null)
                          ): ReactElement = {
 
     WithPanelStacksSpec.withContext(element, leftStack, rightStack, panelInput)

@@ -19,7 +19,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     val panelStack = PanelStackProps(
       isRight = false,
       panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
-      stack = new PanelStack(isActive = true, List(
+      stack = new PanelStack(isActive = true, js.Array(
         PanelStackItem("quickViewComp".asInstanceOf[ReactClass], dispatch)
       ), null)
     )
@@ -55,7 +55,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     val panelStack = PanelStackProps(
       isRight = true,
       panelInput = js.Dynamic.literal("emit" -> emitMock).asInstanceOf[BlessedElement],
-      stack = new PanelStack(isActive = true, List(
+      stack = new PanelStack(isActive = true, js.Array(
         PanelStackItem("quickViewComp".asInstanceOf[ReactClass], dispatch)
       ), null)
     )
@@ -81,7 +81,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     val panelStack = PanelStackProps(
       isRight = false,
       panelInput = js.Dynamic.literal("emit" -> emitMock).asInstanceOf[BlessedElement],
-      stack = new PanelStack(isActive = true, List(
+      stack = new PanelStack(isActive = true, js.Array(
         PanelStackItem("quickViewComp".asInstanceOf[ReactClass], dispatch)
       ), null)
     )
@@ -106,7 +106,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     val panelStack = PanelStackProps(
       isRight = false,
       panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
-      stack = new PanelStack(isActive = true, List(
+      stack = new PanelStack(isActive = true, js.Array(
         PanelStackItem("quickViewComp".asInstanceOf[ReactClass], dispatch)
       ), null)
     )
@@ -124,7 +124,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     val panelStack = PanelStackProps(
       isRight = false,
       panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
-      stack = new PanelStack(isActive = true, List(
+      stack = new PanelStack(isActive = true, js.Array(
         PanelStackItem("quickViewComp".asInstanceOf[ReactClass], dispatch)
       ), null)
     )
