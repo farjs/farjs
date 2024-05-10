@@ -48,7 +48,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
   it should "dispatch error task if failed to open file when mount" in {
     //given
     val fs = new FSMocks
-    ViewerFileReader.fs = fs.fs
+    ViewerController.fs = fs.fs
     val inputRef = ReactRef.create[BlessedElement]
     val dispatch = mockFunction[js.Any, Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None)
@@ -83,7 +83,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
   it should "open/close file and use default viewport params if no history when mount/unmount" in {
     //given
     val fs = new FSMocks
-    ViewerFileReader.fs = fs.fs
+    ViewerController.fs = fs.fs
     val inputRef = ReactRef.create[BlessedElement]
     val dispatch = mockFunction[js.Any, Unit]
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
@@ -135,7 +135,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
   it should "open/close file and use viewport params from history when mount/unmount" in {
     //given
     val fs = new FSMocks
-    ViewerFileReader.fs = fs.fs
+    ViewerController.fs = fs.fs
     val inputRef = ReactRef.create[BlessedElement]
     val dispatch = mockFunction[js.Any, Unit]
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
@@ -203,7 +203,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
   it should "render left and right scroll indicators" in {
     //given
     val fs = new FSMocks
-    ViewerFileReader.fs = fs.fs
+    ViewerController.fs = fs.fs
     val inputRef = ReactRef.create[BlessedElement]
     val dispatch = mockFunction[js.Any, Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None)
