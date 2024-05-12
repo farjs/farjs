@@ -10,7 +10,7 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
 
   //noinspection TypeAnnotation
   class FileReader {
-    val readBytes = mockFunction[Double, Int, Future[Buffer]]
+    val readBytes = mockFunction[Double, Buffer, Future[Int]]
 
     val fileReader = new MockFileReader(
       readBytesMock = readBytes
@@ -48,10 +48,14 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val lines = 3
 
     //then
-    fileReader.readBytes.expects(3, bufferSize)
-      .returning(Future.successful(Buffer.from("t file\ncontent\n", encoding)))
-    fileReader.readBytes.expects(0, 3)
-      .returning(Future.successful(Buffer.from("tes", encoding)))
+    fileReader.readBytes.expects(3, *).onCall { (_, buf) =>
+      buf.length shouldBe bufferSize
+      writeBuf(buf, "t file\ncontent\n")
+    }
+    fileReader.readBytes.expects(0, *).onCall { (_, buf) =>
+      buf.length shouldBe 3
+      writeBuf(buf, "tes")
+    }
 
     //when
     val resultF = reader.readPrevLines(lines, position, maxPos = 18, encoding)
@@ -74,10 +78,14 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val lines = 3
 
     //then
-    fileReader.readBytes.expects(3, bufferSize)
-      .returning(Future.successful(Buffer.from("st file\ncontent", encoding)))
-    fileReader.readBytes.expects(0, 3)
-      .returning(Future.successful(Buffer.from("\nte", encoding)))
+    fileReader.readBytes.expects(3, *).onCall { (_, buf) =>
+      buf.length shouldBe bufferSize
+      writeBuf(buf, "st file\ncontent")
+    }
+    fileReader.readBytes.expects(0, *).onCall { (_, buf) =>
+      buf.length shouldBe 3
+      writeBuf(buf, "\nte")
+    }
 
     //when
     val resultF = reader.readPrevLines(lines, position, maxPos = 18, encoding)
@@ -100,7 +108,10 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val lines = 3
 
     //then
-    fileReader.readBytes.expects(0, 9).returning(Future.successful(Buffer.from("test\nfile", encoding)))
+    fileReader.readBytes.expects(0, *).onCall { (_, buf) =>
+      buf.length shouldBe 9
+      writeBuf(buf, "test\nfile")
+    }
 
     //when
     val resultF = reader.readPrevLines(lines, position, maxPos = 25, encoding)
@@ -122,7 +133,10 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val lines = 2
 
     //then
-    fileReader.readBytes.expects(0, 1).returning(Future.successful(Buffer.from("\n", encoding)))
+    fileReader.readBytes.expects(0, *).onCall { (_, buf) =>
+      buf.length shouldBe 1
+      writeBuf(buf, "\n")
+    }
 
     //when
     val resultF = reader.readPrevLines(lines, position, maxPos = 18, encoding)
@@ -143,8 +157,10 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val lines = 3
 
     //then
-    fileReader.readBytes.expects(0, bufferSize)
-      .returning(Future.successful(Buffer.from("testfilecontent", encoding)))
+    fileReader.readBytes.expects(0, *).onCall { (_, buf) =>
+      buf.length shouldBe bufferSize
+      writeBuf(buf, "testfilecontent")
+    }
 
     //when
     val resultF = reader.readPrevLines(lines, position, maxPos = 15, encoding)
@@ -158,17 +174,21 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     }
   }
 
-  it should "read file content when readNextLines" in {
+  it should "read file content with new lines when readNextLines" in {
     //given
     val fileReader = new FileReader
     val reader = new ViewerFileReader(fileReader.fileReader, bufferSize, maxLineLength)
     val lines = 3
 
     //then
-    fileReader.readBytes.expects(0, bufferSize)
-      .returning(Future.successful(Buffer.from("\ntest file\ncon", encoding)))
-    fileReader.readBytes.expects(14, bufferSize)
-      .returning(Future.successful(Buffer.from("tent\n", encoding)))
+    fileReader.readBytes.expects(0, *).onCall { (_, buf) =>
+      buf.length shouldBe bufferSize
+      writeBuf(buf, "\ntest file")
+    }
+    fileReader.readBytes.expects(10, *).onCall { (_, buf) =>
+      buf.length shouldBe bufferSize
+      writeBuf(buf, "\ncontent\n")
+    }
 
     //when
     val resultF = reader.readNextLines(lines, 0, encoding)
@@ -183,6 +203,38 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     }
   }
 
+  it should "read file content without new lines when readNextLines" in {
+    //given
+    val fileReader = new FileReader
+    val reader = new ViewerFileReader(fileReader.fileReader, bufferSize, maxLineLength)
+    val lines = 3
+
+    //then
+    fileReader.readBytes.expects(0, *).onCall { (_, buf) =>
+      buf.length shouldBe bufferSize
+      writeBuf(buf, "test fi")
+    }
+    fileReader.readBytes.expects(7, *).onCall { (_, buf) =>
+      buf.length shouldBe bufferSize
+      writeBuf(buf, "le\ncontent")
+    }
+    fileReader.readBytes.expects(17, *).onCall { (_, buf) =>
+      buf.length shouldBe bufferSize
+      writeBuf(buf, "")
+    }
+
+    //when
+    val resultF = reader.readNextLines(lines, 0, encoding)
+    
+    //then
+    resultF.map { linesData =>
+      linesData shouldBe List(
+        "test file" -> 10,
+        "content" -> 7
+      )
+    }
+  }
+
   it should "read long lines when readNextLines" in {
     //given
     val fileReader = new FileReader
@@ -190,10 +242,14 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val lines = 3
 
     //then
-    fileReader.readBytes.expects(0, bufferSize)
-      .returning(Future.successful(Buffer.from("testfilecontent", encoding)))
-    fileReader.readBytes.expects(15, bufferSize)
-      .returning(Future.successful(Buffer.from("", encoding)))
+    fileReader.readBytes.expects(0, *).onCall { (_, buf) =>
+      buf.length shouldBe bufferSize
+      writeBuf(buf, "testfilecontent")
+    }
+    fileReader.readBytes.expects(15, *).onCall { (_, buf) =>
+      buf.length shouldBe bufferSize
+      writeBuf(buf, "")
+    }
 
     //when
     val resultF = reader.readNextLines(lines, 0, encoding)
@@ -205,5 +261,10 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
         "ntent" -> 5
       )
     }
+  }
+  
+  private def writeBuf(buf: Buffer, content: String): Future[Int] = {
+    buf.write(content, 0, content.length, encoding)
+    Future.successful(content.length)
   }
 }

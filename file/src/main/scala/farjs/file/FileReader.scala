@@ -23,11 +23,8 @@ class FileReader(fs: FS) {
     }
   }
 
-  def readBytes(position: Double, size: Int): Future[Buffer] = {
-    val buf = Buffer.allocUnsafe(size)
-    fs.read(fd, buf, offset = 0, length = buf.length, position).map { bytesRead =>
-      buf.subarray(0, bytesRead)
-    }.andThen {
+  def readBytes(position: Double, buf: Buffer): Future[Int] = {
+    fs.read(fd, buf, offset = 0, length = buf.length, position).andThen {
       case Failure(NonFatal(ex)) =>
         Console.err.println(s"Failed to read from file, error: $ex")
     }

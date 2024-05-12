@@ -9,13 +9,13 @@ import scala.concurrent.Future
 class MockFileReader(
   openMock: String => Future[Unit] = _ => ???,
   closeMock: () => Future[Unit] = () => ???,
-  readBytesMock: (Double, Int) => Future[Buffer] = (_, _) => ???,
+  readBytesMock: (Double, Buffer) => Future[Int] = (_, _) => ???,
 ) extends FileReader(fs = null) {
 
   override def open(filePath: String): Future[Unit] = openMock(filePath)
 
   override def close(): Future[Unit] = closeMock()
 
-  override def readBytes(position: Double, size: Int): Future[Buffer] =
-    readBytesMock(position, size)
+  override def readBytes(position: Double, buf: Buffer): Future[Int] =
+    readBytesMock(position, buf)
 }
