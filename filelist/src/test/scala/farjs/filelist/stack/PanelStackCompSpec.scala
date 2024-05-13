@@ -1,8 +1,11 @@
 package farjs.filelist.stack
 
 import farjs.filelist.stack.PanelStackComp._
-import farjs.filelist.stack.PanelStackCompSpec.TestParams
+import farjs.filelist.stack.PanelStackCompSpec._
 import farjs.ui.WithSizeProps
+import org.scalatest.Assertion
+import org.scalatest.Inside.inside
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import scommons.react._
 import scommons.react.blessed.BlessedElement
 import scommons.react.hooks._
@@ -58,13 +61,13 @@ class PanelStackCompSpec extends TestSpec with TestRendererUtils {
 
     //when
     val result = renderWithSize(
-      <(PanelStackComp())(^.wrapped := props)(
+      <(PanelStackComp())(^.plain := props)(
         <(stackComp).empty
       )
     )
 
     //then
-    stackCtx.get() shouldBe props.copy(width = width, height = height)
+    assertPanelStackProps(stackCtx.get(), PanelStackProps.copy(props)(width = width, height = height))
     
     inside(result.children.toList) { case List(resTopComp, resCtxHook) =>
       resTopComp.`type` shouldBe "TopComp"
@@ -112,5 +115,16 @@ object PanelStackCompSpec {
     ))(
       element
     )
+  }
+
+  def assertPanelStackProps(result: PanelStackProps, expected: PanelStackProps): Assertion = {
+    inside(result) {
+      case PanelStackProps(isRight, panelInput, stack, width, height) =>
+        isRight shouldBe expected.isRight
+        panelInput shouldBe expected.panelInput
+        stack shouldBe expected.stack
+        width shouldBe expected.width
+        height shouldBe expected.height
+    }
   }
 }

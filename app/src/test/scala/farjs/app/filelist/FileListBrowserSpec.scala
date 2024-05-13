@@ -66,7 +66,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val leftButton = inside(findComponents(comp, <.button.name)) {
       case List(leftButton, _) => leftButton
     }
-    inside(findProps(comp, panelStackComp)) {
+    inside(findProps(comp, panelStackComp, plain = true)) {
       case List(leftStack, rightStack) =>
         leftStack.isRight shouldBe false
         leftStack.stack.isActive shouldBe true
@@ -78,7 +78,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     leftButton.props.onFocus()
 
     //then
-    inside(findProps(comp, panelStackComp)) {
+    inside(findProps(comp, panelStackComp, plain = true)) {
       case List(leftStack, rightStack) =>
         leftStack.isRight shouldBe false
         leftStack.stack.isActive shouldBe true
@@ -105,7 +105,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val leftButton = inside(findComponents(comp, <.button.name)) {
       case List(leftButton, _) => leftButton
     }
-    inside(findProps(comp, panelStackComp)) {
+    inside(findProps(comp, panelStackComp, plain = true)) {
       case List(leftStack, rightStack) =>
         leftStack.isRight shouldBe false
         leftStack.stack.isActive shouldBe false
@@ -117,7 +117,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     leftButton.props.onFocus()
     
     //then
-    inside(findProps(comp, panelStackComp)) {
+    inside(findProps(comp, panelStackComp, plain = true)) {
       case List(leftStack, rightStack) =>
         leftStack.isRight shouldBe false
         leftStack.stack.isActive shouldBe true
@@ -144,7 +144,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val rightButton = inside(findComponents(comp, <.button.name)) {
       case List(_, rightButton) => rightButton
     }
-    inside(findProps(comp, panelStackComp)) {
+    inside(findProps(comp, panelStackComp, plain = true)) {
       case List(leftStack, rightStack) =>
         leftStack.isRight shouldBe false
         leftStack.stack.isActive shouldBe true
@@ -156,7 +156,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     rightButton.props.onFocus()
     
     //then
-    inside(findProps(comp, panelStackComp)) {
+    inside(findProps(comp, panelStackComp, plain = true)) {
       case List(leftStack, rightStack) =>
         leftStack.isRight shouldBe false
         leftStack.stack.isActive shouldBe false
@@ -218,7 +218,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val button = inside(findComponents(comp, <.button.name)) {
       case List(button, _) => button
     }
-    inside(findProps(comp, panelStackComp)) {
+    inside(findProps(comp, panelStackComp, plain = true)) {
       case List(leftStack, rightStack) =>
         leftStack.isRight shouldBe false
         leftStack.stack.isActive shouldBe true
@@ -234,7 +234,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     button.props.onKeypress(screen, literal(full = keyFull).asInstanceOf[KeyboardKey])
 
     //then
-    inside(findProps(comp, panelStackComp)) {
+    inside(findProps(comp, panelStackComp, plain = true)) {
       case List(leftStack, rightStack) =>
         leftStack.isRight shouldBe false
         leftStack.stack.isActive shouldBe false
@@ -637,7 +637,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         ^.rbWidth := "50%",
         ^.rbHeight := "100%-1"
       )(
-        <(panelStackComp())(^.assertWrapped(inside(_) {
+        <(panelStackComp())(^.assertPlain[PanelStackProps](inside(_) {
           case PanelStackProps(isRight, _, stack, _, _) =>
             isRight shouldBe false
             stack.isActive shouldBe false
@@ -649,7 +649,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
         ^.rbHeight := "100%-1",
         ^.rbLeft := "50%"
       )(
-        <(panelStackComp())(^.assertWrapped(inside(_) {
+        <(panelStackComp())(^.assertPlain[PanelStackProps](inside(_) {
           case PanelStackProps(isRight, _, stack, _, _) =>
             isRight shouldBe true
             stack.isActive shouldBe true

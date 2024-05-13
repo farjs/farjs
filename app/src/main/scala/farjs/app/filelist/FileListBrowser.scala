@@ -120,7 +120,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         ^.rbOnFocus := onActivate(isRight),
         ^.rbOnKeypress := onKeypress
       )(
-        <(panelStackComp())(^.wrapped := PanelStackProps(
+        <(panelStackComp())(^.plain := PanelStackProps(
           isRight = false,
           panelInput = leftButtonRef.current,
           stack = getStack(isRight)
@@ -136,7 +136,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         ^.rbOnFocus := onActivate(!isRight),
         ^.rbOnKeypress := onKeypress
       )(
-        <(panelStackComp())(^.wrapped := PanelStackProps(
+        <(panelStackComp())(^.plain := PanelStackProps(
           isRight = true,
           panelInput = rightButtonRef.current,
           stack = getStack(!isRight)
