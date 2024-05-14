@@ -1,7 +1,6 @@
 package farjs.filelist.stack
 
 import scommons.react._
-import scommons.react.blessed.BlessedElement
 import scommons.react.hooks._
 import scommons.react.test._
 
@@ -47,10 +46,8 @@ class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
     val updater: js.Function1[js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]], Unit] = { _ =>
     }
     val props = WithPanelStacksProps(
-      new PanelStack(isActive = true, js.Array(), updater),
-      null,
-      new PanelStack(isActive = false, js.Array(), updater),
-      null
+      PanelStackData(new PanelStack(isActive = true, js.Array(), updater), null),
+      PanelStackData(new PanelStack(isActive = false, js.Array(), updater), null)
     )
 
     //when
@@ -83,16 +80,12 @@ class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
 object WithPanelStacksSpec {
 
   def withContext(element: ReactElement,
-                  leftStack: PanelStack,
-                  rightStack: PanelStack,
-                  leftInput: BlessedElement = null,
-                  rightInput: BlessedElement = null): ReactElement = {
+                  left: PanelStackData,
+                  right: PanelStackData): ReactElement = {
 
     <(WithPanelStacks.Context.Provider)(^.contextValue := WithPanelStacksProps(
-      leftStack = leftStack,
-      leftInput = leftInput,
-      rightStack = rightStack,
-      rightInput = rightInput
+      left = left,
+      right = right
     ))(
       element
     )

@@ -92,7 +92,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
     ViewerPlugin.onKeyTrigger("f3", stacks).map(_ shouldBe None)
@@ -112,7 +112,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
     ViewerPlugin.onKeyTrigger("f3", stacks).map(_ shouldBe None)
@@ -133,7 +133,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
     val filePath = path.join(leftState.currDir.path, item.name)
 
     //then
@@ -161,7 +161,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
     val filePath = path.join(leftState.currDir.path, item.name)
 
     //then
@@ -186,7 +186,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
     val filePath = path.join(leftState.currDir.path, item.name)
     
     //then
@@ -211,7 +211,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, leftState)
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
     val filePath = path.join(leftState.currDir.path, item.name)
 
     //then
@@ -235,7 +235,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
     ViewerPlugin.onKeyTrigger("f3", stacks).map(_ should not be None)

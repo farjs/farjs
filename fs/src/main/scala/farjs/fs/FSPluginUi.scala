@@ -32,8 +32,8 @@ class FSPluginUi(val showDrivePopupOnLeft: Option[Boolean] = None,
 
     def onChangeDir(isLeft: Boolean)(dir: String): Unit = {
       val currStack =
-        if (isLeft) stacks.leftStack
-        else stacks.rightStack
+        if (isLeft) stacks.left.stack
+        else stacks.right.stack
 
       if (currStack.peek != currStack.peekLast) {
         currStack.clear()
@@ -52,7 +52,7 @@ class FSPluginUi(val showDrivePopupOnLeft: Option[Boolean] = None,
     }
     
     val onChangeDirInActivePanel: String => Unit =
-      onChangeDir(stacks.leftStack.isActive)
+      onChangeDir(stacks.left.stack.isActive)
 
     <.>()(
       <(drive())(^.wrapped := DriveControllerProps(

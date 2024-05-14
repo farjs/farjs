@@ -32,7 +32,7 @@ class FileListUiPluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       new PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
     Future.sequence(Seq(

@@ -119,10 +119,8 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
       })(
         element
       ),
-      leftStack = leftPanelStack.stack,
-      rightStack = rightPanelStack.stack,
-      leftInput = leftPanelStack.panelInput,
-      rightInput = rightPanelStack.panelInput
+      left = PanelStackData(leftPanelStack.stack, leftPanelStack.panelInput),
+      right = PanelStackData(rightPanelStack.stack, rightPanelStack.panelInput)
     )
   }
   

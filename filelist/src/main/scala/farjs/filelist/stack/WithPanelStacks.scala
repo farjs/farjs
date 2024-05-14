@@ -1,23 +1,22 @@
 package farjs.filelist.stack
 
 import scommons.react._
-import scommons.react.blessed.BlessedElement
 import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class WithPanelStacksProps(leftStack: PanelStack,
-                                leftInput: BlessedElement,
-                                rightStack: PanelStack,
-                                rightInput: BlessedElement) {
-  
-  def activeStack: PanelStack =
-    if (leftStack.isActive) leftStack
-    else rightStack
+case class WithPanelStacksProps(left: PanelStackData,
+                                right: PanelStackData)
 
-  def activeInput: BlessedElement =
-    if (leftStack.isActive) leftInput
-    else rightInput
+object WithPanelStacksProps {
+
+  def active(stacks: WithPanelStacksProps): PanelStackData =
+    if (stacks.left.stack.isActive) stacks.left
+    else stacks.right
+
+  def nonActive(stacks: WithPanelStacksProps): PanelStackData =
+    if (!stacks.left.stack.isActive) stacks.left
+    else stacks.right
 }
 
 object WithPanelStacks extends FunctionComponent[WithPanelStacksProps] {

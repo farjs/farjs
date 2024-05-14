@@ -19,10 +19,10 @@ object CopyMovePlugin extends FileListPlugin {
                             data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
     
     val (maybeFrom, maybeTo, toInput) =
-      if (stacks.leftStack.isActive) {
-        (getData(stacks.leftStack), getData(stacks.rightStack), stacks.rightInput)
+      if (stacks.left.stack.isActive) {
+        (getData(stacks.left.stack), getData(stacks.right.stack), stacks.right.input)
       }
-      else (getData(stacks.rightStack), getData(stacks.leftStack), stacks.leftInput)
+      else (getData(stacks.right.stack), getData(stacks.left.stack), stacks.left.input)
 
     val res = key match {
       case "f5" | "f6" =>

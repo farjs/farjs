@@ -718,10 +718,8 @@ object ZipPanelSpec {
 
   def withContext(element: ReactElement, leftStack: PanelStack, rightStack: PanelStack): ReactElement = {
     <(WithPanelStacks.Context.Provider)(^.contextValue := WithPanelStacksProps(
-      leftStack = leftStack,
-      leftInput = null,
-      rightStack = rightStack,
-      rightInput = null
+      left = PanelStackData(leftStack, null),
+      right = PanelStackData(rightStack, null)
     ))(
       withThemeContext(element)
     )

@@ -34,8 +34,8 @@ object DrivePopup extends FunctionComponent[DrivePopupProps] {
     val data = getData(platform, disks)
 
     val (panelInput, currStack, otherStack) =
-      if (props.showOnLeft) (stacks.leftInput, stacks.leftStack, stacks.rightStack)
-      else (stacks.rightInput, stacks.rightStack, stacks.leftStack)
+      if (props.showOnLeft) (stacks.left.input, stacks.left.stack, stacks.right.stack)
+      else (stacks.right.input, stacks.right.stack, stacks.left.stack)
     
     def onAction(dir: String): Unit = {
       val targetDir =

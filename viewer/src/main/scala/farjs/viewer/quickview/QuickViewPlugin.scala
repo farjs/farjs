@@ -17,21 +17,18 @@ object QuickViewPlugin extends FileListPlugin {
                             stacks: WithPanelStacksProps,
                             data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
     val exists =
-      if (stacks.leftStack.peek.component == panelComp) {
-        stacks.leftStack.pop()
+      if (stacks.left.stack.peek.component == panelComp) {
+        stacks.left.stack.pop()
         true
       }
-      else if (stacks.rightStack.peek.component == panelComp) {
-        stacks.rightStack.pop()
+      else if (stacks.right.stack.peek.component == panelComp) {
+        stacks.right.stack.pop()
         true
       }
       else false
     
     if (!exists) {
-      val stack =
-        if (stacks.leftStack.isActive) stacks.rightStack
-        else stacks.leftStack
-
+      val stack = WithPanelStacksProps.nonActive(stacks).stack
       stack.push(PanelStackItem[QuickViewParams](
         component = panelComp,
         dispatch = js.undefined,

@@ -30,8 +30,8 @@ object MenuController extends FunctionComponent[FileListUiData] {
       )
       action._2 match {
         case None => process.stdin.emit("keypress", js.undefined, data)
-        case Some(false) => stacks.leftInput.emit("keypress", js.undefined, data)
-        case Some(true) => stacks.rightInput.emit("keypress", js.undefined, data)
+        case Some(false) => stacks.left.input.emit("keypress", js.undefined, data)
+        case Some(true) => stacks.right.input.emit("keypress", js.undefined, data)
       }
     }
     

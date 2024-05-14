@@ -339,7 +339,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
                           rightStack: PanelStack = new PanelStack(isActive = false, js.Array(), null)
                          ): ReactElement = {
 
-    WithPanelStacksSpec.withContext(element, leftStack, rightStack, panelInput)
+    WithPanelStacksSpec.withContext(element, PanelStackData(leftStack, panelInput), PanelStackData(rightStack, null))
   }
 
   private def assertDrivePopup(result: TestInstance,

@@ -67,10 +67,8 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     }
     
     val stacks = WithPanelStacksProps(
-      leftStack = getStack(isRight),
-      leftInput = leftButtonRef.current,
-      rightStack = getStack(!isRight),
-      rightInput = rightButtonRef.current
+      left = PanelStackData(getStack(isRight), leftButtonRef.current),
+      right = PanelStackData(getStack(!isRight), rightButtonRef.current)
     )
     val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (_, key) =>
       def screen = leftButtonRef.current.screen

@@ -40,7 +40,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
     ArchiverPlugin.onKeyTrigger("", stacks).map(_ shouldBe None)
@@ -60,7 +60,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
     ArchiverPlugin.onKeyTrigger("", stacks).map(_ shouldBe None)
@@ -80,7 +80,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
     ArchiverPlugin.onKeyTrigger("", stacks).map(_ should not be None)
@@ -101,7 +101,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
     ArchiverPlugin.onKeyTrigger("", stacks).map(_ should not be None)

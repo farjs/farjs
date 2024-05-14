@@ -1,7 +1,7 @@
 package farjs.fs.popups
 
 import farjs.filelist.FileListState
-import farjs.filelist.stack.WithPanelStacks
+import farjs.filelist.stack.{WithPanelStacks, WithPanelStacksProps}
 import farjs.fs.FSServices
 import farjs.ui.popup._
 import scommons.react._
@@ -42,7 +42,7 @@ object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps]
             setItems(maybeItems.map(items => items.updated(selected, None)))
           }
         case "+" =>
-          val stackItem = stacks.activeStack.peekLast[FileListState]
+          val stackItem = WithPanelStacksProps.active(stacks).stack.peekLast[FileListState]
           stackItem.state.foreach { state =>
             val dir = state.currDir.path
             services.folderShortcuts.save(selected, dir).foreach { _ =>

@@ -35,9 +35,9 @@ object ViewerPlugin extends FileListPlugin {
     }
     else {
       val stack = key match {
-        case `onViewerOpenLeft` => stacks.leftStack
-        case `onViewerOpenRight` => stacks.rightStack
-        case _ => stacks.activeStack
+        case `onViewerOpenLeft` => stacks.left.stack
+        case `onViewerOpenRight` => stacks.right.stack
+        case _ => WithPanelStacksProps.active(stacks).stack
       }
       val stackItem = stack.peek[FileListState]
       stackItem.getData.toOption.flatMap { data =>

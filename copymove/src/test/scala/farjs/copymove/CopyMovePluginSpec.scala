@@ -41,7 +41,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
     Future.sequence(Seq(
@@ -69,7 +69,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("otherComp".asInstanceOf[ReactClass], dispatch, actions, "otherState")
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
     Future.sequence(Seq(
@@ -100,7 +100,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
     CopyMovePlugin.onKeyTrigger("unknown", stacks).map(_ shouldBe None)
@@ -120,7 +120,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("otherComp".asInstanceOf[ReactClass])
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
     CopyMovePlugin.onKeyTrigger("S-f5", stacks).map(_ should not be None)
@@ -142,7 +142,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
     CopyMovePlugin.onKeyTrigger("f5", stacks).map(_ should not be None)
@@ -165,7 +165,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], dispatch, actions, state)
     ), updater = null)
-    val stacks = WithPanelStacksProps(leftStack, null, rightStack, null)
+    val stacks = WithPanelStacksProps(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
     CopyMovePlugin.onKeyTrigger("f6", stacks).map(_ should not be None)
