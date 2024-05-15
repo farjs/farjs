@@ -5,7 +5,7 @@ import farjs.archiver.zip.ZipPanel._
 import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.stack.{WithPanelStacks, WithPanelStacksProps}
+import farjs.filelist.stack.{WithPanelStacks, PanelStacks}
 import farjs.ui.Dispatch
 import farjs.ui.popup.{MessageBox, MessageBoxAction, MessageBoxProps}
 import farjs.ui.task.{Task, TaskAction}
@@ -35,7 +35,7 @@ class ZipPanel(zipPath: String,
     
     def onClosePanel(): Unit = {
       val stackData = {
-        val stackItem = WithPanelStacksProps.active(stacks).stack.peekLast[FileListState]
+        val stackItem = PanelStacks.active(stacks).stack.peekLast[FileListState]
         stackItem.getData
       }
       stackData.foreach { case FileListData(dispatch, actions, state) =>
@@ -84,7 +84,7 @@ class ZipPanel(zipPath: String,
           if (props.state.currDir.path != rootPath) setShowWarning(true)
           else {
             val stackData = {
-              val stackItem = WithPanelStacksProps.active(stacks).stack.peek[FileListState]
+              val stackItem = PanelStacks.active(stacks).stack.peek[FileListState]
               stackItem.getData
             }
             stackData.foreach { case FileListData(dispatch, actions, state) =>

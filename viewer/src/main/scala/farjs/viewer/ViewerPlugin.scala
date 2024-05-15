@@ -4,7 +4,7 @@ import farjs.file.FileEvent.onFileView
 import farjs.file.FileViewHistory
 import farjs.filelist._
 import farjs.filelist.api.FileListItem
-import farjs.filelist.stack.WithPanelStacksProps
+import farjs.filelist.stack.PanelStacks
 import farjs.viewer.ViewerEvent._
 import scommons.nodejs._
 import scommons.react._
@@ -22,7 +22,7 @@ object ViewerPlugin extends FileListPlugin {
   )
 
   override def onKeyTrigger(key: String,
-                            stacks: WithPanelStacksProps,
+                            stacks: PanelStacks,
                             data: js.UndefOr[js.Dynamic] = js.undefined
                            ): Future[Option[ReactClass]] = Future {
     
@@ -37,7 +37,7 @@ object ViewerPlugin extends FileListPlugin {
       val stack = key match {
         case `onViewerOpenLeft` => stacks.left.stack
         case `onViewerOpenRight` => stacks.right.stack
-        case _ => WithPanelStacksProps.active(stacks).stack
+        case _ => PanelStacks.active(stacks).stack
       }
       val stackItem = stack.peek[FileListState]
       stackItem.getData.toOption.flatMap { data =>

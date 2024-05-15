@@ -12,7 +12,7 @@ object FilePlugin extends FileListPlugin {
   override val triggerKeys: js.Array[String] = js.Array("M-v")
 
   override def onKeyTrigger(key: String,
-                            stacks: WithPanelStacksProps,
+                            stacks: PanelStacks,
                             data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
 
     Future.successful(createUi(key).map(_.apply()))

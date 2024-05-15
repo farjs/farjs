@@ -1,7 +1,7 @@
 package farjs.filelist
 
 import farjs.filelist.api.{FileListCapability, FileListItem}
-import farjs.filelist.stack.WithPanelStacksProps
+import farjs.filelist.stack.PanelStacks
 import scommons.react.ReactClass
 
 import scala.concurrent.Future
@@ -14,10 +14,10 @@ object FileListUiPlugin extends FileListPlugin {
   )
 
   override def onKeyTrigger(key: String,
-                            stacks: WithPanelStacksProps,
+                            stacks: PanelStacks,
                             data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
     val maybeCurrData = {
-      val stackItem = WithPanelStacksProps.active(stacks).stack.peek[FileListState]
+      val stackItem = PanelStacks.active(stacks).stack.peek[FileListState]
       stackItem.getData.toOption
     }
     val res = createUiData(key, maybeCurrData).map(uiData => new FileListUi(uiData).apply())

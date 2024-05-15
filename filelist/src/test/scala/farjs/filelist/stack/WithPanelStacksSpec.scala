@@ -1,5 +1,9 @@
 package farjs.filelist.stack
 
+import farjs.filelist.stack.WithPanelStacksSpec.assertPanelStacks
+import org.scalatest.Assertion
+import org.scalatest.Inside.inside
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import scommons.react._
 import scommons.react.hooks._
 import scommons.react.test._
@@ -45,19 +49,19 @@ class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
     val (stacksCtx, stacksComp) = getStacksCtxHook
     val updater: js.Function1[js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]], Unit] = { _ =>
     }
-    val props = WithPanelStacksProps(
+    val props = PanelStacks(
       PanelStackData(new PanelStack(isActive = true, js.Array(), updater), null),
       PanelStackData(new PanelStack(isActive = false, js.Array(), updater), null)
     )
 
     //when
-    val result = createTestRenderer(<(WithPanelStacks())(^.wrapped := props)(
+    val result = createTestRenderer(<(WithPanelStacks())(^.plain := props)(
       <(stacksComp).empty,
       <.>()("some other content")
     )).root
 
     //then
-    stacksCtx.get() shouldBe props
+    assertPanelStacks(stacksCtx.get(), props)
     
     inside(result.children.toList) { case List(resCtxHook, otherContent) =>
       resCtxHook.`type` shouldBe stacksComp
@@ -65,8 +69,8 @@ class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
     }
   }
 
-  private def getStacksCtxHook: (AtomicReference[WithPanelStacksProps], ReactClass) = {
-    val ref = new AtomicReference[WithPanelStacksProps](null)
+  private def getStacksCtxHook: (AtomicReference[PanelStacks], ReactClass) = {
+    val ref = new AtomicReference[PanelStacks](null)
     (ref, new FunctionComponent[Unit] {
       protected def render(props: Props): ReactElement = {
         val ctx = useContext(WithPanelStacks.Context)
@@ -83,11 +87,19 @@ object WithPanelStacksSpec {
                   left: PanelStackData,
                   right: PanelStackData): ReactElement = {
 
-    <(WithPanelStacks.Context.Provider)(^.contextValue := WithPanelStacksProps(
+    <(WithPanelStacks.Context.Provider)(^.contextValue := PanelStacks(
       left = left,
       right = right
     ))(
       element
     )
+  }
+  
+  def assertPanelStacks(result: PanelStacks, expected: PanelStacks): Assertion = {
+    inside(result) {
+      case PanelStacks(left, right) =>
+        left shouldBe expected.left
+        right shouldBe expected.right
+    }
   }
 }

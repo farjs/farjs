@@ -1,6 +1,6 @@
 package farjs.filelist
 
-import farjs.filelist.stack.{PanelStackItem, WithPanelStacksProps}
+import farjs.filelist.stack.{PanelStackItem, PanelStacks}
 import scommons.react.ReactClass
 
 import scala.concurrent.Future
@@ -12,7 +12,7 @@ trait FileListPlugin {
   val triggerKeys: js.Array[String] = js.Array()
   
   def onKeyTrigger(key: String,
-                   stacks: WithPanelStacksProps,
+                   stacks: PanelStacks,
                    data: js.UndefOr[js.Dynamic]): Future[Option[ReactClass]] = {
     Future.successful(None)
   }

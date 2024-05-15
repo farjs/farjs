@@ -5,25 +5,11 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class WithPanelStacksProps(left: PanelStackData,
-                                right: PanelStackData)
+object WithPanelStacks extends FunctionComponent[PanelStacks] {
 
-object WithPanelStacksProps {
-
-  def active(stacks: WithPanelStacksProps): PanelStackData =
-    if (stacks.left.stack.isActive) stacks.left
-    else stacks.right
-
-  def nonActive(stacks: WithPanelStacksProps): PanelStackData =
-    if (!stacks.left.stack.isActive) stacks.left
-    else stacks.right
-}
-
-object WithPanelStacks extends FunctionComponent[WithPanelStacksProps] {
+  val Context: ReactContext[PanelStacks] = ReactContext[PanelStacks](defaultValue = null)
   
-  val Context: ReactContext[WithPanelStacksProps] = ReactContext[WithPanelStacksProps](defaultValue = null)
-
-  def usePanelStacks: WithPanelStacksProps = {
+  def usePanelStacks: PanelStacks = {
     val ctx = useContext(Context)
     if (ctx == null) {
       throw js.JavaScriptException(js.Error(
@@ -35,7 +21,7 @@ object WithPanelStacks extends FunctionComponent[WithPanelStacksProps] {
   }
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     
     <(WithPanelStacks.Context.Provider)(^.contextValue := props)(
       compProps.children

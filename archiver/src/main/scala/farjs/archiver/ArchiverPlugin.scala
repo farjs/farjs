@@ -3,7 +3,7 @@ package farjs.archiver
 import farjs.archiver.zip._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.stack.{PanelStackItem, WithPanelStacksProps}
+import farjs.filelist.stack.{PanelStackItem, PanelStacks}
 import scommons.nodejs.path
 import scommons.react.ReactClass
 
@@ -22,10 +22,10 @@ object ArchiverPlugin extends FileListPlugin {
   override val triggerKeys: js.Array[String] = js.Array("S-f7")
 
   override def onKeyTrigger(key: String,
-                            stacks: WithPanelStacksProps,
+                            stacks: PanelStacks,
                             data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
 
-    val stackItem = WithPanelStacksProps.active(stacks).stack.peek[FileListState]
+    val stackItem = PanelStacks.active(stacks).stack.peek[FileListState]
     val res = stackItem.getData.toOption.flatMap { case FileListData(dispatch, actions, state) =>
       val items =
         if (state.selectedNames.nonEmpty) FileListState.selectedItems(state).toList

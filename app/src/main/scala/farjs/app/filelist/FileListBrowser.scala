@@ -66,7 +66,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       }
     }
     
-    val stacks = WithPanelStacksProps(
+    val stacks = PanelStacks(
       left = PanelStackData(getStack(isRight), leftButtonRef.current),
       right = PanelStackData(getStack(!isRight), rightButtonRef.current)
     )
@@ -108,7 +108,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       ()
     }, Nil)
 
-    <(WithPanelStacks())(^.wrapped := stacks)(
+    <(WithPanelStacks())(^.plain := stacks)(
       <.button(
         ^("isRight") := false,
         ^.reactRef := leftButtonRef,

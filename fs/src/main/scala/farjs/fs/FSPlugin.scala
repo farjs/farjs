@@ -42,7 +42,7 @@ class FSPlugin(reducer: js.Function2[FileListState, js.Any, FileListState]) exte
   }
 
   override def onKeyTrigger(key: String,
-                            stacks: WithPanelStacksProps,
+                            stacks: PanelStacks,
                             data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
 
     Future.successful(createUi(key).map(_.apply()))

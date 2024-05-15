@@ -3,7 +3,7 @@ package farjs.copymove
 import farjs.copymove.CopyMoveUiAction._
 import farjs.filelist._
 import farjs.filelist.api.{FileListCapability, FileListItem}
-import farjs.filelist.stack.{PanelStack, WithPanelStacksProps}
+import farjs.filelist.stack.{PanelStack, PanelStacks}
 import scommons.react.ReactClass
 import scommons.react.blessed.BlessedElement
 
@@ -15,7 +15,7 @@ object CopyMovePlugin extends FileListPlugin {
   override val triggerKeys: js.Array[String] = js.Array("f5", "f6", "S-f5", "S-f6")
 
   override def onKeyTrigger(key: String,
-                            stacks: WithPanelStacksProps,
+                            stacks: PanelStacks,
                             data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
     
     val (maybeFrom, maybeTo, toInput) =

@@ -31,7 +31,7 @@ class QuickViewPluginSpec extends AsyncTestSpec {
     //given
     val leftStack = new Stack(isActive = true)
     val rightStack = new Stack
-    val stacks = WithPanelStacksProps(PanelStackData(leftStack.stack, null), PanelStackData(rightStack.stack, null))
+    val stacks = PanelStacks(PanelStackData(leftStack.stack, null), PanelStackData(rightStack.stack, null))
     leftStack.peek.expects().returning(PanelStackItem(QuickViewPanel()))
     
     //then
@@ -45,7 +45,7 @@ class QuickViewPluginSpec extends AsyncTestSpec {
     //given
     val leftStack = new Stack(isActive = true)
     val rightStack = new Stack
-    val stacks = WithPanelStacksProps(PanelStackData(leftStack.stack, null), PanelStackData(rightStack.stack, null))
+    val stacks = PanelStacks(PanelStackData(leftStack.stack, null), PanelStackData(rightStack.stack, null))
     leftStack.peek.expects().returning(PanelStackItem("other".asInstanceOf[ReactClass]))
     rightStack.peek.expects().returning(PanelStackItem(QuickViewPanel()))
     
@@ -60,7 +60,7 @@ class QuickViewPluginSpec extends AsyncTestSpec {
     //given
     val leftStack = new Stack
     val rightStack = new Stack(isActive = true)
-    val stacks = WithPanelStacksProps(PanelStackData(leftStack.stack, null), PanelStackData(rightStack.stack, null))
+    val stacks = PanelStacks(PanelStackData(leftStack.stack, null), PanelStackData(rightStack.stack, null))
     leftStack.peek.expects().returning(PanelStackItem("other1".asInstanceOf[ReactClass]))
     rightStack.peek.expects().returning(PanelStackItem("other2".asInstanceOf[ReactClass]))
     
@@ -78,7 +78,7 @@ class QuickViewPluginSpec extends AsyncTestSpec {
     //given
     val leftStack = new Stack(isActive = true)
     val rightStack = new Stack
-    val stacks = WithPanelStacksProps(PanelStackData(leftStack.stack, null), PanelStackData(rightStack.stack, null))
+    val stacks = PanelStacks(PanelStackData(leftStack.stack, null), PanelStackData(rightStack.stack, null))
     leftStack.peek.expects().returning(PanelStackItem("other1".asInstanceOf[ReactClass]))
     rightStack.peek.expects().returning(PanelStackItem("other2".asInstanceOf[ReactClass]))
     
