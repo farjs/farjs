@@ -4,21 +4,21 @@ import farjs.filelist._
 import farjs.filelist.stack._
 import scommons.react.ReactClass
 
-import scala.concurrent.Future
 import scala.scalajs.js
 
-object FilePlugin extends FileListPlugin {
-
-  override val triggerKeys: js.Array[String] = js.Array("M-v")
+object FilePlugin extends FileListPlugin(js.Array("M-v")) {
 
   override def onKeyTrigger(key: String,
                             stacks: PanelStacks,
-                            data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
+                            data: js.UndefOr[js.Dynamic] = js.undefined): js.Promise[js.UndefOr[ReactClass]] = {
 
-    Future.successful(createUi(key).map(_.apply()))
+    js.Promise.resolve[js.UndefOr[ReactClass]](createUi(key).map(_.apply()) match {
+      case Some(r) => r
+      case None => js.undefined
+    })
   }
   
-  private[file] def createUi(key: String): Option[FilePluginUi] = {
+  private[file] final def createUi(key: String): Option[FilePluginUi] = {
     key match {
       case "M-v" => Some(new FilePluginUi(showFileViewHistoryPopup = true))
       case _ => None

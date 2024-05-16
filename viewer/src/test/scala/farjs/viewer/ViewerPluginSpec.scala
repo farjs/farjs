@@ -48,7 +48,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     fs.lstatSync.expects(data.path).throwing(JavaScriptException(js.Error("no such file")))
 
     //when
-    ViewerPlugin.onKeyTrigger(onFileView, null, data.asInstanceOf[js.Dynamic]).failed.map { ex =>
+    ViewerPlugin.onKeyTrigger(onFileView, null, data.asInstanceOf[js.Dynamic]).toFuture.failed.map { ex =>
       //then
       ex.getMessage should include("no such file")
     }
@@ -71,9 +71,9 @@ class ViewerPluginSpec extends AsyncTestSpec {
     fs.lstatSync.expects(data.path).returning(js.Dynamic.literal(size = 50).asInstanceOf[Stats])
 
     //when
-    ViewerPlugin.onKeyTrigger(onFileView, null, data.asInstanceOf[js.Dynamic]).map { res =>
+    ViewerPlugin.onKeyTrigger(onFileView, null, data.asInstanceOf[js.Dynamic]).toFuture.map { res =>
       //then
-      res should not be None
+      res should not be js.undefined
     }
   }
 
@@ -95,7 +95,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
-    ViewerPlugin.onKeyTrigger("f3", stacks).map(_ shouldBe None)
+    ViewerPlugin.onKeyTrigger("f3", stacks).toFuture.map(_ shouldBe js.undefined)
   }
 
   it should "return None if non-local fs when onKeyTrigger(f3)" in {
@@ -115,7 +115,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
-    ViewerPlugin.onKeyTrigger("f3", stacks).map(_ shouldBe None)
+    ViewerPlugin.onKeyTrigger("f3", stacks).toFuture.map(_ shouldBe js.undefined)
   }
 
   it should "return failed Future if no such file when onKeyTrigger(f3)" in {
@@ -140,7 +140,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     fs.lstatSync.expects(filePath).throwing(JavaScriptException(js.Error("no such file")))
 
     //when
-    ViewerPlugin.onKeyTrigger("f3", stacks).failed.map { ex =>
+    ViewerPlugin.onKeyTrigger("f3", stacks).toFuture.failed.map { ex =>
       //then
       ex.getMessage should include("no such file")
     }
@@ -168,7 +168,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     fs.lstatSync.expects(filePath).returning(js.Dynamic.literal(size = 50).asInstanceOf[Stats])
 
     //when & then
-    ViewerPlugin.onKeyTrigger("f3", stacks).map(_ should not be None)
+    ViewerPlugin.onKeyTrigger("f3", stacks).toFuture.map(_ should not be js.undefined)
   }
 
   it should "return Some(ViewerPluginUi) if file when onKeyTrigger(onViewerOpenLeft)" in {
@@ -193,7 +193,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     fs.lstatSync.expects(filePath).returning(js.Dynamic.literal(size = 50).asInstanceOf[Stats])
 
     //when & then
-    ViewerPlugin.onKeyTrigger(onViewerOpenLeft, stacks).map(_ should not be None)
+    ViewerPlugin.onKeyTrigger(onViewerOpenLeft, stacks).toFuture.map(_ should not be js.undefined)
   }
 
   it should "return Some(ViewerPluginUi) if file when onKeyTrigger(onViewerOpenRight)" in {
@@ -218,7 +218,7 @@ class ViewerPluginSpec extends AsyncTestSpec {
     fs.lstatSync.expects(filePath).returning(js.Dynamic.literal(size = 50).asInstanceOf[Stats])
 
     //when & then
-    ViewerPlugin.onKeyTrigger(onViewerOpenRight, stacks).map(_ should not be None)
+    ViewerPlugin.onKeyTrigger(onViewerOpenRight, stacks).toFuture.map(_ should not be js.undefined)
   }
 
   it should "return Some(ViewItemsPopup) if dir when onKeyTrigger(f3)" in {
@@ -238,6 +238,6 @@ class ViewerPluginSpec extends AsyncTestSpec {
     val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
-    ViewerPlugin.onKeyTrigger("f3", stacks).map(_ should not be None)
+    ViewerPlugin.onKeyTrigger("f3", stacks).toFuture.map(_ should not be js.undefined)
   }
 }

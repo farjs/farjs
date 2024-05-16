@@ -4,18 +4,15 @@ import farjs.filelist.FileListPlugin
 import farjs.filelist.stack.{PanelStackItem, PanelStacks}
 import scommons.react.ReactClass
 
-import scala.concurrent.Future
 import scala.scalajs.js
 
-object QuickViewPlugin extends FileListPlugin {
-
-  override val triggerKeys: js.Array[String] = js.Array("C-q")
+object QuickViewPlugin extends FileListPlugin(js.Array("C-q")) {
 
   private val panelComp: ReactClass = QuickViewPanel()
 
   override def onKeyTrigger(key: String,
                             stacks: PanelStacks,
-                            data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
+                            data: js.UndefOr[js.Dynamic] = js.undefined): js.Promise[js.UndefOr[ReactClass]] = {
     val exists =
       if (stacks.left.stack.peek.component == panelComp) {
         stacks.left.stack.pop()
@@ -37,6 +34,6 @@ object QuickViewPlugin extends FileListPlugin {
       ))
     }
     
-    Future.successful(None)
+    js.Promise.resolve[js.UndefOr[ReactClass]](js.undefined)
   }
 }

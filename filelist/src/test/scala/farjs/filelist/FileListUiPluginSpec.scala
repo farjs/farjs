@@ -36,8 +36,8 @@ class FileListUiPluginSpec extends AsyncTestSpec {
 
     //when & then
     Future.sequence(Seq(
-      FileListUiPlugin.onKeyTrigger("test_key", stacks).map(_ shouldBe None),
-      FileListUiPlugin.onKeyTrigger("f1", stacks).map(_ should not be None)
+      FileListUiPlugin.onKeyTrigger("test_key", stacks).toFuture.map(_ shouldBe js.undefined),
+      FileListUiPlugin.onKeyTrigger("f1", stacks).toFuture.map(_ should not be js.undefined)
     )).map(_ => Succeeded)
   }
 

@@ -5,12 +5,10 @@ import farjs.filelist.stack._
 import farjs.ui.Dispatch
 import scommons.react.ReactClass
 
-import scala.concurrent.Future
 import scala.scalajs.js
 
-class FSPlugin(reducer: js.Function2[FileListState, js.Any, FileListState]) extends FileListPlugin {
-
-  override val triggerKeys: js.Array[String] = js.Array("M-l", "M-r", "M-h", "C-d")
+class FSPlugin(reducer: js.Function2[FileListState, js.Any, FileListState])
+  extends FileListPlugin(js.Array("M-l", "M-r", "M-h", "C-d")) {
 
   val component: ReactClass = new FileListPanelController(FSPanel).apply()
 
@@ -43,12 +41,15 @@ class FSPlugin(reducer: js.Function2[FileListState, js.Any, FileListState]) exte
 
   override def onKeyTrigger(key: String,
                             stacks: PanelStacks,
-                            data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
+                            data: js.UndefOr[js.Dynamic] = js.undefined): js.Promise[js.UndefOr[ReactClass]] = {
 
-    Future.successful(createUi(key).map(_.apply()))
+    js.Promise.resolve[js.UndefOr[ReactClass]](createUi(key).map(_.apply()) match {
+      case Some(r) => r
+      case None => js.undefined
+    })
   }
   
-  private[fs] def createUi(key: String): Option[FSPluginUi] = {
+  private[fs] final def createUi(key: String): Option[FSPluginUi] = {
     key match {
       case "M-l" => Some(new FSPluginUi(showDrivePopupOnLeft = Some(true)))
       case "M-r" => Some(new FSPluginUi(showDrivePopupOnLeft = Some(false)))

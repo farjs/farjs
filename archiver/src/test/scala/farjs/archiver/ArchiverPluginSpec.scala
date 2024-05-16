@@ -43,7 +43,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
-    ArchiverPlugin.onKeyTrigger("", stacks).map(_ shouldBe None)
+    ArchiverPlugin.onKeyTrigger("", stacks).toFuture.map(_ shouldBe js.undefined)
   }
 
   it should "return None if non-local fs when onKeyTrigger" in {
@@ -63,7 +63,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
-    ArchiverPlugin.onKeyTrigger("", stacks).map(_ shouldBe None)
+    ArchiverPlugin.onKeyTrigger("", stacks).toFuture.map(_ shouldBe js.undefined)
   }
 
   it should "return Some(ui) if not .. when onKeyTrigger" in {
@@ -83,7 +83,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
-    ArchiverPlugin.onKeyTrigger("", stacks).map(_ should not be None)
+    ArchiverPlugin.onKeyTrigger("", stacks).toFuture.map(_ should not be js.undefined)
   }
 
   it should "return Some(ui) if selected items when onKeyTrigger" in {
@@ -104,7 +104,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
-    ArchiverPlugin.onKeyTrigger("", stacks).map(_ should not be None)
+    ArchiverPlugin.onKeyTrigger("", stacks).toFuture.map(_ should not be None)
   }
 
   it should "trigger plugin on .zip and .jar file extensions" in {
@@ -113,11 +113,11 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     
     //when & then
     Future.sequence(Seq(
-      ArchiverPlugin.onFileTrigger("filePath.txt", header, () => ()).map(_ shouldBe None),
-      ArchiverPlugin.onFileTrigger("filePath.zip", header, () => ()).map(_ should not be None),
-      ArchiverPlugin.onFileTrigger("filePath.ZIP", header, () => ()).map(_ should not be None),
-      ArchiverPlugin.onFileTrigger("filePath.jar", header, () => ()).map(_ should not be None),
-      ArchiverPlugin.onFileTrigger("filePath.Jar", header, () => ()).map(_ should not be None)
+      ArchiverPlugin.onFileTrigger("filePath.txt", header, () => ()).toFuture.map(_ shouldBe js.undefined),
+      ArchiverPlugin.onFileTrigger("filePath.zip", header, () => ()).toFuture.map(_ should not be js.undefined),
+      ArchiverPlugin.onFileTrigger("filePath.ZIP", header, () => ()).toFuture.map(_ should not be js.undefined),
+      ArchiverPlugin.onFileTrigger("filePath.jar", header, () => ()).toFuture.map(_ should not be js.undefined),
+      ArchiverPlugin.onFileTrigger("filePath.Jar", header, () => ()).toFuture.map(_ should not be js.undefined)
     )).map(_ => Succeeded)
   }
 
@@ -127,8 +127,8 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     
     //when & then
     Future.sequence(Seq(
-      ArchiverPlugin.onFileTrigger("filePath.txt", new Uint8Array(2), () => ()).map(_ shouldBe None),
-      ArchiverPlugin.onFileTrigger("filePath.txt", header, () => ()).map(_ should not be None)
+      ArchiverPlugin.onFileTrigger("filePath.txt", new Uint8Array(2), () => ()).toFuture.map(_ shouldBe js.undefined),
+      ArchiverPlugin.onFileTrigger("filePath.txt", header, () => ()).toFuture.map(_ should not be js.undefined)
     )).map(_ => Succeeded)
   }
 }

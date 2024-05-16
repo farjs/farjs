@@ -87,7 +87,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           }
         case keyFull =>
           props.plugins.find(_.triggerKeys.contains(keyFull)).foreach { plugin =>
-            val pluginRes = plugin.onKeyTrigger(keyFull, stacks, key.data)
+            val pluginRes = plugin.onKeyTrigger(keyFull, stacks, key.data).toFuture
             pluginRes.foreach { maybePluginUi =>
               maybePluginUi.foreach { pluginUi =>
                 setCurrPluginUi(Some(pluginUi))
@@ -192,11 +192,11 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       } yield {
         buff.subarray(0, bytesRead)
       }).flatMap { fileHeader =>
-        val zero = Future.successful(Option.empty[PanelStackItem[FileListState]])
+        val zero = Future.successful(js.undefined: js.UndefOr[PanelStackItem[FileListState]])
         val pluginRes = plugins.foldLeft(zero) { (resF, plugin) =>
           resF.flatMap {
-            case None => plugin.onFileTrigger(filePath, fileHeader, onClose)
-            case Some(_) => resF
+            case res if res.isEmpty => plugin.onFileTrigger(filePath, fileHeader, onClose).toFuture
+            case _ => resF
           }
         }
         pluginRes.map { maybePluginItem =>

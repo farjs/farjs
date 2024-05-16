@@ -7,16 +7,13 @@ import farjs.filelist.stack.{PanelStack, PanelStacks}
 import scommons.react.ReactClass
 import scommons.react.blessed.BlessedElement
 
-import scala.concurrent.Future
 import scala.scalajs.js
 
-object CopyMovePlugin extends FileListPlugin {
-
-  override val triggerKeys: js.Array[String] = js.Array("f5", "f6", "S-f5", "S-f6")
+object CopyMovePlugin extends FileListPlugin(js.Array("f5", "f6", "S-f5", "S-f6")) {
 
   override def onKeyTrigger(key: String,
                             stacks: PanelStacks,
-                            data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
+                            data: js.UndefOr[js.Dynamic] = js.undefined): js.Promise[js.UndefOr[ReactClass]] = {
     
     val (maybeFrom, maybeTo, toInput) =
       if (stacks.left.stack.isActive) {
@@ -39,7 +36,11 @@ object CopyMovePlugin extends FileListPlugin {
         }
       case _ => None
     }
-    Future.successful(res)
+
+    js.Promise.resolve[js.UndefOr[ReactClass]](res match {
+      case Some(r) => r
+      case None => js.undefined
+    })
   }
 
   private def getData(stack: PanelStack): Option[FileListData] = {
@@ -47,7 +48,7 @@ object CopyMovePlugin extends FileListPlugin {
     item.getData.toOption
   }
 
-  private[copymove] def onCopyMoveInplace(move: Boolean, from: FileListData): Option[CopyMoveUiAction] = {
+  private[copymove] final def onCopyMoveInplace(move: Boolean, from: FileListData): Option[CopyMoveUiAction] = {
     FileListState.currentItem(from.state).filter(_ != FileListItem.up).toOption.flatMap { _ =>
       if (move && from.actions.api.capabilities.contains(FileListCapability.moveInplace)) {
         Some(ShowMoveInplace)
@@ -59,10 +60,10 @@ object CopyMovePlugin extends FileListPlugin {
     }
   }
 
-  private[copymove] def onCopyMove(move: Boolean,
-                                   from: FileListData,
-                                   to: FileListData,
-                                   toInput: BlessedElement): Option[CopyMoveUiAction] = {
+  private[copymove] final def onCopyMove(move: Boolean,
+                                         from: FileListData,
+                                         to: FileListData,
+                                         toInput: BlessedElement): Option[CopyMoveUiAction] = {
 
     val currItem = FileListState.currentItem(from.state).filter(_ != FileListItem.up)
 

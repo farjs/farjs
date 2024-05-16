@@ -38,7 +38,7 @@ class QuickViewPluginSpec extends AsyncTestSpec {
     leftStack.pop.expects()
 
     //when
-    QuickViewPlugin.onKeyTrigger("", stacks).map(_ shouldBe None)
+    QuickViewPlugin.onKeyTrigger("", stacks).toFuture.map(_ shouldBe js.undefined)
   }
   
   it should "remove plugin from right panel when onKeyTrigger" in {
@@ -53,7 +53,7 @@ class QuickViewPluginSpec extends AsyncTestSpec {
     rightStack.pop.expects()
 
     //when
-    QuickViewPlugin.onKeyTrigger("", stacks).map(_ shouldBe None)
+    QuickViewPlugin.onKeyTrigger("", stacks).toFuture.map(_ shouldBe js.undefined)
   }
   
   it should "add plugin to left panel when onKeyTrigger" in {
@@ -71,7 +71,7 @@ class QuickViewPluginSpec extends AsyncTestSpec {
     }
 
     //when
-    QuickViewPlugin.onKeyTrigger("", stacks).map(_ shouldBe None)
+    QuickViewPlugin.onKeyTrigger("", stacks).toFuture.map(_ shouldBe js.undefined)
   }
   
   it should "add plugin to right panel when onKeyTrigger" in {
@@ -89,6 +89,6 @@ class QuickViewPluginSpec extends AsyncTestSpec {
     }
 
     //when
-    QuickViewPlugin.onKeyTrigger("", stacks).map(_ shouldBe None)
+    QuickViewPlugin.onKeyTrigger("", stacks).toFuture.map(_ shouldBe js.undefined)
   }
 }

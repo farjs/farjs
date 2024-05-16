@@ -84,8 +84,8 @@ class FSPluginSpec extends AsyncTestSpec with OptionValues {
 
     //when & then
     Future.sequence(Seq(
-      FSPlugin.onKeyTrigger("test_key", stacks).map(_ shouldBe None),
-      FSPlugin.onKeyTrigger("M-l", stacks).map(_ should not be None)
+      FSPlugin.onKeyTrigger("test_key", stacks).toFuture.map(_ shouldBe js.undefined),
+      FSPlugin.onKeyTrigger("M-l", stacks).toFuture.map(_ should not be js.undefined)
     )).map(_ => Succeeded)
   }
 

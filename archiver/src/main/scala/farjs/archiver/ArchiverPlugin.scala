@@ -11,19 +11,17 @@ import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 
-object ArchiverPlugin extends FileListPlugin {
+object ArchiverPlugin extends FileListPlugin(js.Array("S-f7")) {
 
-  private[archiver] var readZip: String => Future[Map[String, List[ZipEntry]]] = ZipApi.readZip
-  private[archiver] var createApi: (String, String, Future[Map[String, List[ZipEntry]]]) => ZipApi = {
+  private[archiver] final var readZip: String => Future[Map[String, List[ZipEntry]]] = ZipApi.readZip
+  private[archiver] final var createApi: (String, String, Future[Map[String, List[ZipEntry]]]) => ZipApi = {
     (zipPath, rootPath, entriesByParentF) =>
       new ZipApi(zipPath, rootPath, entriesByParentF)
   }
 
-  override val triggerKeys: js.Array[String] = js.Array("S-f7")
-
   override def onKeyTrigger(key: String,
                             stacks: PanelStacks,
-                            data: js.UndefOr[js.Dynamic] = js.undefined): Future[Option[ReactClass]] = {
+                            data: js.UndefOr[js.Dynamic] = js.undefined): js.Promise[js.UndefOr[ReactClass]] = {
 
     val stackItem = PanelStacks.active(stacks).stack.peek[FileListState]
     val res = stackItem.getData.toOption.flatMap { case FileListData(dispatch, actions, state) =>
@@ -38,12 +36,16 @@ object ArchiverPlugin extends FileListPlugin {
       }
       else None
     }
-    Future.successful(res)
+
+    js.Promise.resolve[js.UndefOr[ReactClass]](res match {
+      case Some(r) => r
+      case None => js.undefined
+    })
   }
   
   override def onFileTrigger(filePath: String,
                              fileHeader: Uint8Array,
-                             onClose: () => Unit): Future[Option[PanelStackItem[FileListState]]] = {
+                             onClose: js.Function0[Unit]): js.Promise[js.UndefOr[PanelStackItem[FileListState]]] = {
     val pathLower = filePath.toLowerCase
     val res =
       if (pathLower.endsWith(".zip") || pathLower.endsWith(".jar") || checkFileHeader(fileHeader)) {
@@ -62,7 +64,10 @@ object ArchiverPlugin extends FileListPlugin {
       }
       else None
 
-    Future.successful(res)
+    js.Promise.resolve[js.UndefOr[PanelStackItem[FileListState]]](res match {
+      case Some(r) => r
+      case None => js.undefined
+    })
   }
   
   private def checkFileHeader(header: Uint8Array): Boolean = {

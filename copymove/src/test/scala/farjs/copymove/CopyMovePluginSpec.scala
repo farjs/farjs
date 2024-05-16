@@ -45,10 +45,10 @@ class CopyMovePluginSpec extends AsyncTestSpec {
 
     //when & then
     Future.sequence(Seq(
-      CopyMovePlugin.onKeyTrigger("f5", stacks).map(_ shouldBe None),
-      CopyMovePlugin.onKeyTrigger("f6", stacks).map(_ shouldBe None),
-      CopyMovePlugin.onKeyTrigger("S-f5", stacks).map(_ shouldBe None),
-      CopyMovePlugin.onKeyTrigger("S-f6", stacks).map(_ shouldBe None)
+      CopyMovePlugin.onKeyTrigger("f5", stacks).toFuture.map(_ shouldBe js.undefined),
+      CopyMovePlugin.onKeyTrigger("f6", stacks).toFuture.map(_ shouldBe js.undefined),
+      CopyMovePlugin.onKeyTrigger("S-f5", stacks).toFuture.map(_ shouldBe js.undefined),
+      CopyMovePlugin.onKeyTrigger("S-f6", stacks).toFuture.map(_ shouldBe js.undefined)
     )).map(_ => Succeeded)
   }
 
@@ -73,10 +73,10 @@ class CopyMovePluginSpec extends AsyncTestSpec {
 
     //when & then
     Future.sequence(Seq(
-      CopyMovePlugin.onKeyTrigger("f5", stacks).map(_ shouldBe None),
-      CopyMovePlugin.onKeyTrigger("f6", stacks).map(_ shouldBe None),
-      CopyMovePlugin.onKeyTrigger("S-f5", stacks).map(_ shouldBe None),
-      CopyMovePlugin.onKeyTrigger("S-f6", stacks).map(_ shouldBe None)
+      CopyMovePlugin.onKeyTrigger("f5", stacks).toFuture.map(_ shouldBe js.undefined),
+      CopyMovePlugin.onKeyTrigger("f6", stacks).toFuture.map(_ shouldBe js.undefined),
+      CopyMovePlugin.onKeyTrigger("S-f5", stacks).toFuture.map(_ shouldBe js.undefined),
+      CopyMovePlugin.onKeyTrigger("S-f6", stacks).toFuture.map(_ shouldBe js.undefined)
     )).map(_ => Succeeded)
   }
 
@@ -103,7 +103,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
-    CopyMovePlugin.onKeyTrigger("unknown", stacks).map(_ shouldBe None)
+    CopyMovePlugin.onKeyTrigger("unknown", stacks).toFuture.map(_ shouldBe js.undefined)
   }
 
   it should "return Some(ui) when onKeyTrigger(Shift-F5)" in {
@@ -123,7 +123,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
-    CopyMovePlugin.onKeyTrigger("S-f5", stacks).map(_ should not be None)
+    CopyMovePlugin.onKeyTrigger("S-f5", stacks).toFuture.map(_ should not be js.undefined)
   }
 
   it should "return Some(ui) when onKeyTrigger(F5)" in {
@@ -145,7 +145,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
-    CopyMovePlugin.onKeyTrigger("f5", stacks).map(_ should not be None)
+    CopyMovePlugin.onKeyTrigger("f5", stacks).toFuture.map(_ should not be js.undefined)
   }
 
   it should "return Some(ui) if selected items when onKeyTrigger(F6)" in {
@@ -168,7 +168,7 @@ class CopyMovePluginSpec extends AsyncTestSpec {
     val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
 
     //when & then
-    CopyMovePlugin.onKeyTrigger("f6", stacks).map(_ should not be None)
+    CopyMovePlugin.onKeyTrigger("f6", stacks).toFuture.map(_ should not be js.undefined)
   }
 
   it should "return CopyMoveUiAction when onCopyMoveInplace" in {

@@ -35,8 +35,8 @@ class FilePluginSpec extends AsyncTestSpec {
 
     //when & then
     Future.sequence(Seq(
-      FilePlugin.onKeyTrigger("test_key", stacks).map(_ shouldBe None),
-      FilePlugin.onKeyTrigger("M-v", stacks).map(_ should not be None)
+      FilePlugin.onKeyTrigger("test_key", stacks).toFuture.map(_ shouldBe js.undefined),
+      FilePlugin.onKeyTrigger("M-v", stacks).toFuture.map(_ should not be js.undefined)
     )).map(_ => Succeeded)
   }
 
