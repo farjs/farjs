@@ -10,7 +10,7 @@ import scala.scalajs.js
 object FarjsDBMigrations {
 
   def apply(db: Database): Future[Unit] = {
-    val module = "./farjs/domain/bundle.json"
+    val module = "./migrations/bundle.json"
     val url = new URL(module, js.`import`.meta.url.asInstanceOf[String])
     val json = FS.readFileSync(url, new FileOptions {
       override val encoding = "utf8"

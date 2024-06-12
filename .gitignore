@@ -11,6 +11,7 @@ package-lock.json
 dist/*
 target/
 build/
+app/migrations/bundle.json
 node_modules/
 lib_managed/
 src_managed/

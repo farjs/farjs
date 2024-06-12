@@ -4,6 +4,7 @@ import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
 import sbt._
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
+import scalajsbundler.util.Commands
 import scommons.sbtplugin.ScommonsPlugin.autoImport._
 import scoverage.ScoverageKeys.coverageExcludedPackages
 
@@ -24,7 +25,6 @@ object FarjsApp extends ScalaJsModule {
       publishM2 := ((): Unit),
 
       scommonsResourcesFileFilter := scommonsResourcesFileFilter.value || "*.mjs",
-      scommonsBundlesFileFilter := "*.sql",
 
       coverageExcludedPackages :=
         "farjs.app.FarjsApp" +
@@ -38,13 +38,12 @@ object FarjsApp extends ScalaJsModule {
 
       scalaJSUseMainModuleInitializer := false,
 
+      sjsStageSettings(fastOptJS, Compile),
+      sjsStageSettings(fullOptJS, Compile),
+      sjsStageSettings(fastOptJS, Test),
+      sjsStageSettings(fullOptJS, Test),
+
       Compile / copyToTargetDir := {
-        def copyToDir(targetDir: File)(file: File): File = {
-          val copy = targetDir / file.name
-          IO.copyFile(file, copy)
-          copy
-        }
-      
         val targetDir = (Compile / npmUpdate / crossTarget).value
         copyToDir(targetDir)(baseDirectory.value / ".." / "package.json")
         copyToDir(targetDir)(baseDirectory.value / ".." / "LICENSE.txt")
@@ -55,6 +54,24 @@ object FarjsApp extends ScalaJsModule {
       //useYarn := true,
       //yarnExtraArgs := Seq("--frozen-lockfile"),
     )
+
+  private def copyToDir(targetDir: File)(file: File): File = {
+    val copy = targetDir / file.name
+    IO.copyFile(file, copy)
+    copy
+  }
+
+  private def sjsStageSettings(sjsStage: TaskKey[Attributed[File]], config: ConfigKey) = {
+    config / sjsStage := {
+      val logger = streams.value.log
+      val workingDir = baseDirectory.value / ".."
+      Commands.run(Seq("npm", "run", "sql-bundle"), workingDir, logger, IO.transfer(_, System.out)).fold(sys.error, _ => ())
+
+      val targetDir = (config / sjsStage / crossTarget).value
+      copyToDir(targetDir / "migrations")(baseDirectory.value / "migrations" / "bundle.json")
+      (config / sjsStage).value
+    }
+  }
 
   override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Seq(
     FarjsFileList.definition % "compile->compile;test->test",

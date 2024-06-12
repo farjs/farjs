@@ -8,6 +8,9 @@
   },
   "private": false,
   "description": "FAR.js - Cross-platform File and Archive Manager app in your terminal",
+  "scripts": {
+    "sql-bundle": "npx sql-bundle ./app/migrations"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/farjs/farjs/issues"
@@ -45,7 +48,7 @@
   "files": [
     "dist/farjs.mjs",
     "dist/versionChecker.mjs",
-    "farjs/domain/bundle.json",
+    "migrations/bundle.json",
     "farjs-app-opt.js",
     "LICENSE.txt",
     "README.md"
@@ -60,6 +63,7 @@
     "bun": ">=0.8"
   },
   "dependencies": {
+    "@farjs/better-sqlite3-migrate": "^1.0.0",
     "@farjs/better-sqlite3-websql": "^1.0.1",
     "@farjs/filelist": "0.2.1",
     "@farjs/ui": "0.7.1",
