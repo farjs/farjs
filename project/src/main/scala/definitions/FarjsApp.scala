@@ -3,8 +3,8 @@ package definitions
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
 import sbt._
+import scalajsbundler.Npm
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
-import scalajsbundler.util.Commands
 import scommons.sbtplugin.ScommonsPlugin.autoImport._
 import scoverage.ScoverageKeys.coverageExcludedPackages
 
@@ -65,7 +65,7 @@ object FarjsApp extends ScalaJsModule {
     config / sjsStage := {
       val logger = streams.value.log
       val workingDir = baseDirectory.value / ".."
-      Commands.run(Seq("npm", "run", "sql-bundle"), workingDir, logger, IO.transfer(_, System.out)).fold(sys.error, _ => ())
+      Npm.run("run", "sql-bundle")(workingDir, logger)
 
       val targetDir = (config / sjsStage / crossTarget).value
       copyToDir(targetDir / "migrations")(baseDirectory.value / "migrations" / "bundle.json")
