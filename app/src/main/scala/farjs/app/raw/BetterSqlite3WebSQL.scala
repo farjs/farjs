@@ -1,6 +1,5 @@
 package farjs.app.raw
 
-import scommons.websql.Database
 import scommons.websql.raw.WebSQLDatabase
 
 import scala.scalajs.js
@@ -15,10 +14,9 @@ object BetterSqlite3WebSQL {
   @JSImport("@farjs/better-sqlite3-websql", JSImport.Default)
   private object _openDatabase extends js.Function
 
-  def openDatabase(name: String): Database = {
-    val db = _openDatabase
+  def openDatabase(name: String): WebSQLDatabase = {
+    _openDatabase
       .asInstanceOf[js.Function4[String, String, String, Int, WebSQLDatabase]]
       .apply(name, "1.0", "description", 1)
-    new Database(db)
   }
 }

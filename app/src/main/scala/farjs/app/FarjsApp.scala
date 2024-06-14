@@ -98,7 +98,9 @@ object FarjsApp {
       _ <- FSFileListActions.api.mkDirs(js.Array(FarjsData.getDataDir: _*)).toFuture
       db = BetterSqlite3WebSQL.openDatabase(FarjsData.getDBFilePath)
       _ <- FarjsDBMigrations.apply(db)
-    } yield db
+    } yield {
+      new Database(db)
+    }
 
     dbF.recover {
       case error =>
