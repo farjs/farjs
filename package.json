@@ -63,7 +63,7 @@
     "bun": ">=0.8"
   },
   "dependencies": {
-    "@farjs/better-sqlite3-migrate": "^1.0.0",
+    "@farjs/better-sqlite3-migrate": "^1.1.0",
     "@farjs/better-sqlite3-websql": "^1.0.1",
     "@farjs/filelist": "0.2.1",
     "@farjs/ui": "0.7.1",
