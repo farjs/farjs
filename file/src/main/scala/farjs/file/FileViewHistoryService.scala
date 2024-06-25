@@ -2,12 +2,7 @@ package farjs.file
 
 import scala.concurrent.Future
 
-case class FileViewHistory(path: String,
-                           isEdit: Boolean,
-                           encoding: String,
-                           position: Double,
-                           wrap: Option[Boolean],
-                           column: Option[Int])
+case class FileViewHistory(path: String, params: FileViewHistoryParams)
 
 trait FileViewHistoryService {
 

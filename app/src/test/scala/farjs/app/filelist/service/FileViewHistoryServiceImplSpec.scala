@@ -3,7 +3,8 @@ package farjs.app.filelist.service
 import farjs.app.BaseDBContextSpec
 import farjs.app.filelist.FileListModule
 import farjs.domain.dao.FileViewHistoryDao
-import farjs.file.FileViewHistory
+import farjs.file.FileViewHistorySpec.assertFileViewHistory
+import farjs.file.{FileViewHistory, FileViewHistoryParams}
 import org.scalatest.Succeeded
 
 import scala.concurrent.Future
@@ -18,11 +19,13 @@ class FileViewHistoryServiceImplSpec extends BaseDBContextSpec {
     val service = module.fileViewHistoryService
     val history = FileViewHistory(
       path = "test/path",
-      isEdit = false,
-      encoding = "test-encoding",
-      position = 123,
-      wrap = Some(true),
-      column = Some(4)
+      params = FileViewHistoryParams(
+        isEdit = false,
+        encoding = "test-encoding",
+        position = 123,
+        wrap = true,
+        column = 4
+      )
     )
     
     for {
@@ -30,7 +33,7 @@ class FileViewHistoryServiceImplSpec extends BaseDBContextSpec {
       _ <- service.getAll.map { entities =>
         entities should be (empty)
       }
-      _ <- service.getOne(history.path, history.isEdit).map { maybeHistory =>
+      _ <- service.getOne(history.path, history.params.isEdit).map { maybeHistory =>
         maybeHistory shouldBe None
       }
 
@@ -39,10 +42,17 @@ class FileViewHistoryServiceImplSpec extends BaseDBContextSpec {
 
       //then
       allRes <- service.getAll
-      oneRes <- service.getOne(history.path, history.isEdit)
+      oneRes <- service.getOne(history.path, history.params.isEdit)
     } yield {
-      allRes shouldBe List(history)
-      oneRes shouldBe Some(history)
+      allRes.size shouldBe 1
+      allRes.zip(List(history)).foreach { case (result, expected) =>
+        assertFileViewHistory(result, expected)
+      }
+      oneRes.size shouldBe 1
+      oneRes.zip(Some(history)).foreach { case (result, expected) =>
+        assertFileViewHistory(result, expected)
+      }
+      Succeeded
     }
   }
 
@@ -53,39 +63,54 @@ class FileViewHistoryServiceImplSpec extends BaseDBContextSpec {
     val service = module.fileViewHistoryService
     val history1 = FileViewHistory(
       path = "test/path",
-      isEdit = false,
-      encoding = "test-encoding1",
-      position = 1,
-      wrap = Some(true),
-      column = Some(3)
+      params = FileViewHistoryParams(
+        isEdit = false,
+        encoding = "test-encoding1",
+        position = 1,
+        wrap = true,
+        column = 3
+      )
     )
     val history2 = FileViewHistory(
       path = "test/path",
-      isEdit = true,
-      encoding = "test-encoding2",
-      position = 2,
-      wrap = None,
-      column = None
+      params = FileViewHistoryParams(
+        isEdit = true,
+        encoding = "test-encoding2",
+        position = 2,
+        wrap = js.undefined,
+        column = js.undefined
+      )
     )
     val updated = history1.copy(
-      encoding = "updated-encoding",
-      position = 456,
-      wrap = Some(false),
-      column = Some(5)
+      params = FileViewHistoryParams.copy(history1.params)(
+        encoding = "updated-encoding",
+        position = 456,
+        wrap = false,
+        column = 5
+      )
     )
     
     for {
       _ <- dao.deleteAll()
       _ <- service.save(history1)
       _ <- service.save(history2)
-      _ <- service.getOne(history1.path, history1.isEdit).map { entity =>
-        entity shouldBe Some(history1)
+      _ <- service.getOne(history1.path, history1.params.isEdit).map { maybeRes =>
+        inside(maybeRes) {
+          case Some(res) => assertFileViewHistory(res, history1)
+        }
       }
-      _ <- service.getOne(history2.path, history2.isEdit).map { entity =>
-        entity shouldBe Some(history2)
+      _ <- service.getOne(history2.path, history2.params.isEdit).map { maybeRes =>
+        inside(maybeRes) {
+          case Some(res) => assertFileViewHistory(res, history2)
+        }
       }
-      _ <- service.getAll.map { entities =>
-        entities.sortBy(e => (e.path, e.isEdit)) shouldBe List(history1, history2)
+      _ <- service.getAll.map { allRes =>
+        val allResSorted = allRes.sortBy(e => (e.path, e.params.isEdit))
+        val expected = List(history1, history2)
+        allResSorted.size shouldBe expected.size
+        allResSorted.zip(expected).foreach { case (result, expected) =>
+          assertFileViewHistory(result, expected)
+        }
       }
 
       //when
@@ -93,10 +118,19 @@ class FileViewHistoryServiceImplSpec extends BaseDBContextSpec {
 
       //then
       allRes <- service.getAll
-      oneRes <- service.getOne(history1.path, history1.isEdit)
+      oneRes <- service.getOne(history1.path, history1.params.isEdit)
     } yield {
-      allRes.sortBy(e => (e.path, e.isEdit)) shouldBe List(updated, history2)
-      oneRes shouldBe Some(updated)
+      val resultsSorted = allRes.sortBy(e => (e.path, e.params.isEdit))
+      val allExpected = List(updated, history2)
+      resultsSorted.size shouldBe allExpected.size
+      resultsSorted.zip(allExpected).foreach { case (result, expected) =>
+        assertFileViewHistory(result, expected)
+      }
+      oneRes.size shouldBe 1
+      oneRes.zip(Some(updated)).foreach { case (result, expected) =>
+        assertFileViewHistory(result, expected)
+      }
+      Succeeded
     }
   }
 
@@ -183,11 +217,13 @@ class FileViewHistoryServiceImplSpec extends BaseDBContextSpec {
     val service = new FileViewHistoryServiceImpl(dao)
     val history = FileViewHistory(
       path = "test/path",
-      isEdit = false,
-      encoding = "test-encoding",
-      position = 123,
-      wrap = Some(true),
-      column = Some(4)
+      params = FileViewHistoryParams(
+        isEdit = false,
+        encoding = "test-encoding",
+        position = 123,
+        wrap = true,
+        column = 4
+      )
     )
     val ex = new Exception("test error")
 

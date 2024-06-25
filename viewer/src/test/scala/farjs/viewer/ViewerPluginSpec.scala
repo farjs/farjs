@@ -1,7 +1,7 @@
 package farjs.viewer
 
 import farjs.file.FileEvent.onFileView
-import farjs.file.FileViewHistory
+import farjs.file.{FileViewHistory, FileViewHistoryParams}
 import farjs.filelist.api.{FileListDir, FileListItem, MockFileListApi}
 import farjs.filelist.stack._
 import farjs.filelist.{FileListState, MockFileListActions}
@@ -37,11 +37,13 @@ class ViewerPluginSpec extends AsyncTestSpec {
     ViewerPlugin.fs = fs.fs
     val data = FileViewHistory(
       path = "test/path",
-      isEdit = false,
-      encoding = "utf8",
-      position = 123,
-      wrap = None,
-      column = None
+      params = FileViewHistoryParams(
+        isEdit = false,
+        encoding = "utf8",
+        position = 123,
+        wrap = js.undefined,
+        column = js.undefined
+      )
     )
 
     //then
@@ -60,11 +62,13 @@ class ViewerPluginSpec extends AsyncTestSpec {
     ViewerPlugin.fs = fs.fs
     val data = FileViewHistory(
       path = "test/path",
-      isEdit = false,
-      encoding = "utf8",
-      position = 123,
-      wrap = None,
-      column = None
+      params = FileViewHistoryParams(
+        isEdit = false,
+        encoding = "utf8",
+        position = 123,
+        wrap = js.undefined,
+        column = js.undefined
+      )
     )
 
     //then

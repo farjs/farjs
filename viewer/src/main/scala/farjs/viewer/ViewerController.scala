@@ -1,6 +1,6 @@
 package farjs.viewer
 
-import farjs.file.{Encoding, FileReader, FileServices, FileViewHistory}
+import farjs.file.{Encoding, FileReader, FileServices, FileViewHistory, FileViewHistoryParams}
 import farjs.filelist.theme.FileListTheme
 import farjs.ui.task.{Task, TaskAction}
 import farjs.ui.{Dispatch, WithSize, WithSizeProps}
@@ -45,13 +45,13 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
       } yield {
         props.setViewport(Some(ViewerFileViewport(
           fileReader = viewer,
-          encoding = history.map(_.encoding).getOrElse(Encoding.platformEncoding),
+          encoding = history.map(_.params.encoding).getOrElse(Encoding.platformEncoding),
           size = props.size,
           width = 0,
           height = 0,
-          wrap = history.flatMap(_.wrap).getOrElse(false),
-          column = history.flatMap(_.column).getOrElse(0),
-          position = history.map(_.position).getOrElse(0.0)
+          wrap = history.flatMap(_.params.wrap.toOption).getOrElse(false),
+          column = history.flatMap(_.params.column.toOption).getOrElse(0),
+          position = history.map(_.params.position).getOrElse(0.0)
         )))
       }
       openF.andThen { case Failure(NonFatal(_)) =>
@@ -63,11 +63,13 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
         viewportRef.current.foreach { vp =>
           services.fileViewHistory.save(FileViewHistory(
             path = props.filePath,
-            isEdit = false,
-            encoding = vp.encoding,
-            position = vp.position,
-            wrap = Some(vp.wrap),
-            column = Some(vp.column)
+            params = FileViewHistoryParams(
+              isEdit = false,
+              encoding = vp.encoding,
+              position = vp.position,
+              wrap = vp.wrap,
+              column = vp.column
+            )
           ))
         }
       }

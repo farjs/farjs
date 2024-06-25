@@ -32,7 +32,7 @@ object FileViewHistoryPopup extends FunctionComponent[FileViewHistoryPopupProps]
         title = "File view history",
         items = items.map { item =>
           val prefix =
-            if (item.isEdit) "Edit: "
+            if (item.params.isEdit) "Edit: "
             else "View: "
           s"$prefix${item.path}"
         },

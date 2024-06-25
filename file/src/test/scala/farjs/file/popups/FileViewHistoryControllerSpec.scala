@@ -1,7 +1,7 @@
 package farjs.file.popups
 
 import farjs.file.popups.FileViewHistoryController._
-import farjs.file.{FileEvent, FileViewHistory}
+import farjs.file.{FileEvent, FileViewHistory, FileViewHistoryParams}
 import farjs.filelist.stack.WithPanelStacksSpec.withContext
 import farjs.filelist.stack.{PanelStack, PanelStackData, PanelStackItem}
 import org.scalatest.Succeeded
@@ -36,11 +36,13 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
     ))
     val history = FileViewHistory(
       path = "test/path",
-      isEdit = false,
-      encoding = "utf8",
-      position = 0,
-      wrap = None,
-      column = None
+      params = FileViewHistoryParams(
+        isEdit = false,
+        encoding = "utf8",
+        position = 0,
+        wrap = js.undefined,
+        column = js.undefined
+      )
     )
 
     //then

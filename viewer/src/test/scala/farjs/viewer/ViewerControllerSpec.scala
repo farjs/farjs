@@ -1,7 +1,8 @@
 package farjs.viewer
 
 import farjs.file.FileServicesSpec.withServicesContext
-import farjs.file.{Encoding, FileViewHistory, MockFileViewHistoryService}
+import farjs.file.FileViewHistorySpec.assertFileViewHistory
+import farjs.file.{Encoding, FileViewHistory, FileViewHistoryParams, MockFileViewHistoryService}
 import farjs.filelist.theme.FileListTheme
 import farjs.filelist.theme.FileListThemeSpec.withThemeContext
 import farjs.ui.WithSizeProps
@@ -145,11 +146,13 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val historyService = new FileViewHistoryService
     val history = FileViewHistory(
       path = props.filePath,
-      isEdit = false,
-      encoding = "test-enc",
-      position = 456,
-      wrap = Some(true),
-      column = Some(7)
+      params = FileViewHistoryParams(
+        isEdit = false,
+        encoding = "test-enc",
+        position = 456,
+        wrap = true,
+        column = 7
+      )
     )
     historyService.getOne.expects(props.filePath, false).returning(Future.successful(Some(history)))
 
@@ -171,13 +174,13 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     eventually {
       inside(resViewport) {
         case ViewerFileViewport(_, encoding, size, width, height, wrap, column, position, linesData) =>
-          encoding shouldBe history.encoding
+          encoding shouldBe history.params.encoding
           size shouldBe props.size
           width shouldBe 0
           height shouldBe 0
-          wrap shouldBe history.wrap.get
-          column shouldBe history.column.get
-          position shouldBe history.position
+          wrap shouldBe history.params.wrap
+          column shouldBe history.params.column
+          position shouldBe history.params.position
           linesData shouldBe Nil
       }
     }.map { _ =>
@@ -190,7 +193,10 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
 
       //then
       fs.closeSync.expects(fd)
-      historyService.save.expects(history).returning(Future.unit)
+      historyService.save.expects(*).onCall { resHistory: FileViewHistory =>
+        assertFileViewHistory(resHistory, history)
+        Future.unit
+      }
 
       //when
       TestRenderer.act { () =>

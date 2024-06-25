@@ -2,7 +2,7 @@ package farjs.file.popups
 
 import farjs.file.FileServicesSpec.withServicesContext
 import farjs.file.popups.FileViewHistoryPopup._
-import farjs.file.{FileViewHistory, MockFileViewHistoryService}
+import farjs.file.{FileViewHistory, FileViewHistoryParams, MockFileViewHistoryService}
 import farjs.ui.popup.ListPopupProps
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
@@ -33,11 +33,13 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     val items = List("item 1", "item 2").map { path =>
       FileViewHistory(
         path = path,
-        isEdit = false,
-        encoding = "utf8",
-        position = 0,
-        wrap = None,
-        column = None
+        params = FileViewHistoryParams(
+          isEdit = false,
+          encoding = "utf8",
+          position = 0,
+          wrap = js.undefined,
+          column = js.undefined
+        )
       )
     }
     val itemsF = Future.successful(items)
@@ -69,11 +71,13 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     val items = List.fill(20)("item").zipWithIndex.map { case (path, index) =>
       FileViewHistory(
         path = path,
-        isEdit = index % 2 == 0,
-        encoding = "utf8",
-        position = 0,
-        wrap = None,
-        column = None
+        params = FileViewHistoryParams(
+          isEdit = index % 2 == 0,
+          encoding = "utf8",
+          position = 0,
+          wrap = js.undefined,
+          column = js.undefined
+        )
       )
     }
     val itemsF = Future.successful(items)
@@ -87,7 +91,7 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     //then
     result.children.toList should be (empty)
     itemsF.map { _ =>
-      assertFileViewHistoryPopup(result, props, items)
+      assertFileViewHistoryPopup(result, items)
     }
   }
   
@@ -100,7 +104,6 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
   }
 
   private def assertFileViewHistoryPopup(result: TestInstance,
-                                         props: FileViewHistoryPopupProps,
                                          items: List[FileViewHistory]): Assertion = {
     
     assertComponents(result.children, List(
@@ -121,7 +124,7 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
           title shouldBe "File view history"
           resItems.toList shouldBe items.map { item =>
             val prefix =
-              if (item.isEdit) "Edit: "
+              if (item.params.isEdit) "Edit: "
               else "View: "
             s"$prefix${item.path}"
           }

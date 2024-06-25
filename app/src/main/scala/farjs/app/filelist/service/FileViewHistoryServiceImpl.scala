@@ -3,10 +3,11 @@ package farjs.app.filelist.service
 import farjs.app.filelist.service.FileViewHistoryServiceImpl._
 import farjs.domain.FileViewHistoryEntity
 import farjs.domain.dao.FileViewHistoryDao
-import farjs.file.{FileViewHistory, FileViewHistoryService}
+import farjs.file.{FileViewHistory, FileViewHistoryParams, FileViewHistoryService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.scalajs.js
 import scala.util.control.NonFatal
 
 class FileViewHistoryServiceImpl(dao: FileViewHistoryDao) extends FileViewHistoryService {
@@ -44,22 +45,30 @@ object FileViewHistoryServiceImpl {
   private def convertToFileViewHistory(entity: FileViewHistoryEntity): FileViewHistory = {
     FileViewHistory(
       path = entity.path,
-      isEdit = entity.isEdit,
-      encoding = entity.encoding,
-      position = entity.position,
-      wrap = entity.wrap,
-      column = entity.column
+      params = FileViewHistoryParams(
+        isEdit = entity.isEdit,
+        encoding = entity.encoding,
+        position = entity.position,
+        wrap = entity.wrap match {
+          case Some(v) => v
+          case None => js.undefined
+        },
+        column = entity.column match {
+          case Some(v) => v
+          case None => js.undefined
+        }
+      )
     )
   }
 
   private def convertToFileViewHistoryEntity(history: FileViewHistory): FileViewHistoryEntity = {
     FileViewHistoryEntity(
       path = history.path,
-      isEdit = history.isEdit,
-      encoding = history.encoding,
-      position = history.position,
-      wrap = history.wrap,
-      column = history.column,
+      isEdit = history.params.isEdit,
+      encoding = history.params.encoding,
+      position = history.params.position,
+      wrap = history.params.wrap.toOption,
+      column = history.params.column.toOption,
       System.currentTimeMillis()
     )
   }
