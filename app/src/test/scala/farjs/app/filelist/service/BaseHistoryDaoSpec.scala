@@ -1,21 +1,21 @@
 package farjs.app.filelist.service
 
 import farjs.app.BaseDBContextSpec
-import farjs.domain.dao.HistoryDao
-import farjs.domain.{FarjsDBContext, HistoryEntity}
+import farjs.domain.dao.BaseHistoryDao
+import farjs.domain.{FarjsDBContext, BaseHistory}
 
 import scala.concurrent.Future
 
 abstract class BaseHistoryDaoSpec extends BaseDBContextSpec {
 
-  protected def createDao(ctx: FarjsDBContext, maxItemsCount: Int = 10): HistoryDao
+  protected def createDao(ctx: FarjsDBContext, maxItemsCount: Int = 10): BaseHistoryDao
 
   private val testItem = "test/item"
   
   it should "create new record when save" in withCtx { ctx =>
     //given
     val dao = createDao(ctx)
-    val entity = HistoryEntity(testItem, System.currentTimeMillis())
+    val entity = BaseHistory(testItem, System.currentTimeMillis())
     val beforeF = dao.deleteAll()
     
     //when
@@ -41,7 +41,7 @@ abstract class BaseHistoryDaoSpec extends BaseDBContextSpec {
     val resultF = beforeF.flatMap { existing =>
       existing.map(_.item) shouldBe List(testItem)
       val entity = existing.head
-      val updated = HistoryEntity(testItem, entity.updatedAt + 1)
+      val updated = BaseHistory(testItem, entity.updatedAt + 1)
       dao.save(updated).map { _ =>
         updated
       }
@@ -67,7 +67,7 @@ abstract class BaseHistoryDaoSpec extends BaseDBContextSpec {
 
       val entity = existing.head
       Future.sequence((1 to 5).toList.map { i =>
-        dao.save(HistoryEntity(s"$testItem$i", entity.updatedAt + i))
+        dao.save(BaseHistory(s"$testItem$i", entity.updatedAt + i))
       })
     }
 

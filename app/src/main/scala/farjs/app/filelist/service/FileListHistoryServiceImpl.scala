@@ -1,14 +1,14 @@
 package farjs.app.filelist.service
 
-import farjs.domain.HistoryEntity
-import farjs.domain.dao.HistoryDao
+import farjs.domain.BaseHistory
+import farjs.domain.dao.BaseHistoryDao
 import farjs.filelist.history.FileListHistoryService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
-class FileListHistoryServiceImpl(dao: HistoryDao)
+class FileListHistoryServiceImpl(dao: BaseHistoryDao)
   extends FileListHistoryService {
 
   def getAll: Future[Seq[String]] = {
@@ -20,7 +20,7 @@ class FileListHistoryServiceImpl(dao: HistoryDao)
   }
 
   def save(path: String): Future[Unit] = {
-    val entity = HistoryEntity(path, System.currentTimeMillis())
+    val entity = BaseHistory(path, System.currentTimeMillis())
     dao.save(entity).recover {
       case NonFatal(ex) =>
         Console.err.println(s"Failed to save history item, error: $ex")

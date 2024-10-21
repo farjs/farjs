@@ -1,3 +1,8 @@
 package farjs.domain
 
-case class HistoryEntity(item: String, updatedAt: Long)
+import scala.scalajs.js
+
+case class HistoryEntity(kindId: Int,
+                         item: String,
+                         params: Option[js.Object],
+                         updatedAt: Long)

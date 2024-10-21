@@ -15,7 +15,7 @@ object FileViewHistorySpec {
     }
   }
 
-  private def assertFileViewHistoryParams(result: FileViewHistoryParams, expected: FileViewHistoryParams)(implicit position: Position): Assertion = {
+  def assertFileViewHistoryParams(result: FileViewHistoryParams, expected: FileViewHistoryParams)(implicit position: Position): Assertion = {
     inside(result) {
       case FileViewHistoryParams(isEdit, encoding, position, wrap, column) =>
         isEdit shouldBe expected.isEdit

@@ -2,7 +2,7 @@ package farjs.app.filelist.service
 
 import farjs.app.BaseDBContextSpec
 import farjs.app.filelist.FileListModule
-import farjs.domain.dao.HistoryDao
+import farjs.domain.dao.BaseHistoryDao
 import org.scalatest.Succeeded
 
 import scala.concurrent.Future
@@ -39,7 +39,7 @@ class FileListHistoryServiceImplSpec extends BaseDBContextSpec {
   it should "recover and log error when getAll" in {
     //given
     val errorLogger = mockFunction[String, Unit]
-    val dao = mock[HistoryDao]
+    val dao = mock[BaseHistoryDao]
     val service = new FileListHistoryServiceImpl(dao)
     val ex = new Exception("test error")
 
@@ -63,7 +63,7 @@ class FileListHistoryServiceImplSpec extends BaseDBContextSpec {
   it should "recover and log error when save" in {
     //given
     val errorLogger = mockFunction[String, Unit]
-    val dao = mock[HistoryDao]
+    val dao = mock[BaseHistoryDao]
     val service = new FileListHistoryServiceImpl(dao)
     val path = "test/path"
     val ex = new Exception("test error")

@@ -1,10 +1,10 @@
 package farjs.app.filelist.service
 
 import farjs.domain.FarjsDBContext
-import farjs.domain.dao.{HistoryDao, HistoryFolderDao}
+import farjs.domain.dao.{BaseHistoryDao, HistoryFolderDao}
 
 class HistoryFolderDaoSpec extends BaseHistoryDaoSpec {
 
-  protected def createDao(ctx: FarjsDBContext, maxItemsCount: Int): HistoryDao =
+  protected def createDao(ctx: FarjsDBContext, maxItemsCount: Int): BaseHistoryDao =
     new HistoryFolderDao(ctx, maxItemsCount)
 }
