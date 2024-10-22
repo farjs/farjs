@@ -6,7 +6,7 @@ import scommons.websql.io.dao.CommonDao
 import scala.concurrent.Future
 import scala.scalajs.js
 
-class HistoryDao(val ctx: FarjsDBContext, maxItemsCount: Int = 150)
+class HistoryDao(val ctx: FarjsDBContext, maxItemsCount: Int)
   extends CommonDao {
 
   import ctx._
