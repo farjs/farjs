@@ -4,6 +4,7 @@ import common.Libs
 import sbt.Keys._
 import sbt._
 import scommons.sbtplugin.project.CommonNodeJsModule
+import scoverage.ScoverageKeys.coverageExcludedPackages
 
 object FarjsDao extends FarjsModule with CommonNodeJsModule {
 
@@ -15,7 +16,10 @@ object FarjsDao extends FarjsModule with CommonNodeJsModule {
     super.definition
       .settings(ScalaJsModule.settings: _*)
       .settings(
-        description := "Data access object (DAO) module for FAR.js app"
+        description := "Data access object (DAO) module for FAR.js app",
+
+        //to avoid Scala.js error: Found a dangling UndefinedParam
+        coverageExcludedPackages := "farjs.domain.dao.HistoryDao"
       )
   }
 
