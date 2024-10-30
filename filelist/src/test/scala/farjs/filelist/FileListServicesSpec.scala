@@ -43,6 +43,7 @@ class FileListServicesSpec extends TestSpec with TestRendererUtils {
 object FileListServicesSpec {
 
   def withServicesContext(element: ReactElement,
+                          historyProvider: HistoryProvider = new MockHistoryProvider,
                           foldersHistory: FileListHistoryService = new MockFileListHistoryService,
                           mkDirsHistory: FileListHistoryService = new MockFileListHistoryService,
                           selectPatternsHistory: FileListHistoryService = new MockFileListHistoryService,
@@ -50,6 +51,7 @@ object FileListServicesSpec {
                          ): ReactElement = {
 
     <(FileListServices.Context.Provider)(^.contextValue := FileListServices(
+      historyProvider = historyProvider,
       foldersHistory = foldersHistory,
       mkDirsHistory = mkDirsHistory,
       selectPatternsHistory = selectPatternsHistory,

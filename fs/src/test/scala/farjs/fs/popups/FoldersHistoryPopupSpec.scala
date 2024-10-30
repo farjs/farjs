@@ -34,7 +34,7 @@ class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestR
     historyService.getAll.expects().returning(itemsF)
     
     val result = createTestRenderer(withServicesContext(
-      <(FoldersHistoryPopup())(^.wrapped := props)(), historyService.service
+      <(FoldersHistoryPopup())(^.wrapped := props)(), foldersHistory = historyService.service
     )).root
 
     itemsF.flatMap { _ =>
@@ -62,7 +62,7 @@ class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestR
     
     //when
     val result = createTestRenderer(withServicesContext(
-      <(FoldersHistoryPopup())(^.wrapped := props)(), historyService.service
+      <(FoldersHistoryPopup())(^.wrapped := props)(), foldersHistory = historyService.service
     )).root
 
     //then

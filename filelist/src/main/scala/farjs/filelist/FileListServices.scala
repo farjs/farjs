@@ -1,12 +1,13 @@
 package farjs.filelist
 
-import farjs.filelist.history.FileListHistoryService
+import farjs.filelist.history.{FileListHistoryService, HistoryProvider}
 import scommons.react._
 import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class FileListServices(foldersHistory: FileListHistoryService,
+case class FileListServices(historyProvider: HistoryProvider,
+                            foldersHistory: FileListHistoryService,
                             mkDirsHistory: FileListHistoryService,
                             selectPatternsHistory: FileListHistoryService,
                             copyItemsHistory: FileListHistoryService)

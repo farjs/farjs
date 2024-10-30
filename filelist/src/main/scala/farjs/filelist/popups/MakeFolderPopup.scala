@@ -1,6 +1,7 @@
 package farjs.filelist.popups
 
 import farjs.filelist.FileListServices
+import farjs.filelist.popups.MakeFolderController.mkDirsHistoryKind
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.ModalContent._
@@ -48,12 +49,15 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
     )
 
     useLayoutEffect({ () =>
-      services.mkDirsHistory.getAll.map { items =>
-        val itemsReversed = items.reverse
+      for {
+        mkDirsHistory <- services.historyProvider.get(mkDirsHistoryKind).toFuture
+        items <- mkDirsHistory.getAll.toFuture
+      } yield {
+        val itemsReversed = items.reverse.map(_.item)
         itemsReversed.headOption.foreach { last =>
           setFolderName(last)
         }
-        setItems(Some(js.Array(itemsReversed: _*)))
+        setItems(Some(itemsReversed))
       }
       ()
     }, Nil)

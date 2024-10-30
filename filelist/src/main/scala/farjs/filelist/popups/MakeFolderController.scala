@@ -1,12 +1,16 @@
 package farjs.filelist.popups
 
+import farjs.filelist.history.{History, HistoryKind}
 import farjs.filelist.{FileListServices, FileListUiData}
 import scommons.react._
 import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.scalajs.js
 
 object MakeFolderController extends FunctionComponent[FileListUiData] {
+  
+  val mkDirsHistoryKind: HistoryKind = HistoryKind("farjs.mkdirs", 50)
 
   private[popups] var makeFolderPopup: UiComponent[MakeFolderPopupProps] = MakeFolderPopup
 
@@ -30,7 +34,8 @@ object MakeFolderController extends FunctionComponent[FileListUiData] {
             )
             for {
               _ <- action.task.result.toFuture
-              _ <- services.mkDirsHistory.save(dir)
+              mkDirsHistory <- services.historyProvider.get(mkDirsHistoryKind).toFuture
+              _ <- mkDirsHistory.save(History(dir, js.undefined)).toFuture
             } yield {
               setMultiple(multiple)
               initialMultiple = multiple

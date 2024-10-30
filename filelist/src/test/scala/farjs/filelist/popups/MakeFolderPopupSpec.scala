@@ -1,7 +1,8 @@
 package farjs.filelist.popups
 
 import farjs.filelist.FileListServicesSpec.withServicesContext
-import farjs.filelist.history.MockFileListHistoryService
+import farjs.filelist.history._
+import farjs.filelist.popups.MakeFolderController.mkDirsHistoryKind
 import farjs.filelist.popups.MakeFolderPopup._
 import farjs.ui._
 import farjs.ui.border._
@@ -13,7 +14,6 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 import scommons.react.test._
 
-import scala.concurrent.Future
 import scala.scalajs.js
 
 class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
@@ -26,11 +26,15 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   MakeFolderPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
-  class HistoryService {
-    val getAll = mockFunction[Future[Seq[String]]]
+  class HistoryMocks {
+    val get = mockFunction[HistoryKind, js.Promise[HistoryService]]
+    val getAll = mockFunction[js.Promise[js.Array[History]]]
 
-    val service = new MockFileListHistoryService(
+    val service = new MockHistoryService(
       getAllMock = getAll
+    )
+    val provider = new MockHistoryProvider(
+      getMock = get
     )
   }
 
@@ -38,14 +42,19 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     //given
     val onCancel = mockFunction[Unit]
     val props = getMakeFolderPopupProps(onCancel = onCancel)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("folder"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array(History("folder", js.undefined)))
+    var getAllCalled = false
+    historyMocks.get.expects(mkDirsHistoryKind).returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val renderer = createTestRenderer(withServicesContext(
-      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
+      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     ))
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val modal = inside(findComponents(renderer.root, modalComp)) {
         case List(modal) => modal.props.asInstanceOf[ModalProps]
       }
@@ -64,14 +73,22 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     //given
     val folderName = "initial folder name"
     val props = getMakeFolderPopupProps()
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("folder", folderName))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array(
+      History("folder", js.undefined),
+      History(folderName, js.undefined)
+    ))
+    var getAllCalled = false
+    historyMocks.get.expects(mkDirsHistoryKind).returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val renderer = createTestRenderer(withServicesContext(
-      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
+      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     ))
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val comboBox = inside(findComponents(renderer.root, comboBoxComp)) {
         case List(c) => c.props.asInstanceOf[ComboBoxProps]
       }
@@ -91,14 +108,22 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   it should "set multiple flag when onChange in CheckBox" in {
     //given
     val props = getMakeFolderPopupProps()
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("folder", "folder 2"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array(
+      History("folder", js.undefined),
+      History("folder 2", js.undefined)
+    ))
+    var getAllCalled = false
+    historyMocks.get.expects(mkDirsHistoryKind).returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val renderer = createTestRenderer(withServicesContext(
-      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
+      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     ))
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val checkbox = inside(findComponents(renderer.root, checkBoxComp)) {
         case List(c) => c.props.asInstanceOf[CheckBoxProps]
       }
@@ -119,14 +144,22 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
     val props = getMakeFolderPopupProps(multiple = true, onOk, onCancel)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("folder", "test"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array(
+      History("folder", js.undefined),
+      History("test", js.undefined)
+    ))
+    var getAllCalled = false
+    historyMocks.get.expects(mkDirsHistoryKind).returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
+      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     )).root
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val comboBox = inside(findComponents(comp, comboBoxComp)) {
         case List(c) => c.props.asInstanceOf[ComboBoxProps]
       }
@@ -147,14 +180,22 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
     val props = getMakeFolderPopupProps(multiple = true, onOk, onCancel)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("folder", "test"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array(
+      History("folder", js.undefined),
+      History("test", js.undefined)
+    ))
+    var getAllCalled = false
+    historyMocks.get.expects(mkDirsHistoryKind).returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
+      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     )).root
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
         case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
       }
@@ -176,14 +217,19 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
     val props = getMakeFolderPopupProps(multiple = true, onOk, onCancel)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(Nil)
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array[History]())
+    var getAllCalled = false
+    historyMocks.get.expects(mkDirsHistoryKind).returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
+      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     )).root
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
         case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
       }
@@ -205,14 +251,19 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val onOk = mockFunction[String, Boolean, Unit]
     val onCancel = mockFunction[Unit]
     val props = getMakeFolderPopupProps(onOk = onOk, onCancel = onCancel)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(Nil)
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array[History]())
+    var getAllCalled = false
+    historyMocks.get.expects(mkDirsHistoryKind).returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
+      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     )).root
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
         case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
       }
@@ -232,18 +283,26 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   it should "render component" in {
     //given
     val props = getMakeFolderPopupProps()
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("folder", "folder 2"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array(
+      History("folder", js.undefined),
+      History("folder 2", js.undefined)
+    ))
+    var getAllCalled = false
+    historyMocks.get.expects(mkDirsHistoryKind).returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     //when
     val result = createTestRenderer(withServicesContext(
-      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), mkDirsHistory = historyService.service
+      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     )).root
 
     //then
     result.children.toList should be (empty)
-    itemsF.flatMap { items =>
+    eventually(getAllCalled shouldBe true).flatMap(_ => itemsF.toFuture).map { items =>
       result.children.toList should not be empty
       assertMakeFolderPopup(result.children(0), items, List("[ OK ]", "[ Cancel ]"))
     }
@@ -260,10 +319,11 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   }
 
   private def assertMakeFolderPopup(result: TestInstance,
-                                    items: List[String],
+                                    items: js.Array[History],
                                     actions: List[String]): Assertion = {
     val (width, height) = (75, 10)
     val style = DefaultTheme.popup.regular
+    val itemsReversed = items.reverse.map(_.item)
     
     assertNativeComponent(result,
       <(modalComp)(^.assertPlain[ModalProps](inside(_) {
@@ -288,9 +348,9 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
           case ComboBoxProps(left, top, resWidth, resItems, resValue, _, _) =>
             left shouldBe 2
             top shouldBe 2
-            resItems.toList shouldBe items.reverse
+            resItems.toList shouldBe itemsReversed.toList
             resWidth shouldBe (width - 10)
-            resValue shouldBe items.lastOption.getOrElse("")
+            resValue shouldBe itemsReversed.headOption.getOrElse("")
         }))(),
         
         <(horizontalLineComp)(^.assertPlain[HorizontalLineProps](inside(_) {

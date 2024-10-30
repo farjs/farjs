@@ -27,7 +27,7 @@ class FSFoldersHistorySpec extends TestSpec with TestRendererUtils {
     
     //when
     val renderer = createTestRenderer(withServicesContext(
-      <(FSFoldersHistory())(^.wrapped := props)(), historyService.service
+      <(FSFoldersHistory())(^.wrapped := props)(), foldersHistory = historyService.service
     ))
 
     //then
@@ -44,7 +44,7 @@ class FSFoldersHistorySpec extends TestSpec with TestRendererUtils {
     
     //when
     val renderer = createTestRenderer(withServicesContext(
-      <(FSFoldersHistory())(^.wrapped := props)(), historyService.service
+      <(FSFoldersHistory())(^.wrapped := props)(), foldersHistory = historyService.service
     ))
 
     //then
@@ -58,7 +58,7 @@ class FSFoldersHistorySpec extends TestSpec with TestRendererUtils {
     historyService.save.expects(props.currDirPath).returning(Future.unit)
 
     val renderer = createTestRenderer(withServicesContext(
-      <(FSFoldersHistory())(^.wrapped := props)(), historyService.service
+      <(FSFoldersHistory())(^.wrapped := props)(), foldersHistory = historyService.service
     ))
     val updatedProps = props.copy(currDirPath = "dir 1")
 
@@ -68,7 +68,7 @@ class FSFoldersHistorySpec extends TestSpec with TestRendererUtils {
     //when
     TestRenderer.act { () =>
       renderer.update(withServicesContext(
-        <(FSFoldersHistory())(^.wrapped := updatedProps)(), historyService.service
+        <(FSFoldersHistory())(^.wrapped := updatedProps)(), foldersHistory = historyService.service
       ))
     }
   }
@@ -80,7 +80,7 @@ class FSFoldersHistorySpec extends TestSpec with TestRendererUtils {
     historyService.save.expects(props.currDirPath).returning(Future.unit)
     
     val renderer = createTestRenderer(withServicesContext(
-      <(FSFoldersHistory())(^.wrapped := props)(), historyService.service
+      <(FSFoldersHistory())(^.wrapped := props)(), foldersHistory = historyService.service
     ))
     val updatedProps = props.copy(currDirPath = "dir 2")
 
@@ -90,7 +90,7 @@ class FSFoldersHistorySpec extends TestSpec with TestRendererUtils {
     //when
     TestRenderer.act { () =>
       renderer.update(withServicesContext(
-        <(FSFoldersHistory())(^.wrapped := updatedProps)(), historyService.service
+        <(FSFoldersHistory())(^.wrapped := updatedProps)(), foldersHistory = historyService.service
       ))
     }
   }
