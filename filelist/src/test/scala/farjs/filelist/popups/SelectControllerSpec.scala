@@ -4,24 +4,30 @@ import farjs.filelist.FileListActions.FileListParamsChangedAction
 import farjs.filelist.FileListActionsSpec.assertFileListParamsChangedAction
 import farjs.filelist.FileListServicesSpec.withServicesContext
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.history.MockFileListHistoryService
+import farjs.filelist.history._
 import farjs.filelist.popups.SelectController._
 import farjs.filelist.{FileListData, FileListState, FileListUiData, MockFileListActions}
+import org.scalatest.Succeeded
+import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.test._
 
-import scala.concurrent.Future
 import scala.scalajs.js
 
-class SelectControllerSpec extends TestSpec with TestRendererUtils {
+class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
+  with TestRendererUtils {
 
   SelectController.selectPopupComp = mockUiComponent("SelectPopup")
 
   //noinspection TypeAnnotation
-  class HistoryService {
-    val save = mockFunction[String, Future[Unit]]
+  class HistoryMocks {
+    val get = mockFunction[HistoryKind, js.Promise[HistoryService]]
+    val save = mockFunction[History, js.Promise[Unit]]
 
-    val service = new MockFileListHistoryService(
+    val service = new MockHistoryService(
       saveMock = save
+    )
+    val provider = new MockHistoryProvider(
+      getMock = get
     )
   }
 
@@ -41,14 +47,20 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
       data = Some(FileListData(dispatch, actions, state)),
       onClose = onClose
     )
-    val historyService = new HistoryService
+    val historyMocks = new HistoryMocks
     val renderer = createTestRenderer(withServicesContext(
-      <(SelectController())(^.wrapped := props)(), selectPatternsHistory = historyService.service
+      <(SelectController())(^.wrapped := props)(), historyProvider = historyMocks.provider
     ))
     val pattern = "*"
 
     //then
-    historyService.save.expects(pattern).returning(Future.unit)
+    var saveHistory: History = null
+    historyMocks.get.expects(selectPatternsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.save.expects(*).onCall { h: History =>
+      saveHistory = h
+      js.Promise.resolve[Unit](())
+    }
     dispatch.expects(*).onCall { action: Any =>
       assertFileListParamsChangedAction(action,
         FileListParamsChangedAction(state.offset, state.index,
@@ -59,6 +71,15 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
     //when
     findComponentProps(renderer.root, selectPopupComp).onAction(pattern)
+    
+    //then
+    eventually(saveHistory should not be null).map { _ =>
+      inside(saveHistory) {
+        case History(item, params) =>
+          item shouldBe pattern
+          params shouldBe js.undefined
+      }
+    }
   }
 
   it should "dispatch actions and update state when Select" in {
@@ -77,14 +98,20 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
       data = Some(FileListData(dispatch, actions, state)),
       onClose = onClose
     )
-    val historyService = new HistoryService
+    val historyMocks = new HistoryMocks
     val renderer = createTestRenderer(withServicesContext(
-      <(SelectController())(^.wrapped := props)(), selectPatternsHistory = historyService.service
+      <(SelectController())(^.wrapped := props)(), historyProvider = historyMocks.provider
     ))
     val pattern = "*.test"
 
     //then
-    historyService.save.expects(pattern).returning(Future.unit)
+    var saveHistory: History = null
+    historyMocks.get.expects(selectPatternsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.save.expects(*).onCall { h: History =>
+      saveHistory = h
+      js.Promise.resolve[Unit](())
+    }
     dispatch.expects(*).onCall { action: Any =>
       assertFileListParamsChangedAction(action,
         FileListParamsChangedAction(state.offset, state.index,
@@ -95,6 +122,15 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
     //when
     findComponentProps(renderer.root, selectPopupComp).onAction(pattern)
+
+    //then
+    eventually(saveHistory should not be null).map { _ =>
+      inside(saveHistory) {
+        case History(item, params) =>
+          item shouldBe pattern
+          params shouldBe js.undefined
+      }
+    }
   }
 
   it should "dispatch actions and update state when Deselect" in {
@@ -113,14 +149,20 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
       data = Some(FileListData(dispatch, actions, state)),
       onClose = onClose
     )
-    val historyService = new HistoryService
+    val historyMocks = new HistoryMocks
     val renderer = createTestRenderer(withServicesContext(
-      <(SelectController())(^.wrapped := props)(), selectPatternsHistory = historyService.service
+      <(SelectController())(^.wrapped := props)(), historyProvider = historyMocks.provider
     ))
     val pattern = "file1.test;file2.test"
 
     //then
-    historyService.save.expects(pattern).returning(Future.unit)
+    var saveHistory: History = null
+    historyMocks.get.expects(selectPatternsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.save.expects(*).onCall { h: History =>
+      saveHistory = h
+      js.Promise.resolve[Unit](())
+    }
     dispatch.expects(*).onCall { action: Any =>
       assertFileListParamsChangedAction(action,
         FileListParamsChangedAction(
@@ -135,6 +177,15 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
     //when
     findComponentProps(renderer.root, selectPopupComp).onAction(pattern)
+
+    //then
+    eventually(saveHistory should not be null).map { _ =>
+      inside(saveHistory) {
+        case History(item, params) =>
+          item shouldBe pattern
+          params shouldBe js.undefined
+      }
+    }
   }
 
   it should "call onClose when Cancel" in {
@@ -148,9 +199,8 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
       data = Some(FileListData(dispatch, actions, state)),
       onClose = onClose
     )
-    val historyService = new MockFileListHistoryService
     val comp = testRender(withServicesContext(
-      <(SelectController())(^.wrapped := props)(), selectPatternsHistory = historyService
+      <(SelectController())(^.wrapped := props)()
     ))
     val popup = findComponentProps(comp, selectPopupComp)
 
@@ -159,6 +209,8 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
 
     //when
     popup.onCancel()
+    
+    Succeeded
   }
 
   it should "render Select popup" in {
@@ -170,11 +222,10 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
       showSelectPopup = Some(true),
       data = Some(FileListData(dispatch, actions, state))
     )
-    val historyService = new MockFileListHistoryService
 
     //when
     val result = testRender(withServicesContext(
-      <(SelectController())(^.wrapped := props)(), selectPatternsHistory = historyService
+      <(SelectController())(^.wrapped := props)()
     ))
 
     //then
@@ -193,11 +244,10 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
       showSelectPopup = Some(false),
       data = Some(FileListData(dispatch, actions, state))
     )
-    val historyService = new MockFileListHistoryService
 
     //when
     val result = testRender(withServicesContext(
-      <(SelectController())(^.wrapped := props)(), selectPatternsHistory = historyService
+      <(SelectController())(^.wrapped := props)()
     ))
 
     //then
@@ -213,11 +263,10 @@ class SelectControllerSpec extends TestSpec with TestRendererUtils {
     val actions = new MockFileListActions
     val state = FileListState()
     val props = FileListUiData(data = Some(FileListData(dispatch, actions, state)))
-    val historyService = new MockFileListHistoryService
 
     //when
     val renderer = createTestRenderer(withServicesContext(
-      <(SelectController())(^.wrapped := props)(), selectPatternsHistory = historyService
+      <(SelectController())(^.wrapped := props)()
     ))
 
     //then

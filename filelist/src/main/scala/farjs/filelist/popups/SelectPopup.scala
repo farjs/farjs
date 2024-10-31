@@ -1,6 +1,7 @@
 package farjs.filelist.popups
 
 import farjs.filelist.FileListServices
+import farjs.filelist.popups.SelectController.selectPatternsHistoryKind
 import farjs.ui._
 import farjs.ui.popup.ModalContent._
 import farjs.ui.popup._
@@ -37,12 +38,15 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
     }
     
     useLayoutEffect({ () =>
-      services.selectPatternsHistory.getAll.map { items =>
-        val itemsReversed = items.reverse
+      for {
+        selectPatternsHistory <- services.historyProvider.get(selectPatternsHistoryKind).toFuture
+        items <- selectPatternsHistory.getAll.toFuture
+      } yield {
+        val itemsReversed = items.reverse.map(_.item)
         itemsReversed.headOption.foreach { last =>
           setPattern(last)
         }
-        setItems(Some(js.Array(itemsReversed: _*)))
+        setItems(Some(itemsReversed))
       }
       ()
     }, Nil)

@@ -2,13 +2,17 @@ package farjs.filelist.popups
 
 import farjs.filelist.FileListActions.FileListParamsChangedAction
 import farjs.filelist.api.FileListItem
+import farjs.filelist.history.{History, HistoryKind}
 import farjs.filelist.{FileListServices, FileListUiData}
 import scommons.react._
 
 import java.util.regex.Pattern
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 
 object SelectController extends FunctionComponent[FileListUiData] {
+
+  val selectPatternsHistoryKind: HistoryKind = HistoryKind("farjs.selectPatterns", 50)
 
   private[popups] var selectPopupComp: UiComponent[SelectPopupProps] = SelectPopup
 
@@ -21,7 +25,10 @@ object SelectController extends FunctionComponent[FileListUiData] {
         <(selectPopupComp())(^.wrapped := SelectPopupProps(
           showSelect = showSelectPopup,
           onAction = { pattern =>
-            services.selectPatternsHistory.save(pattern)
+            for {
+              selectPatternsHistory <- services.historyProvider.get(selectPatternsHistoryKind).toFuture
+              _ <- selectPatternsHistory.save(History(pattern, js.undefined)).toFuture
+            } yield ()
 
             val regexes = pattern.split(';')
               .map(mask => Pattern.compile(fileMaskToRegex(mask)))

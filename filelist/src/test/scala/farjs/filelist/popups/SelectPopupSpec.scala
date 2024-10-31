@@ -1,7 +1,8 @@
 package farjs.filelist.popups
 
 import farjs.filelist.FileListServicesSpec.withServicesContext
-import farjs.filelist.history.MockFileListHistoryService
+import farjs.filelist.history._
+import farjs.filelist.popups.SelectController.selectPatternsHistoryKind
 import farjs.filelist.popups.SelectPopup._
 import farjs.ui._
 import farjs.ui.popup.ModalProps
@@ -12,7 +13,7 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 import scommons.react.test._
 
-import scala.concurrent.Future
+import scala.scalajs.js
 
 class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -20,11 +21,15 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   SelectPopup.comboBoxComp = "ComboBox".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
-  class HistoryService {
-    val getAll = mockFunction[Future[Seq[String]]]
+  class HistoryMocks {
+    val get = mockFunction[HistoryKind, js.Promise[HistoryService]]
+    val getAll = mockFunction[js.Promise[js.Array[History]]]
 
-    val service = new MockFileListHistoryService(
+    val service = new MockHistoryService(
       getAllMock = getAll
+    )
+    val provider = new MockHistoryProvider(
+      getMock = get
     )
   }
 
@@ -32,15 +37,24 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val onCancel = mockFunction[Unit]
     val props = getSelectPopupProps(showSelect = true, onCancel = onCancel)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("pattern", "test"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val items = List("pattern", "test")
+    val itemsF = js.Promise.resolve[js.Array[History]](
+      js.Array(items.map(i => History(i, js.undefined)): _*)
+    )
+    var getAllCalled = false
+    historyMocks.get.expects(selectPatternsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(SelectPopup())(^.wrapped := props)()), selectPatternsHistory = historyService.service
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     )).root
 
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val modal = inside(findComponents(comp, modalComp)) {
         case List(modal) => modal.props.asInstanceOf[ModalProps]
       }
@@ -59,14 +73,23 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     //given
     val pattern = "initial pattern"
     val props = getSelectPopupProps(showSelect = true)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("pattern", pattern))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val items = List("pattern", pattern)
+    val itemsF = js.Promise.resolve[js.Array[History]](
+      js.Array(items.map(i => History(i, js.undefined)): _*)
+    )
+    var getAllCalled = false
+    historyMocks.get.expects(selectPatternsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val renderer = createTestRenderer(withServicesContext(
-      withThemeContext(<(SelectPopup())(^.wrapped := props)()), selectPatternsHistory = historyService.service
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     ))
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val comboBox = inside(findComponents(renderer.root, comboBoxComp)) {
         case List(c) => c.props.asInstanceOf[ComboBoxProps]
       }
@@ -88,15 +111,24 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
     val props = getSelectPopupProps(showSelect = true, onAction, onCancel)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("pattern", "test"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val items = List("pattern", "test")
+    val itemsF = js.Promise.resolve[js.Array[History]](
+      js.Array(items.map(i => History(i, js.undefined)): _*)
+    )
+    var getAllCalled = false
+    historyMocks.get.expects(selectPatternsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(SelectPopup())(^.wrapped := props)()), selectPatternsHistory = historyService.service
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     )).root
 
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val comboBox = inside(findComponents(comp, comboBoxComp)) {
         case List(c) => c.props.asInstanceOf[ComboBoxProps]
       }
@@ -116,15 +148,21 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
     val props = getSelectPopupProps(showSelect = true, onAction, onCancel)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(Nil)
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array[History]())
+    var getAllCalled = false
+    historyMocks.get.expects(selectPatternsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(SelectPopup())(^.wrapped := props)()), selectPatternsHistory = historyService.service
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     )).root
 
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val comboBox = inside(findComponents(comp, comboBoxComp)) {
         case List(c) => c.props.asInstanceOf[ComboBoxProps]
       }
@@ -142,17 +180,26 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "render Select component" in {
     //given
     val props = getSelectPopupProps(showSelect = true)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("pattern", "pattern 2"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val items = List("pattern", "pattern 2")
+    val itemsF = js.Promise.resolve[js.Array[History]](
+      js.Array(items.map(i => History(i, js.undefined)): _*)
+    )
+    var getAllCalled = false
+    historyMocks.get.expects(selectPatternsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     //when
     val result = createTestRenderer(withServicesContext(
-      withThemeContext(<(SelectPopup())(^.wrapped := props)()), selectPatternsHistory = historyService.service
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     )).root
 
     //then
-    itemsF.flatMap { items =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       assertSelectPopup(result.children(0), items, "Select")
     }
   }
@@ -160,17 +207,26 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
   it should "render Deselect component" in {
     //given
     val props = getSelectPopupProps(showSelect = false)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("pattern", "pattern 2"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val items = List("pattern", "pattern 2")
+    val itemsF = js.Promise.resolve[js.Array[History]](
+      js.Array(items.map(i => History(i, js.undefined)): _*)
+    )
+    var getAllCalled = false
+    historyMocks.get.expects(selectPatternsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     //when
     val result = createTestRenderer(withServicesContext(
-      withThemeContext(<(SelectPopup())(^.wrapped := props)()), selectPatternsHistory = historyService.service
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     )).root
 
     //then
-    itemsF.flatMap { items =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       assertSelectPopup(result.children(0), items, "Deselect")
     }
   }
