@@ -1,6 +1,7 @@
 package farjs.fs.popups
 
 import farjs.filelist.FileListServices
+import farjs.fs.FSFoldersHistory.foldersHistoryKind
 import farjs.ui.popup._
 import scommons.react._
 import scommons.react.hooks._
@@ -21,8 +22,11 @@ object FoldersHistoryPopup extends FunctionComponent[FoldersHistoryPopupProps] {
     val props = compProps.wrapped
 
     useLayoutEffect({ () =>
-      services.foldersHistory.getAll.map { items =>
-        setItems(Some(js.Array(items: _*)))
+      for {
+        foldersHistory <- services.historyProvider.get(foldersHistoryKind).toFuture
+        items <- foldersHistory.getAll.toFuture
+      } yield {
+        setItems(Some(items.map(_.item)))
       }
       ()
     }, Nil)

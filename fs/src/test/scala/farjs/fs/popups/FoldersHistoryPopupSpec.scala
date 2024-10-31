@@ -1,7 +1,8 @@
 package farjs.fs.popups
 
 import farjs.filelist.FileListServicesSpec.withServicesContext
-import farjs.filelist.history.MockFileListHistoryService
+import farjs.filelist.history._
+import farjs.fs.FSFoldersHistory.foldersHistoryKind
 import farjs.fs.popups.FoldersHistoryPopup._
 import farjs.ui.popup.ListPopupProps
 import org.scalatest.{Assertion, Succeeded}
@@ -9,7 +10,6 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 import scommons.react.test._
 
-import scala.concurrent.Future
 import scala.scalajs.js
 
 class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
@@ -17,11 +17,15 @@ class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestR
   FoldersHistoryPopup.listPopup = "ListPopup".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
-  class HistoryService {
-    val getAll = mockFunction[Future[Seq[String]]]
+  class HistoryMocks {
+    val get = mockFunction[HistoryKind, js.Promise[HistoryService]]
+    val getAll = mockFunction[js.Promise[js.Array[History]]]
 
-    val service = new MockFileListHistoryService(
+    val service = new MockHistoryService(
       getAllMock = getAll
+    )
+    val provider = new MockHistoryProvider(
+      getMock = get
     )
   }
 
@@ -29,15 +33,24 @@ class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestR
     //given
     val onChangeDir = mockFunction[String, Unit]
     val props = getFoldersHistoryPopupProps(onChangeDir = onChangeDir)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("item 1", "item 2"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array(
+      History("item 1", js.undefined),
+      History("item 2", js.undefined)
+    ))
+    var getAllCalled = false
+    historyMocks.get.expects(foldersHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
     
     val result = createTestRenderer(withServicesContext(
-      <(FoldersHistoryPopup())(^.wrapped := props)(), foldersHistory = historyService.service
+      <(FoldersHistoryPopup())(^.wrapped := props)(), historyProvider = historyMocks.provider
     )).root
 
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val popup = inside(findComponents(result, listPopup)) {
         case List(c) => c.props.asInstanceOf[ListPopupProps]
       }
@@ -55,20 +68,28 @@ class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestR
   it should "render popup" in {
     //given
     val props = getFoldersHistoryPopupProps()
-    val historyService = new HistoryService
+    val historyMocks = new HistoryMocks
     val items = List.fill(20)("item")
-    val itemsF = Future.successful(items)
-    historyService.getAll.expects().returning(itemsF)
+    val itemsF = js.Promise.resolve[js.Array[History]](
+      js.Array(items.map(i => History(i, js.undefined)): _*)
+    )
+    var getAllCalled = false
+    historyMocks.get.expects(foldersHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
     
     //when
     val result = createTestRenderer(withServicesContext(
-      <(FoldersHistoryPopup())(^.wrapped := props)(), foldersHistory = historyService.service
+      <(FoldersHistoryPopup())(^.wrapped := props)(), historyProvider = historyMocks.provider
     )).root
 
     //then
     result.children.toList should be (empty)
-    itemsF.map { _ =>
-      assertFoldersHistoryPopup(result, props, items)
+    eventually(getAllCalled shouldBe true).map { _ =>
+      assertFoldersHistoryPopup(result, items)
     }
   }
   
@@ -79,10 +100,7 @@ class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestR
     )
   }
 
-  private def assertFoldersHistoryPopup(result: TestInstance,
-                                        props: FoldersHistoryPopupProps,
-                                        items: List[String]): Assertion = {
-    
+  private def assertFoldersHistoryPopup(result: TestInstance, items: List[String]): Assertion = {
     assertComponents(result.children, List(
       <(listPopup)(^.assertPlain[ListPopupProps](inside(_) {
         case ListPopupProps(

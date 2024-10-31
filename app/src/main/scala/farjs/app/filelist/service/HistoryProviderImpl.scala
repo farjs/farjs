@@ -2,21 +2,26 @@ package farjs.app.filelist.service
 
 import farjs.filelist.history._
 import farjs.filelist.popups.MakeFolderController.mkDirsHistoryKind
+import farjs.fs.FSFoldersHistory.foldersHistoryKind
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.JSRichFutureNonThenable
 
-class HistoryProviderImpl(mkDirService: FileListHistoryService) extends HistoryProvider {
+class HistoryProviderImpl(mkDirService: FileListHistoryService,
+                          folderService: FileListHistoryService
+                         ) extends HistoryProvider {
 
   private val mkDirsHistory = new HistoryServiceImpl(mkDirService)
+  private val foldersHistory = new HistoryServiceImpl(folderService)
   private val noopHistory = new NoopHistoryService
   
   override def get(kind: HistoryKind): js.Promise[HistoryService] = {
-    val historyService =
-      if (kind.name == mkDirsHistoryKind.name) mkDirsHistory
-      else noopHistory
-    
+    val historyService = kind.name match {
+      case mkDirsHistoryKind.name => mkDirsHistory
+      case foldersHistoryKind.name => foldersHistory
+      case _ => noopHistory
+    }
     js.Promise.resolve[HistoryService](historyService)
   }
 }
