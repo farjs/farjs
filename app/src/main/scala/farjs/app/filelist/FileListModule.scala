@@ -24,7 +24,8 @@ class FileListModule(ctx: FarjsDBContext) {
   val historyProvider = new HistoryProviderImpl(
     mkDirService = mkDirService,
     folderService = folderService,
-    selectPatternService = selectPatternService
+    selectPatternService = selectPatternService,
+    copyItemService = copyItemService
   )
 
   val fileListServices = new FileListServices(

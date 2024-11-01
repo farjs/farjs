@@ -1,5 +1,6 @@
 package farjs.app.filelist.service
 
+import farjs.copymove.CopyMoveUi.copyItemsHistoryKind
 import farjs.filelist.history._
 import farjs.filelist.popups.MakeFolderController.mkDirsHistoryKind
 import farjs.filelist.popups.SelectController.selectPatternsHistoryKind
@@ -11,12 +12,14 @@ import scala.scalajs.js.JSConverters.JSRichFutureNonThenable
 
 class HistoryProviderImpl(mkDirService: FileListHistoryService,
                           folderService: FileListHistoryService,
-                          selectPatternService: FileListHistoryService
+                          selectPatternService: FileListHistoryService,
+                          copyItemService: FileListHistoryService
                          ) extends HistoryProvider {
 
   private val mkDirsHistory = new HistoryServiceImpl(mkDirService)
   private val foldersHistory = new HistoryServiceImpl(folderService)
   private val selectPatternsHistory = new HistoryServiceImpl(selectPatternService)
+  private val copyItemsHistory = new HistoryServiceImpl(copyItemService)
   private val noopHistory = new NoopHistoryService
   
   override def get(kind: HistoryKind): js.Promise[HistoryService] = {
@@ -24,6 +27,7 @@ class HistoryProviderImpl(mkDirService: FileListHistoryService,
       case mkDirsHistoryKind.name => mkDirsHistory
       case foldersHistoryKind.name => foldersHistory
       case selectPatternsHistoryKind.name => selectPatternsHistory
+      case copyItemsHistoryKind.name => copyItemsHistory
       case _ => noopHistory
     }
     js.Promise.resolve[HistoryService](historyService)

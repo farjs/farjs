@@ -1,5 +1,6 @@
 package farjs.copymove
 
+import farjs.copymove.CopyMoveUi.copyItemsHistoryKind
 import farjs.filelist.FileListServices
 import farjs.filelist.api.FileListItem
 import farjs.ui._
@@ -57,9 +58,12 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
     )
 
     useLayoutEffect({ () =>
-      services.copyItemsHistory.getAll.map { items =>
-        val itemsReversed = items.reverse
-        setItems(Some(js.Array(itemsReversed: _*)))
+      for {
+        copyItemsHistory <- services.historyProvider.get(copyItemsHistoryKind).toFuture
+        items <- copyItemsHistory.getAll.toFuture
+      } yield {
+        val itemsReversed = items.reverse.map(_.item)
+        setItems(Some(itemsReversed))
       }
       ()
     }, Nil)

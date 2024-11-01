@@ -1,9 +1,10 @@
 package farjs.copymove
 
 import farjs.copymove.CopyItemsPopup._
+import farjs.copymove.CopyMoveUi.copyItemsHistoryKind
 import farjs.filelist.FileListServicesSpec.withServicesContext
 import farjs.filelist.api.FileListItem
-import farjs.filelist.history.MockFileListHistoryService
+import farjs.filelist.history._
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.ModalContent._
@@ -15,7 +16,6 @@ import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 import scommons.react.test._
 
-import scala.concurrent.Future
 import scala.scalajs.js
 
 class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
@@ -27,11 +27,15 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
   CopyItemsPopup.buttonsPanelComp = "ButtonsPanel".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
-  class HistoryService {
-    val getAll = mockFunction[Future[Seq[String]]]
+  class HistoryMocks {
+    val get = mockFunction[HistoryKind, js.Promise[HistoryService]]
+    val getAll = mockFunction[js.Promise[js.Array[History]]]
 
-    val service = new MockFileListHistoryService(
+    val service = new MockHistoryService(
       getAllMock = getAll
+    )
+    val provider = new MockHistoryProvider(
+      getMock = get
     )
   }
 
@@ -39,14 +43,21 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     //given
     val onCancel = mockFunction[Unit]
     val props = CopyItemsPopupProps(move = false, "path", Seq(FileListItem("file 1")), _ => (), onCancel)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("path", "path 2"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val items = List("path", "path 2")
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array(items.map(i => History(i, js.undefined)): _*))
+    var getAllCalled = false
+    historyMocks.get.expects(copyItemsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val renderer = createTestRenderer(withServicesContext(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     ))
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val modal = inside(findComponents(renderer.root, modalComp)) {
         case List(modal) => modal.props.asInstanceOf[ModalProps]
       }
@@ -65,14 +76,21 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     //given
     val path = "initial path"
     val props = CopyItemsPopupProps(move = false, path, Seq(FileListItem("file 1")), _ => (), () => ())
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("path", "path 2"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val items = List("path", "path 2")
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array(items.map(i => History(i, js.undefined)): _*))
+    var getAllCalled = false
+    historyMocks.get.expects(copyItemsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val renderer = createTestRenderer(withServicesContext(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     ))
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val comboBox = inside(findComponents(renderer.root, comboBoxComp)) {
         case List(c) => c.props.asInstanceOf[ComboBoxProps]
       }
@@ -94,14 +112,21 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
     val props = CopyItemsPopupProps(move = false, "test", Seq(FileListItem("file 1")), onAction, onCancel)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("path", "path 2"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val items = List("path", "path 2")
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array(items.map(i => History(i, js.undefined)): _*))
+    var getAllCalled = false
+    historyMocks.get.expects(copyItemsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     )).root
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val comboBox = inside(findComponents(comp, comboBoxComp)) {
         case List(c) => c.props.asInstanceOf[ComboBoxProps]
       }
@@ -122,14 +147,21 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
     val props = CopyItemsPopupProps(move = false, "test", Seq(FileListItem("file 1")), onAction, onCancel)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("path", "path 2"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val items = List("path", "path 2")
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array(items.map(i => History(i, js.undefined)): _*))
+    var getAllCalled = false
+    historyMocks.get.expects(copyItemsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     )).root
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
         case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
       }
@@ -151,14 +183,21 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
     val props = CopyItemsPopupProps(move = false, "", Seq(FileListItem("file 1")), onAction, onCancel)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("path", "path 2"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val items = List("path", "path 2")
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array(items.map(i => History(i, js.undefined)): _*))
+    var getAllCalled = false
+    historyMocks.get.expects(copyItemsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     )).root
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
         case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
       }
@@ -180,14 +219,21 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
     val props = CopyItemsPopupProps(move = false, "", Seq(FileListItem("file 1")), onAction, onCancel)
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("path", "path 2"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val items = List("path", "path 2")
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array(items.map(i => History(i, js.undefined)): _*))
+    var getAllCalled = false
+    historyMocks.get.expects(copyItemsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     )).root
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
         case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
       }
@@ -207,17 +253,24 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
   it should "render component when copy" in {
     //given
     val props = CopyItemsPopupProps(move = false, "test folder", Seq(FileListItem("file 1")), _ => (), () => ())
-    val historyService = new HistoryService
-    val itemsF = Future.successful(List("path", "path 2"))
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val items = List("path", "path 2")
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array(items.map(i => History(i, js.undefined)): _*))
+    var getAllCalled = false
+    historyMocks.get.expects(copyItemsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     //when
     val result = createTestRenderer(withServicesContext(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     )).root
 
     //then
-    itemsF.flatMap { items =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       assertCopyItemsPopup(result.children(0), props, items, List("[ Copy ]", "[ Cancel ]"))
     }
   }
@@ -225,18 +278,24 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
   it should "render component when move" in {
     //given
     val props = CopyItemsPopupProps(move = true, "test folder", Seq(FileListItem("file 1")), _ => (), () => ())
-    val historyService = new HistoryService
-    val itemsF = Future.successful(Nil)
-    historyService.getAll.expects().returning(itemsF)
+    val historyMocks = new HistoryMocks
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array[History]())
+    var getAllCalled = false
+    historyMocks.get.expects(copyItemsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
 
     //when
     val result = createTestRenderer(withServicesContext(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), copyItemsHistory = historyService.service
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
     )).root
 
     //then
-    itemsF.flatMap { items =>
-      assertCopyItemsPopup(result.children(0), props, items, List("[ Rename ]", "[ Cancel ]"))
+    eventually(getAllCalled shouldBe true).map { _ =>
+      assertCopyItemsPopup(result.children(0), props, Nil, List("[ Rename ]", "[ Cancel ]"))
     }
   }
 

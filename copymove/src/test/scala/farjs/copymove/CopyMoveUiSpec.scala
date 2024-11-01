@@ -7,7 +7,7 @@ import farjs.filelist.FileListActions._
 import farjs.filelist.FileListActionsSpec.{assertFileListItemCreatedAction, assertFileListParamsChangedAction}
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem, MockFileListApi}
-import farjs.filelist.history.{FileListHistoryService, MockFileListHistoryService}
+import farjs.filelist.history._
 import farjs.ui.Dispatch
 import farjs.ui.popup.MessageBoxProps
 import farjs.ui.task.{Task, TaskAction}
@@ -49,11 +49,15 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
   }
 
   //noinspection TypeAnnotation
-  class HistoryService {
-    val save = mockFunction[String, Future[Unit]]
+  class HistoryMocks {
+    val get = mockFunction[HistoryKind, js.Promise[HistoryService]]
+    val save = mockFunction[History, js.Promise[Unit]]
 
-    val service = new MockFileListHistoryService(
+    val service = new MockHistoryService(
       saveMock = save
+    )
+    val provider = new MockHistoryProvider(
+      getMock = get
     )
   }
   
@@ -654,8 +658,8 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       from = FileListData(fromDispatch, fromActions.actions, fromState),
       maybeTo = Some(FileListData(toDispatch, toActions.actions, toState))
     )
-    val historyService = new HistoryService
-    val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)(), historyService.service))
+    val historyMocks = new HistoryMocks
+    val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)(), historyMocks.provider))
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
 
     val toDir = FileListDir("/to/path/dir 1", isRoot = false, js.Array())
@@ -696,7 +700,13 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
         ()
       }
       onClose.expects()
-      historyService.save.expects(to).returning(Future.unit)
+      var saveHistory: History = null
+      historyMocks.get.expects(copyItemsHistoryKind)
+        .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+      historyMocks.save.expects(*).onCall { h: History =>
+        saveHistory = h
+        js.Promise.resolve[Unit](())
+      }
       fromActions.updateDir.expects(*, leftDir.path).returning(leftAction)
       toActions.updateDir.expects(*, rightDir.path).returning(rightAction)
       fromDispatch.expects(leftAction)
@@ -709,7 +719,14 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       for {
         _ <- leftAction.task.result.toFuture
         _ <- rightAction.task.result.toFuture
-      } yield Succeeded
+        _ <- eventually(saveHistory should not be null)
+      } yield {
+        inside(saveHistory) {
+          case History(item, params) =>
+            item shouldBe to
+            params shouldBe js.undefined
+        }
+      }
     }
   }
 
@@ -735,8 +752,8 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       from = FileListData(fromDispatch, fromActions.actions, fromState),
       maybeTo = Some(FileListData(toDispatch, toActions.actions, toState))
     )
-    val historyService = new HistoryService
-    val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)(), historyService.service))
+    val historyMocks = new HistoryMocks
+    val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)(), historyMocks.provider))
     val copyPopup = findComponentProps(renderer.root, copyItemsPopup)
     val to = "test to path"
     copyPopup.onAction(to)
@@ -757,7 +774,13 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
       //then
       onClose.expects()
-      historyService.save.expects(to).returning(Future.unit)
+      var saveHistory: History = null
+      historyMocks.get.expects(copyItemsHistoryKind)
+        .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+      historyMocks.save.expects(*).onCall { h: History =>
+        saveHistory = h
+        js.Promise.resolve[Unit](())
+      }
       fromActions.updateDir.expects(*, leftDir.path).returning(leftAction)
       fromDispatch.expects(leftAction)
       fromDispatch.expects(*).onCall { action: Any =>
@@ -769,7 +792,16 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       progressPopup.onDone()
 
       //then
-      leftAction.task.result.toFuture.map(_ => Succeeded)
+      for {
+        _ <- leftAction.task.result.toFuture
+        _ <- eventually(saveHistory should not be null)
+      } yield {
+        inside(saveHistory) {
+          case History(item, params) =>
+            item shouldBe to
+            params shouldBe js.undefined
+        }
+      }
     }
   }
 
@@ -954,9 +986,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 object CopyMoveUiSpec {
 
   def withContext(element: ReactElement,
-                  copyItemsHistory: FileListHistoryService = new MockFileListHistoryService
+                  historyProvider: HistoryProvider = new MockHistoryProvider
                  ): ReactElement = {
 
-    FileListServicesSpec.withServicesContext(withThemeContext(element), copyItemsHistory = copyItemsHistory)
+    FileListServicesSpec.withServicesContext(withThemeContext(element), historyProvider = historyProvider)
   }
 }
