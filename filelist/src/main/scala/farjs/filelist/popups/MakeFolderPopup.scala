@@ -1,6 +1,6 @@
 package farjs.filelist.popups
 
-import farjs.filelist.FileListServices
+import farjs.filelist.history.HistoryProvider
 import farjs.filelist.popups.MakeFolderController.mkDirsHistoryKind
 import farjs.ui._
 import farjs.ui.border._
@@ -27,7 +27,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
   private[popups] var buttonsPanelComp: ReactClass = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
-    val services = FileListServices.useServices
+    val historyProvider = HistoryProvider.useHistoryProvider
     val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
     val props = compProps.wrapped
     val (folderName, setFolderName) = useState("")
@@ -50,7 +50,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
 
     useLayoutEffect({ () =>
       for {
-        mkDirsHistory <- services.historyProvider.get(mkDirsHistoryKind).toFuture
+        mkDirsHistory <- historyProvider.get(mkDirsHistoryKind).toFuture
         items <- mkDirsHistory.getAll.toFuture
       } yield {
         val itemsReversed = items.reverse.map(_.item)

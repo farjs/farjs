@@ -1,8 +1,8 @@
 package farjs.copymove
 
 import farjs.copymove.CopyMoveUi.copyItemsHistoryKind
-import farjs.filelist.FileListServices
 import farjs.filelist.api.FileListItem
+import farjs.filelist.history.HistoryProvider
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.ModalContent._
@@ -29,7 +29,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
   private[copymove] var buttonsPanelComp: ReactClass = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
-    val services = FileListServices.useServices
+    val historyProvider = HistoryProvider.useHistoryProvider
     val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
     val props = compProps.wrapped
     val (path, setPath) = useState(props.path)
@@ -59,7 +59,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
 
     useLayoutEffect({ () =>
       for {
-        copyItemsHistory <- services.historyProvider.get(copyItemsHistoryKind).toFuture
+        copyItemsHistory <- historyProvider.get(copyItemsHistoryKind).toFuture
         items <- copyItemsHistory.getAll.toFuture
       } yield {
         val itemsReversed = items.reverse.map(_.item)

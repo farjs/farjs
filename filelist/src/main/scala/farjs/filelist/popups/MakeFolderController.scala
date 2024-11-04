@@ -1,7 +1,7 @@
 package farjs.filelist.popups
 
-import farjs.filelist.history.{History, HistoryKind}
-import farjs.filelist.{FileListServices, FileListUiData}
+import farjs.filelist.FileListUiData
+import farjs.filelist.history.{History, HistoryKind, HistoryProvider}
 import scommons.react._
 import scommons.react.hooks._
 
@@ -17,7 +17,7 @@ object MakeFolderController extends FunctionComponent[FileListUiData] {
   private var initialMultiple = false
 
   protected def render(compProps: Props): ReactElement = {
-    val services = FileListServices.useServices
+    val historyProvider = HistoryProvider.useHistoryProvider
     val (multiple, setMultiple) = useState(initialMultiple)
     val props = compProps.wrapped
 
@@ -34,7 +34,7 @@ object MakeFolderController extends FunctionComponent[FileListUiData] {
             )
             for {
               _ <- action.task.result.toFuture
-              mkDirsHistory <- services.historyProvider.get(mkDirsHistoryKind).toFuture
+              mkDirsHistory <- historyProvider.get(mkDirsHistoryKind).toFuture
               _ <- mkDirsHistory.save(History(dir, js.undefined)).toFuture
             } yield {
               setMultiple(multiple)

@@ -1,6 +1,6 @@
 package farjs.filelist.popups
 
-import farjs.filelist.FileListServices
+import farjs.filelist.history.HistoryProvider
 import farjs.filelist.popups.SelectController.selectPatternsHistoryKind
 import farjs.ui._
 import farjs.ui.popup.ModalContent._
@@ -22,7 +22,7 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
   private[popups] var comboBoxComp: ReactClass = ComboBox
 
   protected def render(compProps: Props): ReactElement = {
-    val services = FileListServices.useServices
+    val historyProvider = HistoryProvider.useHistoryProvider
     val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
     val props = compProps.wrapped
     val (pattern, setPattern) = useState("")
@@ -39,7 +39,7 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
     
     useLayoutEffect({ () =>
       for {
-        selectPatternsHistory <- services.historyProvider.get(selectPatternsHistoryKind).toFuture
+        selectPatternsHistory <- historyProvider.get(selectPatternsHistoryKind).toFuture
         items <- selectPatternsHistory.getAll.toFuture
       } yield {
         val itemsReversed = items.reverse.map(_.item)

@@ -1,6 +1,6 @@
 package farjs.fs
 
-import farjs.filelist.FileListServicesSpec.withServicesContext
+import farjs.filelist.history.HistoryProviderSpec.withHistoryProvider
 import farjs.filelist.history._
 import farjs.fs.FSFoldersHistory.foldersHistoryKind
 import org.scalatest.Succeeded
@@ -35,8 +35,8 @@ class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec
     historyMocks.save.expects(*).never()
     
     //when
-    val renderer = createTestRenderer(withServicesContext(
-      <(FSFoldersHistory())(^.wrapped := props)(), historyProvider = historyMocks.provider
+    val renderer = createTestRenderer(withHistoryProvider(
+      <(FSFoldersHistory())(^.wrapped := props)(), historyMocks.provider
     ))
 
     //then
@@ -58,8 +58,8 @@ class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec
     }
     
     //when
-    val renderer = createTestRenderer(withServicesContext(
-      <(FSFoldersHistory())(^.wrapped := props)(), historyProvider = historyMocks.provider
+    val renderer = createTestRenderer(withHistoryProvider(
+      <(FSFoldersHistory())(^.wrapped := props)(), historyMocks.provider
     ))
 
     //then
@@ -85,8 +85,8 @@ class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec
       js.Promise.resolve[Unit](())
     }
 
-    val renderer = createTestRenderer(withServicesContext(
-      <(FSFoldersHistory())(^.wrapped := props)(), historyProvider = historyMocks.provider
+    val renderer = createTestRenderer(withHistoryProvider(
+      <(FSFoldersHistory())(^.wrapped := props)(), historyMocks.provider
     ))
     eventually(saveHistory should not be null).map { _ =>
       inside(saveHistory) {
@@ -103,8 +103,8 @@ class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec
 
     //when
     TestRenderer.act { () =>
-      renderer.update(withServicesContext(
-        <(FSFoldersHistory())(^.wrapped := updatedProps)(), historyProvider = historyMocks.provider
+      renderer.update(withHistoryProvider(
+        <(FSFoldersHistory())(^.wrapped := updatedProps)(), historyMocks.provider
       ))
     }
     
@@ -125,8 +125,8 @@ class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec
       js.Promise.resolve[Unit](())
     }.twice()
     
-    val renderer = createTestRenderer(withServicesContext(
-      <(FSFoldersHistory())(^.wrapped := props)(), historyProvider = historyMocks.provider
+    val renderer = createTestRenderer(withHistoryProvider(
+      <(FSFoldersHistory())(^.wrapped := props)(), historyMocks.provider
     ))
     eventually(saveHistory should not be null).map { _ =>
       inside(saveHistory) {
@@ -140,8 +140,8 @@ class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec
 
     //when
     TestRenderer.act { () =>
-      renderer.update(withServicesContext(
-        <(FSFoldersHistory())(^.wrapped := updatedProps)(), historyProvider = historyMocks.provider
+      renderer.update(withHistoryProvider(
+        <(FSFoldersHistory())(^.wrapped := updatedProps)(), historyMocks.provider
       ))
     }
 

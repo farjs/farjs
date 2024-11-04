@@ -2,8 +2,8 @@ package farjs.copymove
 
 import farjs.copymove.CopyItemsPopup._
 import farjs.copymove.CopyMoveUi.copyItemsHistoryKind
-import farjs.filelist.FileListServicesSpec.withServicesContext
 import farjs.filelist.api.FileListItem
+import farjs.filelist.history.HistoryProviderSpec.withHistoryProvider
 import farjs.filelist.history._
 import farjs.ui._
 import farjs.ui.border._
@@ -54,8 +54,8 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       itemsF
     }
 
-    val renderer = createTestRenderer(withServicesContext(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
+    val renderer = createTestRenderer(withHistoryProvider(
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyMocks.provider
     ))
     eventually(getAllCalled shouldBe true).map { _ =>
       val modal = inside(findComponents(renderer.root, modalComp)) {
@@ -87,8 +87,8 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       itemsF
     }
 
-    val renderer = createTestRenderer(withServicesContext(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
+    val renderer = createTestRenderer(withHistoryProvider(
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyMocks.provider
     ))
     eventually(getAllCalled shouldBe true).map { _ =>
       val comboBox = inside(findComponents(renderer.root, comboBoxComp)) {
@@ -123,8 +123,8 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       itemsF
     }
 
-    val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
+    val comp = createTestRenderer(withHistoryProvider(
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyMocks.provider
     )).root
     eventually(getAllCalled shouldBe true).map { _ =>
       val comboBox = inside(findComponents(comp, comboBoxComp)) {
@@ -158,8 +158,8 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       itemsF
     }
 
-    val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
+    val comp = createTestRenderer(withHistoryProvider(
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyMocks.provider
     )).root
     eventually(getAllCalled shouldBe true).map { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
@@ -194,8 +194,8 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       itemsF
     }
 
-    val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
+    val comp = createTestRenderer(withHistoryProvider(
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyMocks.provider
     )).root
     eventually(getAllCalled shouldBe true).map { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
@@ -230,8 +230,8 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       itemsF
     }
 
-    val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
+    val comp = createTestRenderer(withHistoryProvider(
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyMocks.provider
     )).root
     eventually(getAllCalled shouldBe true).map { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
@@ -265,8 +265,8 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     }
 
     //when
-    val result = createTestRenderer(withServicesContext(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
+    val result = createTestRenderer(withHistoryProvider(
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyMocks.provider
     )).root
 
     //then
@@ -289,8 +289,8 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     }
 
     //when
-    val result = createTestRenderer(withServicesContext(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
+    val result = createTestRenderer(withHistoryProvider(
+      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyMocks.provider
     )).root
 
     //then

@@ -5,7 +5,7 @@ import farjs.copymove.CopyMoveUiAction._
 import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.history.{History, HistoryKind}
+import farjs.filelist.history.{History, HistoryKind, HistoryProvider}
 import farjs.ui.popup._
 import farjs.ui.task.{Task, TaskAction}
 import farjs.ui.theme.Theme
@@ -34,7 +34,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
                  maybeTo: Option[FileListData]) extends FunctionComponent[FileListPluginUiProps] {
 
   protected def render(compProps: Props): ReactElement = {
-    val services = FileListServices.useServices
+    val historyProvider = HistoryProvider.useHistoryProvider
     val (maybeTotal, setTotal) = useState[Option[Double]](None)
     val (maybeToPath, setToPath) = useState[Option[(String, String)]](None)
     val (inplace, setInplace) = useState(false)
@@ -64,7 +64,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
       props.onClose()
 
       for {
-        copyItemsHistory <- services.historyProvider.get(copyItemsHistoryKind).toFuture
+        copyItemsHistory <- historyProvider.get(copyItemsHistoryKind).toFuture
         _ <- copyItemsHistory.save(History(path, js.undefined)).toFuture
       } yield ()
 

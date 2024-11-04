@@ -989,6 +989,6 @@ object CopyMoveUiSpec {
                   historyProvider: HistoryProvider = new MockHistoryProvider
                  ): ReactElement = {
 
-    FileListServicesSpec.withServicesContext(withThemeContext(element), historyProvider = historyProvider)
+    HistoryProviderSpec.withHistoryProvider(withThemeContext(element), historyProvider)
   }
 }

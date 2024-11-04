@@ -1,9 +1,9 @@
 package farjs.filelist.popups
 
 import farjs.filelist.FileListActions.FileListParamsChangedAction
+import farjs.filelist.FileListUiData
 import farjs.filelist.api.FileListItem
-import farjs.filelist.history.{History, HistoryKind}
-import farjs.filelist.{FileListServices, FileListUiData}
+import farjs.filelist.history.{History, HistoryKind, HistoryProvider}
 import scommons.react._
 
 import java.util.regex.Pattern
@@ -17,7 +17,7 @@ object SelectController extends FunctionComponent[FileListUiData] {
   private[popups] var selectPopupComp: UiComponent[SelectPopupProps] = SelectPopup
 
   protected def render(compProps: Props): ReactElement = {
-    val services = FileListServices.useServices
+    val historyProvider = HistoryProvider.useHistoryProvider
     val props = compProps.wrapped
 
     (props.data, props.showSelectPopup) match {
@@ -26,7 +26,7 @@ object SelectController extends FunctionComponent[FileListUiData] {
           showSelect = showSelectPopup,
           onAction = { pattern =>
             for {
-              selectPatternsHistory <- services.historyProvider.get(selectPatternsHistoryKind).toFuture
+              selectPatternsHistory <- historyProvider.get(selectPatternsHistoryKind).toFuture
               _ <- selectPatternsHistory.save(History(pattern, js.undefined)).toFuture
             } yield ()
 

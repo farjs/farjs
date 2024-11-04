@@ -1,6 +1,6 @@
 package farjs.fs.popups
 
-import farjs.filelist.FileListServicesSpec.withServicesContext
+import farjs.filelist.history.HistoryProviderSpec.withHistoryProvider
 import farjs.filelist.history._
 import farjs.fs.FSFoldersHistory.foldersHistoryKind
 import farjs.fs.popups.FoldersHistoryPopup._
@@ -46,8 +46,8 @@ class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestR
       itemsF
     }
     
-    val result = createTestRenderer(withServicesContext(
-      <(FoldersHistoryPopup())(^.wrapped := props)(), historyProvider = historyMocks.provider
+    val result = createTestRenderer(withHistoryProvider(
+      <(FoldersHistoryPopup())(^.wrapped := props)(), historyMocks.provider
     )).root
 
     eventually(getAllCalled shouldBe true).map { _ =>
@@ -82,8 +82,8 @@ class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestR
     }
     
     //when
-    val result = createTestRenderer(withServicesContext(
-      <(FoldersHistoryPopup())(^.wrapped := props)(), historyProvider = historyMocks.provider
+    val result = createTestRenderer(withHistoryProvider(
+      <(FoldersHistoryPopup())(^.wrapped := props)(), historyMocks.provider
     )).root
 
     //then

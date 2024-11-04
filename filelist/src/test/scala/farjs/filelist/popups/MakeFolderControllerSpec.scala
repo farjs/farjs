@@ -1,8 +1,8 @@
 package farjs.filelist.popups
 
-import farjs.filelist.FileListServicesSpec.withServicesContext
 import farjs.filelist._
 import farjs.filelist.api.FileListDir
+import farjs.filelist.history.HistoryProviderSpec.withHistoryProvider
 import farjs.filelist.history._
 import farjs.filelist.popups.MakeFolderController._
 import farjs.ui.Dispatch
@@ -54,8 +54,8 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
       onClose = onClose
     )
     val historyMocks = new HistoryMocks
-    val renderer = createTestRenderer(withServicesContext(
-      <(MakeFolderController())(^.wrapped := props)(), historyProvider = historyMocks.provider
+    val renderer = createTestRenderer(withHistoryProvider(
+      <(MakeFolderController())(^.wrapped := props)(), historyMocks.provider
     ))
     findComponentProps(renderer.root, makeFolderPopup).multiple shouldBe false
     val action = TaskAction(
@@ -108,8 +108,8 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
       onClose = onClose
     )
     val historyProvider = new MockHistoryProvider
-    val comp = testRender(withServicesContext(
-      <(MakeFolderController())(^.wrapped := props)(), historyProvider = historyProvider
+    val comp = testRender(withHistoryProvider(
+      <(MakeFolderController())(^.wrapped := props)(), historyProvider
     ))
     val popup = findComponentProps(comp, makeFolderPopup)
 
@@ -134,8 +134,8 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val historyProvider = new MockHistoryProvider
 
     //when
-    val result = testRender(withServicesContext(
-      <(MakeFolderController())(^.wrapped := props)(), historyProvider = historyProvider
+    val result = testRender(withHistoryProvider(
+      <(MakeFolderController())(^.wrapped := props)(), historyProvider
     ))
 
     //then
@@ -154,8 +154,8 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val historyProvider = new MockHistoryProvider
 
     //when
-    val renderer = createTestRenderer(withServicesContext(
-      <(MakeFolderController())(^.wrapped := props)(), historyProvider = historyProvider
+    val renderer = createTestRenderer(withHistoryProvider(
+      <(MakeFolderController())(^.wrapped := props)(), historyProvider
     ))
 
     //then
@@ -168,8 +168,8 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val historyProvider = new MockHistoryProvider
 
     //when
-    val renderer = createTestRenderer(withServicesContext(
-      <(MakeFolderController())(^.wrapped := props)(), historyProvider = historyProvider
+    val renderer = createTestRenderer(withHistoryProvider(
+      <(MakeFolderController())(^.wrapped := props)(), historyProvider
     ))
 
     //then

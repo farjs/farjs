@@ -2,8 +2,8 @@ package farjs.filelist.popups
 
 import farjs.filelist.FileListActions.FileListParamsChangedAction
 import farjs.filelist.FileListActionsSpec.assertFileListParamsChangedAction
-import farjs.filelist.FileListServicesSpec.withServicesContext
 import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.filelist.history.HistoryProviderSpec.withHistoryProvider
 import farjs.filelist.history._
 import farjs.filelist.popups.SelectController._
 import farjs.filelist.{FileListData, FileListState, FileListUiData, MockFileListActions}
@@ -48,8 +48,8 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
       onClose = onClose
     )
     val historyMocks = new HistoryMocks
-    val renderer = createTestRenderer(withServicesContext(
-      <(SelectController())(^.wrapped := props)(), historyProvider = historyMocks.provider
+    val renderer = createTestRenderer(withHistoryProvider(
+      <(SelectController())(^.wrapped := props)(), historyMocks.provider
     ))
     val pattern = "*"
 
@@ -99,8 +99,8 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
       onClose = onClose
     )
     val historyMocks = new HistoryMocks
-    val renderer = createTestRenderer(withServicesContext(
-      <(SelectController())(^.wrapped := props)(), historyProvider = historyMocks.provider
+    val renderer = createTestRenderer(withHistoryProvider(
+      <(SelectController())(^.wrapped := props)(), historyMocks.provider
     ))
     val pattern = "*.test"
 
@@ -150,8 +150,8 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
       onClose = onClose
     )
     val historyMocks = new HistoryMocks
-    val renderer = createTestRenderer(withServicesContext(
-      <(SelectController())(^.wrapped := props)(), historyProvider = historyMocks.provider
+    val renderer = createTestRenderer(withHistoryProvider(
+      <(SelectController())(^.wrapped := props)(), historyMocks.provider
     ))
     val pattern = "file1.test;file2.test"
 
@@ -199,7 +199,7 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
       data = Some(FileListData(dispatch, actions, state)),
       onClose = onClose
     )
-    val comp = testRender(withServicesContext(
+    val comp = testRender(withHistoryProvider(
       <(SelectController())(^.wrapped := props)()
     ))
     val popup = findComponentProps(comp, selectPopupComp)
@@ -224,7 +224,7 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     )
 
     //when
-    val result = testRender(withServicesContext(
+    val result = testRender(withHistoryProvider(
       <(SelectController())(^.wrapped := props)()
     ))
 
@@ -246,7 +246,7 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     )
 
     //when
-    val result = testRender(withServicesContext(
+    val result = testRender(withHistoryProvider(
       <(SelectController())(^.wrapped := props)()
     ))
 
@@ -265,7 +265,7 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     val props = FileListUiData(data = Some(FileListData(dispatch, actions, state)))
 
     //when
-    val renderer = createTestRenderer(withServicesContext(
+    val renderer = createTestRenderer(withHistoryProvider(
       <(SelectController())(^.wrapped := props)()
     ))
 
@@ -276,11 +276,10 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
   it should "render empty component when data is None" in {
     //given
     val props = FileListUiData(showSelectPopup = Some(true))
-    val historyService = new MockFileListHistoryService
 
     //when
-    val renderer = createTestRenderer(withServicesContext(
-      <(SelectController())(^.wrapped := props)(), selectPatternsHistory = historyService
+    val renderer = createTestRenderer(withHistoryProvider(
+      <(SelectController())(^.wrapped := props)()
     ))
 
     //then

@@ -1,6 +1,6 @@
 package farjs.filelist.popups
 
-import farjs.filelist.FileListServicesSpec.withServicesContext
+import farjs.filelist.history.HistoryProviderSpec.withHistoryProvider
 import farjs.filelist.history._
 import farjs.filelist.popups.SelectController.selectPatternsHistoryKind
 import farjs.filelist.popups.SelectPopup._
@@ -50,8 +50,8 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       itemsF
     }
 
-    val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
+    val comp = createTestRenderer(withHistoryProvider(
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyMocks.provider
     )).root
 
     eventually(getAllCalled shouldBe true).map { _ =>
@@ -86,8 +86,8 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       itemsF
     }
 
-    val renderer = createTestRenderer(withServicesContext(
-      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
+    val renderer = createTestRenderer(withHistoryProvider(
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyMocks.provider
     ))
     eventually(getAllCalled shouldBe true).map { _ =>
       val comboBox = inside(findComponents(renderer.root, comboBoxComp)) {
@@ -124,8 +124,8 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       itemsF
     }
 
-    val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
+    val comp = createTestRenderer(withHistoryProvider(
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyMocks.provider
     )).root
 
     eventually(getAllCalled shouldBe true).map { _ =>
@@ -158,8 +158,8 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       itemsF
     }
 
-    val comp = createTestRenderer(withServicesContext(
-      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
+    val comp = createTestRenderer(withHistoryProvider(
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyMocks.provider
     )).root
 
     eventually(getAllCalled shouldBe true).map { _ =>
@@ -194,8 +194,8 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     }
 
     //when
-    val result = createTestRenderer(withServicesContext(
-      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
+    val result = createTestRenderer(withHistoryProvider(
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyMocks.provider
     )).root
 
     //then
@@ -221,8 +221,8 @@ class SelectPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     }
 
     //when
-    val result = createTestRenderer(withServicesContext(
-      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyProvider = historyMocks.provider
+    val result = createTestRenderer(withHistoryProvider(
+      withThemeContext(<(SelectPopup())(^.wrapped := props)()), historyMocks.provider
     )).root
 
     //then
