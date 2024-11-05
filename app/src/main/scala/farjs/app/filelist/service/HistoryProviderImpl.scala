@@ -1,6 +1,8 @@
 package farjs.app.filelist.service
 
 import farjs.copymove.CopyMoveUi.copyItemsHistoryKind
+import farjs.file.FileViewHistory
+import farjs.file.FileViewHistory.fileViewsHistoryKind
 import farjs.filelist.history._
 import farjs.filelist.popups.MakeFolderController.mkDirsHistoryKind
 import farjs.filelist.popups.SelectController.selectPatternsHistoryKind
@@ -13,13 +15,15 @@ import scala.scalajs.js.JSConverters.JSRichFutureNonThenable
 class HistoryProviderImpl(mkDirService: FileListHistoryService,
                           folderService: FileListHistoryService,
                           selectPatternService: FileListHistoryService,
-                          copyItemService: FileListHistoryService
+                          copyItemService: FileListHistoryService,
+                          fileViewHistoryService: FileViewHistoryServiceImpl
                          ) extends HistoryProvider {
 
   private val mkDirsHistory = new HistoryServiceImpl(mkDirService)
   private val foldersHistory = new HistoryServiceImpl(folderService)
   private val selectPatternsHistory = new HistoryServiceImpl(selectPatternService)
   private val copyItemsHistory = new HistoryServiceImpl(copyItemService)
+  private val fileViewsHistory = new ViewHistoryServiceImpl(fileViewHistoryService)
   private val noopHistory = new NoopHistoryService
   
   override def get(kind: HistoryKind): js.Promise[HistoryService] = {
@@ -28,10 +32,27 @@ class HistoryProviderImpl(mkDirService: FileListHistoryService,
       case foldersHistoryKind.name => foldersHistory
       case selectPatternsHistoryKind.name => selectPatternsHistory
       case copyItemsHistoryKind.name => copyItemsHistory
+      case fileViewsHistoryKind.name => fileViewsHistory
       case _ => noopHistory
     }
     js.Promise.resolve[HistoryService](historyService)
   }
+}
+
+class ViewHistoryServiceImpl(oldService: FileViewHistoryServiceImpl) extends NoopHistoryService {
+
+  override def getAll: js.Promise[js.Array[History]] = oldService.getAll.map { items =>
+    js.Array[History](items.map(FileViewHistory.toHistory): _*)
+  }.toJSPromise
+
+  override def getOne(item: String): js.Promise[js.UndefOr[History]] =
+    oldService.getOne(item, isEdit = false).map {
+      case Some(h) => FileViewHistory.toHistory(h): js.UndefOr[History]
+      case None => js.undefined: js.UndefOr[History]
+    }.toJSPromise
+
+  override def save(h: History): js.Promise[Unit] =
+    oldService.save(FileViewHistory.fromHistory(h).orNull).toJSPromise
 }
 
 class HistoryServiceImpl(oldService: FileListHistoryService) extends NoopHistoryService {

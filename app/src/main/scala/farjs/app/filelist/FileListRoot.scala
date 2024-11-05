@@ -3,7 +3,7 @@ package farjs.app.filelist
 import farjs.app.filelist.FileListRoot._
 import farjs.archiver.ArchiverPlugin
 import farjs.copymove.CopyMovePlugin
-import farjs.file.{FilePlugin, FileServices}
+import farjs.file.FilePlugin
 import farjs.filelist._
 import farjs.filelist.history.HistoryProvider
 import farjs.fs.{FSPlugin, FSServices}
@@ -20,15 +20,13 @@ class FileListRoot(dispatch: Dispatch,
   protected def render(compProps: Props): ReactElement = {
     <(HistoryProvider.Context.Provider)(^.contextValue := module.historyProvider)(
       <(FSServices.Context.Provider)(^.contextValue := module.fsServices)(
-        <(FileServices.Context.Provider)(^.contextValue := module.fileServices)(
-          <(withPortalsComp)()(
-            <(fileListComp)(^.wrapped := FileListBrowserProps(
-              dispatch = dispatch,
-              plugins = plugins
-            ))(),
+        <(withPortalsComp)()(
+          <(fileListComp)(^.wrapped := FileListBrowserProps(
+            dispatch = dispatch,
+            plugins = plugins
+          ))(),
 
-            compProps.children
-          )
+          compProps.children
         )
       )
     )

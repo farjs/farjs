@@ -1,15 +1,17 @@
 package farjs.viewer
 
-import farjs.file.FileServicesSpec.withServicesContext
+import farjs.file.FileViewHistory.fileViewsHistoryKind
 import farjs.file.FileViewHistorySpec.assertFileViewHistory
-import farjs.file.{Encoding, FileViewHistory, FileViewHistoryParams, MockFileViewHistoryService}
+import farjs.file.{Encoding, FileViewHistory, FileViewHistoryParams}
+import farjs.filelist.history.HistoryProviderSpec.withHistoryProvider
+import farjs.filelist.history._
 import farjs.filelist.theme.FileListTheme
 import farjs.filelist.theme.FileListThemeSpec.withThemeContext
 import farjs.ui.WithSizeProps
 import farjs.ui.task.{Task, TaskAction}
 import farjs.viewer.ViewerController._
 import org.scalactic.source.Position
-import org.scalatest.{Assertion, Succeeded}
+import org.scalatest.{Assertion, OptionValues, Succeeded}
 import scommons.nodejs.raw.FSConstants
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
@@ -19,7 +21,8 @@ import scommons.react.test._
 import scala.concurrent.Future
 import scala.scalajs.js
 
-class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
+class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
+  with TestRendererUtils with OptionValues {
 
   ViewerController.withSizeComp = "WithSize".asInstanceOf[ReactClass]
   ViewerController.viewerContent = mockUiComponent("ViewerContent")
@@ -36,13 +39,17 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
   }
 
   //noinspection TypeAnnotation
-  class FileViewHistoryService {
-    val getOne = mockFunction[String, Boolean, Future[Option[FileViewHistory]]]
-    val save = mockFunction[FileViewHistory, Future[Unit]]
+  class HistoryMocks {
+    val get = mockFunction[HistoryKind, js.Promise[HistoryService]]
+    val getOne = mockFunction[String, js.Promise[js.UndefOr[History]]]
+    val save = mockFunction[History, js.Promise[Unit]]
 
-    val service = new MockFileViewHistoryService(
+    val service = new MockHistoryService(
       getOneMock = getOne,
       saveMock = save
+    )
+    val provider = new MockHistoryProvider(
+      getMock = get
     )
   }
 
@@ -54,8 +61,11 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val dispatch = mockFunction[js.Any, Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None)
     val expectedError = new Exception("test error")
-    val historyService = new FileViewHistoryService
-    historyService.getOne.expects(props.filePath, false).returning(Future.successful(None))
+    val historyMocks = new HistoryMocks
+    historyMocks.get.expects(fileViewsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getOne.expects(props.filePath)
+      .returning(js.Promise.resolve[js.UndefOr[History]](js.undefined: js.UndefOr[History]))
 
     //then
     var openF: Future[_] = null
@@ -67,8 +77,8 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     }
 
     //when
-    val renderer = createTestRenderer(withThemeContext(withServicesContext(
-      <(ViewerController())(^.wrapped := props)(), historyService.service
+    val renderer = createTestRenderer(withThemeContext(withHistoryProvider(
+      <(ViewerController())(^.wrapped := props)(), historyMocks.provider
     )))
 
     //then
@@ -91,8 +101,11 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None, setViewport)
     val fd = 123
     var resViewport: ViewerFileViewport = null
-    val historyService = new FileViewHistoryService
-    historyService.getOne.expects(props.filePath, false).returning(Future.successful(None))
+    val historyMocks = new HistoryMocks
+    historyMocks.get.expects(fileViewsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getOne.expects(props.filePath)
+      .returning(js.Promise.resolve[js.UndefOr[History]](js.undefined: js.UndefOr[History]))
 
     //then
     fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).returning(fd)
@@ -103,8 +116,8 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     }
 
     //when
-    val renderer = createTestRenderer(withThemeContext(withServicesContext(
-      <(ViewerController())(^.wrapped := props)(), historyService.service
+    val renderer = createTestRenderer(withThemeContext(withHistoryProvider(
+      <(ViewerController())(^.wrapped := props)(), historyMocks.provider
     )))
 
     //then
@@ -143,7 +156,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None, setViewport)
     val fd = 123
     var resViewport: ViewerFileViewport = null
-    val historyService = new FileViewHistoryService
+    val historyMocks = new HistoryMocks
     val history = FileViewHistory(
       path = props.filePath,
       params = FileViewHistoryParams(
@@ -154,7 +167,10 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
         column = 7
       )
     )
-    historyService.getOne.expects(props.filePath, false).returning(Future.successful(Some(history)))
+    historyMocks.get.expects(fileViewsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getOne.expects(props.filePath)
+      .returning(js.Promise.resolve[js.UndefOr[History]](FileViewHistory.toHistory(history)))
 
     //then
     fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).returning(fd)
@@ -165,8 +181,8 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     }
 
     //when
-    val renderer = createTestRenderer(withThemeContext(withServicesContext(
-      <(ViewerController())(^.wrapped := props)(), historyService.service
+    val renderer = createTestRenderer(withThemeContext(withHistoryProvider(
+      <(ViewerController())(^.wrapped := props)(), historyMocks.provider
     )))
 
     //then
@@ -183,26 +199,33 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
           position shouldBe history.params.position
           linesData shouldBe Nil
       }
-    }.map { _ =>
+    }.flatMap { _ =>
       //when
       TestRenderer.act { () =>
-        renderer.update(withThemeContext(withServicesContext(
-          <(ViewerController())(^.wrapped := props.copy(viewport = Some(resViewport)))(), historyService.service
+        renderer.update(withThemeContext(withHistoryProvider(
+          <(ViewerController())(^.wrapped := props.copy(viewport = Some(resViewport)))(), historyMocks.provider
         )))
       }
 
       //then
       fs.closeSync.expects(fd)
-      historyService.save.expects(*).onCall { resHistory: FileViewHistory =>
-        assertFileViewHistory(resHistory, history)
-        Future.unit
+      var saveHistory: History = null
+      historyMocks.get.expects(fileViewsHistoryKind)
+        .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+      historyMocks.save.expects(*).onCall { h: History =>
+        saveHistory = h
+        js.Promise.resolve[Unit](())
       }
 
       //when
       TestRenderer.act { () =>
         renderer.unmount()
       }
-      Succeeded
+
+      //then
+      eventually(saveHistory should not be null).map { _ =>
+        assertFileViewHistory(FileViewHistory.fromHistory(saveHistory).value, history)
+      }
     }
   }
 
@@ -214,35 +237,40 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val dispatch = mockFunction[js.Any, Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None)
     fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).returning(123)
-    val historyService = new FileViewHistoryService
-    historyService.getOne.expects(props.filePath, false).returning(Future.successful(None))
+    val historyMocks = new HistoryMocks
+    historyMocks.get.expects(fileViewsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getOne.expects(props.filePath)
+      .returning(js.Promise.resolve[js.UndefOr[History]](js.undefined: js.UndefOr[History]))
 
-    val renderer = createTestRenderer(withThemeContext(withServicesContext(
-      <(ViewerController())(^.wrapped := props)(), historyService.service
+    val renderer = createTestRenderer(withThemeContext(withHistoryProvider(
+      <(ViewerController())(^.wrapped := props)(), historyMocks.provider
     )))
-
-    val updatedProps = props.copy(viewport = Some(ViewerFileViewport(
-      fileReader = new MockViewerFileReader,
-      encoding = "win",
-      size = 123,
-      width = 3,
-      height = 2,
-      column = 1,
-      linesData = List(
-        "test" -> 4,
-        "test content" -> 12
-      )
-    )))
-
-    //when
-    TestRenderer.act { () =>
-      renderer.update(withThemeContext(withServicesContext(
-        <(ViewerController())(^.wrapped := updatedProps)(), historyService.service
+    
+    eventually(assertViewerController(renderer.root, props)).map { _ =>
+      val updatedProps = props.copy(viewport = Some(ViewerFileViewport(
+        fileReader = new MockViewerFileReader,
+        encoding = "win",
+        size = 123,
+        width = 3,
+        height = 2,
+        column = 1,
+        linesData = List(
+          "test" -> 4,
+          "test content" -> 12
+        )
       )))
-    }
 
-    //then
-    assertViewerController(renderer.root, updatedProps, scrollIndicators = List(1))
+      //when
+      TestRenderer.act { () =>
+        renderer.update(withThemeContext(withHistoryProvider(
+          <(ViewerController())(^.wrapped := updatedProps)(), historyMocks.provider
+        )))
+      }
+
+      //then
+      assertViewerController(renderer.root, updatedProps, scrollIndicators = List(1))
+    }
   }
 
   private def assertViewerController(result: TestInstance,

@@ -1,15 +1,16 @@
 package farjs.file.popups
 
-import farjs.file.FileServicesSpec.withServicesContext
+import farjs.file.FileViewHistory.fileViewsHistoryKind
 import farjs.file.popups.FileViewHistoryPopup._
-import farjs.file.{FileViewHistory, FileViewHistoryParams, MockFileViewHistoryService}
+import farjs.file.{FileViewHistory, FileViewHistoryParams}
+import farjs.filelist.history.HistoryProviderSpec.withHistoryProvider
+import farjs.filelist.history._
 import farjs.ui.popup.ListPopupProps
-import org.scalatest.{Assertion, Succeeded}
+import org.scalatest.Assertion
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
 import scommons.react.test._
 
-import scala.concurrent.Future
 import scala.scalajs.js
 
 class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
@@ -17,11 +18,15 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
   FileViewHistoryPopup.listPopup = "ListPopup".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
-  class HistoryService {
-    val getAll = mockFunction[Future[Seq[FileViewHistory]]]
+  class HistoryMocks {
+    val get = mockFunction[HistoryKind, js.Promise[HistoryService]]
+    val getAll = mockFunction[js.Promise[js.Array[History]]]
 
-    val service = new MockFileViewHistoryService(
+    val service = new MockHistoryService(
       getAllMock = getAll
+    )
+    val provider = new MockHistoryProvider(
+      getMock = get
     )
   }
 
@@ -29,7 +34,7 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     //given
     val onAction = mockFunction[FileViewHistory, Unit]
     val props = getFileViewHistoryPopupProps(onAction = onAction)
-    val historyService = new HistoryService
+    val historyMocks = new HistoryMocks
     val items = List("item 1", "item 2").map { path =>
       FileViewHistory(
         path = path,
@@ -42,32 +47,42 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
         )
       )
     }
-    val itemsF = Future.successful(items)
-    historyService.getAll.expects().returning(itemsF)
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array(items.map(FileViewHistory.toHistory): _*))
+    var getAllCalled = false
+    historyMocks.get.expects(fileViewsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
     
-    val result = createTestRenderer(withServicesContext(
-      <(FileViewHistoryPopup())(^.wrapped := props)(), historyService.service
+    val result = createTestRenderer(withHistoryProvider(
+      <(FileViewHistoryPopup())(^.wrapped := props)(), historyMocks.provider
     )).root
 
-    itemsF.flatMap { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       val popup = inside(findComponents(result, listPopup)) {
         case List(c) => c.props.asInstanceOf[ListPopupProps]
       }
 
       //then
-      onAction.expects(items(1))
+      var capturedHistory: FileViewHistory = null
+      onAction.expects(*).onCall { h: FileViewHistory =>
+        capturedHistory = h
+      }
       
       //when
       popup.onAction(1)
 
-      Succeeded
+      //then
+      capturedHistory shouldBe items(1)
     }
   }
   
   it should "render popup" in {
     //given
     val props = getFileViewHistoryPopupProps()
-    val historyService = new HistoryService
+    val historyMocks = new HistoryMocks
     val items = List.fill(20)("item").zipWithIndex.map { case (path, index) =>
       FileViewHistory(
         path = path,
@@ -80,17 +95,23 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
         )
       )
     }
-    val itemsF = Future.successful(items)
-    historyService.getAll.expects().returning(itemsF)
+    val itemsF = js.Promise.resolve[js.Array[History]](js.Array(items.map(FileViewHistory.toHistory): _*))
+    var getAllCalled = false
+    historyMocks.get.expects(fileViewsHistoryKind)
+      .returning(js.Promise.resolve[HistoryService](historyMocks.service))
+    historyMocks.getAll.expects().onCall { () =>
+      getAllCalled = true
+      itemsF
+    }
     
     //when
-    val result = createTestRenderer(withServicesContext(
-      <(FileViewHistoryPopup())(^.wrapped := props)(), historyService.service
+    val result = createTestRenderer(withHistoryProvider(
+      <(FileViewHistoryPopup())(^.wrapped := props)(), historyMocks.provider
     )).root
 
     //then
     result.children.toList should be (empty)
-    itemsF.map { _ =>
+    eventually(getAllCalled shouldBe true).map { _ =>
       assertFileViewHistoryPopup(result, items)
     }
   }

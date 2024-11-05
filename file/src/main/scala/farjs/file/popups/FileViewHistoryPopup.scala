@@ -1,6 +1,8 @@
 package farjs.file.popups
 
-import farjs.file.{FileServices, FileViewHistory}
+import farjs.file.FileViewHistory
+import farjs.file.FileViewHistory.fileViewsHistoryKind
+import farjs.filelist.history.HistoryProvider
 import farjs.ui.popup._
 import scommons.react._
 import scommons.react.hooks._
@@ -16,13 +18,16 @@ object FileViewHistoryPopup extends FunctionComponent[FileViewHistoryPopupProps]
   private[popups] var listPopup: ReactClass = ListPopup
   
   protected def render(compProps: Props): ReactElement = {
-    val services = FileServices.useServices
+    val historyProvider = HistoryProvider.useHistoryProvider
     val (maybeItems, setItems) = useState(Option.empty[js.Array[FileViewHistory]])
     val props = compProps.wrapped
 
     useLayoutEffect({ () =>
-      services.fileViewHistory.getAll.map { items =>
-        setItems(Some(js.Array(items: _*)))
+      for {
+        fileViewsHistory <- historyProvider.get(fileViewsHistoryKind).toFuture
+        items <- fileViewsHistory.getAll.toFuture
+      } yield {
+        setItems(Some(items.flatMap(FileViewHistory.fromHistory)))
       }
       ()
     }, Nil)

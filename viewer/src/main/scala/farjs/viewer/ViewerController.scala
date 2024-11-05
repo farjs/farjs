@@ -1,6 +1,8 @@
 package farjs.viewer
 
-import farjs.file.{Encoding, FileReader, FileServices, FileViewHistory, FileViewHistoryParams}
+import farjs.file.FileViewHistory.fileViewsHistoryKind
+import farjs.file.{Encoding, FileReader, FileViewHistory, FileViewHistoryParams}
+import farjs.filelist.history.HistoryProvider
 import farjs.filelist.theme.FileListTheme
 import farjs.ui.task.{Task, TaskAction}
 import farjs.ui.{Dispatch, WithSize, WithSizeProps}
@@ -31,7 +33,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
   
   protected def render(compProps: Props): ReactElement = {
     val theme = FileListTheme.useTheme
-    val services = FileServices.useServices
+    val historyProvider = HistoryProvider.useHistoryProvider
     val props = compProps.wrapped
     val viewportRef = useRef(props.viewport)
     viewportRef.current = props.viewport
@@ -40,9 +42,11 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
       val fileReader = new FileReader(fs)
       val viewer = new ViewerFileReader(fileReader)
       val openF = for {
-        history <- services.fileViewHistory.getOne(props.filePath, isEdit = false)
+        fileViewsHistory <- historyProvider.get(fileViewsHistoryKind).toFuture
+        maybeHistory <- fileViewsHistory.getOne(props.filePath).toFuture
         _ <- fileReader.open(props.filePath)
       } yield {
+        val history = maybeHistory.toOption.flatMap(FileViewHistory.fromHistory)
         props.setViewport(Some(ViewerFileViewport(
           fileReader = viewer,
           encoding = history.map(_.params.encoding).getOrElse(Encoding.platformEncoding),
@@ -61,7 +65,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
       val cleanup: js.Function0[Unit] = { () =>
         fileReader.close()
         viewportRef.current.foreach { vp =>
-          services.fileViewHistory.save(FileViewHistory(
+          val history = FileViewHistory(
             path = props.filePath,
             params = FileViewHistoryParams(
               isEdit = false,
@@ -70,7 +74,11 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
               wrap = vp.wrap,
               column = vp.column
             )
-          ))
+          )
+          for {
+            fileViewsHistory <- historyProvider.get(fileViewsHistoryKind).toFuture
+            _ <- fileViewsHistory.save(FileViewHistory.toHistory(history)).toFuture
+          } yield ()
         }
       }
       cleanup

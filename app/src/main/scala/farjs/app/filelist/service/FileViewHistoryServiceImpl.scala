@@ -3,14 +3,14 @@ package farjs.app.filelist.service
 import farjs.app.filelist.service.FileViewHistoryServiceImpl._
 import farjs.domain.FileViewHistoryEntity
 import farjs.domain.dao.FileViewHistoryDao
-import farjs.file.{FileViewHistory, FileViewHistoryParams, FileViewHistoryService}
+import farjs.file.{FileViewHistory, FileViewHistoryParams}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
 import scala.util.control.NonFatal
 
-class FileViewHistoryServiceImpl(dao: FileViewHistoryDao) extends FileViewHistoryService {
+class FileViewHistoryServiceImpl(dao: FileViewHistoryDao) {
 
   def getAll: Future[Seq[FileViewHistory]] = {
     dao.getAll

@@ -1,6 +1,5 @@
 package farjs.app.filelist
 
-import farjs.file.FileServices
 import farjs.filelist.history.HistoryProvider
 import farjs.fs.FSServices
 import scommons.react._
@@ -16,7 +15,7 @@ class FileListRootSpec extends TestSpec with TestRendererUtils {
 
   it should "render component with contexts" in {
     //given
-    val (historyProviderCtx, fsCtx, fileCtx, servicesComp) = getServicesCtxHook
+    val (historyProviderCtx, fsCtx, servicesComp) = getServicesCtxHook
     FileListRoot.fileListComp = servicesComp
     val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val module = mock[FileListModule]
@@ -30,7 +29,6 @@ class FileListRootSpec extends TestSpec with TestRendererUtils {
     //then
     historyProviderCtx.get() shouldBe module.historyProvider
     fsCtx.get() shouldBe module.fsServices
-    fileCtx.get() shouldBe module.fileServices
     assertComponents(result.children, List(
       <(withPortalsComp)()(
         <(servicesComp)(^.assertWrapped(inside(_) {
@@ -46,17 +44,15 @@ class FileListRootSpec extends TestSpec with TestRendererUtils {
   }
 
   private def getServicesCtxHook: (
-    AtomicReference[HistoryProvider], AtomicReference[FSServices], AtomicReference[FileServices], ReactClass
+    AtomicReference[HistoryProvider], AtomicReference[FSServices], ReactClass
     ) = {
 
     val historyProviderRef = new AtomicReference[HistoryProvider](null)
     val fsRef = new AtomicReference[FSServices](null)
-    val fileRef = new AtomicReference[FileServices](null)
-    (historyProviderRef, fsRef, fileRef, new FunctionComponent[Unit] {
+    (historyProviderRef, fsRef, new FunctionComponent[Unit] {
       protected def render(props: Props): ReactElement = {
         historyProviderRef.set(useContext(HistoryProvider.Context))
         fsRef.set(useContext(FSServices.Context))
-        fileRef.set(useContext(FileServices.Context))
         <.>()()
       }
     }.apply())
