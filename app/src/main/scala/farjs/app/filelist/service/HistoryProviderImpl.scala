@@ -19,11 +19,11 @@ class HistoryProviderImpl(mkDirService: FileListHistoryService,
                           fileViewHistoryService: FileViewHistoryServiceImpl
                          ) extends HistoryProvider {
 
-  private val mkDirsHistory = new HistoryServiceImpl(mkDirService)
-  private val foldersHistory = new HistoryServiceImpl(folderService)
-  private val selectPatternsHistory = new HistoryServiceImpl(selectPatternService)
-  private val copyItemsHistory = new HistoryServiceImpl(copyItemService)
-  private val fileViewsHistory = new ViewHistoryServiceImpl(fileViewHistoryService)
+  private val mkDirsHistory = new OldHistoryServiceImpl(mkDirService)
+  private val foldersHistory = new OldHistoryServiceImpl(folderService)
+  private val selectPatternsHistory = new OldHistoryServiceImpl(selectPatternService)
+  private val copyItemsHistory = new OldHistoryServiceImpl(copyItemService)
+  private val fileViewsHistory = new OldViewHistoryServiceImpl(fileViewHistoryService)
   private val noopHistory = new NoopHistoryService
   
   override def get(kind: HistoryKind): js.Promise[HistoryService] = {
@@ -39,7 +39,7 @@ class HistoryProviderImpl(mkDirService: FileListHistoryService,
   }
 }
 
-class ViewHistoryServiceImpl(oldService: FileViewHistoryServiceImpl) extends NoopHistoryService {
+class OldViewHistoryServiceImpl(oldService: FileViewHistoryServiceImpl) extends NoopHistoryService {
 
   override def getAll: js.Promise[js.Array[History]] = oldService.getAll.map { items =>
     js.Array[History](items.map(FileViewHistory.toHistory): _*)
@@ -55,7 +55,7 @@ class ViewHistoryServiceImpl(oldService: FileViewHistoryServiceImpl) extends Noo
     oldService.save(FileViewHistory.fromHistory(h).orNull).toJSPromise
 }
 
-class HistoryServiceImpl(oldService: FileListHistoryService) extends NoopHistoryService {
+class OldHistoryServiceImpl(oldService: FileListHistoryService) extends NoopHistoryService {
 
   override def getAll: js.Promise[js.Array[History]] = oldService.getAll.map { items =>
     js.Array[History](items.map(i => History(i, js.undefined)): _*)

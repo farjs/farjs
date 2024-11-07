@@ -2,7 +2,6 @@ package farjs.domain
 
 import scala.scalajs.js
 
-case class HistoryEntity(kindId: Int,
-                         item: String,
+case class HistoryEntity(item: String,
                          params: Option[js.Object],
                          updatedAt: Long)

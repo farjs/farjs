@@ -11,14 +11,14 @@ class HistoryKindDao(val ctx: FarjsDBContext) extends CommonDao {
 
   private val tableName = "history_kinds"
 
-  def getAll: Future[Seq[HistoryKind]] = {
+  def getAll: Future[Seq[HistoryKindEntity]] = {
     ctx.performIO(ctx.runQuery(
       sql = s"SELECT id, name FROM $tableName ORDER BY id",
-      extractor = HistoryKind.tupled
+      extractor = HistoryKindEntity.tupled
     ))
   }
 
-  def upsert(entity: HistoryKind): Future[HistoryKind] = {
+  def upsert(entity: HistoryKindEntity): Future[HistoryKindEntity] = {
     val q = for {
       _ <- ctx.runAction(
         sql = s"INSERT INTO $tableName (name) VALUES (?) ON CONFLICT (name) DO NOTHING",
@@ -27,7 +27,7 @@ class HistoryKindDao(val ctx: FarjsDBContext) extends CommonDao {
       res <- ctx.runQuery(
         sql = s"SELECT id, name FROM $tableName WHERE name = ?",
         args = entity.name,
-        extractor = HistoryKind.tupled
+        extractor = HistoryKindEntity.tupled
       )
     } yield res.head
 

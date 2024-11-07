@@ -1,16 +1,16 @@
 package farjs.app.filelist.service
 
 import farjs.app.BaseDBContextSpec
-import farjs.domain.HistoryKind
+import farjs.domain.HistoryKindEntity
 import farjs.domain.dao.{HistoryDao, HistoryKindDao}
 
 class HistoryKindDaoSpec extends BaseDBContextSpec {
 
   it should "create new record when upsert" in withCtx { ctx =>
     //given
-    val historyDao = new HistoryDao(ctx, maxItemsCount = 10)
+    val historyDao = new HistoryDao(ctx, HistoryKindEntity(-1, "non-existing"), maxItemsCount = 10)
     val dao = new HistoryKindDao(ctx)
-    val entity = HistoryKind(-1, "test_history")
+    val entity = HistoryKindEntity(-1, "test_history")
     
     for {
       _ <- historyDao.deleteAll()
@@ -23,7 +23,7 @@ class HistoryKindDaoSpec extends BaseDBContextSpec {
       results <- dao.getAll
     } yield {
       inside(res) {
-        case HistoryKind(id, name) =>
+        case HistoryKindEntity(id, name) =>
           id should be > 0
           name shouldBe entity.name
       }
@@ -46,7 +46,7 @@ class HistoryKindDaoSpec extends BaseDBContextSpec {
       results <- dao.getAll
     } yield {
       inside(res) {
-        case HistoryKind(id, name) =>
+        case HistoryKindEntity(id, name) =>
           id shouldBe existing.id
           name shouldBe entity.name
       }
