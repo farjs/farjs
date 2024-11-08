@@ -1,6 +1,9 @@
 package farjs.app.filelist.service
 
+import farjs.app.filelist.service.HistoryProviderImpl.limitMaxItemsCount
 import farjs.copymove.CopyMoveUi.copyItemsHistoryKind
+import farjs.domain.HistoryKindEntity
+import farjs.domain.dao.{HistoryDao, HistoryKindDao}
 import farjs.file.FileViewHistory
 import farjs.file.FileViewHistory.fileViewsHistoryKind
 import farjs.filelist.history._
@@ -8,16 +11,17 @@ import farjs.filelist.popups.MakeFolderController.mkDirsHistoryKind
 import farjs.filelist.popups.SelectController.selectPatternsHistoryKind
 import farjs.fs.FSFoldersHistory.foldersHistoryKind
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.JSRichFutureNonThenable
+import scala.util.control.NonFatal
 
-class HistoryProviderImpl(mkDirService: FileListHistoryService,
-                          folderService: FileListHistoryService,
-                          selectPatternService: FileListHistoryService,
-                          copyItemService: FileListHistoryService,
-                          fileViewHistoryService: FileViewHistoryServiceImpl
-                         ) extends HistoryProvider {
+class OldHistoryProviderImpl(mkDirService: FileListHistoryService,
+                             folderService: FileListHistoryService,
+                             selectPatternService: FileListHistoryService,
+                             copyItemService: FileListHistoryService,
+                             fileViewHistoryService: FileViewHistoryServiceImpl
+                            ) extends HistoryProvider {
 
   private val mkDirsHistory = new OldHistoryServiceImpl(mkDirService)
   private val foldersHistory = new OldHistoryServiceImpl(folderService)
@@ -63,6 +67,36 @@ class OldHistoryServiceImpl(oldService: FileListHistoryService) extends NoopHist
 
   override def save(h: History): js.Promise[Unit] =
     oldService.save(h.item).toJSPromise
+}
+
+class HistoryProviderImpl(kindDao: HistoryKindDao) extends HistoryProvider {
+
+  private var services = Map.empty[String, HistoryService]
+  private val noopService = new NoopHistoryService
+
+  override def get(kind: HistoryKind): js.Promise[HistoryService] = {
+    services.get(kind.name) match {
+      case Some(service) => js.Promise.resolve[HistoryService](service)
+      case None =>
+        kindDao.upsert(HistoryKindEntity(-1, kind.name)).map { kindEntity =>
+          val service = new HistoryServiceImpl(
+            new HistoryDao(kindDao.ctx, kindEntity, limitMaxItemsCount(kind.maxItemsCount))
+          )
+          services = services.updated(kind.name, service)
+          service
+        }.recover {
+          case NonFatal(ex) =>
+            Console.err.println(s"Failed to upsert history kind '${kind.name}', error: $ex")
+            noopService
+        }.toJSPromise
+    }
+  }
+}
+
+object HistoryProviderImpl {
+
+  private[service] def limitMaxItemsCount(maxCount: Int): Int =
+    Math.min(Math.max(maxCount, 5), 150)
 }
 
 class NoopHistoryService extends HistoryService {

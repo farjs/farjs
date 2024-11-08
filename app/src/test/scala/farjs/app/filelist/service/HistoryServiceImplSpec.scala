@@ -1,12 +1,15 @@
 package farjs.app.filelist.service
 
 import farjs.app.BaseDBContextSpec
+import farjs.app.filelist.service.HistoryServiceImplSpec.assertHistory
 import farjs.domain.HistoryKindEntity
 import farjs.domain.dao.{HistoryDao, HistoryKindDao}
 import farjs.file.FileViewHistoryParams
 import farjs.file.FileViewHistorySpec.assertFileViewHistoryParams
 import farjs.filelist.history.History
 import org.scalactic.source.Position
+import org.scalatest.Inside.inside
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatest.{Assertion, OptionValues, Succeeded}
 
 import scala.concurrent.Future
@@ -134,6 +137,9 @@ class HistoryServiceImplSpec extends BaseDBContextSpec with OptionValues {
       Succeeded
     }
   }
+}
+
+object HistoryServiceImplSpec {
   
   def assertHistory(result: History,
                     expected: History,
