@@ -64,7 +64,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
     val historyMocks = new HistoryMocks
     historyMocks.get.expects(fileViewsHistoryKind)
       .returning(js.Promise.resolve[HistoryService](historyMocks.service))
-    historyMocks.getOne.expects(props.filePath)
+    historyMocks.getOne.expects(FileViewHistory.pathToItem(props.filePath, isEdit = false))
       .returning(js.Promise.resolve[js.UndefOr[History]](js.undefined: js.UndefOr[History]))
 
     //then
@@ -104,7 +104,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
     val historyMocks = new HistoryMocks
     historyMocks.get.expects(fileViewsHistoryKind)
       .returning(js.Promise.resolve[HistoryService](historyMocks.service))
-    historyMocks.getOne.expects(props.filePath)
+    historyMocks.getOne.expects(FileViewHistory.pathToItem(props.filePath, isEdit = false))
       .returning(js.Promise.resolve[js.UndefOr[History]](js.undefined: js.UndefOr[History]))
 
     //then
@@ -169,7 +169,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
     )
     historyMocks.get.expects(fileViewsHistoryKind)
       .returning(js.Promise.resolve[HistoryService](historyMocks.service))
-    historyMocks.getOne.expects(props.filePath)
+    historyMocks.getOne.expects(FileViewHistory.pathToItem(props.filePath, isEdit = false))
       .returning(js.Promise.resolve[js.UndefOr[History]](FileViewHistory.toHistory(history)))
 
     //then
@@ -240,7 +240,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
     val historyMocks = new HistoryMocks
     historyMocks.get.expects(fileViewsHistoryKind)
       .returning(js.Promise.resolve[HistoryService](historyMocks.service))
-    historyMocks.getOne.expects(props.filePath)
+    historyMocks.getOne.expects(FileViewHistory.pathToItem(props.filePath, isEdit = false))
       .returning(js.Promise.resolve[js.UndefOr[History]](js.undefined: js.UndefOr[History]))
 
     val renderer = createTestRenderer(withThemeContext(withHistoryProvider(

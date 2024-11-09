@@ -22,13 +22,8 @@ class FileListModule(ctx: FarjsDBContext) {
   val fileViewHistoryDao = new FileViewHistoryDao(ctx)
   val fileViewHistoryService = new FileViewHistoryServiceImpl(fileViewHistoryDao)
 
-  val historyProvider = new OldHistoryProviderImpl(
-    mkDirService = mkDirService,
-    folderService = folderService,
-    selectPatternService = selectPatternService,
-    copyItemService = copyItemService,
-    fileViewHistoryService = fileViewHistoryService
-  )
+  val historyKindDao = new HistoryKindDao(ctx)
+  val historyProvider = new HistoryProviderImpl(historyKindDao)
 
   val folderShortcutDao = new FolderShortcutDao(ctx)
   val folderShortcutsService = new FolderShortcutsServiceImpl(folderShortcutDao)
