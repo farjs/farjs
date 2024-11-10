@@ -7,21 +7,6 @@ import farjs.fs.FSServices
 
 class FileListModule(ctx: FarjsDBContext) {
 
-  val folderDao = new HistoryFolderDao(ctx)
-  val folderService = new FileListHistoryServiceImpl(folderDao)
-
-  val mkDirDao = new HistoryMkDirDao(ctx)
-  val mkDirService = new FileListHistoryServiceImpl(mkDirDao)
-
-  val selectPatternDao = new HistorySelectPatternDao(ctx)
-  val selectPatternService = new FileListHistoryServiceImpl(selectPatternDao)
-
-  val copyItemDao = new HistoryCopyItemDao(ctx)
-  val copyItemService = new FileListHistoryServiceImpl(copyItemDao)
-
-  val fileViewHistoryDao = new FileViewHistoryDao(ctx)
-  val fileViewHistoryService = new FileViewHistoryServiceImpl(fileViewHistoryDao)
-
   val historyKindDao = new HistoryKindDao(ctx)
   val historyProvider = new HistoryProviderImpl(historyKindDao)
 
