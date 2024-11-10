@@ -1,6 +1,6 @@
-package farjs.app.filelist.service
+package farjs.app.service
 
-import farjs.app.filelist.service.HistoryServiceImpl._
+import farjs.app.service.HistoryServiceImpl._
 import farjs.domain.HistoryEntity
 import farjs.domain.dao.HistoryDao
 import farjs.filelist.history.{History, HistoryService}

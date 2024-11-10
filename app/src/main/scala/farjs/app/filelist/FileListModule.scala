@@ -1,6 +1,6 @@
 package farjs.app.filelist
 
-import farjs.app.filelist.service._
+import farjs.app.service.{FolderShortcutsServiceImpl, HistoryProviderImpl}
 import farjs.domain.FarjsDBContext
 import farjs.domain.dao._
 import farjs.fs.FSServices

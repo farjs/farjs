@@ -1,4 +1,4 @@
-package farjs.app.filelist.service
+package farjs.app.service
 
 import farjs.domain.FolderShortcut
 import farjs.domain.dao.FolderShortcutDao

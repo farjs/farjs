@@ -1,6 +1,6 @@
-package farjs.app.filelist.service
+package farjs.app.service
 
-import farjs.app.filelist.service.HistoryProviderImpl.limitMaxItemsCount
+import farjs.app.service.HistoryProviderImpl.limitMaxItemsCount
 import farjs.domain.HistoryKindEntity
 import farjs.domain.dao.{HistoryDao, HistoryKindDao}
 import farjs.filelist.history._

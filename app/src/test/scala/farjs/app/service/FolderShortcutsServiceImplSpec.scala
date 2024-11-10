@@ -1,4 +1,4 @@
-package farjs.app.filelist.service
+package farjs.app.service
 
 import farjs.app.BaseDBContextSpec
 import farjs.app.filelist.FileListModule

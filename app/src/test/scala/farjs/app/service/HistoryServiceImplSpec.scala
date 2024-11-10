@@ -1,7 +1,7 @@
-package farjs.app.filelist.service
+package farjs.app.service
 
 import farjs.app.BaseDBContextSpec
-import farjs.app.filelist.service.HistoryServiceImplSpec.assertHistory
+import farjs.app.service.HistoryServiceImplSpec.assertHistory
 import farjs.domain.HistoryKindEntity
 import farjs.domain.dao.{HistoryDao, HistoryKindDao}
 import farjs.file.FileViewHistoryParams
