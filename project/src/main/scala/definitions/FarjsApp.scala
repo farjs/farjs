@@ -1,5 +1,6 @@
 package definitions
 
+import common.Libs
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
 import sbt._
@@ -28,7 +29,9 @@ object FarjsApp extends ScalaJsModule {
 
       coverageExcludedPackages :=
         "farjs.app.FarjsApp" +
-          ";farjs.app.raw",
+          ";farjs.app.raw" +
+          //to avoid Scala.js error: Found a dangling UndefinedParam
+          ";farjs.domain.dao.HistoryDao",
 
       //TODO: temporarily disabled
       //  @see: https://github.com/scalameta/metabrowse/issues/271
@@ -79,7 +82,18 @@ object FarjsApp extends ScalaJsModule {
     FarjsFs.definition,
     FarjsArchiver.definition,
     FarjsViewer.definition,
-    FarjsCopyMove.definition,
-    FarjsDao.definition
+    FarjsCopyMove.definition
   )
+
+  override def superRepoProjectsDependencies: Seq[(String, String, Option[String])] = {
+    super.superRepoProjectsDependencies ++ Seq(
+      ("scommons-websql", "scommons-websql-io", None)
+    )
+  }
+
+  override def runtimeDependencies: Def.Initialize[Seq[ModuleID]] = Def.setting {
+    super.runtimeDependencies.value ++ Seq(
+      Libs.scommonsWebSqlIO.value
+    )
+  }
 }
