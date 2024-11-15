@@ -1,6 +1,7 @@
 package farjs.domain.dao
 
 import farjs.domain._
+import farjs.filelist.history.History
 import scommons.websql.io.dao.CommonDao
 
 import scala.concurrent.Future
@@ -13,9 +14,12 @@ class HistoryDao(val ctx: FarjsDBContext, kind: HistoryKindEntity, maxItemsCount
 
   private val tableName = "history"
   
-  private val rowExtractor: ((String, Option[String], Long)) => HistoryEntity = {
-    case (item, params, updatedAt) =>
-      HistoryEntity(item, params.map(fromJson), updatedAt)
+  private val rowExtractor: ((String, Option[String])) => History = {
+    case (item, params) =>
+      History(item, params.map(fromJson) match {
+        case Some(p) => p: js.UndefOr[js.Object]
+        case None => js.undefined: js.UndefOr[js.Object]
+      })
   }
 
   private def fromJson(params: String): js.Object =
@@ -24,23 +28,23 @@ class HistoryDao(val ctx: FarjsDBContext, kind: HistoryKindEntity, maxItemsCount
   private def toJson(params: js.Object): String =
     js.JSON.stringify(params)
 
-  def getAll: Future[Seq[HistoryEntity]] = {
+  def getAll: Future[Seq[History]] = {
     ctx.performIO(ctx.runQuery(
-      sql = s"SELECT item, params, updated_at FROM $tableName WHERE kind_id = ? ORDER BY updated_at",
+      sql = s"SELECT item, params FROM $tableName WHERE kind_id = ? ORDER BY updated_at",
       args = kind.id,
       extractor = rowExtractor
     ))
   }
 
-  def getByItem(item: String): Future[Option[HistoryEntity]] = {
+  def getByItem(item: String): Future[Option[History]] = {
     getOne("getByItem", ctx.performIO(ctx.runQuery(
-      sql = s"SELECT item, params, updated_at FROM $tableName WHERE kind_id = ? AND item = ?",
+      sql = s"SELECT item, params FROM $tableName WHERE kind_id = ? AND item = ?",
       args = (kind.id, item),
       extractor = rowExtractor
     )))
   }
 
-  def save(entity: HistoryEntity): Future[Unit] = {
+  def save(entity: History, updatedAt: Double): Future[Unit] = {
     val q = for {
       _ <- ctx.runAction(
         sql = s"INSERT INTO $tableName (kind_id, item, params, updated_at) VALUES (?, ?, ?, ?)" +
@@ -48,7 +52,7 @@ class HistoryDao(val ctx: FarjsDBContext, kind: HistoryKindEntity, maxItemsCount
             |  params = excluded.params,
             |  updated_at = excluded.updated_at
             |""".stripMargin,
-        args = (kind.id, entity.item, entity.params.map(toJson), entity.updatedAt)
+        args = (kind.id, entity.item, entity.params.map(toJson).toOption, updatedAt)
       )
       _ <- ctx.runAction(
         sql = s"DELETE FROM $tableName WHERE kind_id = ? AND updated_at < " +

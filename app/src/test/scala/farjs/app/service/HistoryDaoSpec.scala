@@ -1,14 +1,16 @@
 package farjs.app.service
 
 import farjs.app.BaseDBContextSpec
+import farjs.domain.HistoryKindEntity
 import farjs.domain.dao.{HistoryDao, HistoryKindDao}
-import farjs.domain.{HistoryEntity, HistoryKindEntity}
 import farjs.file.FileViewHistoryParams
 import farjs.file.FileViewHistorySpec.assertFileViewHistoryParams
+import farjs.filelist.history.History
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 
 import scala.concurrent.Future
+import scala.scalajs.js
 
 class HistoryDaoSpec extends BaseDBContextSpec {
 
@@ -37,8 +39,8 @@ class HistoryDaoSpec extends BaseDBContextSpec {
       //when & then
       kind1 <- kindDao.upsert(HistoryKindEntity(-1, "test_kind1"))
       dao1 = new HistoryDao(ctx, kind1, maxItemsCount)
-      entity1 = HistoryEntity(testItem, Some(params), System.currentTimeMillis())
-      _ <- dao1.save(entity1)
+      entity1 = History(testItem, params)
+      _ <- dao1.save(entity1, js.Date.now())
       _ <- dao1.getByItem(entity1.item).map(inside(_) { case Some(res) =>
         assertHistoryEntity(res, entity1, Some(params))
       })
@@ -46,8 +48,8 @@ class HistoryDaoSpec extends BaseDBContextSpec {
       //when & then
       kind2 <- kindDao.upsert(HistoryKindEntity(-1, "test_kind2"))
       dao2 = new HistoryDao(ctx, kind2, maxItemsCount)
-      entity2 = HistoryEntity(testItem, None, System.currentTimeMillis())
-      _ <- dao2.save(entity2)
+      entity2 = History(testItem, js.undefined)
+      _ <- dao2.save(entity2, js.Date.now())
       _ <- dao2.getByItem(entity2.item).map(inside(_) { case Some(res) =>
         assertHistoryEntity(res, entity2, None)
       })
@@ -78,10 +80,6 @@ class HistoryDaoSpec extends BaseDBContextSpec {
         case List(kind1, kind2) => (kind1, kind2)
       }
       dao1 = new HistoryDao(ctx, kind1, maxItemsCount)
-      all1 <- dao1.getAll
-      entity1 = inside(all1.toList) {
-        case List(entity1) => entity1
-      }
       dao2 = new HistoryDao(ctx, kind2, maxItemsCount)
       all2 <- dao2.getAll
       entity2 = inside(all2.toList) {
@@ -89,8 +87,8 @@ class HistoryDaoSpec extends BaseDBContextSpec {
       }
       
       //when
-      updated = HistoryEntity(testItem, Some(updatedParams), entity1.updatedAt + 1)
-      _ <- dao1.save(updated)
+      updated = History(testItem, updatedParams)
+      _ <- dao1.save(updated, js.Date.now())
 
       //then
       results1 <- dao1.getAll
@@ -113,12 +111,11 @@ class HistoryDaoSpec extends BaseDBContextSpec {
       }
       dao1 = new HistoryDao(ctx, kind1, maxItemsCount)
       dao2 = new HistoryDao(ctx, kind2, maxItemsCount)
-      all1 <- dao1.getAll
+      updatedAt = js.Date.now()
 
       //when
-      entity1 = all1.head
       _ <- Future.sequence((1 to 5).toList.map { i =>
-        dao1.save(HistoryEntity(s"$testItem$i", None, entity1.updatedAt + i))
+        dao1.save(History(s"$testItem$i", js.undefined), updatedAt + i)
       })
       
       //then
@@ -136,8 +133,8 @@ class HistoryDaoSpec extends BaseDBContextSpec {
     }
   }
   
-  private def assertResults(results: Seq[HistoryEntity],
-                            expected: List[(HistoryEntity, Option[FileViewHistoryParams])]
+  private def assertResults(results: Seq[History],
+                            expected: List[(History, Option[FileViewHistoryParams])]
                            )(implicit position: Position): Assertion = {
 
     results.size shouldBe expected.size
@@ -147,15 +144,15 @@ class HistoryDaoSpec extends BaseDBContextSpec {
     Succeeded
   }
 
-  private def assertHistoryEntity(result: HistoryEntity,
-                                  entity: HistoryEntity,
+  private def assertHistoryEntity(result: History,
+                                  entity: History,
                                   params: Option[FileViewHistoryParams]
                                  )(implicit position: Position): Assertion = {
     inside(result) {
-      case HistoryEntity(item, resParams, _) =>
+      case History(item, resParams) =>
         item shouldBe entity.item
-        resParams.size shouldBe params.size
-        resParams.zip(params).foreach { case (res, expected) =>
+        resParams.toOption.size shouldBe params.size
+        resParams.toOption.zip(params).foreach { case (res, expected) =>
           assertFileViewHistoryParams(res.asInstanceOf[FileViewHistoryParams], expected)
         }
         Succeeded

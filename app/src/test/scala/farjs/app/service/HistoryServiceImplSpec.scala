@@ -30,14 +30,12 @@ class HistoryServiceImplSpec extends BaseDBContextSpec with OptionValues {
     val kindDao = new HistoryKindDao(ctx)
     val maxItemsCount = 10
     val dao0 = new HistoryDao(ctx, HistoryKindEntity(-1, "non-existing"), maxItemsCount)
-    val timeBeforeSave = System.currentTimeMillis()
 
     for {
       _ <- dao0.deleteAll()
       _ <- kindDao.deleteAll()
       kind <- kindDao.upsert(HistoryKindEntity(-1, "test_kind1"))
-      dao = new HistoryDao(ctx, kind, maxItemsCount)
-      service = new HistoryServiceImpl(dao)
+      service = new HistoryServiceImpl(new HistoryDao(ctx, kind, maxItemsCount))
       
       //when
       entity1 = History("test/path/1", js.undefined)
@@ -46,12 +44,10 @@ class HistoryServiceImplSpec extends BaseDBContextSpec with OptionValues {
       _ <- service.save(entity2).toFuture
       
       //then
-      entities <- dao.getAll
       results <- service.getAll.toFuture
       result1 <- service.getOne(entity1.item).toFuture
       result2 <- service.getOne(entity2.item).toFuture
     } yield {
-      entities.foreach(_.updatedAt should be >= timeBeforeSave)
       assertHistory(result1.toOption.value, entity1, None)
       assertHistory(result2.toOption.value, entity2, Some(params))
 
@@ -125,7 +121,7 @@ class HistoryServiceImplSpec extends BaseDBContextSpec with OptionValues {
     js.Dynamic.global.console.error = errorLogger
 
     //then
-    (dao.save _).expects(*).returning(Future.failed(ex))
+    (dao.save _).expects(*, *).returning(Future.failed(ex))
     errorLogger.expects(s"Failed to save history item, error: $ex")
 
     //when
