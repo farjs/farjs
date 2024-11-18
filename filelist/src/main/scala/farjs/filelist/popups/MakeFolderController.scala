@@ -17,7 +17,7 @@ object MakeFolderController extends FunctionComponent[FileListUiData] {
   private var initialMultiple = false
 
   protected def render(compProps: Props): ReactElement = {
-    val historyProvider = HistoryProvider.useHistoryProvider
+    val historyProvider = HistoryProvider.useHistoryProvider()
     val (multiple, setMultiple) = useState(initialMultiple)
     val props = compProps.wrapped
 

@@ -1,27 +1,20 @@
 package farjs.filelist.history
 
-import scommons.react.ReactContext
-import scommons.react.hooks.useContext
+import scommons.react.raw.NativeContext
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
 trait HistoryProvider extends js.Object {
 
   def get(kind: HistoryKind): js.Promise[HistoryService]
 }
 
-object HistoryProvider {
+@js.native
+@JSImport("@farjs/filelist/history/HistoryProvider.mjs", JSImport.Default)
+object HistoryProvider extends js.Object {
 
-  val Context: ReactContext[HistoryProvider] = ReactContext[HistoryProvider](defaultValue = null)
+  val Context: NativeContext = js.native
 
-  def useHistoryProvider: HistoryProvider = {
-    val ctx = useContext(Context)
-    if (ctx == null) {
-      throw js.JavaScriptException(js.Error(
-        "HistoryProvider.Context is not found." +
-          "\nPlease, make sure you use HistoryProvider.Context.Provider in parent components"
-      ))
-    }
-    ctx
-  }
+  def useHistoryProvider(): HistoryProvider = js.native
 }

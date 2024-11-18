@@ -34,7 +34,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
                  maybeTo: Option[FileListData]) extends FunctionComponent[FileListPluginUiProps] {
 
   protected def render(compProps: Props): ReactElement = {
-    val historyProvider = HistoryProvider.useHistoryProvider
+    val historyProvider = HistoryProvider.useHistoryProvider()
     val (maybeTotal, setTotal) = useState[Option[Double]](None)
     val (maybeToPath, setToPath) = useState[Option[(String, String)]](None)
     val (inplace, setInplace) = useState(false)

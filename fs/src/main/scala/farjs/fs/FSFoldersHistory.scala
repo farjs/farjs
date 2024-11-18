@@ -14,7 +14,7 @@ object FSFoldersHistory extends FunctionComponent[FSFoldersHistoryProps] {
   val foldersHistoryKind: HistoryKind = HistoryKind("farjs.folders", 100)
 
   protected def render(compProps: Props): ReactElement = {
-    val historyProvider = HistoryProvider.useHistoryProvider
+    val historyProvider = HistoryProvider.useHistoryProvider()
     val props = compProps.wrapped
     val currDirPath = props.currDirPath
 

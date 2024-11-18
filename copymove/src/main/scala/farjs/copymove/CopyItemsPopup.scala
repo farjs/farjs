@@ -29,7 +29,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
   private[copymove] var buttonsPanelComp: ReactClass = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
-    val historyProvider = HistoryProvider.useHistoryProvider
+    val historyProvider = HistoryProvider.useHistoryProvider()
     val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
     val props = compProps.wrapped
     val (path, setPath) = useState(props.path)

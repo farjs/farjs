@@ -51,7 +51,7 @@ class FileListRootSpec extends TestSpec with TestRendererUtils {
     val fsRef = new AtomicReference[FSServices](null)
     (historyProviderRef, fsRef, new FunctionComponent[Unit] {
       protected def render(props: Props): ReactElement = {
-        historyProviderRef.set(useContext(HistoryProvider.Context))
+        historyProviderRef.set(HistoryProvider.useHistoryProvider())
         fsRef.set(useContext(FSServices.Context))
         <.>()()
       }

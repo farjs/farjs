@@ -22,7 +22,7 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
   private[popups] var comboBoxComp: ReactClass = ComboBox
 
   protected def render(compProps: Props): ReactElement = {
-    val historyProvider = HistoryProvider.useHistoryProvider
+    val historyProvider = HistoryProvider.useHistoryProvider()
     val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
     val props = compProps.wrapped
     val (pattern, setPattern) = useState("")

@@ -33,7 +33,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
   
   protected def render(compProps: Props): ReactElement = {
     val theme = FileListTheme.useTheme
-    val historyProvider = HistoryProvider.useHistoryProvider
+    val historyProvider = HistoryProvider.useHistoryProvider()
     val props = compProps.wrapped
     val viewportRef = useRef(props.viewport)
     viewportRef.current = props.viewport
