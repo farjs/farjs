@@ -10,10 +10,14 @@ class FolderShortcutDao(val ctx: FarjsDBContext) {
   
   private val tableName = "folder_shortcuts"
 
+  private val rowExtractor: ((Int, String)) => FolderShortcut = {
+    case (id, path) => FolderShortcut(id, path)
+  }
+
   def getAll: Future[Seq[FolderShortcut]] = {
     ctx.performIO(ctx.runQuery(
       sql = s"SELECT id, path FROM $tableName ORDER BY id",
-      extractor = FolderShortcut.tupled
+      extractor = rowExtractor
     ))
   }
 
