@@ -11,10 +11,14 @@ class HistoryKindDao(val ctx: FarjsDBContext) extends CommonDao {
 
   private val tableName = "history_kinds"
 
+  private val rowExtractor: ((Int, String)) => HistoryKindEntity = {
+    case (id, name) => HistoryKindEntity(id, name)
+  }
+
   def getAll: Future[Seq[HistoryKindEntity]] = {
     ctx.performIO(ctx.runQuery(
       sql = s"SELECT id, name FROM $tableName ORDER BY id",
-      extractor = HistoryKindEntity.tupled
+      extractor = rowExtractor
     ))
   }
 
@@ -27,7 +31,7 @@ class HistoryKindDao(val ctx: FarjsDBContext) extends CommonDao {
       res <- ctx.runQuery(
         sql = s"SELECT id, name FROM $tableName WHERE name = ?",
         args = entity.name,
-        extractor = HistoryKindEntity.tupled
+        extractor = rowExtractor
       )
     } yield res.head
 

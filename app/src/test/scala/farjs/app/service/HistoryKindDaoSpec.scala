@@ -3,6 +3,7 @@ package farjs.app.service
 import farjs.app.BaseDBContextSpec
 import farjs.domain.HistoryKindEntity
 import farjs.domain.dao.{HistoryDao, HistoryKindDao}
+import org.scalatest.Assertion
 
 class HistoryKindDaoSpec extends BaseDBContextSpec {
 
@@ -27,7 +28,8 @@ class HistoryKindDaoSpec extends BaseDBContextSpec {
           id should be > 0
           name shouldBe entity.name
       }
-      results shouldBe List(res)
+      results.size shouldBe 1
+      assertHistoryKindEntity(results.head, res)
     }
   }
 
@@ -37,7 +39,7 @@ class HistoryKindDaoSpec extends BaseDBContextSpec {
     
     for {
       existing <- dao.getAll.map(_.head)
-      entity = existing.copy(id = -1)
+      entity = HistoryKindEntity.copy(existing)(id = -1)
 
       //when
       res <- dao.upsert(entity)
@@ -45,12 +47,22 @@ class HistoryKindDaoSpec extends BaseDBContextSpec {
       //then
       results <- dao.getAll
     } yield {
-      inside(res) {
-        case HistoryKindEntity(id, name) =>
-          id shouldBe existing.id
-          name shouldBe entity.name
-      }
-      results shouldBe List(res)
+      assertHistoryKindEntity(res, HistoryKindEntity(
+        id = existing.id,
+        name = entity.name
+      ))
+      results.size shouldBe 1
+      assertHistoryKindEntity(results.head, res)
+    }
+  }
+  
+  private def assertHistoryKindEntity(result: HistoryKindEntity,
+                                      expected: HistoryKindEntity
+                                     ): Assertion = {
+    inside(result) {
+      case HistoryKindEntity(id, name) =>
+        id shouldBe expected.id
+        name shouldBe expected.name
     }
   }
 }
