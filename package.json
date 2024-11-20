@@ -9,7 +9,11 @@
   "private": false,
   "description": "FAR.js - Cross-platform File and Archive Manager app in your terminal",
   "scripts": {
-    "sql-bundle": "npx sql-bundle ./app/migrations"
+    "sql-bundle": "npx sql-bundle ./app/migrations",
+    "lint": "quick-lint-js ./**/*.mjs",
+    "test": "tsc && bun test && node ./test/all.mjs",
+    "format": "prettier **/*.mjs --write",
+    "formatCheck": "prettier **/*.mjs --check"
   },
   "license": "MIT",
   "bugs": {
@@ -70,6 +74,16 @@
     "iconv-lite": "0.6.3"
   },
   "devDependencies": {
-    "react-test-renderer" : "^17.0.1"
+    "@types/node": "^16.6.2",
+    "@types/react": "^17.0.1",
+    "@types/react-blessed": "^0.7.3",
+    "@types/react-test-renderer": "^17.0.1",
+    "c8": "^7.13.0",
+    "mock-fn": "^1.1.0",
+    "prettier": "^2.8.8",
+    "quick-lint-js": "^3.0.0",
+    "react-assert": "^1.1.0",
+    "react-test-renderer": "^17.0.1",
+    "typescript": "^4.9.5"
   }
 }

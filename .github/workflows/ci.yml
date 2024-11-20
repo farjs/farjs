@@ -3,12 +3,12 @@ name: CI
 on:
   push:
     paths-ignore:
-      - '*.md'
-    branches: [ main ]
+      - "*.md"
+    branches: [main]
     tags:
-      - '*'
+      - "*"
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 env:
   NODE_OPTIONS: "--max_old_space_size=4096"
@@ -18,83 +18,103 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      - name: Git checkout (merge)
+        uses: actions/checkout@v4
+        if: github.event_name != 'pull_request'
+        with:
+          fetch-depth: 0
 
-    - name: Git checkout (merge)
-      uses: actions/checkout@v4
-      if: github.event_name != 'pull_request'
-      with:
-        fetch-depth: 0
+      - name: Git checkout (PR)
+        uses: actions/checkout@v4
+        if: github.event_name == 'pull_request'
+        with:
+          fetch-depth: 0
+          # see: https://frontside.com/blog/2020-05-26-github-actions-pull_request/#how-does-pull_request-affect-actionscheckout
+          ref: ${{ github.event.pull_request.head.sha }}
 
-    - name: Git checkout (PR)
-      uses: actions/checkout@v4
-      if: github.event_name == 'pull_request'
-      with:
-        fetch-depth: 0
-        # see: https://frontside.com/blog/2020-05-26-github-actions-pull_request/#how-does-pull_request-affect-actionscheckout
-        ref: ${{ github.event.pull_request.head.sha }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      #        cache: 'npm'
+      #        cache-dependency-path: '**/package-lock.json'
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-#        cache: 'npm'
-#        cache-dependency-path: '**/package-lock.json'
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: "8"
+          distribution: "adopt"
+          cache: "sbt"
 
-    - name: Set up JDK 8
-      uses: actions/setup-java@v4
-      with:
-        java-version: '8'
-        distribution: 'adopt'
-        cache: 'sbt'
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            ~/.nvm
+            ~/work/farjs/farjs/node_modules
+            ~/work/farjs/farjs/package-lock.json
+          key: ${{ runner.os }}-node_modules-cache-v4-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-cache-v4-
 
-    - name: Cache node_modules
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.npm
-          ~/.nvm
-          ~/work/farjs/farjs/node_modules
-          ~/work/farjs/farjs/package-lock.json
-        key: ${{ runner.os }}-node_modules-cache-v4-${{ hashFiles('package.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node_modules-cache-v4-
+      - name: Extract Tag Name
+        run: echo "TAG_NAME=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
+        if: ${{ startsWith(github.ref, 'refs/tags') }}
 
-    - name: Extract Tag Name
-      run: echo "TAG_NAME=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
-      if: ${{ startsWith(github.ref, 'refs/tags') }}
+      - name: Run js tests
+        run: |
+          npm i
+          npx tsc
+          npx quick-lint-js ./**/*.mjs
+          npm run formatCheck
+          NODE_V8_COVERAGE=coverage0 npx c8 -r lcovonly --all --src ./ node --experimental-test-coverage ./test/all.mjs
+        if: ${{ env.TAG_NAME == '' }}
 
-    - name: Run tests
-      run: |
-        npm i
-        sbt coverage test
-        sbt coverageAggregate coveralls
-      if: ${{ env.TAG_NAME == '' }}
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      - name: Report js coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel: true
+        if: ${{ env.TAG_NAME == '' }}
 
-    - name: Build SNAPSHOT artifact
-      run: |
-        sbt clean "project farjs-app" copyToTargetDir fullOptJS
-        cd app/target/scala-2.13/scalajs-bundler/main
-        npm pack
-      if: ${{ env.TAG_NAME == '' }}
+      - name: Run sbt tests
+        run: |
+          sbt coverage test
+          sbt coverageAggregate coveralls
+        if: ${{ env.TAG_NAME == '' }}
+        env:
+          COVERALLS_PARALLEL: true
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
-    - name: Upload SNAPSHOT artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: farjs-app-0.1.0-SNAPSHOT.tgz
-        path: app/target/scala-2.13/scalajs-bundler/main/farjs-app-0.1.0-SNAPSHOT.tgz
-      if: ${{ env.TAG_NAME == '' }}
+      - name: Close parallel build in Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
+        if: ${{ env.TAG_NAME == '' }}
 
-    - name: Publish RELEASE
-      run: |
-        VERSION="$(echo "$TAG_NAME" | cut -d'v' -f 2)"
-        echo "Publish a release version=$VERSION for tag $TAG_NAME"
-        sbt clean "project farjs-app" copyToTargetDir fullOptJS
-        cd app/target/scala-2.13/scalajs-bundler/main
-        npm --no-git-tag-version --allow-same-version version $VERSION
-        echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
-        npm publish
-      if: ${{ env.TAG_NAME != '' }}
-      env:
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Build SNAPSHOT artifact
+        run: |
+          sbt clean "project farjs-app" copyToTargetDir fullOptJS
+          cd app/target/scala-2.13/scalajs-bundler/main
+          npm pack
+        if: ${{ env.TAG_NAME == '' }}
+
+      - name: Upload SNAPSHOT artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: farjs-app-0.1.0-SNAPSHOT.tgz
+          path: app/target/scala-2.13/scalajs-bundler/main/farjs-app-0.1.0-SNAPSHOT.tgz
+        if: ${{ env.TAG_NAME == '' }}
+
+      - name: Publish RELEASE
+        run: |
+          VERSION="$(echo "$TAG_NAME" | cut -d'v' -f 2)"
+          echo "Publish a release version=$VERSION for tag $TAG_NAME"
+          sbt clean "project farjs-app" copyToTargetDir fullOptJS
+          cd app/target/scala-2.13/scalajs-bundler/main
+          npm --no-git-tag-version --allow-same-version version $VERSION
+          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+          npm publish
+        if: ${{ env.TAG_NAME != '' }}
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
