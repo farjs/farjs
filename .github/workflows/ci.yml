@@ -18,19 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Git checkout (merge)
+      - name: Git checkout
         uses: actions/checkout@v4
-        if: github.event_name != 'pull_request'
         with:
           fetch-depth: 0
-
-      - name: Git checkout (PR)
-        uses: actions/checkout@v4
-        if: github.event_name == 'pull_request'
-        with:
-          fetch-depth: 0
-          # see: https://frontside.com/blog/2020-05-26-github-actions-pull_request/#how-does-pull_request-affect-actionscheckout
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -68,23 +59,34 @@ jobs:
           npx tsc
           npx quick-lint-js ./**/*.mjs
           npm run formatCheck
-          NODE_V8_COVERAGE=coverage0 npx c8 -r lcovonly --all --src ./ node --experimental-test-coverage ./test/all.mjs
+          NODE_V8_COVERAGE=coverage0 npx c8 -r lcovonly --all --exclude "app/**" --exclude "test/**" node --experimental-test-coverage ./test/all.mjs
         if: ${{ env.TAG_NAME == '' }}
 
       - name: Report js coverage to Coveralls
         uses: coverallsapp/github-action@v2
         with:
           parallel: true
+          flag-name: js
         if: ${{ env.TAG_NAME == '' }}
 
-      - name: Run sbt tests
-        run: |
-          sbt coverage test
-          sbt coverageAggregate coveralls
+      - name: Run scala tests
+        run: sbt coverage test coverageReport
         if: ${{ env.TAG_NAME == '' }}
-        env:
-          COVERALLS_PARALLEL: true
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+
+      - name: Report scala coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel: true
+          flag-name: scala
+          files: ./app/target/scala-2.13/coverage-report/cobertura.xml
+            ./archiver/target/scala-2.13/coverage-report/cobertura.xml
+            ./copymove/target/scala-2.13/coverage-report/cobertura.xml
+            ./file/target/scala-2.13/coverage-report/cobertura.xml
+            ./filelist/target/scala-2.13/coverage-report/cobertura.xml
+            ./fs/target/scala-2.13/coverage-report/cobertura.xml
+            ./viewer/target/scala-2.13/coverage-report/cobertura.xml
+          format: cobertura
+        if: ${{ env.TAG_NAME == '' }}
 
       - name: Close parallel build in Coveralls
         uses: coverallsapp/github-action@v2

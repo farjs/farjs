@@ -4,15 +4,22 @@ import common.{Libs, TestLibs}
 import org.scalajs.jsenv.Input.{CommonJSModule, ESModule}
 import org.scalajs.linker.interface.ESVersion
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
-import sbt.Keys._
+import org.xml.sax.helpers.{AttributesImpl, XMLFilterImpl, XMLReaderFactory}
+import org.xml.sax.{Attributes, InputSource}
 import sbt._
+import sbt.Keys._
 import sbt.nio.file.FileTreeView
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
 import scalajsbundler.util.JSON
 import scommons.sbtplugin.project.CommonNodeJsModule
+import scoverage.ScoverageKeys.coverageReport
 
-import java.io.IOException
+import java.io.{IOException, StringReader}
 import java.nio.file.Files
+import javax.xml.XMLConstants
+import javax.xml.transform.{OutputKeys, TransformerFactory}
+import javax.xml.transform.sax.SAXSource
+import javax.xml.transform.stream.StreamResult
 
 trait ScalaJsModule extends FarjsModule with CommonNodeJsModule {
 
@@ -123,6 +130,11 @@ object ScalaJsModule {
       val logger = streams.value.log
       doClean(logger, Seq(managedDirectory.value, target.value), cleanKeepFiles.value)
     },
+
+    coverageReport := {
+      coverageReport.value
+      addSrcPathToCoberturaXml(name.value.stripPrefix("farjs-"))
+    },
   ) ++
     inConfig(Compile)(configSettings) ++
     inConfig(Test)(configSettings)
@@ -159,5 +171,50 @@ object ScalaJsModule {
       }
     }
     else logger.info(s"keep: $file")
+  }
+
+  private def addSrcPathToCoberturaXml(module: String): Unit = {
+    val xmlFile = new File(s"./$module/target/scala-2.13/coverage-report/cobertura.xml")
+    if (xmlFile.exists()) {
+      val xr = new XMLFilterImpl(XMLReaderFactory.createXMLReader) {
+        override def startElement(uri: String, localName: String, qName: String, atts: Attributes): Unit = {
+          if (!qName.startsWith("source")) {
+            val newAtts =
+              if (qName == "class") {
+                val atts2 = new AttributesImpl(atts)
+                val idx = atts2.getIndex("filename")
+                val path = atts2.getValue(idx)
+                atts2.setValue(idx, s"$module/src/main/scala/$path")
+                atts2
+              }
+              else atts
+
+            super.startElement(uri, localName, qName, newAtts)
+          }
+        }
+
+        override def endElement(uri: String, localName: String, qName: String): Unit = {
+          if (!qName.startsWith("source")) {
+            super.endElement(uri, localName, qName)
+          }
+        }
+
+        override def characters(ch: Array[Char], start: Int, length: Int): Unit = {
+          //super.characters(ch, start, length);
+        }
+      }
+
+      val xmlStr = IO.read(xmlFile).stripPrefix(
+        """<?xml version="1.0"?>
+          |<!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
+          |""".stripMargin)
+
+      val src = new SAXSource(xr, new InputSource(new StringReader(xmlStr)))
+      val res = new StreamResult(xmlFile)
+      val transformer = TransformerFactory.newInstance.newTransformer
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes")
+      transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2")
+      transformer.transform(src, res)
+    }
   }
 }
