@@ -9,7 +9,7 @@
   "private": false,
   "description": "FAR.js - Cross-platform File and Archive Manager app in your terminal",
   "scripts": {
-    "sql-bundle": "npx sql-bundle ./app/migrations",
+    "sql-bundle": "npx sql-bundle ./dao/migrations",
     "lint": "quick-lint-js ./**/*.mjs",
     "test": "tsc && bun test && node ./test/all.mjs",
     "format": "prettier **/*.mjs --write",
@@ -50,16 +50,14 @@
     "farjs": "dist/farjs.mjs"
   },
   "files": [
+    "build/farjs-app-opt.js",
+    "dao/migrations/bundle.json",
     "dist/farjs.mjs",
-    "dist/versionChecker.mjs",
-    "migrations/bundle.json",
-    "farjs-app-opt.js",
-    "LICENSE.txt",
-    "README.md"
+    "dist/versionChecker.mjs"
   ],
   "type": "module",
-  "main": "./farjs-app-opt.js",
-  "exports": "./farjs-app-opt.js",
+  "main": "./build/farjs-app-opt.js",
+  "exports": "./build/farjs-app-opt.js",
   "preferGlobal": true,
   "browserslist": "maintained node versions",
   "engines": {

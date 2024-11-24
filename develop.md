@@ -1,6 +1,7 @@
 ## Developing
 
 ### Install node dependencies
+
 ```bash
 npm i --install-links=true
 ```
@@ -8,6 +9,7 @@ npm i --install-links=true
 ### How to Build
 
 To build and run all the tests use the following command:
+
 ```bash
 sbt test
 ```
@@ -15,10 +17,11 @@ sbt test
 ### How to Run
 
 To run the app use the following commands:
-```bash
-sbt "project farjs-app" copyToTargetDir fastOptJS
 
-node ./app/target/scala-2.13/scalajs-bundler/main/dev.loader.mjs
+```bash
+sbt "project farjs-app" fastOptJS
+
+node ./dist/farjs.dev.mjs
 ```
 
 ### How to Run with Reload Workflow
@@ -30,7 +33,7 @@ sbt
 >~fastOptJS
 
 #console 2:
-node --watch ./app/target/scala-2.13/scalajs-bundler/main/dev.loader.mjs
+node --trace-deprecation --watch ./dist/farjs.dev.mjs
 ```
 
 ## Resources

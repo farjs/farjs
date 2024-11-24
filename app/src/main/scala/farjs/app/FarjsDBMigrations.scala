@@ -11,7 +11,7 @@ import scala.scalajs.js
 object FarjsDBMigrations {
 
   def apply(db: WebSQLDatabase): Future[Unit] = {
-    val module = "./migrations/bundle.json"
+    val module = "../dao/migrations/bundle.json"
     val url = new URL(module, js.`import`.meta.url.asInstanceOf[String])
 
     MigrationBundle.readBundle(url).toFuture.flatMap { bundle =>

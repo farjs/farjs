@@ -5,7 +5,6 @@ import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
 import sbt._
 import scalajsbundler.Npm
-import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
 import scommons.sbtplugin.ScommonsPlugin.autoImport._
 import scoverage.ScoverageKeys.coverageExcludedPackages
 
@@ -14,9 +13,6 @@ object FarjsApp extends ScalaJsModule {
   override val id = "farjs-app"
 
   override val base: File = file("app")
-
-  private val copyToTargetDir: TaskKey[Unit] =
-    taskKey[Unit]("Copies npm package resources from root dir to target dir")
 
   override def definition: Project = super.definition
     .settings(
@@ -41,39 +37,25 @@ object FarjsApp extends ScalaJsModule {
 
       scalaJSUseMainModuleInitializer := false,
 
-      sjsStageSettings(fastOptJS, Compile),
-      sjsStageSettings(fullOptJS, Compile),
-      sjsStageSettings(fastOptJS, Test),
-      sjsStageSettings(fullOptJS, Test),
-
-      Compile / copyToTargetDir := {
-        val targetDir = (Compile / npmUpdate / crossTarget).value
-        copyToDir(targetDir)(baseDirectory.value / ".." / "package.json")
-        copyToDir(targetDir)(baseDirectory.value / ".." / "LICENSE.txt")
-        copyToDir(targetDir)(baseDirectory.value / ".." / "README.md")
-        targetDir
-      },
-
       //useYarn := true,
       //yarnExtraArgs := Seq("--frozen-lockfile"),
+    ).settings(
+      sjsStageSettings(fastOptJS, Compile) ++
+      sjsStageSettings(fullOptJS, Compile) ++
+      sjsStageSettings(fastOptJS, Test) ++
+      sjsStageSettings(fullOptJS, Test): _*
     )
 
-  private def copyToDir(targetDir: File)(file: File): File = {
-    val copy = targetDir / file.name
-    IO.copyFile(file, copy)
-    copy
-  }
-
   private def sjsStageSettings(sjsStage: TaskKey[Attributed[File]], config: ConfigKey) = {
-    config / sjsStage := {
-      val logger = streams.value.log
-      val workingDir = baseDirectory.value / ".."
-      Npm.run("run", "sql-bundle")(workingDir, logger)
-
-      val targetDir = (config / sjsStage / crossTarget).value
-      copyToDir(targetDir / "migrations")(baseDirectory.value / "migrations" / "bundle.json")
-      (config / sjsStage).value
-    }
+    Seq(
+      config / sjsStage / crossTarget := baseDirectory.value / ".." / "build",
+      config / sjsStage := {
+        val logger = streams.value.log
+        val workingDir = baseDirectory.value / ".."
+        Npm.run("run", "sql-bundle")(workingDir, logger)
+        (config / sjsStage).value
+      }
+    )
   }
 
   override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Seq(

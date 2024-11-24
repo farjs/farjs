@@ -2,6 +2,7 @@
 *.log
 package-lock.json
 bun.lockb
+dao/migrations/bundle.json
 
 # sbt specific
 .cache
@@ -9,10 +10,8 @@ bun.lockb
 .lib/
 .idea/
 .bsp/
-dist/*
 target/
 build/
-app/migrations/bundle.json
 node_modules/
 lib_managed/
 src_managed/
