@@ -1,7 +1,7 @@
 {
   // see https://www.typescriptlang.org/tsconfig to better understand tsconfigs
   "include": ["./**/*.mjs"],
-  "exclude": ["./app/**/*.mjs", "./**/target/**/*.mjs"],
+  "exclude": ["./build/*", "./dist/farjs*", "./**/target/**/*js"],
   "compilerOptions": {
     "module": "node16",
     //got from here: https://stackoverflow.com/questions/61305578/what-typescript-configuration-produces-output-closest-to-node-js-14-capabilities/61305579#61305579

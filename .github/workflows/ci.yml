@@ -59,7 +59,7 @@ jobs:
           npx tsc
           npx quick-lint-js ./**/*.mjs
           npm run formatCheck
-          NODE_V8_COVERAGE=coverage0 npx c8 -r lcovonly --all --exclude "app/**" --exclude "test/**" node --experimental-test-coverage ./test/all.mjs
+          NODE_V8_COVERAGE=coverage0 npx c8 -r lcovonly --all --exclude "dist/**" --exclude "test/**" node --experimental-test-coverage ./test/all.mjs
         if: ${{ env.TAG_NAME == '' }}
 
       - name: Report js coverage to Coveralls
@@ -96,8 +96,7 @@ jobs:
 
       - name: Build SNAPSHOT artifact
         run: |
-          sbt clean "project farjs-app" copyToTargetDir fullOptJS
-          cd app/target/scala-2.13/scalajs-bundler/main
+          sbt clean "project farjs-app" fullOptJS
           npm pack
         if: ${{ env.TAG_NAME == '' }}
 
@@ -105,15 +104,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: farjs-app-0.1.0-SNAPSHOT.tgz
-          path: app/target/scala-2.13/scalajs-bundler/main/farjs-app-0.1.0-SNAPSHOT.tgz
+          path: farjs-app-0.1.0-SNAPSHOT.tgz
         if: ${{ env.TAG_NAME == '' }}
 
       - name: Publish RELEASE
         run: |
           VERSION="$(echo "$TAG_NAME" | cut -d'v' -f 2)"
           echo "Publish a release version=$VERSION for tag $TAG_NAME"
-          sbt clean "project farjs-app" copyToTargetDir fullOptJS
-          cd app/target/scala-2.13/scalajs-bundler/main
+          sbt clean "project farjs-app" fullOptJS
           npm --no-git-tag-version --allow-same-version version $VERSION
           echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
           npm publish
