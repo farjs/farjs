@@ -35,4 +35,5 @@ jobs:
       - name: Run tests
         run: |
           bun install
+          bun run sql-bundle
           bun test

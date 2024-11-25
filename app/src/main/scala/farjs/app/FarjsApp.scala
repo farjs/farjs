@@ -1,7 +1,7 @@
 package farjs.app
 
 import farjs.app.filelist.{FileListModule, FileListRoot}
-import farjs.app.raw.BetterSqlite3WebSQL
+import farjs.app.raw.{BetterSqlite3Database, BetterSqlite3WebSQL}
 import farjs.domain.FarjsDBContext
 import farjs.filelist.theme.FileListTheme
 import farjs.fs.FSFileListActions
@@ -74,9 +74,8 @@ object FarjsApp {
         loadMainUi = { dispatch =>
           onReady.foreach(_.apply())
 
-          prepareDB().map { db =>
-            val ctx = new FarjsDBContext(db)
-            val fileListModule = new FileListModule(ctx)
+          prepareDB().map { case (db, ctx) =>
+            val fileListModule = new FileListModule(db, ctx)
             val mainUi = new FileListRoot(dispatch, fileListModule, WithPortals.create(screen)).apply()
             val theme =
               if (screen.terminal == TerminalName.`xterm-256color`) FileListTheme.xterm256Theme
@@ -93,13 +92,14 @@ object FarjsApp {
     screen
   }
 
-  private def prepareDB(): Future[Database] = {
+  private def prepareDB(): Future[(BetterSqlite3Database, FarjsDBContext)] = {
     val dbF = for {
       _ <- FSFileListActions.api.mkDirs(js.Array(FarjsData.getDataDir: _*)).toFuture
-      db = BetterSqlite3WebSQL.openDatabase(FarjsData.getDBFilePath)
+      webDb = BetterSqlite3WebSQL.openDatabase(FarjsData.getDBFilePath)
+      db = webDb._db.asInstanceOf[js.Dynamic]._db.asInstanceOf[BetterSqlite3Database]
       _ <- FarjsDBMigrations.apply(db)
     } yield {
-      new Database(db)
+      (db, new FarjsDBContext(new Database(webDb)))
     }
 
     dbF.recover {

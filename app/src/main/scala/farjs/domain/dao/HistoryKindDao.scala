@@ -1,44 +1,23 @@
 package farjs.domain.dao
 
+import farjs.app.raw.BetterSqlite3Database
 import farjs.domain._
-import scommons.websql.io.dao.CommonDao
 
-import scala.concurrent.Future
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
-class HistoryKindDao(val ctx: FarjsDBContext) extends CommonDao {
+trait HistoryKindDao extends js.Object {
 
-  import ctx._
+  def getAll(): js.Promise[js.Array[HistoryKindEntity]]
 
-  private val tableName = "history_kinds"
+  def upsert(entity: HistoryKindEntity): js.Promise[HistoryKindEntity]
 
-  private val rowExtractor: ((Int, String)) => HistoryKindEntity = {
-    case (id, name) => HistoryKindEntity(id, name)
-  }
+  def deleteAll(): js.Promise[Unit]
+}
 
-  def getAll: Future[Seq[HistoryKindEntity]] = {
-    ctx.performIO(ctx.runQuery(
-      sql = s"SELECT id, name FROM $tableName ORDER BY id",
-      extractor = rowExtractor
-    ))
-  }
+@js.native
+@JSImport("../dao/HistoryKindDao.mjs", JSImport.Default)
+object HistoryKindDao extends js.Function1[BetterSqlite3Database, HistoryKindDao] {
 
-  def upsert(entity: HistoryKindEntity): Future[HistoryKindEntity] = {
-    val q = for {
-      _ <- ctx.runAction(
-        sql = s"INSERT INTO $tableName (name) VALUES (?) ON CONFLICT (name) DO NOTHING",
-        args = entity.name
-      )
-      res <- ctx.runQuery(
-        sql = s"SELECT id, name FROM $tableName WHERE name = ?",
-        args = entity.name,
-        extractor = rowExtractor
-      )
-    } yield res.head
-
-    ctx.performIO(q)
-  }
-  
-  def deleteAll(): Future[Long] = {
-    ctx.performIO(ctx.runAction(s"DELETE FROM $tableName"))
-  }
+  def apply(db: BetterSqlite3Database): HistoryKindDao = js.native
 }

@@ -59,6 +59,7 @@ jobs:
           npx tsc
           npx quick-lint-js ./**/*.mjs
           npm run formatCheck
+          npm run sql-bundle
           NODE_V8_COVERAGE=coverage0 npx c8 -r lcovonly --all --exclude "dist/**" --exclude "test/**" node --experimental-test-coverage ./test/all.mjs
         if: ${{ env.TAG_NAME == '' }}
 

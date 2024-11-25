@@ -25,16 +25,16 @@ class HistoryServiceImplSpec extends BaseDBContextSpec with OptionValues {
     column = 4
   )
 
-  it should "store and read items" in withCtx { ctx =>
+  it should "store and read items" in withCtx { (db, ctx) =>
     //given
-    val kindDao = new HistoryKindDao(ctx)
+    val kindDao = HistoryKindDao(db)
     val maxItemsCount = 10
     val dao0 = new HistoryDao(ctx, HistoryKindEntity(-1, "non-existing"), maxItemsCount)
 
     for {
       _ <- dao0.deleteAll()
-      _ <- kindDao.deleteAll()
-      kind <- kindDao.upsert(HistoryKindEntity(-1, "test_kind1"))
+      _ <- kindDao.deleteAll().toFuture
+      kind <- kindDao.upsert(HistoryKindEntity(-1, "test_kind1")).toFuture
       service = new HistoryServiceImpl(new HistoryDao(ctx, kind, maxItemsCount))
       
       //when

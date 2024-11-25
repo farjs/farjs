@@ -9,23 +9,31 @@ import farjs.file.FileViewHistoryParams
 import farjs.filelist.history.{History, HistoryKind}
 import org.scalatest.OptionValues
 
-import scala.concurrent.Future
 import scala.scalajs.js
 
 class HistoryProviderImplSpec extends BaseDBContextSpec with OptionValues {
 
   private val maxItemsCount = 10
-  
-  it should "save and read history" in withCtx { ctx =>
+
+  //noinspection TypeAnnotation
+  class HistoryKindMocks {
+    val upsert = mockFunction[HistoryKindEntity, js.Promise[HistoryKindEntity]]
+
+    val kindDao = MockHistoryKindDao(
+      upsertMock = upsert
+    )
+  }
+
+  it should "save and read history" in withCtx { (db, ctx) =>
     //given
-    val kindDao = new HistoryKindDao(ctx)
-    val provider = new HistoryProviderImpl(kindDao)
+    val kindDao = HistoryKindDao(db)
+    val provider = new HistoryProviderImpl(kindDao, ctx)
     val dao0 = new HistoryDao(ctx, HistoryKindEntity(-1, "non-existing"), maxItemsCount)
     val entity = History("test/path", js.undefined)
 
     for {
       _ <- dao0.deleteAll()
-      _ <- kindDao.deleteAll()
+      _ <- kindDao.deleteAll().toFuture
 
       //when
       service1 <- provider.get(HistoryKind("test_kind", maxItemsCount)).toFuture
@@ -46,21 +54,21 @@ class HistoryProviderImplSpec extends BaseDBContextSpec with OptionValues {
     }
   }
 
-  it should "recover and log error when get" in {
+  it should "recover and log error when get" in withCtx { (_, ctx) =>
     //given
     val errorLogger = mockFunction[String, Unit]
-    val kindDao = mock[HistoryKindDao]
-    val provider = new HistoryProviderImpl(kindDao)
+    val kindMocks = new HistoryKindMocks
+    val provider = new HistoryProviderImpl(kindMocks.kindDao, ctx)
     val kind = HistoryKind("test_kind", maxItemsCount)
     val entity = History("test/path", js.undefined)
-    val ex = new Exception("test error")
+    val error = js.Error("test error")
 
     val savedConsoleError = js.Dynamic.global.console.error
     js.Dynamic.global.console.error = errorLogger
 
     //then
-    (kindDao.upsert _).expects(*).returning(Future.failed(ex))
-    errorLogger.expects(s"Failed to upsert history kind '${kind.name}', error: $ex")
+    kindMocks.upsert.expects(*).returning(js.Promise.reject(error))
+    errorLogger.expects(s"Failed to upsert history kind '${kind.name}', error: scala.scalajs.js.JavaScriptException: Error: test error")
 
     for {
       //when

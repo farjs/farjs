@@ -23,21 +23,21 @@ class HistoryDaoSpec extends BaseDBContextSpec {
     column = 4
   )
   
-  it should "create new records when save" in withCtx { ctx =>
+  it should "create new records when save" in withCtx { (db, ctx) =>
     //given
-    val kindDao = new HistoryKindDao(ctx)
+    val kindDao = HistoryKindDao(db)
     val maxItemsCount = 10
     val dao0 = new HistoryDao(ctx, HistoryKindEntity(-1, "non-existing"), maxItemsCount)
 
     for {
       _ <- dao0.deleteAll()
-      _ <- kindDao.deleteAll()
+      _ <- kindDao.deleteAll().toFuture
       _ <- dao0.getByItem("test").map { maybeHistory =>
         maybeHistory shouldBe None
       }
 
       //when & then
-      kind1 <- kindDao.upsert(HistoryKindEntity(-1, "test_kind1"))
+      kind1 <- kindDao.upsert(HistoryKindEntity(-1, "test_kind1")).toFuture
       dao1 = new HistoryDao(ctx, kind1, maxItemsCount)
       entity1 = History(testItem, params)
       _ <- dao1.save(entity1, js.Date.now())
@@ -46,7 +46,7 @@ class HistoryDaoSpec extends BaseDBContextSpec {
       })
 
       //when & then
-      kind2 <- kindDao.upsert(HistoryKindEntity(-1, "test_kind2"))
+      kind2 <- kindDao.upsert(HistoryKindEntity(-1, "test_kind2")).toFuture
       dao2 = new HistoryDao(ctx, kind2, maxItemsCount)
       entity2 = History(testItem, js.undefined)
       _ <- dao2.save(entity2, js.Date.now())
@@ -63,9 +63,9 @@ class HistoryDaoSpec extends BaseDBContextSpec {
     }
   }
   
-  it should "update existing record when save" in withCtx { ctx =>
+  it should "update existing record when save" in withCtx { (db, ctx) =>
     //given
-    val kindDao = new HistoryKindDao(ctx)
+    val kindDao = HistoryKindDao(db)
     val maxItemsCount = 10
     val updatedParams = FileViewHistoryParams.copy(params)(
       encoding = "updated-encoding",
@@ -75,7 +75,7 @@ class HistoryDaoSpec extends BaseDBContextSpec {
     )
 
     for {
-      allKinds <- kindDao.getAll
+      allKinds <- kindDao.getAll().toFuture
       (kind1, kind2) = inside(allKinds.toList) {
         case List(kind1, kind2) => (kind1, kind2)
       }
@@ -99,13 +99,13 @@ class HistoryDaoSpec extends BaseDBContextSpec {
     }
   }
 
-  it should "keep last N records when save" in withCtx { ctx =>
+  it should "keep last N records when save" in withCtx { (db, ctx) =>
     //given
-    val kindDao = new HistoryKindDao(ctx)
+    val kindDao = HistoryKindDao(db)
     val maxItemsCount = 3
 
     for {
-      allKinds <- kindDao.getAll
+      allKinds <- kindDao.getAll().toFuture
       (kind1, kind2) = inside(allKinds.toList) {
         case List(kind1, kind2) => (kind1, kind2)
       }
