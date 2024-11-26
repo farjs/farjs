@@ -9,7 +9,7 @@ import farjs.fs.FSServices
 class FileListModule(db: BetterSqlite3Database, ctx: FarjsDBContext) {
 
   private val historyKindDao = HistoryKindDao(db)
-  val historyProvider = new HistoryProviderImpl(historyKindDao, ctx)
+  val historyProvider = new HistoryProviderImpl(db, historyKindDao)
 
   val folderShortcutDao = new FolderShortcutDao(ctx)
   val folderShortcutsService = new FolderShortcutsServiceImpl(folderShortcutDao)

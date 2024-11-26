@@ -1,7 +1,8 @@
 package farjs.app.service
 
+import farjs.app.raw.BetterSqlite3Database
 import farjs.app.service.HistoryProviderImpl.limitMaxItemsCount
-import farjs.domain.{FarjsDBContext, HistoryKindEntity}
+import farjs.domain.HistoryKindEntity
 import farjs.domain.dao.{HistoryDao, HistoryKindDao}
 import farjs.filelist.history._
 
@@ -10,7 +11,7 @@ import scala.scalajs.js
 import scala.scalajs.js.JSConverters.JSRichFutureNonThenable
 import scala.util.control.NonFatal
 
-class HistoryProviderImpl(kindDao: HistoryKindDao, ctx: FarjsDBContext) extends HistoryProvider {
+class HistoryProviderImpl(db: BetterSqlite3Database, kindDao: HistoryKindDao) extends HistoryProvider {
 
   private var services = Map.empty[String, HistoryService]
   private val noopService = new NoopHistoryService
@@ -21,7 +22,7 @@ class HistoryProviderImpl(kindDao: HistoryKindDao, ctx: FarjsDBContext) extends 
       case None =>
         kindDao.upsert(HistoryKindEntity(-1, kind.name)).toFuture.map { kindEntity =>
           val service = new HistoryServiceImpl(
-            new HistoryDao(ctx, kindEntity, limitMaxItemsCount(kind.maxItemsCount))
+            HistoryDao(db, kindEntity, limitMaxItemsCount(kind.maxItemsCount))
           )
           services = services.updated(kind.name, service)
           service

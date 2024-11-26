@@ -3,6 +3,7 @@
  */
 import assert from "node:assert/strict";
 import testDb from "../db.mjs";
+import HistoryDao from "../../dao/HistoryDao.mjs";
 import HistoryKindDao from "../../dao/HistoryKindDao.mjs";
 
 const { describe, it } = await (async () => {
@@ -20,6 +21,8 @@ describe("HistoryKindDao.test.mjs", () => {
     const db = await testDb();
     const dao = HistoryKindDao(db);
     const entity = getHistoryKindEntity();
+    const dao0 = HistoryDao(db, { id: -1, name: "non-existing-kind" }, 10);
+    await dao0.deleteAll();
     await dao.deleteAll();
 
     //when

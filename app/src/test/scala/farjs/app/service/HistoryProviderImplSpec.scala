@@ -24,15 +24,15 @@ class HistoryProviderImplSpec extends BaseDBContextSpec with OptionValues {
     )
   }
 
-  it should "save and read history" in withCtx { (db, ctx) =>
+  it should "save and read history" in withCtx { (db, _) =>
     //given
     val kindDao = HistoryKindDao(db)
-    val provider = new HistoryProviderImpl(kindDao, ctx)
-    val dao0 = new HistoryDao(ctx, HistoryKindEntity(-1, "non-existing"), maxItemsCount)
+    val provider = new HistoryProviderImpl(db, kindDao)
+    val dao0 = HistoryDao(db, HistoryKindEntity(-1, "non-existing"), maxItemsCount)
     val entity = History("test/path", js.undefined)
 
     for {
-      _ <- dao0.deleteAll()
+      _ <- dao0.deleteAll().toFuture
       _ <- kindDao.deleteAll().toFuture
 
       //when
@@ -54,11 +54,11 @@ class HistoryProviderImplSpec extends BaseDBContextSpec with OptionValues {
     }
   }
 
-  it should "recover and log error when get" in withCtx { (_, ctx) =>
+  it should "recover and log error when get" in withCtx { (db, _) =>
     //given
     val errorLogger = mockFunction[String, Unit]
     val kindMocks = new HistoryKindMocks
-    val provider = new HistoryProviderImpl(kindMocks.kindDao, ctx)
+    val provider = new HistoryProviderImpl(db, kindMocks.kindDao)
     val kind = HistoryKind("test_kind", maxItemsCount)
     val entity = History("test/path", js.undefined)
     val error = js.Error("test error")

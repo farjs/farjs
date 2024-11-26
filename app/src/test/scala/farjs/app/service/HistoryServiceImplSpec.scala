@@ -12,10 +12,22 @@ import org.scalatest.Inside.inside
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatest.{Assertion, OptionValues, Succeeded}
 
-import scala.concurrent.Future
 import scala.scalajs.js
 
 class HistoryServiceImplSpec extends BaseDBContextSpec with OptionValues {
+
+  //noinspection TypeAnnotation
+  class HistoryMocks {
+    val getAll = mockFunction[js.Promise[js.Array[History]]]
+    val getByItem = mockFunction[String, js.Promise[js.UndefOr[History]]]
+    val save = mockFunction[History, Double, js.Promise[Unit]]
+
+    val dao = MockHistoryDao(
+      getAllMock = getAll,
+      getByItemMock = getByItem,
+      saveMock = save
+    )
+  }
 
   private val params = FileViewHistoryParams(
     isEdit = false,
@@ -25,17 +37,17 @@ class HistoryServiceImplSpec extends BaseDBContextSpec with OptionValues {
     column = 4
   )
 
-  it should "store and read items" in withCtx { (db, ctx) =>
+  it should "store and read items" in withCtx { (db, _) =>
     //given
     val kindDao = HistoryKindDao(db)
     val maxItemsCount = 10
-    val dao0 = new HistoryDao(ctx, HistoryKindEntity(-1, "non-existing"), maxItemsCount)
+    val dao0 = HistoryDao(db, HistoryKindEntity(-1, "non-existing"), maxItemsCount)
 
     for {
-      _ <- dao0.deleteAll()
+      _ <- dao0.deleteAll().toFuture
       _ <- kindDao.deleteAll().toFuture
       kind <- kindDao.upsert(HistoryKindEntity(-1, "test_kind1")).toFuture
-      service = new HistoryServiceImpl(new HistoryDao(ctx, kind, maxItemsCount))
+      service = new HistoryServiceImpl(HistoryDao(db, kind, maxItemsCount))
       
       //when
       entity1 = History("test/path/1", js.undefined)
@@ -63,16 +75,16 @@ class HistoryServiceImplSpec extends BaseDBContextSpec with OptionValues {
   it should "recover and log error when getAll" in {
     //given
     val errorLogger = mockFunction[String, Unit]
-    val dao = mock[HistoryDao]
-    val service = new HistoryServiceImpl(dao)
-    val ex = new Exception("test error")
+    val mocks = new HistoryMocks
+    val service = new HistoryServiceImpl(mocks.dao)
+    val error = js.Error("test error")
 
     val savedConsoleError = js.Dynamic.global.console.error
     js.Dynamic.global.console.error = errorLogger
 
     //then
-    (() => dao.getAll).expects().returning(Future.failed(ex))
-    errorLogger.expects(s"Failed to read all history items, error: $ex")
+    mocks.getAll.expects().returning(js.Promise.reject(error))
+    errorLogger.expects(s"Failed to read all history items, error: scala.scalajs.js.JavaScriptException: Error: test error")
 
     //when
     val resultF = service.getAll.toFuture
@@ -87,17 +99,17 @@ class HistoryServiceImplSpec extends BaseDBContextSpec with OptionValues {
   it should "recover and log error when getOne" in {
     //given
     val errorLogger = mockFunction[String, Unit]
-    val dao = mock[HistoryDao]
-    val service = new HistoryServiceImpl(dao)
-    val ex = new Exception("test error")
+    val mocks = new HistoryMocks
+    val service = new HistoryServiceImpl(mocks.dao)
+    val error = js.Error("test error")
     val path = "test/path"
 
     val savedConsoleError = js.Dynamic.global.console.error
     js.Dynamic.global.console.error = errorLogger
 
     //then
-    (dao.getByItem _).expects(path).returning(Future.failed(ex))
-    errorLogger.expects(s"Failed to read history item, error: $ex")
+    mocks.getByItem.expects(path).returning(js.Promise.reject(error))
+    errorLogger.expects(s"Failed to read history item, error: scala.scalajs.js.JavaScriptException: Error: test error")
 
     //when
     val resultF = service.getOne(path).toFuture
@@ -112,17 +124,17 @@ class HistoryServiceImplSpec extends BaseDBContextSpec with OptionValues {
   it should "recover and log error when save" in {
     //given
     val errorLogger = mockFunction[String, Unit]
-    val dao = mock[HistoryDao]
-    val service = new HistoryServiceImpl(dao)
+    val mocks = new HistoryMocks
+    val service = new HistoryServiceImpl(mocks.dao)
     val path = "test/path"
-    val ex = new Exception("test error")
+    val error = js.Error("test error")
 
     val savedConsoleError = js.Dynamic.global.console.error
     js.Dynamic.global.console.error = errorLogger
 
     //then
-    (dao.save _).expects(*, *).returning(Future.failed(ex))
-    errorLogger.expects(s"Failed to save history item, error: $ex")
+    mocks.save.expects(*, *).returning(js.Promise.reject(error))
+    errorLogger.expects(s"Failed to save history item, error: scala.scalajs.js.JavaScriptException: Error: test error")
 
     //when
     val resultF = service.save(History(path, js.undefined)).toFuture

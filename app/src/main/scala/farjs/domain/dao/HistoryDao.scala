@@ -1,72 +1,26 @@
 package farjs.domain.dao
 
+import farjs.app.raw.BetterSqlite3Database
 import farjs.domain._
 import farjs.filelist.history.History
-import scommons.websql.io.dao.CommonDao
 
-import scala.concurrent.Future
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
-class HistoryDao(val ctx: FarjsDBContext, kind: HistoryKindEntity, maxItemsCount: Int)
-  extends CommonDao {
+trait HistoryDao extends js.Object {
 
-  import ctx._
+  def getAll(): js.Promise[js.Array[History]]
 
-  private val tableName = "history"
-  
-  private val rowExtractor: ((String, Option[String])) => History = {
-    case (item, params) =>
-      History(item, params.map(fromJson) match {
-        case Some(p) => p: js.UndefOr[js.Object]
-        case None => js.undefined: js.UndefOr[js.Object]
-      })
-  }
+  def getByItem(item: String): js.Promise[js.UndefOr[History]]
 
-  private def fromJson(params: String): js.Object =
-    js.JSON.parse(params).asInstanceOf[js.Object]
+  def save(entity: History, updatedAt: Double): js.Promise[Unit]
 
-  private def toJson(params: js.Object): String =
-    js.JSON.stringify(params)
+  def deleteAll(): js.Promise[Unit]
+}
 
-  def getAll: Future[Seq[History]] = {
-    ctx.performIO(ctx.runQuery(
-      sql = s"SELECT item, params FROM $tableName WHERE kind_id = ? ORDER BY updated_at",
-      args = kind.id,
-      extractor = rowExtractor
-    ))
-  }
+@js.native
+@JSImport("../dao/HistoryDao.mjs", JSImport.Default)
+object HistoryDao extends js.Function3[BetterSqlite3Database, HistoryKindEntity, Int, HistoryDao] {
 
-  def getByItem(item: String): Future[Option[History]] = {
-    getOne("getByItem", ctx.performIO(ctx.runQuery(
-      sql = s"SELECT item, params FROM $tableName WHERE kind_id = ? AND item = ?",
-      args = (kind.id, item),
-      extractor = rowExtractor
-    )))
-  }
-
-  def save(entity: History, updatedAt: Double): Future[Unit] = {
-    val q = for {
-      _ <- ctx.runAction(
-        sql = s"INSERT INTO $tableName (kind_id, item, params, updated_at) VALUES (?, ?, ?, ?)" +
-          """ON CONFLICT (kind_id, item) DO UPDATE SET
-            |  params = excluded.params,
-            |  updated_at = excluded.updated_at
-            |""".stripMargin,
-        args = (kind.id, entity.item, entity.params.map(toJson).toOption, updatedAt)
-      )
-      _ <- ctx.runAction(
-        sql = s"DELETE FROM $tableName WHERE kind_id = ? AND updated_at < " +
-          "(SELECT min(updated_at) FROM (" +
-          s"SELECT updated_at FROM $tableName WHERE kind_id = ? ORDER BY updated_at DESC LIMIT ?" +
-          "))",
-        args = (kind.id, kind.id, maxItemsCount)
-      )
-    } yield ()
-
-    ctx.performIO(q)
-  }
-  
-  def deleteAll(): Future[Long] = {
-    ctx.performIO(ctx.runAction(s"DELETE FROM $tableName"))
-  }
+  def apply(db: BetterSqlite3Database, kind: HistoryKindEntity, maxItemsCount: Int): HistoryDao = js.native
 }
