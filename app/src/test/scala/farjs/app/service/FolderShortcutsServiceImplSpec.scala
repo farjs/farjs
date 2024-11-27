@@ -2,23 +2,35 @@ package farjs.app.service
 
 import farjs.app.BaseDBContextSpec
 import farjs.app.filelist.FileListModule
-import farjs.domain.dao.FolderShortcutDao
+import farjs.domain.FolderShortcut
 import org.scalatest.Succeeded
 
-import scala.concurrent.Future
 import scala.scalajs.js
 
 class FolderShortcutsServiceImplSpec extends BaseDBContextSpec {
 
-  it should "store new folder shortcut when save" in withCtx { (db, ctx) =>
+  //noinspection TypeAnnotation
+  class FolderShortcutMocks {
+    val getAll = mockFunction[js.Promise[js.Array[FolderShortcut]]]
+    val save = mockFunction[FolderShortcut, js.Promise[Unit]]
+    val delete = mockFunction[Int, js.Promise[Unit]]
+
+    val dao = MockFolderShortcutDao(
+      getAllMock = getAll,
+      saveMock = save,
+      deleteMock = delete
+    )
+  }
+
+  it should "store new folder shortcut when save" in withCtx { db =>
     //given
-    val module = new FileListModule(db, ctx)
+    val module = new FileListModule(db)
     val dao = module.folderShortcutDao
     val service = module.folderShortcutsService
     val path = "test/path"
     
     for {
-      _ <- dao.deleteAll()
+      _ <- dao.deleteAll().toFuture
       _ <- service.getAll.map { shortcuts =>
         shortcuts shouldBe List.fill(10)(Option.empty[String])
       }
@@ -35,15 +47,15 @@ class FolderShortcutsServiceImplSpec extends BaseDBContextSpec {
     }
   }
   
-  it should "update existing folder shortcut when save" in withCtx { (db, ctx) =>
+  it should "update existing folder shortcut when save" in withCtx { db =>
     //given
-    val module = new FileListModule(db, ctx)
+    val module = new FileListModule(db)
     val dao = module.folderShortcutDao
     val service = module.folderShortcutsService
     val path = "test/path"
     
     for {
-      _ <- dao.deleteAll()
+      _ <- dao.deleteAll().toFuture
       _ <- service.save(1, path)
       _ <- service.getAll.map { shortcuts =>
         shortcuts shouldBe {
@@ -63,15 +75,15 @@ class FolderShortcutsServiceImplSpec extends BaseDBContextSpec {
     }
   }
   
-  it should "delete folder shortcut when delete" in withCtx { (db, ctx) =>
+  it should "delete folder shortcut when delete" in withCtx { db =>
     //given
-    val module = new FileListModule(db, ctx)
+    val module = new FileListModule(db)
     val dao = module.folderShortcutDao
     val service = module.folderShortcutsService
     val path = "test/path"
     
     for {
-      _ <- dao.deleteAll()
+      _ <- dao.deleteAll().toFuture
       _ <- service.save(1, path)
       _ <- service.getAll.map { shortcuts =>
         shortcuts shouldBe {
@@ -92,16 +104,16 @@ class FolderShortcutsServiceImplSpec extends BaseDBContextSpec {
   it should "recover and log error when getAll" in {
     //given
     val errorLogger = mockFunction[String, Unit]
-    val dao = mock[FolderShortcutDao]
-    val service = new FolderShortcutsServiceImpl(dao)
-    val ex = new Exception("test error")
+    val mocks = new FolderShortcutMocks
+    val service = new FolderShortcutsServiceImpl(mocks.dao)
+    val error = js.Error("test error")
 
     val savedConsoleError = js.Dynamic.global.console.error
     js.Dynamic.global.console.error = errorLogger
 
     //then
-    (() => dao.getAll).expects().returning(Future.failed(ex))
-    errorLogger.expects(s"Failed to read folder shortcuts, error: $ex")
+    mocks.getAll.expects().returning(js.Promise.reject(error))
+    errorLogger.expects("Failed to read folder shortcuts, error: scala.scalajs.js.JavaScriptException: Error: test error")
 
     //when
     val resultF = service.getAll
@@ -116,17 +128,17 @@ class FolderShortcutsServiceImplSpec extends BaseDBContextSpec {
   it should "recover and log error when save" in {
     //given
     val errorLogger = mockFunction[String, Unit]
-    val dao = mock[FolderShortcutDao]
-    val service = new FolderShortcutsServiceImpl(dao)
+    val mocks = new FolderShortcutMocks
+    val service = new FolderShortcutsServiceImpl(mocks.dao)
     val path = "test/path"
-    val ex = new Exception("test error")
+    val error = js.Error("test error")
 
     val savedConsoleError = js.Dynamic.global.console.error
     js.Dynamic.global.console.error = errorLogger
 
     //then
-    (dao.save _).expects(*).returning(Future.failed(ex))
-    errorLogger.expects(s"Failed to save folder shortcut, error: $ex")
+    mocks.save.expects(*).returning(js.Promise.reject(error))
+    errorLogger.expects("Failed to save folder shortcut, error: scala.scalajs.js.JavaScriptException: Error: test error")
 
     //when
     val resultF = service.save(0, path)
@@ -141,17 +153,17 @@ class FolderShortcutsServiceImplSpec extends BaseDBContextSpec {
   it should "recover and log error when delete" in {
     //given
     val errorLogger = mockFunction[String, Unit]
-    val dao = mock[FolderShortcutDao]
-    val service = new FolderShortcutsServiceImpl(dao)
-    val ex = new Exception("test error")
+    val mocks = new FolderShortcutMocks
+    val service = new FolderShortcutsServiceImpl(mocks.dao)
+    val error = js.Error("test error")
     val index = 0
 
     val savedConsoleError = js.Dynamic.global.console.error
     js.Dynamic.global.console.error = errorLogger
 
     //then
-    (dao.delete _).expects(index).returning(Future.failed(ex))
-    errorLogger.expects(s"Failed to delete folder shortcut, error: $ex")
+    mocks.delete.expects(index).returning(js.Promise.reject(error))
+    errorLogger.expects("Failed to delete folder shortcut, error: scala.scalajs.js.JavaScriptException: Error: test error")
 
     //when
     val resultF = service.delete(index)

@@ -13,7 +13,7 @@ class FolderShortcutsServiceImpl(dao: FolderShortcutDao)
   extends FolderShortcutsService {
 
   def getAll: Future[Seq[Option[String]]] = {
-    dao.getAll.map { shortcuts =>
+    dao.getAll().toFuture.map { shortcuts =>
       val res = ArrayBuffer.fill(10)(Option.empty[String])
       shortcuts.take(10).foreach { shortcut =>
         res.update(shortcut.id, Some(shortcut.path))
@@ -28,14 +28,14 @@ class FolderShortcutsServiceImpl(dao: FolderShortcutDao)
 
   def save(index: Int, path: String): Future[Unit] = {
     val entity = FolderShortcut(index, path)
-    dao.save(entity).recover {
+    dao.save(entity).toFuture.recover {
       case NonFatal(ex) =>
         Console.err.println(s"Failed to save folder shortcut, error: $ex")
     }
   }
 
   def delete(index: Int): Future[Unit] = {
-    dao.delete(index).recover {
+    dao.delete(index).toFuture.recover {
       case NonFatal(ex) =>
         Console.err.println(s"Failed to delete folder shortcut, error: $ex")
     }

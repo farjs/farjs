@@ -24,7 +24,7 @@ class HistoryProviderImplSpec extends BaseDBContextSpec with OptionValues {
     )
   }
 
-  it should "save and read history" in withCtx { (db, _) =>
+  it should "save and read history" in withCtx { db =>
     //given
     val kindDao = HistoryKindDao(db)
     val provider = new HistoryProviderImpl(db, kindDao)
@@ -54,7 +54,7 @@ class HistoryProviderImplSpec extends BaseDBContextSpec with OptionValues {
     }
   }
 
-  it should "recover and log error when get" in withCtx { (db, _) =>
+  it should "recover and log error when get" in withCtx { db =>
     //given
     val errorLogger = mockFunction[String, Unit]
     val kindMocks = new HistoryKindMocks

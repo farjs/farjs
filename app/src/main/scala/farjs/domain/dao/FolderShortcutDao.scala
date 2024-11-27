@@ -1,50 +1,25 @@
 package farjs.domain.dao
 
+import farjs.app.raw.BetterSqlite3Database
 import farjs.domain._
 
-import scala.concurrent.Future
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
-class FolderShortcutDao(val ctx: FarjsDBContext) {
+trait FolderShortcutDao extends js.Object {
 
-  import ctx._
-  
-  private val tableName = "folder_shortcuts"
+  def getAll(): js.Promise[js.Array[FolderShortcut]]
 
-  private val rowExtractor: ((Int, String)) => FolderShortcut = {
-    case (id, path) => FolderShortcut(id, path)
-  }
+  def save(entity: FolderShortcut): js.Promise[Unit]
 
-  def getAll: Future[Seq[FolderShortcut]] = {
-    ctx.performIO(ctx.runQuery(
-      sql = s"SELECT id, path FROM $tableName ORDER BY id",
-      extractor = rowExtractor
-    ))
-  }
+  def delete(id: Int): js.Promise[Unit]
 
-  def save(entity: FolderShortcut): Future[Unit] = {
-    val q = for {
-      _ <- ctx.runAction(
-        sql = s"INSERT INTO $tableName (id, path) VALUES (?, ?)" +
-          "ON CONFLICT (id) DO UPDATE SET path = excluded.path",
-        args = (entity.id, entity.path)
-      )
-    } yield ()
+  def deleteAll(): js.Promise[Unit]
+}
 
-    ctx.performIO(q)
-  }
-  
-  def delete(id: Int): Future[Unit] = {
-    val q = for {
-      _ <- ctx.runAction(
-        sql = s"DELETE FROM $tableName WHERE id = ?",
-        args = id
-      )
-    } yield ()
+@js.native
+@JSImport("../dao/FolderShortcutDao.mjs", JSImport.Default)
+object FolderShortcutDao extends js.Function1[BetterSqlite3Database, FolderShortcutDao] {
 
-    ctx.performIO(q)
-  }
-  
-  def deleteAll(): Future[Long] = {
-    ctx.performIO(ctx.runAction(s"DELETE FROM $tableName"))
-  }
+  def apply(db: BetterSqlite3Database): FolderShortcutDao = js.native
 }

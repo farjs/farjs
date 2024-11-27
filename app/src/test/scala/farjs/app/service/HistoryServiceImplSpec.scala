@@ -37,7 +37,7 @@ class HistoryServiceImplSpec extends BaseDBContextSpec with OptionValues {
     column = 4
   )
 
-  it should "store and read items" in withCtx { (db, _) =>
+  it should "store and read items" in withCtx { db =>
     //given
     val kindDao = HistoryKindDao(db)
     val maxItemsCount = 10
