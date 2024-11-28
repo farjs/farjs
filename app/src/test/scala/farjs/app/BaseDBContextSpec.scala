@@ -1,11 +1,10 @@
 package farjs.app
 
-import farjs.app.raw.{BetterSqlite3Database, BetterSqlite3WebSQL}
+import farjs.app.raw.BetterSqlite3Database
 import org.scalatest.Assertion
 import scommons.nodejs.test.AsyncTestSpec
 
 import scala.concurrent.Future
-import scala.scalajs.js
 
 trait BaseDBContextSpec extends AsyncTestSpec {
 
@@ -19,11 +18,7 @@ object BaseDBContextSpec {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   private lazy val contextF: Future[BetterSqlite3Database] = {
-    val webDb = BetterSqlite3WebSQL.openDatabase(":memory:")
-    val db = webDb._db.asInstanceOf[js.Dynamic]._db.asInstanceOf[BetterSqlite3Database]
-    
-    FarjsDBMigrations.apply(db).map { _ =>
-      db
-    }
+    val db = new BetterSqlite3Database(":memory:")
+    FarjsDBMigrations.apply(db).map(_ => db)
   }
 }

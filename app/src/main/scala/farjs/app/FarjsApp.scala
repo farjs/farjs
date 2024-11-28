@@ -1,7 +1,7 @@
 package farjs.app
 
 import farjs.app.filelist.{FileListModule, FileListRoot}
-import farjs.app.raw.{BetterSqlite3Database, BetterSqlite3WebSQL}
+import farjs.app.raw.BetterSqlite3Database
 import farjs.filelist.theme.FileListTheme
 import farjs.fs.FSFileListActions
 import farjs.ui.app._
@@ -93,8 +93,7 @@ object FarjsApp {
   private def prepareDB(): Future[BetterSqlite3Database] = {
     val dbF = for {
       _ <- FSFileListActions.api.mkDirs(js.Array(FarjsData.getDataDir: _*)).toFuture
-      webDb = BetterSqlite3WebSQL.openDatabase(FarjsData.getDBFilePath)
-      db = webDb._db.asInstanceOf[js.Dynamic]._db.asInstanceOf[BetterSqlite3Database]
+      db = new BetterSqlite3Database(FarjsData.getDBFilePath)
       _ <- FarjsDBMigrations.apply(db)
     } yield db
 

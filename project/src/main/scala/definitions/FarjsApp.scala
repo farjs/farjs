@@ -1,6 +1,5 @@
 package definitions
 
-import common.Libs
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
 import sbt._
@@ -66,16 +65,4 @@ object FarjsApp extends ScalaJsModule {
     FarjsViewer.definition,
     FarjsCopyMove.definition
   )
-
-  override def superRepoProjectsDependencies: Seq[(String, String, Option[String])] = {
-    super.superRepoProjectsDependencies ++ Seq(
-      ("scommons-websql", "scommons-websql-io", None)
-    )
-  }
-
-  override def runtimeDependencies: Def.Initialize[Seq[ModuleID]] = Def.setting {
-    super.runtimeDependencies.value ++ Seq(
-      Libs.scommonsWebSqlIO.value
-    )
-  }
 }
