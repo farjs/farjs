@@ -20,7 +20,7 @@ object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps]
   protected def render(compProps: Props): ReactElement = {
     val stacks = WithPanelStacks.usePanelStacks
     val services = FSServices.useServices
-    val (maybeItems, setItems) = useState(Option.empty[List[Option[String]]])
+    val (maybeItems, setItems) = useState(Option.empty[List[js.UndefOr[String]]])
     val (selected, setSelected) = useState(0)
     val props = compProps.wrapped
 
@@ -38,15 +38,15 @@ object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps]
         case "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" =>
           onAction(key.toInt)
         case "-" =>
-          services.folderShortcuts.delete(selected).foreach { _ =>
-            setItems(maybeItems.map(items => items.updated(selected, None)))
+          services.folderShortcuts.delete(selected).toFuture.foreach { _ =>
+            setItems(maybeItems.map(items => items.updated(selected, js.undefined)))
           }
         case "+" =>
           val stackItem = PanelStacks.active(stacks).stack.peekLast[FileListState]
           stackItem.state.foreach { state =>
             val dir = state.currDir.path
-            services.folderShortcuts.save(selected, dir).foreach { _ =>
-              setItems(maybeItems.map(items => items.updated(selected, Some(dir))))
+            services.folderShortcuts.save(selected, dir).toFuture.foreach { _ =>
+              setItems(maybeItems.map(items => items.updated(selected, dir)))
             }
           }
         case _ =>
@@ -57,7 +57,7 @@ object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps]
     }
 
     useLayoutEffect({ () =>
-      services.folderShortcuts.getAll.map { shortcuts =>
+      services.folderShortcuts.getAll().toFuture.map { shortcuts =>
         setItems(Some(shortcuts.toList))
       }
       ()

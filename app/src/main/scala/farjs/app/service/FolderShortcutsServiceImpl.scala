@@ -1,43 +1,14 @@
 package farjs.app.service
 
-import farjs.domain.FolderShortcut
 import farjs.domain.dao.FolderShortcutDao
 import farjs.fs.popups.FolderShortcutsService
 
-import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import scala.util.control.NonFatal
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
-class FolderShortcutsServiceImpl(dao: FolderShortcutDao)
-  extends FolderShortcutsService {
+@js.native
+@JSImport("../fs/popups/FolderShortcutsService.mjs", JSImport.Default)
+object FolderShortcutsServiceImpl extends js.Function1[FolderShortcutDao, FolderShortcutsService] {
 
-  def getAll: Future[Seq[Option[String]]] = {
-    dao.getAll().toFuture.map { shortcuts =>
-      val res = ArrayBuffer.fill(10)(Option.empty[String])
-      shortcuts.take(10).foreach { shortcut =>
-        res.update(shortcut.id, Some(shortcut.path))
-      }
-      res.toList
-    }.recover {
-      case NonFatal(ex) =>
-        Console.err.println(s"Failed to read folder shortcuts, error: $ex")
-        Nil
-    }
-  }
-
-  def save(index: Int, path: String): Future[Unit] = {
-    val entity = FolderShortcut(index, path)
-    dao.save(entity).toFuture.recover {
-      case NonFatal(ex) =>
-        Console.err.println(s"Failed to save folder shortcut, error: $ex")
-    }
-  }
-
-  def delete(index: Int): Future[Unit] = {
-    dao.delete(index).toFuture.recover {
-      case NonFatal(ex) =>
-        Console.err.println(s"Failed to delete folder shortcut, error: $ex")
-    }
-  }
+  def apply(dao: FolderShortcutDao): FolderShortcutsService = js.native
 }

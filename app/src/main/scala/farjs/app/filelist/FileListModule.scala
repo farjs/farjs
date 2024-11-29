@@ -11,7 +11,7 @@ class FileListModule(db: BetterSqlite3Database) {
   val historyProvider = new HistoryProviderImpl(db, historyKindDao)
 
   val folderShortcutDao: FolderShortcutDao = FolderShortcutDao(db)
-  val folderShortcutsService = new FolderShortcutsServiceImpl(folderShortcutDao)
+  val folderShortcutsService = FolderShortcutsServiceImpl(folderShortcutDao)
 
   val fsServices = new FSServices(
     folderShortcuts = folderShortcutsService

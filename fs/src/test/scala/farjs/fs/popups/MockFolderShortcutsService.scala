@@ -1,17 +1,17 @@
 package farjs.fs.popups
 
-import scala.concurrent.Future
+import scala.scalajs.js
 
 //noinspection NotImplementedCode
 class MockFolderShortcutsService(
-  getAllMock: () => Future[Seq[Option[String]]] = () => ???,
-  saveMock: (Int, String) => Future[Unit] = (_, _) => ???,
-  deleteMock: Int => Future[Unit] = _ => ???
+  getAllMock: () => js.Promise[js.Array[js.UndefOr[String]]] = () => ???,
+  saveMock: (Int, String) => js.Promise[Unit] = (_, _) => ???,
+  deleteMock: Int => js.Promise[Unit] = _ => ???
 ) extends FolderShortcutsService {
 
-  override def getAll: Future[Seq[Option[String]]] = getAllMock()
+  override def getAll(): js.Promise[js.Array[js.UndefOr[String]]] = getAllMock()
 
-  override def save(index: Int, path: String): Future[Unit] = saveMock(index, path)
+  override def save(index: Int, path: String): js.Promise[Unit] = saveMock(index, path)
   
-  override def delete(index: Int): Future[Unit] = deleteMock(index)
+  override def delete(index: Int): js.Promise[Unit] = deleteMock(index)
 }

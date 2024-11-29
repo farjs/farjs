@@ -1,12 +1,12 @@
 package farjs.fs.popups
 
-import scala.concurrent.Future
+import scala.scalajs.js
 
-trait FolderShortcutsService {
+trait FolderShortcutsService extends js.Object {
 
-  def getAll: Future[Seq[Option[String]]]
+  def getAll(): js.Promise[js.Array[js.UndefOr[String]]]
 
-  def save(index: Int, path: String): Future[Unit]
+  def save(index: Int, path: String): js.Promise[Unit]
 
-  def delete(index: Int): Future[Unit]
+  def delete(index: Int): js.Promise[Unit]
 }

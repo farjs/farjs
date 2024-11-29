@@ -54,7 +54,8 @@
     "dao/migrations/bundle.json",
     "dao/**/*.mjs",
     "dist/farjs.mjs",
-    "dist/versionChecker.mjs"
+    "dist/versionChecker.mjs",
+    "fs/**/*.mjs"
   ],
   "type": "module",
   "main": "./build/farjs-app-opt.js",
