@@ -24,7 +24,7 @@ object FoldersHistoryPopup extends FunctionComponent[FoldersHistoryPopupProps] {
     useLayoutEffect({ () =>
       for {
         foldersHistory <- historyProvider.get(foldersHistoryKind).toFuture
-        items <- foldersHistory.getAll.toFuture
+        items <- foldersHistory.getAll().toFuture
       } yield {
         setItems(Some(items.map(_.item)))
       }

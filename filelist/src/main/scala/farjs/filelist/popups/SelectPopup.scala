@@ -40,7 +40,7 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
     useLayoutEffect({ () =>
       for {
         selectPatternsHistory <- historyProvider.get(selectPatternsHistoryKind).toFuture
-        items <- selectPatternsHistory.getAll.toFuture
+        items <- selectPatternsHistory.getAll().toFuture
       } yield {
         val itemsReversed = items.reverse.map(_.item)
         itemsReversed.headOption.foreach { last =>

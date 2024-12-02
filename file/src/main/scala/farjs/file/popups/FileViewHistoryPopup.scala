@@ -25,7 +25,7 @@ object FileViewHistoryPopup extends FunctionComponent[FileViewHistoryPopupProps]
     useLayoutEffect({ () =>
       for {
         fileViewsHistory <- historyProvider.get(fileViewsHistoryKind).toFuture
-        items <- fileViewsHistory.getAll.toFuture
+        items <- fileViewsHistory.getAll().toFuture
       } yield {
         setItems(Some(items.flatMap(FileViewHistory.fromHistory)))
       }

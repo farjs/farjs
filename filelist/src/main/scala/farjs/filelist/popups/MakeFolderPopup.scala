@@ -51,7 +51,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
     useLayoutEffect({ () =>
       for {
         mkDirsHistory <- historyProvider.get(mkDirsHistoryKind).toFuture
-        items <- mkDirsHistory.getAll.toFuture
+        items <- mkDirsHistory.getAll().toFuture
       } yield {
         val itemsReversed = items.reverse.map(_.item)
         itemsReversed.headOption.foreach { last =>

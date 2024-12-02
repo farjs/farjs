@@ -21,7 +21,7 @@ class HistoryProviderImpl(db: BetterSqlite3Database, kindDao: HistoryKindDao) ex
       case Some(service) => js.Promise.resolve[HistoryService](service)
       case None =>
         kindDao.upsert(HistoryKindEntity(-1, kind.name)).toFuture.map { kindEntity =>
-          val service = new HistoryServiceImpl(
+          val service = HistoryServiceImpl(
             HistoryDao(db, kindEntity, limitMaxItemsCount(kind.maxItemsCount))
           )
           services = services.updated(kind.name, service)
@@ -43,7 +43,7 @@ object HistoryProviderImpl {
 
 class NoopHistoryService extends HistoryService {
 
-  override def getAll: js.Promise[js.Array[History]] =
+  override def getAll(): js.Promise[js.Array[History]] =
     js.Promise.resolve[js.Array[History]](js.Array[History]())
 
   override def getOne(item: String): js.Promise[js.UndefOr[History]] =

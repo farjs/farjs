@@ -163,9 +163,9 @@ describe("FolderShortcutsService.test.mjs", () => {
  */
 function FolderShortcutDaoMock() {
   return {
-    getAll: () => Promise.reject(Error("not implemented")),
-    save: () => Promise.reject(Error("not implemented")),
-    delete: () => Promise.reject(Error("not implemented")),
-    deleteAll: () => Promise.reject(Error("not implemented")),
+    getAll: () => Promise.reject(Error("test stub")),
+    save: () => Promise.reject(Error("test stub")),
+    delete: () => Promise.reject(Error("test stub")),
+    deleteAll: () => Promise.reject(Error("test stub")),
   };
 }

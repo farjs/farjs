@@ -2,12 +2,13 @@ package farjs.app.service
 
 import farjs.app.BaseDBContextSpec
 import farjs.app.service.HistoryProviderImpl.limitMaxItemsCount
-import farjs.app.service.HistoryServiceImplSpec.assertHistory
 import farjs.domain.HistoryKindEntity
 import farjs.domain.dao.{HistoryDao, HistoryKindDao}
 import farjs.file.FileViewHistoryParams
+import farjs.file.FileViewHistorySpec.assertFileViewHistoryParams
 import farjs.filelist.history.{History, HistoryKind}
-import org.scalatest.OptionValues
+import org.scalactic.source.Position
+import org.scalatest.{Assertion, OptionValues, Succeeded}
 
 import scala.scalajs.js
 
@@ -41,7 +42,7 @@ class HistoryProviderImplSpec extends BaseDBContextSpec with OptionValues {
       _ <- service2.save(entity).toFuture
 
       //then
-      results <- service2.getAll.toFuture
+      results <- service2.getAll().toFuture
       result <- service2.getOne(entity.item).toFuture
     } yield {
       service1 shouldBe service2
@@ -76,7 +77,7 @@ class HistoryProviderImplSpec extends BaseDBContextSpec with OptionValues {
       _ <- service.save(entity).toFuture
 
       //then
-      results <- service.getAll.toFuture
+      results <- service.getAll().toFuture
       result <- service.getOne(entity.item).toFuture
     } yield {
       js.Dynamic.global.console.error = savedConsoleError
@@ -95,5 +96,21 @@ class HistoryProviderImplSpec extends BaseDBContextSpec with OptionValues {
     limitMaxItemsCount(150) shouldBe 150
     limitMaxItemsCount(151) shouldBe 150
     limitMaxItemsCount(152) shouldBe 150
+  }
+
+  private def assertHistory(result: History,
+                            expected: History,
+                            params: Option[FileViewHistoryParams]
+                           )(implicit position: Position): Assertion = {
+
+    inside(result) {
+      case History(item, resParams) =>
+        item shouldBe expected.item
+        resParams.toOption.size shouldBe params.size
+        resParams.toOption.zip(params).foreach { case (res, expected) =>
+          assertFileViewHistoryParams(res.asInstanceOf[FileViewHistoryParams], expected)
+        }
+        Succeeded
+    }
   }
 }

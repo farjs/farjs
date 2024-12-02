@@ -9,7 +9,7 @@ class MockHistoryService(
   saveMock: History => js.Promise[Unit] = _ => ???,
 ) extends HistoryService {
 
-  override def getAll: js.Promise[js.Array[History]] = getAllMock()
+  override def getAll(): js.Promise[js.Array[History]] = getAllMock()
 
   override def getOne(item: String): js.Promise[js.UndefOr[History]] = getOneMock(item)
 

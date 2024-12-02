@@ -60,7 +60,7 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
     useLayoutEffect({ () =>
       for {
         copyItemsHistory <- historyProvider.get(copyItemsHistoryKind).toFuture
-        items <- copyItemsHistory.getAll.toFuture
+        items <- copyItemsHistory.getAll().toFuture
       } yield {
         val itemsReversed = items.reverse.map(_.item)
         setItems(Some(itemsReversed))
