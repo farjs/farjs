@@ -6,15 +6,12 @@ import scommons.react._
 
 import scala.scalajs.js
 
-case class SortModesPopupProps(sort: FileListSort,
-                               onClose: () => Unit)
-
 object SortModesPopup extends FunctionComponent[SortModesPopupProps] {
 
   private[sort] var menuPopup: ReactClass = MenuPopup
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val stackProps = PanelStackComp.usePanelStack
     val showOnLeft = !stackProps.isRight
 

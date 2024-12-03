@@ -98,7 +98,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     viewProps.onKeypress(screen, "C-f12")
 
     //then
-    inside(findComponentProps(renderer.root, sortModesPopup)) {
+    inside(findComponentProps(renderer.root, sortModesPopup, plain = true)) {
       case SortModesPopupProps(FileListSort(mode, asc), onClose) =>
         mode shouldBe SortMode.Name
         asc shouldBe true
@@ -107,7 +107,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         onClose()
 
         //then
-        findProps(renderer.root, sortModesPopup) should be (empty)
+        findProps(renderer.root, sortModesPopup, plain = true) should be (empty)
     }
   }
 

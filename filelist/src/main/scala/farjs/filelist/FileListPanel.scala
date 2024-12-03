@@ -125,7 +125,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
       },
 
       if (showSortModes) Some(
-        <(sortModesPopup())(^.wrapped := SortModesPopupProps(
+        <(sortModesPopup())(^.plain := SortModesPopupProps(
           sort = props.state.sort,
           onClose = { () =>
             setShowSortModes(false)

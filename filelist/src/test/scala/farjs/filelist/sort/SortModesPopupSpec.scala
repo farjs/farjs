@@ -22,7 +22,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
     val inputMock = js.Dynamic.literal("emit" -> emitMock).asInstanceOf[BlessedElement]
     val props = SortModesPopupProps(FileListSort(SortMode.Name, asc = true), onClose)
     val comp = testRender(withContext(
-      <(SortModesPopup())(^.wrapped := props)(), stack = stack, width = 40, panelInput = inputMock
+      <(SortModesPopup())(^.plain := props)(), stack = stack, width = 40, panelInput = inputMock
     ))
     val menuProps = inside(findComponents(comp, menuPopup)) {
       case List(c) => c.props.asInstanceOf[MenuPopupProps]
@@ -47,7 +47,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val props = SortModesPopupProps(FileListSort(SortMode.Name, asc = true), onClose)
     val comp = testRender(withContext(
-      <(SortModesPopup())(^.wrapped := props)(), stack = stack, width = 40
+      <(SortModesPopup())(^.plain := props)(), stack = stack, width = 40
     ))
     val menuProps = inside(findComponents(comp, menuPopup)) {
       case List(c) => c.props.asInstanceOf[MenuPopupProps]
@@ -69,7 +69,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
 
     //when
     val result = testRender(withContext(
-      <(SortModesPopup())(^.wrapped := props)(), stack = stack, isRight = isRight, width = width
+      <(SortModesPopup())(^.plain := props)(), stack = stack, isRight = isRight, width = width
     ))
 
     //then
@@ -85,7 +85,7 @@ class SortModesPopupSpec extends TestSpec with TestRendererUtils {
 
     //when
     val result = testRender(withContext(
-      <(SortModesPopup())(^.wrapped := props)(), stack = stack, isRight = isRight, width = width
+      <(SortModesPopup())(^.plain := props)(), stack = stack, isRight = isRight, width = width
     ))
 
     //then
