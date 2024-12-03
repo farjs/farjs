@@ -8,13 +8,11 @@ import scommons.react.blessed._
 
 import scala.scalajs.js
 
-case class SortIndicatorProps(sort: FileListSort)
-
 object SortIndicator extends FunctionComponent[SortIndicatorProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val stackProps = PanelStackComp.usePanelStack
-    val props = compProps.wrapped
+    val props = compProps.plain
     val text = s"${getIndicator(props.sort)} "
     val theme = FileListTheme.useTheme.fileList
 

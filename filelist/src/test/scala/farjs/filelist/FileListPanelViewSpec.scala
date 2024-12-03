@@ -224,7 +224,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           focused shouldBe props.state.isActive
           padding shouldBe js.undefined
       }))(),
-      <(sortIndicator())(^.assertWrapped(inside(_) {
+      <(sortIndicator())(^.assertPlain[SortIndicatorProps](inside(_) {
         case SortIndicatorProps(FileListSort(mode, asc)) =>
           mode shouldBe props.state.sort.mode
           asc shouldBe props.state.sort.asc

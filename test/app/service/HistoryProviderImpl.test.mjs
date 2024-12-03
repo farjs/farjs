@@ -104,32 +104,6 @@ describe("HistoryProviderImpl.test.mjs", () => {
     assert.deepEqual(HistoryProviderImpl._limitMaxItemsCount(151), 150);
     assert.deepEqual(HistoryProviderImpl._limitMaxItemsCount(152), 150);
   });
-
-  // it("should recover and log error when save", async () => {
-  //   //given
-  //   const savedConsoleError = console.error;
-  //   let capturedError = "";
-  //   const errorLogger = mockFunction((error) => {
-  //     capturedError = error;
-  //   });
-  //   console.error = errorLogger;
-  //   const daoMock = {
-  //     ...HistoryDaoMock(),
-  //     save: () => Promise.reject(Error("test error")),
-  //   };
-  //   const service = HistoryServiceImpl(daoMock);
-
-  //   //when
-  //   await service.save({ item: "test item" });
-
-  //   //then
-  //   console.error = savedConsoleError;
-  //   assert.deepEqual(errorLogger.times, 1);
-  //   assert.deepEqual(
-  //     capturedError,
-  //     "Failed to save history item, error: Error: test error"
-  //   );
-  // });
 });
 
 /**

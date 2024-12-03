@@ -30,7 +30,7 @@ class SortIndicatorSpec extends TestSpec with TestRendererUtils {
     val stack = new PanelStack(isActive = true, js.Array(), null)
     val props = SortIndicatorProps(FileListSort(SortMode.Name, asc = true))
     val textElem = testRender(withContext(
-      withThemeContext(<(SortIndicator())(^.wrapped := props)()), stack = stack, isRight = isRight
+      withThemeContext(<(SortIndicator())(^.plain := props)()), stack = stack, isRight = isRight
     ))
 
     //then
@@ -60,7 +60,7 @@ class SortIndicatorSpec extends TestSpec with TestRendererUtils {
     val stack = new PanelStack(isActive = false, js.Array(), null)
     val props = SortIndicatorProps(FileListSort(SortMode.Name, asc = true))
     val textElem = testRender(withContext(
-      withThemeContext(<(SortIndicator())(^.wrapped := props)()), stack = stack, isRight = isRight
+      withThemeContext(<(SortIndicator())(^.plain := props)()), stack = stack, isRight = isRight
     ))
 
     //then
@@ -80,7 +80,7 @@ class SortIndicatorSpec extends TestSpec with TestRendererUtils {
 
     //when
     val result = testRender(withContext(
-      withThemeContext(<(SortIndicator())(^.wrapped := props)()), stack = stack
+      withThemeContext(<(SortIndicator())(^.plain := props)()), stack = stack
     ))
 
     //then
