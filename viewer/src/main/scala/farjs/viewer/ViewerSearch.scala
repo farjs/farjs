@@ -15,7 +15,7 @@ object ViewerSearch extends FunctionComponent[ViewerSearchProps] {
   private[viewer] var statusPopupComp: ReactClass = StatusPopup
 
   protected def render(compProps: Props): ReactElement = {
-    FileListTheme.useTheme
+    FileListTheme.useTheme()
     val props = compProps.wrapped
     
     useLayoutEffect({ () =>

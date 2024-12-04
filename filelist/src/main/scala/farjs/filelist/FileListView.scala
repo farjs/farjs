@@ -30,7 +30,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
     val columnSizeRef = useRef[Int](0)
     val columnsPosRef = useRef[Seq[(Int, Int, Int)]](null)
     val inputEl = PanelStackComp.usePanelStack.panelInput
-    val currTheme = FileListTheme.useTheme
+    val currTheme = FileListTheme.useTheme()
     
     val props = compProps.wrapped
     propsRef.current = props

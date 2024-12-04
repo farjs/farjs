@@ -1,38 +1,20 @@
 package farjs.filelist.theme
 
-import farjs.ui.theme.{DefaultTheme, Theme, XTerm256Theme}
+import farjs.ui.theme.Theme
 import scommons.react.blessed.BlessedStyle
 
 import scala.scalajs.js
-import scala.scalajs.js.|
+import scala.scalajs.js.annotation.JSImport
 
-object FileListTheme {
+@js.native
+@JSImport("@farjs/filelist/theme/FileListTheme.mjs", JSImport.Default)
+object FileListTheme extends js.Object {
 
-  def useTheme: FileListTheme = {
-    Theme.useTheme().asInstanceOf[FileListTheme]
-  }
+  def useTheme(): FileListTheme = js.native
   
-  lazy val defaultTheme: FileListTheme = {
-    mergeJSObjects[FileListTheme](js.Dynamic.literal(
-      fileList = DefaultThemeFileList
-    ), DefaultTheme)
-  }
+  val defaultTheme: FileListTheme = js.native
 
-  lazy val xterm256Theme: FileListTheme = {
-    mergeJSObjects[FileListTheme](js.Dynamic.literal(
-      fileList = XTerm256ThemeFileList
-    ), XTerm256Theme)
-  }
-
-  private def mergeJSObjects[T <: js.Object](objs: (js.Object | js.Dynamic)*): T = {
-    val result = js.Dictionary.empty[js.Any]
-    for (source <- objs) {
-      for ((key, value) <- source.asInstanceOf[js.Dictionary[js.Any]]) {
-        result(key) = value
-      }
-    }
-    result.asInstanceOf[T]
-  }
+  val xterm256Theme: FileListTheme = js.native
 }
 
 trait FileListTheme extends Theme {

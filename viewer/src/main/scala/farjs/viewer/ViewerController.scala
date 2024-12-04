@@ -32,7 +32,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
   private[viewer] var fs: FS = nodejs.fs
   
   protected def render(compProps: Props): ReactElement = {
-    val theme = FileListTheme.useTheme
+    val theme = FileListTheme.useTheme()
     val historyProvider = HistoryProvider.useHistoryProvider()
     val props = compProps.wrapped
     val viewportRef = useRef(props.viewport)

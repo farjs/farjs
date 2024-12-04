@@ -23,7 +23,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
   private[viewer] var viewerSearch: UiComponent[ViewerSearchProps] = ViewerSearch
 
   protected def render(compProps: Props): ReactElement = {
-    val theme = FileListTheme.useTheme
+    val theme = FileListTheme.useTheme()
     val readF = useRef(Future.unit)
     val (showEncodingsPopup, setShowEncodingsPopup) = useState(false)
     val (showSearchPopup, setShowSearchPopup) = useState(false)
