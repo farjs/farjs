@@ -37,7 +37,7 @@ object ViewerPlugin extends FileListPlugin(js.Array(
           case _ => PanelStacks.active(stacks).stack
         }
         val stackItem = stack.peek[FileListState]
-        stackItem.getData.toOption.flatMap { data =>
+        stackItem.getData().toOption.flatMap { data =>
           val FileListData(_, actions, state) = data
           FileListState.currentItem(state).filter(_ != FileListItem.up).toOption match {
             case Some(item) if actions.api.isLocal && !item.isDir =>

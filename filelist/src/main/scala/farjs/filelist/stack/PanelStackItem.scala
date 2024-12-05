@@ -1,12 +1,15 @@
 package farjs.filelist.stack
 
-import farjs.filelist.{FileListActions, FileListData, FileListState}
+import farjs.filelist.{FileListActions, FileListData}
 import farjs.ui.Dispatch
 import scommons.react.ReactClass
 
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr
+import scala.scalajs.js.annotation.JSImport
 
+@js.native
+@JSImport("@farjs/filelist/stack/PanelStackItem.mjs", JSImport.Default)
 class PanelStackItem[T](
   val component: ReactClass,
   val dispatch: js.UndefOr[Dispatch],
@@ -14,21 +17,11 @@ class PanelStackItem[T](
   val state: js.UndefOr[T]
 ) extends js.Object {
 
-  def withState(s: T): PanelStackItem[T] = {
-    new PanelStackItem[T](component, dispatch, actions, s)
-  }
+  def withState(s: T): PanelStackItem[T] = js.native
   
-  def updateState(f: T => T): PanelStackItem[T] = {
-    new PanelStackItem[T](component, dispatch, actions, state.map(f))
-  }
+  def updateState(f: js.Function1[T, T]): PanelStackItem[T] = js.native
   
-  def getData: js.UndefOr[FileListData] = {
-    (dispatch.toOption, actions.toOption, state.toOption) match {
-      case (Some(dispatch), Some(actions), Some(state)) if FileListState.isFileListState(state.asInstanceOf[js.Any]) =>
-        FileListData(dispatch, actions, state.asInstanceOf[FileListState])
-      case _ => js.undefined
-    }
-  }
+  def getData(): js.UndefOr[FileListData] = js.native
 }
 
 object PanelStackItem {

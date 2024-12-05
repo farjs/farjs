@@ -13,7 +13,7 @@ class FileListPanelController(
     val stack = stackProps.stack
     val maybeCurrData = {
       val stackItem = stack.peek[FileListState]
-      stackItem.getData
+      stackItem.getData()
     }
 
     useLayoutEffect({ () =>

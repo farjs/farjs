@@ -80,7 +80,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         case "enter" | "C-pagedown" =>
           val stack = getStack(isRightActive)
           val stackItem = stack.peek[js.Any]
-          stackItem.getData.collect {
+          stackItem.getData().collect {
             case FileListData(_, actions, state) if actions.api.isLocal
                 && FileListState.currentItem(state).exists(!_.isDir) =>
               openCurrItem(props.plugins, props.dispatch, stack, actions, state)
