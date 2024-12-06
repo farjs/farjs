@@ -42,7 +42,7 @@ object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps]
             setItems(maybeItems.map(items => items.updated(selected, js.undefined)))
           }
         case "+" =>
-          val stackItem = PanelStacks.active(stacks).stack.peekLast[FileListState]
+          val stackItem = PanelStacks.active(stacks).stack.peekLast[FileListState]()
           stackItem.state.foreach { state =>
             val dir = state.currDir.path
             services.folderShortcuts.save(selected, dir).toFuture.foreach { _ =>

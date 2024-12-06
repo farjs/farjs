@@ -14,11 +14,11 @@ object QuickViewPlugin extends FileListPlugin(js.Array("C-q")) {
                             stacks: PanelStacks,
                             data: js.UndefOr[js.Dynamic] = js.undefined): js.Promise[js.UndefOr[ReactClass]] = {
     val exists =
-      if (stacks.left.stack.peek.component == panelComp) {
+      if (stacks.left.stack.peek().component == panelComp) {
         stacks.left.stack.pop()
         true
       }
-      else if (stacks.right.stack.peek.component == panelComp) {
+      else if (stacks.right.stack.peek().component == panelComp) {
         stacks.right.stack.pop()
         true
       }

@@ -25,7 +25,7 @@ object PanelStackComp extends FunctionComponent[PanelStackProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
-    val topComp = props.stack.peek.component
+    val topComp = props.stack.peek().component
 
     <(withSizeComp)(^.plain := WithSizeProps({ (width, height) =>
       <(PanelStackComp.Context.Provider)(^.contextValue := PanelStackProps.copy(props)(width = width, height = height))(

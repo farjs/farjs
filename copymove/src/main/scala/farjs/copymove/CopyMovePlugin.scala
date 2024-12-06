@@ -44,7 +44,7 @@ object CopyMovePlugin extends FileListPlugin(js.Array("f5", "f6", "S-f5", "S-f6"
   }
 
   private def getData(stack: PanelStack): Option[FileListData] = {
-    val item = stack.peek[js.Any]
+    val item = stack.peek[js.Any]()
     item.getData().toOption
   }
 

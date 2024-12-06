@@ -272,7 +272,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       leftStack.update[FileListState](_.withState(currState))
     }
     val fsItem = inside(findComponentProps(comp, WithPanelStacks, plain = true)) { case PanelStacks(PanelStackData(leftStack, _), _) =>
-      leftStack.peek[FileListState]
+      leftStack.peek[FileListState]()
     }
     fsItem.state shouldBe currState
     val button = inside(findComponents(comp, <.button.name)) {
@@ -289,7 +289,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     //then
     Future.unit.map { _ =>
       inside(findComponentProps(comp, WithPanelStacks, plain = true)) { case PanelStacks(PanelStackData(leftStack, _), _) =>
-        leftStack.peek[FileListState] shouldBe fsItem
+        leftStack.peek[FileListState]() shouldBe fsItem
       }
     }
   }
@@ -329,7 +329,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       leftStack.push(nonFSItem)
     }
     inside(findComponentProps(comp, WithPanelStacks, plain = true)) { case PanelStacks(PanelStackData(leftStack, _), _) =>
-      leftStack.peek[FileListState] shouldBe nonFSItem
+      leftStack.peek[FileListState]() shouldBe nonFSItem
     }
     inside(nonFSItem.actions.toOption) { case Some(actions) =>
       actions.api.isLocal shouldBe false
@@ -348,7 +348,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     //then
     Future.unit.map { _ =>
       inside(findComponentProps(comp, WithPanelStacks, plain = true)) { case PanelStacks(PanelStackData(leftStack, _), _) =>
-        leftStack.peek[FileListState] shouldBe nonFSItem
+        leftStack.peek[FileListState]() shouldBe nonFSItem
       }
     }
   }
@@ -382,7 +382,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       leftStack.update[FileListState](PanelStackItem.copy(_)(actions = actions.actions, state = currState))
     }
     val fsItem = inside(findComponentProps(comp, WithPanelStacks, plain = true)) { case PanelStacks(PanelStackData(leftStack, _), _) =>
-      leftStack.peek[FileListState]
+      leftStack.peek[FileListState]()
     }
     fsItem.state shouldBe currState
     val button = inside(findComponents(comp, <.button.name)) {
@@ -411,7 +411,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }.flatMap(_ => openF.failed).map { ex =>
       ex shouldBe js.JavaScriptException(expectedError)
       inside(findComponentProps(comp, WithPanelStacks, plain = true)) { case PanelStacks(PanelStackData(leftStack, _), _) =>
-        leftStack.peek[FileListState] shouldBe fsItem
+        leftStack.peek[FileListState]() shouldBe fsItem
       }
     }
   }
@@ -455,7 +455,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       leftStack.update[FileListState](PanelStackItem.copy(_)(actions = actions.actions, state = currState))
     }
     val fsItem = inside(findComponentProps(comp, WithPanelStacks, plain = true)) { case PanelStacks(PanelStackData(leftStack, _), _) =>
-      leftStack.peek[FileListState]
+      leftStack.peek[FileListState]()
     }
     fsItem.state shouldBe currState
     val button = inside(findComponents(comp, <.button.name)) {
@@ -486,7 +486,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     eventually(onCloseCapture should not be null).flatMap { _ =>
       //then
       inside(findComponentProps(comp, WithPanelStacks, plain = true)) { case PanelStacks(PanelStackData(leftStack, _), _) =>
-        val item = leftStack.peek[FileListState]
+        val item = leftStack.peek[FileListState]()
         item.component shouldBe pluginItem.component
         item.dispatch should not be None
       }
@@ -497,7 +497,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       //then
       Future.unit.map { _ =>
         inside(findComponentProps(comp, WithPanelStacks, plain = true)) { case PanelStacks(PanelStackData(leftStack, _), _) =>
-          leftStack.peek[FileListState] shouldBe fsItem
+          leftStack.peek[FileListState]() shouldBe fsItem
         }
       }
     }

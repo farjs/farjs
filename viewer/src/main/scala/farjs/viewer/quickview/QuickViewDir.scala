@@ -33,7 +33,7 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
 
     val props = compProps.wrapped
     val stack = props.stack
-    val params = stack.params[QuickViewParams]
+    val params = stack.params[QuickViewParams]()
     val theme = FileListTheme.useTheme().fileList
 
     def scanDir(): Unit = {
@@ -78,7 +78,7 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
     }, List(showPopup))
 
     useLayoutEffect({ () =>
-      val params = stack.params[QuickViewParams]
+      val params = stack.params[QuickViewParams]()
       if (params.name != props.currItem.name || params.parent != props.state.currDir.path) {
         setShowPopup(true)
       }

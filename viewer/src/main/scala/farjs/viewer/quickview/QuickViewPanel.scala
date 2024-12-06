@@ -28,7 +28,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
     val stack =
       if (!panelStack.isRight) stacks.right.stack
       else stacks.left.stack
-    val stackItem = stack.peek[FileListState]
+    val stackItem = stack.peek[FileListState]()
 
     val maybeCurrData = stackItem.getData().toOption.flatMap {
       case FileListData(dispatch, actions, state) =>

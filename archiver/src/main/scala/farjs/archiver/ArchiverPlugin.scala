@@ -23,7 +23,7 @@ object ArchiverPlugin extends FileListPlugin(js.Array("S-f7")) {
                             stacks: PanelStacks,
                             data: js.UndefOr[js.Dynamic] = js.undefined): js.Promise[js.UndefOr[ReactClass]] = {
 
-    val stackItem = PanelStacks.active(stacks).stack.peek[FileListState]
+    val stackItem = PanelStacks.active(stacks).stack.peek[FileListState]()
     val res = stackItem.getData().toOption.flatMap { case FileListData(dispatch, actions, state) =>
       val items =
         if (state.selectedNames.nonEmpty) FileListState.selectedItems(state).toList

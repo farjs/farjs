@@ -35,11 +35,11 @@ class FSPluginUi(val showDrivePopupOnLeft: Option[Boolean] = None,
         if (isLeft) stacks.left.stack
         else stacks.right.stack
 
-      if (currStack.peek != currStack.peekLast) {
+      if (currStack.peek() != currStack.peekLast()) {
         currStack.clear()
       }
 
-      val stackItem = currStack.peekLast[FileListState]
+      val stackItem = currStack.peekLast[FileListState]()
       stackItem.getData().foreach { case FileListData(dispatch, actions, state) =>
         if (dir != state.currDir.path) {
           dispatch(actions.changeDir(

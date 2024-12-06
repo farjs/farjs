@@ -13,12 +13,12 @@ class FSPlugin(reducer: js.Function2[FileListState, js.Any, FileListState])
   val component: ReactClass = new FileListPanelController(FSPanel).apply()
 
   def init(parentDispatch: Dispatch, stack: PanelStack): Unit = {
-    stack.updateFor[FileListState](component) { item =>
+    stack.updateFor[FileListState](component, { item =>
       PanelStackItem.copy(initDispatch(parentDispatch, reducer, stack, item))(
         actions = FSFileListActions,
         state = FileListState(isActive = stack.isActive)
       )
-    }
+    })
   }
 
   def initDispatch(parentDispatch: Dispatch,
@@ -28,11 +28,11 @@ class FSPlugin(reducer: js.Function2[FileListState, js.Any, FileListState])
                   ): PanelStackItem[FileListState] = {
 
     val dispatch: js.Function1[js.Any, Unit] = { action =>
-      stack.updateFor[FileListState](item.component) { item =>
+      stack.updateFor[FileListState](item.component, { item =>
         item.updateState { state =>
           reducer(state, action)
         }
-      }
+      })
       parentDispatch(action)
     }
 

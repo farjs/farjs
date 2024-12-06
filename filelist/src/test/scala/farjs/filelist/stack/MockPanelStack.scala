@@ -24,11 +24,11 @@ class MockPanelStack[P](
 
   override def clear(): Unit = clearMock()
 
-  override def peek[T]: PanelStackItem[T] =
+  override def peek[T](): PanelStackItem[T] =
     peekMock().asInstanceOf[PanelStackItem[T]]
   
-  override def peekLast[T]: PanelStackItem[T] =
+  override def peekLast[T](): PanelStackItem[T] =
     peekLastMock().asInstanceOf[PanelStackItem[T]]
 
-  override def params[T]: T = paramsMock().asInstanceOf[T]
+  override def params[T](): T = paramsMock().asInstanceOf[T]
 }

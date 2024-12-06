@@ -12,7 +12,7 @@ class FileListPanelController(
     val stackProps = PanelStackComp.usePanelStack
     val stack = stackProps.stack
     val maybeCurrData = {
-      val stackItem = stack.peek[FileListState]
+      val stackItem = stack.peek[FileListState]()
       stackItem.getData()
     }
 

@@ -35,7 +35,7 @@ class ZipPanel(zipPath: String,
     
     def onClosePanel(): Unit = {
       val stackData = {
-        val stackItem = PanelStacks.active(stacks).stack.peekLast[FileListState]
+        val stackItem = PanelStacks.active(stacks).stack.peekLast[FileListState]()
         stackItem.getData()
       }
       stackData.foreach { case FileListData(dispatch, actions, state) =>
@@ -84,7 +84,7 @@ class ZipPanel(zipPath: String,
           if (props.state.currDir.path != rootPath) setShowWarning(true)
           else {
             val stackData = {
-              val stackItem = PanelStacks.active(stacks).stack.peek[FileListState]
+              val stackItem = PanelStacks.active(stacks).stack.peek[FileListState]()
               stackItem.getData()
             }
             stackData.foreach { case FileListData(dispatch, actions, state) =>

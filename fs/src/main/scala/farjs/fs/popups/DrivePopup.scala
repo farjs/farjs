@@ -39,10 +39,10 @@ object DrivePopup extends FunctionComponent[DrivePopupProps] {
     
     def onAction(dir: String): Unit = {
       val targetDir =
-        otherStack.peekLast[FileListState].state.collect {
+        otherStack.peekLast[FileListState]().state.collect {
           case s if s.currDir.path.startsWith(dir) => s.currDir.path
         }.orElse(
-          currStack.peekLast[FileListState].state.collect {
+          currStack.peekLast[FileListState]().state.collect {
             case s if s.currDir.path.startsWith(dir) => s.currDir.path
           }
         ).getOrElse(dir)

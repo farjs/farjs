@@ -79,7 +79,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           screen.focusNext()
         case "enter" | "C-pagedown" =>
           val stack = getStack(isRightActive)
-          val stackItem = stack.peek[js.Any]
+          val stackItem = stack.peek[js.Any]()
           stackItem.getData().collect {
             case FileListData(_, actions, state) if actions.api.isLocal
                 && FileListState.currentItem(state).exists(!_.isDir) =>
