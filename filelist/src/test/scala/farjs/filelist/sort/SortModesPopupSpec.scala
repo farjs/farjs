@@ -2,7 +2,7 @@ package farjs.filelist.sort
 
 import farjs.filelist.sort.SortModesPopup._
 import farjs.filelist.stack.PanelStack
-import farjs.filelist.stack.PanelStackCompSpec.withContext
+import farjs.filelist.stack.WithStackSpec.withContext
 import farjs.ui.menu.{MenuPopup, MenuPopupProps}
 import scommons.react.ReactClass
 import scommons.react.blessed.BlessedElement

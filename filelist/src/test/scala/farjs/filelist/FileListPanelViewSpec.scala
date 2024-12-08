@@ -3,7 +3,7 @@ package farjs.filelist
 import farjs.filelist.FileListPanelView._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.sort.{FileListSort, SortIndicatorProps}
-import farjs.filelist.stack.PanelStackCompSpec
+import farjs.filelist.stack.WithStackSpec
 import farjs.filelist.theme.FileListTheme
 import farjs.filelist.theme.FileListThemeSpec.withThemeContext
 import farjs.ui._
@@ -167,7 +167,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   }
 
   private def withContext(element: ReactElement): ReactElement = {
-    PanelStackCompSpec.withContext(element, width = width, height = height)
+    WithStackSpec.withContext(element, width = width, height = height)
   }
 
   private def assertFileListPanelView(result: TestInstance,

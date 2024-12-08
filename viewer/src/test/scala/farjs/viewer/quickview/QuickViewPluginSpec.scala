@@ -26,7 +26,7 @@ class QuickViewPluginSpec extends AsyncTestSpec with OptionValues {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, js.undefined)
     ), null)
-    val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
+    val stacks = WithStacksProps(WithStacksData(leftStack, null), WithStacksData(rightStack, null))
 
     //when
     QuickViewPlugin.onKeyTrigger("", stacks).toFuture.map(_ shouldBe js.undefined)
@@ -48,7 +48,7 @@ class QuickViewPluginSpec extends AsyncTestSpec with OptionValues {
     val rightStack = new PanelStack(isActive = false, stackState, { f =>
       stackState = f(stackState)
     }: js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]] => Unit)
-    val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
+    val stacks = WithStacksProps(WithStacksData(leftStack, null), WithStacksData(rightStack, null))
 
     //when
     QuickViewPlugin.onKeyTrigger("", stacks).toFuture.map(_ shouldBe js.undefined)
@@ -69,7 +69,7 @@ class QuickViewPluginSpec extends AsyncTestSpec with OptionValues {
     val rightStack = new PanelStack(isActive = true, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, js.undefined)
     ), null)
-    val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
+    val stacks = WithStacksProps(WithStacksData(leftStack, null), WithStacksData(rightStack, null))
     
     //when
     QuickViewPlugin.onKeyTrigger("", stacks).toFuture.map(_ shouldBe js.undefined)
@@ -91,7 +91,7 @@ class QuickViewPluginSpec extends AsyncTestSpec with OptionValues {
     val rightStack = new PanelStack(isActive = false, stackState, { f =>
       stackState = f(stackState)
     }: js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]] => Unit)
-    val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
+    val stacks = WithStacksProps(WithStacksData(leftStack, null), WithStacksData(rightStack, null))
 
     //when
     QuickViewPlugin.onKeyTrigger("", stacks).toFuture.map(_ shouldBe js.undefined)

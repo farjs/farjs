@@ -4,23 +4,23 @@ import scommons.react.blessed.BlessedElement
 
 import scala.scalajs.js
 
-sealed trait PanelStackData extends js.Object {
+sealed trait WithStacksData extends js.Object {
   val stack: PanelStack
   val input: BlessedElement
 }
 
-object PanelStackData {
+object WithStacksData {
 
   def apply(stack: PanelStack,
-            input: BlessedElement): PanelStackData = {
+            input: BlessedElement): WithStacksData = {
 
     js.Dynamic.literal(
       stack = stack,
       input = input
-    ).asInstanceOf[PanelStackData]
+    ).asInstanceOf[WithStacksData]
   }
 
-  def unapply(arg: PanelStackData): Option[(PanelStack, BlessedElement)] = {
+  def unapply(arg: WithStacksData): Option[(PanelStack, BlessedElement)] = {
     Some((
       arg.stack,
       arg.input

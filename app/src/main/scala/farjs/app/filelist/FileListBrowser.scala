@@ -23,7 +23,7 @@ case class FileListBrowserProps(dispatch: Dispatch,
 
 object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
 
-  private[filelist] var panelStackComp: UiComponent[PanelStackProps] = PanelStackComp
+  private[filelist] var panelStackComp: UiComponent[WithStackProps] = WithStack
   private[filelist] var bottomMenuComp: ReactClass = BottomMenu
   private[filelist] var menuBarTrigger: ReactClass = MenuBarTrigger
   private[filelist] var fsPlugin: FSPlugin = FSPlugin
@@ -66,9 +66,9 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       }
     }
     
-    val stacks = PanelStacks(
-      left = PanelStackData(getStack(isRight), leftButtonRef.current),
-      right = PanelStackData(getStack(!isRight), rightButtonRef.current)
+    val stacks = WithStacksProps(
+      left = WithStacksData(getStack(isRight), leftButtonRef.current),
+      right = WithStacksData(getStack(!isRight), rightButtonRef.current)
     )
     val onKeypress: js.Function2[js.Dynamic, KeyboardKey, Unit] = { (_, key) =>
       def screen = leftButtonRef.current.screen
@@ -108,7 +108,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       ()
     }, Nil)
 
-    <(WithPanelStacks())(^.plain := stacks)(
+    <(WithStacks())(^.plain := stacks)(
       <.button(
         ^("isRight") := false,
         ^.reactRef := leftButtonRef,
@@ -118,7 +118,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         ^.rbOnFocus := onActivate(isRight),
         ^.rbOnKeypress := onKeypress
       )(
-        <(panelStackComp())(^.plain := PanelStackProps(
+        <(panelStackComp())(^.plain := WithStackProps(
           isRight = false,
           panelInput = leftButtonRef.current,
           stack = getStack(isRight)
@@ -134,7 +134,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         ^.rbOnFocus := onActivate(!isRight),
         ^.rbOnKeypress := onKeypress
       )(
-        <(panelStackComp())(^.plain := PanelStackProps(
+        <(panelStackComp())(^.plain := WithStackProps(
           isRight = true,
           panelInput = rightButtonRef.current,
           stack = getStack(!isRight)

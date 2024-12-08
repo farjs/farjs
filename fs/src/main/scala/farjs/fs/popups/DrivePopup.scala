@@ -1,7 +1,7 @@
 package farjs.fs.popups
 
 import farjs.filelist.FileListState
-import farjs.filelist.stack.WithPanelStacks
+import farjs.filelist.stack.WithStacks
 import farjs.fs.{FSDisk, FSService}
 import farjs.ui.border.SingleChars
 import farjs.ui.menu.{MenuPopup, MenuPopupProps}
@@ -30,7 +30,7 @@ object DrivePopup extends FunctionComponent[DrivePopupProps] {
   protected def render(compProps: Props): ReactElement = {
     val (disks, setDisks) = useState(List.empty[FSDisk])
     val props = compProps.wrapped
-    val stacks = WithPanelStacks.usePanelStacks
+    val stacks = WithStacks.useStacks()
     val data = getData(platform, disks)
 
     val (panelInput, currStack, otherStack) =

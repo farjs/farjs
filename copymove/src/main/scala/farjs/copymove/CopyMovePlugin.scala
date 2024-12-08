@@ -3,7 +3,7 @@ package farjs.copymove
 import farjs.copymove.CopyMoveUiAction._
 import farjs.filelist._
 import farjs.filelist.api.{FileListCapability, FileListItem}
-import farjs.filelist.stack.{PanelStack, PanelStacks}
+import farjs.filelist.stack.{PanelStack, WithStacksProps}
 import scommons.react.ReactClass
 import scommons.react.blessed.BlessedElement
 
@@ -12,7 +12,7 @@ import scala.scalajs.js
 object CopyMovePlugin extends FileListPlugin(js.Array("f5", "f6", "S-f5", "S-f6")) {
 
   override def onKeyTrigger(key: String,
-                            stacks: PanelStacks,
+                            stacks: WithStacksProps,
                             data: js.UndefOr[js.Dynamic] = js.undefined): js.Promise[js.UndefOr[ReactClass]] = {
     
     val (maybeFrom, maybeTo, toInput) =

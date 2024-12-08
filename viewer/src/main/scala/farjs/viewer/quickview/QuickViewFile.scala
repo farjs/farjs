@@ -1,6 +1,6 @@
 package farjs.viewer.quickview
 
-import farjs.filelist.stack.PanelStackProps
+import farjs.filelist.stack.WithStackProps
 import farjs.ui.Dispatch
 import farjs.viewer._
 import scommons.react._
@@ -10,7 +10,7 @@ import scommons.react.hooks._
 import scala.scalajs.js
 
 case class QuickViewFileProps(dispatch: Dispatch,
-                              panelStack: PanelStackProps,
+                              panelStack: WithStackProps,
                               filePath: String,
                               size: Double)
 

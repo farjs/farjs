@@ -1,8 +1,8 @@
 package farjs.filelist
 
 import farjs.filelist.FileListUi._
-import farjs.filelist.stack.WithPanelStacksSpec.withContext
-import farjs.filelist.stack.{PanelStack, PanelStackData, PanelStackItem}
+import farjs.filelist.stack.WithStacksSpec.withContext
+import farjs.filelist.stack.{PanelStack, WithStacksData, PanelStackItem}
 import scommons.react.ReactClass
 import scommons.react.test._
 
@@ -35,7 +35,7 @@ class FileListUiSpec extends TestSpec with TestRendererUtils {
 
     //when
     val result = createTestRenderer(
-      withContext(<(fileListUi())(^.plain := props)(), PanelStackData(leftStack, null), PanelStackData(rightStack, null))
+      withContext(<(fileListUi())(^.plain := props)(), WithStacksData(leftStack, null), WithStacksData(rightStack, null))
     ).root
 
     //then

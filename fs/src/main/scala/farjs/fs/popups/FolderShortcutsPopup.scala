@@ -1,7 +1,7 @@
 package farjs.fs.popups
 
 import farjs.filelist.FileListState
-import farjs.filelist.stack.{WithPanelStacks, PanelStacks}
+import farjs.filelist.stack.{WithStacks, WithStacksProps}
 import farjs.fs.FSServices
 import farjs.ui.popup._
 import scommons.react._
@@ -18,7 +18,7 @@ object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps]
   private[popups] var listPopup: ReactClass = ListPopup
   
   protected def render(compProps: Props): ReactElement = {
-    val stacks = WithPanelStacks.usePanelStacks
+    val stacks = WithStacks.useStacks()
     val services = FSServices.useServices
     val (maybeItems, setItems) = useState(Option.empty[List[js.UndefOr[String]]])
     val (selected, setSelected) = useState(0)
@@ -42,7 +42,7 @@ object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps]
             setItems(maybeItems.map(items => items.updated(selected, js.undefined)))
           }
         case "+" =>
-          val stackItem = PanelStacks.active(stacks).stack.peekLast[FileListState]()
+          val stackItem = WithStacksProps.active(stacks).stack.peekLast[FileListState]()
           stackItem.state.foreach { state =>
             val dir = state.currDir.path
             services.folderShortcuts.save(selected, dir).toFuture.foreach { _ =>

@@ -2,8 +2,8 @@ package farjs.file.popups
 
 import farjs.file.popups.FileViewHistoryController._
 import farjs.file.{FileEvent, FileViewHistory, FileViewHistoryParams}
-import farjs.filelist.stack.WithPanelStacksSpec.withContext
-import farjs.filelist.stack.{PanelStack, PanelStackData, PanelStackItem}
+import farjs.filelist.stack.WithStacksSpec.withContext
+import farjs.filelist.stack.{PanelStack, WithStacksData, PanelStackItem}
 import org.scalatest.Succeeded
 import scommons.react.ReactClass
 import scommons.react.blessed.BlessedElement
@@ -31,8 +31,8 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileViewHistoryControllerProps(showPopup = true, onClose)
     val renderer = createTestRenderer(withContext(
       <(FileViewHistoryController())(^.wrapped := props)(),
-      left = PanelStackData(currStack, inputElementMock.asInstanceOf[BlessedElement]),
-      right = PanelStackData(otherStack, null)
+      left = WithStacksData(currStack, inputElementMock.asInstanceOf[BlessedElement]),
+      right = WithStacksData(otherStack, null)
     ))
     val history = FileViewHistory(
       path = "test/path",
@@ -64,8 +64,8 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileViewHistoryControllerProps(showPopup = true, onClose)
     val comp = testRender(withContext(
       <(FileViewHistoryController())(^.wrapped := props)(),
-      left = PanelStackData(currStack, null),
-      right = PanelStackData(otherStack, null)
+      left = WithStacksData(currStack, null),
+      right = WithStacksData(otherStack, null)
     ))
     val popup = findComponentProps(comp, fileViewHistoryPopup)
 
@@ -83,8 +83,8 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
     //when
     val result = testRender(withContext(
       <(FileViewHistoryController())(^.wrapped := props)(),
-      left = PanelStackData(currStack, null),
-      right = PanelStackData(otherStack, null)
+      left = WithStacksData(currStack, null),
+      right = WithStacksData(otherStack, null)
     ))
 
     //then
@@ -100,8 +100,8 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
     //when
     val renderer = createTestRenderer(withContext(
       <(FileViewHistoryController())(^.wrapped := props)(),
-      left = PanelStackData(currStack, null),
-      right = PanelStackData(otherStack, null)
+      left = WithStacksData(currStack, null),
+      right = WithStacksData(otherStack, null)
     ))
 
     //then

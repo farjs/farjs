@@ -6,18 +6,18 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-object PanelStackComp extends FunctionComponent[PanelStackProps] {
+object WithStack extends FunctionComponent[WithStackProps] {
   
-  val Context: ReactContext[PanelStackProps] = ReactContext[PanelStackProps](defaultValue = null)
+  val Context: ReactContext[WithStackProps] = ReactContext[WithStackProps](defaultValue = null)
 
   private[stack] var withSizeComp: ReactClass = WithSize
 
-  def usePanelStack: PanelStackProps = {
+  def useStack(): WithStackProps = {
     val ctx = useContext(Context)
     if (ctx == null) {
       throw js.JavaScriptException(js.Error(
-        "PanelStackComp.Context is not found." +
-          "\nPlease, make sure you use PanelStackComp.Context.Provider in parent component."
+        "WithStack.Context is not found." +
+          "\nPlease, make sure you use WithStack.Context.Provider in parent component."
       ))
     }
     ctx
@@ -28,7 +28,7 @@ object PanelStackComp extends FunctionComponent[PanelStackProps] {
     val topComp = props.stack.peek().component
 
     <(withSizeComp)(^.plain := WithSizeProps({ (width, height) =>
-      <(PanelStackComp.Context.Provider)(^.contextValue := PanelStackProps.copy(props)(width = width, height = height))(
+      <(WithStack.Context.Provider)(^.contextValue := WithStackProps.copy(props)(width = width, height = height))(
         <(topComp)()(),
         compProps.children
       )

@@ -1,7 +1,7 @@
 package farjs.filelist
 
 import farjs.filelist.FileListStateSpec.assertFileListState
-import farjs.filelist.stack.PanelStackCompSpec.withContext
+import farjs.filelist.stack.WithStackSpec.withContext
 import farjs.filelist.stack.{PanelStack, PanelStackItem}
 import org.scalatest.OptionValues
 import scommons.react.ReactClass

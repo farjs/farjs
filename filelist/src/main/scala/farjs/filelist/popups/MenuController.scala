@@ -1,7 +1,7 @@
 package farjs.filelist.popups
 
 import farjs.filelist.FileListUiData
-import farjs.filelist.stack.WithPanelStacks
+import farjs.filelist.stack.WithStacks
 import farjs.ui.menu._
 import scommons.nodejs._
 import scommons.react._
@@ -13,7 +13,7 @@ object MenuController extends FunctionComponent[FileListUiData] {
   private[popups] var menuBarComp: ReactClass = MenuBar
 
   protected def render(compProps: Props): ReactElement = {
-    val stacks = WithPanelStacks.usePanelStacks
+    val stacks = WithStacks.useStacks()
     val props = compProps.wrapped
 
     val onAction: js.Function2[Int, Int, Unit] = { (menuIndex, subIndex) =>

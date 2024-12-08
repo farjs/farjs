@@ -1,6 +1,6 @@
 package farjs.filelist.stack
 
-import farjs.filelist.stack.WithPanelStacksSpec.assertPanelStacks
+import farjs.filelist.stack.WithStacksSpec.assertStacks
 import org.scalatest.Assertion
 import org.scalatest.Inside.inside
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
@@ -11,13 +11,13 @@ import scommons.react.test._
 import java.util.concurrent.atomic.AtomicReference
 import scala.scalajs.js
 
-class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
+class WithStacksSpec extends TestSpec with TestRendererUtils {
 
-  it should "fail if no context when usePanelStacks" in {
+  it should "fail if no context when useStacks" in {
     //given
     val wrapper = new FunctionComponent[Unit] {
       protected def render(props: Props): ReactElement = {
-        WithPanelStacks.usePanelStacks
+        WithStacks.useStacks()
         <.>()()
       }
     }
@@ -38,8 +38,8 @@ class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
     
     assertNativeComponent(result,
       <.div()(
-        "Error: WithPanelStacks.Context is not found." +
-          "\nPlease, make sure you use WithPanelStacks.Context.Provider in parent component."
+        "Error: WithStacks.Context is not found." +
+          "\nPlease, make sure you use WithStacks.Context.Provider in parent component."
       )
     )
   }
@@ -49,19 +49,19 @@ class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
     val (stacksCtx, stacksComp) = getStacksCtxHook
     val updater: js.Function1[js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]], Unit] = { _ =>
     }
-    val props = PanelStacks(
-      PanelStackData(new PanelStack(isActive = true, js.Array(), updater), null),
-      PanelStackData(new PanelStack(isActive = false, js.Array(), updater), null)
+    val props = WithStacksProps(
+      WithStacksData(new PanelStack(isActive = true, js.Array(), updater), null),
+      WithStacksData(new PanelStack(isActive = false, js.Array(), updater), null)
     )
 
     //when
-    val result = createTestRenderer(<(WithPanelStacks())(^.plain := props)(
+    val result = createTestRenderer(<(WithStacks())(^.plain := props)(
       <(stacksComp).empty,
       <.>()("some other content")
     )).root
 
     //then
-    assertPanelStacks(stacksCtx.get(), props)
+    assertStacks(stacksCtx.get(), props)
     
     inside(result.children.toList) { case List(resCtxHook, otherContent) =>
       resCtxHook.`type` shouldBe stacksComp
@@ -69,11 +69,11 @@ class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
     }
   }
 
-  private def getStacksCtxHook: (AtomicReference[PanelStacks], ReactClass) = {
-    val ref = new AtomicReference[PanelStacks](null)
+  private def getStacksCtxHook: (AtomicReference[WithStacksProps], ReactClass) = {
+    val ref = new AtomicReference[WithStacksProps](null)
     (ref, new FunctionComponent[Unit] {
       protected def render(props: Props): ReactElement = {
-        val ctx = useContext(WithPanelStacks.Context)
+        val ctx = useContext(WithStacks.Context)
         ref.set(ctx)
         <.>()()
       }
@@ -81,13 +81,13 @@ class WithPanelStacksSpec extends TestSpec with TestRendererUtils {
   }
 }
 
-object WithPanelStacksSpec {
+object WithStacksSpec {
 
   def withContext(element: ReactElement,
-                  left: PanelStackData,
-                  right: PanelStackData): ReactElement = {
+                  left: WithStacksData,
+                  right: WithStacksData): ReactElement = {
 
-    <(WithPanelStacks.Context.Provider)(^.contextValue := PanelStacks(
+    <(WithStacks.Context.Provider)(^.contextValue := WithStacksProps(
       left = left,
       right = right
     ))(
@@ -95,9 +95,9 @@ object WithPanelStacksSpec {
     )
   }
   
-  def assertPanelStacks(result: PanelStacks, expected: PanelStacks): Assertion = {
+  def assertStacks(result: WithStacksProps, expected: WithStacksProps): Assertion = {
     inside(result) {
-      case PanelStacks(left, right) =>
+      case WithStacksProps(left, right) =>
         left shouldBe expected.left
         right shouldBe expected.right
     }

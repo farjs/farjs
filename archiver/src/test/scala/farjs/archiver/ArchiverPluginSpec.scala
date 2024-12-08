@@ -40,7 +40,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
-    val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
+    val stacks = WithStacksProps(WithStacksData(leftStack, null), WithStacksData(rightStack, null))
 
     //when & then
     ArchiverPlugin.onKeyTrigger("", stacks).toFuture.map(_ shouldBe js.undefined)
@@ -60,7 +60,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
-    val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
+    val stacks = WithStacksProps(WithStacksData(leftStack, null), WithStacksData(rightStack, null))
 
     //when & then
     ArchiverPlugin.onKeyTrigger("", stacks).toFuture.map(_ shouldBe js.undefined)
@@ -80,7 +80,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
-    val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
+    val stacks = WithStacksProps(WithStacksData(leftStack, null), WithStacksData(rightStack, null))
 
     //when & then
     ArchiverPlugin.onKeyTrigger("", stacks).toFuture.map(_ should not be js.undefined)
@@ -101,7 +101,7 @@ class ArchiverPluginSpec extends AsyncTestSpec {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("fsComp".asInstanceOf[ReactClass])
     ), updater = null)
-    val stacks = PanelStacks(PanelStackData(leftStack, null), PanelStackData(rightStack, null))
+    val stacks = WithStacksProps(WithStacksData(leftStack, null), WithStacksData(rightStack, null))
 
     //when & then
     ArchiverPlugin.onKeyTrigger("", stacks).toFuture.map(_ should not be None)

@@ -1,7 +1,7 @@
 package farjs.filelist.stack
 
-import farjs.filelist.stack.PanelStackComp._
-import farjs.filelist.stack.PanelStackCompSpec._
+import farjs.filelist.stack.WithStack._
+import farjs.filelist.stack.WithStackSpec._
 import farjs.ui.WithSizeProps
 import org.scalatest.Assertion
 import org.scalatest.Inside.inside
@@ -14,17 +14,17 @@ import scommons.react.test._
 import java.util.concurrent.atomic.AtomicReference
 import scala.scalajs.js
 
-class PanelStackCompSpec extends TestSpec with TestRendererUtils {
+class WithStackSpec extends TestSpec with TestRendererUtils {
 
-  PanelStackComp.withSizeComp = "WithSize".asInstanceOf[ReactClass]
+  WithStack.withSizeComp = "WithSize".asInstanceOf[ReactClass]
 
   private val (width, height) = (25, 15)
 
-  it should "fail if no context when usePanelStack" in {
+  it should "fail if no context when useStack" in {
     //given
     val wrapper = new FunctionComponent[Unit] {
       protected def render(props: Props): ReactElement = {
-        PanelStackComp.usePanelStack
+        WithStack.useStack()
         <.>()()
       }
     }
@@ -45,8 +45,8 @@ class PanelStackCompSpec extends TestSpec with TestRendererUtils {
     
     assertNativeComponent(result,
       <.div()(
-        "Error: PanelStackComp.Context is not found." +
-          "\nPlease, make sure you use PanelStackComp.Context.Provider in parent component."
+        "Error: WithStack.Context is not found." +
+          "\nPlease, make sure you use WithStack.Context.Provider in parent component."
       )
     )
   }
@@ -57,17 +57,17 @@ class PanelStackCompSpec extends TestSpec with TestRendererUtils {
     val top = PanelStackItem[TestParams]("TopComp".asInstanceOf[ReactClass])
     val other = PanelStackItem[TestParams]("OtherComp".asInstanceOf[ReactClass])
     val stack = new PanelStack(isActive = false, js.Array(top, other), null)
-    val props = PanelStackProps(isRight = true, panelInput = null, stack)
+    val props = WithStackProps(isRight = true, panelInput = null, stack)
 
     //when
     val result = renderWithSize(
-      <(PanelStackComp())(^.plain := props)(
+      <(WithStack())(^.plain := props)(
         <(stackComp).empty
       )
     )
 
     //then
-    assertPanelStackProps(stackCtx.get(), PanelStackProps.copy(props)(width = width, height = height))
+    assertStackProps(stackCtx.get(), WithStackProps.copy(props)(width = width, height = height))
     
     inside(result.children.toList) { case List(resTopComp, resCtxHook) =>
       resTopComp.`type` shouldBe "TopComp"
@@ -82,11 +82,11 @@ class PanelStackCompSpec extends TestSpec with TestRendererUtils {
     createTestRenderer(withSizeProps.render(width, height)).root
   }
   
-  private def getStackCtxHook: (AtomicReference[PanelStackProps], ReactClass) = {
-    val ref = new AtomicReference[PanelStackProps](null)
+  private def getStackCtxHook: (AtomicReference[WithStackProps], ReactClass) = {
+    val ref = new AtomicReference[WithStackProps](null)
     (ref, new FunctionComponent[Unit] {
       protected def render(props: Props): ReactElement = {
-        val ctx = useContext(PanelStackComp.Context)
+        val ctx = useContext(WithStack.Context)
         ref.set(ctx)
         <.>()()
       }
@@ -94,7 +94,7 @@ class PanelStackCompSpec extends TestSpec with TestRendererUtils {
   }
 }
 
-object PanelStackCompSpec {
+object WithStackSpec {
 
   private case class TestParams(name: String)
 
@@ -106,7 +106,7 @@ object PanelStackCompSpec {
                   height: Int = 0
                  ): ReactElement = {
 
-    <(PanelStackComp.Context.Provider)(^.contextValue := PanelStackProps(
+    <(WithStack.Context.Provider)(^.contextValue := WithStackProps(
       isRight = isRight,
       panelInput = panelInput,
       stack = stack,
@@ -117,9 +117,9 @@ object PanelStackCompSpec {
     )
   }
 
-  def assertPanelStackProps(result: PanelStackProps, expected: PanelStackProps): Assertion = {
+  def assertStackProps(result: WithStackProps, expected: WithStackProps): Assertion = {
     inside(result) {
-      case PanelStackProps(isRight, panelInput, stack, width, height) =>
+      case WithStackProps(isRight, panelInput, stack, width, height) =>
         isRight shouldBe expected.isRight
         panelInput shouldBe expected.panelInput
         stack shouldBe expected.stack

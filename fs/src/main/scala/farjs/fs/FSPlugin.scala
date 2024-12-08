@@ -40,7 +40,7 @@ class FSPlugin(reducer: js.Function2[FileListState, js.Any, FileListState])
   }
 
   override def onKeyTrigger(key: String,
-                            stacks: PanelStacks,
+                            stacks: WithStacksProps,
                             data: js.UndefOr[js.Dynamic] = js.undefined): js.Promise[js.UndefOr[ReactClass]] = {
 
     js.Promise.resolve[js.UndefOr[ReactClass]](createUi(key).map(_.apply()) match {

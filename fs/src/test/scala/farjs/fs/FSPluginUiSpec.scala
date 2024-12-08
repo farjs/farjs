@@ -1,8 +1,8 @@
 package farjs.fs
 
 import farjs.filelist.api.FileListDir
-import farjs.filelist.stack.WithPanelStacksSpec.withContext
-import farjs.filelist.stack.{PanelStack, PanelStackData, PanelStackItem}
+import farjs.filelist.stack.WithStacksSpec.withContext
+import farjs.filelist.stack.{PanelStack, WithStacksData, PanelStackItem}
 import farjs.filelist.{FileListPluginUiProps, FileListState, MockFileListActions}
 import farjs.fs.FSPluginUi._
 import farjs.fs.popups._
@@ -54,8 +54,8 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
 
     val renderer = createTestRenderer(withContext(
       <(fsPluginUi())(^.plain := FileListPluginUiProps(dispatch, onClose))(),
-      left = PanelStackData(currStack, null),
-      right = PanelStackData(otherStack, null)
+      left = WithStacksData(currStack, null),
+      right = WithStacksData(otherStack, null)
     ))
     val foldersHistoryProps = findComponentProps(renderer.root, foldersHistory)
     val action = TaskAction(Task("Changing Dir",
@@ -91,8 +91,8 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
 
     val renderer = createTestRenderer(withContext(
       <(fsPluginUi())(^.plain := FileListPluginUiProps(dispatch, onClose))(),
-      left = PanelStackData(otherStack, null),
-      right = PanelStackData(currStack, null)
+      left = WithStacksData(otherStack, null),
+      right = WithStacksData(currStack, null)
     ))
     val driveProps = findComponentProps(renderer.root, drive)
     val action = TaskAction(Task("Changing Dir",
@@ -133,8 +133,8 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
 
     val renderer = createTestRenderer(withContext(
       <(fsPluginUi())(^.plain := FileListPluginUiProps(dispatch, onClose))(),
-      left = PanelStackData(otherStack, null),
-      right = PanelStackData(currStack, null)
+      left = WithStacksData(otherStack, null),
+      right = WithStacksData(currStack, null)
     ))
     val foldersHistoryProps = findComponentProps(renderer.root, foldersHistory)
     val dir = currState.currDir.path
@@ -165,8 +165,8 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     //when
     val result = createTestRenderer(withContext(
       <(fsPluginUi())(^.plain := FileListPluginUiProps(dispatch, onClose))(),
-      left = PanelStackData(leftStack, null),
-      right = PanelStackData(rightStack, null)
+      left = WithStacksData(leftStack, null),
+      right = WithStacksData(rightStack, null)
     )).root
 
     //then

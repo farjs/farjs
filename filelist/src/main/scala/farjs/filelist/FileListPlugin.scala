@@ -1,6 +1,6 @@
 package farjs.filelist
 
-import farjs.filelist.stack.{PanelStackItem, PanelStacks}
+import farjs.filelist.stack.{PanelStackItem, WithStacksProps}
 import scommons.react.ReactClass
 
 import scala.scalajs.js
@@ -9,7 +9,7 @@ import scala.scalajs.js.typedarray.Uint8Array
 class FileListPlugin(val triggerKeys: js.Array[String] = js.Array()) extends js.Object {
   
   def onKeyTrigger(key: String,
-                   stacks: PanelStacks,
+                   stacks: WithStacksProps,
                    data: js.UndefOr[js.Dynamic]): js.Promise[js.UndefOr[ReactClass]] = {
     
     js.Promise.resolve[js.UndefOr[ReactClass]](js.undefined)

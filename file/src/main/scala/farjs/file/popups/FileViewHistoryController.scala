@@ -1,7 +1,7 @@
 package farjs.file.popups
 
 import farjs.file.FileEvent
-import farjs.filelist.stack.{WithPanelStacks, PanelStacks}
+import farjs.filelist.stack.{WithStacks, WithStacksProps}
 import scommons.react._
 
 import scala.scalajs.js
@@ -15,7 +15,7 @@ object FileViewHistoryController extends FunctionComponent[FileViewHistoryContro
     FileViewHistoryPopup
 
   protected def render(compProps: Props): ReactElement = {
-    val stacks = WithPanelStacks.usePanelStacks
+    val stacks = WithStacks.useStacks()
     val props = compProps.wrapped
 
     if (props.showPopup) {
@@ -23,7 +23,7 @@ object FileViewHistoryController extends FunctionComponent[FileViewHistoryContro
         onAction = { history =>
           props.onClose()
 
-          PanelStacks.active(stacks).input.emit("keypress", js.undefined, js.Dynamic.literal(
+          WithStacksProps.active(stacks).input.emit("keypress", js.undefined, js.Dynamic.literal(
             name = "",
             full = FileEvent.onFileView,
             data = history.asInstanceOf[js.Dynamic]

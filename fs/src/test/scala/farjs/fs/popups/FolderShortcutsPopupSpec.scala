@@ -2,8 +2,8 @@ package farjs.fs.popups
 
 import farjs.filelist.FileListState
 import farjs.filelist.api.FileListDir
-import farjs.filelist.stack.WithPanelStacksSpec.withContext
-import farjs.filelist.stack.{PanelStack, PanelStackData, PanelStackItem}
+import farjs.filelist.stack.WithStacksSpec.withContext
+import farjs.filelist.stack.{PanelStack, WithStacksData, PanelStackItem}
 import farjs.fs.FSServicesSpec.withServicesContext
 import farjs.fs.popups.FolderShortcutsPopup._
 import farjs.ui.popup.ListPopupProps
@@ -49,7 +49,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     
     val result = createTestRenderer(withContext(withServicesContext(
       <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
-    ), PanelStackData(leftStack, null), PanelStackData(rightStack, null))).root
+    ), WithStacksData(leftStack, null), WithStacksData(rightStack, null))).root
 
     itemsF.toFuture.flatMap { _ =>
       val popup = findListPopupProps(result)
@@ -82,7 +82,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     
     val result = createTestRenderer(withContext(withServicesContext(
       <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
-    ), PanelStackData(leftStack, null), PanelStackData(rightStack, null))).root
+    ), WithStacksData(leftStack, null), WithStacksData(rightStack, null))).root
 
     itemsF.toFuture.flatMap { _ =>
       val popup = findListPopupProps(result)
@@ -124,7 +124,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
 
     val result = createTestRenderer(withContext(withServicesContext(
       <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
-    ), PanelStackData(leftStack, null), PanelStackData(rightStack, null))).root
+    ), WithStacksData(leftStack, null), WithStacksData(rightStack, null))).root
 
     itemsF.toFuture.flatMap { _ =>
       val popup = findListPopupProps(result)
@@ -173,7 +173,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     
     val result = createTestRenderer(withContext(withServicesContext(
       <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
-    ), PanelStackData(leftStack, null), PanelStackData(rightStack, null))).root
+    ), WithStacksData(leftStack, null), WithStacksData(rightStack, null))).root
 
     itemsF.toFuture.flatMap { _ =>
       val popup = findListPopupProps(result)
@@ -210,7 +210,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     
     val result = createTestRenderer(withContext(withServicesContext(
       <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
-    ), PanelStackData(leftStack, null), PanelStackData(rightStack, null))).root
+    ), WithStacksData(leftStack, null), WithStacksData(rightStack, null))).root
 
     itemsF.toFuture.flatMap { _ =>
       findListPopupProps(result).onSelect.foreach(f => f(1))
@@ -244,7 +244,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     
     val result = createTestRenderer(withContext(withServicesContext(
       <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
-    ), PanelStackData(leftStack, null), PanelStackData(rightStack, null))).root
+    ), WithStacksData(leftStack, null), WithStacksData(rightStack, null))).root
 
     itemsF.toFuture.flatMap { _ =>
       val popup = findListPopupProps(result)
@@ -282,7 +282,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     //when
     val result = createTestRenderer(withContext(withServicesContext(
       <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
-    ), PanelStackData(leftStack, null), PanelStackData(rightStack, null))).root
+    ), WithStacksData(leftStack, null), WithStacksData(rightStack, null))).root
 
     //then
     result.children.toList should be (empty)

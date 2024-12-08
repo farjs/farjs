@@ -39,7 +39,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
     var stackState = js.Array[PanelStackItem[_]](
       PanelStackItem(currComp, js.undefined, js.undefined, QuickViewParams())
     )
-    val leftPanelStack = PanelStackProps(
+    val leftPanelStack = WithStackProps(
       isRight = false,
       panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
       stack = new PanelStack(isActive = false, stackState, { f =>
@@ -48,7 +48,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
       width = width,
       height = height
     )
-    val rightPanelStack = PanelStackProps(
+    val rightPanelStack = WithStackProps(
       isRight = true,
       panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
       stack = new PanelStack(isActive = true, js.Array(
@@ -80,7 +80,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
     var stackState = js.Array[PanelStackItem[_]](
       PanelStackItem(currComp, js.undefined, js.undefined, QuickViewParams())
     )
-    val leftPanelStack = PanelStackProps(
+    val leftPanelStack = WithStackProps(
       isRight = false,
       panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
       stack = new PanelStack(isActive = true, js.Array(
@@ -89,7 +89,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
       width = width,
       height = height
     )
-    val rightPanelStack = PanelStackProps(
+    val rightPanelStack = WithStackProps(
       isRight = true,
       panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
       stack = new PanelStack(isActive = false, stackState, { f =>
@@ -109,18 +109,18 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
   }
 
   private def withContext(isRight: Boolean,
-                          leftPanelStack: PanelStackProps,
-                          rightPanelStack: PanelStackProps,
+                          leftPanelStack: WithStackProps,
+                          rightPanelStack: WithStackProps,
                           element: ReactElement): ReactElement = {
 
-    WithPanelStacksSpec.withContext(
-      <(PanelStackComp.Context.Provider)(^.contextValue := {
+    WithStacksSpec.withContext(
+      <(WithStack.Context.Provider)(^.contextValue := {
         if (isRight) rightPanelStack else leftPanelStack
       })(
         element
       ),
-      left = PanelStackData(leftPanelStack.stack, leftPanelStack.panelInput),
-      right = PanelStackData(rightPanelStack.stack, rightPanelStack.panelInput)
+      left = WithStacksData(leftPanelStack.stack, leftPanelStack.panelInput),
+      right = WithStacksData(rightPanelStack.stack, rightPanelStack.panelInput)
     )
   }
   
@@ -128,7 +128,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
                                       dispatch: Dispatch,
                                       actions: FileListActions,
                                       state: FileListState,
-                                      panelStack: PanelStackProps,
+                                      panelStack: WithStackProps,
                                       currItem: FileListItem): Assertion = {
 
     val theme = FileListTheme.defaultTheme.fileList

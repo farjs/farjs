@@ -717,9 +717,9 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 object ZipPanelSpec {
 
   def withContext(element: ReactElement, leftStack: PanelStack, rightStack: PanelStack): ReactElement = {
-    <(WithPanelStacks.Context.Provider)(^.contextValue := PanelStacks(
-      left = PanelStackData(leftStack, null),
-      right = PanelStackData(rightStack, null)
+    <(WithStacks.Context.Provider)(^.contextValue := WithStacksProps(
+      left = WithStacksData(leftStack, null),
+      right = WithStacksData(rightStack, null)
     ))(
       withThemeContext(element)
     )

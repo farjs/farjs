@@ -4,7 +4,7 @@ import scommons.react.blessed.BlessedElement
 
 import scala.scalajs.js
 
-sealed trait PanelStackProps extends js.Object {
+sealed trait WithStackProps extends js.Object {
   val isRight: Boolean
   val panelInput: BlessedElement
   val stack: PanelStack
@@ -12,13 +12,13 @@ sealed trait PanelStackProps extends js.Object {
   val height: Int
 }
 
-object PanelStackProps {
+object WithStackProps {
 
   def apply(isRight: Boolean,
             panelInput: BlessedElement,
             stack: PanelStack,
             width: Int = 0,
-            height: Int = 0): PanelStackProps = {
+            height: Int = 0): WithStackProps = {
 
     js.Dynamic.literal(
       isRight = isRight,
@@ -26,10 +26,10 @@ object PanelStackProps {
       stack = stack,
       width = width,
       height = height
-    ).asInstanceOf[PanelStackProps]
+    ).asInstanceOf[WithStackProps]
   }
 
-  def unapply(arg: PanelStackProps): Option[(Boolean, BlessedElement, PanelStack, Int, Int)] = {
+  def unapply(arg: WithStackProps): Option[(Boolean, BlessedElement, PanelStack, Int, Int)] = {
     Some((
       arg.isRight,
       arg.panelInput,
@@ -39,13 +39,13 @@ object PanelStackProps {
     ))
   }
 
-  def copy(p: PanelStackProps)(isRight: Boolean = p.isRight,
-                               panelInput: BlessedElement = p.panelInput,
-                               stack: PanelStack = p.stack,
-                               width: Int = p.width,
-                               height: Int = p.height): PanelStackProps = {
+  def copy(p: WithStackProps)(isRight: Boolean = p.isRight,
+                              panelInput: BlessedElement = p.panelInput,
+                              stack: PanelStack = p.stack,
+                              width: Int = p.width,
+                              height: Int = p.height): WithStackProps = {
 
-    PanelStackProps(
+    WithStackProps(
       isRight = isRight,
       panelInput = panelInput,
       stack = stack,

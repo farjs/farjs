@@ -2,7 +2,7 @@ package farjs.viewer.quickview
 
 import farjs.filelist.{FileListData, FileListState}
 import farjs.filelist.api.FileListItem
-import farjs.filelist.stack.{PanelStackComp, WithPanelStacks}
+import farjs.filelist.stack.{WithStack, WithStacks}
 import farjs.filelist.theme.FileListTheme
 import farjs.ui._
 import farjs.ui.border._
@@ -19,8 +19,8 @@ object QuickViewPanel extends FunctionComponent[Unit] {
   private[quickview] var quickViewFileComp: UiComponent[QuickViewFileProps] = QuickViewFile
 
   protected def render(compProps: Props): ReactElement = {
-    val stacks = WithPanelStacks.usePanelStacks
-    val panelStack = PanelStackComp.usePanelStack
+    val stacks = WithStacks.useStacks()
+    val panelStack = WithStack.useStack()
     val width = panelStack.width
     val height = panelStack.height
     

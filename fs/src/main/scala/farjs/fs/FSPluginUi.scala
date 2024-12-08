@@ -1,6 +1,6 @@
 package farjs.fs
 
-import farjs.filelist.stack.WithPanelStacks
+import farjs.filelist.stack.WithStacks
 import farjs.filelist.{FileListData, FileListPluginUiProps, FileListState}
 import farjs.fs.FSPluginUi._
 import farjs.fs.popups._
@@ -27,7 +27,7 @@ class FSPluginUi(val showDrivePopupOnLeft: Option[Boolean] = None,
                 ) extends FunctionComponent[FileListPluginUiProps] {
 
   protected def render(compProps: Props): ReactElement = {
-    val stacks = WithPanelStacks.usePanelStacks
+    val stacks = WithStacks.useStacks()
     val props = compProps.plain
 
     def onChangeDir(isLeft: Boolean)(dir: String): Unit = {

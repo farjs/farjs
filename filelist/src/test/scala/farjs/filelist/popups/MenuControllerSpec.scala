@@ -2,8 +2,8 @@ package farjs.filelist.popups
 
 import farjs.filelist.FileListUiData
 import farjs.filelist.popups.MenuController._
-import farjs.filelist.stack.{PanelStack, PanelStackData}
-import farjs.filelist.stack.WithPanelStacksSpec.withContext
+import farjs.filelist.stack.{PanelStack, WithStacksData}
+import farjs.filelist.stack.WithStacksSpec.withContext
 import farjs.ui.menu.MenuBarProps
 import scommons.nodejs._
 import scommons.react.ReactClass
@@ -34,8 +34,8 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListUiData(showMenuPopup = true, onClose = onClose)
     val comp = testRender(withContext(
       <(MenuController())(^.wrapped := props)(),
-      left = PanelStackData(new PanelStack(isActive = true, js.Array(), null), null),
-      right = PanelStackData(new PanelStack(isActive = false, js.Array(), null), null)
+      left = WithStacksData(new PanelStack(isActive = true, js.Array(), null), null),
+      right = WithStacksData(new PanelStack(isActive = false, js.Array(), null), null)
     ))
     val menuBarProps = inside(findComponents(comp, menuBarComp)) {
       case List(menuBar) => menuBar.props.asInstanceOf[MenuBarProps]
@@ -72,8 +72,8 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListUiData(showMenuPopup = true, onClose = onClose)
     val comp = testRender(withContext(
       <(MenuController())(^.wrapped := props)(),
-      left = PanelStackData(new PanelStack(isActive = true, js.Array(), null), leftInput),
-      right = PanelStackData(new PanelStack(isActive = false, js.Array(), null), null)
+      left = WithStacksData(new PanelStack(isActive = true, js.Array(), null), leftInput),
+      right = WithStacksData(new PanelStack(isActive = false, js.Array(), null), null)
     ))
     val menuBarProps = inside(findComponents(comp, menuBarComp)) {
       case List(menuBar) => menuBar.props.asInstanceOf[MenuBarProps]
@@ -107,8 +107,8 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListUiData(showMenuPopup = true, onClose = onClose)
     val comp = testRender(withContext(
       <(MenuController())(^.wrapped := props)(),
-      left = PanelStackData(new PanelStack(isActive = true, js.Array(), null), null),
-      right = PanelStackData(new PanelStack(isActive = false, js.Array(), null), rightInput)
+      left = WithStacksData(new PanelStack(isActive = true, js.Array(), null), null),
+      right = WithStacksData(new PanelStack(isActive = false, js.Array(), null), rightInput)
     ))
     val menuBarProps = inside(findComponents(comp, menuBarComp)) {
       case List(menuBar) => menuBar.props.asInstanceOf[MenuBarProps]
@@ -128,8 +128,8 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListUiData(showMenuPopup = true, onClose = onClose)
     val comp = testRender(withContext(
       <(MenuController())(^.wrapped := props)(),
-      left = PanelStackData(new PanelStack(isActive = true, js.Array(), null), null),
-      right = PanelStackData(new PanelStack(isActive = false, js.Array(), null), null)
+      left = WithStacksData(new PanelStack(isActive = true, js.Array(), null), null),
+      right = WithStacksData(new PanelStack(isActive = false, js.Array(), null), null)
     ))
     val menuBarProps = inside(findComponents(comp, menuBarComp)) {
       case List(menuBar) => menuBar.props.asInstanceOf[MenuBarProps]
@@ -151,8 +151,8 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     //when
     val result = testRender(withContext(
       <(MenuController())(^.wrapped := props)(),
-      left = PanelStackData(new PanelStack(isActive = true, js.Array(), null), leftInput),
-      right = PanelStackData(new PanelStack(isActive = false, js.Array(), null), rightInput)
+      left = WithStacksData(new PanelStack(isActive = true, js.Array(), null), leftInput),
+      right = WithStacksData(new PanelStack(isActive = false, js.Array(), null), rightInput)
     ))
 
     //then
