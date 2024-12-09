@@ -1,37 +1,16 @@
 package farjs.filelist.stack
 
-import farjs.ui.{WithSize, WithSizeProps}
 import scommons.react._
-import scommons.react.hooks._
+import scommons.react.raw.NativeContext
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
-object WithStack extends FunctionComponent[WithStackProps] {
-  
-  val Context: ReactContext[WithStackProps] = ReactContext[WithStackProps](defaultValue = null)
+@js.native
+@JSImport("@farjs/filelist/stack/WithStack.mjs", JSImport.Default)
+object WithStack extends ReactClass {
 
-  private[stack] var withSizeComp: ReactClass = WithSize
+  val Context: NativeContext = js.native
 
-  def useStack(): WithStackProps = {
-    val ctx = useContext(Context)
-    if (ctx == null) {
-      throw js.JavaScriptException(js.Error(
-        "WithStack.Context is not found." +
-          "\nPlease, make sure you use WithStack.Context.Provider in parent component."
-      ))
-    }
-    ctx
-  }
-
-  protected def render(compProps: Props): ReactElement = {
-    val props = compProps.plain
-    val topComp = props.stack.peek().component
-
-    <(withSizeComp)(^.plain := WithSizeProps({ (width, height) =>
-      <(WithStack.Context.Provider)(^.contextValue := WithStackProps.copy(props)(width = width, height = height))(
-        <(topComp)()(),
-        compProps.children
-      )
-    }))()
-  }
+  def useStack(): WithStackProps = js.native
 }
