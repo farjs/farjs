@@ -108,7 +108,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       ()
     }, Nil)
 
-    <(WithStacks())(^.plain := stacks)(
+    <(WithStacks)(^.plain := stacks)(
       <.button(
         ^("isRight") := false,
         ^.reactRef := leftButtonRef,

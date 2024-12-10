@@ -1,30 +1,16 @@
 package farjs.filelist.stack
 
 import scommons.react._
-import scommons.react.hooks._
+import scommons.react.raw.NativeContext
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
-object WithStacks extends FunctionComponent[WithStacksProps] {
+@js.native
+@JSImport("@farjs/filelist/stack/WithStacks.mjs", JSImport.Default)
+object WithStacks extends ReactClass {
 
-  val Context: ReactContext[WithStacksProps] = ReactContext[WithStacksProps](defaultValue = null)
+  val Context: NativeContext = js.native
   
-  def useStacks(): WithStacksProps = {
-    val ctx = useContext(Context)
-    if (ctx == null) {
-      throw js.JavaScriptException(js.Error(
-        "WithStacks.Context is not found." +
-          "\nPlease, make sure you use WithStacks.Context.Provider in parent component."
-      ))
-    }
-    ctx
-  }
-
-  protected def render(compProps: Props): ReactElement = {
-    val props = compProps.plain
-    
-    <(WithStacks.Context.Provider)(^.contextValue := props)(
-      compProps.children
-    )
-  }
+  def useStacks(): WithStacksProps = js.native
 }

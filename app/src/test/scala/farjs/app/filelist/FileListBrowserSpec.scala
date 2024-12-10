@@ -267,12 +267,14 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
-    inside(findComponentProps(comp, WithStacks, plain = true)) { case WithStacksProps(WithStacksData(leftStack, _), _) =>
-      leftStack.isActive shouldBe true
-      leftStack.update[FileListState](_.withState(currState))
+    inside(findComponents(comp, WithStacks).map(_.props.asInstanceOf[WithStacksProps])) {
+      case List(WithStacksProps(WithStacksData(leftStack, _), _)) =>
+        leftStack.isActive shouldBe true
+        leftStack.update[FileListState](_.withState(currState))
     }
-    val fsItem = inside(findComponentProps(comp, WithStacks, plain = true)) { case WithStacksProps(WithStacksData(leftStack, _), _) =>
-      leftStack.peek[FileListState]()
+    val fsItem = inside(findComponents(comp, WithStacks).map(_.props.asInstanceOf[WithStacksProps])) {
+      case List(WithStacksProps(WithStacksData(leftStack, _), _)) =>
+        leftStack.peek[FileListState]()
     }
     fsItem.state shouldBe currState
     val button = inside(findComponents(comp, <.button.name)) {
@@ -288,8 +290,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
     //then
     Future.unit.map { _ =>
-      inside(findComponentProps(comp, WithStacks, plain = true)) { case WithStacksProps(WithStacksData(leftStack, _), _) =>
-        leftStack.peek[FileListState]() shouldBe fsItem
+      inside(findComponents(comp, WithStacks).map(_.props.asInstanceOf[WithStacksProps])) {
+        case List(WithStacksProps(WithStacksData(leftStack, _), _)) =>
+          leftStack.peek[FileListState]() shouldBe fsItem
       }
     }
   }
@@ -324,12 +327,14 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       actions = nonFSActions,
       state = currState
     )
-    inside(findComponentProps(comp, WithStacks, plain = true)) { case WithStacksProps(WithStacksData(leftStack, _), _) =>
-      leftStack.isActive shouldBe true
-      leftStack.push(nonFSItem)
+    inside(findComponents(comp, WithStacks).map(_.props.asInstanceOf[WithStacksProps])) {
+      case List(WithStacksProps(WithStacksData(leftStack, _), _)) =>
+        leftStack.isActive shouldBe true
+        leftStack.push(nonFSItem)
     }
-    inside(findComponentProps(comp, WithStacks, plain = true)) { case WithStacksProps(WithStacksData(leftStack, _), _) =>
-      leftStack.peek[FileListState]() shouldBe nonFSItem
+    inside(findComponents(comp, WithStacks).map(_.props.asInstanceOf[WithStacksProps])) {
+      case List(WithStacksProps(WithStacksData(leftStack, _), _)) =>
+        leftStack.peek[FileListState]() shouldBe nonFSItem
     }
     inside(nonFSItem.actions.toOption) { case Some(actions) =>
       actions.api.isLocal shouldBe false
@@ -347,8 +352,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     
     //then
     Future.unit.map { _ =>
-      inside(findComponentProps(comp, WithStacks, plain = true)) { case WithStacksProps(WithStacksData(leftStack, _), _) =>
-        leftStack.peek[FileListState]() shouldBe nonFSItem
+      inside(findComponents(comp, WithStacks).map(_.props.asInstanceOf[WithStacksProps])) {
+        case List(WithStacksProps(WithStacksData(leftStack, _), _)) =>
+          leftStack.peek[FileListState]() shouldBe nonFSItem
       }
     }
   }
@@ -377,12 +383,14 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       else null
     })
     val actions = new Actions
-    inside(findComponentProps(comp, WithStacks, plain = true)) { case WithStacksProps(WithStacksData(leftStack, _), _) =>
-      leftStack.isActive shouldBe true
-      leftStack.update[FileListState](PanelStackItem.copy(_)(actions = actions.actions, state = currState))
+    inside(findComponents(comp, WithStacks).map(_.props.asInstanceOf[WithStacksProps])) {
+      case List(WithStacksProps(WithStacksData(leftStack, _), _)) =>
+        leftStack.isActive shouldBe true
+        leftStack.update[FileListState](PanelStackItem.copy(_)(actions = actions.actions, state = currState))
     }
-    val fsItem = inside(findComponentProps(comp, WithStacks, plain = true)) { case WithStacksProps(WithStacksData(leftStack, _), _) =>
-      leftStack.peek[FileListState]()
+    val fsItem = inside(findComponents(comp, WithStacks).map(_.props.asInstanceOf[WithStacksProps])) {
+      case List(WithStacksProps(WithStacksData(leftStack, _), _)) =>
+        leftStack.peek[FileListState]()
     }
     fsItem.state shouldBe currState
     val button = inside(findComponents(comp, <.button.name)) {
@@ -410,8 +418,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       openF should not be null
     }.flatMap(_ => openF.failed).map { ex =>
       ex shouldBe js.JavaScriptException(expectedError)
-      inside(findComponentProps(comp, WithStacks, plain = true)) { case WithStacksProps(WithStacksData(leftStack, _), _) =>
-        leftStack.peek[FileListState]() shouldBe fsItem
+      inside(findComponents(comp, WithStacks).map(_.props.asInstanceOf[WithStacksProps])) {
+        case List(WithStacksProps(WithStacksData(leftStack, _), _)) =>
+          leftStack.peek[FileListState]() shouldBe fsItem
       }
     }
   }
@@ -450,12 +459,14 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     })
     val actions = new Actions
     val source = new Source
-    inside(findComponentProps(comp, WithStacks, plain = true)) { case WithStacksProps(WithStacksData(leftStack, _), _) =>
-      leftStack.isActive shouldBe true
-      leftStack.update[FileListState](PanelStackItem.copy(_)(actions = actions.actions, state = currState))
+    inside(findComponents(comp, WithStacks).map(_.props.asInstanceOf[WithStacksProps])) {
+      case List(WithStacksProps(WithStacksData(leftStack, _), _)) =>
+        leftStack.isActive shouldBe true
+        leftStack.update[FileListState](PanelStackItem.copy(_)(actions = actions.actions, state = currState))
     }
-    val fsItem = inside(findComponentProps(comp, WithStacks, plain = true)) { case WithStacksProps(WithStacksData(leftStack, _), _) =>
-      leftStack.peek[FileListState]()
+    val fsItem = inside(findComponents(comp, WithStacks).map(_.props.asInstanceOf[WithStacksProps])) {
+      case List(WithStacksProps(WithStacksData(leftStack, _), _)) =>
+        leftStack.peek[FileListState]()
     }
     fsItem.state shouldBe currState
     val button = inside(findComponents(comp, <.button.name)) {
@@ -485,10 +496,11 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     
     eventually(onCloseCapture should not be null).flatMap { _ =>
       //then
-      inside(findComponentProps(comp, WithStacks, plain = true)) { case WithStacksProps(WithStacksData(leftStack, _), _) =>
-        val item = leftStack.peek[FileListState]()
-        item.component shouldBe pluginItem.component
-        item.dispatch should not be None
+      inside(findComponents(comp, WithStacks).map(_.props.asInstanceOf[WithStacksProps])) {
+        case List(WithStacksProps(WithStacksData(leftStack, _), _)) =>
+          val item = leftStack.peek[FileListState]()
+          item.component shouldBe pluginItem.component
+          item.dispatch should not be None
       }
 
       //when
@@ -496,8 +508,9 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       
       //then
       Future.unit.map { _ =>
-        inside(findComponentProps(comp, WithStacks, plain = true)) { case WithStacksProps(WithStacksData(leftStack, _), _) =>
-          leftStack.peek[FileListState]() shouldBe fsItem
+        inside(findComponents(comp, WithStacks).map(_.props.asInstanceOf[WithStacksProps])) {
+          case List(WithStacksProps(WithStacksData(leftStack, _), _)) =>
+            leftStack.peek[FileListState]() shouldBe fsItem
         }
       }
     }
@@ -523,7 +536,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
-    val stacks = findComponentProps(renderer.root, WithStacks, plain = true)
+    val stacks = findComponents(renderer.root, WithStacks).map(_.props.asInstanceOf[WithStacksProps]).head
     val button = inside(findComponents(renderer.root, <.button.name)) {
       case List(button, _) => button
     }
@@ -579,7 +592,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
       if (el.`type` == <.button.name.asInstanceOf[js.Any]) buttonMock
       else null
     })
-    val stacks = findComponentProps(renderer.root, WithStacks, plain = true)
+    val stacks = findComponents(renderer.root, WithStacks).map(_.props.asInstanceOf[WithStacksProps]).head
     val button = inside(findComponents(renderer.root, <.button.name)) {
       case List(button, _) => button
     }
@@ -635,7 +648,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
   }
   
   private def assertFileListBrowser(result: TestInstance): Assertion = {
-    assertNativeComponent(result, <(WithStacks())(^.assertPlain[WithStacksProps](inside(_) {
+    assertNativeComponent(result, <(WithStacks)(^.assertPlain[WithStacksProps](inside(_) {
       case WithStacksProps(WithStacksData(leftStack, _), WithStacksData(rightStack, _)) =>
         leftStack should not be null
         rightStack should not be null
