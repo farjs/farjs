@@ -20,7 +20,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
   FileListPanelView.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   FileListPanelView.fileListComp = mockUiComponent("FileList")
   FileListPanelView.textLineComp = "TextLine".asInstanceOf[ReactClass]
-  FileListPanelView.sortIndicator = mockUiComponent("SortIndicator")
+  FileListPanelView.sortIndicator = "SortIndicator".asInstanceOf[ReactClass]
 
   private val (width, height) = (25, 15)
   
@@ -224,7 +224,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           focused shouldBe props.state.isActive
           padding shouldBe js.undefined
       }))(),
-      <(sortIndicator())(^.assertPlain[SortIndicatorProps](inside(_) {
+      <(sortIndicator)(^.assertPlain[SortIndicatorProps](inside(_) {
         case SortIndicatorProps(FileListSort(mode, asc)) =>
           mode shouldBe props.state.sort.mode
           asc shouldBe props.state.sort.asc

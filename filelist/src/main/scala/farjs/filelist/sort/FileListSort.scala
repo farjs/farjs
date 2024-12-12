@@ -12,8 +12,10 @@ sealed trait FileListSort extends js.Object {
 
 @js.native
 @JSImport("@farjs/filelist/sort/FileListSort.mjs", JSImport.Default)
-object NativeFileListSort extends js.Object {
+object NativeFileListSort extends js.Function2[SortMode, Boolean, FileListSort] {
 
+  def apply(mode: SortMode, asc: Boolean): FileListSort = js.native
+  
   def nextSort(sort: FileListSort, nextMode: SortMode): FileListSort = js.native
 
   def sortItems(items: js.Array[FileListItem], mode: SortMode): js.Array[FileListItem] = js.native
@@ -21,12 +23,8 @@ object NativeFileListSort extends js.Object {
 
 object FileListSort {
 
-  def apply(mode: SortMode, asc: Boolean): FileListSort = {
-    js.Dynamic.literal(
-      mode = mode,
-      asc = asc
-    ).asInstanceOf[FileListSort]
-  }
+  def apply(mode: SortMode, asc: Boolean): FileListSort =
+    NativeFileListSort(mode, asc)
 
   def unapply(arg: FileListSort): Option[(SortMode, Boolean)] = {
     Some((
