@@ -12,6 +12,7 @@ import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs._
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.blessed.{BlessedScreen, KeyboardKey}
 import scommons.react.test._
 
@@ -23,7 +24,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   FileListPanel.fileListPanelView = mockUiComponent("FileListPanelView")
   FileListPanel.fileListQuickSearch = mockUiComponent("FileListQuickSearch")
-  FileListPanel.sortModesPopup = mockUiComponent("SortModesPopup")
+  FileListPanel.sortModesPopup = "SortModesPopup".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class Actions {
@@ -98,8 +99,8 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     viewProps.onKeypress(screen, "C-f12")
 
     //then
-    inside(findComponentProps(renderer.root, sortModesPopup, plain = true)) {
-      case SortModesPopupProps(FileListSort(mode, asc), onClose) =>
+    inside(findComponents(renderer.root, sortModesPopup).map(_.props.asInstanceOf[SortModesPopupProps])) {
+      case List(SortModesPopupProps(FileListSort(mode, asc), onClose)) =>
         mode shouldBe SortMode.Name
         asc shouldBe true
         
@@ -107,7 +108,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         onClose()
 
         //then
-        findProps(renderer.root, sortModesPopup, plain = true) should be (empty)
+        findComponents(renderer.root, sortModesPopup) should be (empty)
     }
   }
 

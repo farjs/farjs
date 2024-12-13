@@ -21,7 +21,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
 
   private[filelist] var fileListPanelView: UiComponent[FileListPanelViewProps] = FileListPanelView
   private[filelist] var fileListQuickSearch: UiComponent[FileListQuickSearchProps] = FileListQuickSearch
-  private[filelist] var sortModesPopup: UiComponent[SortModesPopupProps] = SortModesPopup
+  private[filelist] var sortModesPopup: ReactClass = SortModesPopup
 
   protected def render(compProps: Props): ReactElement = {
     val stackProps = WithStack.useStack()
@@ -125,7 +125,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
       },
 
       if (showSortModes) Some(
-        <(sortModesPopup())(^.plain := SortModesPopupProps(
+        <(sortModesPopup)(^.plain := SortModesPopupProps(
           sort = props.state.sort,
           onClose = { () =>
             setShowSortModes(false)
