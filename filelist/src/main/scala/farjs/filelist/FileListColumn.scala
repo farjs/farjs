@@ -6,32 +6,21 @@ import farjs.ui._
 import scommons.react._
 import scommons.react.blessed._
 
-case class FileListColumnProps(size: (Int, Int),
-                               left: Int,
-                               borderCh: String,
-                               items: Seq[FileListItem],
-                               focusedIndex: Int,
-                               selectedNames: Set[String])
+import scala.scalajs.js
 
 object FileListColumn extends FunctionComponent[FileListColumnProps] {
 
   private[filelist] var textLineComp: ReactClass = TextLine
 
-  override protected def create(): ReactClass = {
-    ReactMemo[Props](super.create(), { (prevProps, nextProps) =>
-      prevProps.wrapped == nextProps.wrapped
-    })
-  }
-  
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
-    val (width, height) = props.size
+    val props = compProps.plain
+    val (width, height) = (props.width, props.height)
     val theme = FileListTheme.useTheme().fileList
     
     val borderEnd = UI.renderText2(theme.regularItem, props.borderCh)
     val overlapEnd = UI.renderText2(theme.regularItem, "}")
 
-    def renderItems(): Seq[String] = props.items.zipWithIndex.map {
+    def renderItems(): js.Array[String] = props.items.zipWithIndex.map {
       case (item, index) =>
         val name = item.name
         val style = {
@@ -91,9 +80,7 @@ object FileListColumn extends FunctionComponent[FileListColumnProps] {
           ^.content := itemsContent
         )()
       )
-      else None,
-
-      compProps.children // just for testing memo/re-render
+      else None
     )
   }
 }

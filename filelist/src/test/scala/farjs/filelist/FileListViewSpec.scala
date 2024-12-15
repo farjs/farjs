@@ -262,19 +262,21 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
           start shouldBe DoubleChars.topSingle
           end shouldBe SingleChars.bottom
       }))())
-      assertTestComponent(col1, fileListColumnComp) {
-        case FileListColumnProps(resSize, left, borderCh, items, focusedPos, selectedNames) =>
-          resSize shouldBe 2 -> 2
+      assertTestComponent(col1, fileListColumnComp, plain = true) {
+        case FileListColumnProps(width, height, left, borderCh, items, focusedPos, selectedNames) =>
+          width shouldBe 2
+          height shouldBe 2
           left shouldBe 0
           borderCh shouldBe SingleChars.vertical
-          assertFileListData((items, focusedPos, selectedNames), expectedData.head)
+          assertFileListData((items.toList, focusedPos, selectedNames.toSet), expectedData.head)
       }
-      assertTestComponent(col2, fileListColumnComp) {
-        case FileListColumnProps(resSize, left, borderCh, items, focusedPos, selectedNames) =>
-          resSize shouldBe 4 -> 2
+      assertTestComponent(col2, fileListColumnComp, plain = true) {
+        case FileListColumnProps(width, height, left, borderCh, items, focusedPos, selectedNames) =>
+          width shouldBe 4
+          height shouldBe 2
           left shouldBe 3
           borderCh shouldBe DoubleChars.vertical
-          assertFileListData((items, focusedPos, selectedNames), expectedData(1))
+          assertFileListData((items.toList, focusedPos, selectedNames.toSet), expectedData(1))
       }
     })
   }

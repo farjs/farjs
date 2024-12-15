@@ -17,88 +17,15 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
 
   FileListColumn.textLineComp = "TextLine".asInstanceOf[ReactClass]
 
-  it should "not re-render component if the same props" in {
-    //given
-    val props = FileListColumnProps(
-      size = (14, 3),
-      left = 2,
-      borderCh = SingleChars.vertical,
-      items = List(
-        FileListItem("item 1"),
-        FileListItem("item 2"),
-        FileListItem("item 3")
-      ),
-      focusedIndex = 1,
-      selectedNames = Set("item 2", "item 3")
-    )
-    val renderer = createTestRenderer(withThemeContext(<(FileListColumn())(^.wrapped := props)(
-      <.text(^.content := "initial")()
-    )))
-    val testEl = renderer.root.children.head.children.head.children(2)
-    testEl.`type` shouldBe "text"
-    testEl.props.content shouldBe "initial"
-
-    //when
-    renderer.update(withThemeContext(
-      <(FileListColumn())(^.wrapped := props.copy(selectedNames = Set("item 3", "item 2")))(
-        <.text(^.content := "update")()
-      )
-    ))
-
-    //then
-    val sameEl = renderer.root.children.head.children.head.children(2)
-    sameEl.`type` shouldBe "text"
-    sameEl.props.content shouldBe "initial"
-    
-    //cleanup
-    renderer.unmount()
-  }
-  
-  it should "re-render component if different props" in {
-    //given
-    val props = FileListColumnProps(
-      size = (14, 3),
-      left = 2,
-      borderCh = SingleChars.vertical,
-      items = List(
-        FileListItem("item 1"),
-        FileListItem("item 2"),
-        FileListItem("item 3")
-      ),
-      focusedIndex = 1,
-      selectedNames = Set("item 2", "item 3")
-    )
-    val renderer = createTestRenderer(withThemeContext(<(FileListColumn())(^.wrapped := props)(
-      <.text(^.content := "initial")()
-    )))
-    val testEl = renderer.root.children.head.children.head.children(2)
-    testEl.`type` shouldBe "text"
-    testEl.props.content shouldBe "initial"
-
-    //when
-    renderer.update(withThemeContext(
-      <(FileListColumn())(^.wrapped := props.copy(selectedNames = Set("item 3")))(
-        <.text(^.content := "update")()
-      )
-    ))
-
-    //then
-    val updatedEl = renderer.root.children.head.children.head.children(2)
-    updatedEl.`type` shouldBe "text"
-    updatedEl.props.content shouldBe "update"
-
-    //cleanup
-    renderer.unmount()
-  }
-  
   it should "render non-empty component" in {
     //given
     val currTheme = FileListTheme.xterm256Theme
     val props = FileListColumnProps(
-      size = (14, 3),
+      width = 14,
+      height = 3,
       left = 2,
       borderCh = SingleChars.vertical,
-      items = List(
+      items = js.Array(
         FileListItem.up,
         FileListItem("dir\t1 {bold}", isDir = true),
         FileListItem(".dir 2 looooooong", isDir = true),
@@ -109,11 +36,11 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
         FileListItem("file.zip")
       ),
       focusedIndex = 2,
-      selectedNames = Set(".dir 2 looooooong", "file 3")
+      selectedNames = js.Set(".dir 2 looooooong", "file 3")
     )
 
     //when
-    val result = testRender(withThemeContext(<(FileListColumn())(^.wrapped := props)(), currTheme))
+    val result = testRender(withThemeContext(<(FileListColumn())(^.plain := props)(), currTheme))
 
     //then
     assertFileListColumn(result, props, Some(
@@ -133,16 +60,17 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
   it should "render empty component" in {
     //given
     val props = FileListColumnProps(
-      size = (6, 3),
+      width = 6,
+      height = 3,
       left = 2,
       borderCh = SingleChars.vertical,
-      items = Nil,
+      items = js.Array[FileListItem](),
       focusedIndex = -1,
-      selectedNames = Set.empty
+      selectedNames = js.Set[String]()
     )
 
     //when
-    val result = testRender(withThemeContext(<(FileListColumn())(^.wrapped := props)()))
+    val result = testRender(withThemeContext(<(FileListColumn())(^.plain := props)()))
 
     //then
     assertFileListColumn(result, props, None)
@@ -161,7 +89,7 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
           align shouldBe TextAlign.center
           left shouldBe 0
           top shouldBe 0
-          width shouldBe props.size._1
+          width shouldBe props.width
           text shouldBe "Name"
           style shouldBe theme.header
           focused shouldBe js.undefined
@@ -174,7 +102,7 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
         }
         
         assertNativeComponent(textEl, <.text(
-          ^.rbWidth := props.size._1 + 1,
+          ^.rbWidth := props.width + 1,
           ^.rbTop := 1,
           ^.rbTags := true,
           ^.rbWrap := false,
@@ -184,9 +112,9 @@ class FileListColumnSpec extends TestSpec with TestRendererUtils {
       expectedContent.size shouldBe itemsText.size
     }
     
-    assertNativeComponent(result.children.head, <.box(
-      ^.rbWidth := props.size._1,
-      ^.rbHeight := props.size._2,
+    assertNativeComponent(result, <.box(
+      ^.rbWidth := props.width,
+      ^.rbHeight := props.height,
       ^.rbLeft := props.left,
       ^.rbStyle := theme.regularItem
     )(), inside(_) {

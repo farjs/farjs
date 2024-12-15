@@ -123,13 +123,14 @@ object FileListView extends FunctionComponent[FileListViewProps] {
               }
               else None,
 
-              <(fileListColumnComp())(^.wrapped := FileListColumnProps(
-                size = (colWidth, height),
+              <(fileListColumnComp())(^.plain := FileListColumnProps(
+                width = colWidth,
+                height = height,
                 left = colLeft,
                 borderCh =
                   if (colIndex != columns - 1) SingleChars.vertical
                   else DoubleChars.vertical,
-                items = colItems,
+                items = js.Array(colItems: _*),
                 focusedIndex = {
                   val firstIndex = columnSizeRef.current * colIndex
                   val lastIndex = firstIndex + colItems.size - 1
@@ -139,7 +140,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
                   }
                   else -1
                 },
-                selectedNames = props.selectedNames.intersect(colItems.map(_.name).toSet)
+                selectedNames = js.Set(props.selectedNames.intersect(colItems.map(_.name).toSet).toList: _*)
               ))()
             )
         }
