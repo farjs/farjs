@@ -1,6 +1,5 @@
 package farjs.filelist
 
-import farjs.filelist.api.FileListItem
 import farjs.filelist.stack.WithStack
 import farjs.filelist.theme.FileListTheme
 import farjs.ui.border._
@@ -9,15 +8,6 @@ import scommons.react.blessed._
 import scommons.react.hooks._
 
 import scala.scalajs.js
-
-case class FileListViewProps(size: (Int, Int),
-                             columns: Int,
-                             items: Seq[FileListItem],
-                             focusedIndex: Int = -1,
-                             selectedNames: Set[String] = Set.empty,
-                             onWheel: Boolean => Unit = _ => (),
-                             onClick: Int => Unit = _ => (),
-                             onKeypress: (BlessedScreen, String) => Unit = (_, _) => ())
 
 object FileListView extends FunctionComponent[FileListViewProps] {
 
@@ -32,10 +22,10 @@ object FileListView extends FunctionComponent[FileListViewProps] {
     val inputEl = WithStack.useStack().panelInput
     val currTheme = FileListTheme.useTheme()
     
-    val props = compProps.wrapped
+    val props = compProps.plain
     propsRef.current = props
 
-    val (width, height) = props.size
+    val (width, height) = (props.width, props.height)
     val columns = props.columns
     columnSizeRef.current = height - 1 // excluding column header
     
@@ -103,7 +93,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
       ^.rbTop := 1
     )(
       if (columnSizeRef.current > 0) {
-        val columnsItems = props.items.grouped(columnSizeRef.current).toSeq
+        val columnsItems = props.items.toList.grouped(columnSizeRef.current).toSeq
         
         columnsItems.zipAll(columnsPosRef.current, Nil, (0, 0, 0)).map {
           case (colItems, (colLeft, colWidth, colIndex)) =>
@@ -140,7 +130,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
                   }
                   else -1
                 },
-                selectedNames = js.Set(props.selectedNames.intersect(colItems.map(_.name).toSet).toList: _*)
+                selectedNames = js.Set(props.selectedNames.toSet.intersect(colItems.map(_.name).toSet).toList: _*)
               ))()
             )
         }

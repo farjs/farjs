@@ -116,12 +116,15 @@ object FileList extends FunctionComponent[FileListProps] {
       }
     }
     
-    <(fileListViewComp())(^.wrapped := FileListViewProps(
-      size = props.size,
+    val (viewWidth, viewHeight) = props.size
+    
+    <(fileListViewComp())(^.plain := FileListViewProps(
+      width = viewWidth,
+      height = viewHeight,
       columns = props.columns,
-      items = viewItems,
+      items = js.Array(viewItems: _*),
       focusedIndex = if (props.state.isActive) focusedIndex else -1,
-      selectedNames = props.state.selectedNames.toSet,
+      selectedNames = props.state.selectedNames,
       onWheel = { up =>
         if (props.state.isActive) {
           if (up) {

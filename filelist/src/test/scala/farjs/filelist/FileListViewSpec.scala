@@ -23,7 +23,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
   it should "call onWheel when onWheelup/onWheeldown" in {
     //given
     val onWheel = mockFunction[Boolean, Unit]
-    val props = FileListViewProps((7, 7), columns = 2, items = List(
+    val props = FileListViewProps(7, 7, columns = 2, items = js.Array(
       FileListItem("item 1"),
       FileListItem("item 2")
     ), onWheel = onWheel)
@@ -47,7 +47,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     onMock.expects("keypress", *)
     onMock.expects("click", *)
     
-    val renderer = createTestRenderer(withContext(withThemeContext(<(FileListView())(^.wrapped := props)()), input), { el =>
+    val renderer = createTestRenderer(withContext(withThemeContext(<(FileListView())(^.plain := props)()), input), { el =>
       if (el.`type` == <.box.name.asInstanceOf[js.Any]) literal(aleft = 5, atop = 3)
       else null
     })
@@ -82,7 +82,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
   it should "call onClick when onClick" in {
     //given
     val onClick = mockFunction[Int, Unit]
-    val props = FileListViewProps((7, 3), columns = 2, items = List(
+    val props = FileListViewProps(7, 3, columns = 2, items = js.Array(
       FileListItem("item 1"),
       FileListItem("item 2"),
       FileListItem("item 3")
@@ -103,7 +103,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     onMock.expects("wheelup", *)
     onMock.expects("wheeldown", *)
     
-    val renderer = createTestRenderer(withContext(withThemeContext(<(FileListView())(^.wrapped := props)()), input), { el =>
+    val renderer = createTestRenderer(withContext(withThemeContext(<(FileListView())(^.plain := props)()), input), { el =>
       if (el.`type` == <.box.name.asInstanceOf[js.Any]) literal(aleft = 5, atop = 3)
       else null
     })
@@ -139,7 +139,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
   it should "call onKeypress when onKeypress(...)" in {
     //given
     val onKeypress = mockFunction[BlessedScreen, String, Unit]
-    val props = FileListViewProps((7, 3), columns = 2, items = List(
+    val props = FileListViewProps(7, 3, columns = 2, items = js.Array(
       FileListItem("item 1"),
       FileListItem("item 2")
     ), onKeypress = onKeypress)
@@ -161,7 +161,7 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     onMock.expects("wheeldown", *)
     onMock.expects("click", *)
     
-    val renderer = createTestRenderer(withContext(withThemeContext(<(FileListView())(^.wrapped := props)()), input))
+    val renderer = createTestRenderer(withContext(withThemeContext(<(FileListView())(^.plain := props)()), input))
     val keyFull = "some-key"
     
     //then
@@ -180,36 +180,34 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
 
   it should "render empty component when height < 2" in {
     //given
-    val props = FileListViewProps((13, 1), columns = 2,
-      items = List(FileListItem("item 1"), FileListItem("item 2"))
+    val props = FileListViewProps(13, 1, columns = 2,
+      items = js.Array(FileListItem("item 1"), FileListItem("item 2"))
     )
-    val (width, height) = props.size
 
     //when
-    val result = testRender(withContext(withThemeContext(<(FileListView())(^.wrapped := props)())))
+    val result = testRender(withContext(withThemeContext(<(FileListView())(^.plain := props)())))
 
     //then
-    assertNativeComponent(result, <.box(^.rbWidth := width, ^.rbHeight := height)())
+    assertNativeComponent(result, <.box(^.rbWidth := props.width, ^.rbHeight := props.height)())
   }
   
   it should "render empty component when columns = 0" in {
     //given
-    val props = FileListViewProps((13, 12), columns = 0, items = Nil)
-    val (width, height) = props.size
+    val props = FileListViewProps(13, 12, columns = 0, items = js.Array[FileListItem]())
 
     //when
-    val result = testRender(withContext(withThemeContext(<(FileListView())(^.wrapped := props)())))
+    val result = testRender(withContext(withThemeContext(<(FileListView())(^.plain := props)())))
 
     //then
-    assertNativeComponent(result, <.box(^.rbWidth := width, ^.rbHeight := height)())
+    assertNativeComponent(result, <.box(^.rbWidth := props.width, ^.rbHeight := props.height)())
   }
   
   it should "render empty component with 2 columns" in {
     //given
-    val props = FileListViewProps((7, 2), columns = 2, items = Nil)
+    val props = FileListViewProps(7, 2, columns = 2, items = js.Array[FileListItem]())
 
     //when
-    val result = testRender(withContext(withThemeContext(<(FileListView())(^.wrapped := props)())))
+    val result = testRender(withContext(withThemeContext(<(FileListView())(^.plain := props)())))
 
     //then
     assertFileListView(result, props, List(
@@ -220,14 +218,14 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
   
   it should "render non-empty component with 2 columns" in {
     //given
-    val props = FileListViewProps((7, 2), columns = 2,
-      items = List(FileListItem("item 1"), FileListItem("item 2")),
+    val props = FileListViewProps(7, 2, columns = 2,
+      items = js.Array(FileListItem("item 1"), FileListItem("item 2")),
       focusedIndex = 1,
-      selectedNames = Set("item 2")
+      selectedNames = js.Set("item 2")
     )
 
     //when
-    val result = testRender(withContext(withThemeContext(<(FileListView())(^.wrapped := props)())))
+    val result = testRender(withContext(withThemeContext(<(FileListView())(^.plain := props)())))
 
     //then
     assertFileListView(result, props, List(
@@ -247,8 +245,8 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
     val currThem = FileListTheme.defaultTheme
     
     assertNativeComponent(result, <.box(
-      ^.rbWidth := props.size._1,
-      ^.rbHeight := props.size._2,
+      ^.rbWidth := props.width,
+      ^.rbHeight := props.height,
       ^.rbLeft := 1,
       ^.rbTop := 1
     )(), inside(_) { case List(sep, col1, col2) =>
