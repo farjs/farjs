@@ -18,7 +18,7 @@ import scala.scalajs.js.Dynamic.literal
 class FileListViewSpec extends TestSpec with TestRendererUtils {
 
   FileListView.verticalLineComp = "VerticalLine".asInstanceOf[ReactClass]
-  FileListView.fileListColumnComp = mockUiComponent("FileListColumn")
+  FileListView.fileListColumnComp = "FileListColumn".asInstanceOf[ReactClass]
 
   it should "call onWheel when onWheelup/onWheeldown" in {
     //given
@@ -260,22 +260,22 @@ class FileListViewSpec extends TestSpec with TestRendererUtils {
           start shouldBe DoubleChars.topSingle
           end shouldBe SingleChars.bottom
       }))())
-      assertTestComponent(col1, fileListColumnComp, plain = true) {
+      assertNativeComponent(col1, <(fileListColumnComp)(^.assertPlain[FileListColumnProps](inside(_) {
         case FileListColumnProps(width, height, left, borderCh, items, focusedPos, selectedNames) =>
           width shouldBe 2
           height shouldBe 2
           left shouldBe 0
           borderCh shouldBe SingleChars.vertical
           assertFileListData((items.toList, focusedPos, selectedNames.toSet), expectedData.head)
-      }
-      assertTestComponent(col2, fileListColumnComp, plain = true) {
+      }))())
+      assertNativeComponent(col2, <(fileListColumnComp)(^.assertPlain[FileListColumnProps](inside(_) {
         case FileListColumnProps(width, height, left, borderCh, items, focusedPos, selectedNames) =>
           width shouldBe 4
           height shouldBe 2
           left shouldBe 3
           borderCh shouldBe DoubleChars.vertical
           assertFileListData((items.toList, focusedPos, selectedNames.toSet), expectedData(1))
-      }
+      }))())
     })
   }
   

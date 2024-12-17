@@ -12,7 +12,7 @@ import scala.scalajs.js
 object FileListView extends FunctionComponent[FileListViewProps] {
 
   private[filelist] var verticalLineComp: ReactClass = VerticalLine
-  private[filelist] var fileListColumnComp: UiComponent[FileListColumnProps] = FileListColumn
+  private[filelist] var fileListColumnComp: ReactClass = FileListColumn
   
   protected def render(compProps: Props): ReactElement = {
     val elementRef = useRef[BlessedElement](null)
@@ -113,7 +113,7 @@ object FileListView extends FunctionComponent[FileListViewProps] {
               }
               else None,
 
-              <(fileListColumnComp())(^.plain := FileListColumnProps(
+              <(fileListColumnComp)(^.plain := FileListColumnProps(
                 width = colWidth,
                 height = height,
                 left = colLeft,
