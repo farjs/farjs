@@ -18,7 +18,7 @@ case class FileListProps(dispatch: Dispatch,
 
 object FileList extends FunctionComponent[FileListProps] {
 
-  private[filelist] var fileListViewComp: UiComponent[FileListViewProps] = FileListView
+  private[filelist] var fileListViewComp: ReactClass = FileListView
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -118,7 +118,7 @@ object FileList extends FunctionComponent[FileListProps] {
     
     val (viewWidth, viewHeight) = props.size
     
-    <(fileListViewComp())(^.plain := FileListViewProps(
+    <(fileListViewComp)(^.plain := FileListViewProps(
       width = viewWidth,
       height = viewHeight,
       columns = props.columns,
