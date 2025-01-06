@@ -2,31 +2,21 @@ package farjs.filelist
 
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.FileListItem
-import farjs.ui.Dispatch
 import scommons.react._
-import scommons.react.blessed.BlessedScreen
 import scommons.react.hooks._
 
 import scala.scalajs.js
-
-case class FileListProps(dispatch: Dispatch,
-                         actions: FileListActions,
-                         state: FileListState,
-                         size: (Int, Int),
-                         columns: Int,
-                         onKeypress: (BlessedScreen, String) => Unit = (_, _) => ())
 
 object FileList extends FunctionComponent[FileListProps] {
 
   private[filelist] var fileListViewComp: ReactClass = FileListView
   
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     
-    val (_, height) = props.size
     val items = props.state.currDir.items.toSeq
     val itemsLength = items.length
-    val columnSize = height - 1 // excluding column header
+    val columnSize = props.height - 1 // excluding column header
     val viewSize = columnSize * props.columns
     
     val (viewOffset, focusedIndex) = {
@@ -116,11 +106,9 @@ object FileList extends FunctionComponent[FileListProps] {
       }
     }
     
-    val (viewWidth, viewHeight) = props.size
-    
     <(fileListViewComp)(^.plain := FileListViewProps(
-      width = viewWidth,
-      height = viewHeight,
+      width = props.width,
+      height = props.height,
       columns = props.columns,
       items = js.Array(viewItems: _*),
       focusedIndex = if (props.state.isActive) focusedIndex else -1,

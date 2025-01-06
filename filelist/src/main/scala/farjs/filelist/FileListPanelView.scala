@@ -45,11 +45,12 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         startCh = DoubleChars.leftSingle,
         endCh = DoubleChars.rightSingle
       ))(),
-      <(fileListComp())(^.wrapped := FileListProps(
+      <(fileListComp())(^.plain := FileListProps(
         dispatch = props.dispatch,
         actions = props.actions,
         state = props.state,
-        size = (width - 2, height - 5),
+        width = width - 2,
+        height = height - 5,
         columns = 2,
         onKeypress = props.onKeypress
       ))(),

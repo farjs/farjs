@@ -204,14 +204,14 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           startCh shouldBe DoubleChars.leftSingle
           endCh shouldBe DoubleChars.rightSingle
       }))(),
-      <(fileListComp())(^.assertWrapped(inside(_) {
-        case FileListProps(dispatch, actions, resState, resSize, columns, onKeypress) =>
+      <(fileListComp())(^.assertPlain[FileListProps](inside(_) {
+        case FileListProps(dispatch, actions, resState, resWidth, resHeight, columns, _) =>
           dispatch shouldBe props.dispatch
           actions shouldBe props.actions
           resState shouldBe state
-          resSize shouldBe (width - 2) -> (height - 5)
+          resWidth shouldBe (width - 2)
+          resHeight shouldBe (height - 5)
           columns shouldBe 2
-          onKeypress shouldBe props.onKeypress
       }))(),
       <(textLineComp)(^.assertPlain[TextLineProps](inside(_) {
         case TextLineProps(align, left, top, resWidth, text, style, focused, padding) =>
