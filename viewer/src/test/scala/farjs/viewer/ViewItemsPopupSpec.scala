@@ -37,7 +37,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val dir1 = FileListItem("dir 1", isDir = true)
     val file1 = FileListItem.copy(FileListItem("file 1"))(size = 10)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(dir1, file1))
-    val state = FileListState(currDir = currDir, isActive = true, selectedNames = js.Set("dir 1", "file 1"))
+    val state = FileListState(currDir = currDir, selectedNames = js.Set("dir 1", "file 1"))
     val onClose = mockFunction[Unit]
     val props = FileListPluginUiProps(dispatch, onClose)
     val p = Promise[Boolean]()
@@ -93,7 +93,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
       FileListItem("dir 1", isDir = true)
     ))
-    val state = FileListState(currDir = currDir, isActive = true)
+    val state = FileListState(currDir = currDir)
     val onClose = mockFunction[Unit]
     val props = FileListPluginUiProps(dispatch, onClose)
     val p = Promise[Boolean]()
@@ -144,7 +144,7 @@ class ViewItemsPopupSpec extends AsyncTestSpec with BaseTestSpec
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
       FileListItem("dir 1", isDir = true)
     ))
-    val state = FileListState(currDir = currDir, isActive = true)
+    val state = FileListState(currDir = currDir)
     val onClose = mockFunction[Unit]
     val props = FileListPluginUiProps(dispatch, onClose)
     val p = Promise[Boolean]()

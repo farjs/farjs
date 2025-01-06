@@ -46,7 +46,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array())
-    val state = FileListState(isActive = true, currDir = currDir)
+    val state = FileListState(currDir = currDir)
     val onClose = mockFunction[Unit]
     val props = FileListUiData(
       showMkFolderPopup = true,

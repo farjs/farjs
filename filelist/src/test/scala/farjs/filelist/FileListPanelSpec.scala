@@ -5,14 +5,14 @@ import farjs.filelist.FileListActionsSpec.{assertFileListParamsChangedAction, as
 import farjs.filelist.FileListPanel._
 import farjs.filelist.api.{FileListCapability, FileListDir, FileListItem, MockFileListApi}
 import farjs.filelist.sort.{FileListSort, SortMode, SortModesPopupProps}
-import farjs.filelist.stack.WithStackSpec.withContext
+import farjs.filelist.stack.{PanelStack, PanelStackItem, WithStackSpec}
 import farjs.ui.Dispatch
 import farjs.ui.task.{Task, TaskAction}
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs._
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react.ReactClass
+import scommons.react.{ReactClass, ReactElement}
 import scommons.react.blessed.{BlessedScreen, KeyboardKey}
 import scommons.react.test._
 
@@ -345,7 +345,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     //given
     val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
-    val props = FileListPanelProps(dispatch, actions.actions, FileListState(isActive = true))
+    val props = FileListPanelProps(dispatch, actions.actions, FileListState())
     val comp = createTestRenderer(withContext(<(FileListPanel())(^.wrapped := props)())).root
     val viewProps = findComponentProps(comp, fileListPanelView)
 
@@ -363,7 +363,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     //given
     val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
-    val props = FileListPanelProps(dispatch, actions.actions, FileListState(isActive = true))
+    val props = FileListPanelProps(dispatch, actions.actions, FileListState())
     val comp = createTestRenderer(withContext(<(FileListPanel())(^.wrapped := props)())).root
     findComponentProps(comp, fileListPanelView).onKeypress(null, "C-s")
     findProps(comp, fileListQuickSearch) should not be empty
@@ -379,8 +379,8 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     //given
     val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
-    val props = FileListPanelProps(dispatch, actions.actions, FileListState(isActive = true))
-    val renderer = createTestRenderer(withContext(<(FileListPanel())(^.wrapped := props)()))
+    val props = FileListPanelProps(dispatch, actions.actions, FileListState())
+    val renderer = createTestRenderer(withContext(<(FileListPanel())(^.wrapped := props)(), isActive = true))
     findComponentProps(renderer.root, fileListPanelView).onKeypress(null, "C-s")
     findProps(renderer.root, fileListQuickSearch) should not be empty
 
@@ -388,7 +388,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     TestRenderer.act { () =>
       renderer.update(withContext(
         <(FileListPanel())(^.wrapped := props.copy(
-          state = FileListState.copy(props.state)(isActive = false)
+          state = FileListState.copy(props.state)()
         ))()
       ))
     }
@@ -401,8 +401,8 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     //given
     val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
-    val props = FileListPanelProps(dispatch, actions.actions, FileListState(isActive = true))
-    val comp = createTestRenderer(withContext(<(FileListPanel())(^.wrapped := props)())).root
+    val props = FileListPanelProps(dispatch, actions.actions, FileListState())
+    val comp = createTestRenderer(withContext(<(FileListPanel())(^.wrapped := props)(), isActive = true)).root
     findComponentProps(comp, fileListPanelView).onKeypress(null, "C-s")
     val searchProps = findComponentProps(comp, fileListQuickSearch)
 
@@ -486,6 +486,10 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
     //then
     assertFileListPanel(result, props)
+  }
+
+  private def withContext(element: ReactElement, isRight: Boolean = false, isActive: Boolean = false): ReactElement = {
+    WithStackSpec.withContext(element, isRight, stack = new PanelStack(isActive, js.Array[PanelStackItem[_]](), _ => ()))
   }
 
   private def assertFileListPanel(result: TestInstance,

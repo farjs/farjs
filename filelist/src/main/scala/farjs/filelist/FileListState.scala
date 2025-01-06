@@ -13,7 +13,6 @@ sealed trait FileListState extends js.Object {
   val index: Int = js.native
   val currDir: FileListDir = js.native
   val selectedNames: js.Set[String] = js.native
-  val isActive: Boolean = js.native
   val diskSpace: js.UndefOr[Double] = js.native
   val sort: FileListSort = js.native
 }
@@ -46,7 +45,6 @@ object FileListState {
             index: Int = 0,
             currDir: FileListDir = FileListDir("", isRoot = false, js.Array()),
             selectedNames: js.Set[String] = js.Set(),
-            isActive: Boolean = false,
             diskSpace: js.UndefOr[Double] = js.undefined,
             sort: FileListSort = FileListSort(SortMode.Name, asc = true)): FileListState = {
 
@@ -55,19 +53,17 @@ object FileListState {
       index = index,
       currDir = currDir,
       selectedNames = selectedNames,
-      isActive = isActive,
       diskSpace = diskSpace,
       sort = sort
     )
   }
   
-  def unapply(arg: FileListState): Option[(Int, Int, FileListDir, js.Set[String], Boolean, js.UndefOr[Double], FileListSort)] = {
+  def unapply(arg: FileListState): Option[(Int, Int, FileListDir, js.Set[String], js.UndefOr[Double], FileListSort)] = {
     Some((
       arg.offset,
       arg.index,
       arg.currDir,
       arg.selectedNames,
-      arg.isActive,
       arg.diskSpace,
       arg.sort
     ))
@@ -77,7 +73,6 @@ object FileListState {
                              index: Int = p.index,
                              currDir: FileListDir = p.currDir,
                              selectedNames: js.Set[String] = p.selectedNames,
-                             isActive: Boolean = p.isActive,
                              diskSpace: js.UndefOr[Double] = p.diskSpace,
                              sort: FileListSort = p.sort): FileListState = {
 
@@ -87,7 +82,6 @@ object FileListState {
     dynRes.index = index
     dynRes.currDir = currDir
     dynRes.selectedNames = selectedNames
-    dynRes.isActive = isActive
     dynRes.diskSpace = diskSpace
     dynRes.sort = sort
     res

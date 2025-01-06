@@ -61,7 +61,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         width = width - 2,
         text = props.state.currDir.path,
         style = theme.regularItem,
-        focused = props.state.isActive
+        focused = panelStack.stack.isActive
       ))(),
       <(sortIndicator)(^.plain := SortIndicatorProps(
         sort = props.state.sort

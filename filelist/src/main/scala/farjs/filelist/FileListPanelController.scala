@@ -2,7 +2,6 @@ package farjs.filelist
 
 import farjs.filelist.stack.WithStack
 import scommons.react._
-import scommons.react.hooks._
 
 class FileListPanelController(
   fileListPanelComp: UiComponent[FileListPanelProps]
@@ -16,13 +15,6 @@ class FileListPanelController(
       stackItem.getData()
     }
 
-    useLayoutEffect({ () =>
-      stack.update[FileListState](
-        _.updateState(FileListState.copy(_)(isActive = stack.isActive))
-      )
-      ()
-    }, List(stack.isActive))
-    
     maybeCurrData.map { case FileListData(dispatch, actions, state) =>
       <(fileListPanelComp())(^.wrapped := FileListPanelProps(dispatch, actions, state))()
     }.orNull

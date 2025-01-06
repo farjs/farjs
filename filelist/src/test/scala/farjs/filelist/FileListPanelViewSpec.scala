@@ -3,7 +3,7 @@ package farjs.filelist
 import farjs.filelist.FileListPanelView._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.filelist.sort.{FileListSort, SortIndicatorProps}
-import farjs.filelist.stack.WithStackSpec
+import farjs.filelist.stack.{PanelStack, PanelStackItem, WithStackSpec}
 import farjs.filelist.theme.FileListTheme
 import farjs.filelist.theme.FileListThemeSpec.withThemeContext
 import farjs.ui._
@@ -84,14 +84,14 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
       FileListItem.copy(FileListItem("file 1"))(size = 1),
       FileListItem.copy(FileListItem("file 2"))(size = 2, permissions = "drwxr-xr-x"),
       FileListItem.copy(FileListItem("file 3"))(size = 3)
-    )), isActive = true)
+    )))
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
-    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)()), isActive = true))
 
     //then
-    assertFileListPanelView(result, props, state, "file 2", "2", permissions = "drwxr-xr-x", showDate = true, dirSize = "6 (3)")
+    assertFileListPanelView(result, props, state, "file 2", "2", permissions = "drwxr-xr-x", showDate = true, dirSize = "6 (3)", isActive = true)
   }
   
   it should "render component with root dir and focused dir" in {
@@ -166,8 +166,13 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     assertFileListPanelView(result, props, state, "..", dirSize = "2 (1)")
   }
 
-  private def withContext(element: ReactElement): ReactElement = {
-    WithStackSpec.withContext(element, width = width, height = height)
+  private def withContext(element: ReactElement, isActive: Boolean = false): ReactElement = {
+    WithStackSpec.withContext(
+      element = element,
+      stack = new PanelStack(isActive, js.Array[PanelStackItem[_]](), _ => ()),
+      width = width,
+      height = height
+    )
   }
 
   private def assertFileListPanelView(result: TestInstance,
@@ -179,7 +184,8 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
                                       showDate: Boolean = false,
                                       selected: Option[String] = None,
                                       dirSize: String = "0 (0)",
-                                      diskSpace: Option[Double] = None): Unit = {
+                                      diskSpace: Option[Double] = None,
+                                      isActive: Boolean = false): Unit = {
     
     val theme = FileListTheme.defaultTheme.fileList
     
@@ -221,7 +227,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           resWidth shouldBe (width - 2)
           text shouldBe state.currDir.path
           style shouldBe theme.regularItem
-          focused shouldBe props.state.isActive
+          focused shouldBe isActive
           padding shouldBe js.undefined
       }))(),
       <(sortIndicator)(^.assertPlain[SortIndicatorProps](inside(_) {

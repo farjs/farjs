@@ -2,6 +2,7 @@ package farjs.filelist
 
 import farjs.filelist.FileListActions._
 import farjs.filelist.api.FileListItem
+import farjs.filelist.stack.WithStack
 import scommons.react._
 import scommons.react.hooks._
 
@@ -12,6 +13,7 @@ object FileList extends FunctionComponent[FileListProps] {
   private[filelist] var fileListViewComp: ReactClass = FileListView
   
   protected def render(compProps: Props): ReactElement = {
+    val stackProps = WithStack.useStack()
     val props = compProps.plain
     
     val items = props.state.currDir.items.toSeq
@@ -111,10 +113,10 @@ object FileList extends FunctionComponent[FileListProps] {
       height = props.height,
       columns = props.columns,
       items = js.Array(viewItems: _*),
-      focusedIndex = if (props.state.isActive) focusedIndex else -1,
+      focusedIndex = if (stackProps.stack.isActive) focusedIndex else -1,
       selectedNames = props.state.selectedNames,
       onWheel = { up =>
-        if (props.state.isActive) {
+        if (stackProps.stack.isActive) {
           if (up) {
             if (viewOffset > 0) focusItem(viewOffset - 1, focusedIndex)
             else focusItem(viewOffset, focusedIndex - 1)

@@ -70,7 +70,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
       FileListItem("dir 1", isDir = true)
     ))
-    val state = FileListState(currDir = currDir, isActive = true)
+    val state = FileListState(currDir = currDir)
     val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
@@ -125,7 +125,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
       FileListItem("dir 1", isDir = true)
     ))
-    val state = FileListState(currDir = currDir, isActive = true)
+    val state = FileListState(currDir = currDir)
     val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
@@ -182,7 +182,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val currDir = FileListDir("/folder", isRoot = false, js.Array(
       FileListItem("dir 1", isDir = true)
     ))
-    val state = FileListState(currDir = currDir, isActive = true)
+    val state = FileListState(currDir = currDir)
     val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
@@ -211,7 +211,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("/folder", isRoot = false, js.Array(item))
-    val state = FileListState(currDir = currDir, isActive = true)
+    val state = FileListState(currDir = currDir)
     val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
@@ -267,7 +267,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("folder", isRoot = false, js.Array(item))
-    val state = FileListState(currDir = currDir, isActive = true)
+    val state = FileListState(currDir = currDir)
     val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
@@ -325,7 +325,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
     val currDir = FileListDir("folder", isRoot = false, js.Array(item))
-    val state = FileListState(currDir = currDir, isActive = true)
+    val state = FileListState(currDir = currDir)
     val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
@@ -384,7 +384,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       item,
       FileListItem("file 1")
     ))
-    val state = FileListState(currDir = currDir, isActive = true)
+    val state = FileListState(currDir = currDir)
     val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
@@ -436,7 +436,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       item,
       FileListItem("file 1")
     ))
-    val state = FileListState(currDir = currDir, isActive = true)
+    val state = FileListState(currDir = currDir)
     val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
@@ -476,7 +476,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       item,
       FileListItem("file 1")
     ))
-    val state = FileListState(currDir = currDir, isActive = true)
+    val state = FileListState(currDir = currDir)
     val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
@@ -526,7 +526,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       item,
       FileListItem("file 1")
     ))
-    val state = FileListState(currDir = currDir, isActive = true)
+    val state = FileListState(currDir = currDir)
     val toDispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
@@ -591,7 +591,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       item,
       FileListItem("file 1")
     ))
-    val state = FileListState(currDir = currDir, isActive = true)
+    val state = FileListState(currDir = currDir)
     val toDispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState()
@@ -647,7 +647,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       FileListItem("file 1")
     ))
     val rightDir = FileListDir("/right/dir", isRoot = false, js.Array(FileListItem("dir 2", isDir = true)))
-    val fromState = FileListState(index = 1, currDir = leftDir, isActive = true, selectedNames = js.Set(dir.name, "file 1"))
+    val fromState = FileListState(index = 1, currDir = leftDir, selectedNames = js.Set(dir.name, "file 1"))
     val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val toState = FileListState(currDir = rightDir)
@@ -741,7 +741,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       FileListItem("file 1")
     ))
     val rightDir = FileListDir("/right/dir", isRoot = false, js.Array(FileListItem("dir 2", isDir = true)))
-    val fromState = FileListState(index = 1, currDir = leftDir, isActive = true, selectedNames = js.Set("file 1"))
+    val fromState = FileListState(index = 1, currDir = leftDir, selectedNames = js.Set("file 1"))
     val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new Actions
     val toState = FileListState(currDir = rightDir)
@@ -810,7 +810,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
-    val state = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array(item)), isActive = true)
+    val state = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array(item)))
     val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState(currDir = FileListDir("/test-path", isRoot = false, js.Array()))
@@ -841,7 +841,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
     val item = FileListItem("dir 1", isDir = true)
-    val state = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array(item)), isActive = true)
+    val state = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array(item)))
     val toDispatch = mockFunction[js.Any, Unit]
     val toActions = new MockFileListActions
     val toState = FileListState(currDir = FileListDir("/folder", isRoot = false, js.Array()))
@@ -877,7 +877,6 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )
     val fromState = FileListState(
       currDir = FileListDir("/test-path", isRoot = false, items),
-      isActive = true,
       selectedNames = js.Set("file 1", "dir 1")
     )
     val toDispatch = mockFunction[js.Any, Unit]
@@ -915,7 +914,6 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )
     val fromState = FileListState(
       currDir = FileListDir("/folder", isRoot = false, items),
-      isActive = true,
       selectedNames = js.Set("file 1", "dir 1")
     )
     val toDispatch = mockFunction[js.Any, Unit]
@@ -954,7 +952,6 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )
     val fromState = FileListState(
       currDir = FileListDir("/test-path", isRoot = false, items),
-      isActive = true,
       selectedNames = js.Set("file 1", "dir 1")
     )
     val toActions = new MockFileListActions

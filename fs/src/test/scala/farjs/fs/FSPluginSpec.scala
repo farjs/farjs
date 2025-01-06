@@ -39,7 +39,7 @@ class FSPluginSpec extends AsyncTestSpec with OptionValues {
       val currState = inside(resState.toOption) {
         case Some(s) =>
           val state = s.asInstanceOf[FileListState]
-          assertFileListState(state, FileListState(currDir = state.currDir, isActive = true))
+          assertFileListState(state, FileListState(currDir = state.currDir))
           state
       }
       

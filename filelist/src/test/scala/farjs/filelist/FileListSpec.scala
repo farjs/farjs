@@ -5,12 +5,13 @@ import farjs.filelist.FileListActions._
 import farjs.filelist.FileListActionsSpec.assertFileListParamsChangedAction
 import farjs.filelist.api.FileListItemSpec.assertFileListItems
 import farjs.filelist.api.{FileListDir, FileListItem}
+import farjs.filelist.stack.{PanelStack, PanelStackItem, WithStackSpec}
 import farjs.ui.Dispatch
 import farjs.ui.task.{Task, TaskAction}
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react.ReactClass
+import scommons.react.{ReactClass, ReactElement}
 import scommons.react.blessed.BlessedScreen
 import scommons.react.test._
 
@@ -36,7 +37,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val actions = new Actions
     val state1 = FileListState()
     val props1 = FileListProps(dispatch, actions.actions, state1, width = 7, height = 2, columns = 2)
-    val state2 = FileListState.copy(state1)(isActive = true)
+    val state2 = FileListState.copy(state1)(offset = state1.offset + 1)
     val props2 = FileListProps.copy(props1)(state = state2)
     val action = TaskAction(
       Task("Changing dir", Future.successful(state1.currDir))
@@ -47,8 +48,8 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     dispatch.expects(action)
     
     //when
-    val renderer = createTestRenderer(<(FileList())(^.plain := props1)())
-    renderer.update(<(FileList())(^.plain := props2)()) //noop
+    val renderer = createTestRenderer(withContext(<(FileList())(^.plain := props1)()))
+    renderer.update(withContext(<(FileList())(^.plain := props2)())) //noop
     
     //cleanup
     renderer.unmount()
@@ -67,11 +68,10 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         FileListItem("item 3"),
         FileListItem("item 4"),
         FileListItem("item 5")
-      )),
-      isActive = true
+      ))
     ), width = 7, height = 3, columns = 2)
 
-    val renderer = createTestRenderer(<(FileList())(^.plain := props)())
+    val renderer = createTestRenderer(withContext(<(FileList())(^.plain := props)(), isActive = true))
     findComponents(renderer.root, fileListViewComp).map(_.props.asInstanceOf[FileListViewProps]).head.focusedIndex shouldBe 0
 
     def check(up: Boolean, offset: Int, index: Int, changed: Boolean = true)(implicit pos: Position): Assertion = {
@@ -86,7 +86,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       
       //when
       findComponents(renderer.root, fileListViewComp).map(_.props.asInstanceOf[FileListViewProps]).head.onWheel(up)
-      renderer.update(<(FileList())(^.plain := FileListProps.copy(props)(state = state))())
+      renderer.update(withContext(<(FileList())(^.plain := FileListProps.copy(props)(state = state))(), isActive = true))
 
       //then
       val res = findComponents(renderer.root, fileListViewComp).map(_.props.asInstanceOf[FileListViewProps]).head
@@ -119,7 +119,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       ))
     ), width = 7, height = 3, columns = 2)
 
-    val comp = testRender(<(FileList())(^.plain := props)())
+    val comp = testRender(withContext(<(FileList())(^.plain := props)()))
     val viewProps = findComponents(comp, fileListViewComp).map(_.props.asInstanceOf[FileListViewProps]).head
     viewProps.focusedIndex shouldBe -1
 
@@ -142,11 +142,10 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         FileListItem("item 1"),
         FileListItem("item 2"),
         FileListItem("item 3")
-      )),
-      isActive = true
+      ))
     ), width = 7, height = 3, columns = 2)
 
-    val renderer = createTestRenderer(<(FileList())(^.plain := props)())
+    val renderer = createTestRenderer(withContext(<(FileList())(^.plain := props)(), isActive = true))
     findComponents(renderer.root, fileListViewComp).map(_.props.asInstanceOf[FileListViewProps]).head.focusedIndex shouldBe 0
 
     def check(clickIndex: Int, index: Int, changed: Boolean = true)(implicit pos: Position): Assertion = {
@@ -161,7 +160,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
       //when
       findComponents(renderer.root, fileListViewComp).map(_.props.asInstanceOf[FileListViewProps]).head.onClick(clickIndex)
-      renderer.update(<(FileList())(^.plain := FileListProps.copy(props)(state = state))())
+      renderer.update(withContext(<(FileList())(^.plain := FileListProps.copy(props)(state = state))(), isActive = true))
 
       //then
       val res = findComponents(renderer.root, fileListViewComp).map(_.props.asInstanceOf[FileListViewProps]).head
@@ -190,12 +189,11 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       FileListItem("item 7")
     )
     val rootProps = FileListProps(dispatch, actions.actions, FileListState(
-      currDir = FileListDir("/", isRoot = true, items = items),
-      isActive = true
+      currDir = FileListDir("/", isRoot = true, items = items)
     ), width = 7, height = 3, columns = 2, onKeypress = onKeypress)
     val screen = js.Dynamic.literal().asInstanceOf[BlessedScreen]
 
-    val renderer = createTestRenderer(<(FileList())(^.plain := rootProps)())
+    val renderer = createTestRenderer(withContext(<(FileList())(^.plain := rootProps)(), isActive = true))
     findComponents(renderer.root, fileListViewComp).map(_.props.asInstanceOf[FileListViewProps]).head.focusedIndex shouldBe 0
     
     def check(keyFull: String,
@@ -221,7 +219,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
       //when
       findComponents(renderer.root, fileListViewComp).map(_.props.asInstanceOf[FileListViewProps]).head.onKeypress(screen, keyFull)
-      renderer.update(<(FileList())(^.plain := FileListProps.copy(props)(state = state))())
+      renderer.update(withContext(<(FileList())(^.plain := FileListProps.copy(props)(state = state))(), isActive = true))
 
       //then
       val res = findComponents(renderer.root, fileListViewComp).map(_.props.asInstanceOf[FileListViewProps]).head
@@ -301,7 +299,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val nonRootProps = FileListProps.copy(rootProps)(state = FileListState.copy(rootProps.state)(
       currDir = FileListDir.copy(rootProps.state.currDir)(items = FileListItem.up +: items)
     ))
-    renderer.update(<(FileList())(^.plain := nonRootProps)())
+    renderer.update(withContext(<(FileList())(^.plain := nonRootProps)(), isActive = true))
     findComponents(renderer.root, fileListViewComp).map(_.props.asInstanceOf[FileListViewProps]).head.focusedIndex shouldBe 0
 
     //when & then
@@ -323,7 +321,7 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     dispatch.expects(dirAction)
 
     //when
-    val result = testRender(<(FileList())(^.plain := props)())
+    val result = testRender(withContext(<(FileList())(^.plain := props)()))
 
     //then
     dirAction.task.result.toFuture.map { _ =>
@@ -344,12 +342,11 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         FileListItem("item 1"),
         FileListItem("item 2"),
         FileListItem("item 3")
-      )),
-      isActive = true
+      ))
     ), width = 7, height = 2, columns = 2)
 
     //when
-    val result = testRender(<(FileList())(^.plain := props)())
+    val result = testRender(withContext(<(FileList())(^.plain := props)(), isActive = true))
 
     //then
     assertFileList(result, props,
@@ -369,12 +366,11 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         FileListItem("item 1"),
         FileListItem("item 2"),
         FileListItem("item 3")
-      )),
-      isActive = true
+      ))
     ), width = 7, height = 2, columns = 2)
 
     //when
-    val result = testRender(<(FileList())(^.plain := props)())
+    val result = testRender(withContext(<(FileList())(^.plain := props)(), isActive = true))
 
     //then
     assertFileList(result, props,
@@ -383,7 +379,11 @@ class FileListSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       selectedNames = Set.empty
     )
   }
-  
+
+  private def withContext(element: ReactElement, isActive: Boolean = false): ReactElement = {
+    WithStackSpec.withContext(element, stack = new PanelStack(isActive, js.Array[PanelStackItem[_]](), _ => ()))
+  }
+
   private def assertFileList(result: TestInstance,
                              props: FileListProps,
                              viewItems: List[FileListItem],

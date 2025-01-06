@@ -1,6 +1,5 @@
 package farjs.filelist
 
-import farjs.filelist.FileListStateSpec.assertFileListState
 import farjs.filelist.stack.WithStackSpec.withContext
 import farjs.filelist.stack.{PanelStack, PanelStackItem}
 import org.scalatest.OptionValues
@@ -15,58 +14,27 @@ class FileListPanelControllerSpec extends TestSpec with TestRendererUtils with O
   
   private val controller = new FileListPanelController(fileListPanelComp)
 
-  it should "render component and update isActive" in {
+  it should "render component" in {
     //given
     val dispatch: js.Function1[js.Any, Unit] = _ => ()
     val actions = new MockFileListActions
     val state = FileListState()
-    state.isActive shouldBe false
-    
-    var stackState = js.Array[PanelStackItem[_]](
+    val stackState = js.Array[PanelStackItem[_]](
       new PanelStackItem[FileListState]("fsPanel".asInstanceOf[ReactClass], dispatch, actions, state)
     )
-    val stack = new PanelStack(isActive = true, stackState, { f =>
-      stackState = f(stackState)
-    }: js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]] => Unit)
+    val stack = new PanelStack(isActive = true, stackState, _ => ())
 
-    //when & then
+    //when
     val renderer = createTestRenderer(
       withContext(<(controller())()(), stack = stack)
     )
+    
+    //then
     assertTestComponent(renderer.root.children(0), fileListPanelComp) {
       case FileListPanelProps(resDispatch, resActions, resState, _) =>
         resDispatch shouldBe dispatch
         resActions shouldBe actions
         resState shouldBe state
-    }
-
-    //then
-    inside(stackState.head) { case PanelStackItem(_, resDispatch, resActions, resState) =>
-      resDispatch shouldBe dispatch
-      resActions shouldBe actions
-      assertFileListState(resState.toOption.value.asInstanceOf[FileListState], FileListState.copy(state)(isActive = true))
-    }
-    val updaterMock = mockFunction[js.Function1[js.Array[PanelStackItem[_]], js.Array[PanelStackItem[_]]], Unit]
-    updaterMock.expects(*).never()
-    
-    //when & then
-    TestRenderer.act { () =>
-      renderer.update(
-        withContext(<(controller())()(), stack = new PanelStack(isActive = true, stackState, updaterMock))
-      )
-    }
-    assertTestComponent(renderer.root.children(0), fileListPanelComp) {
-      case FileListPanelProps(resDispatch, resActions, resState, _) =>
-        resDispatch shouldBe dispatch
-        resActions shouldBe actions
-        assertFileListState(resState, FileListState.copy(state)(isActive = true))
-    }
-
-    //then
-    inside(stackState.head) { case PanelStackItem(_, resDispatch, resActions, resState) =>
-      resDispatch shouldBe dispatch
-      resActions shouldBe actions
-      assertFileListState(resState.toOption.value.asInstanceOf[FileListState], FileListState.copy(state)(isActive = true))
     }
   }
 }

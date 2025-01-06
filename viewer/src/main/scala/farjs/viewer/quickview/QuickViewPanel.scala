@@ -56,7 +56,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
         width = width - 2,
         text = "Quick view",
         style = theme.regularItem,
-        focused = !stackItem.state.exists(_.isActive)
+        focused = panelStack.stack.isActive
       ))(),
 
       maybeCurrData.map { case (dispatch, actions, state, currItem) =>

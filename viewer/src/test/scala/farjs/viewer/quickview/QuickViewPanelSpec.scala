@@ -76,7 +76,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
       FileListItem.up,
       file,
       FileListItem.copy(FileListItem("dir", isDir = true))(size = 1)
-    )), index = 1, isActive = true)
+    )), index = 1)
     var stackState = js.Array[PanelStackItem[_]](
       PanelStackItem(currComp, js.undefined, js.undefined, QuickViewParams())
     )
@@ -167,7 +167,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
           resWidth shouldBe (width - 2)
           text shouldBe "Quick view"
           style shouldBe theme.regularItem
-          focused shouldBe !state.isActive
+          focused shouldBe panelStack.stack.isActive
           padding shouldBe js.undefined
       }))())
 

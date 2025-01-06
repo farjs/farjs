@@ -102,10 +102,10 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
     }
     
     useLayoutEffect({ () =>
-      if (!props.state.isActive) {
+      if (!stackProps.stack.isActive) {
         setMaybeQuickSearch(None)
       }
-    }, List(props.state.isActive))
+    }, List(stackProps.stack.isActive))
   
     <.>()(
       <(fileListPanelView())(^.wrapped := FileListPanelViewProps(
