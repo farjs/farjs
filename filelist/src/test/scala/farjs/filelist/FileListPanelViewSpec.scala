@@ -32,7 +32,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
-    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.plain := props)())))
 
     //then
     assertFileListPanelView(result, props, state)
@@ -50,7 +50,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
-    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.plain := props)())))
 
     //then
     assertFileListPanelView(result, props, state, "file", "3", showDate = true,
@@ -69,7 +69,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
-    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.plain := props)())))
 
     //then
     assertFileListPanelView(result, props, state, "file", "3", showDate = true,
@@ -88,7 +88,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
-    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)()), isActive = true))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.plain := props)()), isActive = true))
 
     //then
     assertFileListPanelView(result, props, state, "file 2", "2", permissions = "drwxr-xr-x", showDate = true, dirSize = "6 (3)", isActive = true)
@@ -106,7 +106,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
-    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.plain := props)())))
 
     //then
     assertFileListPanelView(result, props, state, "dir 2", "999,999,999", permissions = "drwxr-xr-x", showDate = true, dirSize = "4 (2)")
@@ -124,7 +124,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
-    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.plain := props)())))
 
     //then
     assertFileListPanelView(result, props, state, "file 2", "~1 G", permissions = "drwxr-xr-x", showDate = true, dirSize = "1,123,456,793 (3)")
@@ -142,7 +142,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
-    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.plain := props)())))
 
     //then
     assertFileListPanelView(result, props, state, "dir", "1", permissions = "dr--r--r--", showDate = true, dirSize = "2 (1)")
@@ -160,7 +160,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
     val props = FileListPanelViewProps(dispatch, actions, state)
 
     //when
-    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.wrapped := props)())))
+    val result = testRender(withContext(withThemeContext(<(FileListPanelView())(^.plain := props)())))
 
     //then
     assertFileListPanelView(result, props, state, "..", dirSize = "2 (1)")

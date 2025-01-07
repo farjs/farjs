@@ -42,7 +42,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
       }
     }
 
-    def onKeypress(screen: BlessedScreen, key: String): Unit = {
+    val onKeypress: js.Function2[BlessedScreen, String, Unit] = (screen, key) => {
       if (!props.onKeypress(screen, key)) {
         key match {
           case "C-f3" => props.dispatch(FileListSortAction(SortMode.Name))
@@ -108,7 +108,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
     }, List(stackProps.stack.isActive))
   
     <.>()(
-      <(fileListPanelView())(^.wrapped := FileListPanelViewProps(
+      <(fileListPanelView())(^.plain := FileListPanelViewProps(
         dispatch = props.dispatch,
         actions = props.actions,
         state = props.state,

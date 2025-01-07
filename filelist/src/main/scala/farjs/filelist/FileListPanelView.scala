@@ -11,11 +11,6 @@ import scommons.react.blessed._
 
 import scala.scalajs.js
 
-case class FileListPanelViewProps(dispatch: Dispatch,
-                                  actions: FileListActions,
-                                  state: FileListState,
-                                  onKeypress: (BlessedScreen, String) => Unit = (_, _) => ())
-
 object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
 
   private[filelist] var doubleBorderComp: ReactClass = DoubleBorder
@@ -25,7 +20,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
   private[filelist] var sortIndicator: ReactClass = SortIndicator
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val panelStack = WithStack.useStack()
     val width = panelStack.width
     val height = panelStack.height
