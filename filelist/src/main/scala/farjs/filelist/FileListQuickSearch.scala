@@ -9,15 +9,13 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class FileListQuickSearchProps(text: String, onClose: () => Unit)
-
 object FileListQuickSearch extends FunctionComponent[FileListQuickSearchProps] {
 
   private[filelist] var doubleBorderComp: ReactClass = DoubleBorder
 
   protected def render(compProps: Props): ReactElement = {
     val elementRef = useRef[BlessedElement](null)
-    val props = compProps.wrapped
+    val props = compProps.plain
     val width = 25
     val height = 3
     val currTheme = Theme.useTheme()

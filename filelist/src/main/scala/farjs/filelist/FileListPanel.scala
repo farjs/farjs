@@ -116,7 +116,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
       ))(),
 
       maybeQuickSearch.map { text =>
-        <(fileListQuickSearch())(^.wrapped := FileListQuickSearchProps(
+        <(fileListQuickSearch())(^.plain := FileListQuickSearchProps(
           text = text,
           onClose = { () =>
             setMaybeQuickSearch(None)

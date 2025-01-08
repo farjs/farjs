@@ -353,7 +353,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     viewProps.onKeypress(null, "C-s")
 
     //then
-    inside(findComponentProps(comp, fileListQuickSearch)) {
+    inside(findComponentProps(comp, fileListQuickSearch, plain = true)) {
       case FileListQuickSearchProps(text, _) =>
         text shouldBe ""
     }
@@ -366,13 +366,13 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val props = FileListPanelProps(dispatch, actions.actions, FileListState())
     val comp = createTestRenderer(withContext(<(FileListPanel())(^.wrapped := props)())).root
     findComponentProps(comp, fileListPanelView, plain = true).onKeypress(null, "C-s")
-    findProps(comp, fileListQuickSearch) should not be empty
+    findProps(comp, fileListQuickSearch, plain = true) should not be empty
 
     //when
     findComponentProps(comp, fileListPanelView, plain = true).onKeypress(null, "unknown")
 
     //then
-    findProps(comp, fileListQuickSearch) should be (empty)
+    findProps(comp, fileListQuickSearch, plain = true) should be (empty)
   }
 
   it should "hide quick Search box when panel is deactivated" in {
@@ -382,7 +382,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val props = FileListPanelProps(dispatch, actions.actions, FileListState())
     val renderer = createTestRenderer(withContext(<(FileListPanel())(^.wrapped := props)(), isActive = true))
     findComponentProps(renderer.root, fileListPanelView, plain = true).onKeypress(null, "C-s")
-    findProps(renderer.root, fileListQuickSearch) should not be empty
+    findProps(renderer.root, fileListQuickSearch, plain = true) should not be empty
 
     //when
     TestRenderer.act { () =>
@@ -394,7 +394,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }
 
     //then
-    findProps(renderer.root, fileListQuickSearch) should be (empty)
+    findProps(renderer.root, fileListQuickSearch, plain = true) should be (empty)
   }
 
   it should "hide quick Search box when onClose" in {
@@ -404,13 +404,13 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val props = FileListPanelProps(dispatch, actions.actions, FileListState())
     val comp = createTestRenderer(withContext(<(FileListPanel())(^.wrapped := props)(), isActive = true)).root
     findComponentProps(comp, fileListPanelView, plain = true).onKeypress(null, "C-s")
-    val searchProps = findComponentProps(comp, fileListQuickSearch)
+    val searchProps = findComponentProps(comp, fileListQuickSearch, plain = true)
 
     //when
     searchProps.onClose()
 
     //then
-    findProps(comp, fileListQuickSearch) should be (empty)
+    findProps(comp, fileListQuickSearch, plain = true) should be (empty)
   }
 
   it should "dispatch actions when quick Search" in {
@@ -430,7 +430,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val props = FileListPanelProps(dispatch, actions.actions, state)
     val renderer = createTestRenderer(withContext(<(FileListPanel())(^.wrapped := props)()))
     findComponentProps(renderer.root, fileListPanelView, plain = true).onKeypress(null, "C-s")
-    findProps(renderer.root, fileListQuickSearch) should not be empty
+    findProps(renderer.root, fileListQuickSearch, plain = true) should not be empty
 
     def check(fullKey: String, index: Int, text: String, dispatchAction: Boolean)
              (implicit pos: Position): Unit = {
@@ -453,7 +453,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       findComponentProps(renderer.root, fileListPanelView, plain = true).onKeypress(null, fullKey)
 
       //then
-      findComponentProps(renderer.root, fileListQuickSearch).text shouldBe text
+      findComponentProps(renderer.root, fileListQuickSearch, plain = true).text shouldBe text
     }
 
     //when & then
