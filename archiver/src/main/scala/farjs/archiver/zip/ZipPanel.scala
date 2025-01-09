@@ -70,7 +70,7 @@ class ZipPanel(zipPath: String,
       ()
     }, Nil)
     
-    def onKeypress(screen: BlessedScreen, key: String): Boolean = {
+    val onKeypress: js.Function2[BlessedScreen, String, Boolean] = { (screen, key) =>
       var processed = true
       key match {
         case "C-pageup" if props.state.currDir.path == rootPath =>
@@ -106,7 +106,7 @@ class ZipPanel(zipPath: String,
     }
 
     <.>()(
-      <(fileListPanelComp())(^.wrapped := props.copy(onKeypress = onKeypress))(),
+      <(fileListPanelComp())(^.plain := FileListPanelProps.copy(props)(onKeypress = onKeypress))(),
 
       if (showWarning) Some(
         <(messageBoxComp)(^.plain := MessageBoxProps(

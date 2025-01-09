@@ -4,12 +4,13 @@ import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
 import farjs.fs.FSPanel._
 import farjs.ui.task.{Task, TaskAction}
+import org.scalatest.OptionValues
 import scommons.react.test._
 
 import scala.concurrent.Future
 import scala.scalajs.js
 
-class FSPanelSpec extends TestSpec with TestRendererUtils {
+class FSPanelSpec extends TestSpec with TestRendererUtils with OptionValues {
 
   FSPanel.fileListPanelComp = mockUiComponent("FileListPanel")
   FSPanel.fsFreeSpaceComp = mockUiComponent("FSFreeSpace")
@@ -32,10 +33,10 @@ class FSPanelSpec extends TestSpec with TestRendererUtils {
     FSPanel.fsService = new FsService().fsService
     val props = FileListPanelProps(dispatch, actions, FileListState())
     val comp = testRender(<(FSPanel())(^.wrapped := props)())
-    val panelProps = findComponentProps(comp, fileListPanelComp)
+    val panelProps = findComponentProps(comp, fileListPanelComp, plain = true)
 
     //when & then
-    panelProps.onKeypress(null, "unknown") shouldBe false
+    panelProps.onKeypress.toOption.value(null, "unknown") shouldBe false
   }
 
   it should "dispatch action when onKeypress(M-o)" in {
@@ -48,7 +49,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils {
       currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("item 1")))
     ))
     val comp = testRender(<(FSPanel())(^.wrapped := props)())
-    val panelProps = findComponentProps(comp, fileListPanelComp)
+    val panelProps = findComponentProps(comp, fileListPanelComp, plain = true)
     val taskFuture = Future.unit
 
     //then
@@ -59,7 +60,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils {
     }
 
     //when & then
-    panelProps.onKeypress(null, "M-o") shouldBe true
+    panelProps.onKeypress.toOption.value(null, "M-o") shouldBe true
 
     inside(resultAction.asInstanceOf[TaskAction]) {
       case TaskAction(Task("Opening default app", _)) =>
@@ -78,7 +79,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils {
 
     //then
     assertComponents(result.children, List(
-      <(fileListPanelComp())(^.assertWrapped(inside(_) {
+      <(fileListPanelComp())(^.assertPlain[FileListPanelProps](inside(_) {
         case FileListPanelProps(resDispatch, resActions, resState, _) =>
           resDispatch shouldBe dispatch
           resActions shouldBe actions

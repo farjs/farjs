@@ -13,7 +13,7 @@ import farjs.ui.popup.{MessageBoxAction, MessageBoxProps}
 import farjs.ui.task.{Task, TaskAction}
 import farjs.ui.theme.DefaultTheme
 import farjs.ui.theme.ThemeSpec.withThemeContext
-import org.scalatest.Succeeded
+import org.scalatest.{OptionValues, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
 import scommons.react.test._
@@ -21,7 +21,7 @@ import scommons.react.test._
 import scala.concurrent.Future
 import scala.scalajs.js
 
-class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
+class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils with OptionValues {
 
   ZipPanel.fileListPanelComp = mockUiComponent("FileListPanel")
   ZipPanel.addToArchController = mockUiComponent("AddToArchController")
@@ -76,10 +76,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val comp = testRender(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(comp, fileListPanelComp)
+    val panelProps = findComponentProps(comp, fileListPanelComp, plain = true)
 
     //when & then
-    panelProps.onKeypress(null, "unknown") shouldBe false
+    panelProps.onKeypress.toOption.value(null, "unknown") shouldBe false
   }
 
   it should "call onClose if root dir when onKeypress(C-pageup)" in {
@@ -111,7 +111,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val comp = testRender(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(comp, fileListPanelComp)
+    val panelProps = findComponentProps(comp, fileListPanelComp, plain = true)
     val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
       FileListItem("file 1")
     ))
@@ -123,7 +123,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     onClose.expects()
 
     //when & then
-    panelProps.onKeypress(null, "C-pageup") shouldBe true
+    panelProps.onKeypress.toOption.value(null, "C-pageup") shouldBe true
 
     Succeeded
   }
@@ -156,7 +156,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val comp = testRender(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(comp, fileListPanelComp)
+    val panelProps = findComponentProps(comp, fileListPanelComp, plain = true)
     val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
       FileListItem("file 1")
     ))
@@ -168,8 +168,8 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     onClose.expects().twice()
 
     //when & then
-    panelProps.onKeypress(null, "enter") shouldBe true
-    panelProps.onKeypress(null, "C-pagedown") shouldBe true
+    panelProps.onKeypress.toOption.value(null, "enter") shouldBe true
+    panelProps.onKeypress.toOption.value(null, "C-pagedown") shouldBe true
 
     Succeeded
   }
@@ -202,14 +202,14 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val comp = testRender(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(comp, fileListPanelComp)
+    val panelProps = findComponentProps(comp, fileListPanelComp, plain = true)
 
     //then
     onClose.expects().never()
 
     //when & then
-    panelProps.onKeypress(null, "enter") shouldBe false
-    panelProps.onKeypress(null, "C-pagedown") shouldBe false
+    panelProps.onKeypress.toOption.value(null, "enter") shouldBe false
+    panelProps.onKeypress.toOption.value(null, "C-pagedown") shouldBe false
 
     Succeeded
   }
@@ -248,10 +248,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val comp = testRender(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(comp, fileListPanelComp)
+    val panelProps = findComponentProps(comp, fileListPanelComp, plain = true)
 
     //when & then
-    panelProps.onKeypress(null, FileListEvent.onFileListCopy) shouldBe false
+    panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListCopy) shouldBe false
 
     //then
     findProps(comp, addToArchController) should be (empty)
@@ -290,10 +290,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val comp = testRender(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(comp, fileListPanelComp)
+    val panelProps = findComponentProps(comp, fileListPanelComp, plain = true)
 
     //when & then
-    panelProps.onKeypress(null, FileListEvent.onFileListCopy) shouldBe false
+    panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListCopy) shouldBe false
 
     //then
     findProps(comp, addToArchController) should be (empty)
@@ -331,10 +331,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val renderer = createTestRenderer(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(renderer.root, fileListPanelComp)
+    val panelProps = findComponentProps(renderer.root, fileListPanelComp, plain = true)
 
     //when & then
-    panelProps.onKeypress(null, FileListEvent.onFileListCopy) shouldBe true
+    panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListCopy) shouldBe true
 
     //then
     inside(findComponentProps(renderer.root, addToArchController)) {
@@ -393,10 +393,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val renderer = createTestRenderer(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(renderer.root, fileListPanelComp)
+    val panelProps = findComponentProps(renderer.root, fileListPanelComp, plain = true)
 
     //when & then
-    panelProps.onKeypress(null, FileListEvent.onFileListCopy) shouldBe true
+    panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListCopy) shouldBe true
 
     //then
     inside(findComponentProps(renderer.root, addToArchController)) {
@@ -467,10 +467,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val renderer = createTestRenderer(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(renderer.root, fileListPanelComp)
+    val panelProps = findComponentProps(renderer.root, fileListPanelComp, plain = true)
 
     //when & then
-    panelProps.onKeypress(null, FileListEvent.onFileListMove) shouldBe true
+    panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListMove) shouldBe true
 
     //then
     inside(findComponentProps(renderer.root, addToArchController)) {
@@ -543,10 +543,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val renderer = createTestRenderer(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(renderer.root, fileListPanelComp)
+    val panelProps = findComponentProps(renderer.root, fileListPanelComp, plain = true)
 
     //when & then
-    panelProps.onKeypress(null, FileListEvent.onFileListCopy) shouldBe true
+    panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListCopy) shouldBe true
 
     //then
     findProps(renderer.root, addToArchController) should be (empty)
@@ -702,7 +702,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     )
 
     //then
-    assertTestComponent(result, fileListPanelComp) {
+    assertTestComponent(result, fileListPanelComp, plain = true) {
       case FileListPanelProps(_, resActions, resState, _) =>
         resActions shouldBe actions
         resState shouldBe state

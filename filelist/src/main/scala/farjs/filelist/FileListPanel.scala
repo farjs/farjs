@@ -4,18 +4,12 @@ import farjs.filelist.FileListActions._
 import farjs.filelist.api.FileListItem
 import farjs.filelist.sort._
 import farjs.filelist.stack.WithStack
-import farjs.ui.Dispatch
 import scommons.nodejs._
 import scommons.react._
 import scommons.react.blessed.BlessedScreen
 import scommons.react.hooks._
 
 import scala.scalajs.js
-
-case class FileListPanelProps(dispatch: Dispatch,
-                              actions: FileListActions,
-                              state: FileListState,
-                              onKeypress: (BlessedScreen, String) => Boolean = (_, _) => false)
 
 object FileListPanel extends FunctionComponent[FileListPanelProps] {
 
@@ -27,7 +21,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
     val stackProps = WithStack.useStack()
     val (maybeQuickSearch, setMaybeQuickSearch) = useState(Option.empty[String])
     val (showSortModes, setShowSortModes) = useState(false)
-    val props = compProps.wrapped
+    val props = compProps.plain
 
     def quickSearch(text: String): Unit = {
       val index = props.state.currDir.items.indexWhere(_.name.startsWith(text))
@@ -43,7 +37,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
     }
 
     val onKeypress: js.Function2[BlessedScreen, String, Unit] = (screen, key) => {
-      if (!props.onKeypress(screen, key)) {
+      if (!props.onKeypress.getOrElse(((_, _) => false): js.Function2[BlessedScreen, String, Boolean])(screen, key)) {
         key match {
           case "C-f3" => props.dispatch(FileListSortAction(SortMode.Name))
           case "C-f4" => props.dispatch(FileListSortAction(SortMode.Extension))

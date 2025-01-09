@@ -5,6 +5,8 @@ import farjs.ui.task.{Task, TaskAction}
 import scommons.react._
 import scommons.react.blessed.BlessedScreen
 
+import scala.scalajs.js
+
 object FSPanel extends FunctionComponent[FileListPanelProps] {
 
   private[fs] var fileListPanelComp: UiComponent[FileListPanelProps] = FileListPanel
@@ -15,7 +17,7 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
 
-    def onKeypress(screen: BlessedScreen, key: String): Boolean = {
+    val onKeypress: js.Function2[BlessedScreen, String, Boolean] = { (screen, key) =>
       var processed = true
       key match {
         case "M-o" =>
@@ -32,7 +34,7 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
     }
 
     <.>()(
-      <(fileListPanelComp())(^.wrapped := props.copy(onKeypress = onKeypress))(),
+      <(fileListPanelComp())(^.plain := FileListPanelProps.copy(props)(onKeypress = onKeypress))(),
 
       <(fsFreeSpaceComp())(^.wrapped := FSFreeSpaceProps(
         dispatch = props.dispatch,
