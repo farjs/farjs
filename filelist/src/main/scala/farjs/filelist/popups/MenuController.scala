@@ -14,7 +14,7 @@ object MenuController extends FunctionComponent[FileListUiData] {
 
   protected def render(compProps: Props): ReactElement = {
     val stacks = WithStacks.useStacks()
-    val props = compProps.wrapped
+    val props = compProps.plain
 
     val onAction: js.Function2[Int, Int, Unit] = { (menuIndex, subIndex) =>
       props.onClose()
@@ -35,7 +35,7 @@ object MenuController extends FunctionComponent[FileListUiData] {
       }
     }
     
-    if (props.showMenuPopup) {
+    if (props.showMenuPopup.getOrElse(false)) {
       <(menuBarComp)(^.plain := MenuBarProps(
         items = items,
         onAction = onAction,

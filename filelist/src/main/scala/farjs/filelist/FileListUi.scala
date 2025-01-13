@@ -18,15 +18,15 @@ class FileListUi(val data: FileListUiData) extends FunctionComponent[FileListPlu
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
-    val uiData = data.copy(onClose = props.onClose)
+    val uiData = FileListUiData.copy(data)(onClose = props.onClose)
 
     <.>()(
-      <(helpController())(^.wrapped := uiData)(),
-      <(exitController())(^.wrapped := uiData)(),
-      <(menuController())(^.wrapped := uiData)(),
-      <(deleteController())(^.wrapped := uiData)(),
-      <(makeFolderController())(^.wrapped := uiData)(),
-      <(selectController())(^.wrapped := uiData)()
+      <(helpController())(^.plain := uiData)(),
+      <(exitController())(^.plain := uiData)(),
+      <(menuController())(^.plain := uiData)(),
+      <(deleteController())(^.plain := uiData)(),
+      <(makeFolderController())(^.plain := uiData)(),
+      <(selectController())(^.plain := uiData)()
     )
   }
 }

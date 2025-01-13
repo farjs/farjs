@@ -20,7 +20,7 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
     //given
     val onClose = mockFunction[Unit]
     val props = FileListUiData(showExitPopup = true, onClose = onClose)
-    val comp = testRender(withThemeContext(<(ExitController())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(ExitController())(^.plain := props)()))
     val msgBox = inside(findComponents(comp, messageBoxComp)) {
       case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
     }
@@ -51,7 +51,7 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
     //given
     val onClose = mockFunction[Unit]
     val props = FileListUiData(showExitPopup = true, onClose = onClose)
-    val comp = testRender(withThemeContext(<(ExitController())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(ExitController())(^.plain := props)()))
     val msgBox = inside(findComponents(comp, messageBoxComp)) {
       case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
     }
@@ -68,7 +68,7 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListUiData(showExitPopup = true)
 
     //when
-    val result = testRender(withThemeContext(<(ExitController())(^.wrapped := props)()))
+    val result = testRender(withThemeContext(<(ExitController())(^.plain := props)()))
 
     //then
     val currThem = DefaultTheme
@@ -88,7 +88,7 @@ class ExitControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListUiData()
 
     //when
-    val renderer = createTestRenderer(withThemeContext(<(ExitController())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(ExitController())(^.plain := props)()))
 
     //then
     renderer.root.children.toList should be (empty)

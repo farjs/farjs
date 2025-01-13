@@ -12,11 +12,11 @@ object DeleteController extends FunctionComponent[FileListUiData] {
   private[popups] var messageBoxComp: ReactClass = MessageBox
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val theme = Theme.useTheme().popup
 
-    props.data match {
-      case Some(data) if props.showDeletePopup =>
+    props.data.toOption match {
+      case Some(data) if props.showDeletePopup.getOrElse(false) =>
         <(messageBoxComp)(^.plain := MessageBoxProps(
           title = "Delete",
           message = "Do you really want to delete selected item(s)?",

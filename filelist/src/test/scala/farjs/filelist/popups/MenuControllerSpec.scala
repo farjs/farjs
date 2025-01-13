@@ -33,7 +33,7 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val props = FileListUiData(showMenuPopup = true, onClose = onClose)
     val comp = testRender(withContext(
-      <(MenuController())(^.wrapped := props)(),
+      <(MenuController())(^.plain := props)(),
       left = WithStacksData(new PanelStack(isActive = true, js.Array(), null), null),
       right = WithStacksData(new PanelStack(isActive = false, js.Array(), null), null)
     ))
@@ -71,7 +71,7 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val props = FileListUiData(showMenuPopup = true, onClose = onClose)
     val comp = testRender(withContext(
-      <(MenuController())(^.wrapped := props)(),
+      <(MenuController())(^.plain := props)(),
       left = WithStacksData(new PanelStack(isActive = true, js.Array(), null), leftInput),
       right = WithStacksData(new PanelStack(isActive = false, js.Array(), null), null)
     ))
@@ -106,7 +106,7 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val props = FileListUiData(showMenuPopup = true, onClose = onClose)
     val comp = testRender(withContext(
-      <(MenuController())(^.wrapped := props)(),
+      <(MenuController())(^.plain := props)(),
       left = WithStacksData(new PanelStack(isActive = true, js.Array(), null), null),
       right = WithStacksData(new PanelStack(isActive = false, js.Array(), null), rightInput)
     ))
@@ -127,7 +127,7 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val props = FileListUiData(showMenuPopup = true, onClose = onClose)
     val comp = testRender(withContext(
-      <(MenuController())(^.wrapped := props)(),
+      <(MenuController())(^.plain := props)(),
       left = WithStacksData(new PanelStack(isActive = true, js.Array(), null), null),
       right = WithStacksData(new PanelStack(isActive = false, js.Array(), null), null)
     ))
@@ -150,7 +150,7 @@ class MenuControllerSpec extends TestSpec with TestRendererUtils {
 
     //when
     val result = testRender(withContext(
-      <(MenuController())(^.wrapped := props)(),
+      <(MenuController())(^.plain := props)(),
       left = WithStacksData(new PanelStack(isActive = true, js.Array(), null), leftInput),
       right = WithStacksData(new PanelStack(isActive = false, js.Array(), null), rightInput)
     ))

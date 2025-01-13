@@ -18,9 +18,9 @@ object SelectController extends FunctionComponent[FileListUiData] {
 
   protected def render(compProps: Props): ReactElement = {
     val historyProvider = HistoryProvider.useHistoryProvider()
-    val props = compProps.wrapped
+    val props = compProps.plain
 
-    (props.data, props.showSelectPopup) match {
+    (props.data.toOption, props.showSelectPopup.toOption) match {
       case (Some(data), Some(showSelectPopup)) =>
         <(selectPopupComp())(^.wrapped := SelectPopupProps(
           showSelect = showSelectPopup,

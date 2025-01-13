@@ -42,11 +42,11 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val state = FileListState(currDir = currDir)
     val onClose = mockFunction[Unit]
     val props = FileListUiData(
-      showDeletePopup = true,
-      data = Some(FileListData(dispatch, actions.actions, state)),
-      onClose = onClose
+      onClose = onClose,
+      data = FileListData(dispatch, actions.actions, state),
+      showDeletePopup = true
     )
-    val comp = testRender(withThemeContext(<(DeleteController())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(DeleteController())(^.plain := props)()))
     val msgBox = inside(findComponents(comp, messageBoxComp)) {
       case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
     }
@@ -80,11 +80,11 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val state = FileListState(currDir = currDir, selectedNames = js.Set("file 2"))
     val onClose = mockFunction[Unit]
     val props = FileListUiData(
-      showDeletePopup = true,
-      data = Some(FileListData(dispatch, actions.actions, state)),
-      onClose = onClose
+      onClose = onClose,
+      data = FileListData(dispatch, actions.actions, state),
+      showDeletePopup = true
     )
-    val comp = testRender(withThemeContext(<(DeleteController())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(DeleteController())(^.plain := props)()))
     val msgBox = inside(findComponents(comp, messageBoxComp)) {
       case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
     }
@@ -114,11 +114,11 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val state = FileListState()
     val onClose = mockFunction[Unit]
     val props = FileListUiData(
-      showDeletePopup = true,
-      data = Some(FileListData(dispatch, actions.actions, state)),
-      onClose = onClose
+      onClose = onClose,
+      data = FileListData(dispatch, actions.actions, state),
+      showDeletePopup = true
     )
-    val comp = testRender(withThemeContext(<(DeleteController())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(DeleteController())(^.plain := props)()))
     val msgBox = inside(findComponents(comp, messageBoxComp)) {
       case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
     }
@@ -138,12 +138,12 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val actions = new Actions
     val state = FileListState()
     val props = FileListUiData(
-      showDeletePopup = true,
-      data = Some(FileListData(dispatch, actions.actions, state))
+      data = FileListData(dispatch, actions.actions, state),
+      showDeletePopup = true
     )
 
     //when
-    val result = testRender(withThemeContext(<(DeleteController())(^.wrapped := props)()))
+    val result = testRender(withThemeContext(<(DeleteController())(^.plain := props)()))
 
     //then
     val currTheme = DefaultTheme
@@ -163,10 +163,10 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState()
-    val props = FileListUiData(data = Some(FileListData(dispatch, actions, state)))
+    val props = FileListUiData(data = FileListData(dispatch, actions, state))
 
     //when
-    val renderer = createTestRenderer(withThemeContext(<(DeleteController())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(DeleteController())(^.plain := props)()))
 
     //then
     renderer.root.children.toList should be (empty)
@@ -177,7 +177,7 @@ class DeleteControllerSpec extends AsyncTestSpec with BaseTestSpec
     val props = FileListUiData(showDeletePopup = true)
 
     //when
-    val renderer = createTestRenderer(withThemeContext(<(DeleteController())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(DeleteController())(^.plain := props)()))
 
     //then
     renderer.root.children.toList should be (empty)

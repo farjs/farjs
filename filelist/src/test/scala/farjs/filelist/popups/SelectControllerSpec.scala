@@ -43,13 +43,13 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     )), selectedNames = js.Set("file.test3"))
     val onClose = mockFunction[Unit]
     val props = FileListUiData(
-      showSelectPopup = Some(true),
-      data = Some(FileListData(dispatch, actions, state)),
-      onClose = onClose
+      onClose = onClose,
+      data = FileListData(dispatch, actions, state),
+      showSelectPopup = true
     )
     val historyMocks = new HistoryMocks
     val renderer = createTestRenderer(withHistoryProvider(
-      <(SelectController())(^.wrapped := props)(), historyMocks.provider
+      <(SelectController())(^.plain := props)(), historyMocks.provider
     ))
     val pattern = "*"
 
@@ -94,13 +94,13 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     )), selectedNames = js.Set("file.test3"))
     val onClose = mockFunction[Unit]
     val props = FileListUiData(
-      showSelectPopup = Some(true),
-      data = Some(FileListData(dispatch, actions, state)),
-      onClose = onClose
+      onClose = onClose,
+      data = FileListData(dispatch, actions, state),
+      showSelectPopup = true
     )
     val historyMocks = new HistoryMocks
     val renderer = createTestRenderer(withHistoryProvider(
-      <(SelectController())(^.wrapped := props)(), historyMocks.provider
+      <(SelectController())(^.plain := props)(), historyMocks.provider
     ))
     val pattern = "*.test"
 
@@ -145,13 +145,13 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     )), selectedNames = js.Set("file1.test", "file2.test", "file.test3"))
     val onClose = mockFunction[Unit]
     val props = FileListUiData(
-      showSelectPopup = Some(false),
-      data = Some(FileListData(dispatch, actions, state)),
-      onClose = onClose
+      onClose = onClose,
+      data = FileListData(dispatch, actions, state),
+      showSelectPopup = false
     )
     val historyMocks = new HistoryMocks
     val renderer = createTestRenderer(withHistoryProvider(
-      <(SelectController())(^.wrapped := props)(), historyMocks.provider
+      <(SelectController())(^.plain := props)(), historyMocks.provider
     ))
     val pattern = "file1.test;file2.test"
 
@@ -195,12 +195,12 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     val state = FileListState()
     val onClose = mockFunction[Unit]
     val props = FileListUiData(
-      showSelectPopup = Some(true),
-      data = Some(FileListData(dispatch, actions, state)),
-      onClose = onClose
+      onClose = onClose,
+      data = FileListData(dispatch, actions, state),
+      showSelectPopup = true
     )
     val comp = testRender(withHistoryProvider(
-      <(SelectController())(^.wrapped := props)()
+      <(SelectController())(^.plain := props)()
     ))
     val popup = findComponentProps(comp, selectPopupComp)
 
@@ -219,13 +219,13 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     val actions = new MockFileListActions
     val state = FileListState()
     val props = FileListUiData(
-      showSelectPopup = Some(true),
-      data = Some(FileListData(dispatch, actions, state))
+      data = FileListData(dispatch, actions, state),
+      showSelectPopup = true
     )
 
     //when
     val result = testRender(withHistoryProvider(
-      <(SelectController())(^.wrapped := props)()
+      <(SelectController())(^.plain := props)()
     ))
 
     //then
@@ -241,13 +241,13 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     val actions = new MockFileListActions
     val state = FileListState()
     val props = FileListUiData(
-      showSelectPopup = Some(false),
-      data = Some(FileListData(dispatch, actions, state))
+      data = FileListData(dispatch, actions, state),
+      showSelectPopup = false
     )
 
     //when
     val result = testRender(withHistoryProvider(
-      <(SelectController())(^.wrapped := props)()
+      <(SelectController())(^.plain := props)()
     ))
 
     //then
@@ -262,11 +262,11 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     val dispatch = mockFunction[js.Any, Unit]
     val actions = new MockFileListActions
     val state = FileListState()
-    val props = FileListUiData(data = Some(FileListData(dispatch, actions, state)))
+    val props = FileListUiData(data = FileListData(dispatch, actions, state))
 
     //when
     val renderer = createTestRenderer(withHistoryProvider(
-      <(SelectController())(^.wrapped := props)()
+      <(SelectController())(^.plain := props)()
     ))
 
     //then
@@ -275,11 +275,11 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "render empty component when data is None" in {
     //given
-    val props = FileListUiData(showSelectPopup = Some(true))
+    val props = FileListUiData(showSelectPopup = true)
 
     //when
     val renderer = createTestRenderer(withHistoryProvider(
-      <(SelectController())(^.wrapped := props)()
+      <(SelectController())(^.plain := props)()
     ))
 
     //then

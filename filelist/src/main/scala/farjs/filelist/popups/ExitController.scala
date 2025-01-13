@@ -13,10 +13,10 @@ object ExitController extends FunctionComponent[FileListUiData] {
   private[popups] var messageBoxComp: ReactClass = MessageBox
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val theme = Theme.useTheme().popup
 
-    if (props.showExitPopup) {
+    if (props.showExitPopup.getOrElse(false)) {
       <(messageBoxComp)(^.plain := MessageBoxProps(
         title = "Exit",
         message = "Do you really want to exit FAR.js?",

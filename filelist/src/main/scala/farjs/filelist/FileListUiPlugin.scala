@@ -15,34 +15,31 @@ object FileListUiPlugin extends FileListPlugin(js.Array(
                             data: js.UndefOr[js.Dynamic] = js.undefined): js.Promise[js.UndefOr[ReactClass]] = {
     val maybeCurrData = {
       val stackItem = WithStacksProps.active(stacks).stack.peek[FileListState]()
-      stackItem.getData().toOption
+      stackItem.getData()
     }
     val res = createUiData(key, maybeCurrData).map(uiData => new FileListUi(uiData).apply())
-    js.Promise.resolve[js.UndefOr[ReactClass]](res match {
-      case Some(r) => r
-      case None => js.undefined
-    })
+    js.Promise.resolve[js.UndefOr[ReactClass]](res)
   }
 
-  private[filelist] final def createUiData(key: String, data: Option[FileListData]): Option[FileListUiData] = {
+  private[filelist] final def createUiData(key: String, data: js.UndefOr[FileListData]): js.UndefOr[FileListUiData] = {
     key match {
-      case "f1" => Some(FileListUiData(showHelpPopup = true, data = data))
+      case "f1" => FileListUiData(showHelpPopup = true, data = data)
       case "f7" => data.flatMap {
         case d if d.actions.api.capabilities.contains(FileListCapability.mkDirs) =>
-          Some(FileListUiData(showMkFolderPopup = true, data = data))
-        case _ => None
+          FileListUiData(showMkFolderPopup = true, data = data)
+        case _ => js.undefined
       }
       case "f8" | "delete" => data.flatMap {
         case d if d.actions.api.capabilities.contains(FileListCapability.delete) &&
           (FileListState.selectedItems(d.state).nonEmpty || FileListState.currentItem(d.state).exists(_ != FileListItem.up)) =>
-          Some(FileListUiData(showDeletePopup = true, data = data))
-        case _ => None
+          FileListUiData(showDeletePopup = true, data = data)
+        case _ => js.undefined
       }
-      case "f9" => Some(FileListUiData(showMenuPopup = true, data = data))
-      case "f10" => Some(FileListUiData(showExitPopup = true, data = data))
-      case "M-s" => Some(FileListUiData(showSelectPopup = Some(true), data = data))
-      case "M-d" => Some(FileListUiData(showSelectPopup = Some(false), data = data))
-      case _ => None
+      case "f9" => FileListUiData(showMenuPopup = true, data = data)
+      case "f10" => FileListUiData(showExitPopup = true, data = data)
+      case "M-s" => FileListUiData(showSelectPopup = true, data = data)
+      case "M-d" => FileListUiData(showSelectPopup = false, data = data)
+      case _ => js.undefined
     }
   }
 }

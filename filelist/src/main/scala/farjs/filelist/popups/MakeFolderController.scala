@@ -19,10 +19,10 @@ object MakeFolderController extends FunctionComponent[FileListUiData] {
   protected def render(compProps: Props): ReactElement = {
     val historyProvider = HistoryProvider.useHistoryProvider()
     val (multiple, setMultiple) = useState(initialMultiple)
-    val props = compProps.wrapped
+    val props = compProps.plain
 
-    props.data match {
-      case Some(data) if props.showMkFolderPopup =>
+    props.data.toOption match {
+      case Some(data) if props.showMkFolderPopup.getOrElse(false) =>
         <(makeFolderPopup())(^.wrapped := MakeFolderPopupProps(
           multiple = multiple,
           onOk = { (dir, multiple) =>

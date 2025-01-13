@@ -10,6 +10,10 @@ import scala.concurrent.Future
 import scala.scalajs.js
 
 class FileListUiPluginSpec extends AsyncTestSpec {
+  
+  private val jsUndefined: js.UndefOr[Boolean] = js.undefined
+  private val jsFalse: js.UndefOr[Boolean] = false
+  private val jsTrue: js.UndefOr[Boolean] = true
 
   it should "define triggerKeys" in {
     //when & then
@@ -48,23 +52,23 @@ class FileListUiPluginSpec extends AsyncTestSpec {
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up
     )))
-    val someData = Some(FileListData(dispatch, actions, state))
+    val someData = FileListData(dispatch, actions, state)
 
     //when & then
-    inside(FileListUiPlugin.createUiData("f1", someData)) {
-      case Some(FileListUiData(true, false, false, false, false, None, `someData`, _)) =>
+    inside(FileListUiPlugin.createUiData("f1", someData).toOption) {
+      case Some(FileListUiData(_, `someData`, `jsTrue`, `jsUndefined`, `jsUndefined`, `jsUndefined`, `jsUndefined`, `jsUndefined`)) =>
     }
-    inside(FileListUiPlugin.createUiData("f9", someData)) {
-      case Some(FileListUiData(false, false, true, false, false, None, `someData`, _)) =>
+    inside(FileListUiPlugin.createUiData("f9", someData).toOption) {
+      case Some(FileListUiData(_, `someData`, `jsUndefined`, `jsUndefined`, `jsTrue`, `jsUndefined`, `jsUndefined`, `jsUndefined`)) =>
     }
-    inside(FileListUiPlugin.createUiData("f10", someData)) {
-      case Some(FileListUiData(false, true, false, false, false, None, `someData`, _)) =>
+    inside(FileListUiPlugin.createUiData("f10", someData).toOption) {
+      case Some(FileListUiData(_, `someData`, `jsUndefined`, `jsTrue`, `jsUndefined`, `jsUndefined`, `jsUndefined`, `jsUndefined`)) =>
     }
-    inside(FileListUiPlugin.createUiData("M-s", someData)) {
-      case Some(FileListUiData(false, false, false, false, false, Some(true), `someData`, _)) =>
+    inside(FileListUiPlugin.createUiData("M-s", someData).toOption) {
+      case Some(FileListUiData(_, `someData`, `jsUndefined`, `jsUndefined`, `jsUndefined`, `jsUndefined`, `jsUndefined`, `jsTrue`)) =>
     }
-    inside(FileListUiPlugin.createUiData("M-d", someData)) {
-      case Some(FileListUiData(false, false, false, false, false, Some(false), `someData`, _)) =>
+    inside(FileListUiPlugin.createUiData("M-d", someData).toOption) {
+      case Some(FileListUiData(_, `someData`, `jsUndefined`, `jsUndefined`, `jsUndefined`, `jsUndefined`, `jsUndefined`, `jsFalse`)) =>
     }
     Succeeded
   }
@@ -76,14 +80,14 @@ class FileListUiPluginSpec extends AsyncTestSpec {
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem.up
     )))
-    val noCapabilityData = Some(FileListData(dispatch, new MockFileListActions, state))
-    val correctData = Some(FileListData(dispatch, actions, state))
+    val noCapabilityData = FileListData(dispatch, new MockFileListActions, state)
+    val correctData = FileListData(dispatch, actions, state)
 
     //when & then
-    FileListUiPlugin.createUiData("f7", None) shouldBe None
-    FileListUiPlugin.createUiData("f7", noCapabilityData) shouldBe None
-    inside(FileListUiPlugin.createUiData("f7", correctData)) {
-      case Some(FileListUiData(false, false, false, false, true, None, `correctData`, _)) =>
+    FileListUiPlugin.createUiData("f7", js.undefined).toOption shouldBe None
+    FileListUiPlugin.createUiData("f7", noCapabilityData).toOption shouldBe None
+    inside(FileListUiPlugin.createUiData("f7", correctData).toOption) {
+      case Some(FileListUiData(_, `correctData`, `jsUndefined`, `jsUndefined`, `jsUndefined`, `jsUndefined`, `jsTrue`, `jsUndefined`)) =>
     }
     Succeeded
   }
@@ -95,26 +99,26 @@ class FileListUiPluginSpec extends AsyncTestSpec {
     val state = FileListState(currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
       FileListItem("item 1")
     )))
-    val noCapabilityData = Some(FileListData(dispatch, new MockFileListActions, state))
-    val noItemData = Some(FileListData(dispatch, actions, FileListState.copy(state)(currDir = FileListDir.copy(state.currDir)(items = js.Array(
+    val noCapabilityData = FileListData(dispatch, new MockFileListActions, state)
+    val noItemData = FileListData(dispatch, actions, FileListState.copy(state)(currDir = FileListDir.copy(state.currDir)(items = js.Array(
       FileListItem.up,
       FileListItem("item 1")
-    )))))
-    val selectedItemsData = Some(FileListData(dispatch, actions, FileListState.copy(state)(currDir = FileListDir.copy(state.currDir)(items = js.Array(
+    ))))
+    val selectedItemsData = FileListData(dispatch, actions, FileListState.copy(state)(currDir = FileListDir.copy(state.currDir)(items = js.Array(
       FileListItem.up,
       FileListItem("test")
-    )), selectedNames = js.Set("test"))))
-    val currItemData = Some(FileListData(dispatch, actions, state))
+    )), selectedNames = js.Set("test")))
+    val currItemData = FileListData(dispatch, actions, state)
 
     //when & then
-    FileListUiPlugin.createUiData("f8", None) shouldBe None
-    FileListUiPlugin.createUiData("f8", noCapabilityData) shouldBe None
-    FileListUiPlugin.createUiData("f8", noItemData) shouldBe None
-    inside(FileListUiPlugin.createUiData("f8", selectedItemsData)) {
-      case Some(FileListUiData(false, false, false, true, false, None, `selectedItemsData`, _)) =>
+    FileListUiPlugin.createUiData("f8", js.undefined).toOption shouldBe None
+    FileListUiPlugin.createUiData("f8", noCapabilityData).toOption shouldBe None
+    FileListUiPlugin.createUiData("f8", noItemData).toOption shouldBe None
+    inside(FileListUiPlugin.createUiData("f8", selectedItemsData).toOption) {
+      case Some(FileListUiData(_, `selectedItemsData`, `jsUndefined`, `jsUndefined`, `jsUndefined`, `jsTrue`, `jsUndefined`, `jsUndefined`)) =>
     }
-    inside(FileListUiPlugin.createUiData("delete", currItemData)) {
-      case Some(FileListUiData(false, false, false, true, false, None, `currItemData`, _)) =>
+    inside(FileListUiPlugin.createUiData("delete", currItemData).toOption) {
+      case Some(FileListUiData(_, `currItemData`, `jsUndefined`, `jsUndefined`, `jsUndefined`, `jsTrue`, `jsUndefined`, `jsUndefined`)) =>
     }
     Succeeded
   }

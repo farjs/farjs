@@ -16,7 +16,7 @@ class HelpControllerSpec extends TestSpec with TestRendererUtils {
     //given
     val onClose = mockFunction[Unit]
     val props = FileListUiData(showHelpPopup = true, onClose = onClose)
-    val comp = testRender(withThemeContext(<(HelpController())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(HelpController())(^.plain := props)()))
     val msgBox = inside(findComponents(comp, messageBoxComp)) {
       case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
     }
@@ -33,7 +33,7 @@ class HelpControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListUiData(showHelpPopup = true)
 
     //when
-    val result = testRender(withThemeContext(<(HelpController())(^.wrapped := props)()))
+    val result = testRender(withThemeContext(<(HelpController())(^.plain := props)()))
 
     //then
     val currTheme = DefaultTheme
@@ -53,7 +53,7 @@ class HelpControllerSpec extends TestSpec with TestRendererUtils {
     val props = FileListUiData()
 
     //when
-    val renderer = createTestRenderer(withThemeContext(<(HelpController())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(HelpController())(^.plain := props)()))
 
     //then
     renderer.root.children.toList should be (empty)

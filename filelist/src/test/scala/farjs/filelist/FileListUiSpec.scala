@@ -2,7 +2,8 @@ package farjs.filelist
 
 import farjs.filelist.FileListUi._
 import farjs.filelist.stack.WithStacksSpec.withContext
-import farjs.filelist.stack.{PanelStack, WithStacksData, PanelStackItem}
+import farjs.filelist.stack.{PanelStack, PanelStackItem, WithStacksData}
+import org.scalatest.Assertion
 import scommons.react.ReactClass
 import scommons.react.test._
 
@@ -30,8 +31,8 @@ class FileListUiSpec extends TestSpec with TestRendererUtils {
     val rightStack = new PanelStack(isActive = false, js.Array(
       PanelStackItem("otherComp".asInstanceOf[ReactClass])
     ), null)
-    val fileListUi = new FileListUi(FileListUiData(data = Some(FileListData(dispatch, actions, state))))
-    val uiData = fileListUi.data.copy(onClose = onClose)
+    val fileListUi = new FileListUi(FileListUiData(data = FileListData(dispatch, actions, state)))
+    val uiData = FileListUiData.copy(fileListUi.data)(onClose = onClose)
 
     //when
     val result = createTestRenderer(
@@ -40,12 +41,26 @@ class FileListUiSpec extends TestSpec with TestRendererUtils {
 
     //then
     assertComponents(result.children, List(
-      <(helpController())(^.assertWrapped(_ shouldBe uiData))(),
-      <(exitController())(^.assertWrapped(_ shouldBe uiData))(),
-      <(menuController())(^.assertWrapped(_ shouldBe uiData))(),
-      <(deleteController())(^.assertWrapped(_ shouldBe uiData))(),
-      <(makeFolderController())(^.assertWrapped(_ shouldBe uiData))(),
-      <(selectController())(^.assertWrapped(_ shouldBe uiData))()
+      <(helpController())(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))(),
+      <(exitController())(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))(),
+      <(menuController())(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))(),
+      <(deleteController())(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))(),
+      <(makeFolderController())(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))(),
+      <(selectController())(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))()
     ))
+  }
+  
+  private def assertFileListUiData(result: FileListUiData, expected: FileListUiData): Assertion = {
+    inside(result) {
+      case FileListUiData(onClose, data, showHelpPopup, showExitPopup, showMenuPopup, showDeletePopup, showMkFolderPopup, showSelectPopup) =>
+        onClose shouldBe expected.onClose
+        data shouldBe expected.data
+        showHelpPopup shouldBe expected.showHelpPopup
+        showExitPopup shouldBe expected.showExitPopup
+        showMenuPopup shouldBe expected.showMenuPopup
+        showDeletePopup shouldBe expected.showDeletePopup
+        showMkFolderPopup shouldBe expected.showMkFolderPopup
+        showSelectPopup shouldBe expected.showSelectPopup
+    }
   }
 }
