@@ -22,7 +22,7 @@ object SelectController extends FunctionComponent[FileListUiData] {
 
     (props.data.toOption, props.showSelectPopup.toOption) match {
       case (Some(data), Some(showSelectPopup)) =>
-        <(selectPopupComp())(^.wrapped := SelectPopupProps(
+        <(selectPopupComp())(^.plain := SelectPopupProps(
           showSelect = showSelectPopup,
           onAction = { pattern =>
             for {

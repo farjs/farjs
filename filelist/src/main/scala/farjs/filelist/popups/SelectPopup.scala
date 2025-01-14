@@ -12,10 +12,6 @@ import scommons.react.hooks._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 
-case class SelectPopupProps(showSelect: Boolean,
-                            onAction: String => Unit,
-                            onCancel: () => Unit)
-
 object SelectPopup extends FunctionComponent[SelectPopupProps] {
 
   private[popups] var modalComp: ReactClass = Modal
@@ -24,7 +20,7 @@ object SelectPopup extends FunctionComponent[SelectPopupProps] {
   protected def render(compProps: Props): ReactElement = {
     val historyProvider = HistoryProvider.useHistoryProvider()
     val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
-    val props = compProps.wrapped
+    val props = compProps.plain
     val (pattern, setPattern) = useState("")
     val (width, height) = (55, 5)
     val contentWidth = width - (paddingHorizontal + 2) * 2

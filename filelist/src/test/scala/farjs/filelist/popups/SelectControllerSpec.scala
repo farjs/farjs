@@ -70,7 +70,7 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     onClose.expects()
 
     //when
-    findComponentProps(renderer.root, selectPopupComp).onAction(pattern)
+    findComponentProps(renderer.root, selectPopupComp, plain = true).onAction(pattern)
     
     //then
     eventually(saveHistory should not be null).map { _ =>
@@ -121,7 +121,7 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     onClose.expects()
 
     //when
-    findComponentProps(renderer.root, selectPopupComp).onAction(pattern)
+    findComponentProps(renderer.root, selectPopupComp, plain = true).onAction(pattern)
 
     //then
     eventually(saveHistory should not be null).map { _ =>
@@ -176,7 +176,7 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     onClose.expects()
 
     //when
-    findComponentProps(renderer.root, selectPopupComp).onAction(pattern)
+    findComponentProps(renderer.root, selectPopupComp, plain = true).onAction(pattern)
 
     //then
     eventually(saveHistory should not be null).map { _ =>
@@ -202,7 +202,7 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     val comp = testRender(withHistoryProvider(
       <(SelectController())(^.plain := props)()
     ))
-    val popup = findComponentProps(comp, selectPopupComp)
+    val popup = findComponentProps(comp, selectPopupComp, plain = true)
 
     //then
     onClose.expects()
@@ -229,7 +229,7 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     ))
 
     //then
-    assertTestComponent(result, selectPopupComp) {
+    assertTestComponent(result, selectPopupComp, plain = true) {
       case SelectPopupProps(showSelect, _, _) =>
         showSelect shouldBe true
     }
@@ -251,7 +251,7 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     ))
 
     //then
-    assertTestComponent(result, selectPopupComp) {
+    assertTestComponent(result, selectPopupComp, plain = true) {
       case SelectPopupProps(showSelect, _, _) =>
         showSelect shouldBe false
     }
