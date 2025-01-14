@@ -23,7 +23,7 @@ object MakeFolderController extends FunctionComponent[FileListUiData] {
 
     props.data.toOption match {
       case Some(data) if props.showMkFolderPopup.getOrElse(false) =>
-        <(makeFolderPopup())(^.wrapped := MakeFolderPopupProps(
+        <(makeFolderPopup())(^.plain := MakeFolderPopupProps(
           multiple = multiple,
           onOk = { (dir, multiple) =>
             val action = data.actions.createDir(

@@ -13,10 +13,6 @@ import scommons.react.hooks._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 
-case class MakeFolderPopupProps(multiple: Boolean,
-                                onOk: (String, Boolean) => Unit,
-                                onCancel: () => Unit)
-
 object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
 
   private[popups] var modalComp: ReactClass = Modal
@@ -29,7 +25,7 @@ object MakeFolderPopup extends FunctionComponent[MakeFolderPopupProps] {
   protected def render(compProps: Props): ReactElement = {
     val historyProvider = HistoryProvider.useHistoryProvider()
     val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
-    val props = compProps.wrapped
+    val props = compProps.plain
     val (folderName, setFolderName) = useState("")
     val (multiple, setMultiple) = useState(props.multiple)
     val (width, height) = (75, 10)

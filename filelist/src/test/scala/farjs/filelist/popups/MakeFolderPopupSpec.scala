@@ -52,7 +52,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
 
     val renderer = createTestRenderer(withHistoryProvider(
-      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), historyMocks.provider
+      withThemeContext(<(MakeFolderPopup())(^.plain := props)()), historyMocks.provider
     ))
     eventually(getAllCalled shouldBe true).map { _ =>
       val modal = inside(findComponents(renderer.root, modalComp)) {
@@ -86,7 +86,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
 
     val renderer = createTestRenderer(withHistoryProvider(
-      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), historyMocks.provider
+      withThemeContext(<(MakeFolderPopup())(^.plain := props)()), historyMocks.provider
     ))
     eventually(getAllCalled shouldBe true).map { _ =>
       val comboBox = inside(findComponents(renderer.root, comboBoxComp)) {
@@ -121,7 +121,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
 
     val renderer = createTestRenderer(withHistoryProvider(
-      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), historyMocks.provider
+      withThemeContext(<(MakeFolderPopup())(^.plain := props)()), historyMocks.provider
     ))
     eventually(getAllCalled shouldBe true).map { _ =>
       val checkbox = inside(findComponents(renderer.root, checkBoxComp)) {
@@ -157,7 +157,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
 
     val comp = createTestRenderer(withHistoryProvider(
-      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), historyMocks.provider
+      withThemeContext(<(MakeFolderPopup())(^.plain := props)()), historyMocks.provider
     )).root
     eventually(getAllCalled shouldBe true).map { _ =>
       val comboBox = inside(findComponents(comp, comboBoxComp)) {
@@ -193,7 +193,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
 
     val comp = createTestRenderer(withHistoryProvider(
-      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), historyMocks.provider
+      withThemeContext(<(MakeFolderPopup())(^.plain := props)()), historyMocks.provider
     )).root
     eventually(getAllCalled shouldBe true).map { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
@@ -227,7 +227,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
 
     val comp = createTestRenderer(withHistoryProvider(
-      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), historyMocks.provider
+      withThemeContext(<(MakeFolderPopup())(^.plain := props)()), historyMocks.provider
     )).root
     eventually(getAllCalled shouldBe true).map { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
@@ -261,7 +261,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     }
 
     val comp = createTestRenderer(withHistoryProvider(
-      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), historyMocks.provider
+      withThemeContext(<(MakeFolderPopup())(^.plain := props)()), historyMocks.provider
     )).root
     eventually(getAllCalled shouldBe true).map { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
@@ -297,7 +297,7 @@ class MakeFolderPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
     //when
     val result = createTestRenderer(withHistoryProvider(
-      withThemeContext(<(MakeFolderPopup())(^.wrapped := props)()), historyMocks.provider
+      withThemeContext(<(MakeFolderPopup())(^.plain := props)()), historyMocks.provider
     )).root
 
     //then

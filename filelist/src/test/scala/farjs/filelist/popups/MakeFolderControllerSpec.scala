@@ -57,7 +57,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val renderer = createTestRenderer(withHistoryProvider(
       <(MakeFolderController())(^.plain := props)(), historyMocks.provider
     ))
-    findComponentProps(renderer.root, makeFolderPopup).multiple shouldBe false
+    findComponentProps(renderer.root, makeFolderPopup, plain = true).multiple shouldBe false
     val action = TaskAction(
       Task("Creating...", Future.successful(()))
     )
@@ -77,7 +77,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     onClose.expects()
 
     //when
-    findComponentProps(renderer.root, makeFolderPopup).onOk(dir, multiple)
+    findComponentProps(renderer.root, makeFolderPopup, plain = true).onOk(dir, multiple)
     
     //then
     for {
@@ -89,7 +89,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
           item shouldBe dir
           params shouldBe js.undefined
       }
-      inside(findComponentProps(renderer.root, makeFolderPopup)) {
+      inside(findComponentProps(renderer.root, makeFolderPopup, plain = true)) {
         case MakeFolderPopupProps(resMultiple, _, _) =>
           resMultiple shouldBe multiple
       }
@@ -111,7 +111,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val comp = testRender(withHistoryProvider(
       <(MakeFolderController())(^.plain := props)(), historyProvider
     ))
-    val popup = findComponentProps(comp, makeFolderPopup)
+    val popup = findComponentProps(comp, makeFolderPopup, plain = true)
 
     //then
     onClose.expects()
@@ -139,7 +139,7 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     ))
 
     //then
-    assertTestComponent(result, makeFolderPopup) {
+    assertTestComponent(result, makeFolderPopup, plain = true) {
       case MakeFolderPopupProps(initialMultiple, _, _) =>
         initialMultiple shouldBe true
     }
