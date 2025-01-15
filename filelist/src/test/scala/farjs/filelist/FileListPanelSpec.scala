@@ -22,7 +22,7 @@ import scala.scalajs.js.Dynamic.literal
 
 class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  FileListPanel.fileListPanelView = mockUiComponent("FileListPanelView")
+  FileListPanel.fileListPanelView = "FileListPanelView".asInstanceOf[ReactClass]
   FileListPanel.fileListQuickSearch = mockUiComponent("FileListQuickSearch")
   FileListPanel.sortModesPopup = "SortModesPopup".asInstanceOf[ReactClass]
 
@@ -69,7 +69,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       }
 
       //when
-      findComponentProps(renderer.root, fileListPanelView, plain = true).onKeypress(screen, fullKey)
+      inside(findComponents(renderer.root, fileListPanelView)) {
+        case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+      }.onKeypress(screen, fullKey)
     }
 
     //when & then
@@ -92,7 +94,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("..")))
     ))
     val renderer = createTestRenderer(withContext(<(FileListPanel())(^.plain := props)()))
-    val viewProps = findComponentProps(renderer.root, fileListPanelView, plain = true)
+    val viewProps = inside(findComponents(renderer.root, fileListPanelView)) {
+      case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+    }
     val screen = js.Dynamic.literal().asInstanceOf[BlessedScreen]
 
     //when
@@ -120,7 +124,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("..")))
     ))
     val comp = testRender(withContext(<(FileListPanel())(^.plain := props)()))
-    val viewProps = findComponentProps(comp, fileListPanelView, plain = true)
+    val viewProps = inside(findComponents(comp, fileListPanelView)) {
+      case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+    }
     val copyToClipboardMock = mockFunction[String, Boolean]
     val screenMock = literal("copyToClipboard" -> copyToClipboardMock)
 
@@ -141,7 +147,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("item 1")))
     ))
     val comp = testRender(withContext(<(FileListPanel())(^.plain := props)()))
-    val viewProps = findComponentProps(comp, fileListPanelView, plain = true)
+    val viewProps = inside(findComponents(comp, fileListPanelView)) {
+      case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+    }
     val copyToClipboardMock = mockFunction[String, Boolean]
     val screenMock = literal("copyToClipboard" -> copyToClipboardMock)
 
@@ -162,7 +170,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("item 1")))
     ))
     val comp = testRender(withContext(<(FileListPanel())(^.plain := props)()))
-    val viewProps = findComponentProps(comp, fileListPanelView, plain = true)
+    val viewProps = inside(findComponents(comp, fileListPanelView)) {
+      case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+    }
     val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
       FileListItem("file 1")
     ))
@@ -186,7 +196,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("dir 1", isDir = true)))
     ))
     val comp = testRender(withContext(<(FileListPanel())(^.plain := props)()))
-    val viewProps = findComponentProps(comp, fileListPanelView, plain = true)
+    val viewProps = inside(findComponents(comp, fileListPanelView)) {
+      case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+    }
     val changedDir = FileListDir(path = "/test", isRoot = false, js.Array())
     val action = TaskAction(
       Task("Changing dir", Future.successful(changedDir))
@@ -210,7 +222,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("item 1")))
     ))
     val comp = testRender(withContext(<(FileListPanel())(^.plain := props)()))
-    val viewProps = findComponentProps(comp, fileListPanelView, plain = true)
+    val viewProps = inside(findComponents(comp, fileListPanelView)) {
+      case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+    }
     val changedDir = FileListDir(path = "/test", isRoot = false, js.Array())
     val action = TaskAction(
       Task("Changing dir", Future.successful(changedDir))
@@ -248,7 +262,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val comp = testRender(withContext(
       <(FileListPanel())(^.plain := props)(), isRight = isRight
     ))
-    val viewProps = findComponentProps(comp, fileListPanelView, plain = true)
+    val viewProps = inside(findComponents(comp, fileListPanelView)) {
+      case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+    }
 
     //then
     onKey.expects("l", false, true, false)
@@ -284,7 +300,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val comp = testRender(withContext(
       <(FileListPanel())(^.plain := props)(), isRight = isRight
     ))
-    val viewProps = findComponentProps(comp, fileListPanelView, plain = true)
+    val viewProps = inside(findComponents(comp, fileListPanelView)) {
+      case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+    }
 
     //then
     onKey.expects("r", false, true, false)
@@ -306,7 +324,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("dir 1", isDir = true)))
     ))
     val comp = testRender(withContext(<(FileListPanel())(^.plain := props)()))
-    val viewProps = findComponentProps(comp, fileListPanelView, plain = true)
+    val viewProps = inside(findComponents(comp, fileListPanelView)) {
+      case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+    }
     val changedDir = FileListDir(path = "/test", isRoot = false, js.Array())
     val action = TaskAction(
       Task("Changing dir", Future.successful(changedDir))
@@ -330,7 +350,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("item 1")))
     ))
     val comp = testRender(withContext(<(FileListPanel())(^.plain := props)()))
-    val viewProps = findComponentProps(comp, fileListPanelView, plain = true)
+    val viewProps = inside(findComponents(comp, fileListPanelView)) {
+      case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+    }
 
     //then
     dispatch.expects(*).never()
@@ -347,7 +369,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val actions = new Actions
     val props = FileListPanelProps(dispatch, actions.actions, FileListState())
     val comp = createTestRenderer(withContext(<(FileListPanel())(^.plain := props)())).root
-    val viewProps = findComponentProps(comp, fileListPanelView, plain = true)
+    val viewProps = inside(findComponents(comp, fileListPanelView)) {
+      case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+    }
 
     //when
     viewProps.onKeypress(null, "C-s")
@@ -365,11 +389,15 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val actions = new Actions
     val props = FileListPanelProps(dispatch, actions.actions, FileListState())
     val comp = createTestRenderer(withContext(<(FileListPanel())(^.plain := props)())).root
-    findComponentProps(comp, fileListPanelView, plain = true).onKeypress(null, "C-s")
+    inside(findComponents(comp, fileListPanelView)) {
+      case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+    }.onKeypress(null, "C-s")
     findProps(comp, fileListQuickSearch, plain = true) should not be empty
 
     //when
-    findComponentProps(comp, fileListPanelView, plain = true).onKeypress(null, "unknown")
+    inside(findComponents(comp, fileListPanelView)) {
+      case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+    }.onKeypress(null, "unknown")
 
     //then
     findProps(comp, fileListQuickSearch, plain = true) should be (empty)
@@ -381,7 +409,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val actions = new Actions
     val props = FileListPanelProps(dispatch, actions.actions, FileListState())
     val renderer = createTestRenderer(withContext(<(FileListPanel())(^.plain := props)(), isActive = true))
-    findComponentProps(renderer.root, fileListPanelView, plain = true).onKeypress(null, "C-s")
+    inside(findComponents(renderer.root, fileListPanelView)) {
+      case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+    }.onKeypress(null, "C-s")
     findProps(renderer.root, fileListQuickSearch, plain = true) should not be empty
 
     //when
@@ -403,7 +433,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val actions = new Actions
     val props = FileListPanelProps(dispatch, actions.actions, FileListState())
     val comp = createTestRenderer(withContext(<(FileListPanel())(^.plain := props)(), isActive = true)).root
-    findComponentProps(comp, fileListPanelView, plain = true).onKeypress(null, "C-s")
+    inside(findComponents(comp, fileListPanelView)) {
+      case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+    }.onKeypress(null, "C-s")
     val searchProps = findComponentProps(comp, fileListQuickSearch, plain = true)
 
     //when
@@ -429,7 +461,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     )
     val props = FileListPanelProps(dispatch, actions.actions, state)
     val renderer = createTestRenderer(withContext(<(FileListPanel())(^.plain := props)()))
-    findComponentProps(renderer.root, fileListPanelView, plain = true).onKeypress(null, "C-s")
+    inside(findComponents(renderer.root, fileListPanelView)) {
+      case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+    }.onKeypress(null, "C-s")
     findProps(renderer.root, fileListQuickSearch, plain = true) should not be empty
 
     def check(fullKey: String, index: Int, text: String, dispatchAction: Boolean)
@@ -450,7 +484,9 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       }
 
       //when
-      findComponentProps(renderer.root, fileListPanelView, plain = true).onKeypress(null, fullKey)
+      inside(findComponents(renderer.root, fileListPanelView)) {
+        case List(panelView) => panelView.props.asInstanceOf[FileListPanelViewProps]
+      }.onKeypress(null, fullKey)
 
       //then
       findComponentProps(renderer.root, fileListQuickSearch, plain = true).text shouldBe text
@@ -496,7 +532,7 @@ class FileListPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
                                   props: FileListPanelProps): Assertion = {
     
     assertComponents(result.children, List(
-      <(fileListPanelView())(^.assertPlain[FileListPanelViewProps](inside(_) {
+      <(fileListPanelView)(^.assertPlain[FileListPanelViewProps](inside(_) {
         case FileListPanelViewProps(dispatch, actions, state, _) =>
           dispatch shouldBe props.dispatch
           actions shouldBe props.actions

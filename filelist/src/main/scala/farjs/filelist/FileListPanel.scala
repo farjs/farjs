@@ -13,7 +13,7 @@ import scala.scalajs.js
 
 object FileListPanel extends FunctionComponent[FileListPanelProps] {
 
-  private[filelist] var fileListPanelView: UiComponent[FileListPanelViewProps] = FileListPanelView
+  private[filelist] var fileListPanelView: ReactClass = FileListPanelView
   private[filelist] var fileListQuickSearch: UiComponent[FileListQuickSearchProps] = FileListQuickSearch
   private[filelist] var sortModesPopup: ReactClass = SortModesPopup
 
@@ -102,7 +102,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
     }, List(stackProps.stack.isActive))
   
     <.>()(
-      <(fileListPanelView())(^.plain := FileListPanelViewProps(
+      <(fileListPanelView)(^.plain := FileListPanelViewProps(
         dispatch = props.dispatch,
         actions = props.actions,
         state = props.state,
