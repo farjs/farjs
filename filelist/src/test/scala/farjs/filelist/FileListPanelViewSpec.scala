@@ -18,7 +18,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
 
   FileListPanelView.doubleBorderComp = "DoubleBorder".asInstanceOf[ReactClass]
   FileListPanelView.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
-  FileListPanelView.fileListComp = mockUiComponent("FileList")
+  FileListPanelView.fileListComp = "FileList".asInstanceOf[ReactClass]
   FileListPanelView.textLineComp = "TextLine".asInstanceOf[ReactClass]
   FileListPanelView.sortIndicator = "SortIndicator".asInstanceOf[ReactClass]
 
@@ -210,7 +210,7 @@ class FileListPanelViewSpec extends TestSpec with TestRendererUtils {
           startCh shouldBe DoubleChars.leftSingle
           endCh shouldBe DoubleChars.rightSingle
       }))(),
-      <(fileListComp())(^.assertPlain[FileListProps](inside(_) {
+      <(fileListComp)(^.assertPlain[FileListProps](inside(_) {
         case FileListProps(dispatch, actions, resState, resWidth, resHeight, columns, _) =>
           dispatch shouldBe props.dispatch
           actions shouldBe props.actions

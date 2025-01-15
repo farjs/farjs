@@ -15,7 +15,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
 
   private[filelist] var doubleBorderComp: ReactClass = DoubleBorder
   private[filelist] var horizontalLineComp: ReactClass = HorizontalLine
-  private[filelist] var fileListComp: UiComponent[FileListProps] = FileList
+  private[filelist] var fileListComp: ReactClass = FileList
   private[filelist] var textLineComp: ReactClass = TextLine
   private[filelist] var sortIndicator: ReactClass = SortIndicator
 
@@ -40,7 +40,7 @@ object FileListPanelView extends FunctionComponent[FileListPanelViewProps] {
         startCh = DoubleChars.leftSingle,
         endCh = DoubleChars.rightSingle
       ))(),
-      <(fileListComp())(^.plain := FileListProps(
+      <(fileListComp)(^.plain := FileListProps(
         dispatch = props.dispatch,
         actions = props.actions,
         state = props.state,
