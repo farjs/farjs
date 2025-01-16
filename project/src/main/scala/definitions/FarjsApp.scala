@@ -3,7 +3,6 @@ package definitions
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
 import sbt._
-import scalajsbundler.Npm
 import scommons.sbtplugin.ScommonsPlugin.autoImport._
 import scoverage.ScoverageKeys.coverageExcludedPackages
 
@@ -38,24 +37,7 @@ object FarjsApp extends ScalaJsModule {
 
       //useYarn := true,
       //yarnExtraArgs := Seq("--frozen-lockfile"),
-    ).settings(
-      sjsStageSettings(fastOptJS, Compile) ++
-      sjsStageSettings(fullOptJS, Compile) ++
-      sjsStageSettings(fastOptJS, Test) ++
-      sjsStageSettings(fullOptJS, Test): _*
     )
-
-  private def sjsStageSettings(sjsStage: TaskKey[Attributed[File]], config: ConfigKey) = {
-    Seq(
-      config / sjsStage / crossTarget := baseDirectory.value / ".." / "build",
-      config / sjsStage := {
-        val logger = streams.value.log
-        val workingDir = baseDirectory.value / ".."
-        Npm.run("run", "sql-bundle")(workingDir, logger)
-        (config / sjsStage).value
-      }
-    )
-  }
 
   override val internalDependencies: Seq[ClasspathDep[ProjectReference]] = Seq(
     FarjsFileList.definition % "compile->compile;test->test",

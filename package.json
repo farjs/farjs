@@ -56,6 +56,7 @@
     "dao/**/*.mjs",
     "dist/farjs.mjs",
     "dist/versionChecker.mjs",
+    "filelist/**/*.mjs",
     "fs/**/*.mjs"
   ],
   "type": "module",

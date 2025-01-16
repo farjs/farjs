@@ -9,6 +9,7 @@ import org.xml.sax.{Attributes, InputSource}
 import sbt._
 import sbt.Keys._
 import sbt.nio.file.FileTreeView
+import scalajsbundler.Npm
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
 import scalajsbundler.util.JSON
 import scommons.sbtplugin.project.CommonNodeJsModule
@@ -137,7 +138,23 @@ object ScalaJsModule {
     },
   ) ++
     inConfig(Compile)(configSettings) ++
-    inConfig(Test)(configSettings)
+    inConfig(Test)(configSettings) ++
+    sjsStageSettings(fastOptJS, Compile) ++
+    sjsStageSettings(fullOptJS, Compile) ++
+    sjsStageSettings(fastOptJS, Test) ++
+    sjsStageSettings(fullOptJS, Test)
+
+  private def sjsStageSettings(sjsStage: TaskKey[Attributed[File]], config: ConfigKey) = {
+    Seq(
+      config / sjsStage / crossTarget := baseDirectory.value / ".." / "build",
+      config / sjsStage := {
+        val logger = streams.value.log
+        val workingDir = baseDirectory.value / ".."
+        Npm.run("run", "sql-bundle")(workingDir, logger)
+        (config / sjsStage).value
+      }
+    )
+  }
 
   private def doClean(logger: Logger, clean: Seq[File], preserve: Seq[File]): Unit = {
     val filesToPreserve = preserve.toSet
