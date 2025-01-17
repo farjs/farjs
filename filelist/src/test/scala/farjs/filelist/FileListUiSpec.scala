@@ -12,7 +12,7 @@ import scala.scalajs.js
 class FileListUiSpec extends TestSpec with TestRendererUtils {
 
   FileListUi.helpController = "HelpController".asInstanceOf[ReactClass]
-  FileListUi.exitController = mockUiComponent("ExitController")
+  FileListUi.exitController = "ExitController".asInstanceOf[ReactClass]
   FileListUi.menuController = mockUiComponent("MenuController")
   FileListUi.deleteController = mockUiComponent("DeleteController")
   FileListUi.makeFolderController = mockUiComponent("MakeFolderController")
@@ -42,7 +42,7 @@ class FileListUiSpec extends TestSpec with TestRendererUtils {
     //then
     assertComponents(result.children, List(
       <(helpController)(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))(),
-      <(exitController())(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))(),
+      <(exitController)(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))(),
       <(menuController())(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))(),
       <(deleteController())(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))(),
       <(makeFolderController())(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))(),

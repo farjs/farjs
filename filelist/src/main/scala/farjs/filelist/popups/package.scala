@@ -10,4 +10,8 @@ package object popups {
   @js.native
   @JSImport("../filelist/popups/HelpController.mjs", JSImport.Default)
   object HelpController extends ReactClass
+
+  @js.native
+  @JSImport("../filelist/popups/ExitController.mjs", JSImport.Default)
+  object ExitController extends ReactClass
 }

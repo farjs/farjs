@@ -7,7 +7,7 @@ import scommons.react._
 object FileListUi {
 
   private[filelist] var helpController: ReactClass = HelpController
-  private[filelist] var exitController: UiComponent[FileListUiData] = ExitController
+  private[filelist] var exitController: ReactClass = ExitController
   private[filelist] var menuController: UiComponent[FileListUiData] = MenuController
   private[filelist] var deleteController: UiComponent[FileListUiData] = DeleteController
   private[filelist] var makeFolderController: UiComponent[FileListUiData] = MakeFolderController
@@ -22,7 +22,7 @@ class FileListUi(val data: FileListUiData) extends FunctionComponent[FileListPlu
 
     <.>()(
       <(helpController)(^.plain := uiData)(),
-      <(exitController())(^.plain := uiData)(),
+      <(exitController)(^.plain := uiData)(),
       <(menuController())(^.plain := uiData)(),
       <(deleteController())(^.plain := uiData)(),
       <(makeFolderController())(^.plain := uiData)(),
