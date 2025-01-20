@@ -14,4 +14,8 @@ package object popups {
   @js.native
   @JSImport("../filelist/popups/ExitController.mjs", JSImport.Default)
   object ExitController extends ReactClass
+
+  @js.native
+  @JSImport("../filelist/popups/MenuController.mjs", JSImport.Default)
+  object MenuController extends ReactClass
 }
