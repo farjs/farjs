@@ -5,6 +5,7 @@ await import("./dao/FolderShortcutDao.test.mjs");
 await import("./dao/HistoryDao.test.mjs");
 await import("./dao/HistoryKindDao.test.mjs");
 
+await import("./filelist/popups/DeleteController.test.mjs");
 await import("./filelist/popups/ExitController.test.mjs");
 await import("./filelist/popups/HelpController.test.mjs");
 await import("./filelist/popups/MenuController.test.mjs");
