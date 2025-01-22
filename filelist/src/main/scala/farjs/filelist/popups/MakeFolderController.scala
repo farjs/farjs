@@ -12,7 +12,7 @@ object MakeFolderController extends FunctionComponent[FileListUiData] {
   
   val mkDirsHistoryKind: HistoryKind = HistoryKind("farjs.mkdirs", 50)
 
-  private[popups] var makeFolderPopup: UiComponent[MakeFolderPopupProps] = MakeFolderPopup
+  private[popups] var makeFolderPopup: ReactClass = MakeFolderPopup
 
   private var initialMultiple = false
 
@@ -23,7 +23,7 @@ object MakeFolderController extends FunctionComponent[FileListUiData] {
 
     props.data.toOption match {
       case Some(data) if props.showMkFolderPopup.getOrElse(false) =>
-        <(makeFolderPopup())(^.plain := MakeFolderPopupProps(
+        <(makeFolderPopup)(^.plain := MakeFolderPopupProps(
           multiple = multiple,
           onOk = { (dir, multiple) =>
             val action = data.actions.createDir(

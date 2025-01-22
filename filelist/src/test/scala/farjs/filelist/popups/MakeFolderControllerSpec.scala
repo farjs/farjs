@@ -9,6 +9,7 @@ import farjs.ui.Dispatch
 import farjs.ui.task.{Task, TaskAction}
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.Future
@@ -17,7 +18,7 @@ import scala.scalajs.js
 class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
   with TestRendererUtils {
 
-  MakeFolderController.makeFolderPopup = mockUiComponent("MakeFolderPopup")
+  MakeFolderController.makeFolderPopup = "MakeFolderPopup".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class Actions {
@@ -57,7 +58,9 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val renderer = createTestRenderer(withHistoryProvider(
       <(MakeFolderController())(^.plain := props)(), historyMocks.provider
     ))
-    findComponentProps(renderer.root, makeFolderPopup, plain = true).multiple shouldBe false
+    inside(findComponents(renderer.root, makeFolderPopup)) {
+      case List(c) => c.props.asInstanceOf[MakeFolderPopupProps].multiple shouldBe false
+    }
     val action = TaskAction(
       Task("Creating...", Future.successful(()))
     )
@@ -77,7 +80,9 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     onClose.expects()
 
     //when
-    findComponentProps(renderer.root, makeFolderPopup, plain = true).onOk(dir, multiple)
+    inside(findComponents(renderer.root, makeFolderPopup)) {
+      case List(c) => c.props.asInstanceOf[MakeFolderPopupProps].onOk(dir, multiple)
+    }
     
     //then
     for {
@@ -89,9 +94,12 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
           item shouldBe dir
           params shouldBe js.undefined
       }
-      inside(findComponentProps(renderer.root, makeFolderPopup, plain = true)) {
-        case MakeFolderPopupProps(resMultiple, _, _) =>
-          resMultiple shouldBe multiple
+      inside(findComponents(renderer.root, makeFolderPopup)) {
+        case List(c) =>
+          inside(c.props.asInstanceOf[MakeFolderPopupProps]) {
+            case MakeFolderPopupProps(resMultiple, _, _) =>
+              resMultiple shouldBe multiple
+          }
       }
     }
   }
@@ -111,7 +119,9 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     val comp = testRender(withHistoryProvider(
       <(MakeFolderController())(^.plain := props)(), historyProvider
     ))
-    val popup = findComponentProps(comp, makeFolderPopup, plain = true)
+    val popup = inside(findComponents(comp, makeFolderPopup)) {
+      case List(c) => c.props.asInstanceOf[MakeFolderPopupProps]
+    }
 
     //then
     onClose.expects()
@@ -139,10 +149,10 @@ class MakeFolderControllerSpec extends AsyncTestSpec with BaseTestSpec
     ))
 
     //then
-    assertTestComponent(result, makeFolderPopup, plain = true) {
+    assertNativeComponent(result, <(makeFolderPopup)(^.assertPlain[MakeFolderPopupProps](inside(_) {
       case MakeFolderPopupProps(initialMultiple, _, _) =>
         initialMultiple shouldBe true
-    }
+    }))())
   }
 
   it should "render empty component if showMkFolderPopup=false" in {
