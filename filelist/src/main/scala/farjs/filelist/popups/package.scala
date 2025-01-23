@@ -26,4 +26,8 @@ package object popups {
   @js.native
   @JSImport("../filelist/popups/MakeFolderPopup.mjs", JSImport.Default)
   object MakeFolderPopup extends ReactClass
+
+  @js.native
+  @JSImport("../filelist/popups/MakeFolderController.mjs", JSImport.Default)
+  object MakeFolderController extends ReactClass
 }
