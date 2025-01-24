@@ -14,7 +14,7 @@ object SelectController extends FunctionComponent[FileListUiData] {
 
   val selectPatternsHistoryKind: HistoryKind = HistoryKind("farjs.selectPatterns", 50)
 
-  private[popups] var selectPopupComp: UiComponent[SelectPopupProps] = SelectPopup
+  private[popups] var selectPopupComp: ReactClass = SelectPopup
 
   protected def render(compProps: Props): ReactElement = {
     val historyProvider = HistoryProvider.useHistoryProvider()
@@ -22,7 +22,7 @@ object SelectController extends FunctionComponent[FileListUiData] {
 
     (props.data.toOption, props.showSelectPopup.toOption) match {
       case (Some(data), Some(showSelectPopup)) =>
-        <(selectPopupComp())(^.plain := SelectPopupProps(
+        <(selectPopupComp)(^.plain := SelectPopupProps(
           showSelect = showSelectPopup,
           onAction = { pattern =>
             for {

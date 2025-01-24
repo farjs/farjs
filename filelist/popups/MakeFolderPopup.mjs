@@ -64,7 +64,7 @@ const MakeFolderPopup = (props) => {
     { label: "[ Cancel ]", onAction: props.onCancel },
   ];
 
-  const fetchHistory = async () => {
+  const readHistory = async () => {
     const mkDirsHistory = await historyProvider.get(
       MakeFolderPopup.mkDirsHistoryKind
     );
@@ -77,7 +77,7 @@ const MakeFolderPopup = (props) => {
   };
 
   useLayoutEffect(() => {
-    fetchHistory();
+    readHistory();
   }, []);
 
   if (maybeItems !== undefined) {

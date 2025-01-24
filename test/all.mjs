@@ -11,5 +11,6 @@ await import("./filelist/popups/HelpController.test.mjs");
 await import("./filelist/popups/MakeFolderController.test.mjs");
 await import("./filelist/popups/MakeFolderPopup.test.mjs");
 await import("./filelist/popups/MenuController.test.mjs");
+await import("./filelist/popups/SelectPopup.test.mjs");
 
 await import("./fs/popups/FolderShortcutsService.test.mjs");

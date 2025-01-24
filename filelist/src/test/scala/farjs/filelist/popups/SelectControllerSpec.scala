@@ -9,6 +9,7 @@ import farjs.filelist.popups.SelectController._
 import farjs.filelist.{FileListData, FileListState, FileListUiData, MockFileListActions}
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.scalajs.js
@@ -16,7 +17,7 @@ import scala.scalajs.js
 class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
   with TestRendererUtils {
 
-  SelectController.selectPopupComp = mockUiComponent("SelectPopup")
+  SelectController.selectPopupComp = "SelectPopup".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class HistoryMocks {
@@ -70,7 +71,9 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     onClose.expects()
 
     //when
-    findComponentProps(renderer.root, selectPopupComp, plain = true).onAction(pattern)
+    inside(findComponents(renderer.root, selectPopupComp)) {
+      case List(c) => c.props.asInstanceOf[SelectPopupProps].onAction(pattern)
+    }
     
     //then
     eventually(saveHistory should not be null).map { _ =>
@@ -121,7 +124,9 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     onClose.expects()
 
     //when
-    findComponentProps(renderer.root, selectPopupComp, plain = true).onAction(pattern)
+    inside(findComponents(renderer.root, selectPopupComp)) {
+      case List(c) => c.props.asInstanceOf[SelectPopupProps].onAction(pattern)
+    }
 
     //then
     eventually(saveHistory should not be null).map { _ =>
@@ -176,7 +181,9 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     onClose.expects()
 
     //when
-    findComponentProps(renderer.root, selectPopupComp, plain = true).onAction(pattern)
+    inside(findComponents(renderer.root, selectPopupComp)) {
+      case List(c) => c.props.asInstanceOf[SelectPopupProps].onAction(pattern)
+    }
 
     //then
     eventually(saveHistory should not be null).map { _ =>
@@ -202,7 +209,9 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     val comp = testRender(withHistoryProvider(
       <(SelectController())(^.plain := props)()
     ))
-    val popup = findComponentProps(comp, selectPopupComp, plain = true)
+    val popup = inside(findComponents(comp, selectPopupComp)) {
+      case List(c) => c.props.asInstanceOf[SelectPopupProps]
+    }
 
     //then
     onClose.expects()
@@ -229,10 +238,10 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     ))
 
     //then
-    assertTestComponent(result, selectPopupComp, plain = true) {
+    assertNativeComponent(result, <(selectPopupComp)(^.assertPlain[SelectPopupProps](inside(_) {
       case SelectPopupProps(showSelect, _, _) =>
         showSelect shouldBe true
-    }
+    }))())
   }
 
   it should "render Deselect popup" in {
@@ -251,10 +260,10 @@ class SelectControllerSpec extends AsyncTestSpec with BaseTestSpec
     ))
 
     //then
-    assertTestComponent(result, selectPopupComp, plain = true) {
+    assertNativeComponent(result, <(selectPopupComp)(^.assertPlain[SelectPopupProps](inside(_) {
       case SelectPopupProps(showSelect, _, _) =>
         showSelect shouldBe false
-    }
+    }))())
   }
 
   it should "render empty component when showSelectPopup is None" in {
