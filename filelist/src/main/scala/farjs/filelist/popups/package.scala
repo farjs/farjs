@@ -34,4 +34,8 @@ package object popups {
   @js.native
   @JSImport("../filelist/popups/SelectPopup.mjs", JSImport.Default)
   object SelectPopup extends ReactClass
+
+  @js.native
+  @JSImport("../filelist/popups/SelectController.mjs", JSImport.Default)
+  object SelectController extends ReactClass
 }

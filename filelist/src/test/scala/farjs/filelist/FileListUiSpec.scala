@@ -16,7 +16,7 @@ class FileListUiSpec extends TestSpec with TestRendererUtils {
   FileListUi.menuController = "MenuController".asInstanceOf[ReactClass]
   FileListUi.deleteController = "DeleteController".asInstanceOf[ReactClass]
   FileListUi.makeFolderController = "MakeFolderController".asInstanceOf[ReactClass]
-  FileListUi.selectController = mockUiComponent("SelectController")
+  FileListUi.selectController = "SelectController".asInstanceOf[ReactClass]
 
   it should "render component" in {
     //given
@@ -46,7 +46,7 @@ class FileListUiSpec extends TestSpec with TestRendererUtils {
       <(menuController)(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))(),
       <(deleteController)(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))(),
       <(makeFolderController)(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))(),
-      <(selectController())(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))()
+      <(selectController)(^.assertPlain[FileListUiData](assertFileListUiData(_, uiData)))()
     ))
   }
   

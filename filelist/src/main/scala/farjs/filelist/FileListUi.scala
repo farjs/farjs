@@ -11,7 +11,7 @@ object FileListUi {
   private[filelist] var menuController: ReactClass = MenuController
   private[filelist] var deleteController: ReactClass = DeleteController
   private[filelist] var makeFolderController: ReactClass = MakeFolderController
-  private[filelist] var selectController: UiComponent[FileListUiData] = SelectController
+  private[filelist] var selectController: ReactClass = SelectController
 }
 
 class FileListUi(val data: FileListUiData) extends FunctionComponent[FileListPluginUiProps] {
@@ -26,7 +26,7 @@ class FileListUi(val data: FileListUiData) extends FunctionComponent[FileListPlu
       <(menuController)(^.plain := uiData)(),
       <(deleteController)(^.plain := uiData)(),
       <(makeFolderController)(^.plain := uiData)(),
-      <(selectController())(^.plain := uiData)()
+      <(selectController)(^.plain := uiData)()
     )
   }
 }
