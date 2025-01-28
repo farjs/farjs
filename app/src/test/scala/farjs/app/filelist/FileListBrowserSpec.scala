@@ -247,7 +247,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     //given
     val dispatch = mockFunction[js.Any, Unit]
     val onTriggerMock = mockFunction[String, Uint8Array, js.Function0[Unit], js.Promise[js.UndefOr[PanelStackItem[FileListState]]]]
-    val plugin = new FileListPlugin {
+    val plugin = new FileListPlugin(js.Array()) {
       override def onFileTrigger(filePath: String,
                                  fileHeader: Uint8Array,
                                  onClose: js.Function0[Unit]): js.Promise[js.UndefOr[PanelStackItem[FileListState]]] = {
@@ -301,7 +301,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     //given
     val dispatch = mockFunction[js.Any, Unit]
     val onTriggerMock = mockFunction[String, Uint8Array, js.Function0[Unit], js.Promise[js.UndefOr[PanelStackItem[FileListState]]]]
-    val plugin = new FileListPlugin {
+    val plugin = new FileListPlugin(js.Array()) {
       override def onFileTrigger(filePath: String,
                                  fileHeader: Uint8Array,
                                  onClose: js.Function0[Unit]): js.Promise[js.UndefOr[PanelStackItem[FileListState]]] = {
@@ -363,7 +363,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     //given
     val dispatch = mockFunction[js.Any, Unit]
     val onTriggerMock = mockFunction[String, Uint8Array, js.Function0[Unit], js.Promise[js.UndefOr[PanelStackItem[FileListState]]]]
-    val plugin = new FileListPlugin {
+    val plugin = new FileListPlugin(js.Array()) {
       override def onFileTrigger(filePath: String,
                                  fileHeader: Uint8Array,
                                  onClose: js.Function0[Unit]): js.Promise[js.UndefOr[PanelStackItem[FileListState]]] = {
@@ -430,15 +430,15 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val dispatch = mockFunction[js.Any, Unit]
     val onTrigger2Mock = mockFunction[String, Uint8Array, () => Unit, js.Promise[js.UndefOr[PanelStackItem[FileListState]]]]
     val onTrigger3Mock = mockFunction[String, Uint8Array, () => Unit, js.Promise[js.UndefOr[PanelStackItem[FileListState]]]]
-    val plugin1 = new FileListPlugin {}
-    val plugin2 = new FileListPlugin {
+    val plugin1 = new FileListPlugin(js.Array()) {}
+    val plugin2 = new FileListPlugin(js.Array()) {
       override def onFileTrigger(filePath: String,
                                  fileHeader: Uint8Array,
                                  onClose: js.Function0[Unit]): js.Promise[js.UndefOr[PanelStackItem[FileListState]]] = {
         onTrigger2Mock(filePath, fileHeader, onClose)
       }
     }
-    val plugin3 = new FileListPlugin {
+    val plugin3 = new FileListPlugin(js.Array()) {
       override def onFileTrigger(filePath: String,
                                  fileHeader: Uint8Array,
                                  onClose: js.Function0[Unit]): js.Promise[js.UndefOr[PanelStackItem[FileListState]]] = {
@@ -521,7 +521,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val onTriggerMock = mockFunction[String, WithStacksProps, js.UndefOr[js.Dynamic], js.Promise[js.UndefOr[ReactClass]]]
     val keyFull = "C-p"
-    val plugin = new FileListPlugin {
+    val plugin = new FileListPlugin(js.Array()) {
       override val triggerKeys: js.Array[String] = js.Array(keyFull)
       override def onKeyTrigger(key: String, stacks: WithStacksProps, data: js.UndefOr[js.Dynamic]): js.Promise[js.UndefOr[ReactClass]] = {
         onTriggerMock(key, stacks, data)
@@ -577,7 +577,7 @@ class FileListBrowserSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val dispatch = mockFunction[js.Any, Unit]
     val onTriggerMock = mockFunction[String, WithStacksProps, js.UndefOr[js.Dynamic], js.Promise[js.UndefOr[ReactClass]]]
     val keyFull = "C-p"
-    val plugin = new FileListPlugin {
+    val plugin = new FileListPlugin(js.Array()) {
       override val triggerKeys: js.Array[String] = js.Array(keyFull)
       override def onKeyTrigger(key: String, stacks: WithStacksProps, data: js.UndefOr[js.Dynamic]): js.Promise[js.UndefOr[ReactClass]] = {
         onTriggerMock(key, stacks, data)
