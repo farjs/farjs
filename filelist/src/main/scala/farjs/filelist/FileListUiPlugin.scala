@@ -17,7 +17,7 @@ object FileListUiPlugin extends FileListPlugin(js.Array(
       val stackItem = WithStacksProps.active(stacks).stack.peek[FileListState]()
       stackItem.getData()
     }
-    val res = createUiData(key, maybeCurrData).map(uiData => new FileListUi(uiData).apply())
+    val res = createUiData(key, maybeCurrData).map(uiData => FileListUi(uiData))
     js.Promise.resolve[js.UndefOr[ReactClass]](res)
   }
 
