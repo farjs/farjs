@@ -14,7 +14,7 @@ import scala.scalajs.js
 object FileListPanel extends FunctionComponent[FileListPanelProps] {
 
   private[filelist] var fileListPanelView: ReactClass = FileListPanelView
-  private[filelist] var fileListQuickSearch: UiComponent[FileListQuickSearchProps] = FileListQuickSearch
+  private[filelist] var fileListQuickSearch: ReactClass = FileListQuickSearch
   private[filelist] var sortModesPopup: ReactClass = SortModesPopup
 
   protected def render(compProps: Props): ReactElement = {
@@ -110,7 +110,7 @@ object FileListPanel extends FunctionComponent[FileListPanelProps] {
       ))(),
 
       maybeQuickSearch.map { text =>
-        <(fileListQuickSearch())(^.plain := FileListQuickSearchProps(
+        <(fileListQuickSearch)(^.plain := FileListQuickSearchProps(
           text = text,
           onClose = { () =>
             setMaybeQuickSearch(None)
