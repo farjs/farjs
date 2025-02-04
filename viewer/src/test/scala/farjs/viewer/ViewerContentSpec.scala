@@ -197,7 +197,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       fileReader.readNextLines.expects(viewport.height, viewport.position, encoding).returning(readF)
 
       //when
-      findComponentProps(renderer.root, encodingsPopup).onApply(encoding)
+      findComponentProps(renderer.root, encodingsPopup, plain = true).onApply(encoding)
 
       //then
       eventually(assertViewerContent(renderer.root, props, expected, hasEncodingsPopup = true))
@@ -210,7 +210,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       ))
     }.flatMap { _ =>
       findComponentProps(renderer.root, viewerInput).onKeypress("f8")
-      eventually(findComponentProps(renderer.root, encodingsPopup))
+      eventually(findComponentProps(renderer.root, encodingsPopup, plain = true))
     }.flatMap { _ =>
       List(
         //when & then
@@ -221,8 +221,8 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
           "reload2"
         )), { () =>
           Future.successful {
-            findComponentProps(renderer.root, encodingsPopup).onClose()
-            findProps(renderer.root, encodingsPopup) should be (empty)
+            findComponentProps(renderer.root, encodingsPopup, plain = true).onClose()
+            findProps(renderer.root, encodingsPopup, plain = true) should be (empty)
             ()
           }
         }
@@ -652,7 +652,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         )(),
 
         if (hasEncodingsPopup) Some(
-          <(encodingsPopup())(^.assertWrapped(inside(_) {
+          <(encodingsPopup())(^.assertPlain[EncodingsPopupProps](inside(_) {
             case EncodingsPopupProps(encoding, _, _) =>
               encoding shouldBe props.viewport.encoding
           }))()

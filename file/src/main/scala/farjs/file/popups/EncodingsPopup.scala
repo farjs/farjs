@@ -7,16 +7,12 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class EncodingsPopupProps(encoding: String,
-                               onApply: String => Unit,
-                               onClose: () => Unit)
-
 object EncodingsPopup extends FunctionComponent[EncodingsPopupProps] {
 
   private[file] var listPopup: ReactClass = ListPopup
   
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
 
     useLayoutEffect({ () =>

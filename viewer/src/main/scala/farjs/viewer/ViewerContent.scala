@@ -64,7 +64,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       }
     }
     
-    def onEncoding(encoding: String): Unit = {
+    val onEncoding: js.Function1[String, Unit] = { encoding =>
       readF.current = readF.current.andThen { _ =>
         updated(viewport.copy(encoding = encoding))
       }
@@ -123,7 +123,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       )(),
 
       if (showEncodingsPopup) Some {
-        <(encodingsPopup())(^.wrapped := EncodingsPopupProps(
+        <(encodingsPopup())(^.plain := EncodingsPopupProps(
           encoding = props.viewport.encoding,
           onApply = onEncoding,
           onClose = { () =>

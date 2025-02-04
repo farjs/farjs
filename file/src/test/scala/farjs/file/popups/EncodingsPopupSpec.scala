@@ -20,7 +20,7 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val onClose = mockFunction[Unit]
     val props = getEncodingsPopupProps(onApply = onApply, onClose = onClose)
 
-    val renderer = createTestRenderer(<(EncodingsPopup())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(EncodingsPopup())(^.plain := props)())
 
     eventually {
       inside(findComponents(renderer.root, listPopup)) {
@@ -44,7 +44,7 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val onClose = mockFunction[Unit]
     val props = getEncodingsPopupProps(encoding = "big5", onApply = onApply, onClose = onClose)
 
-    val result = createTestRenderer(<(EncodingsPopup())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(EncodingsPopup())(^.plain := props)()).root
 
     eventually {
       inside(findComponents(result, listPopup)) {
@@ -67,7 +67,7 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val props = getEncodingsPopupProps(encoding = "big5")
     
     //when
-    val result = createTestRenderer(<(EncodingsPopup())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(EncodingsPopup())(^.plain := props)()).root
 
     //then
     eventually {
