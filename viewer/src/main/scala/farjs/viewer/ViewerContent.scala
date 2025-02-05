@@ -19,7 +19,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
   
   private[viewer] var viewerInput: UiComponent[ViewerInputProps] = ViewerInput
   private[viewer] var encodingsPopup: UiComponent[EncodingsPopupProps] = EncodingsPopup
-  private[viewer] var textSearchPopup: UiComponent[TextSearchPopupProps] = TextSearchPopup
+  private[viewer] var textSearchPopup: ReactClass = TextSearchPopup
   private[viewer] var viewerSearch: UiComponent[ViewerSearchProps] = ViewerSearch
 
   protected def render(compProps: Props): ReactElement = {
@@ -134,7 +134,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       else None,
 
       if (showSearchPopup) Some {
-        <(textSearchPopup())(^.plain := TextSearchPopupProps(
+        <(textSearchPopup)(^.plain := TextSearchPopupProps(
           onSearch = { term =>
             setShowSearchPopup(false)
             setSearchTerm(term)

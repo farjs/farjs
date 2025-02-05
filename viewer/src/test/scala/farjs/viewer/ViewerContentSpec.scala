@@ -1,13 +1,13 @@
 package farjs.viewer
 
-import farjs.file.popups.EncodingsPopupProps
+import farjs.file.popups.{EncodingsPopupProps, TextSearchPopupProps}
 import farjs.filelist.theme.FileListTheme
 import farjs.filelist.theme.FileListThemeSpec.withThemeContext
 import farjs.viewer.ViewerContent._
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react.ReactRef
+import scommons.react.{ReactClass, ReactRef}
 import scommons.react.blessed._
 import scommons.react.test._
 
@@ -17,7 +17,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   ViewerContent.viewerInput = mockUiComponent("ViewerInput")
   ViewerContent.encodingsPopup = mockUiComponent("EncodingsPopup")
-  ViewerContent.textSearchPopup = mockUiComponent("TextSearchPopup")
+  ViewerContent.textSearchPopup = "TextSearchPopup".asInstanceOf[ReactClass]
   ViewerContent.viewerSearch = mockUiComponent("ViewerSearch")
 
   //noinspection TypeAnnotation
@@ -152,10 +152,12 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }.flatMap { _ =>
       //when
       findComponentProps(renderer.root, viewerInput).onKeypress("f7")
-      findComponentProps(renderer.root, textSearchPopup, plain = true).onCancel()
+      inside(findComponents(renderer.root, textSearchPopup)) {
+        case List(c) => c.props.asInstanceOf[TextSearchPopupProps].onCancel()
+      }
 
       //then
-      findProps(renderer.root, textSearchPopup, plain = true) should be(empty)
+      findComponents(renderer.root, textSearchPopup) should be(empty)
     }
   }
 
@@ -174,8 +176,10 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       val searchTerm = "test"
 
       //when & then
-      findComponentProps(renderer.root, textSearchPopup, plain = true).onSearch(searchTerm)
-      findProps(renderer.root, textSearchPopup, plain = true) should be(empty)
+      inside(findComponents(renderer.root, textSearchPopup)) {
+        case List(c) => c.props.asInstanceOf[TextSearchPopupProps].onSearch(searchTerm)
+      }
+      findComponents(renderer.root, textSearchPopup) should be(empty)
 
       //when & then
       findComponentProps(renderer.root, viewerSearch).onComplete()
