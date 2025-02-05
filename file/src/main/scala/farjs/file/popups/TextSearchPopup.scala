@@ -10,9 +10,6 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class TextSearchPopupProps(onSearch: String => Unit,
-                                onCancel: () => Unit)
-
 object TextSearchPopup extends FunctionComponent[TextSearchPopupProps] {
 
   private[popups] var modalComp: ReactClass = Modal
@@ -22,7 +19,7 @@ object TextSearchPopup extends FunctionComponent[TextSearchPopupProps] {
   private[popups] var buttonsPanelComp: ReactClass = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val (searchText, setSearchText) = useState("")
     val (width, height) = (75, 8)
     val contentWidth = width - (paddingHorizontal + 2) * 2

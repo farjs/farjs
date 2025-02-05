@@ -134,7 +134,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       else None,
 
       if (showSearchPopup) Some {
-        <(textSearchPopup())(^.wrapped := TextSearchPopupProps(
+        <(textSearchPopup())(^.plain := TextSearchPopupProps(
           onSearch = { term =>
             setShowSearchPopup(false)
             setSearchTerm(term)

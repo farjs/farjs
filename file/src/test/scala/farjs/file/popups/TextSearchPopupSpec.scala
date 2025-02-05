@@ -27,7 +27,7 @@ class TextSearchPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val props = getTextSearchPopupProps(onCancel = onCancel)
 
     val renderer = createTestRenderer(
-      withThemeContext(<(TextSearchPopup())(^.wrapped := props)())
+      withThemeContext(<(TextSearchPopup())(^.plain := props)())
     )
     val modal = inside(findComponents(renderer.root, modalComp)) {
       case List(modal) => modal.props.asInstanceOf[ModalProps]
@@ -47,7 +47,7 @@ class TextSearchPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val props = getTextSearchPopupProps()
 
     val renderer = createTestRenderer(
-      withThemeContext(<(TextSearchPopup())(^.wrapped := props)())
+      withThemeContext(<(TextSearchPopup())(^.plain := props)())
     )
     val comboBox = inside(findComponents(renderer.root, comboBoxComp)) {
       case List(c) => c.props.asInstanceOf[ComboBoxProps]
@@ -70,7 +70,7 @@ class TextSearchPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val props = getTextSearchPopupProps(onSearch, onCancel)
 
     val comp = createTestRenderer(
-      withThemeContext(<(TextSearchPopup())(^.wrapped := props)())
+      withThemeContext(<(TextSearchPopup())(^.plain := props)())
     ).root
     inside(findComponents(comp, comboBoxComp)) {
       case List(c) => c.props.asInstanceOf[ComboBoxProps].onChange("test")
@@ -95,7 +95,7 @@ class TextSearchPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val props = getTextSearchPopupProps(onSearch, onCancel)
 
     val comp = createTestRenderer(
-      withThemeContext(<(TextSearchPopup())(^.wrapped := props)())
+      withThemeContext(<(TextSearchPopup())(^.plain := props)())
     ).root
     val comboBox = inside(findComponents(comp, comboBoxComp)) {
       case List(c) => c.props.asInstanceOf[ComboBoxProps]
@@ -123,7 +123,7 @@ class TextSearchPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val props = getTextSearchPopupProps(onSearch, onCancel)
 
     val comp = createTestRenderer(
-      withThemeContext(<(TextSearchPopup())(^.wrapped := props)())
+      withThemeContext(<(TextSearchPopup())(^.plain := props)())
     ).root
     val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
@@ -147,7 +147,7 @@ class TextSearchPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
     val props = getTextSearchPopupProps(onSearch = onSearch, onCancel = onCancel)
 
     val comp = createTestRenderer(
-      withThemeContext(<(TextSearchPopup())(^.wrapped := props)())
+      withThemeContext(<(TextSearchPopup())(^.plain := props)())
     ).root
     val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
@@ -170,7 +170,7 @@ class TextSearchPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRende
 
     //when
     val result = createTestRenderer(
-      withThemeContext(<(TextSearchPopup())(^.wrapped := props)())
+      withThemeContext(<(TextSearchPopup())(^.plain := props)())
     ).root
 
     //then

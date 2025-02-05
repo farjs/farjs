@@ -152,10 +152,10 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }.flatMap { _ =>
       //when
       findComponentProps(renderer.root, viewerInput).onKeypress("f7")
-      findComponentProps(renderer.root, textSearchPopup).onCancel()
+      findComponentProps(renderer.root, textSearchPopup, plain = true).onCancel()
 
       //then
-      findProps(renderer.root, textSearchPopup) should be(empty)
+      findProps(renderer.root, textSearchPopup, plain = true) should be(empty)
     }
   }
 
@@ -174,8 +174,8 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       val searchTerm = "test"
 
       //when & then
-      findComponentProps(renderer.root, textSearchPopup).onSearch(searchTerm)
-      findProps(renderer.root, textSearchPopup) should be(empty)
+      findComponentProps(renderer.root, textSearchPopup, plain = true).onSearch(searchTerm)
+      findProps(renderer.root, textSearchPopup, plain = true) should be(empty)
 
       //when & then
       findComponentProps(renderer.root, viewerSearch).onComplete()
