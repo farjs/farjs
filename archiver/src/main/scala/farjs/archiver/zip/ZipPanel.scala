@@ -106,7 +106,7 @@ class ZipPanel(zipPath: String,
     }
 
     <.>()(
-      <(fileListPanelComp())(^.plain := FileListPanelProps.copy(props)(onKeypress = onKeypress))(),
+      <(fileListPanelComp)(^.plain := FileListPanelProps.copy(props)(onKeypress = onKeypress))(),
 
       if (showWarning) Some(
         <(messageBoxComp)(^.plain := MessageBoxProps(
@@ -151,7 +151,7 @@ class ZipPanel(zipPath: String,
 
 object ZipPanel {
 
-  private[zip] var fileListPanelComp: UiComponent[FileListPanelProps] = FileListPanel
+  private[zip] var fileListPanelComp: ReactClass = FileListPanel
   private[zip] var addToArchController: UiComponent[AddToArchControllerProps] = AddToArchController
   private[zip] var messageBoxComp: ReactClass = MessageBox
 }

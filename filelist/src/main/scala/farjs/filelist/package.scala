@@ -35,6 +35,10 @@ package object filelist {
   object FileListQuickSearch extends ReactClass
 
   @js.native
+  @JSImport("@farjs/filelist/FileListPanel.mjs", JSImport.Default)
+  object FileListPanel extends ReactClass
+
+  @js.native
   @JSImport("../filelist/FileListUiPlugin.mjs", JSImport.Default)
   object FileListUiPlugin extends FileListPlugin(js.native)
 }

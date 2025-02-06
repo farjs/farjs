@@ -23,7 +23,7 @@ import scala.scalajs.js
 
 class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils with OptionValues {
 
-  ZipPanel.fileListPanelComp = mockUiComponent("FileListPanel")
+  ZipPanel.fileListPanelComp = "FileListPanel".asInstanceOf[ReactClass]
   ZipPanel.addToArchController = mockUiComponent("AddToArchController")
   ZipPanel.messageBoxComp = "MessageBox".asInstanceOf[ReactClass]
 
@@ -76,7 +76,9 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val comp = testRender(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(comp, fileListPanelComp, plain = true)
+    val panelProps = inside(findComponents(comp, fileListPanelComp)) {
+      case List(c) => c.props.asInstanceOf[FileListPanelProps]
+    }
 
     //when & then
     panelProps.onKeypress.toOption.value(null, "unknown") shouldBe false
@@ -111,7 +113,9 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val comp = testRender(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(comp, fileListPanelComp, plain = true)
+    val panelProps = inside(findComponents(comp, fileListPanelComp)) {
+      case List(c) => c.props.asInstanceOf[FileListPanelProps]
+    }
     val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
       FileListItem("file 1")
     ))
@@ -156,7 +160,9 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val comp = testRender(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(comp, fileListPanelComp, plain = true)
+    val panelProps = inside(findComponents(comp, fileListPanelComp)) {
+      case List(c) => c.props.asInstanceOf[FileListPanelProps]
+    }
     val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
       FileListItem("file 1")
     ))
@@ -202,7 +208,9 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val comp = testRender(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(comp, fileListPanelComp, plain = true)
+    val panelProps = inside(findComponents(comp, fileListPanelComp)) {
+      case List(c) => c.props.asInstanceOf[FileListPanelProps]
+    }
 
     //then
     onClose.expects().never()
@@ -248,7 +256,9 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val comp = testRender(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(comp, fileListPanelComp, plain = true)
+    val panelProps = inside(findComponents(comp, fileListPanelComp)) {
+      case List(c) => c.props.asInstanceOf[FileListPanelProps]
+    }
 
     //when & then
     panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListCopy) shouldBe false
@@ -290,7 +300,9 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val comp = testRender(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(comp, fileListPanelComp, plain = true)
+    val panelProps = inside(findComponents(comp, fileListPanelComp)) {
+      case List(c) => c.props.asInstanceOf[FileListPanelProps]
+    }
 
     //when & then
     panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListCopy) shouldBe false
@@ -331,7 +343,9 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val renderer = createTestRenderer(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(renderer.root, fileListPanelComp, plain = true)
+    val panelProps = inside(findComponents(renderer.root, fileListPanelComp)) {
+      case List(c) => c.props.asInstanceOf[FileListPanelProps]
+    }
 
     //when & then
     panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListCopy) shouldBe true
@@ -393,7 +407,9 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val renderer = createTestRenderer(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(renderer.root, fileListPanelComp, plain = true)
+    val panelProps = inside(findComponents(renderer.root, fileListPanelComp)) {
+      case List(c) => c.props.asInstanceOf[FileListPanelProps]
+    }
 
     //when & then
     panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListCopy) shouldBe true
@@ -467,7 +483,9 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val renderer = createTestRenderer(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(renderer.root, fileListPanelComp, plain = true)
+    val panelProps = inside(findComponents(renderer.root, fileListPanelComp)) {
+      case List(c) => c.props.asInstanceOf[FileListPanelProps]
+    }
 
     //when & then
     panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListMove) shouldBe true
@@ -543,7 +561,9 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val renderer = createTestRenderer(
       withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
     )
-    val panelProps = findComponentProps(renderer.root, fileListPanelComp, plain = true)
+    val panelProps = inside(findComponents(renderer.root, fileListPanelComp)) {
+      case List(c) => c.props.asInstanceOf[FileListPanelProps]
+    }
 
     //when & then
     panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListCopy) shouldBe true
@@ -702,11 +722,11 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     )
 
     //then
-    assertTestComponent(result, fileListPanelComp, plain = true) {
+    assertNativeComponent(result, <(fileListPanelComp)(^.assertPlain[FileListPanelProps](inside(_) {
       case FileListPanelProps(_, resActions, resState, _) =>
         resActions shouldBe actions
         resState shouldBe state
-    }
+    }))())
     for {
       _ <- eventually(actionF should not be null)
       _ <- actionF
