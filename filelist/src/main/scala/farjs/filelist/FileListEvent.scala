@@ -1,7 +1,12 @@
 package farjs.filelist
 
-object FileListEvent {
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
-  val onFileListCopy = "onFileListCopy"
-  val onFileListMove = "onFileListMove"
+@js.native
+@JSImport("@farjs/filelist/FileListEvent.mjs", JSImport.Default)
+object FileListEvent extends js.Object {
+
+  val onFileListCopy: String = js.native
+  val onFileListMove: String = js.native
 }
