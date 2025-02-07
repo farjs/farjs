@@ -33,7 +33,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils with OptionValues {
     val actions = new MockFileListActions
     FSPanel.fsService = new FsService().fsService
     val props = FileListPanelProps(dispatch, actions, FileListState())
-    val comp = testRender(<(FSPanel())(^.wrapped := props)())
+    val comp = testRender(<(FSPanel())(^.plain := props)())
     val panelProps = inside(findComponents(comp, fileListPanelComp)) {
       case List(c) => c.props.asInstanceOf[FileListPanelProps]
     }
@@ -51,7 +51,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils with OptionValues {
     val props = FileListPanelProps(dispatch, actions, FileListState(
       currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(FileListItem("item 1")))
     ))
-    val comp = testRender(<(FSPanel())(^.wrapped := props)())
+    val comp = testRender(<(FSPanel())(^.plain := props)())
     val panelProps = inside(findComponents(comp, fileListPanelComp)) {
       case List(c) => c.props.asInstanceOf[FileListPanelProps]
     }
@@ -80,7 +80,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils with OptionValues {
     val props = FileListPanelProps(dispatch, actions, state)
     
     //when
-    val result = createTestRenderer(<(FSPanel())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(FSPanel())(^.plain := props)()).root
 
     //then
     assertComponents(result.children, List(

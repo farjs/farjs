@@ -74,7 +74,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
       PanelStackItem("zipComp".asInstanceOf[ReactClass])
     ), null)
     val comp = testRender(
-      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(zipPanel())(^.plain := props)(), leftStack, rightStack)
     )
     val panelProps = inside(findComponents(comp, fileListPanelComp)) {
       case List(c) => c.props.asInstanceOf[FileListPanelProps]
@@ -111,7 +111,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     dispatch.expects(*).never()
     val comp = testRender(
-      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(zipPanel())(^.plain := props)(), leftStack, rightStack)
     )
     val panelProps = inside(findComponents(comp, fileListPanelComp)) {
       case List(c) => c.props.asInstanceOf[FileListPanelProps]
@@ -158,7 +158,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     dispatch.expects(*).never()
     val comp = testRender(
-      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(zipPanel())(^.plain := props)(), leftStack, rightStack)
     )
     val panelProps = inside(findComponents(comp, fileListPanelComp)) {
       case List(c) => c.props.asInstanceOf[FileListPanelProps]
@@ -206,7 +206,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     dispatch.expects(*).never()
     val comp = testRender(
-      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(zipPanel())(^.plain := props)(), leftStack, rightStack)
     )
     val panelProps = inside(findComponents(comp, fileListPanelComp)) {
       case List(c) => c.props.asInstanceOf[FileListPanelProps]
@@ -254,7 +254,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     dispatch.expects(*).never()
     val comp = testRender(
-      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(zipPanel())(^.plain := props)(), leftStack, rightStack)
     )
     val panelProps = inside(findComponents(comp, fileListPanelComp)) {
       case List(c) => c.props.asInstanceOf[FileListPanelProps]
@@ -298,7 +298,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     dispatch.expects(*).never()
     val comp = testRender(
-      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(zipPanel())(^.plain := props)(), leftStack, rightStack)
     )
     val panelProps = inside(findComponents(comp, fileListPanelComp)) {
       case List(c) => c.props.asInstanceOf[FileListPanelProps]
@@ -341,7 +341,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     dispatch.expects(*).never()
     val renderer = createTestRenderer(
-      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(zipPanel())(^.plain := props)(), leftStack, rightStack)
     )
     val panelProps = inside(findComponents(renderer.root, fileListPanelComp)) {
       case List(c) => c.props.asInstanceOf[FileListPanelProps]
@@ -405,7 +405,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     dispatch.expects(*).never()
     val renderer = createTestRenderer(
-      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(zipPanel())(^.plain := props)(), leftStack, rightStack)
     )
     val panelProps = inside(findComponents(renderer.root, fileListPanelComp)) {
       case List(c) => c.props.asInstanceOf[FileListPanelProps]
@@ -481,7 +481,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     dispatch.expects(*).never()
     val renderer = createTestRenderer(
-      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(zipPanel())(^.plain := props)(), leftStack, rightStack)
     )
     val panelProps = inside(findComponents(renderer.root, fileListPanelComp)) {
       case List(c) => c.props.asInstanceOf[FileListPanelProps]
@@ -559,7 +559,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     dispatch.expects(*).never()
     val renderer = createTestRenderer(
-      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(zipPanel())(^.plain := props)(), leftStack, rightStack)
     )
     val panelProps = inside(findComponents(renderer.root, fileListPanelComp)) {
       case List(c) => c.props.asInstanceOf[FileListPanelProps]
@@ -626,7 +626,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     
     //when
     testRender(
-      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(zipPanel())(^.plain := props)(), leftStack, rightStack)
     )
 
     //then
@@ -664,7 +664,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     
     //when
     testRender(
-      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(zipPanel())(^.plain := props)(), leftStack, rightStack)
     )
 
     //then
@@ -718,7 +718,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     
     //when
     val result = testRender(
-      withContext(<(zipPanel())(^.wrapped := props)(), leftStack, rightStack)
+      withContext(<(zipPanel())(^.plain := props)(), leftStack, rightStack)
     )
 
     //then

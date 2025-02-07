@@ -1,22 +1,13 @@
 package farjs.filelist
 
-import farjs.filelist.stack.WithStack
 import scommons.react._
 
-class FileListPanelController(
-  fileListPanelComp: UiComponent[FileListPanelProps]
-) extends FunctionComponent[Unit] {
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
-  protected def render(compProps: Props): ReactElement = {
-    val stackProps = WithStack.useStack()
-    val stack = stackProps.stack
-    val maybeCurrData = {
-      val stackItem = stack.peek[FileListState]()
-      stackItem.getData()
-    }
+@js.native
+@JSImport("@farjs/filelist/FileListPanelController.mjs", JSImport.Default)
+object FileListPanelController extends js.Function1[ReactClass, ReactClass] {
 
-    maybeCurrData.map { case FileListData(dispatch, actions, state) =>
-      <(fileListPanelComp())(^.wrapped := FileListPanelProps(dispatch, actions, state))()
-    }.orNull
-  }
+  def apply(fileListPanelComp: ReactClass): ReactClass = js.native
 }

@@ -15,7 +15,7 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
   private[fs] var fsFoldersHistory: UiComponent[FSFoldersHistoryProps] = FSFoldersHistory
   
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
 
     val onKeypress: js.Function2[BlessedScreen, String, Boolean] = { (screen, key) =>
       var processed = true
