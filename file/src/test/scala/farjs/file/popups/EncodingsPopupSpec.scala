@@ -107,7 +107,7 @@ class EncodingsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
           itemWrapPrefixLen
         ) =>
           title shouldBe "Encodings"
-          resItems.toList shouldBe Encoding.encodings
+          resItems shouldBe Encoding.encodings
           resSelected shouldBe selected
           footer shouldBe js.undefined
           textPaddingLeft shouldBe js.undefined

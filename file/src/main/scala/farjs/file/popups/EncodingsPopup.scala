@@ -16,7 +16,7 @@ object EncodingsPopup extends FunctionComponent[EncodingsPopupProps] {
     val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
 
     useLayoutEffect({ () =>
-      setItems(Some(js.Array(Encoding.encodings: _*)))
+      setItems(Some(Encoding.encodings))
       ()
     }, Nil)
 
