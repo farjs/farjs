@@ -18,7 +18,7 @@ case class ViewerContentProps(inputRef: ReactRef[BlessedElement],
 object ViewerContent extends FunctionComponent[ViewerContentProps] {
   
   private[viewer] var viewerInput: UiComponent[ViewerInputProps] = ViewerInput
-  private[viewer] var encodingsPopup: UiComponent[EncodingsPopupProps] = EncodingsPopup
+  private[viewer] var encodingsPopup: ReactClass = EncodingsPopup
   private[viewer] var textSearchPopup: ReactClass = TextSearchPopup
   private[viewer] var viewerSearch: UiComponent[ViewerSearchProps] = ViewerSearch
 
@@ -123,7 +123,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       )(),
 
       if (showEncodingsPopup) Some {
-        <(encodingsPopup())(^.plain := EncodingsPopupProps(
+        <(encodingsPopup)(^.plain := EncodingsPopupProps(
           encoding = props.viewport.encoding,
           onApply = onEncoding,
           onClose = { () =>

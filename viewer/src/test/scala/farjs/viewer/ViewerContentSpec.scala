@@ -16,7 +16,7 @@ import scala.concurrent.{Future, Promise}
 class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   ViewerContent.viewerInput = mockUiComponent("ViewerInput")
-  ViewerContent.encodingsPopup = mockUiComponent("EncodingsPopup")
+  ViewerContent.encodingsPopup = "EncodingsPopup".asInstanceOf[ReactClass]
   ViewerContent.textSearchPopup = "TextSearchPopup".asInstanceOf[ReactClass]
   ViewerContent.viewerSearch = mockUiComponent("ViewerSearch")
 
@@ -201,7 +201,9 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       fileReader.readNextLines.expects(viewport.height, viewport.position, encoding).returning(readF)
 
       //when
-      findComponentProps(renderer.root, encodingsPopup, plain = true).onApply(encoding)
+      inside(findComponents(renderer.root, encodingsPopup)) {
+        case List(c) => c.props.asInstanceOf[EncodingsPopupProps].onApply(encoding)
+      }
 
       //then
       eventually(assertViewerContent(renderer.root, props, expected, hasEncodingsPopup = true))
@@ -214,7 +216,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       ))
     }.flatMap { _ =>
       findComponentProps(renderer.root, viewerInput).onKeypress("f8")
-      eventually(findComponentProps(renderer.root, encodingsPopup, plain = true))
+      eventually(findComponents(renderer.root, encodingsPopup).head)
     }.flatMap { _ =>
       List(
         //when & then
@@ -225,8 +227,10 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
           "reload2"
         )), { () =>
           Future.successful {
-            findComponentProps(renderer.root, encodingsPopup, plain = true).onClose()
-            findProps(renderer.root, encodingsPopup, plain = true) should be (empty)
+            inside(findComponents(renderer.root, encodingsPopup)) {
+              case List(c) => c.props.asInstanceOf[EncodingsPopupProps].onClose()
+            }
+            findComponents(renderer.root, encodingsPopup) should be (empty)
             ()
           }
         }
@@ -656,7 +660,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         )(),
 
         if (hasEncodingsPopup) Some(
-          <(encodingsPopup())(^.assertPlain[EncodingsPopupProps](inside(_) {
+          <(encodingsPopup)(^.assertPlain[EncodingsPopupProps](inside(_) {
             case EncodingsPopupProps(encoding, _, _) =>
               encoding shouldBe props.viewport.encoding
           }))()
