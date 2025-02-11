@@ -1,6 +1,7 @@
 package farjs.file.popups
 
 import farjs.file.FileViewHistory.fileViewsHistoryKind
+import farjs.file.FileViewHistorySpec.assertFileViewHistory
 import farjs.file.popups.FileViewHistoryPopup._
 import farjs.file.{FileViewHistory, FileViewHistoryParams}
 import farjs.filelist.history.HistoryProviderSpec.withHistoryProvider
@@ -75,7 +76,7 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
       popup.onAction(1)
 
       //then
-      capturedHistory shouldBe items(1)
+      assertFileViewHistory(capturedHistory, items(1))
     }
   }
   

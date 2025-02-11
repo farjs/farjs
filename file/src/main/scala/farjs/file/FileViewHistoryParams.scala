@@ -36,19 +36,4 @@ object FileViewHistoryParams {
       arg.column
     ))
   }
-
-  def copy(p: FileViewHistoryParams)(isEdit: Boolean = p.isEdit,
-                                     encoding: String = p.encoding,
-                                     position: Double = p.position,
-                                     wrap: js.UndefOr[Boolean] = p.wrap,
-                                     column: js.UndefOr[Int] = p.column): FileViewHistoryParams = {
-
-    FileViewHistoryParams(
-      isEdit = isEdit,
-      encoding = encoding,
-      position = position,
-      wrap = wrap,
-      column = column
-    )
-  }
 }

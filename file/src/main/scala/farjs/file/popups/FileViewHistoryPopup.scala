@@ -27,7 +27,7 @@ object FileViewHistoryPopup extends FunctionComponent[FileViewHistoryPopupProps]
         fileViewsHistory <- historyProvider.get(fileViewsHistoryKind).toFuture
         items <- fileViewsHistory.getAll().toFuture
       } yield {
-        setItems(Some(items.flatMap(FileViewHistory.fromHistory)))
+        setItems(Some(items.flatMap(h => FileViewHistory.fromHistory(h).toOption)))
       }
       ()
     }, Nil)

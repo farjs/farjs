@@ -224,7 +224,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
 
       //then
       eventually(saveHistory should not be null).map { _ =>
-        assertFileViewHistory(FileViewHistory.fromHistory(saveHistory).value, history)
+        assertFileViewHistory(FileViewHistory.fromHistory(saveHistory).toOption.value, history)
       }
     }
   }

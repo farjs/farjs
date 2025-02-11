@@ -2,36 +2,51 @@ package farjs.file
 
 import farjs.filelist.history.{History, HistoryKind}
 
-case class FileViewHistory(path: String, params: FileViewHistoryParams)
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
+
+sealed trait FileViewHistory extends js.Object {
+  val path: String
+  val params: FileViewHistoryParams
+}
+
+@js.native
+@JSImport("../file/FileViewHistory.mjs", JSImport.Default)
+object NativeFileViewHistory extends js.Object {
+
+  val fileViewsHistoryKind: HistoryKind = js.native
+
+  def toHistory(h: FileViewHistory): History = js.native
+
+  def fromHistory(h: History): js.UndefOr[FileViewHistory] = js.native
+
+  def pathToItem(path: String, isEdit: Boolean): String = js.native
+}
 
 object FileViewHistory {
 
-  val fileViewsHistoryKind: HistoryKind = HistoryKind("farjs.fileViews", 150)
-  
-  def toHistory(h: FileViewHistory): History = {
-    History(
-      item = pathToItem(h.path, h.params.isEdit),
-      params = h.params
-    )
+  def apply(path: String, params: FileViewHistoryParams): FileViewHistory = {
+    js.Dynamic.literal(
+      path = path,
+      params = params
+    ).asInstanceOf[FileViewHistory]
   }
 
-  def fromHistory(h: History): Option[FileViewHistory] = {
-    h.params.toOption.map { params =>
-      FileViewHistory(
-        path = itemToPath(h.item),
-        params = params.asInstanceOf[FileViewHistoryParams]
-      )
-    }
+  def unapply(arg: FileViewHistory): Option[(String, FileViewHistoryParams)] = {
+    Some((
+      arg.path,
+      arg.params
+    ))
   }
   
-  def pathToItem(path: String, isEdit: Boolean): String = {
-    if (isEdit) s"E:$path"
-    else s"V:$path"
-  }
+  val fileViewsHistoryKind: HistoryKind = NativeFileViewHistory.fileViewsHistoryKind
+  
+  def toHistory(h: FileViewHistory): History =
+    NativeFileViewHistory.toHistory(h)
 
-  def itemToPath(item: String): String = {
-    if (item.startsWith("V:")) item.stripPrefix("V:")
-    else if (item.startsWith("E:")) item.stripPrefix("E:")
-    else item
-  }
+  def fromHistory(h: History): js.UndefOr[FileViewHistory] =
+    NativeFileViewHistory.fromHistory(h)
+  
+  def pathToItem(path: String, isEdit: Boolean): String =
+    NativeFileViewHistory.pathToItem(path, isEdit)
 }

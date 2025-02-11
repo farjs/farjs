@@ -47,7 +47,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
         maybeHistory <- fileViewsHistory.getOne(historyItem).toFuture
         _ <- fileReader.open(props.filePath)
       } yield {
-        val history = maybeHistory.toOption.flatMap(FileViewHistory.fromHistory)
+        val history = maybeHistory.toOption.flatMap(h => FileViewHistory.fromHistory(h).toOption)
         props.setViewport(Some(ViewerFileViewport(
           fileReader = viewer,
           encoding = history.map(_.params.encoding).getOrElse(Encoding.platformEncoding),
