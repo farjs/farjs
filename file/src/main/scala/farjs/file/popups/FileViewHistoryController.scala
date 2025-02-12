@@ -19,7 +19,7 @@ object FileViewHistoryController extends FunctionComponent[FileViewHistoryContro
     val props = compProps.wrapped
 
     if (props.showPopup) {
-      <(fileViewHistoryPopup())(^.wrapped := FileViewHistoryPopupProps(
+      <(fileViewHistoryPopup())(^.plain := FileViewHistoryPopupProps(
         onAction = { history =>
           props.onClose()
 

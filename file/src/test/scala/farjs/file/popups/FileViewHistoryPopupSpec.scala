@@ -58,7 +58,7 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     }
     
     val result = createTestRenderer(withHistoryProvider(
-      <(FileViewHistoryPopup())(^.wrapped := props)(), historyMocks.provider
+      <(FileViewHistoryPopup())(^.plain := props)(), historyMocks.provider
     )).root
 
     eventually(getAllCalled shouldBe true).map { _ =>
@@ -107,7 +107,7 @@ class FileViewHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     
     //when
     val result = createTestRenderer(withHistoryProvider(
-      <(FileViewHistoryPopup())(^.wrapped := props)(), historyMocks.provider
+      <(FileViewHistoryPopup())(^.plain := props)(), historyMocks.provider
     )).root
 
     //then

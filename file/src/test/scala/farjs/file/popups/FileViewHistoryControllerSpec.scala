@@ -55,7 +55,7 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
     onClose.expects()
 
     //when
-    findComponentProps(renderer.root, fileViewHistoryPopup).onAction(history)
+    findComponentProps(renderer.root, fileViewHistoryPopup, plain = true).onAction(history)
   }
 
   it should "call onClose when onClose" in {
@@ -67,7 +67,7 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
       left = WithStacksData(currStack, null),
       right = WithStacksData(otherStack, null)
     ))
-    val popup = findComponentProps(comp, fileViewHistoryPopup)
+    val popup = findComponentProps(comp, fileViewHistoryPopup, plain = true)
 
     //then
     onClose.expects()
@@ -88,7 +88,7 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
     ))
 
     //then
-    assertTestComponent(result, fileViewHistoryPopup) {
+    assertTestComponent(result, fileViewHistoryPopup, plain = true) {
       case FileViewHistoryPopupProps(_, _) => Succeeded
     }
   }
