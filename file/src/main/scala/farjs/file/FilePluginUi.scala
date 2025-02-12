@@ -12,7 +12,7 @@ class FilePluginUi(val showFileViewHistoryPopup: Boolean = false)
     val props = compProps.plain
 
     <.>()(
-      <(fileViewHistory())(^.wrapped := FileViewHistoryControllerProps(
+      <(fileViewHistory())(^.plain := FileViewHistoryControllerProps(
         showPopup = showFileViewHistoryPopup,
         onClose = props.onClose
       ))()

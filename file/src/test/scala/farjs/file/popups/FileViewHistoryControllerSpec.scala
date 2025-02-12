@@ -30,7 +30,7 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val props = FileViewHistoryControllerProps(showPopup = true, onClose)
     val renderer = createTestRenderer(withContext(
-      <(FileViewHistoryController())(^.wrapped := props)(),
+      <(FileViewHistoryController())(^.plain := props)(),
       left = WithStacksData(currStack, inputElementMock.asInstanceOf[BlessedElement]),
       right = WithStacksData(otherStack, null)
     ))
@@ -63,7 +63,7 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val props = FileViewHistoryControllerProps(showPopup = true, onClose)
     val comp = testRender(withContext(
-      <(FileViewHistoryController())(^.wrapped := props)(),
+      <(FileViewHistoryController())(^.plain := props)(),
       left = WithStacksData(currStack, null),
       right = WithStacksData(otherStack, null)
     ))
@@ -82,7 +82,7 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
 
     //when
     val result = testRender(withContext(
-      <(FileViewHistoryController())(^.wrapped := props)(),
+      <(FileViewHistoryController())(^.plain := props)(),
       left = WithStacksData(currStack, null),
       right = WithStacksData(otherStack, null)
     ))
@@ -99,7 +99,7 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
 
     //when
     val renderer = createTestRenderer(withContext(
-      <(FileViewHistoryController())(^.wrapped := props)(),
+      <(FileViewHistoryController())(^.plain := props)(),
       left = WithStacksData(currStack, null),
       right = WithStacksData(otherStack, null)
     ))

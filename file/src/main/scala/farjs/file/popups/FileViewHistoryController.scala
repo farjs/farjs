@@ -6,9 +6,6 @@ import scommons.react._
 
 import scala.scalajs.js
 
-case class FileViewHistoryControllerProps(showPopup: Boolean,
-                                          onClose: js.Function0[Unit])
-
 object FileViewHistoryController extends FunctionComponent[FileViewHistoryControllerProps] {
 
   private[popups] var fileViewHistoryPopup: UiComponent[FileViewHistoryPopupProps] =
@@ -16,7 +13,7 @@ object FileViewHistoryController extends FunctionComponent[FileViewHistoryContro
 
   protected def render(compProps: Props): ReactElement = {
     val stacks = WithStacks.useStacks()
-    val props = compProps.wrapped
+    val props = compProps.plain
 
     if (props.showPopup) {
       <(fileViewHistoryPopup())(^.plain := FileViewHistoryPopupProps(

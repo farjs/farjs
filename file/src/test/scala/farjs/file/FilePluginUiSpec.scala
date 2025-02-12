@@ -24,7 +24,7 @@ class FilePluginUiSpec extends TestSpec with TestRendererUtils {
 
     //then
     assertComponents(result.children, List(
-      <(fileViewHistory())(^.assertWrapped(inside(_) {
+      <(fileViewHistory())(^.assertPlain[FileViewHistoryControllerProps](inside(_) {
         case FileViewHistoryControllerProps(showPopup, resOnClose) =>
           showPopup shouldBe false
           resOnClose should be theSameInstanceAs onClose
