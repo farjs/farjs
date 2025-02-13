@@ -8,7 +8,7 @@ import scala.scalajs.js
 
 object FileViewHistoryController extends FunctionComponent[FileViewHistoryControllerProps] {
 
-  private[popups] var fileViewHistoryPopup: UiComponent[FileViewHistoryPopupProps] =
+  private[popups] var fileViewHistoryPopup: ReactClass =
     FileViewHistoryPopup
 
   protected def render(compProps: Props): ReactElement = {
@@ -16,7 +16,7 @@ object FileViewHistoryController extends FunctionComponent[FileViewHistoryContro
     val props = compProps.plain
 
     if (props.showPopup) {
-      <(fileViewHistoryPopup())(^.plain := FileViewHistoryPopupProps(
+      <(fileViewHistoryPopup)(^.plain := FileViewHistoryPopupProps(
         onAction = { history =>
           props.onClose()
 

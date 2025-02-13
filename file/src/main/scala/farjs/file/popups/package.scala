@@ -12,6 +12,10 @@ package object popups {
   object EncodingsPopup extends ReactClass
 
   @js.native
+  @JSImport("../file/popups/FileViewHistoryPopup.mjs", JSImport.Default)
+  object FileViewHistoryPopup extends ReactClass
+
+  @js.native
   @JSImport("../file/popups/TextSearchPopup.mjs", JSImport.Default)
   object TextSearchPopup extends ReactClass
 }

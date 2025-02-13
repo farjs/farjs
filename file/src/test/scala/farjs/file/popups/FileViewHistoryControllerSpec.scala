@@ -13,7 +13,7 @@ import scala.scalajs.js
 
 class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
 
-  FileViewHistoryController.fileViewHistoryPopup = mockUiComponent("FileViewHistoryPopup")
+  FileViewHistoryController.fileViewHistoryPopup = "FileViewHistoryPopup".asInstanceOf[ReactClass]
 
   private val currStack = new PanelStack(isActive = true, js.Array(
     PanelStackItem("fsComp".asInstanceOf[ReactClass])
@@ -55,7 +55,9 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
     onClose.expects()
 
     //when
-    findComponentProps(renderer.root, fileViewHistoryPopup, plain = true).onAction(history)
+    inside(findComponents(renderer.root, fileViewHistoryPopup)) {
+      case List(c) => c.props.asInstanceOf[FileViewHistoryPopupProps].onAction(history)
+    }
   }
 
   it should "call onClose when onClose" in {
@@ -67,7 +69,9 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
       left = WithStacksData(currStack, null),
       right = WithStacksData(otherStack, null)
     ))
-    val popup = findComponentProps(comp, fileViewHistoryPopup, plain = true)
+    val popup = inside(findComponents(comp, fileViewHistoryPopup)) {
+      case List(c) => c.props.asInstanceOf[FileViewHistoryPopupProps]
+    }
 
     //then
     onClose.expects()
@@ -88,9 +92,9 @@ class FileViewHistoryControllerSpec extends TestSpec with TestRendererUtils {
     ))
 
     //then
-    assertTestComponent(result, fileViewHistoryPopup, plain = true) {
+    assertNativeComponent(result, <(fileViewHistoryPopup)(^.assertPlain[FileViewHistoryPopupProps](inside(_) {
       case FileViewHistoryPopupProps(_, _) => Succeeded
-    }
+    }))())
   }
 
   it should "render empty component" in {
