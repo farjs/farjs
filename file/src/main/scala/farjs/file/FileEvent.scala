@@ -1,6 +1,11 @@
 package farjs.file
 
-object FileEvent {
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
-  val onFileView = "onFileView"
+@js.native
+@JSImport("../file/FileEvent.mjs", JSImport.Default)
+object FileEvent extends js.Object {
+
+  val onFileView: String = js.native
 }
