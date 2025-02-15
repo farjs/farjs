@@ -19,7 +19,7 @@ const EncodingsPopup = (props) => {
   const { listPopup } = EncodingsPopup;
 
   const [maybeItems, setItems] = useState(
-    /** @type {string[] | undefined} */ (undefined)
+    /** @type {readonly string[] | undefined} */ (undefined)
   );
 
   useLayoutEffect(() => {

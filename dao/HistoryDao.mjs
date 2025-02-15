@@ -12,7 +12,7 @@ import Database from "@farjs/better-sqlite3-wrapper";
 
 /**
  * @typedef {{
- *  getAll(): Promise<History[]>;
+ *  getAll(): Promise<readonly History[]>;
  *  getByItem(item: string): Promise<History | undefined>;
  *  save(entity: History, updatedAt: number): Promise<void>;
  *  deleteAll(): Promise<void>;

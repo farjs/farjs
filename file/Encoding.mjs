@@ -48,8 +48,6 @@ const Encoding = Object.freeze({
 
   //TODO: load encodings from iconv-lite, see:
   //  https://github.com/ashtuchkin/iconv-lite/issues/289
-  /** @type {string[]} */
-  // @ts-ignore
   encodings: Object.freeze([
     "base64",
     "big5",

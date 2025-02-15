@@ -9,7 +9,7 @@ import Database from "@farjs/better-sqlite3-wrapper";
 
 /**
  * @typedef {{
- *  getAll(): Promise<FolderShortcut[]>;
+ *  getAll(): Promise<readonly FolderShortcut[]>;
  *  save(entity: FolderShortcut): Promise<void>;
  *  delete(id: number): Promise<void>;
  *  deleteAll(): Promise<void>;

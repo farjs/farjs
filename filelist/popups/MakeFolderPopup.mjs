@@ -42,7 +42,7 @@ const MakeFolderPopup = (props) => {
 
   const historyProvider = HistoryProvider.useHistoryProvider();
   const [maybeItems, setItems] = useState(
-    /** @type {string[] | undefined} */ (undefined)
+    /** @type {readonly string[] | undefined} */ (undefined)
   );
   const [folderName, setFolderName] = useState("");
   const [multiple, setMultiple] = useState(props.multiple);
@@ -58,7 +58,7 @@ const MakeFolderPopup = (props) => {
       props.onOk(folderName, multiple);
     }
   };
-  /** @type {ButtonsPanelAction[]} */
+  /** @type {readonly ButtonsPanelAction[]} */
   const actions = [
     { label: "[ OK ]", onAction: onOk },
     { label: "[ Cancel ]", onAction: props.onCancel },

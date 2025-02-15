@@ -49,7 +49,7 @@ const TextSearchPopup = (props) => {
     }
   };
 
-  /** @type {ButtonsPanelAction[]} */
+  /** @type {readonly ButtonsPanelAction[]} */
   const actions = [
     { label: "[ Search ]", onAction: onSearch },
     { label: "[ Cancel ]", onAction: props.onCancel },

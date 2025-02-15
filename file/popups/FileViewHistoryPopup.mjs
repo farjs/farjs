@@ -23,7 +23,7 @@ const FileViewHistoryPopup = (props) => {
 
   const historyProvider = HistoryProvider.useHistoryProvider();
   const [maybeItems, setItems] = useState(
-    /** @type {FileViewHistory[] | undefined} */ (undefined)
+    /** @type {readonly FileViewHistory[] | undefined} */ (undefined)
   );
 
   const readHistory = async () => {

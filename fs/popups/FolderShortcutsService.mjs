@@ -4,7 +4,7 @@
 
 /**
  * @typedef {{
- *  getAll(): Promise<(string | undefined)[]>;
+ *  getAll(): Promise<readonly (string | undefined)[]>;
  *  save(index: number, path: string): Promise<void>;
  *  delete(index: number): Promise<void>;
  * }} FolderShortcutsService

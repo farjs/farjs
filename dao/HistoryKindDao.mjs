@@ -9,7 +9,7 @@ import Database from "@farjs/better-sqlite3-wrapper";
 
 /**
  * @typedef {{
- *  getAll(): Promise<HistoryKindEntity[]>;
+ *  getAll(): Promise<readonly HistoryKindEntity[]>;
  *  upsert(entity: HistoryKindEntity): Promise<HistoryKindEntity>;
  *  deleteAll(): Promise<void>;
  * }} HistoryKindDao

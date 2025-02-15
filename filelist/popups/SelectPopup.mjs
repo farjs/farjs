@@ -27,7 +27,7 @@ const SelectPopup = (props) => {
 
   const historyProvider = HistoryProvider.useHistoryProvider();
   const [maybeItems, setItems] = useState(
-    /** @type {string[] | undefined} */ (undefined)
+    /** @type {readonly string[] | undefined} */ (undefined)
   );
   const [pattern, setPattern] = useState("");
   const width = 55;

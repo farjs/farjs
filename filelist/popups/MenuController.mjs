@@ -75,7 +75,7 @@ function subMenuItem(item, isRight, keyFull) {
   return { item, isRight, keyFull };
 }
 
-/** @type {[string, SubMenuItem[]][]} */
+/** @type {readonly [string, readonly SubMenuItem[]][]} */
 const actions = [
   [
     "Left",
@@ -127,7 +127,7 @@ const actions = [
   ],
 ];
 
-/** @type {MenuBarItem[]} */
+/** @type {readonly MenuBarItem[]} */
 MenuController._items = actions.map(([name, subItems]) => {
   return { label: name, subItems: subItems.map(({ item }) => item) };
 });
