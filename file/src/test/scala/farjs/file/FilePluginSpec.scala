@@ -42,7 +42,7 @@ class FilePluginSpec extends AsyncTestSpec {
 
   it should "return Some(ui) if trigger key when createUi" in {
     //when & then
-    inside(FilePlugin.createUi("M-v")) { case Some(FilePluginUi(true)) => }
+    inside(FilePlugin.createUi("M-v").toOption) { case Some(FilePluginUiParams(true)) => }
     Succeeded
   }
 }

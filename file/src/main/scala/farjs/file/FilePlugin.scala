@@ -12,16 +12,13 @@ object FilePlugin extends FileListPlugin(js.Array("M-v")) {
                             stacks: WithStacksProps,
                             data: js.UndefOr[js.Dynamic] = js.undefined): js.Promise[js.UndefOr[ReactClass]] = {
 
-    js.Promise.resolve[js.UndefOr[ReactClass]](createUi(key).map(_.apply()) match {
-      case Some(r) => r
-      case None => js.undefined
-    })
+    js.Promise.resolve[js.UndefOr[ReactClass]](createUi(key).map(FilePluginUi(_)))
   }
   
-  private[file] final def createUi(key: String): Option[FilePluginUi] = {
+  private[file] final def createUi(key: String): js.UndefOr[FilePluginUiParams] = {
     key match {
-      case "M-v" => Some(new FilePluginUi(showFileViewHistoryPopup = true))
-      case _ => None
+      case "M-v" => FilePluginUiParams(showFileViewHistoryPopup = true)
+      case _ => js.undefined
     }
   }
 }
