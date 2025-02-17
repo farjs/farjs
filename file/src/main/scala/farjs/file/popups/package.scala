@@ -16,6 +16,10 @@ package object popups {
   object FileViewHistoryPopup extends ReactClass
 
   @js.native
+  @JSImport("../file/popups/FileViewHistoryController.mjs", JSImport.Default)
+  object FileViewHistoryController extends ReactClass
+
+  @js.native
   @JSImport("../file/popups/TextSearchPopup.mjs", JSImport.Default)
   object TextSearchPopup extends ReactClass
 }

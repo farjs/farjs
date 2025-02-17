@@ -12,7 +12,7 @@ class FilePluginUi(val showFileViewHistoryPopup: Boolean = false)
     val props = compProps.plain
 
     <.>()(
-      <(fileViewHistory())(^.plain := FileViewHistoryControllerProps(
+      <(fileViewHistory)(^.plain := FileViewHistoryControllerProps(
         showPopup = showFileViewHistoryPopup,
         onClose = props.onClose
       ))()
@@ -22,7 +22,7 @@ class FilePluginUi(val showFileViewHistoryPopup: Boolean = false)
 
 object FilePluginUi {
 
-  private[file] var fileViewHistory: UiComponent[FileViewHistoryControllerProps] =
+  private[file] var fileViewHistory: ReactClass =
     FileViewHistoryController
 
   def unapply(arg: FilePluginUi): Option[Boolean] = {

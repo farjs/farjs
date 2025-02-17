@@ -3,13 +3,14 @@ package farjs.file
 import farjs.file.FilePluginUi._
 import farjs.file.popups.FileViewHistoryControllerProps
 import farjs.filelist.FileListPluginUiProps
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.scalajs.js
 
 class FilePluginUiSpec extends TestSpec with TestRendererUtils {
 
-  FilePluginUi.fileViewHistory = mockUiComponent("FileViewHistoryController")
+  FilePluginUi.fileViewHistory = "FileViewHistoryController".asInstanceOf[ReactClass]
 
   it should "render component" in {
     //given
@@ -24,7 +25,7 @@ class FilePluginUiSpec extends TestSpec with TestRendererUtils {
 
     //then
     assertComponents(result.children, List(
-      <(fileViewHistory())(^.assertPlain[FileViewHistoryControllerProps](inside(_) {
+      <(fileViewHistory)(^.assertPlain[FileViewHistoryControllerProps](inside(_) {
         case FileViewHistoryControllerProps(showPopup, resOnClose) =>
           showPopup shouldBe false
           resOnClose should be theSameInstanceAs onClose
