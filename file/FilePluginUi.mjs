@@ -7,7 +7,13 @@ import FileViewHistoryController from "./popups/FileViewHistoryController.mjs";
 const h = React.createElement;
 
 /**
- * @param {{showFileViewHistoryPopup: boolean}} params
+ * @typedef {{
+ *  readonly showFileViewHistoryPopup: boolean;
+ * }} FilePluginUiParams
+ */
+
+/**
+ * @param {FilePluginUiParams} params
  */
 function FilePluginUi({ showFileViewHistoryPopup }) {
   /**
