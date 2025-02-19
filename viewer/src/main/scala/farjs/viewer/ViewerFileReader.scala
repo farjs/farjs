@@ -14,6 +14,10 @@ class ViewerFileReader(fileReader: FileReader,
   
   private val fileBuf = Buffer.allocUnsafe(math.max(bufferSize, maxLineLength))
   
+  def open(filePath: String): Future[Unit] = fileReader.open(filePath)
+
+  def close(): Future[Unit] = fileReader.close()
+
   def readPrevLines(lines: Int, position: Double, maxPos: Double, encoding: String): Future[List[(String, Int)]] = {
     val res = new mutable.ArrayBuffer[(String, Int)](lines)
     var leftBuf: Buffer = null

@@ -12,7 +12,6 @@ import farjs.ui.task.{Task, TaskAction}
 import farjs.viewer.ViewerController._
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, OptionValues, Succeeded}
-import scommons.nodejs.raw.FSConstants
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
 import scommons.react.blessed._
@@ -28,13 +27,13 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
   ViewerController.viewerContent = mockUiComponent("ViewerContent")
 
   //noinspection TypeAnnotation
-  class FSMocks {
-    val openSync = mockFunction[String, Int, Int]
-    val closeSync = mockFunction[Int, Unit]
+  class ViewerFileReader {
+    val open = mockFunction[String, Future[Unit]]
+    val close = mockFunction[Future[Unit]]
 
-    val fs = new MockFS(
-      openSyncMock = openSync,
-      closeSyncMock = closeSync
+    val fileReader = new MockViewerFileReader(
+      openMock = open,
+      closeMock = close
     )
   }
 
@@ -55,8 +54,8 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "dispatch error task if failed to open file when mount" in {
     //given
-    val fs = new FSMocks
-    ViewerController.fs = fs.fs
+    val fileReader = new ViewerFileReader
+    ViewerController.createFileReader = () => fileReader.fileReader
     val inputRef = ReactRef.create[BlessedElement]
     val dispatch = mockFunction[js.Any, Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None)
@@ -69,7 +68,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
 
     //then
     var openF: Future[_] = null
-    fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).throws(expectedError)
+    fileReader.open.expects(props.filePath).throws(expectedError)
     dispatch.expects(*).onCall { action: Any =>
       inside(action.asInstanceOf[TaskAction]) { case TaskAction(Task("Opening file", future)) =>
         openF = future
@@ -93,13 +92,12 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
   
   it should "open/close file and use default viewport params if no history when mount/unmount" in {
     //given
-    val fs = new FSMocks
-    ViewerController.fs = fs.fs
+    val fileReader = new ViewerFileReader
+    ViewerController.createFileReader = () => fileReader.fileReader
     val inputRef = ReactRef.create[BlessedElement]
     val dispatch = mockFunction[js.Any, Unit]
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None, setViewport)
-    val fd = 123
     var resViewport: ViewerFileViewport = null
     val historyMocks = new HistoryMocks
     historyMocks.get.expects(fileViewsHistoryKind)
@@ -108,7 +106,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
       .returning(js.Promise.resolve[js.UndefOr[History]](js.undefined: js.UndefOr[History]))
 
     //then
-    fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).returning(fd)
+    fileReader.open.expects(props.filePath).returning(Future.unit)
     setViewport.expects(*).onCall { viewport: Option[ViewerFileViewport] =>
       inside(viewport) {
         case Some(vp) => resViewport = vp
@@ -136,7 +134,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
       }
     }.map { _ =>
       //then
-      fs.closeSync.expects(fd)
+      fileReader.close.expects().returning(Future.unit)
       
       //when
       TestRenderer.act { () =>
@@ -148,13 +146,12 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "open/close file and use viewport params from history when mount/unmount" in {
     //given
-    val fs = new FSMocks
-    ViewerController.fs = fs.fs
+    val fileReader = new ViewerFileReader
+    ViewerController.createFileReader = () => fileReader.fileReader
     val inputRef = ReactRef.create[BlessedElement]
     val dispatch = mockFunction[js.Any, Unit]
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None, setViewport)
-    val fd = 123
     var resViewport: ViewerFileViewport = null
     val historyMocks = new HistoryMocks
     val history = FileViewHistory(
@@ -173,7 +170,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
       .returning(js.Promise.resolve[js.UndefOr[History]](FileViewHistory.toHistory(history)))
 
     //then
-    fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).returning(fd)
+    fileReader.open.expects(props.filePath).returning(Future.unit)
     setViewport.expects(*).onCall { viewport: Option[ViewerFileViewport] =>
       inside(viewport) {
         case Some(vp) => resViewport = vp
@@ -208,7 +205,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
       }
 
       //then
-      fs.closeSync.expects(fd)
+      fileReader.close.expects().returning(Future.unit)
       var saveHistory: History = null
       historyMocks.get.expects(fileViewsHistoryKind)
         .returning(js.Promise.resolve[HistoryService](historyMocks.service))
@@ -231,12 +228,12 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   it should "render left and right scroll indicators" in {
     //given
-    val fs = new FSMocks
-    ViewerController.fs = fs.fs
+    val fileReader = new ViewerFileReader
+    ViewerController.createFileReader = () => fileReader.fileReader
     val inputRef = ReactRef.create[BlessedElement]
     val dispatch = mockFunction[js.Any, Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None)
-    fs.openSync.expects(props.filePath, FSConstants.O_RDONLY).returning(123)
+    fileReader.open.expects(props.filePath).returning(Future.unit)
     val historyMocks = new HistoryMocks
     historyMocks.get.expects(fileViewsHistoryKind)
       .returning(js.Promise.resolve[HistoryService](historyMocks.service))

@@ -7,7 +7,6 @@ import farjs.filelist.theme.FileListTheme
 import farjs.ui.task.{Task, TaskAction}
 import farjs.ui.{Dispatch, WithSize, WithSizeProps}
 import scommons.nodejs
-import scommons.nodejs.FS
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
@@ -29,7 +28,9 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
 
   private[viewer] var withSizeComp: ReactClass = WithSize
   private[viewer] var viewerContent: UiComponent[ViewerContentProps] = ViewerContent
-  private[viewer] var fs: FS = nodejs.fs
+
+  private[viewer] var createFileReader: js.Function0[ViewerFileReader] =
+    () => new ViewerFileReader(new FileReader(nodejs.fs))
   
   protected def render(compProps: Props): ReactElement = {
     val theme = FileListTheme.useTheme()
@@ -39,17 +40,16 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
     viewportRef.current = props.viewport
     
     useLayoutEffect({ () =>
-      val fileReader = new FileReader(fs)
-      val viewer = new ViewerFileReader(fileReader)
+      val viewerFileReader = createFileReader()
       val openF = for {
         fileViewsHistory <- historyProvider.get(fileViewsHistoryKind).toFuture
         historyItem = FileViewHistory.pathToItem(props.filePath, isEdit = false)
         maybeHistory <- fileViewsHistory.getOne(historyItem).toFuture
-        _ <- fileReader.open(props.filePath)
+        _ <- viewerFileReader.open(props.filePath)
       } yield {
         val history = maybeHistory.toOption.flatMap(h => FileViewHistory.fromHistory(h).toOption)
         props.setViewport(Some(ViewerFileViewport(
-          fileReader = viewer,
+          fileReader = viewerFileReader,
           encoding = history.map(_.params.encoding).getOrElse(Encoding.platformEncoding),
           size = props.size,
           width = 0,
@@ -64,7 +64,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
       }
 
       val cleanup: js.Function0[Unit] = { () =>
-        fileReader.close()
+        viewerFileReader.close()
         viewportRef.current.foreach { vp =>
           val history = FileViewHistory(
             path = props.filePath,

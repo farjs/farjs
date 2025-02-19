@@ -1,5 +1,6 @@
 package farjs.viewer
 
+import org.scalatest.Succeeded
 import scommons.nodejs.Buffer
 import scommons.nodejs.test.AsyncTestSpec
 
@@ -10,9 +11,13 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
 
   //noinspection TypeAnnotation
   class FileReader {
+    val open = mockFunction[String, Future[Unit]]
+    val close = mockFunction[Future[Unit]]
     val readBytes = mockFunction[Double, Buffer, Future[Int]]
 
     val fileReader = new MockFileReader(
+      openMock = open,
+      closeMock = close,
       readBytesMock = readBytes
     )
   }
@@ -20,6 +25,41 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
   private val bufferSize = 15
   private val maxLineLength = 10
   private val encoding = "utf-8"
+
+  it should "call fileReader.open when open" in {
+    //given
+    val fileReader = new FileReader
+    val reader = new ViewerFileReader(fileReader.fileReader, bufferSize, maxLineLength)
+    val filePath = "test/filePath.txt"
+
+    //then
+    fileReader.open.expects(filePath).returning(Future.unit)
+
+    //when
+    val resultF = reader.open(filePath)
+
+    //then
+    resultF.map { _ =>
+      Succeeded
+    }
+  }
+
+  it should "call fileReader.close when close" in {
+    //given
+    val fileReader = new FileReader
+    val reader = new ViewerFileReader(fileReader.fileReader, bufferSize, maxLineLength)
+
+    //then
+    fileReader.close.expects().returning(Future.unit)
+
+    //when
+    val resultF = reader.close()
+
+    //then
+    resultF.map { _ =>
+      Succeeded
+    }
+  }
 
   it should "do nothing if position=0 when readPrevLines" in {
     //given
