@@ -14,9 +14,9 @@ class ViewerFileReader(fileReader: FileReader,
   
   private val fileBuf = Buffer.allocUnsafe(math.max(bufferSize, maxLineLength))
   
-  def open(filePath: String): Future[Unit] = fileReader.open(filePath)
+  def open(filePath: String): js.Promise[Unit] = fileReader.open(filePath)
 
-  def close(): Future[Unit] = fileReader.close()
+  def close(): js.Promise[Unit] = fileReader.close()
 
   def readPrevLines(lines: Int, position: Double, maxPos: Double, encoding: String): Future[List[(String, Int)]] = {
     val res = new mutable.ArrayBuffer[(String, Int)](lines)
@@ -77,7 +77,7 @@ class ViewerFileReader(fileReader: FileReader,
       
       leftBuf = if (leftBuf != null) Buffer.from(leftBuf) else leftBuf
       
-      fileReader.readBytes(from, fileBuf.subarray(0, size)).flatMap { bytesRead =>
+      fileReader.readBytes(from, fileBuf.subarray(0, size)).toFuture.flatMap { bytesRead =>
         val buf = fileBuf.subarray(0, bytesRead)
 
         loopOverBuffer(
@@ -142,7 +142,7 @@ class ViewerFileReader(fileReader: FileReader,
     def loop(position: Double): Future[List[(String, Int)]] = {
       leftBuf = if (leftBuf != null) Buffer.from(leftBuf) else leftBuf
       
-      fileReader.readBytes(position, fileBuf.subarray(0, bufSize)).flatMap { bytesRead =>
+      fileReader.readBytes(position, fileBuf.subarray(0, bufSize)).toFuture.flatMap { bytesRead =>
         val buf = fileBuf.subarray(0, bytesRead)
         if (buf.length > 0) {
           loopOverBuffer(

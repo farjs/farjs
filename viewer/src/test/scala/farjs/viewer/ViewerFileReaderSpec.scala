@@ -6,14 +6,15 @@ import scommons.nodejs.test.AsyncTestSpec
 
 import scala.concurrent.Future
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters.JSRichFutureNonThenable
 
 class ViewerFileReaderSpec extends AsyncTestSpec {
 
   //noinspection TypeAnnotation
   class FileReader {
-    val open = mockFunction[String, Future[Unit]]
-    val close = mockFunction[Future[Unit]]
-    val readBytes = mockFunction[Double, Buffer, Future[Int]]
+    val open = mockFunction[String, js.Promise[Unit]]
+    val close = mockFunction[js.Promise[Unit]]
+    val readBytes = mockFunction[Double, Buffer, js.Promise[Int]]
 
     val fileReader = new MockFileReader(
       openMock = open,
@@ -33,10 +34,10 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val filePath = "test/filePath.txt"
 
     //then
-    fileReader.open.expects(filePath).returning(Future.unit)
+    fileReader.open.expects(filePath).returning(js.Promise.resolve[Unit](()))
 
     //when
-    val resultF = reader.open(filePath)
+    val resultF = reader.open(filePath).toFuture
 
     //then
     resultF.map { _ =>
@@ -50,10 +51,10 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val reader = new ViewerFileReader(fileReader.fileReader, bufferSize, maxLineLength)
 
     //then
-    fileReader.close.expects().returning(Future.unit)
+    fileReader.close.expects().returning(js.Promise.resolve[Unit](()))
 
     //when
-    val resultF = reader.close()
+    val resultF = reader.close().toFuture
 
     //then
     resultF.map { _ =>
@@ -90,11 +91,11 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     //then
     fileReader.readBytes.expects(3, *).onCall { (_, buf) =>
       buf.length shouldBe bufferSize
-      writeBuf(buf, "t file\ncontent\n")
+      writeBuf(buf, "t file\ncontent\n").toJSPromise
     }
     fileReader.readBytes.expects(0, *).onCall { (_, buf) =>
       buf.length shouldBe 3
-      writeBuf(buf, "tes")
+      writeBuf(buf, "tes").toJSPromise
     }
 
     //when
@@ -120,11 +121,11 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     //then
     fileReader.readBytes.expects(3, *).onCall { (_, buf) =>
       buf.length shouldBe bufferSize
-      writeBuf(buf, "st file\ncontent")
+      writeBuf(buf, "st file\ncontent").toJSPromise
     }
     fileReader.readBytes.expects(0, *).onCall { (_, buf) =>
       buf.length shouldBe 3
-      writeBuf(buf, "\nte")
+      writeBuf(buf, "\nte").toJSPromise
     }
 
     //when
@@ -150,7 +151,7 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     //then
     fileReader.readBytes.expects(0, *).onCall { (_, buf) =>
       buf.length shouldBe 9
-      writeBuf(buf, "test\nfile")
+      writeBuf(buf, "test\nfile").toJSPromise
     }
 
     //when
@@ -175,7 +176,7 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     //then
     fileReader.readBytes.expects(0, *).onCall { (_, buf) =>
       buf.length shouldBe 1
-      writeBuf(buf, "\n")
+      writeBuf(buf, "\n").toJSPromise
     }
 
     //when
@@ -199,7 +200,7 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     //then
     fileReader.readBytes.expects(0, *).onCall { (_, buf) =>
       buf.length shouldBe bufferSize
-      writeBuf(buf, "testfilecontent")
+      writeBuf(buf, "testfilecontent").toJSPromise
     }
 
     //when
@@ -223,11 +224,11 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     //then
     fileReader.readBytes.expects(0, *).onCall { (_, buf) =>
       buf.length shouldBe bufferSize
-      writeBuf(buf, "\ntest file")
+      writeBuf(buf, "\ntest file").toJSPromise
     }
     fileReader.readBytes.expects(10, *).onCall { (_, buf) =>
       buf.length shouldBe bufferSize
-      writeBuf(buf, "\ncontent\n")
+      writeBuf(buf, "\ncontent\n").toJSPromise
     }
 
     //when
@@ -252,15 +253,15 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     //then
     fileReader.readBytes.expects(0, *).onCall { (_, buf) =>
       buf.length shouldBe bufferSize
-      writeBuf(buf, "test fi")
+      writeBuf(buf, "test fi").toJSPromise
     }
     fileReader.readBytes.expects(7, *).onCall { (_, buf) =>
       buf.length shouldBe bufferSize
-      writeBuf(buf, "le\ncontent")
+      writeBuf(buf, "le\ncontent").toJSPromise
     }
     fileReader.readBytes.expects(17, *).onCall { (_, buf) =>
       buf.length shouldBe bufferSize
-      writeBuf(buf, "")
+      writeBuf(buf, "").toJSPromise
     }
 
     //when
@@ -284,11 +285,11 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     //then
     fileReader.readBytes.expects(0, *).onCall { (_, buf) =>
       buf.length shouldBe bufferSize
-      writeBuf(buf, "testfilecontent")
+      writeBuf(buf, "testfilecontent").toJSPromise
     }
     fileReader.readBytes.expects(15, *).onCall { (_, buf) =>
       buf.length shouldBe bufferSize
-      writeBuf(buf, "")
+      writeBuf(buf, "").toJSPromise
     }
 
     //when

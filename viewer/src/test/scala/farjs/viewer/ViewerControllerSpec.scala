@@ -28,8 +28,8 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
 
   //noinspection TypeAnnotation
   class ViewerFileReader {
-    val open = mockFunction[String, Future[Unit]]
-    val close = mockFunction[Future[Unit]]
+    val open = mockFunction[String, js.Promise[Unit]]
+    val close = mockFunction[js.Promise[Unit]]
 
     val fileReader = new MockViewerFileReader(
       openMock = open,
@@ -106,7 +106,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
       .returning(js.Promise.resolve[js.UndefOr[History]](js.undefined: js.UndefOr[History]))
 
     //then
-    fileReader.open.expects(props.filePath).returning(Future.unit)
+    fileReader.open.expects(props.filePath).returning(js.Promise.resolve[Unit](()))
     setViewport.expects(*).onCall { viewport: Option[ViewerFileViewport] =>
       inside(viewport) {
         case Some(vp) => resViewport = vp
@@ -134,7 +134,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
       }
     }.map { _ =>
       //then
-      fileReader.close.expects().returning(Future.unit)
+      fileReader.close.expects().returning(js.Promise.resolve[Unit](()))
       
       //when
       TestRenderer.act { () =>
@@ -170,7 +170,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
       .returning(js.Promise.resolve[js.UndefOr[History]](FileViewHistory.toHistory(history)))
 
     //then
-    fileReader.open.expects(props.filePath).returning(Future.unit)
+    fileReader.open.expects(props.filePath).returning(js.Promise.resolve[Unit](()))
     setViewport.expects(*).onCall { viewport: Option[ViewerFileViewport] =>
       inside(viewport) {
         case Some(vp) => resViewport = vp
@@ -205,7 +205,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
       }
 
       //then
-      fileReader.close.expects().returning(Future.unit)
+      fileReader.close.expects().returning(js.Promise.resolve[Unit](()))
       var saveHistory: History = null
       historyMocks.get.expects(fileViewsHistoryKind)
         .returning(js.Promise.resolve[HistoryService](historyMocks.service))
@@ -233,7 +233,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
     val inputRef = ReactRef.create[BlessedElement]
     val dispatch = mockFunction[js.Any, Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None)
-    fileReader.open.expects(props.filePath).returning(Future.unit)
+    fileReader.open.expects(props.filePath).returning(js.Promise.resolve[Unit](()))
     val historyMocks = new HistoryMocks
     historyMocks.get.expects(fileViewsHistoryKind)
       .returning(js.Promise.resolve[HistoryService](historyMocks.service))

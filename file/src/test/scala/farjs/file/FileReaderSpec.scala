@@ -1,5 +1,6 @@
 package farjs.file
 
+import org.scalatest.Succeeded
 import scommons.nodejs.Buffer
 import scommons.nodejs.raw.FSConstants
 import scommons.nodejs.test.AsyncTestSpec
@@ -23,6 +24,7 @@ class FileReaderSpec extends AsyncTestSpec {
     )
   }
   
+  private val filePath = "test/file"
   private val fd = 123
   private val fileBuf = Buffer.allocUnsafe(64)
 
@@ -30,17 +32,16 @@ class FileReaderSpec extends AsyncTestSpec {
     //given
     val fs = new FSMocks
     val reader = new FileReader(fs.fs)
-    val filePath = "test/file"
 
     //then
     fs.openSync.expects(filePath, FSConstants.O_RDONLY).returning(fd)
 
     //when
-    val resultF = reader.open(filePath)
+    val resultF = reader.open(filePath).toFuture
     
     //then
     resultF.map { _ =>
-      reader.fd shouldBe fd
+      Succeeded
     }
   }
 
@@ -48,7 +49,7 @@ class FileReaderSpec extends AsyncTestSpec {
     //given
     val fs = new FSMocks
     val reader = new FileReader(fs.fs)
-    reader.fd = fd
+    fs.openSync.expects(filePath, FSConstants.O_RDONLY).returning(fd)
 
     val errorLogger = mockFunction[String, Unit]
     val savedConsoleError = js.Dynamic.global.console.error
@@ -64,7 +65,10 @@ class FileReaderSpec extends AsyncTestSpec {
     }
 
     //when
-    val resultF = reader.close()
+    val resultF = for {
+      _ <- reader.open(filePath).toFuture
+      res <- reader.close().toFuture
+    } yield res
     
     //then
     resultF.map { _ =>
@@ -78,7 +82,8 @@ class FileReaderSpec extends AsyncTestSpec {
     //given
     val fs = new FSMocks
     val reader = new FileReader(fs.fs)
-    reader.fd = fd
+    fs.openSync.expects(filePath, FSConstants.O_RDONLY).returning(fd)
+    
     val position = 9.0
     val size = 5
     val buf = fileBuf.subarray(0, size)
@@ -94,7 +99,10 @@ class FileReaderSpec extends AsyncTestSpec {
     errorLogger.expects(s"Failed to read from file, error: $ex")
 
     //when
-    val resultF = reader.readBytes(position, buf)
+    val resultF = for {
+      _ <- reader.open(filePath).toFuture
+      res <- reader.readBytes(position, buf).toFuture
+    } yield res
     
     //then
     resultF.failed.map { resEx =>
@@ -108,7 +116,8 @@ class FileReaderSpec extends AsyncTestSpec {
     //given
     val fs = new FSMocks
     val reader = new FileReader(fs.fs)
-    reader.fd = fd
+    fs.openSync.expects(filePath, FSConstants.O_RDONLY).returning(fd)
+    
     val position = 9.0
     val size = 5
     val buf = fileBuf.subarray(0, size)
@@ -120,7 +129,10 @@ class FileReaderSpec extends AsyncTestSpec {
     }
 
     //when
-    val resultF = reader.readBytes(position, buf)
+    val resultF = for {
+      _ <- reader.open(filePath).toFuture
+      res <- reader.readBytes(position, buf).toFuture
+    } yield res
     
     //then
     resultF.map { bytesRead =>
