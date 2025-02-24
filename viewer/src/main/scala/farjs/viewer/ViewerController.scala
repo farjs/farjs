@@ -6,7 +6,6 @@ import farjs.filelist.history.HistoryProvider
 import farjs.filelist.theme.FileListTheme
 import farjs.ui.task.{Task, TaskAction}
 import farjs.ui.{Dispatch, WithSize, WithSizeProps}
-import scommons.nodejs
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
@@ -30,7 +29,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
   private[viewer] var viewerContent: UiComponent[ViewerContentProps] = ViewerContent
 
   private[viewer] var createFileReader: js.Function0[ViewerFileReader] =
-    () => new ViewerFileReader(new FileReader(nodejs.fs))
+    () => new ViewerFileReader(new FileReader())
   
   protected def render(compProps: Props): ReactElement = {
     val theme = FileListTheme.useTheme()

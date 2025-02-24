@@ -10,7 +10,7 @@ class MockFileReader(
   openMock: String => js.Promise[Unit] = _ => ???,
   closeMock: () => js.Promise[Unit] = () => ???,
   readBytesMock: (Double, Buffer) => js.Promise[Int] = (_, _) => ???,
-) extends FileReader(fs = null) {
+) extends FileReader() {
 
   override def open(filePath: String): js.Promise[Unit] = openMock(filePath)
 
