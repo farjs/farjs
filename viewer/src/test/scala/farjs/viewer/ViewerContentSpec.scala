@@ -182,8 +182,8 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       findComponents(renderer.root, textSearchPopup) should be(empty)
 
       //when & then
-      findComponentProps(renderer.root, viewerSearch).onComplete()
-      findProps(renderer.root, viewerSearch) should be(empty)
+      findComponentProps(renderer.root, viewerSearch, plain = true).onComplete()
+      findProps(renderer.root, viewerSearch, plain = true) should be(empty)
     }
   }
 

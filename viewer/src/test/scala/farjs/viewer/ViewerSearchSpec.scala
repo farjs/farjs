@@ -17,7 +17,7 @@ class ViewerSearchSpec extends AsyncTestSpec with BaseTestSpec with TestRenderer
     val props = getViewerSearchProps(searchTerm = "test", onComplete = onComplete)
     
     //when
-    val result = createTestRenderer(withThemeContext(<(ViewerSearch())(^.wrapped := props)()))
+    val result = createTestRenderer(withThemeContext(<(ViewerSearch())(^.plain := props)()))
 
     //then
     assertComponents(result.root.children, List(

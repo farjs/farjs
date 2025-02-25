@@ -147,7 +147,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       else None,
 
       if (searchTerm.nonEmpty) Some {
-        <(viewerSearch())(^.wrapped := ViewerSearchProps(
+        <(viewerSearch())(^.plain := ViewerSearchProps(
           searchTerm = searchTerm,
           onComplete = { () =>
             setSearchTerm("")

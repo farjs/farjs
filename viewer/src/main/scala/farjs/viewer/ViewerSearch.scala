@@ -7,16 +7,13 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class ViewerSearchProps(searchTerm: String,
-                             onComplete: () => Unit)
-
 object ViewerSearch extends FunctionComponent[ViewerSearchProps] {
   
   private[viewer] var statusPopupComp: ReactClass = StatusPopup
 
   protected def render(compProps: Props): ReactElement = {
     FileListTheme.useTheme()
-    val props = compProps.wrapped
+    val props = compProps.plain
     
     useLayoutEffect({ () =>
       //TODO: start search
