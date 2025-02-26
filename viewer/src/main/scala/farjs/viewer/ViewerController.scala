@@ -9,13 +9,14 @@ import farjs.ui.{Dispatch, WithSize, WithSizeProps}
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
+import scommons.react.raw.NativeRef
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.util.Failure
 import scala.util.control.NonFatal
 
-case class ViewerControllerProps(inputRef: ReactRef[BlessedElement],
+case class ViewerControllerProps(inputRef: NativeRef,
                                  dispatch: Dispatch,
                                  filePath: String,
                                  size: Double,

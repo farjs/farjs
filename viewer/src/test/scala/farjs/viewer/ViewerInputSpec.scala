@@ -1,7 +1,7 @@
 package farjs.viewer
 
-import scommons.react.ReactRef
 import scommons.react.blessed._
+import scommons.react.raw
 import scommons.react.test._
 
 import scala.scalajs.js
@@ -19,7 +19,7 @@ class ViewerInputSpec extends TestSpec with TestRendererUtils {
       "off" -> offMock
     ).asInstanceOf[BlessedElement]
 
-    val inputRef = ReactRef.create[BlessedElement]
+    val inputRef = raw.React.createRef()
     inputRef.current = input
     val props = ViewerInputProps(inputRef, onKeypress = onKeypress)
 
@@ -30,7 +30,7 @@ class ViewerInputSpec extends TestSpec with TestRendererUtils {
     }
     onMock.expects("wheelup", *)
     onMock.expects("wheeldown", *)
-    val renderer = createTestRenderer(<(ViewerInput())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(ViewerInput())(^.plain := props)())
     val keyFull = "some-key"
 
     //then
@@ -56,7 +56,7 @@ class ViewerInputSpec extends TestSpec with TestRendererUtils {
       "off" -> offMock
     ).asInstanceOf[BlessedElement]
 
-    val inputRef = ReactRef.create[BlessedElement]
+    val inputRef = raw.React.createRef()
     inputRef.current = input
     val props = ViewerInputProps(inputRef, onWheel = onWheel)
 
@@ -72,7 +72,7 @@ class ViewerInputSpec extends TestSpec with TestRendererUtils {
     }
     onMock.expects("keypress", *)
 
-    val renderer = createTestRenderer(<(ViewerInput())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(ViewerInput())(^.plain := props)())
 
     def check(up: Boolean): Unit = {
       //then
@@ -96,11 +96,11 @@ class ViewerInputSpec extends TestSpec with TestRendererUtils {
 
   it should "render children" in {
     //given
-    val inputRef = ReactRef.create[BlessedElement]
+    val inputRef = raw.React.createRef()
     val props = ViewerInputProps(inputRef)
 
     //when
-    val result = createTestRenderer(<(ViewerInput())(^.wrapped := props)(
+    val result = createTestRenderer(<(ViewerInput())(^.plain := props)(
       <.text()("test_child")
     )).root
 

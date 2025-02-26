@@ -4,9 +4,9 @@ import farjs.filelist._
 import farjs.ui.menu.{BottomMenu, BottomMenuProps}
 import farjs.ui.popup.{Popup, PopupProps}
 import farjs.viewer.ViewerPluginUi._
-import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
+import scommons.react.{raw, _}
 
 import scala.scalajs.js
 
@@ -14,7 +14,7 @@ class ViewerPluginUi(filePath: String, size: Double)
   extends FunctionComponent[FileListPluginUiProps] {
 
   protected def render(compProps: Props): ReactElement = {
-    val inputRef = useRef[BlessedElement](null)
+    val inputRef = raw.React.useRef(null)
     val (viewport, setViewport) = useState(Option.empty[ViewerFileViewport])
     val props = compProps.plain
 
@@ -60,8 +60,9 @@ class ViewerPluginUi(filePath: String, size: Double)
         <(viewerHeader())(^.wrapped := headerProps)(),
   
         <.button(
-          ^.reactRef := inputRef,
-          ^.rbTop := 1,
+          ^.ref := { el: BlessedElement =>
+            inputRef.current = el
+          },          ^.rbTop := 1,
           ^.rbWidth := "100%",
           ^.rbHeight := "100%-2"
         )(

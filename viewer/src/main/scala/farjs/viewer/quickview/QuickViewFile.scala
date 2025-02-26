@@ -3,9 +3,9 @@ package farjs.viewer.quickview
 import farjs.filelist.stack.WithStackProps
 import farjs.ui.Dispatch
 import farjs.viewer._
-import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
+import scommons.react.{raw, _}
 
 import scala.scalajs.js
 
@@ -21,13 +21,13 @@ object QuickViewFile extends FunctionComponent[QuickViewFileProps] {
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
     val (viewport, setViewport) = useState(Option.empty[ViewerFileViewport])
-    val inputRef = useRef[BlessedElement](props.panelStack.panelInput)
+    val inputRef = raw.React.useRef(props.panelStack.panelInput)
 
     def onKeypress(key: String): Boolean = {
       var processed = true
       key match {
         case "f3" =>
-          inputRef.current.emit("keypress", js.undefined, js.Dynamic.literal(
+          inputRef.current.asInstanceOf[BlessedElement].emit("keypress", js.undefined, js.Dynamic.literal(
             name = "",
             full =
               if (props.panelStack.isRight) ViewerEvent.onViewerOpenLeft

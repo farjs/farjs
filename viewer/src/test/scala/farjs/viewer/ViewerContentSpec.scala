@@ -7,9 +7,10 @@ import farjs.viewer.ViewerContent._
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react.{ReactClass, ReactRef}
 import scommons.react.blessed._
+import scommons.react.raw.NativeRef
 import scommons.react.test._
+import scommons.react.{ReactClass, raw}
 
 import scala.concurrent.{Future, Promise}
 
@@ -33,8 +34,8 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   //noinspection TypeAnnotation
   class TestContext(implicit pos: Position) {
-    
-    val inputRef = ReactRef.create[BlessedElement]
+
+    val inputRef = raw.React.createRef()
     val fileReader = new ViewerFileReader
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
     var props = getViewerContentProps(inputRef, fileReader, setViewport)
@@ -57,7 +58,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   it should "not move viewport if not completed when onWheel(up/down)" in {
     //given
-    val inputRef = ReactRef.create[BlessedElement]
+    val inputRef = raw.React.createRef()
     val fileReader = new ViewerFileReader
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
     var props = getViewerContentProps(inputRef, fileReader, setViewport)
@@ -82,10 +83,10 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     fileReader.readNextLines.expects(*, *, *).never()
 
     //when
-    findComponentProps(renderer.root, viewerInput).onWheel(true)
-    findComponentProps(renderer.root, viewerInput).onWheel(false)
-    findComponentProps(renderer.root, viewerInput).onWheel(true)
-    findComponentProps(renderer.root, viewerInput).onWheel(false)
+    findComponentProps(renderer.root, viewerInput, plain = true).onWheel(true)
+    findComponentProps(renderer.root, viewerInput, plain = true).onWheel(false)
+    findComponentProps(renderer.root, viewerInput, plain = true).onWheel(true)
+    findComponentProps(renderer.root, viewerInput, plain = true).onWheel(false)
 
     //then
     assertViewerContent(renderer.root, props, content = Nil)
@@ -112,7 +113,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       else fileReader.readNextLines.expects(lines, position, viewport.encoding).returning(readF)
 
       //when
-      findComponentProps(renderer.root, viewerInput).onWheel(up)
+      findComponentProps(renderer.root, viewerInput, plain = true).onWheel(up)
 
       //then
       eventually(assertViewerContent(renderer.root, props, expected))
@@ -151,7 +152,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       ))
     }.flatMap { _ =>
       //when
-      findComponentProps(renderer.root, viewerInput).onKeypress("f7")
+      findComponentProps(renderer.root, viewerInput, plain = true).onKeypress("f7")
       inside(findComponents(renderer.root, textSearchPopup)) {
         case List(c) => c.props.asInstanceOf[TextSearchPopupProps].onCancel()
       }
@@ -172,7 +173,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         "file content"
       ))
     }.flatMap { _ =>
-      findComponentProps(renderer.root, viewerInput).onKeypress("f7")
+      findComponentProps(renderer.root, viewerInput, plain = true).onKeypress("f7")
       val searchTerm = "test"
 
       //when & then
@@ -215,7 +216,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         "file content"
       ))
     }.flatMap { _ =>
-      findComponentProps(renderer.root, viewerInput).onKeypress("f8")
+      findComponentProps(renderer.root, viewerInput, plain = true).onKeypress("f8")
       eventually(findComponents(renderer.root, encodingsPopup).head)
     }.flatMap { _ =>
       List(
@@ -240,7 +241,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   it should "re-load prev page if at the end when onKeypress(down)" in {
     //given
-    val inputRef = ReactRef.create[BlessedElement]
+    val inputRef = raw.React.createRef()
     val fileReader = new ViewerFileReader
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
     var props = {
@@ -275,7 +276,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       fileReader.readPrevLines.expects(viewport.height, viewport.size, viewport.size, viewport.encoding).returning(resF)
   
       //when
-      findComponentProps(renderer.root, viewerInput).onKeypress("down")
+      findComponentProps(renderer.root, viewerInput, plain = true).onKeypress("down")
   
       //then
       eventually {
@@ -312,7 +313,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       }
 
       //when
-      findComponentProps(renderer.root, viewerInput).onKeypress(key)
+      findComponentProps(renderer.root, viewerInput, plain = true).onKeypress(key)
 
       //then
       eventually(assertViewerContent(renderer.root, props, expected))
@@ -407,7 +408,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   it should "do nothing if onKeypress callback returns true when onKeypress(f2)" in {
     //given
-    val inputRef = ReactRef.create[BlessedElement]
+    val inputRef = raw.React.createRef()
     val fileReader = new ViewerFileReader
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
     var props = getViewerContentProps(inputRef, fileReader, setViewport, onKeypress = _ => true)
@@ -434,7 +435,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       ))
     }.flatMap { _ =>
       //when
-      findComponentProps(renderer.root, viewerInput).onKeypress("f2")
+      findComponentProps(renderer.root, viewerInput, plain = true).onKeypress("f2")
   
       //then
       eventually {
@@ -457,7 +458,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       ))
     }.flatMap { _ =>
       //when
-      findComponentProps(renderer.root, viewerInput).onKeypress("unknown")
+      findComponentProps(renderer.root, viewerInput, plain = true).onKeypress("unknown")
   
       //then
       eventually {
@@ -546,7 +547,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
   
   it should "call setViewport when non-empty file" in {
     //given
-    val inputRef = ReactRef.create[BlessedElement]
+    val inputRef = raw.React.createRef()
     val fileReader = new ViewerFileReader
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
     var props = getViewerContentProps(inputRef, fileReader, setViewport)
@@ -582,7 +583,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
   
   it should "call setViewport when empty file" in {
     //given
-    val inputRef = ReactRef.create[BlessedElement]
+    val inputRef = raw.React.createRef()
     val fileReader = new ViewerFileReader
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
     var props = {
@@ -617,7 +618,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     }
   }
   
-  private def getViewerContentProps(inputRef: ReactRef[BlessedElement],
+  private def getViewerContentProps(inputRef: NativeRef,
                                     fileReader: ViewerFileReader,
                                     setViewport: Option[ViewerFileViewport] => Unit,
                                     onKeypress: String => Boolean = _ => false) = {
@@ -644,7 +645,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val theme = FileListTheme.defaultTheme
 
     assertComponents(result.children, List(
-      <(viewerInput())(^.assertWrapped(inside(_) {
+      <(viewerInput())(^.assertPlain[ViewerInputProps](inside(_) {
         case ViewerInputProps(inputRef, _, _) =>
           inputRef shouldBe props.inputRef
       }))(

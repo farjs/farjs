@@ -5,12 +5,13 @@ import farjs.filelist.theme.FileListTheme
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
+import scommons.react.raw.NativeRef
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
 
-case class ViewerContentProps(inputRef: ReactRef[BlessedElement],
+case class ViewerContentProps(inputRef: NativeRef,
                               viewport: ViewerFileViewport,
                               setViewport: js.Function1[Option[ViewerFileViewport], Unit],
                               onKeypress: String => Boolean)
@@ -79,7 +80,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       }
     }
     
-    def onKeypress(keyFull: String): Unit = {
+    val onKeypress: js.Function1[String, Unit] = { keyFull =>
       if (!props.onKeypress(keyFull)) {
         keyFull match {
           case "f2" => onWrap()
@@ -106,7 +107,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       ()
     }, List(viewport.encoding, viewport.size, viewport.width, viewport.height, viewport.wrap))
 
-    <(viewerInput())(^.wrapped := ViewerInputProps(
+    <(viewerInput())(^.plain := ViewerInputProps(
       inputRef = props.inputRef,
       onWheel = { up =>
         if (up) onMoveUp(lines = 1)

@@ -13,8 +13,8 @@ import farjs.viewer.ViewerController._
 import org.scalactic.source.Position
 import org.scalatest.{Assertion, OptionValues, Succeeded}
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.react._
 import scommons.react.blessed._
+import scommons.react.{raw, _}
 import scommons.react.test._
 
 import scala.concurrent.Future
@@ -56,7 +56,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val fileReader = new ViewerFileReader
     ViewerController.createFileReader = () => fileReader.fileReader
-    val inputRef = ReactRef.create[BlessedElement]
+    val inputRef = raw.React.createRef()
     val dispatch = mockFunction[js.Any, Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None)
     val expectedError = new Exception("test error")
@@ -94,7 +94,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val fileReader = new ViewerFileReader
     ViewerController.createFileReader = () => fileReader.fileReader
-    val inputRef = ReactRef.create[BlessedElement]
+    val inputRef = raw.React.createRef()
     val dispatch = mockFunction[js.Any, Unit]
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None, setViewport)
@@ -148,7 +148,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val fileReader = new ViewerFileReader
     ViewerController.createFileReader = () => fileReader.fileReader
-    val inputRef = ReactRef.create[BlessedElement]
+    val inputRef = raw.React.createRef()
     val dispatch = mockFunction[js.Any, Unit]
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None, setViewport)
@@ -230,7 +230,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
     //given
     val fileReader = new ViewerFileReader
     ViewerController.createFileReader = () => fileReader.fileReader
-    val inputRef = ReactRef.create[BlessedElement]
+    val inputRef = raw.React.createRef()
     val dispatch = mockFunction[js.Any, Unit]
     val props = ViewerControllerProps(inputRef, dispatch, "test/file", 10, None)
     fileReader.open.expects(props.filePath).returning(js.Promise.resolve[Unit](()))

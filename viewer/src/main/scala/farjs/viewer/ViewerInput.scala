@@ -6,16 +6,12 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class ViewerInputProps(inputRef: ReactRef[BlessedElement],
-                            onWheel: Boolean => Unit = _ => (),
-                            onKeypress: String => Unit = _ => ())
-
 object ViewerInput extends FunctionComponent[ViewerInputProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val propsRef = useRef[ViewerInputProps](null)
-    val props = compProps.wrapped
-    val inputEl = props.inputRef.current
+    val props = compProps.plain
+    val inputEl = props.inputRef.current.asInstanceOf[BlessedElement]
     propsRef.current = props
     
     useLayoutEffect({ () =>
