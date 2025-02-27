@@ -25,7 +25,7 @@ class ViewerHeaderSpec extends TestSpec with TestRendererUtils {
     )
     
     //when
-    val result = createTestRenderer(withThemeContext(<(ViewerHeader())(^.wrapped := props)())).root
+    val result = createTestRenderer(withThemeContext(<(ViewerHeader())(^.plain := props)())).root
 
     //then
     assertViewerHeader(result, props)

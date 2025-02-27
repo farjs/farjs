@@ -5,19 +5,13 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 
-case class ViewerHeaderProps(filePath: String,
-                             encoding: String = "",
-                             size: Double = 0,
-                             column: Int = 0,
-                             percent: Int = 0)
-
 object ViewerHeader extends FunctionComponent[ViewerHeaderProps] {
 
   private[viewer] var withSizeComp: ReactClass = WithSize
   private[viewer] var textLineComp: ReactClass = TextLine
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val style = Theme.useTheme().menu.item
     val encodingWidth = math.max(props.encoding.length, 10)
     val sizeText = f"${props.size}%,.0f"

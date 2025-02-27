@@ -57,7 +57,7 @@ class ViewerPluginUi(filePath: String, size: Double)
         ^.rbClickable := true,
         ^.rbAutoFocus := false
       )(
-        <(viewerHeader())(^.wrapped := headerProps)(),
+        <(viewerHeader())(^.plain := headerProps)(),
   
         <.button(
           ^.ref := { el: BlessedElement =>

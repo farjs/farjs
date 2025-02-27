@@ -104,7 +104,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     viewerProps.setViewport(Some(viewport))
     
     //then
-    inside(findComponentProps(renderer.root, viewerHeader)) {
+    inside(findComponentProps(renderer.root, viewerHeader, plain = true)) {
       case ViewerHeaderProps(filePath, encoding, size, column, percent) =>
         filePath shouldBe "item 1"
         encoding shouldBe viewport.encoding
@@ -148,7 +148,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
           ^.rbClickable := true,
           ^.rbAutoFocus := false
         )(
-          <(viewerHeader())(^.assertWrapped(inside(_) {
+          <(viewerHeader())(^.assertPlain[ViewerHeaderProps](inside(_) {
             case ViewerHeaderProps(resFilePath, resEncoding, resSize, resColumn, resPercent) =>
               resFilePath shouldBe filePath
               resEncoding shouldBe ""
