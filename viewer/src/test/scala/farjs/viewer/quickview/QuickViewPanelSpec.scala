@@ -172,7 +172,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
       }))())
 
       if (currItem.isDir) {
-        assertTestComponent(content, quickViewDirComp) {
+        assertTestComponent(content, quickViewDirComp, plain = true) {
           case QuickViewDirProps(resDispatch, resActions, resState, resStack, resWidth, resCurrItem) =>
             resDispatch shouldBe dispatch
             resActions shouldBe actions

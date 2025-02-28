@@ -1,9 +1,6 @@
 package farjs.viewer.quickview
 
-import farjs.filelist.api.FileListItem
-import farjs.filelist.stack.PanelStack
 import farjs.filelist.theme.FileListTheme
-import farjs.filelist.{FileListActions, FileListState}
 import farjs.ui._
 import farjs.ui.popup.{StatusPopup, StatusPopupProps}
 import farjs.ui.task.{Task, TaskAction}
@@ -15,13 +12,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.util.{Failure, Success}
 
-case class QuickViewDirProps(dispatch: Dispatch,
-                             actions: FileListActions,
-                             state: FileListState,
-                             stack: PanelStack,
-                             width: Int,
-                             currItem: FileListItem)
-
 object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
 
   private[quickview] var statusPopupComp: ReactClass = StatusPopup
@@ -31,7 +21,7 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
     val (showPopup, setShowPopup) = useState(false)
     val inProgress = useRef(false)
 
-    val props = compProps.wrapped
+    val props = compProps.plain
     val stack = props.stack
     val params = stack.params[QuickViewParams]()
     val theme = FileListTheme.useTheme().fileList

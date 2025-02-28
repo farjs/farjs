@@ -62,7 +62,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       ))
       p.future.toJSPromise
     }
-    val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.plain := props)()))
     
     eventually {
       val popup = inside(findComponents(renderer.root, statusPopupComp)) {
@@ -107,7 +107,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       ))
       p.future.toJSPromise
     }
-    val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.plain := props)()))
     
     eventually {
       val popup = inside(findComponents(renderer.root, statusPopupComp)) {
@@ -149,7 +149,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       onNextDirFn = onNextDir
       p.future.toJSPromise
     }
-    val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.plain := props)()))
     val popup = inside(findComponents(renderer.root, statusPopupComp)) {
       case List(p) => p.props.asInstanceOf[StatusPopupProps]
     }
@@ -200,7 +200,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       p.future.toJSPromise
     }
 
-    val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(QuickViewDir())(^.plain := props)()))
     findComponents(renderer.root, statusPopupComp) should not be empty
 
     //then
@@ -241,7 +241,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
     val props = QuickViewDirProps(dispatch, actions.actions, FileListState(currDir = currDir), stack, 25, currItem)
 
     //when
-    val result = createTestRenderer(withThemeContext(<(QuickViewDir())(^.wrapped := props)())).root
+    val result = createTestRenderer(withThemeContext(<(QuickViewDir())(^.plain := props)())).root
 
     //then
     assertQuickViewDir(result.children, props, params)

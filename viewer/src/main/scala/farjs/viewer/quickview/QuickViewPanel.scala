@@ -62,7 +62,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
       maybeCurrData.map { case (dispatch, actions, state, currItem) =>
         <.>()(
           if (currItem.isDir) {
-            <(quickViewDirComp())(^.wrapped := QuickViewDirProps(
+            <(quickViewDirComp())(^.plain := QuickViewDirProps(
               dispatch = dispatch,
               actions = actions,
               state = state,
