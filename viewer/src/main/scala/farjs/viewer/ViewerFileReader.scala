@@ -3,14 +3,11 @@ package farjs.viewer
 import farjs.file.{Encoding, FileReader}
 import scommons.nodejs.Buffer
 
-import scala.collection.mutable
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.scalajs.js
 
 class ViewerFileReader(fileReader: FileReader,
                        bufferSize: Int = 64 * 1024,
-                       maxLineLength: Int = 1024) {
+                       maxLineLength: Int = 1024) extends js.Object {
   
   private val fileBuf = Buffer.allocUnsafe(math.max(bufferSize, maxLineLength))
   
@@ -18,8 +15,8 @@ class ViewerFileReader(fileReader: FileReader,
 
   def close(): js.Promise[Unit] = fileReader.close()
 
-  def readPrevLines(lines: Int, position: Double, maxPos: Double, encoding: String): Future[List[(String, Int)]] = {
-    val res = new mutable.ArrayBuffer[(String, Int)](lines)
+  def readPrevLines(lines: Int, position: Double, maxPos: Double, encoding: String): js.Promise[js.Array[ViewerFileLine]] = {
+    val res = new js.Array[ViewerFileLine]()
     var leftBuf: Buffer = null
     val bufSize =
       if (lines > 1) bufferSize
@@ -62,7 +59,7 @@ class ViewerFileReader(fileReader: FileReader,
               (line, bytes)
             }
           }
-        res.prepend((line, bytes))
+        res.insert(0, ViewerFileLine(line, bytes))
 
         if (res.length < lines && bytes < buf.length) {
           loopOverBuffer(buf.subarray(0, buf.length - bytes), fromEnd = false)
@@ -70,14 +67,14 @@ class ViewerFileReader(fileReader: FileReader,
       }
     }
 
-    def loop(position: Double): Future[List[(String, Int)]] = {
+    def loop(position: Double): js.Promise[js.Array[ViewerFileLine]] = {
       val (from, size) =
         if (position > bufSize) (position - bufSize, bufSize)
         else (0.0, position.toInt)
       
       leftBuf = if (leftBuf != null) Buffer.from(leftBuf) else leftBuf
       
-      fileReader.readBytes(from, fileBuf.subarray(0, size)).toFuture.flatMap { bytesRead =>
+      fileReader.readBytes(from, fileBuf.subarray(0, size)).`then`[js.Array[ViewerFileLine]]({ bytesRead =>
         val buf = fileBuf.subarray(0, bytesRead)
 
         loopOverBuffer(
@@ -95,19 +92,19 @@ class ViewerFileReader(fileReader: FileReader,
           if (res.length < lines && leftBuf != null) {
             val line = Encoding.decode(leftBuf, encoding, start = 0, end = leftBuf.length)
             val bytes = leftBuf.length
-            res.prepend((line.trim, bytes))
+            res.insert(0, ViewerFileLine(line.trim, bytes))
           }
-          Future.successful(res.toList)
+          js.Promise.resolve[js.Array[ViewerFileLine]](res)
         }
-      }
+      }: js.Function1[Int, js.Thenable[js.Array[ViewerFileLine]]])
     }
 
-    if (position == 0.0) Future.successful(Nil)
+    if (position == 0.0) js.Promise.resolve[js.Array[ViewerFileLine]](new js.Array[ViewerFileLine]())
     else loop(position)
   }
   
-  def readNextLines(lines: Int, position: Double, encoding: String): Future[List[(String, Int)]] = {
-    val res = new mutable.ArrayBuffer[(String, Int)](lines)
+  def readNextLines(lines: Int, position: Double, encoding: String): js.Promise[js.Array[ViewerFileLine]] = {
+    val res = new js.Array[ViewerFileLine]()
     var leftBuf: Buffer = null
     val bufSize =
       if (lines > 1) bufferSize
@@ -131,7 +128,7 @@ class ViewerFileReader(fileReader: FileReader,
             val bytes = newLineIndex + 1
             (line, bytes)
           }
-        res.append((line, bytes))
+        res.push(ViewerFileLine(line, bytes))
 
         if (res.length < lines && bytes < buf.length) {
           loopOverBuffer(buf.subarray(bytes, buf.length))
@@ -139,10 +136,10 @@ class ViewerFileReader(fileReader: FileReader,
       }
     }
 
-    def loop(position: Double): Future[List[(String, Int)]] = {
+    def loop(position: Double): js.Promise[js.Array[ViewerFileLine]] = {
       leftBuf = if (leftBuf != null) Buffer.from(leftBuf) else leftBuf
       
-      fileReader.readBytes(position, fileBuf.subarray(0, bufSize)).toFuture.flatMap { bytesRead =>
+      fileReader.readBytes(position, fileBuf.subarray(0, bufSize)).`then`[js.Array[ViewerFileLine]]({ bytesRead =>
         val buf = fileBuf.subarray(0, bytesRead)
         if (buf.length > 0) {
           loopOverBuffer(
@@ -160,11 +157,11 @@ class ViewerFileReader(fileReader: FileReader,
           if (res.length < lines && leftBuf != null) {
             val line = Encoding.decode(leftBuf, encoding, start = 0, end = leftBuf.length)
             val bytes = leftBuf.length
-            res.append((line, bytes))
+            res.push(ViewerFileLine(line, bytes))
           }
-          Future.successful(res.toList)
+          js.Promise.resolve[js.Array[ViewerFileLine]](res)
         }
-      }
+      }: js.Function1[Int, js.Promise[js.Array[ViewerFileLine]]])
     }
 
     loop(position)

@@ -13,6 +13,8 @@ import scommons.react.test._
 import scommons.react.{ReactClass, raw}
 
 import scala.concurrent.{Future, Promise}
+import scala.scalajs.js
+import scala.scalajs.js.JSConverters.JSRichFutureNonThenable
 
 class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -23,8 +25,8 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
   //noinspection TypeAnnotation
   class ViewerFileReader {
-    val readPrevLines = mockFunction[Int, Double, Double, String, Future[List[(String, Int)]]]
-    val readNextLines = mockFunction[Int, Double, String, Future[List[(String, Int)]]]
+    val readPrevLines = mockFunction[Int, Double, Double, String, js.Promise[js.Array[ViewerFileLine]]]
+    val readNextLines = mockFunction[Int, Double, String, js.Promise[js.Array[ViewerFileLine]]]
 
     val fileReader = new MockViewerFileReader(
       readPrevLinesMock = readPrevLines,
@@ -40,7 +42,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
     var props = getViewerContentProps(inputRef, fileReader, setViewport)
     var viewport = props.viewport
-    val readF = Future.successful("test \nfile content".split('\n').map(c => (c, c.length)).toList)
+    val readF = js.Promise.resolve[js.Array[ViewerFileLine]](js.Array[ViewerFileLine]("test \nfile content".split('\n').map(c => ViewerFileLine(c, c.length)).toList: _*))
     fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readF)
     val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
   
@@ -63,8 +65,8 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
     var props = getViewerContentProps(inputRef, fileReader, setViewport)
     var viewport = props.viewport
-    val readP = Promise[List[(String, Int)]]()
-    fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readP.future)
+    val readP = Promise[js.Array[ViewerFileLine]]()
+    fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readP.future.toJSPromise)
     val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
 
     setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
@@ -90,7 +92,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
     //then
     assertViewerContent(renderer.root, props, content = Nil)
-    readP.success("completed".split('\n').map(c => (c, c.length)).toList)
+    readP.success(js.Array("completed".split('\n').map(c => ViewerFileLine(c, c.length)).toList: _*))
     eventually {
       assertViewerContent(renderer.root, props, List(
         "completed"
@@ -106,7 +108,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     def check(up: Boolean, lines: Int, position: Double, content: String, expected: List[String])
              (implicit pos: Position): () => Future[Unit] = { () =>
 
-      val readF = Future.successful(content.split('\n').map(c => (c, c.length)).toList)
+      val readF = js.Promise.resolve[js.Array[ViewerFileLine]](js.Array(content.split('\n').map(c => ViewerFileLine(c, c.length)).toList: _*))
 
       //then
       if (up) fileReader.readPrevLines.expects(lines, position, viewport.size, viewport.encoding).returning(readF)
@@ -196,7 +198,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     def check(encoding: String, content: String, expected: List[String])
              (implicit pos: Position): () => Future[Unit] = { () =>
 
-      val readF = Future.successful(content.split('\n').map(c => (c, c.length)).toList)
+      val readF = js.Promise.resolve[js.Array[ViewerFileLine]](js.Array(content.split('\n').map(c => ViewerFileLine(c, c.length)).toList: _*))
 
       //then
       fileReader.readNextLines.expects(viewport.height, viewport.position, encoding).returning(readF)
@@ -249,7 +251,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       p.copy(viewport = p.viewport.copy(size = 10))
     }
     var viewport = props.viewport
-    val readF = Future.successful("1\n2\n3\n4\n5\n".split('\n').map(c => (c, c.length + 1)).toList)
+    val readF = js.Promise.resolve[js.Array[ViewerFileLine]](js.Array("1\n2\n3\n4\n5\n".split('\n').map(c => ViewerFileLine(c, c.length + 1)).toList: _*))
     fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readF)
     val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
 
@@ -272,7 +274,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       ))
     }.flatMap { _ =>
       //then
-      val resF = Future.successful("2\n3\n4\n5\n\n".split('\n').map(c => (c, c.length + 1)).toList)
+      val resF = js.Promise.resolve[js.Array[ViewerFileLine]](js.Array("2\n3\n4\n5\n\n".split('\n').map(c => ViewerFileLine(c, c.length + 1)).toList: _*))
       fileReader.readPrevLines.expects(viewport.height, viewport.size, viewport.size, viewport.encoding).returning(resF)
   
       //when
@@ -299,8 +301,8 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
              (implicit pos: Position): () => Future[Unit] = { () =>
 
       val readF =
-        if (content.isEmpty) Future.successful(Nil)
-        else Future.successful(content.split('\n').map(c => (c, c.length)).toList)
+        if (content.isEmpty) js.Promise.resolve[js.Array[ViewerFileLine]](js.Array[ViewerFileLine]())
+        else js.Promise.resolve[js.Array[ViewerFileLine]](js.Array(content.split('\n').map(c => ViewerFileLine(c, c.length)).toList: _*))
 
       //then
       if (!noop) {
@@ -413,7 +415,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
     var props = getViewerContentProps(inputRef, fileReader, setViewport, onKeypress = _ => true)
     var viewport = props.viewport
-    val readF = Future.successful("test \nfile content".split('\n').map(c => (c, c.length)).toList)
+    val readF = js.Promise.resolve[js.Array[ViewerFileLine]](js.Array[ViewerFileLine]("test \nfile content".split('\n').map(c => ViewerFileLine(c, c.length)).toList: _*))
     fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readF)
     val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
 
@@ -493,7 +495,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       updatedProps.viewport.width should not be viewport.width
       updatedProps.viewport.height should not be viewport.height
       val content2 = "test file content2"
-      val read2F = Future.successful(List((content2, content2.length)))
+      val read2F = js.Promise.resolve[js.Array[ViewerFileLine]](js.Array(ViewerFileLine(content2, content2.length)))
 
       //then
       fileReader.readNextLines.expects(updatedProps.viewport.height, 0.0, updatedProps.viewport.encoding)
@@ -552,7 +554,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
     var props = getViewerContentProps(inputRef, fileReader, setViewport)
     var viewport = props.viewport
-    val readF = Future.successful("test \nfile content\n".split('\n').map(c => (c, c.length + 1)).toList)
+    val readF = js.Promise.resolve[js.Array[ViewerFileLine]](js.Array("test \nfile content\n".split('\n').map(c => ViewerFileLine(c, c.length + 1)).toList: _*))
     fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readF)
     val percent = ((19 / viewport.size) * 100).toInt
     percent shouldBe 76
@@ -591,7 +593,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       p.copy(viewport = p.viewport.copy(size = 0))
     }
     var viewport = props.viewport
-    val readF = Future.successful("test content".split('\n').map(c => (c, c.length)).toList)
+    val readF = js.Promise.resolve[js.Array[ViewerFileLine]](js.Array[ViewerFileLine]("test content".split('\n').map(c => ViewerFileLine(c, c.length)).toList: _*))
     fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readF)
     val percent = 0
 

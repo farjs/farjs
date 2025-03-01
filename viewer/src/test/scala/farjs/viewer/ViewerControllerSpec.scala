@@ -130,7 +130,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
           wrap shouldBe false
           column shouldBe 0
           position shouldBe 0
-          linesData shouldBe Nil
+          linesData.toList shouldBe Nil
       }
     }.map { _ =>
       //then
@@ -194,7 +194,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
           wrap shouldBe history.params.wrap
           column shouldBe history.params.column
           position shouldBe history.params.position
-          linesData shouldBe Nil
+          linesData.toList shouldBe Nil
       }
     }.flatMap { _ =>
       //when
@@ -252,9 +252,9 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
         width = 3,
         height = 2,
         column = 1,
-        linesData = List(
-          "test" -> 4,
-          "test content" -> 12
+        linesData = js.Array(
+          ViewerFileLine("test", 4),
+          ViewerFileLine("test content", 12)
         )
       )))
 

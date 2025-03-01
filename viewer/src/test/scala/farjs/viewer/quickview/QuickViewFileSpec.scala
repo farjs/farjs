@@ -35,9 +35,9 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
       width = 3,
       height = 2,
       column = 1,
-      linesData = List(
-        "test" -> 4,
-        "test content" -> 12
+      linesData = js.Array(
+        ViewerFileLine("test", 4),
+        ViewerFileLine("test content", 12)
       )
     )
     

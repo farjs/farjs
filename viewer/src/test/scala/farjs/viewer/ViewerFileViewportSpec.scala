@@ -1,6 +1,9 @@
 package farjs.viewer
 
+import farjs.viewer.ViewerFileReaderSpec.assertViewerFileLines
 import scommons.nodejs.test.TestSpec
+
+import scala.scalajs.js
 
 class ViewerFileViewportSpec extends TestSpec {
 
@@ -12,8 +15,8 @@ class ViewerFileViewportSpec extends TestSpec {
       size = 123,
       width = 10,
       height = 3,
-      linesData = List(
-        "Валютный 123" -> 1
+      linesData = js.Array(
+        ViewerFileLine("Валютный 123", 1)
       )
     )
     
@@ -31,9 +34,9 @@ class ViewerFileViewportSpec extends TestSpec {
       size = 123,
       width = 15,
       height = 3,
-      linesData = List(
-        "\t\rline1\n\u0000\u0008\u001b" -> 1,
-        "\u007fline2" -> 2
+      linesData = js.Array(
+        ViewerFileLine("\t\rline1\n\u0000\u0008\u001b", 1),
+        ViewerFileLine("\u007fline2", 2)
       )
     )
     
@@ -53,9 +56,9 @@ class ViewerFileViewportSpec extends TestSpec {
       width = 10,
       height = 3,
       column = 1,
-      linesData = List(
-        "Валютный 12" -> 1,
-        "Валютный 123" -> 2
+      linesData = js.Array(
+        ViewerFileLine("Валютный 12", 1),
+        ViewerFileLine("Валютный 123", 2)
       )
     )
 
@@ -72,7 +75,7 @@ class ViewerFileViewportSpec extends TestSpec {
       width = 10,
       height = 3
     )
-    val data = List("test line 1" -> 1)
+    val data = js.Array(ViewerFileLine("test line 1", 1))
 
     //when & then
     viewport.doWrap(1, up = false)(data) shouldBe data
@@ -88,17 +91,20 @@ class ViewerFileViewportSpec extends TestSpec {
       height = 3,
       wrap = true
     )
-    val data = List(
-      "test1 2" -> 30,
-      "test3 4" -> 40
+    val data = js.Array(
+      ViewerFileLine("test1 2", 30),
+      ViewerFileLine("test3 4", 40)
     )
 
-    //when & then
-    viewport.doWrap(3, up = false)(data) shouldBe List(
-      "test1 " -> 6,
-      "2" -> 24,
-      "test3 " -> 6
-    )
+    //when
+    val results = viewport.doWrap(3, up = false)(data)
+    
+    //then
+    assertViewerFileLines(results, List(
+      ViewerFileLine("test1 ", 6),
+      ViewerFileLine("2", 24),
+      ViewerFileLine("test3 ", 6)
+    ))
   }
 
   it should "return wrapped data if up=true when doWrap" in {
@@ -111,16 +117,19 @@ class ViewerFileViewportSpec extends TestSpec {
       height = 3,
       wrap = true
     )
-    val data = List(
-      "test1 2" -> 30,
-      "test3 4" -> 40
+    val data = js.Array(
+      ViewerFileLine("test1 2", 30),
+      ViewerFileLine("test3 4", 40)
     )
 
-    //when & then
-    viewport.doWrap(3, up = true)(data) shouldBe List(
-      "est1 2" -> 6,
-      "t" -> 34,
-      "est3 4" -> 6
-    )
+    //when
+    val results = viewport.doWrap(3, up = true)(data)
+    
+    //then
+    assertViewerFileLines(results, List(
+      ViewerFileLine("est1 2", 6),
+      ViewerFileLine("t", 34),
+      ViewerFileLine("est3 4", 6)
+    ))
   }
 }

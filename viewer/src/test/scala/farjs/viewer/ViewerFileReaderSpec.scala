@@ -1,6 +1,9 @@
 package farjs.viewer
 
-import org.scalatest.Succeeded
+import farjs.viewer.ViewerFileReaderSpec.assertViewerFileLines
+import org.scalatest.Inside.inside
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.Buffer
 import scommons.nodejs.test.AsyncTestSpec
 
@@ -76,8 +79,8 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val resultF = reader.readPrevLines(lines, position.get, maxPos = 20, encoding)
     
     //then
-    resultF.map { linesData =>
-      linesData shouldBe Nil
+    resultF.toFuture.map { linesData =>
+      linesData.toList shouldBe Nil
     }
   }
 
@@ -102,12 +105,12 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val resultF = reader.readPrevLines(lines, position, maxPos = 18, encoding)
     
     //then
-    resultF.map { linesData =>
-      linesData shouldBe List(
-        "test file" -> 10,
-        "content" -> 8,
-        "" -> 0
-      )
+    resultF.toFuture.map { results =>
+      assertViewerFileLines(results, List(
+        ViewerFileLine("test file", 10),
+        ViewerFileLine("content", 8),
+        ViewerFileLine("", 0)
+      ))
     }
   }
 
@@ -132,12 +135,12 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val resultF = reader.readPrevLines(lines, position, maxPos = 18, encoding)
     
     //then
-    resultF.map { linesData =>
-      linesData shouldBe List(
-        "" -> 1,
-        "test file" -> 10,
-        "content" -> 7
-      )
+    resultF.toFuture.map { results =>
+      assertViewerFileLines(results, List(
+        ViewerFileLine("", 1),
+        ViewerFileLine("test file", 10),
+        ViewerFileLine("content", 7)
+      ))
     }
   }
 
@@ -158,11 +161,11 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val resultF = reader.readPrevLines(lines, position, maxPos = 25, encoding)
     
     //then
-    resultF.map { linesData =>
-      linesData shouldBe List(
-        "test" -> 5,
-        "file" -> 4
-      )
+    resultF.toFuture.map { results =>
+      assertViewerFileLines(results, List(
+        ViewerFileLine("test", 5),
+        ViewerFileLine("file", 4)
+      ))
     }
   }
 
@@ -183,10 +186,10 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val resultF = reader.readPrevLines(lines, position, maxPos = 18, encoding)
     
     //then
-    resultF.map { linesData =>
-      linesData shouldBe List(
-        "" -> 1
-      )
+    resultF.toFuture.map { results =>
+      assertViewerFileLines(results, List(
+        ViewerFileLine("", 1)
+      ))
     }
   }
 
@@ -207,11 +210,11 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val resultF = reader.readPrevLines(lines, position, maxPos = 15, encoding)
     
     //then
-    resultF.map { linesData =>
-      linesData shouldBe List(
-        "testf" -> 5,
-        "ilecontent" -> 10
-      )
+    resultF.toFuture.map { results =>
+      assertViewerFileLines(results, List(
+        ViewerFileLine("testf", 5),
+        ViewerFileLine("ilecontent", 10)
+      ))
     }
   }
 
@@ -235,12 +238,12 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val resultF = reader.readNextLines(lines, 0, encoding)
     
     //then
-    resultF.map { linesData =>
-      linesData shouldBe List(
-        "" -> 1,
-        "test file" -> 10,
-        "content" -> 8
-      )
+    resultF.toFuture.map { results =>
+      assertViewerFileLines(results, List(
+        ViewerFileLine("", 1),
+        ViewerFileLine("test file", 10),
+        ViewerFileLine("content", 8)
+      ))
     }
   }
 
@@ -268,11 +271,11 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val resultF = reader.readNextLines(lines, 0, encoding)
     
     //then
-    resultF.map { linesData =>
-      linesData shouldBe List(
-        "test file" -> 10,
-        "content" -> 7
-      )
+    resultF.toFuture.map { results =>
+      assertViewerFileLines(results, List(
+        ViewerFileLine("test file", 10),
+        ViewerFileLine("content", 7)
+      ))
     }
   }
 
@@ -296,16 +299,35 @@ class ViewerFileReaderSpec extends AsyncTestSpec {
     val resultF = reader.readNextLines(lines, 0, encoding)
     
     //then
-    resultF.map { linesData =>
-      linesData shouldBe List(
-        "testfileco" -> 10,
-        "ntent" -> 5
-      )
+    resultF.toFuture.map { results =>
+      assertViewerFileLines(results, List(
+        ViewerFileLine("testfileco", 10),
+        ViewerFileLine("ntent", 5)
+      ))
     }
   }
   
   private def writeBuf(buf: Buffer, content: String): Future[Int] = {
     buf.write(content, 0, content.length, encoding)
     Future.successful(content.length)
+  }
+}
+
+object ViewerFileReaderSpec {
+  
+  def assertViewerFileLines(results: js.Array[ViewerFileLine], lines: List[ViewerFileLine]): Assertion = {
+    results.length shouldBe lines.size
+    results.toList.zip(lines).foreach { case (result, expected) =>
+      assertViewerFileLine(result, expected)
+    }
+    Succeeded
+  }
+  
+  def assertViewerFileLine(result: ViewerFileLine, expected: ViewerFileLine): Assertion = {
+    inside(result) {
+      case ViewerFileLine(line, bytes) =>
+        line shouldBe expected.line
+        bytes shouldBe expected.bytes
+    }
   }
 }

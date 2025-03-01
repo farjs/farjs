@@ -97,7 +97,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
       height = 2,
       wrap = true,
       column = 3,
-      linesData = List(("test...", 55))
+      linesData = js.Array(ViewerFileLine("test...", 55))
     )
     
     //when
