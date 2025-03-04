@@ -11,6 +11,7 @@ await import("./file/FilePlugin.test.mjs");
 await import("./file/FilePluginUi.test.mjs");
 await import("./file/FileReader.test.mjs");
 await import("./file/FileViewHistory.test.mjs");
+await import("./file/MockFileReader.test.mjs");
 await import("./file/popups/EncodingsPopup.test.mjs");
 await import("./file/popups/FileViewHistoryController.test.mjs");
 await import("./file/popups/FileViewHistoryPopup.test.mjs");
