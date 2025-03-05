@@ -1,7 +1,5 @@
 package farjs.viewer.quickview
 
-import farjs.filelist.stack.WithStackProps
-import farjs.ui.Dispatch
 import farjs.viewer._
 import scommons.react.blessed._
 import scommons.react.hooks._
@@ -9,17 +7,12 @@ import scommons.react.{raw, _}
 
 import scala.scalajs.js
 
-case class QuickViewFileProps(dispatch: Dispatch,
-                              panelStack: WithStackProps,
-                              filePath: String,
-                              size: Double)
-
 object QuickViewFile extends FunctionComponent[QuickViewFileProps] {
 
   private[quickview] var viewerController: UiComponent[ViewerControllerProps] = ViewerController
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val (viewport, setViewport) = useState(Option.empty[ViewerFileViewport])
     val inputRef = raw.React.useRef(props.panelStack.panelInput)
 

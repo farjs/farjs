@@ -191,7 +191,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
             ^.rbHeight := height - 5,
             ^.rbStyle := theme.regularItem
           )(
-            <(quickViewFileComp())(^assertWrapped(inside(_) {
+            <(quickViewFileComp())(^.assertPlain[QuickViewFileProps](inside(_) {
               case QuickViewFileProps(resDispatch, resPanelStack, filePath, size) =>
                 resDispatch shouldBe dispatch
                 resPanelStack shouldBe panelStack

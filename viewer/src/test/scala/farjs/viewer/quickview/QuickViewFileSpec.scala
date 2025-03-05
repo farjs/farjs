@@ -24,7 +24,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
       ), null)
     )
     val props = QuickViewFileProps(dispatch, panelStack, "some/file/path", size = 123)
-    val renderer = createTestRenderer(<(QuickViewFile())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(QuickViewFile())(^.plain := props)())
     val viewProps = findComponentProps(renderer.root, viewerController)
     viewProps.viewport shouldBe None
 
@@ -60,7 +60,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
       ), null)
     )
     val props = QuickViewFileProps(dispatch, panelStack, "some/file/path", size = 123)
-    val renderer = createTestRenderer(<(QuickViewFile())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(QuickViewFile())(^.plain := props)())
     val viewProps = findComponentProps(renderer.root, viewerController)
 
     //then
@@ -86,7 +86,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
       ), null)
     )
     val props = QuickViewFileProps(dispatch, panelStack, "some/file/path", size = 123)
-    val renderer = createTestRenderer(<(QuickViewFile())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(QuickViewFile())(^.plain := props)())
     val viewProps = findComponentProps(renderer.root, viewerController)
 
     //then
@@ -111,7 +111,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
       ), null)
     )
     val props = QuickViewFileProps(dispatch, panelStack, "some/file/path", size = 123)
-    val renderer = createTestRenderer(<(QuickViewFile())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(QuickViewFile())(^.plain := props)())
     val viewProps = findComponentProps(renderer.root, viewerController)
 
     //when & then
@@ -131,7 +131,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     val props = QuickViewFileProps(dispatch, panelStack, "some/file/path", size = 123)
     
     //when
-    val renderer = createTestRenderer(<(QuickViewFile())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(QuickViewFile())(^.plain := props)())
     
     //then
     assertComponents(renderer.root.children, List(

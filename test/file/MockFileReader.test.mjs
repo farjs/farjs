@@ -37,6 +37,7 @@ describe("MockFileReader.test.mjs", () => {
     //then
     await checkRejected(result.open("test"));
     await checkRejected(result.close());
+    await checkRejected(result.readBytes(0, Buffer.from([])));
   });
 
   it("should construct instance with mocks", () => {
@@ -45,6 +46,7 @@ describe("MockFileReader.test.mjs", () => {
     const mocks = {
       open: mockFunction(),
       close: mockFunction(),
+      readBytes: mockFunction(),
     };
 
     //when
@@ -53,5 +55,6 @@ describe("MockFileReader.test.mjs", () => {
     //then
     assert.deepEqual(result.open === mocks.open, true);
     assert.deepEqual(result.close === mocks.close, true);
+    assert.deepEqual(result.readBytes === mocks.readBytes, true);
   });
 });

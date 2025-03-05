@@ -82,7 +82,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
             )(
               <(quickViewFileComp())(
                 ^.key := filePath,
-                ^.wrapped := QuickViewFileProps(
+                ^.plain := QuickViewFileProps(
                   dispatch = dispatch,
                   panelStack = panelStack,
                   filePath = filePath,
