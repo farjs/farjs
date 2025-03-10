@@ -2,6 +2,7 @@ package definitions
 
 import sbt.Keys._
 import sbt._
+import scoverage.ScoverageKeys.coverageExcludedPackages
 
 object FarjsViewer extends ScalaJsModule {
 
@@ -12,7 +13,11 @@ object FarjsViewer extends ScalaJsModule {
   override def definition: Project = {
     super.definition
       .settings(
-        description := "Internal file viewer implementation"
+        description := "Internal file viewer implementation",
+
+        coverageExcludedPackages :=
+          //to avoid Scala.js error: Found a dangling UndefinedParam
+          "farjs.viewer.ViewerFileReader"
       )
   }
 

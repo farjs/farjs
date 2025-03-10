@@ -49,7 +49,7 @@ object QuickViewDir extends FunctionComponent[QuickViewDirProps] {
         case Success(false) => // already cancelled
         case Success(true) =>
           setShowPopup(false)
-          val newParams = params.copy(folders = folders, files = files, filesSize = filesSize)
+          val newParams = QuickViewParams.copy(params)(folders = folders, files = files, filesSize = filesSize)
           stack.update[QuickViewParams](_.withState(newParams))
         case Failure(_) =>
           setShowPopup(false)

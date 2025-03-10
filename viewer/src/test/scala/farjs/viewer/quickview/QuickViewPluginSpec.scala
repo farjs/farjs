@@ -1,6 +1,7 @@
 package farjs.viewer.quickview
 
 import farjs.filelist.stack._
+import farjs.viewer.quickview.QuickViewDirSpec.assertQuickViewParams
 import org.scalatest.OptionValues
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react.ReactClass
@@ -77,7 +78,7 @@ class QuickViewPluginSpec extends AsyncTestSpec with OptionValues {
     //then
     stackState.length shouldBe 2
     stackState.head.component shouldBe QuickViewPanel()
-    stackState.head.state.toOption.value shouldBe QuickViewParams()
+    assertQuickViewParams(stackState.head.state.asInstanceOf[QuickViewParams], QuickViewParams())
   }
   
   it should "add plugin to right panel when onKeyTrigger" in {
@@ -99,6 +100,6 @@ class QuickViewPluginSpec extends AsyncTestSpec with OptionValues {
     //then
     stackState.length shouldBe 2
     stackState.head.component shouldBe QuickViewPanel()
-    stackState.head.state.toOption.value shouldBe QuickViewParams()
+    assertQuickViewParams(stackState.head.state.asInstanceOf[QuickViewParams], QuickViewParams())
   }
 }

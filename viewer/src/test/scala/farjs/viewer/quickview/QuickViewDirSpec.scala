@@ -9,7 +9,10 @@ import farjs.ui.popup.StatusPopupProps
 import farjs.ui.task.TaskAction
 import farjs.ui.{TextAlign, TextLineProps}
 import farjs.viewer.quickview.QuickViewDir._
+import farjs.viewer.quickview.QuickViewDirSpec.assertQuickViewParams
 import org.scalatest.Assertion
+import org.scalatest.Inside.inside
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.react._
 import scommons.react.blessed._
@@ -75,7 +78,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
 
       //then
       eventually {
-        stackState.head.state shouldBe QuickViewParams("dir 1", currDir.path, 1, 2, 123)
+        assertQuickViewParams(stackState.head.state.asInstanceOf[QuickViewParams], QuickViewParams("dir 1", currDir.path, 1, 2, 123))
         findComponents(renderer.root, statusPopupComp) should be (empty)
       }
     }
@@ -120,7 +123,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
 
       //then
       eventually {
-        stackState.head.state shouldBe QuickViewParams("dir 1", currDir.path, 1, 2, 123)
+        assertQuickViewParams(stackState.head.state.asInstanceOf[QuickViewParams], QuickViewParams("dir 1", currDir.path, 1, 2, 123))
         findComponents(renderer.root, statusPopupComp) should be (empty)
       }
     }
@@ -172,7 +175,7 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
       //then
       result shouldBe false
       eventually {
-        stackState.head.state shouldBe QuickViewParams("dir 1", currDir.path)
+        assertQuickViewParams(stackState.head.state.asInstanceOf[QuickViewParams], QuickViewParams("dir 1", currDir.path))
         findComponents(renderer.root, statusPopupComp) should be (empty)
       }
     }
@@ -290,5 +293,19 @@ class QuickViewDirSpec extends AsyncTestSpec with BaseTestSpec
              |${params.filesSize}%,.0f""".stripMargin
       )()
     ))
+  }
+}
+
+object QuickViewDirSpec {
+  
+  def assertQuickViewParams(result: QuickViewParams, expected: QuickViewParams): Assertion = {
+    inside(result) {
+      case QuickViewParams(name, parent, folders, files, filesSize) =>
+        name shouldBe expected.name
+        parent shouldBe expected.parent
+        folders shouldBe expected.folders
+        files shouldBe expected.files
+        filesSize shouldBe expected.filesSize
+    }
   }
 }
