@@ -41,7 +41,7 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
         currDir = props.state.currDir
       ))(),
 
-      <(fsFoldersHistory())(^.wrapped := FSFoldersHistoryProps(
+      <(fsFoldersHistory())(^.plain := FSFoldersHistoryProps(
         currDirPath = props.state.currDir.path
       ))()
     )

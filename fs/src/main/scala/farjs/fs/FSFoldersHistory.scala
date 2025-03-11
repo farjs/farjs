@@ -7,15 +7,13 @@ import scommons.react.hooks._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 
-case class FSFoldersHistoryProps(currDirPath: String)
-
 object FSFoldersHistory extends FunctionComponent[FSFoldersHistoryProps] {
 
   val foldersHistoryKind: HistoryKind = HistoryKind("farjs.folders", 100)
 
   protected def render(compProps: Props): ReactElement = {
     val historyProvider = HistoryProvider.useHistoryProvider()
-    val props = compProps.wrapped
+    val props = compProps.plain
     val currDirPath = props.currDirPath
 
     useLayoutEffect({ () =>

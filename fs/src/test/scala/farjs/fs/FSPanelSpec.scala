@@ -97,7 +97,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils with OptionValues {
           currDir shouldBe props.state.currDir
       }))(),
 
-      <(fsFoldersHistory())(^.assertWrapped(inside(_) {
+      <(fsFoldersHistory())(^.assertPlain[FSFoldersHistoryProps](inside(_) {
         case FSFoldersHistoryProps(currDirPath) =>
           currDirPath shouldBe props.state.currDir.path
       }))()

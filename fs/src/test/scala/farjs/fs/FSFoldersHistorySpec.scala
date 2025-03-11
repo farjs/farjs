@@ -36,7 +36,7 @@ class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec
     
     //when
     val renderer = createTestRenderer(withHistoryProvider(
-      <(FSFoldersHistory())(^.wrapped := props)(), historyMocks.provider
+      <(FSFoldersHistory())(^.plain := props)(), historyMocks.provider
     ))
 
     //then
@@ -59,7 +59,7 @@ class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec
     
     //when
     val renderer = createTestRenderer(withHistoryProvider(
-      <(FSFoldersHistory())(^.wrapped := props)(), historyMocks.provider
+      <(FSFoldersHistory())(^.plain := props)(), historyMocks.provider
     ))
 
     //then
@@ -86,7 +86,7 @@ class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec
     }
 
     val renderer = createTestRenderer(withHistoryProvider(
-      <(FSFoldersHistory())(^.wrapped := props)(), historyMocks.provider
+      <(FSFoldersHistory())(^.plain := props)(), historyMocks.provider
     ))
     eventually(saveHistory should not be null).map { _ =>
       inside(saveHistory) {
@@ -96,7 +96,7 @@ class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec
       }
     }
 
-    val updatedProps = props.copy(currDirPath = "dir 1")
+    val updatedProps = FSFoldersHistoryProps.copy(props)(currDirPath = "dir 1")
 
     //then
     historyMocks.save.expects(*).never()
@@ -104,7 +104,7 @@ class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec
     //when
     TestRenderer.act { () =>
       renderer.update(withHistoryProvider(
-        <(FSFoldersHistory())(^.wrapped := updatedProps)(), historyMocks.provider
+        <(FSFoldersHistory())(^.plain := updatedProps)(), historyMocks.provider
       ))
     }
     
@@ -126,7 +126,7 @@ class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec
     }.twice()
     
     val renderer = createTestRenderer(withHistoryProvider(
-      <(FSFoldersHistory())(^.wrapped := props)(), historyMocks.provider
+      <(FSFoldersHistory())(^.plain := props)(), historyMocks.provider
     ))
     eventually(saveHistory should not be null).map { _ =>
       inside(saveHistory) {
@@ -136,12 +136,12 @@ class FSFoldersHistorySpec extends AsyncTestSpec with BaseTestSpec
       }
     }
     saveHistory = null
-    val updatedProps = props.copy(currDirPath = "dir 2")
+    val updatedProps = FSFoldersHistoryProps.copy(props)(currDirPath = "dir 2")
 
     //when
     TestRenderer.act { () =>
       renderer.update(withHistoryProvider(
-        <(FSFoldersHistory())(^.wrapped := updatedProps)(), historyMocks.provider
+        <(FSFoldersHistory())(^.plain := updatedProps)(), historyMocks.provider
       ))
     }
 
