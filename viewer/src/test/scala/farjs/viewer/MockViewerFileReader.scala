@@ -8,7 +8,7 @@ class MockViewerFileReader(
   closeMock: () => js.Promise[Unit] = () => ???,
   readPrevLinesMock: (Int, Double, Double, String) => js.Promise[js.Array[ViewerFileLine]] = (_, _, _, _) => ???,
   readNextLinesMock: (Int, Double, String) => js.Promise[js.Array[ViewerFileLine]] = (_, _, _) => ???
-) extends ViewerFileReader(null, bufferSize = 15, maxLineLength = 10) {
+) extends ViewerFileReader(null) {
 
   override def open(filePath: String): js.Promise[Unit] = openMock(filePath)
 

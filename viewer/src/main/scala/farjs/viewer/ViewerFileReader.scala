@@ -7,9 +7,7 @@ import scala.scalajs.js.annotation.JSImport
 
 @js.native
 @JSImport("../viewer/ViewerFileReader.mjs", JSImport.Default)
-class ViewerFileReader(fileReader: FileReader,
-                       bufferSize: Int = js.native,
-                       maxLineLength: Int = js.native) extends js.Object {
+class ViewerFileReader(fileReader: FileReader) extends js.Object {
   
   def open(filePath: String): js.Promise[Unit] = js.native
 
