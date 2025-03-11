@@ -58,7 +58,8 @@
     "dist/versionChecker.mjs",
     "file/**/*.mjs",
     "filelist/**/*.mjs",
-    "fs/**/*.mjs"
+    "fs/**/*.mjs",
+    "viewer/**/*.mjs"
   ],
   "type": "module",
   "main": "./build/farjs-app-opt.js",
