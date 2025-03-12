@@ -91,7 +91,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils with OptionValues {
           resState shouldBe state
       }))(),
 
-      <(fsFreeSpaceComp())(^.assertWrapped(inside(_) {
+      <(fsFreeSpaceComp())(^.assertPlain[FSFreeSpaceProps](inside(_) {
         case FSFreeSpaceProps(resDispatch, currDir) =>
           resDispatch shouldBe dispatch
           currDir shouldBe props.state.currDir

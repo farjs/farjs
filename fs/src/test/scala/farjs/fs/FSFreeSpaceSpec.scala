@@ -38,7 +38,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     }
     
     //when
-    val result = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)()).root
+    val result = createTestRenderer(<(FSFreeSpace())(^.plain := props)()).root
 
     //then
     result.children.toList should be (empty)
@@ -60,8 +60,8 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       ()
     }
 
-    val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
-    val props2 = props.copy(currDir = FileListDir.copy(props.currDir)(path = "/2"))
+    val renderer = createTestRenderer(<(FSFreeSpace())(^.plain := props)())
+    val props2 = FSFreeSpaceProps.copy(props)(currDir = FileListDir.copy(props.currDir)(path = "/2"))
     val resultF2 = Future.successful(Option.empty[FSDisk])
 
     resultF.flatMap { _ =>
@@ -71,7 +71,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
       //when
       TestRenderer.act { () =>
-        renderer.update(<(FSFreeSpace())(^.wrapped := props2)())
+        renderer.update(<(FSFreeSpace())(^.plain := props2)())
       }
 
       //then
@@ -95,8 +95,8 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       ()
     }
 
-    val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
-    val props2 = props.copy(currDir = FileListDir.copy(props.currDir)(path = "/2"))
+    val renderer = createTestRenderer(<(FSFreeSpace())(^.plain := props)())
+    val props2 = FSFreeSpaceProps.copy(props)(currDir = FileListDir.copy(props.currDir)(path = "/2"))
     val resultF2 = Future.failed(new Exception("test error"))
 
     resultF.flatMap { _ =>
@@ -106,7 +106,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
       //when
       TestRenderer.act { () =>
-        renderer.update(<(FSFreeSpace())(^.wrapped := props2)())
+        renderer.update(<(FSFreeSpace())(^.plain := props2)())
       }
 
       //then
@@ -131,8 +131,8 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       ()
     }
 
-    val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
-    val props2 = props.copy(currDir = props.currDir)
+    val renderer = createTestRenderer(<(FSFreeSpace())(^.plain := props)())
+    val props2 = FSFreeSpaceProps.copy(props)(currDir = props.currDir)
 
     resultF.map { _ =>
       //then
@@ -141,7 +141,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
       //when
       TestRenderer.act { () =>
-        renderer.update(<(FSFreeSpace())(^.wrapped := props2)())
+        renderer.update(<(FSFreeSpace())(^.plain := props2)())
       }
 
       //then
@@ -155,7 +155,7 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val fsService = new FsService
     FSFreeSpace.fsService = fsService.fsService
     val props = FSFreeSpaceProps(dispatch, FileListDir("/", isRoot = false, js.Array()))
-    val props2 = props.copy(currDir = FileListDir.copy(props.currDir)(path = "/2"))
+    val props2 = FSFreeSpaceProps.copy(props)(currDir = FileListDir.copy(props.currDir)(path = "/2"))
     val disk1 = FSDisk("/", size = 123.0, free = 456.0, "/")
     val disk2 = FSDisk("/2", size = 124.0, free = 457.0, "/")
     val p1 = Promise[Option[FSDisk]]()
@@ -172,9 +172,9 @@ class FSFreeSpaceSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     }
 
     //when
-    val renderer = createTestRenderer(<(FSFreeSpace())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(FSFreeSpace())(^.plain := props)())
     TestRenderer.act { () =>
-      renderer.update(<(FSFreeSpace())(^.wrapped := props2)())
+      renderer.update(<(FSFreeSpace())(^.plain := props2)())
     }
     
     //then

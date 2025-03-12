@@ -2,22 +2,18 @@ package farjs.fs
 
 import farjs.filelist.FileListActions.FileListDiskSpaceUpdatedAction
 import farjs.filelist.api.FileListDir
-import farjs.ui.Dispatch
 import scommons.react._
 import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.control.NonFatal
 
-case class FSFreeSpaceProps(dispatch: Dispatch,
-                            currDir: FileListDir)
-
 object FSFreeSpace extends FunctionComponent[FSFreeSpaceProps] {
 
   private[fs] var fsService: FSService = FSService.instance
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val currDirRef = useRef[FileListDir](null)
     currDirRef.current = props.currDir
 

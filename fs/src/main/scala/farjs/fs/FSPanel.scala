@@ -36,7 +36,7 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
     <.>()(
       <(fileListPanelComp)(^.plain := FileListPanelProps.copy(props)(onKeypress = onKeypress))(),
 
-      <(fsFreeSpaceComp())(^.wrapped := FSFreeSpaceProps(
+      <(fsFreeSpaceComp())(^.plain := FSFreeSpaceProps(
         dispatch = props.dispatch,
         currDir = props.state.currDir
       ))(),
