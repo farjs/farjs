@@ -205,6 +205,27 @@ describe("ViewerFileReader.test.mjs", () => {
     ]);
   });
 
+  it("should read single line when readPrevLines", async () => {
+    //given
+    let readBytesArgs = /** @type {any[]} */ ([]);
+    const readBytes = mockFunction((pos, buf) => {
+      readBytesArgs = [pos, buf.length];
+      return writeBuf(buf, "testfileco");
+    });
+    const fileReader = new MockFileReader({ readBytes });
+    const reader = new ViewerFileReader(fileReader, bufferSize, maxLineLength);
+    const position = 15;
+    const lines = 1;
+
+    //when
+    const results = await reader.readPrevLines(lines, position, 18, encoding);
+
+    //then
+    assert.deepEqual(readBytes.times, 1);
+    assert.deepEqual(readBytesArgs, [5, maxLineLength]);
+    assert.deepEqual(results, [ViewerFileLine("testfileco", 10)]);
+  });
+
   it("should read file content with new lines when readNextLines", async () => {
     //given
     let readBytesArgs1 = /** @type {any[]} */ ([]);
@@ -297,5 +318,25 @@ describe("ViewerFileReader.test.mjs", () => {
       ViewerFileLine("testfileco", 10),
       ViewerFileLine("ntent", 5),
     ]);
+  });
+
+  it("should read single line when readNextLines", async () => {
+    //given
+    let readBytesArgs = /** @type {any[]} */ ([]);
+    const readBytes = mockFunction((pos, buf) => {
+      readBytesArgs = [pos, buf.length];
+      return writeBuf(buf, "testfileco");
+    });
+    const fileReader = new MockFileReader({ readBytes });
+    const reader = new ViewerFileReader(fileReader, bufferSize, maxLineLength);
+    const lines = 1;
+
+    //when
+    const results = await reader.readNextLines(lines, 0, encoding);
+
+    //then
+    assert.deepEqual(readBytes.times, 1);
+    assert.deepEqual(readBytesArgs, [0, maxLineLength]);
+    assert.deepEqual(results, [ViewerFileLine("testfileco", 10)]);
   });
 });
