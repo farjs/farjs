@@ -6,6 +6,8 @@ import farjs.fs.FSPluginUi._
 import farjs.fs.popups._
 import scommons.react._
 
+import scala.scalajs.js
+
 object FSPluginUi {
 
   private[fs] var drive: UiComponent[DriveControllerProps] = DriveController
@@ -55,9 +57,12 @@ class FSPluginUi(val showDrivePopupOnLeft: Option[Boolean] = None,
       onChangeDir(stacks.left.stack.isActive)
 
     <.>()(
-      <(drive())(^.wrapped := DriveControllerProps(
+      <(drive())(^.plain := DriveControllerProps(
         dispatch = props.dispatch,
-        showDrivePopupOnLeft = showDrivePopupOnLeft,
+        showDrivePopupOnLeft = showDrivePopupOnLeft match {
+          case Some(v) => v
+          case None => js.undefined
+        },
         onChangeDir = { (dir, isLeft) =>
           onChangeDir(isLeft)(dir)
         },

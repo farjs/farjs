@@ -94,7 +94,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
       left = WithStacksData(otherStack, null),
       right = WithStacksData(currStack, null)
     ))
-    val driveProps = findComponentProps(renderer.root, drive)
+    val driveProps = findComponentProps(renderer.root, drive, plain = true)
     val action = TaskAction(Task("Changing Dir",
       Future.successful(FileListDir("/", isRoot = true, items = js.Array()))
     ))
@@ -172,10 +172,10 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     //then
     val onChangeDirInActivePanel = findComponentProps(result, foldersHistory).onChangeDir
     assertComponents(result.children, List(
-      <(drive())(^.assertWrapped(inside(_) {
+      <(drive())(^.assertPlain[DriveControllerProps](inside(_) {
         case DriveControllerProps(resDispatch, showDrivePopupOnLeft, _, resOnClose) =>
           resDispatch shouldBe dispatch
-          showDrivePopupOnLeft shouldBe None
+          showDrivePopupOnLeft shouldBe js.undefined
           resOnClose should be theSameInstanceAs onClose
       }))(),
 
