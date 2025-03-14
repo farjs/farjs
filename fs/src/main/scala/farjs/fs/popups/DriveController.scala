@@ -11,7 +11,7 @@ object DriveController extends FunctionComponent[DriveControllerProps] {
 
     props.showDrivePopupOnLeft.toOption match {
       case Some(showOnLeft) =>
-        <(drivePopup())(^.wrapped := DrivePopupProps(
+        <(drivePopup())(^.plain := DrivePopupProps(
           dispatch = props.dispatch,
           onChangeDir = { dir =>
             props.onClose()

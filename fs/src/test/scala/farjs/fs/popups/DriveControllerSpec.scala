@@ -23,7 +23,7 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
     onChangeDir.expects(dir, true)
 
     //when
-    findComponentProps(renderer.root, drivePopup).onChangeDir(dir)
+    findComponentProps(renderer.root, drivePopup, plain = true).onChangeDir(dir)
   }
 
   it should "call onChangeDir when onChangeDir on the right" in {
@@ -40,7 +40,7 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
     onChangeDir.expects(dir, false)
 
     //when
-    findComponentProps(renderer.root, drivePopup).onChangeDir(dir)
+    findComponentProps(renderer.root, drivePopup, plain = true).onChangeDir(dir)
   }
 
   it should "call onClose when onClose" in {
@@ -50,7 +50,7 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val props = DriveControllerProps(dispatch, showDrivePopupOnLeft = true, onChangeDir, onClose)
     val comp = testRender(<(DriveController())(^.plain := props)())
-    val popup = findComponentProps(comp, drivePopup)
+    val popup = findComponentProps(comp, drivePopup, plain = true)
 
     //then
     onClose.expects()
@@ -69,7 +69,7 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(DriveController())(^.plain := props)())
 
     //then
-    assertTestComponent(result, drivePopup) {
+    assertTestComponent(result, drivePopup, plain = true) {
       case DrivePopupProps(dispatch, _, _, showOnLeft) =>
         dispatch shouldBe props.dispatch
         showOnLeft shouldBe true
@@ -85,7 +85,7 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(DriveController())(^.plain := props)())
 
     //then
-    assertTestComponent(result, drivePopup) {
+    assertTestComponent(result, drivePopup, plain = true) {
       case DrivePopupProps(dispatch, _, _, showOnLeft) =>
         dispatch shouldBe props.dispatch
         showOnLeft shouldBe false

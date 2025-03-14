@@ -6,7 +6,7 @@ import farjs.fs.{FSDisk, FSService}
 import farjs.ui.border.SingleChars
 import farjs.ui.menu.{MenuPopup, MenuPopupProps}
 import farjs.ui.task.{Task, TaskAction}
-import farjs.ui.{Dispatch, WithSize, WithSizeProps}
+import farjs.ui.{WithSize, WithSizeProps}
 import scommons.nodejs.Process.Platform
 import scommons.nodejs.process
 import scommons.react._
@@ -14,11 +14,6 @@ import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
-
-case class DrivePopupProps(dispatch: Dispatch,
-                           onChangeDir: String => Unit,
-                           onClose: () => Unit,
-                           showOnLeft: Boolean)
 
 object DrivePopup extends FunctionComponent[DrivePopupProps] {
 
@@ -29,7 +24,7 @@ object DrivePopup extends FunctionComponent[DrivePopupProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val (disks, setDisks) = useState(List.empty[FSDisk])
-    val props = compProps.wrapped
+    val props = compProps.plain
     val stacks = WithStacks.useStacks()
     val data = getData(platform, disks)
 

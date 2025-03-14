@@ -64,7 +64,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //when & then
     val renderer = createTestRenderer(
-      withContext(<(DrivePopup())(^.wrapped := props)(), leftStack = currStack, rightStack = otherStack)
+      withContext(<(DrivePopup())(^.plain := props)(), leftStack = currStack, rightStack = otherStack)
     )
     renderer.root.children.isEmpty shouldBe true
     
@@ -122,7 +122,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //when & then
     val renderer = createTestRenderer(
-      withContext(<(DrivePopup())(^.wrapped := props)(), leftStack = otherStack, rightStack = currStack)
+      withContext(<(DrivePopup())(^.plain := props)(), leftStack = otherStack, rightStack = currStack)
     )
     renderer.root.children.isEmpty shouldBe true
     
@@ -180,7 +180,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //when & then
     val renderer = createTestRenderer(
-      withContext(<(DrivePopup())(^.wrapped := props)(), leftStack = currStack, rightStack = otherStack)
+      withContext(<(DrivePopup())(^.plain := props)(), leftStack = currStack, rightStack = otherStack)
     )
     renderer.root.children.isEmpty shouldBe true
     
@@ -222,7 +222,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     fsService.readDisks.expects().returning(Future.successful(List(
       FSDisk("C:", size = 1.0, free = 2.0, "Test")
     )))
-    val renderer = createTestRenderer(withContext(<(DrivePopup())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withContext(<(DrivePopup())(^.plain := props)()))
     renderer.root.children.isEmpty shouldBe true
     
     eventually {
@@ -266,7 +266,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )))
 
     //when
-    val renderer = createTestRenderer(withContext(<(DrivePopup())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withContext(<(DrivePopup())(^.plain := props)()))
 
     //then
     renderer.root.children.isEmpty shouldBe true
@@ -305,7 +305,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //when
     val renderer = createTestRenderer(withContext(
-      <(DrivePopup())(^.wrapped := props)(), panelInput = panelInput
+      <(DrivePopup())(^.plain := props)(), panelInput = panelInput
     ))
 
     //then
