@@ -13,7 +13,7 @@ class FoldersHistoryControllerSpec extends TestSpec with TestRendererUtils {
     val onChangeDir = mockFunction[String, Unit]
     val onClose = mockFunction[Unit]
     val props = FoldersHistoryControllerProps(showPopup = true, onChangeDir, onClose)
-    val renderer = createTestRenderer(<(FoldersHistoryController())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(FoldersHistoryController())(^.plain := props)())
     val dir = "test dir"
 
     //then
@@ -29,7 +29,7 @@ class FoldersHistoryControllerSpec extends TestSpec with TestRendererUtils {
     val onChangeDir = mockFunction[String, Unit]
     val onClose = mockFunction[Unit]
     val props = FoldersHistoryControllerProps(showPopup = true, onChangeDir, onClose)
-    val comp = testRender(<(FoldersHistoryController())(^.wrapped := props)())
+    val comp = testRender(<(FoldersHistoryController())(^.plain := props)())
     val popup = findComponentProps(comp, foldersHistoryPopup)
 
     //then
@@ -45,7 +45,7 @@ class FoldersHistoryControllerSpec extends TestSpec with TestRendererUtils {
     val props = FoldersHistoryControllerProps(showPopup = true, _ => (), () => ())
 
     //when
-    val result = testRender(<(FoldersHistoryController())(^.wrapped := props)())
+    val result = testRender(<(FoldersHistoryController())(^.plain := props)())
 
     //then
     assertTestComponent(result, foldersHistoryPopup) {
@@ -58,7 +58,7 @@ class FoldersHistoryControllerSpec extends TestSpec with TestRendererUtils {
     val props = FoldersHistoryControllerProps(showPopup = false, _ => (), () => ())
 
     //when
-    val renderer = createTestRenderer(<(FoldersHistoryController())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(FoldersHistoryController())(^.plain := props)())
 
     //then
     renderer.root.children.toList should be (empty)

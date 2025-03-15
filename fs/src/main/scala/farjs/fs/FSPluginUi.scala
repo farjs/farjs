@@ -32,7 +32,7 @@ class FSPluginUi(val showDrivePopupOnLeft: Option[Boolean] = None,
     val stacks = WithStacks.useStacks()
     val props = compProps.plain
 
-    def onChangeDir(isLeft: Boolean)(dir: String): Unit = {
+    def onChangeDir(isLeft: Boolean): js.Function1[String, Unit] = { dir =>
       val currStack =
         if (isLeft) stacks.left.stack
         else stacks.right.stack
@@ -53,7 +53,7 @@ class FSPluginUi(val showDrivePopupOnLeft: Option[Boolean] = None,
       }
     }
     
-    val onChangeDirInActivePanel: String => Unit =
+    val onChangeDirInActivePanel: js.Function1[String, Unit] =
       onChangeDir(stacks.left.stack.isActive)
 
     <.>()(
@@ -69,7 +69,7 @@ class FSPluginUi(val showDrivePopupOnLeft: Option[Boolean] = None,
         onClose = props.onClose
       ))(),
       
-      <(foldersHistory())(^.wrapped := FoldersHistoryControllerProps(
+      <(foldersHistory())(^.plain := FoldersHistoryControllerProps(
         showPopup = showFoldersHistoryPopup,
         onChangeDir = onChangeDirInActivePanel,
         onClose = props.onClose

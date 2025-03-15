@@ -57,7 +57,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
       left = WithStacksData(currStack, null),
       right = WithStacksData(otherStack, null)
     ))
-    val foldersHistoryProps = findComponentProps(renderer.root, foldersHistory)
+    val foldersHistoryProps = findComponentProps(renderer.root, foldersHistory, plain = true)
     val action = TaskAction(Task("Changing Dir",
       Future.successful(FileListDir("/", isRoot = true, items = js.Array()))
     ))
@@ -136,7 +136,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
       left = WithStacksData(otherStack, null),
       right = WithStacksData(currStack, null)
     ))
-    val foldersHistoryProps = findComponentProps(renderer.root, foldersHistory)
+    val foldersHistoryProps = findComponentProps(renderer.root, foldersHistory, plain = true)
     val dir = currState.currDir.path
 
     //then
@@ -170,7 +170,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
     )).root
 
     //then
-    val onChangeDirInActivePanel = findComponentProps(result, foldersHistory).onChangeDir
+    val onChangeDirInActivePanel = findComponentProps(result, foldersHistory, plain = true).onChangeDir
     assertComponents(result.children, List(
       <(drive())(^.assertPlain[DriveControllerProps](inside(_) {
         case DriveControllerProps(resDispatch, showDrivePopupOnLeft, _, resOnClose) =>
@@ -179,7 +179,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
           resOnClose should be theSameInstanceAs onClose
       }))(),
 
-      <(foldersHistory())(^.assertWrapped(inside(_) {
+      <(foldersHistory())(^.assertPlain[FoldersHistoryControllerProps](inside(_) {
         case FoldersHistoryControllerProps(showPopup, onChangeDir, resOnClose) =>
           showPopup shouldBe false
           onChangeDir shouldBe onChangeDirInActivePanel

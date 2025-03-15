@@ -5,7 +5,7 @@ import scommons.react._
 import scala.scalajs.js
 
 case class FolderShortcutsControllerProps(showPopup: Boolean,
-                                          onChangeDir: String => Unit,
+                                          onChangeDir: js.Function1[String, Unit],
                                           onClose: js.Function0[Unit])
 
 object FolderShortcutsController extends FunctionComponent[FolderShortcutsControllerProps] {
