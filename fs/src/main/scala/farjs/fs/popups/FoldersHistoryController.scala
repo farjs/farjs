@@ -10,7 +10,7 @@ object FoldersHistoryController extends FunctionComponent[FoldersHistoryControll
     val props = compProps.plain
 
     if (props.showPopup) {
-      <(foldersHistoryPopup())(^.wrapped := FoldersHistoryPopupProps(
+      <(foldersHistoryPopup())(^.plain := FoldersHistoryPopupProps(
         onChangeDir = { dir =>
           props.onClose()
           props.onChangeDir(dir)

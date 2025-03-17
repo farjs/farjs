@@ -47,7 +47,7 @@ class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestR
     }
     
     val result = createTestRenderer(withHistoryProvider(
-      <(FoldersHistoryPopup())(^.wrapped := props)(), historyMocks.provider
+      <(FoldersHistoryPopup())(^.plain := props)(), historyMocks.provider
     )).root
 
     eventually(getAllCalled shouldBe true).map { _ =>
@@ -83,7 +83,7 @@ class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestR
     
     //when
     val result = createTestRenderer(withHistoryProvider(
-      <(FoldersHistoryPopup())(^.wrapped := props)(), historyMocks.provider
+      <(FoldersHistoryPopup())(^.plain := props)(), historyMocks.provider
     )).root
 
     //then

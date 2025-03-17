@@ -9,9 +9,6 @@ import scommons.react.hooks._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 
-case class FoldersHistoryPopupProps(onChangeDir: String => Unit,
-                                    onClose: () => Unit)
-
 object FoldersHistoryPopup extends FunctionComponent[FoldersHistoryPopupProps] {
 
   private[popups] var listPopup: ReactClass = ListPopup
@@ -19,7 +16,7 @@ object FoldersHistoryPopup extends FunctionComponent[FoldersHistoryPopupProps] {
   protected def render(compProps: Props): ReactElement = {
     val historyProvider = HistoryProvider.useHistoryProvider()
     val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
-    val props = compProps.wrapped
+    val props = compProps.plain
 
     useLayoutEffect({ () =>
       for {

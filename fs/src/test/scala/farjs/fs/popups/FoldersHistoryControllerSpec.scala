@@ -21,7 +21,7 @@ class FoldersHistoryControllerSpec extends TestSpec with TestRendererUtils {
     onChangeDir.expects(dir)
 
     //when
-    findComponentProps(renderer.root, foldersHistoryPopup).onChangeDir(dir)
+    findComponentProps(renderer.root, foldersHistoryPopup, plain = true).onChangeDir(dir)
   }
 
   it should "call onClose when onClose" in {
@@ -30,7 +30,7 @@ class FoldersHistoryControllerSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val props = FoldersHistoryControllerProps(showPopup = true, onChangeDir, onClose)
     val comp = testRender(<(FoldersHistoryController())(^.plain := props)())
-    val popup = findComponentProps(comp, foldersHistoryPopup)
+    val popup = findComponentProps(comp, foldersHistoryPopup, plain = true)
 
     //then
     onClose.expects()
@@ -48,7 +48,7 @@ class FoldersHistoryControllerSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(FoldersHistoryController())(^.plain := props)())
 
     //then
-    assertTestComponent(result, foldersHistoryPopup) {
+    assertTestComponent(result, foldersHistoryPopup, plain = true) {
       case FoldersHistoryPopupProps(_, _) => Succeeded
     }
   }
