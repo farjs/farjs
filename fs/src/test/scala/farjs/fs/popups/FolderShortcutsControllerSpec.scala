@@ -13,7 +13,7 @@ class FolderShortcutsControllerSpec extends TestSpec with TestRendererUtils {
     val onChangeDir = mockFunction[String, Unit]
     val onClose = mockFunction[Unit]
     val props = FolderShortcutsControllerProps(showPopup = true, onChangeDir, onClose)
-    val renderer = createTestRenderer(<(FolderShortcutsController())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(FolderShortcutsController())(^.plain := props)())
     val dir = "test dir"
 
     //then
@@ -29,7 +29,7 @@ class FolderShortcutsControllerSpec extends TestSpec with TestRendererUtils {
     val onChangeDir = mockFunction[String, Unit]
     val onClose = mockFunction[Unit]
     val props = FolderShortcutsControllerProps(showPopup = true, onChangeDir, onClose)
-    val comp = testRender(<(FolderShortcutsController())(^.wrapped := props)())
+    val comp = testRender(<(FolderShortcutsController())(^.plain := props)())
     val popup = findComponentProps(comp, folderShortcutsPopup)
 
     //then
@@ -45,7 +45,7 @@ class FolderShortcutsControllerSpec extends TestSpec with TestRendererUtils {
     val props = FolderShortcutsControllerProps(showPopup = true, _ => (), () => ())
 
     //when
-    val result = testRender(<(FolderShortcutsController())(^.wrapped := props)())
+    val result = testRender(<(FolderShortcutsController())(^.plain := props)())
 
     //then
     assertTestComponent(result, folderShortcutsPopup) {
@@ -58,7 +58,7 @@ class FolderShortcutsControllerSpec extends TestSpec with TestRendererUtils {
     val props = FolderShortcutsControllerProps(showPopup = false, _ => (), () => ())
 
     //when
-    val renderer = createTestRenderer(<(FolderShortcutsController())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(FolderShortcutsController())(^.plain := props)())
 
     //then
     renderer.root.children.toList should be (empty)

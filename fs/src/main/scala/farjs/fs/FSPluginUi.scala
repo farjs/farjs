@@ -75,7 +75,7 @@ class FSPluginUi(val showDrivePopupOnLeft: Option[Boolean] = None,
         onClose = props.onClose
       ))(),
       
-      <(folderShortcuts())(^.wrapped := FolderShortcutsControllerProps(
+      <(folderShortcuts())(^.plain := FolderShortcutsControllerProps(
         showPopup = showFolderShortcutsPopup,
         onChangeDir = onChangeDirInActivePanel,
         onClose = props.onClose

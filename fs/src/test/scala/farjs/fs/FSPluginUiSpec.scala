@@ -186,7 +186,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
           resOnClose should be theSameInstanceAs onClose
       }))(),
 
-      <(folderShortcuts())(^.assertWrapped(inside(_) {
+      <(folderShortcuts())(^.assertPlain[FolderShortcutsControllerProps](inside(_) {
         case FolderShortcutsControllerProps(showPopup, onChangeDir, resOnClose) =>
           showPopup shouldBe false
           onChangeDir shouldBe onChangeDirInActivePanel
