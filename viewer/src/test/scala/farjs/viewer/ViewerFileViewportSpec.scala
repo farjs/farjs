@@ -63,7 +63,7 @@ class ViewerFileViewportSpec extends TestSpec {
     )
 
     //when & then
-    viewport.scrollIndicators shouldBe List(1)
+    viewport.scrollIndicators.toList shouldBe List(1)
   }
 
   it should "return input data if wrap=false when doWrap" in {

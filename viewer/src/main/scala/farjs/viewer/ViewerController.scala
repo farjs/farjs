@@ -124,7 +124,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
                 ^.rbHeight := 1,
                 ^.content := ">"
               )()
-            }
+            }.toList
           )
         }
       )

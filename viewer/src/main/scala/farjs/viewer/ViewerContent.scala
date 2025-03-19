@@ -38,19 +38,19 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
     
     def onMoveUp(lines: Int, from: Double = viewport.position): Unit = {
       if (readF.current.isCompleted) {
-        readF.current = viewport.moveUp(lines, from).map(updated)
+        readF.current = viewport.moveUp(lines, from).toFuture.map(updated)
       }
     }
     
     def onMoveDown(lines: Int): Unit = {
       if (readF.current.isCompleted) {
-        readF.current = viewport.moveDown(lines).map(updated)
+        readF.current = viewport.moveDown(lines).toFuture.map(updated)
       }
     }
     
     def onReload(from: Double = viewport.position): Unit = {
       readF.current = readF.current.andThen { _ =>
-        readF.current = viewport.reload(from).map(updated)
+        readF.current = viewport.reload(from).toFuture.map(updated)
       }
     }
     
@@ -102,7 +102,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
     
     useLayoutEffect({ () =>
       readF.current = readF.current.andThen { _ =>
-        readF.current = viewport.reload().map(updated)
+        readF.current = viewport.reload().toFuture.map(updated)
       }
       ()
     }, List(viewport.encoding, viewport.size, viewport.width, viewport.height, viewport.wrap))

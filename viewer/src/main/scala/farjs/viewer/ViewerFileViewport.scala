@@ -5,8 +5,8 @@ import farjs.ui.UiString
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters.JSRichFutureNonThenable
 
 case class ViewerFileViewport(fileReader: ViewerFileReader,
                               encoding: String,
@@ -38,10 +38,10 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
     buf.toString()
   }
 
-  lazy val scrollIndicators: List[Int] = {
+  lazy val scrollIndicators: js.Array[Int] = {
     linesData.zipWithIndex.collect {
       case (ViewerFileLine(line, _), index) if UiString(line).strWidth() > column + width => index
-    }.toList
+    }
   }
 
   lazy val progress: Int = {
@@ -51,8 +51,8 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
     else ((viewed / size) * 100).toInt
   }
   
-  def moveUp(lines: Int, from: Double = position): Future[ViewerFileViewport] = {
-    if (from == 0.0) Future.successful(this)
+  def moveUp(lines: Int, from: Double = position): js.Promise[ViewerFileViewport] = {
+    if (from == 0.0) js.Promise.resolve[ViewerFileViewport](this)
     else {
       fileReader.readPrevLines(lines, from, size, encoding).toFuture
         .map(doWrap(lines, up = true))
@@ -67,16 +67,16 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
             )
           }
           else this
-        }
+        }.toJSPromise
     }
   }
 
-  def moveDown(lines: Int): Future[ViewerFileViewport] = {
+  def moveDown(lines: Int): js.Promise[ViewerFileViewport] = {
     val bytes = linesData.map(_.bytes).sum
     val nextPosition = position + bytes
     if (nextPosition >= size) {
       if (linesData.size == height) moveUp(height, from = size)
-      else Future.successful(this)
+      else js.Promise.resolve[ViewerFileViewport](this)
     }
     else {
       fileReader.readNextLines(lines, nextPosition, encoding).toFuture
@@ -90,11 +90,11 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
             )
           }
           else this
-        }
+        }.toJSPromise
     }
   }
 
-  def reload(from: Double = position): Future[ViewerFileViewport] = {
+  def reload(from: Double = position): js.Promise[ViewerFileViewport] = {
     fileReader.readNextLines(height, from, encoding).toFuture
       .map(doWrap(height, up = false))
       .map { linesData =>
@@ -102,7 +102,7 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
           position = from,
           linesData = linesData
         )
-      }
+      }.toJSPromise
   }
 
   private[viewer] def doWrap(lines: Int, up: Boolean)(data: js.Array[ViewerFileLine]): js.Array[ViewerFileLine] = {
@@ -110,11 +110,15 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
     else {
       val res = new js.Array[ViewerFileLine]()
 
-      @annotation.tailrec
-      def loop(data: ViewerFileLine): Unit = {
-        val ViewerFileLine(line, bytes) = data
-        if (line.length <= width) res.push(data)
-        else {
+      def loop(inputLine: ViewerFileLine): Unit = {
+        var fileLine = inputLine
+        while (true) {
+          val ViewerFileLine(line, bytes) = fileLine
+          if (line.length <= width) {
+            res.push(fileLine)
+            return
+          }
+
           val (wrapped, rest) =
             if (up) (line.takeRight(width), line.dropRight(width))
             else (line.take(width), line.drop(width))
@@ -122,7 +126,7 @@ case class ViewerFileViewport(fileReader: ViewerFileReader,
           val wrappedBytes = Encoding.byteLength(wrapped, encoding)
           res.push(ViewerFileLine(wrapped, wrappedBytes))
 
-          loop(ViewerFileLine(rest, math.max(bytes - wrappedBytes, 0)))
+          fileLine = ViewerFileLine(rest, math.max(bytes - wrappedBytes, 0))
         }
       }
       
