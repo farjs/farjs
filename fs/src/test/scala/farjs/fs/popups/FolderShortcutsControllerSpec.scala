@@ -21,7 +21,7 @@ class FolderShortcutsControllerSpec extends TestSpec with TestRendererUtils {
     onChangeDir.expects(dir)
 
     //when
-    findComponentProps(renderer.root, folderShortcutsPopup).onChangeDir(dir)
+    findComponentProps(renderer.root, folderShortcutsPopup, plain = true).onChangeDir(dir)
   }
 
   it should "call onClose when onClose" in {
@@ -30,7 +30,7 @@ class FolderShortcutsControllerSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val props = FolderShortcutsControllerProps(showPopup = true, onChangeDir, onClose)
     val comp = testRender(<(FolderShortcutsController())(^.plain := props)())
-    val popup = findComponentProps(comp, folderShortcutsPopup)
+    val popup = findComponentProps(comp, folderShortcutsPopup, plain = true)
 
     //then
     onClose.expects()
@@ -48,7 +48,7 @@ class FolderShortcutsControllerSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(FolderShortcutsController())(^.plain := props)())
 
     //then
-    assertTestComponent(result, folderShortcutsPopup) {
+    assertTestComponent(result, folderShortcutsPopup, plain = true) {
       case FolderShortcutsPopupProps(_, _) => Succeeded
     }
   }

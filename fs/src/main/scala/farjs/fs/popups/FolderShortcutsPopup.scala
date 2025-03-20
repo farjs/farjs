@@ -10,9 +10,6 @@ import scommons.react.hooks._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 
-case class FolderShortcutsPopupProps(onChangeDir: String => Unit,
-                                     onClose: () => Unit)
-
 object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps] {
 
   private[popups] var listPopup: ReactClass = ListPopup
@@ -22,7 +19,7 @@ object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps]
     val services = FSServices.useServices
     val (maybeItems, setItems) = useState(Option.empty[List[js.UndefOr[String]]])
     val (selected, setSelected) = useState(0)
-    val props = compProps.wrapped
+    val props = compProps.plain
 
     val onAction: js.Function1[Int, Unit] = { index =>
       maybeItems.foreach { items =>

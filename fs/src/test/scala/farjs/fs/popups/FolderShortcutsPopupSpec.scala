@@ -48,7 +48,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     shortcutsService.getAll.expects().returning(itemsF)
     
     val result = createTestRenderer(withContext(withServicesContext(
-      <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
+      <(FolderShortcutsPopup())(^.plain := props)(), shortcutsService.service
     ), WithStacksData(leftStack, null), WithStacksData(rightStack, null))).root
 
     itemsF.toFuture.flatMap { _ =>
@@ -81,7 +81,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     shortcutsService.getAll.expects().returning(itemsF)
     
     val result = createTestRenderer(withContext(withServicesContext(
-      <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
+      <(FolderShortcutsPopup())(^.plain := props)(), shortcutsService.service
     ), WithStacksData(leftStack, null), WithStacksData(rightStack, null))).root
 
     itemsF.toFuture.flatMap { _ =>
@@ -123,7 +123,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     shortcutsService.getAll.expects().returning(itemsF)
 
     val result = createTestRenderer(withContext(withServicesContext(
-      <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
+      <(FolderShortcutsPopup())(^.plain := props)(), shortcutsService.service
     ), WithStacksData(leftStack, null), WithStacksData(rightStack, null))).root
 
     itemsF.toFuture.flatMap { _ =>
@@ -172,7 +172,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     shortcutsService.delete.expects(0).returning(deleteF)
     
     val result = createTestRenderer(withContext(withServicesContext(
-      <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
+      <(FolderShortcutsPopup())(^.plain := props)(), shortcutsService.service
     ), WithStacksData(leftStack, null), WithStacksData(rightStack, null))).root
 
     itemsF.toFuture.flatMap { _ =>
@@ -209,7 +209,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     shortcutsService.save.expects(1, "/test").returning(saveF)
     
     val result = createTestRenderer(withContext(withServicesContext(
-      <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
+      <(FolderShortcutsPopup())(^.plain := props)(), shortcutsService.service
     ), WithStacksData(leftStack, null), WithStacksData(rightStack, null))).root
 
     itemsF.toFuture.flatMap { _ =>
@@ -243,7 +243,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     shortcutsService.getAll.expects().returning(itemsF)
     
     val result = createTestRenderer(withContext(withServicesContext(
-      <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
+      <(FolderShortcutsPopup())(^.plain := props)(), shortcutsService.service
     ), WithStacksData(leftStack, null), WithStacksData(rightStack, null))).root
 
     itemsF.toFuture.flatMap { _ =>
@@ -281,7 +281,7 @@ class FolderShortcutsPopupSpec extends AsyncTestSpec with BaseTestSpec with Test
     
     //when
     val result = createTestRenderer(withContext(withServicesContext(
-      <(FolderShortcutsPopup())(^.wrapped := props)(), shortcutsService.service
+      <(FolderShortcutsPopup())(^.plain := props)(), shortcutsService.service
     ), WithStacksData(leftStack, null), WithStacksData(rightStack, null))).root
 
     //then

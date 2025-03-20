@@ -10,7 +10,7 @@ object FolderShortcutsController extends FunctionComponent[FolderShortcutsContro
     val props = compProps.plain
 
     if (props.showPopup) {
-      <(folderShortcutsPopup())(^.wrapped := FolderShortcutsPopupProps(
+      <(folderShortcutsPopup())(^.plain := FolderShortcutsPopupProps(
         onChangeDir = { dir =>
           props.onClose()
           props.onChangeDir(dir)
