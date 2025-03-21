@@ -1,7 +1,6 @@
 package farjs.copymove
 
 import farjs.copymove.CopyMoveUi.copyItemsHistoryKind
-import farjs.filelist.api.FileListItem
 import farjs.filelist.history.HistoryProvider
 import farjs.ui._
 import farjs.ui.border._
@@ -14,12 +13,6 @@ import scommons.react.hooks._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 
-case class CopyItemsPopupProps(move: Boolean,
-                               path: String,
-                               items: Seq[FileListItem],
-                               onAction: String => Unit,
-                               onCancel: () => Unit)
-
 object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
 
   private[copymove] var modalComp: ReactClass = Modal
@@ -31,14 +24,14 @@ object CopyItemsPopup extends FunctionComponent[CopyItemsPopupProps] {
   protected def render(compProps: Props): ReactElement = {
     val historyProvider = HistoryProvider.useHistoryProvider()
     val (maybeItems, setItems) = useState(Option.empty[js.Array[String]])
-    val props = compProps.wrapped
+    val props = compProps.plain
     val (path, setPath) = useState(props.path)
     val (width, height) = (75, 8)
     val contentWidth = width - (paddingHorizontal + 2) * 2
     val contentLeft = 2
     val theme = Theme.useTheme().popup.regular
     
-    val count = props.items.size
+    val count = props.items.length
     val itemsText =
       if (count > 1) s"$count items"
       else s"${props.items.headOption.map(i => s""""${i.name}"""").getOrElse("")}"

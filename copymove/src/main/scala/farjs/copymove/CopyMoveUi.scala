@@ -94,7 +94,21 @@ class CopyMoveUi(show: CopyMoveUiAction,
       if (!isInplace && fromSelected.nonEmpty) fromSelected
       else FileListState.currentItem(from.state).toList
 
-    def onAction(path: String): Unit = {
+    def resolveTargetDir(move: Boolean, path: String): Future[(String, Boolean)] = {
+      val dirF = for {
+        dir <- from.actions.api.readDir(from.state.currDir.path, path).toFuture
+        sameDrive <-
+          if (move) checkSameDrive(from, dir.path)
+          else Future.successful(false)
+      } yield {
+        (dir.path, sameDrive)
+      }
+
+      from.dispatch(TaskAction(Task("Resolving target dir", dirF)))
+      dirF
+    }
+
+    val onAction: js.Function1[String, Unit] = { path =>
       val move = isMove
       val inplace = isInplace
       val resolveF =
@@ -111,20 +125,6 @@ class CopyMoveUi(show: CopyMoveUiAction,
         if (move && sameDrive) setShowMove(true)
         else setShowStats(true)
       }
-    }
-
-    def resolveTargetDir(move: Boolean, path: String): Future[(String, Boolean)] = {
-      val dirF = for {
-        dir <- from.actions.api.readDir(from.state.currDir.path, path).toFuture
-        sameDrive <-
-          if (move) checkSameDrive(from, dir.path)
-          else Future.successful(false)
-      } yield {
-        (dir.path, sameDrive)
-      }
-
-      from.dispatch(TaskAction(Task("Resolving target dir", dirF)))
-      dirF
     }
 
     val maybeError = maybeToPath.filter(_ => !inplace).flatMap { case (_, toPath) =>
@@ -144,12 +144,12 @@ class CopyMoveUi(show: CopyMoveUiAction,
 
     <.>()(
       if (showPopup) Some {
-        <(copyItemsPopup())(^.wrapped := CopyItemsPopupProps(
+        <(copyItemsPopup())(^.plain := CopyItemsPopupProps(
           move = isMove,
           path =
             if (!isInplace) maybeTo.map(_.state.currDir.path).getOrElse("")
             else FileListState.currentItem(from.state).map(_.name).getOrElse(""),
-          items = items,
+          items = js.Array(items: _*),
           onAction = onAction,
           onCancel = props.onClose
         ))()

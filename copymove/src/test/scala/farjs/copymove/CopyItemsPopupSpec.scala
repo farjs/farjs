@@ -42,7 +42,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
   it should "call onCancel when onCancel in modal" in {
     //given
     val onCancel = mockFunction[Unit]
-    val props = CopyItemsPopupProps(move = false, "path", Seq(FileListItem("file 1")), _ => (), onCancel)
+    val props = CopyItemsPopupProps(move = false, "path", js.Array(FileListItem("file 1")), _ => (), onCancel)
     val historyMocks = new HistoryMocks
     val items = List("path", "path 2")
     val itemsF = js.Promise.resolve[js.Array[History]](js.Array(items.map(i => History(i, js.undefined)): _*))
@@ -55,7 +55,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     }
 
     val renderer = createTestRenderer(withHistoryProvider(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyMocks.provider
+      withThemeContext(<(CopyItemsPopup())(^.plain := props)()), historyMocks.provider
     ))
     eventually(getAllCalled shouldBe true).map { _ =>
       val modal = inside(findComponents(renderer.root, modalComp)) {
@@ -75,7 +75,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
   it should "set path when onChange in TextBox" in {
     //given
     val path = "initial path"
-    val props = CopyItemsPopupProps(move = false, path, Seq(FileListItem("file 1")), _ => (), () => ())
+    val props = CopyItemsPopupProps(move = false, path, js.Array(FileListItem("file 1")), _ => (), () => ())
     val historyMocks = new HistoryMocks
     val items = List("path", "path 2")
     val itemsF = js.Promise.resolve[js.Array[History]](js.Array(items.map(i => History(i, js.undefined)): _*))
@@ -88,7 +88,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     }
 
     val renderer = createTestRenderer(withHistoryProvider(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyMocks.provider
+      withThemeContext(<(CopyItemsPopup())(^.plain := props)()), historyMocks.provider
     ))
     eventually(getAllCalled shouldBe true).map { _ =>
       val comboBox = inside(findComponents(renderer.root, comboBoxComp)) {
@@ -111,7 +111,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     //given
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = CopyItemsPopupProps(move = false, "test", Seq(FileListItem("file 1")), onAction, onCancel)
+    val props = CopyItemsPopupProps(move = false, "test", js.Array(FileListItem("file 1")), onAction, onCancel)
     val historyMocks = new HistoryMocks
     val items = List("path", "path 2")
     val itemsF = js.Promise.resolve[js.Array[History]](js.Array(items.map(i => History(i, js.undefined)): _*))
@@ -124,7 +124,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     }
 
     val comp = createTestRenderer(withHistoryProvider(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyMocks.provider
+      withThemeContext(<(CopyItemsPopup())(^.plain := props)()), historyMocks.provider
     )).root
     eventually(getAllCalled shouldBe true).map { _ =>
       val comboBox = inside(findComponents(comp, comboBoxComp)) {
@@ -146,7 +146,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     //given
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = CopyItemsPopupProps(move = false, "test", Seq(FileListItem("file 1")), onAction, onCancel)
+    val props = CopyItemsPopupProps(move = false, "test", js.Array(FileListItem("file 1")), onAction, onCancel)
     val historyMocks = new HistoryMocks
     val items = List("path", "path 2")
     val itemsF = js.Promise.resolve[js.Array[History]](js.Array(items.map(i => History(i, js.undefined)): _*))
@@ -159,7 +159,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     }
 
     val comp = createTestRenderer(withHistoryProvider(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyMocks.provider
+      withThemeContext(<(CopyItemsPopup())(^.plain := props)()), historyMocks.provider
     )).root
     eventually(getAllCalled shouldBe true).map { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
@@ -182,7 +182,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     //given
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = CopyItemsPopupProps(move = false, "", Seq(FileListItem("file 1")), onAction, onCancel)
+    val props = CopyItemsPopupProps(move = false, "", js.Array(FileListItem("file 1")), onAction, onCancel)
     val historyMocks = new HistoryMocks
     val items = List("path", "path 2")
     val itemsF = js.Promise.resolve[js.Array[History]](js.Array(items.map(i => History(i, js.undefined)): _*))
@@ -195,7 +195,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     }
 
     val comp = createTestRenderer(withHistoryProvider(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyMocks.provider
+      withThemeContext(<(CopyItemsPopup())(^.plain := props)()), historyMocks.provider
     )).root
     eventually(getAllCalled shouldBe true).map { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
@@ -218,7 +218,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     //given
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
-    val props = CopyItemsPopupProps(move = false, "", Seq(FileListItem("file 1")), onAction, onCancel)
+    val props = CopyItemsPopupProps(move = false, "", js.Array(FileListItem("file 1")), onAction, onCancel)
     val historyMocks = new HistoryMocks
     val items = List("path", "path 2")
     val itemsF = js.Promise.resolve[js.Array[History]](js.Array(items.map(i => History(i, js.undefined)): _*))
@@ -231,7 +231,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     }
 
     val comp = createTestRenderer(withHistoryProvider(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyMocks.provider
+      withThemeContext(<(CopyItemsPopup())(^.plain := props)()), historyMocks.provider
     )).root
     eventually(getAllCalled shouldBe true).map { _ =>
       val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
@@ -252,7 +252,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
   
   it should "render component when copy" in {
     //given
-    val props = CopyItemsPopupProps(move = false, "test folder", Seq(FileListItem("file 1")), _ => (), () => ())
+    val props = CopyItemsPopupProps(move = false, "test folder", js.Array(FileListItem("file 1")), _ => (), () => ())
     val historyMocks = new HistoryMocks
     val items = List("path", "path 2")
     val itemsF = js.Promise.resolve[js.Array[History]](js.Array(items.map(i => History(i, js.undefined)): _*))
@@ -266,7 +266,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
 
     //when
     val result = createTestRenderer(withHistoryProvider(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyMocks.provider
+      withThemeContext(<(CopyItemsPopup())(^.plain := props)()), historyMocks.provider
     )).root
 
     //then
@@ -277,7 +277,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
 
   it should "render component when move" in {
     //given
-    val props = CopyItemsPopupProps(move = true, "test folder", Seq(FileListItem("file 1")), _ => (), () => ())
+    val props = CopyItemsPopupProps(move = true, "test folder", js.Array(FileListItem("file 1")), _ => (), () => ())
     val historyMocks = new HistoryMocks
     val itemsF = js.Promise.resolve[js.Array[History]](js.Array[History]())
     var getAllCalled = false
@@ -290,7 +290,7 @@ class CopyItemsPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRender
 
     //when
     val result = createTestRenderer(withHistoryProvider(
-      withThemeContext(<(CopyItemsPopup())(^.wrapped := props)()), historyMocks.provider
+      withThemeContext(<(CopyItemsPopup())(^.plain := props)()), historyMocks.provider
     )).root
 
     //then
