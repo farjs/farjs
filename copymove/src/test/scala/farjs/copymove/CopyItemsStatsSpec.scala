@@ -33,7 +33,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val onCancel = mockFunction[Unit]
     val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
-    val props = CopyItemsStatsProps(dispatch, actions.actions, "/folder", List(
+    val props = CopyItemsStatsProps(dispatch, actions.actions, "/folder", js.Array(
       FileListItem("dir 1", isDir = true)
     ), "Copy", onDone, onCancel)
     actions.scanDirs.expects(props.fromPath, *, *).onCall { (_, resItems, _) =>
@@ -41,7 +41,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       js.Promise.resolve[Boolean](false)
     }
 
-    val renderer = createTestRenderer(<(CopyItemsStats())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(CopyItemsStats())(^.plain := props)())
     val statusPopup = inside(findComponents(renderer.root, statusPopupComp)) {
       case List(p) => p.props.asInstanceOf[StatusPopupProps]
     }
@@ -61,7 +61,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val onCancel = mockFunction[Unit]
     val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
-    val props = CopyItemsStatsProps(dispatch, actions.actions, "/folder", List(
+    val props = CopyItemsStatsProps(dispatch, actions.actions, "/folder", js.Array(
       FileListItem("dir 1", isDir = true),
       FileListItem.copy(FileListItem("file 1"))(size = 10)
     ), "Move", onDone, onCancel)
@@ -74,7 +74,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       ))
       p.future.toJSPromise
     }
-    val renderer = createTestRenderer(<(CopyItemsStats())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(CopyItemsStats())(^.plain := props)())
 
     eventually {
       assertNativeComponent(renderer.root.children(0), <(statusPopupComp)(^.assertPlain[StatusPopupProps](inside(_) {
@@ -108,7 +108,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val onCancel = mockFunction[Unit]
     val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
-    val props = CopyItemsStatsProps(dispatch, actions.actions, "/folder", List(
+    val props = CopyItemsStatsProps(dispatch, actions.actions, "/folder", js.Array(
       FileListItem("dir 1", isDir = true)
     ), "Copy", onDone, onCancel)
     val p = Promise[Boolean]()
@@ -120,7 +120,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       resultF.toJSPromise
     }
     
-    val renderer = createTestRenderer(<(CopyItemsStats())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(CopyItemsStats())(^.plain := props)())
     findComponents(renderer.root, statusPopupComp) should not be empty
     eventually {
       onNextDirFn should not be null
@@ -149,7 +149,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
     val onCancel = mockFunction[Unit]
     val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
-    val props = CopyItemsStatsProps(dispatch, actions.actions, "/folder", List(
+    val props = CopyItemsStatsProps(dispatch, actions.actions, "/folder", js.Array(
       FileListItem("dir 1", isDir = true)
     ), "Copy", onDone, onCancel)
     val p = Promise[Boolean]()
@@ -158,7 +158,7 @@ class CopyItemsStatsSpec extends AsyncTestSpec with BaseTestSpec with TestRender
       p.future.toJSPromise
     }
     
-    val renderer = createTestRenderer(<(CopyItemsStats())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(CopyItemsStats())(^.plain := props)())
     findComponents(renderer.root, statusPopupComp) should not be empty
     var resultF: Future[_] = null
 

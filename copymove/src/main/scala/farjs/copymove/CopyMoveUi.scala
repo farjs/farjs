@@ -163,11 +163,11 @@ class CopyMoveUi(show: CopyMoveUiAction,
         ))()
       }
       else if (showStats) Some {
-        <(copyItemsStats())(^.wrapped := CopyItemsStatsProps(
+        <(copyItemsStats())(^.plain := CopyItemsStatsProps(
           dispatch = from.dispatch,
           actions = from.actions,
           fromPath = from.state.currDir.path,
-          items = items,
+          items = js.Array(items: _*),
           title = if (move) "Move" else "Copy",
           onDone = { total =>
             setTotal(Some(total))

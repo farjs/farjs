@@ -1,8 +1,5 @@
 package farjs.copymove
 
-import farjs.filelist.FileListActions
-import farjs.filelist.api.FileListItem
-import farjs.ui.Dispatch
 import farjs.ui.popup.{StatusPopup, StatusPopupProps}
 import farjs.ui.task.{Task, TaskAction}
 import scommons.react._
@@ -13,14 +10,6 @@ import scala.concurrent.Future
 import scala.scalajs.js
 import scala.util.{Failure, Success}
 
-case class CopyItemsStatsProps(dispatch: Dispatch,
-                               actions: FileListActions,
-                               fromPath: String,
-                               items: Seq[FileListItem],
-                               title: String,
-                               onDone: Double => Unit,
-                               onCancel: () => Unit)
-
 object CopyItemsStats extends FunctionComponent[CopyItemsStatsProps] {
 
   private[copymove] var statusPopupComp: ReactClass = StatusPopup
@@ -28,7 +17,7 @@ object CopyItemsStats extends FunctionComponent[CopyItemsStatsProps] {
   protected def render(compProps: Props): ReactElement = {
     val (currDir, setCurrDir) = useState("")
     val inProgress = useRef(false)
-    val props = compProps.wrapped
+    val props = compProps.plain
 
     def scanDir(): Unit = {
       val parent = props.fromPath
@@ -74,7 +63,7 @@ object CopyItemsStats extends FunctionComponent[CopyItemsStatsProps] {
     <(statusPopupComp)(^.plain := StatusPopupProps(
       text = s"Calculating total size\n$currDir",
       title = props.title,
-      onClose = props.onCancel: js.Function0[Unit]
+      onClose = props.onCancel
     ))()
   }
 }

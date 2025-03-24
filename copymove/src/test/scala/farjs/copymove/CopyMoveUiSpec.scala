@@ -100,11 +100,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     eventually {
-      assertTestComponent(renderer.root.children(0), copyItemsStats) {
+      assertTestComponent(renderer.root.children(0), copyItemsStats, plain = true) {
         case CopyItemsStatsProps(_, resActions, fromPath, items, title, _, _) =>
           resActions shouldBe actions.actions
           fromPath shouldBe currDir.path
-          items shouldBe currDir.items.toList
+          items.toList shouldBe currDir.items.toList
           title shouldBe "Copy"
       }
     }.map { _ =>
@@ -112,7 +112,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       onClose.expects()
 
       //when
-      findComponentProps(renderer.root, copyItemsStats).onCancel()
+      findComponentProps(renderer.root, copyItemsStats, plain = true).onCancel()
       
       Succeeded
     }
@@ -157,11 +157,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     eventually {
-      assertTestComponent(renderer.root.children(0), copyItemsStats) {
+      assertTestComponent(renderer.root.children(0), copyItemsStats, plain = true) {
         case CopyItemsStatsProps(_, resActions, fromPath, items, title, _, _) =>
           resActions shouldBe actions.actions
           fromPath shouldBe currDir.path
-          items shouldBe currDir.items.toList
+          items.toList shouldBe currDir.items.toList
           title shouldBe "Move"
       }
     }.map { _ =>
@@ -169,7 +169,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       onClose.expects()
 
       //when
-      findComponentProps(renderer.root, copyItemsStats).onCancel()
+      findComponentProps(renderer.root, copyItemsStats, plain = true).onCancel()
 
       Succeeded
     }
@@ -496,7 +496,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     eventually {
-      val statsPopup = findComponentProps(renderer.root, copyItemsStats)
+      val statsPopup = findComponentProps(renderer.root, copyItemsStats, plain = true)
       val total = 123456789
       statsPopup.onDone(total)
 
@@ -558,7 +558,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     eventually {
-      val statsPopup = findComponentProps(renderer.root, copyItemsStats)
+      val statsPopup = findComponentProps(renderer.root, copyItemsStats, plain = true)
       val total = 123456789
       statsPopup.onDone(total)
 
@@ -611,7 +611,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     eventually {
-      val statsPopup = findComponentProps(renderer.root, copyItemsStats)
+      val statsPopup = findComponentProps(renderer.root, copyItemsStats, plain = true)
       val total = 123456789
       statsPopup.onDone(total)
 
@@ -674,7 +674,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     copyPopup.onAction(to)
     
     eventually {
-      val statsPopup = findComponentProps(renderer.root, copyItemsStats)
+      val statsPopup = findComponentProps(renderer.root, copyItemsStats, plain = true)
       statsPopup.onDone(123)
 
       findProps(renderer.root, copyProcessComp) should not be empty
@@ -759,7 +759,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     copyPopup.onAction(to)
 
     eventually {
-      val statsPopup = findComponentProps(renderer.root, copyItemsStats)
+      val statsPopup = findComponentProps(renderer.root, copyItemsStats, plain = true)
       statsPopup.onDone(123)
 
       findProps(renderer.root, copyProcessComp) should not be empty
