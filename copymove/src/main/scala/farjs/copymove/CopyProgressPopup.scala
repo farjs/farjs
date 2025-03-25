@@ -8,17 +8,6 @@ import farjs.ui.theme.Theme
 import scommons.react._
 import scommons.react.blessed._
 
-case class CopyProgressPopupProps(move: Boolean,
-                                  item: String,
-                                  to: String,
-                                  itemPercent: Int,
-                                  total: Double,
-                                  totalPercent: Int,
-                                  timeSeconds: Int,
-                                  leftSeconds: Int,
-                                  bytesPerSecond: Double,
-                                  onCancel: () => Unit)
-
 object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
 
   private[copymove] var modalComp: ReactClass = Modal
@@ -27,7 +16,7 @@ object CopyProgressPopup extends FunctionComponent[CopyProgressPopupProps] {
   private[copymove] var progressBarComp: ReactClass = ProgressBar
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val (width, height) = (50, 13)
     val contentWidth = width - (paddingHorizontal + 2) * 2
     val contentLeft = 2

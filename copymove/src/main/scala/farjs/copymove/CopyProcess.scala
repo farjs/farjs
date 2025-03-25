@@ -168,7 +168,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
     val bytesPerSecond = divide(d.total + d.itemBytes, timeSeconds)
     
     <.>()(
-      <(copyProgressPopup())(^.wrapped := CopyProgressPopupProps(
+      <(copyProgressPopup())(^.plain := CopyProgressPopupProps(
         move = props.move,
         item = d.item.name,
         to = d.to,

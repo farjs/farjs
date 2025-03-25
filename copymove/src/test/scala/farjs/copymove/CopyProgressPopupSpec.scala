@@ -25,7 +25,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onCancel = mockFunction[Unit]
     val props = getCopyProgressPopupProps(move = false, onCancel = onCancel)
-    val comp = testRender(withThemeContext(<(CopyProgressPopup())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(CopyProgressPopup())(^.plain := props)()))
     val modal = inside(findComponents(comp, modalComp)) {
       case List(modal) => modal.props.asInstanceOf[ModalProps]
     }
@@ -42,7 +42,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
     val props = getCopyProgressPopupProps(move = false)
 
     //when
-    val result = testRender(withThemeContext(<(CopyProgressPopup())(^.wrapped := props)()))
+    val result = testRender(withThemeContext(<(CopyProgressPopup())(^.plain := props)()))
 
     //then
     assertCopyProgressPopup(result, props)
@@ -53,7 +53,7 @@ class CopyProgressPopupSpec extends TestSpec with TestRendererUtils {
     val props = getCopyProgressPopupProps(move = true)
 
     //when
-    val result = testRender(withThemeContext(<(CopyProgressPopup())(^.wrapped := props)()))
+    val result = testRender(withThemeContext(<(CopyProgressPopup())(^.plain := props)()))
 
     //then
     assertCopyProgressPopup(result, props)
