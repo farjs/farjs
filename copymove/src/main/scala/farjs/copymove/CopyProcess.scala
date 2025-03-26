@@ -1,6 +1,5 @@
 package farjs.copymove
 
-import farjs.filelist.FileListData
 import farjs.filelist.api.FileListItem
 import farjs.ui.popup._
 import farjs.ui.task.{Task, TaskAction}
@@ -15,16 +14,6 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.util.{Failure, Success}
-
-case class CopyProcessProps(from: FileListData,
-                            to: FileListData,
-                            move: Boolean,
-                            fromPath: String,
-                            items: Seq[(FileListItem, String)],
-                            toPath: String,
-                            total: Double,
-                            onTopItem: FileListItem => Unit,
-                            onDone: () => Unit)
 
 object CopyProcess extends FunctionComponent[CopyProcessProps] {
 
@@ -52,22 +41,23 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
     val existsPromise = useRef(Promise.successful[js.UndefOr[Boolean]](js.undefined))
     val data = useRef(CopyInfo())
     val currTheme = Theme.useTheme()
-    val props = compProps.wrapped
+    val props = compProps.plain
     
     def doCopy(): Unit = {
 
       def loop(copied: Boolean,
                parent: String,
                targetDir: String,
-               items: Seq[(FileListItem, String)]): Future[(Boolean, Boolean)] = {
+               items: js.Array[CopyProcessItem]): Future[(Boolean, Boolean)] = {
         
-        items.foldLeft(Future.successful((copied, inProgress.current))) { case (resF, (item, toName)) =>
+        items.foldLeft(Future.successful((copied, inProgress.current))) { case (resF, cpItem) =>
+          val CopyProcessItem(item, toName) = cpItem
           resF.flatMap {
             case (prevCopied, true) if item.isDir && inProgress.current =>
               for {
                 dirList <- props.from.actions.api.readDir(parent, item.name).toFuture
                 dstDir <- props.to.actions.api.mkDirs(js.Array(targetDir, toName)).toFuture
-                res <- loop(prevCopied, dirList.path, dstDir, dirList.items.map(i => (i, i.name)).toSeq)
+                res <- loop(prevCopied, dirList.path, dstDir, dirList.items.map(i => CopyProcessItem(i, i.name)))
                 (isCopied, done) = res
                 _ <-
                   if (isCopied && done && props.move) props.from.actions.api.delete(parent, js.Array(item)).toFuture
@@ -125,12 +115,12 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
         }
       }
 
-      val resultF = props.items.foldLeft(Future.successful(true)) { case (resF, topItem@(item, _)) =>
+      val resultF = props.items.foldLeft(Future.successful(true)) { case (resF, topItem) =>
         resF.flatMap {
           case true if inProgress.current =>
-            loop(copied = true, props.fromPath, props.toPath, Seq(topItem)).map { case (isCopied, done) =>
+            loop(copied = true, props.fromPath, props.toPath, js.Array(topItem)).map { case (isCopied, done) =>
               if (isCopied && done) {
-                props.onTopItem(item)
+                props.onTopItem(topItem.item)
               }
               done
             }

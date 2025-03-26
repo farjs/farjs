@@ -47,7 +47,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
 
     val props = compProps.plain
     
-    def onTopItem(item: FileListItem): Unit = copied.current += item.name
+    val onTopItem: js.Function1[FileListItem, Unit] = item => copied.current += item.name
 
     def onDone(path: String, toPath: String): () => Unit = { () =>
       val currSelected = from.state.selectedNames.toSet
@@ -196,16 +196,17 @@ class CopyMoveUi(show: CopyMoveUiAction,
           (path, toPath) <- maybeToPath
           total <- maybeTotal
         } yield {
-          <(copyProcessComp())(^.wrapped := CopyProcessProps(
+          <(copyProcessComp())(^.plain := CopyProcessProps(
             from = from,
             to =
               if (!inplace) maybeTo.getOrElse(from)
               else from,
             move = move,
             fromPath = from.state.currDir.path,
-            items =
-              if (!inplace) items.map(i => (i, i.name))
-              else items.map(i => (i, toPath)),
+            items = js.Array((
+              if (!inplace) items.map(i => CopyProcessItem(i, i.name))
+              else items.map(i => CopyProcessItem(i, toPath))
+            ): _*),
             toPath =
               if (!inplace) toPath
               else from.state.currDir.path,

@@ -3,6 +3,7 @@ package farjs.copymove
 import farjs.copymove.CopyMoveUi._
 import farjs.copymove.CopyMoveUiAction._
 import farjs.copymove.CopyMoveUiSpec._
+import farjs.copymove.CopyProcessSpec.assertCopyProcessItems
 import farjs.filelist.FileListActions._
 import farjs.filelist.FileListActionsSpec.{assertFileListItemCreatedAction, assertFileListParamsChangedAction}
 import farjs.filelist._
@@ -495,12 +496,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     copyPopup.onAction(to)
 
     //then
-    eventually {
-      val statsPopup = findComponentProps(renderer.root, copyItemsStats, plain = true)
+    eventually(findComponentProps(renderer.root, copyItemsStats, plain = true)).map { statsPopup =>
       val total = 123456789
       statsPopup.onDone(total)
 
-      assertTestComponent(renderer.root.children.head, copyProcessComp) {
+      assertTestComponent(renderer.root.children.head, copyProcessComp, plain = true) {
         case CopyProcessProps(resFrom, resTo, move, fromPath, items, resToPath, resTotal, _, _) =>
           inside(resFrom) { case FileListData(resDispatch, resActions, resState) =>
             resDispatch shouldBe dispatch
@@ -510,7 +510,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
           resTo shouldBe resFrom
           move shouldBe false
           fromPath shouldBe currDir.path
-          items shouldBe List((item, to))
+          assertCopyProcessItems(items.toList, List(CopyProcessItem(item, to)))
           resToPath shouldBe currDir.path
           resTotal shouldBe total
       }
@@ -557,12 +557,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     copyPopup.onAction(to)
 
     //then
-    eventually {
-      val statsPopup = findComponentProps(renderer.root, copyItemsStats, plain = true)
+    eventually(findComponentProps(renderer.root, copyItemsStats, plain = true)).map { statsPopup =>
       val total = 123456789
       statsPopup.onDone(total)
 
-      assertTestComponent(renderer.root.children.head, copyProcessComp) {
+      assertTestComponent(renderer.root.children.head, copyProcessComp, plain = true) {
         case CopyProcessProps(resFrom, resTo, move, fromPath, items, resToPath, resTotal, _, _) =>
           inside(resFrom) { case FileListData(_, resActions, resState) =>
             resActions shouldBe actions.actions
@@ -575,7 +574,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
           }
           move shouldBe true
           fromPath shouldBe currDir.path
-          items shouldBe List((item, item.name))
+          assertCopyProcessItems(items.toList, List(CopyProcessItem(item, item.name)))
           resToPath shouldBe toDir.path
           resTotal shouldBe total
       }
@@ -610,12 +609,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     copyPopup.onAction(to)
 
     //then
-    eventually {
-      val statsPopup = findComponentProps(renderer.root, copyItemsStats, plain = true)
+    eventually(findComponentProps(renderer.root, copyItemsStats, plain = true)).map { statsPopup =>
       val total = 123456789
       statsPopup.onDone(total)
 
-      assertTestComponent(renderer.root.children.head, copyProcessComp) {
+      assertTestComponent(renderer.root.children.head, copyProcessComp, plain = true) {
         case CopyProcessProps(resFrom, resTo, move, fromPath, items, resToPath, resTotal, _, _) =>
           inside(resFrom) { case FileListData(resDispatch, resActions, resState) =>
             resDispatch shouldBe dispatch
@@ -629,7 +627,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
           }
           move shouldBe true
           fromPath shouldBe currDir.path
-          items shouldBe List((item, item.name))
+          assertCopyProcessItems(items.toList, List(CopyProcessItem(item, item.name)))
           resToPath shouldBe to
           resTotal shouldBe total
       }
@@ -677,9 +675,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       val statsPopup = findComponentProps(renderer.root, copyItemsStats, plain = true)
       statsPopup.onDone(123)
 
-      findProps(renderer.root, copyProcessComp) should not be empty
+      findProps(renderer.root, copyProcessComp, plain = true) should not be empty
     }.flatMap { _ =>
-      val progressPopup = findComponentProps(renderer.root, copyProcessComp)
+      val progressPopup = findComponentProps(renderer.root, copyProcessComp, plain = true)
       progressPopup.onTopItem(dir)
 
       val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
@@ -762,9 +760,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       val statsPopup = findComponentProps(renderer.root, copyItemsStats, plain = true)
       statsPopup.onDone(123)
 
-      findProps(renderer.root, copyProcessComp) should not be empty
+      findProps(renderer.root, copyProcessComp, plain = true) should not be empty
     }.flatMap { _ =>
-      val progressPopup = findComponentProps(renderer.root, copyProcessComp)
+      val progressPopup = findComponentProps(renderer.root, copyProcessComp, plain = true)
       progressPopup.onTopItem(dir)
 
       val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
