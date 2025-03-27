@@ -42,13 +42,13 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     MoveProcess.fs = fs.fs
     val item1 = FileListItem("dir 1", isDir = true)
     val item2 = FileListItem.copy(FileListItem("file 1"))(size = 10)
-    val props = MoveProcessProps(dispatch, actions, "/from/path", List(
-      (item1, "newName1"),
-      (item2, item2.name)
+    val props = MoveProcessProps(dispatch, actions, "/from/path", js.Array(
+      CopyProcessItem(item1, "newName1"),
+      CopyProcessItem(item2, item2.name)
     ), "/to/path", onTopItem, onDone)
     val p = Promise[Unit]()
     fs.rename.expects(path.join(props.fromPath, "dir 1"), path.join(props.toPath, "newName1")).returning(p.future)
-    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.plain := props)()))
 
     eventually {
       assertNativeComponent(renderer.root.children(0), <(statusPopupComp)(^.assertPlain[StatusPopupProps](inside(_) {
@@ -88,13 +88,13 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     MoveProcess.fs = fs.fs
     val item1 = FileListItem("dir 1", isDir = true)
     val item2 = FileListItem.copy(FileListItem("file 1"))(size = 10)
-    val props = MoveProcessProps(dispatch, actions, "/from/path", List(
-      (item1, item1.name),
-      (item2, item2.name)
+    val props = MoveProcessProps(dispatch, actions, "/from/path", js.Array(
+      CopyProcessItem(item1, item1.name),
+      CopyProcessItem(item2, item2.name)
     ), "/to/path", onTopItem, onDone)
     val p = Promise[Unit]()
     fs.rename.expects(path.join(props.fromPath, "dir 1"), path.join(props.toPath, "dir 1")).returning(p.future)
-    createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
+    createTestRenderer(withThemeContext(<(MoveProcess())(^.plain := props)()))
 
     //then
     onDone.expects()
@@ -128,13 +128,13 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     MoveProcess.fs = fs.fs
     val item1 = FileListItem("dir 1", isDir = true)
     val item2 = FileListItem.copy(FileListItem("file 1"))(size = 10)
-    val props = MoveProcessProps(dispatch, actions, "/from/path", List(
-      (item1, item1.name),
-      (item2, item2.name)
+    val props = MoveProcessProps(dispatch, actions, "/from/path", js.Array(
+      CopyProcessItem(item1, item1.name),
+      CopyProcessItem(item2, item2.name)
     ), "/to/path", onTopItem, onDone)
     val p = Promise[Unit]()
     fs.rename.expects(path.join(props.fromPath, "dir 1"), path.join(props.toPath, "dir 1")).returning(p.future)
-    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.plain := props)()))
 
     eventually {
       assertNativeComponent(renderer.root.children(0), <(statusPopupComp)(^.assertPlain[StatusPopupProps](inside(_) {
@@ -175,13 +175,13 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     MoveProcess.fs = fs.fs
     val item1 = FileListItem.copy(FileListItem("file 1"))(size = 1)
     val item2 = FileListItem.copy(FileListItem("file 2"))(size = 10)
-    val props = MoveProcessProps(dispatch, actions, "/from/path", List(
-      (item1, item1.name),
-      (item2, item2.name)
+    val props = MoveProcessProps(dispatch, actions, "/from/path", js.Array(
+      CopyProcessItem(item1, item1.name),
+      CopyProcessItem(item2, item2.name)
     ), "/to/path", onTopItem, onDone)
     val newPath = path.join(props.toPath, "file 1")
     fs.existsSync.expects(newPath).returning(true)
-    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.plain := props)()))
 
     eventually {
       inside(renderer.root.children.toList) { case List(_, existsMessage) =>
@@ -228,13 +228,13 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     MoveProcess.fs = fs.fs
     val item1 = FileListItem.copy(FileListItem("file 1"))(size = 1)
     val item2 = FileListItem.copy(FileListItem("file 2"))(size = 10)
-    val props = MoveProcessProps(dispatch, actions, "/from/path", List(
-      (item1, item1.name),
-      (item2, item2.name)
+    val props = MoveProcessProps(dispatch, actions, "/from/path", js.Array(
+      CopyProcessItem(item1, item1.name),
+      CopyProcessItem(item2, item2.name)
     ), "/to/path", onTopItem, onDone)
     val newPath1 = path.join(props.toPath, "file 1")
     fs.existsSync.expects(newPath1).returning(true)
-    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.plain := props)()))
 
     eventually {
       inside(renderer.root.children.toList) { case List(_, existsMessage) =>
@@ -295,13 +295,13 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     MoveProcess.fs = fs.fs
     val item1 = FileListItem.copy(FileListItem("file 1"))(size = 1)
     val item2 = FileListItem.copy(FileListItem("file 2"))(size = 10)
-    val props = MoveProcessProps(dispatch, actions, "/from/path", List(
-      (item1, item1.name),
-      (item2, item2.name)
+    val props = MoveProcessProps(dispatch, actions, "/from/path", js.Array(
+      CopyProcessItem(item1, item1.name),
+      CopyProcessItem(item2, item2.name)
     ), "/to/path", onTopItem, onDone)
     val newPath1 = path.join(props.toPath, "file 1")
     fs.existsSync.expects(newPath1).returning(true)
-    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.plain := props)()))
 
     eventually {
       inside(renderer.root.children.toList) { case List(_, existsMessage) =>
@@ -346,13 +346,13 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     MoveProcess.fs = fs.fs
     val item1 = FileListItem.copy(FileListItem("file 1"))(size = 1)
     val item2 = FileListItem.copy(FileListItem("file 2"))(size = 10)
-    val props = MoveProcessProps(dispatch, actions, "/from/path", List(
-      (item1, item1.name),
-      (item2, item2.name)
+    val props = MoveProcessProps(dispatch, actions, "/from/path", js.Array(
+      CopyProcessItem(item1, item1.name),
+      CopyProcessItem(item2, item2.name)
     ), "/to/path", onTopItem, onDone)
     val newPath1 = path.join(props.toPath, "file 1")
     fs.existsSync.expects(newPath1).returning(true)
-    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.plain := props)()))
 
     eventually {
       inside(renderer.root.children.toList) { case List(_, existsMessage) =>
@@ -406,14 +406,14 @@ class MoveProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val item1 = FileListItem.copy(FileListItem("file 1"))(size = 1)
     val item2 = FileListItem.copy(FileListItem("file 2"))(size = 10)
     val item3 = FileListItem.copy(FileListItem("file 3"))(size = 11)
-    val props = MoveProcessProps(dispatch, actions, "/from/path", List(
-      (item1, item1.name),
-      (item2, item2.name),
-      (item3, item3.name)
+    val props = MoveProcessProps(dispatch, actions, "/from/path", js.Array(
+      CopyProcessItem(item1, item1.name),
+      CopyProcessItem(item2, item2.name),
+      CopyProcessItem(item3, item3.name)
     ), "/to/path", onTopItem, onDone)
     val newPath1 = path.join(props.toPath, "file 1")
     fs.existsSync.expects(newPath1).returning(true)
-    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(MoveProcess())(^.plain := props)()))
 
     eventually {
       inside(renderer.root.children.toList) { case List(_, existsMessage) =>

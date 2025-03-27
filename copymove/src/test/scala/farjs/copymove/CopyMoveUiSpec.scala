@@ -418,11 +418,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     eventually {
-      assertTestComponent(renderer.root.children(0), moveProcessComp) {
+      assertTestComponent(renderer.root.children(0), moveProcessComp, plain = true) {
         case MoveProcessProps(_, resActions, fromPath, items, toPath, _, _) =>
           resActions shouldBe actions.actions
           fromPath shouldBe currDir.path
-          items shouldBe List((item, item.name))
+          assertCopyProcessItems(items.toList, List(CopyProcessItem(item, item.name)))
           toPath shouldBe toDir.path
       }
     }
@@ -457,12 +457,12 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     eventually {
-      assertTestComponent(renderer.root.children(0), moveProcessComp) {
+      assertTestComponent(renderer.root.children(0), moveProcessComp, plain = true) {
         case MoveProcessProps(resDispatch, resActions, fromPath, items, toPath, _, _) =>
           resDispatch shouldBe dispatch
           resActions shouldBe actions.actions
           fromPath shouldBe currDir.path
-          items shouldBe List((item, to))
+          assertCopyProcessItems(items.toList, List(CopyProcessItem(item, to)))
           toPath shouldBe currDir.path
       }
     }

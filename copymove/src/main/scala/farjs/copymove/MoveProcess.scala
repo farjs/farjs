@@ -1,8 +1,5 @@
 package farjs.copymove
 
-import farjs.filelist.FileListActions
-import farjs.filelist.api.FileListItem
-import farjs.ui.Dispatch
 import farjs.ui.popup._
 import farjs.ui.task.{Task, TaskAction}
 import farjs.ui.theme.Theme
@@ -14,14 +11,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.util.{Failure, Success}
-
-case class MoveProcessProps(dispatch: Dispatch,
-                            actions: FileListActions,
-                            fromPath: String,
-                            items: Seq[(FileListItem, String)],
-                            toPath: String,
-                            onTopItem: FileListItem => Unit,
-                            onDone: () => Unit)
 
 object MoveProcess extends FunctionComponent[MoveProcessProps] {
 
@@ -38,10 +27,11 @@ object MoveProcess extends FunctionComponent[MoveProcessProps] {
     val existsPromise = useRef(Promise.successful[Boolean](true))
     val askWhenExists = useRef(true)
     val currTheme = Theme.useTheme()
-    val props = compProps.wrapped
+    val props = compProps.plain
 
     def moveItems(): Unit = {
-      val resultF = props.items.foldLeft(Future.successful(true)) { case (resF, (currItem, toName)) =>
+      val resultF = props.items.foldLeft(Future.successful(true)) { case (resF, cpItem) =>
+        val CopyProcessItem(currItem, toName) = cpItem
         resF.flatMap {
           case true if inProgress.current =>
             setState(_.copy(currItem = currItem.name))
