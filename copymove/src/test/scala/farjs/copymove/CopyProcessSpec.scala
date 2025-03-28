@@ -294,7 +294,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     
     eventually(onExistsFn should not be null).flatMap { _ =>
       val existsF = onExistsFn(FileListItem("existing.file"))
-      val existsProps = findComponentProps(renderer.root, fileExistsPopup)
+      val existsProps = findComponentProps(renderer.root, fileExistsPopup, plain = true)
       
       //then
       onTopItem.expects(*).never()
@@ -307,7 +307,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       existsProps.onCancel()
       
       //then
-      findProps(renderer.root, fileExistsPopup) should be (empty)
+      findProps(renderer.root, fileExistsPopup, plain = true) should be (empty)
       existsF.toFuture.flatMap { res =>
         res shouldBe js.undefined
 
@@ -345,7 +345,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     
     eventually(onExistsFn should not be null).flatMap { _ =>
       val existsF = onExistsFn(FileListItem("existing.file"))
-      val existsProps = findComponentProps(renderer.root, fileExistsPopup)
+      val existsProps = findComponentProps(renderer.root, fileExistsPopup, plain = true)
       
       //when
       TestRenderer.act { () =>
@@ -353,7 +353,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       }
 
       //then
-      findProps(renderer.root, fileExistsPopup) should be (empty)
+      findProps(renderer.root, fileExistsPopup, plain = true) should be (empty)
       existsF.toFuture.flatMap { res =>
         res shouldBe js.undefined
 
@@ -397,7 +397,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     
     eventually(onExistsFn should not be null).flatMap { _ =>
       val existsF = onExistsFn(FileListItem("existing.file"))
-      val existsProps = findComponentProps(renderer.root, fileExistsPopup)
+      val existsProps = findComponentProps(renderer.root, fileExistsPopup, plain = true)
       
       //when
       TestRenderer.act { () =>
@@ -405,7 +405,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       }
 
       //then
-      findProps(renderer.root, fileExistsPopup) should be (empty)
+      findProps(renderer.root, fileExistsPopup, plain = true) should be (empty)
       existsF.toFuture.flatMap { res =>
         res shouldBe false
 
@@ -460,11 +460,11 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       val resultF = eventually(existsF.isCompleted shouldBe true)
       resultF.failed.flatMap { _ =>
         //when
-        val existsProps = findComponentProps(renderer.root, fileExistsPopup)
+        val existsProps = findComponentProps(renderer.root, fileExistsPopup, plain = true)
         TestRenderer.act { () =>
           existsProps.onAction(FileExistsAction.Overwrite)
         }
-        findProps(renderer.root, fileExistsPopup) should be (empty)
+        findProps(renderer.root, fileExistsPopup, plain = true) should be (empty)
 
         //then
         existsF.flatMap { res =>
@@ -571,11 +571,11 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     eventually(onExistsFn1 should not be null).flatMap { _ =>
       //given
       val existsF1 = onExistsFn1(FileListItem("existing.file1")).toFuture
-      val existsProps = findComponentProps(renderer.root, fileExistsPopup)
+      val existsProps = findComponentProps(renderer.root, fileExistsPopup, plain = true)
       TestRenderer.act { () =>
         existsProps.onAction(FileExistsAction.All)
       }
-      findProps(renderer.root, fileExistsPopup) should be (empty)
+      findProps(renderer.root, fileExistsPopup, plain = true) should be (empty)
       existsF1.flatMap { res =>
         res shouldBe true
         p1.success(true)
@@ -585,7 +585,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
           val existsF2 = onExistsFn2(FileListItem("existing.file2")).toFuture
 
           //then
-          findProps(renderer.root, fileExistsPopup) should be (empty)
+          findProps(renderer.root, fileExistsPopup, plain = true) should be (empty)
           existsF2.flatMap { res =>
             res shouldBe true
             
@@ -641,11 +641,11 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     eventually(onExistsFn1 should not be null).flatMap { _ =>
       //given
       val existsF1 = onExistsFn1(FileListItem("existing.file1")).toFuture
-      val existsProps = findComponentProps(renderer.root, fileExistsPopup)
+      val existsProps = findComponentProps(renderer.root, fileExistsPopup, plain = true)
       TestRenderer.act { () =>
         existsProps.onAction(FileExistsAction.SkipAll)
       }
-      findProps(renderer.root, fileExistsPopup) should be (empty)
+      findProps(renderer.root, fileExistsPopup, plain = true) should be (empty)
       existsF1.flatMap { res =>
         res shouldBe js.undefined
         p1.success(true)
@@ -655,7 +655,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
           val existsF2 = onExistsFn2(FileListItem("existing.file2")).toFuture
 
           //then
-          findProps(renderer.root, fileExistsPopup) should be (empty)
+          findProps(renderer.root, fileExistsPopup, plain = true) should be (empty)
           existsF2.flatMap { res =>
             res shouldBe js.undefined
             

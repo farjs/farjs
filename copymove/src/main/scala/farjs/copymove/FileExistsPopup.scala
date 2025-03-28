@@ -1,6 +1,5 @@
 package farjs.copymove
 
-import farjs.filelist.api.FileListItem
 import farjs.ui._
 import farjs.ui.border._
 import farjs.ui.popup.ModalContent._
@@ -11,11 +10,6 @@ import scommons.react.blessed._
 
 import scala.scalajs.js
 
-case class FileExistsPopupProps(newItem: FileListItem,
-                                existing: FileListItem,
-                                onAction: FileExistsAction => Unit,
-                                onCancel: () => Unit)
-
 object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
   
   private[copymove] var modalComp: ReactClass = Modal
@@ -24,7 +18,7 @@ object FileExistsPopup extends FunctionComponent[FileExistsPopupProps] {
   private[copymove] var buttonsPanelComp: ReactClass = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val (width, height) = (58, 11)
     val contentWidth = width - (paddingHorizontal + 2) * 2
     val contentLeft = 2

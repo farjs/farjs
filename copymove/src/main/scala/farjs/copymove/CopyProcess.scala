@@ -175,7 +175,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
       ))(),
 
       state.existing.map { existing =>
-        <(fileExistsPopup())(^.wrapped := FileExistsPopupProps(
+        <(fileExistsPopup())(^.plain := FileExistsPopupProps(
           newItem = d.item,
           existing = existing,
           onAction = { action =>
