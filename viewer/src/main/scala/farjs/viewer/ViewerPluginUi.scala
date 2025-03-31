@@ -57,7 +57,7 @@ class ViewerPluginUi(filePath: String, size: Double)
         ^.rbClickable := true,
         ^.rbAutoFocus := false
       )(
-        <(viewerHeader())(^.plain := headerProps)(),
+        <(viewerHeader)(^.plain := headerProps)(),
   
         <.button(
           ^.ref := { el: BlessedElement =>
@@ -87,7 +87,7 @@ class ViewerPluginUi(filePath: String, size: Double)
 object ViewerPluginUi {
 
   private[viewer] var popupComp: ReactClass = Popup
-  private[viewer] var viewerHeader: UiComponent[ViewerHeaderProps] = ViewerHeader
+  private[viewer] var viewerHeader: ReactClass = ViewerHeader
   private[viewer] var viewerController: UiComponent[ViewerControllerProps] = ViewerController
   private[viewer] var bottomMenuComp: ReactClass = BottomMenu
 

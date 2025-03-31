@@ -13,7 +13,7 @@ import scala.scalajs.js
 class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
 
   ViewerPluginUi.popupComp = "Popup".asInstanceOf[ReactClass]
-  ViewerPluginUi.viewerHeader = mockUiComponent("ViewerHeader")
+  ViewerPluginUi.viewerHeader = "ViewerHeader".asInstanceOf[ReactClass]
   ViewerPluginUi.viewerController = mockUiComponent("ViewerController")
   ViewerPluginUi.bottomMenuComp = "BottomMenu".asInstanceOf[ReactClass]
 
@@ -104,13 +104,15 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     viewerProps.setViewport(Some(viewport))
     
     //then
-    inside(findComponentProps(renderer.root, viewerHeader, plain = true)) {
-      case ViewerHeaderProps(filePath, encoding, size, column, percent) =>
-        filePath shouldBe "item 1"
-        encoding shouldBe viewport.encoding
-        size shouldBe viewport.size
-        column shouldBe viewport.column
-        percent shouldBe 50
+    inside(findComponents(renderer.root, viewerHeader)) {
+      case List(c) => inside(c.props.asInstanceOf[ViewerHeaderProps]) {
+        case ViewerHeaderProps(filePath, encoding, size, column, percent) =>
+          filePath shouldBe "item 1"
+          encoding shouldBe viewport.encoding
+          size shouldBe viewport.size
+          column shouldBe viewport.column
+          percent shouldBe 50
+      }
     }
     findComponentProps(renderer.root, viewerController).viewport shouldBe Some(viewport)
     val bottomMenuProps = inside(findComponents(renderer.root, bottomMenuComp)) {
@@ -148,7 +150,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
           ^.rbClickable := true,
           ^.rbAutoFocus := false
         )(
-          <(viewerHeader())(^.assertPlain[ViewerHeaderProps](inside(_) {
+          <(viewerHeader)(^.assertPlain[ViewerHeaderProps](inside(_) {
             case ViewerHeaderProps(resFilePath, resEncoding, resSize, resColumn, resPercent) =>
               resFilePath shouldBe filePath
               resEncoding shouldBe ""
