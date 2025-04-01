@@ -32,3 +32,4 @@ await import("./fs/popups/FolderShortcutsService.test.mjs");
 
 await import("./viewer/ViewerFileReader.test.mjs");
 await import("./viewer/ViewerHeader.test.mjs");
+await import("./viewer/ViewerInput.test.mjs");

@@ -18,7 +18,7 @@ import scala.scalajs.js.JSConverters.JSRichFutureNonThenable
 
 class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  ViewerContent.viewerInput = mockUiComponent("ViewerInput")
+  ViewerContent.viewerInput = "ViewerInput".asInstanceOf[ReactClass]
   ViewerContent.encodingsPopup = "EncodingsPopup".asInstanceOf[ReactClass]
   ViewerContent.textSearchPopup = "TextSearchPopup".asInstanceOf[ReactClass]
   ViewerContent.viewerSearch = mockUiComponent("ViewerSearch")
@@ -85,10 +85,10 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     fileReader.readNextLines.expects(*, *, *).never()
 
     //when
-    findComponentProps(renderer.root, viewerInput, plain = true).onWheel(true)
-    findComponentProps(renderer.root, viewerInput, plain = true).onWheel(false)
-    findComponentProps(renderer.root, viewerInput, plain = true).onWheel(true)
-    findComponentProps(renderer.root, viewerInput, plain = true).onWheel(false)
+    findComponents(renderer.root, viewerInput).head.props.asInstanceOf[ViewerInputProps].onWheel(true)
+    findComponents(renderer.root, viewerInput).head.props.asInstanceOf[ViewerInputProps].onWheel(false)
+    findComponents(renderer.root, viewerInput).head.props.asInstanceOf[ViewerInputProps].onWheel(true)
+    findComponents(renderer.root, viewerInput).head.props.asInstanceOf[ViewerInputProps].onWheel(false)
 
     //then
     assertViewerContent(renderer.root, props, content = Nil)
@@ -115,7 +115,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       else fileReader.readNextLines.expects(lines, position, viewport.encoding).returning(readF)
 
       //when
-      findComponentProps(renderer.root, viewerInput, plain = true).onWheel(up)
+      findComponents(renderer.root, viewerInput).head.props.asInstanceOf[ViewerInputProps].onWheel(up)
 
       //then
       eventually(assertViewerContent(renderer.root, props, expected))
@@ -154,7 +154,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       ))
     }.flatMap { _ =>
       //when
-      findComponentProps(renderer.root, viewerInput, plain = true).onKeypress("f7")
+      findComponents(renderer.root, viewerInput).head.props.asInstanceOf[ViewerInputProps].onKeypress("f7")
       inside(findComponents(renderer.root, textSearchPopup)) {
         case List(c) => c.props.asInstanceOf[TextSearchPopupProps].onCancel()
       }
@@ -175,7 +175,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         "file content"
       ))
     }.flatMap { _ =>
-      findComponentProps(renderer.root, viewerInput, plain = true).onKeypress("f7")
+      findComponents(renderer.root, viewerInput).head.props.asInstanceOf[ViewerInputProps].onKeypress("f7")
       val searchTerm = "test"
 
       //when & then
@@ -218,7 +218,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         "file content"
       ))
     }.flatMap { _ =>
-      findComponentProps(renderer.root, viewerInput, plain = true).onKeypress("f8")
+      findComponents(renderer.root, viewerInput).head.props.asInstanceOf[ViewerInputProps].onKeypress("f8")
       eventually(findComponents(renderer.root, encodingsPopup).head)
     }.flatMap { _ =>
       List(
@@ -278,7 +278,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       fileReader.readPrevLines.expects(viewport.height, viewport.size, viewport.size, viewport.encoding).returning(resF)
   
       //when
-      findComponentProps(renderer.root, viewerInput, plain = true).onKeypress("down")
+      findComponents(renderer.root, viewerInput).head.props.asInstanceOf[ViewerInputProps].onKeypress("down")
   
       //then
       eventually {
@@ -315,7 +315,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       }
 
       //when
-      findComponentProps(renderer.root, viewerInput, plain = true).onKeypress(key)
+      findComponents(renderer.root, viewerInput).head.props.asInstanceOf[ViewerInputProps].onKeypress(key)
 
       //then
       eventually(assertViewerContent(renderer.root, props, expected))
@@ -437,7 +437,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       ))
     }.flatMap { _ =>
       //when
-      findComponentProps(renderer.root, viewerInput, plain = true).onKeypress("f2")
+      findComponents(renderer.root, viewerInput).head.props.asInstanceOf[ViewerInputProps].onKeypress("f2")
   
       //then
       eventually {
@@ -460,7 +460,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       ))
     }.flatMap { _ =>
       //when
-      findComponentProps(renderer.root, viewerInput, plain = true).onKeypress("unknown")
+      findComponents(renderer.root, viewerInput).head.props.asInstanceOf[ViewerInputProps].onKeypress("unknown")
   
       //then
       eventually {
@@ -647,7 +647,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val theme = FileListTheme.defaultTheme
 
     assertComponents(result.children, List(
-      <(viewerInput())(^.assertPlain[ViewerInputProps](inside(_) {
+      <(viewerInput)(^.assertPlain[ViewerInputProps](inside(_) {
         case ViewerInputProps(inputRef, _, _) =>
           inputRef shouldBe props.inputRef
       }))(

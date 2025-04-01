@@ -18,7 +18,7 @@ case class ViewerContentProps(inputRef: NativeRef,
 
 object ViewerContent extends FunctionComponent[ViewerContentProps] {
   
-  private[viewer] var viewerInput: UiComponent[ViewerInputProps] = ViewerInput
+  private[viewer] var viewerInput: ReactClass = ViewerInput
   private[viewer] var encodingsPopup: ReactClass = EncodingsPopup
   private[viewer] var textSearchPopup: ReactClass = TextSearchPopup
   private[viewer] var viewerSearch: UiComponent[ViewerSearchProps] = ViewerSearch
@@ -107,7 +107,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       ()
     }, List(viewport.encoding, viewport.size, viewport.width, viewport.height, viewport.wrap))
 
-    <(viewerInput())(^.plain := ViewerInputProps(
+    <(viewerInput)(^.plain := ViewerInputProps(
       inputRef = props.inputRef,
       onWheel = { up =>
         if (up) onMoveUp(lines = 1)
