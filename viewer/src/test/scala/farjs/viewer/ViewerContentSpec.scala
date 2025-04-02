@@ -21,7 +21,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
   ViewerContent.viewerInput = "ViewerInput".asInstanceOf[ReactClass]
   ViewerContent.encodingsPopup = "EncodingsPopup".asInstanceOf[ReactClass]
   ViewerContent.textSearchPopup = "TextSearchPopup".asInstanceOf[ReactClass]
-  ViewerContent.viewerSearch = mockUiComponent("ViewerSearch")
+  ViewerContent.viewerSearch = "ViewerSearch".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class ViewerFileReader {
@@ -185,8 +185,8 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       findComponents(renderer.root, textSearchPopup) should be(empty)
 
       //when & then
-      findComponentProps(renderer.root, viewerSearch, plain = true).onComplete()
-      findProps(renderer.root, viewerSearch, plain = true) should be(empty)
+      findComponents(renderer.root, viewerSearch).head.props.asInstanceOf[ViewerSearchProps].onComplete()
+      findComponents(renderer.root, viewerSearch) should be(empty)
     }
   }
 

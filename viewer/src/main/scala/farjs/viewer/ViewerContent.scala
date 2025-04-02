@@ -21,7 +21,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
   private[viewer] var viewerInput: ReactClass = ViewerInput
   private[viewer] var encodingsPopup: ReactClass = EncodingsPopup
   private[viewer] var textSearchPopup: ReactClass = TextSearchPopup
-  private[viewer] var viewerSearch: UiComponent[ViewerSearchProps] = ViewerSearch
+  private[viewer] var viewerSearch: ReactClass = ViewerSearch
 
   protected def render(compProps: Props): ReactElement = {
     val theme = FileListTheme.useTheme()
@@ -148,7 +148,7 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       else None,
 
       if (searchTerm.nonEmpty) Some {
-        <(viewerSearch())(^.plain := ViewerSearchProps(
+        <(viewerSearch)(^.plain := ViewerSearchProps(
           searchTerm = searchTerm,
           onComplete = { () =>
             setSearchTerm("")
