@@ -46,7 +46,7 @@ object ViewerPlugin extends FileListPlugin(js.Array(
               val ui = new ViewerPluginUi(filePath, size)
               Some(ui.apply())
             case Some(item) if state.selectedNames.nonEmpty || item.isDir =>
-              Some(new ViewItemsPopup(data).apply())
+              Some(ViewItemsPopup(data))
             case _ => None
           }
         }
