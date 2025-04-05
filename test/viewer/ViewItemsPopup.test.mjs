@@ -47,7 +47,8 @@ describe("ViewItemsPopup.test.mjs", () => {
     const actions = new MockFileListActions({ scanDirs });
     const dir1 = FileListItem("dir 1", true);
     const file1 = { ...FileListItem("file 1"), size: 10 };
-    const currDir = FileListDir("/folder", false, [dir1, file1]);
+    const file2 = { ...FileListItem("file 2"), size: 11 };
+    const currDir = FileListDir("/folder", false, [dir1, file1, file2]);
     const state = {
       ...FileListState(),
       currDir,
@@ -88,6 +89,7 @@ describe("ViewItemsPopup.test.mjs", () => {
         items: [
           { ...dir1, size: 123 },
           { ...file1, size: 10 },
+          { ...file2, size: 11 },
         ],
       },
     };
