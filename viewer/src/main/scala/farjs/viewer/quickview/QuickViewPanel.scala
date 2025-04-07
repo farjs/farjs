@@ -15,7 +15,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
   private[quickview] var doubleBorderComp: ReactClass = DoubleBorder
   private[quickview] var horizontalLineComp: ReactClass = HorizontalLine
   private[quickview] var textLineComp: ReactClass = TextLine
-  private[quickview] var quickViewDirComp: UiComponent[QuickViewDirProps] = QuickViewDir
+  private[quickview] var quickViewDirComp: ReactClass = QuickViewDir
   private[quickview] var quickViewFileComp: UiComponent[QuickViewFileProps] = QuickViewFile
 
   protected def render(compProps: Props): ReactElement = {
@@ -62,7 +62,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
       maybeCurrData.map { case (dispatch, actions, state, currItem) =>
         <.>()(
           if (currItem.isDir) {
-            <(quickViewDirComp())(^.plain := QuickViewDirProps(
+            <(quickViewDirComp)(^.plain := QuickViewDirProps(
               dispatch = dispatch,
               actions = actions,
               state = state,

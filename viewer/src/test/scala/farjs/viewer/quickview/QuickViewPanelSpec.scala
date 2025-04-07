@@ -21,7 +21,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
   QuickViewPanel.doubleBorderComp = "DoubleBorder".asInstanceOf[ReactClass]
   QuickViewPanel.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   QuickViewPanel.textLineComp = "TextLine".asInstanceOf[ReactClass]
-  QuickViewPanel.quickViewDirComp = mockUiComponent("QuickViewDir")
+  QuickViewPanel.quickViewDirComp = "QuickViewDir".asInstanceOf[ReactClass]
   QuickViewPanel.quickViewFileComp = mockUiComponent("QuickViewFile")
 
   private val currComp = "QuickViewPanel".asInstanceOf[ReactClass]
@@ -172,7 +172,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
       }))())
 
       if (currItem.isDir) {
-        assertTestComponent(content, quickViewDirComp, plain = true) {
+        assertNativeComponent(content, <(quickViewDirComp)(^.assertPlain[QuickViewDirProps](inside(_) {
           case QuickViewDirProps(resDispatch, resActions, resState, resStack, resWidth, resCurrItem) =>
             resDispatch shouldBe dispatch
             resActions shouldBe actions
@@ -180,7 +180,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
             resStack shouldBe panelStack.stack
             resWidth shouldBe width
             resCurrItem shouldBe currItem
-        }
+        }))())
       }
       else {
         assertNativeComponent(content,

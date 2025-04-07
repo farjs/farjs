@@ -150,7 +150,7 @@ describe("ViewItemsPopup.test.mjs", () => {
     assert.deepEqual(dispatch.times, 0);
   });
 
-  it("should dispatch action with calculated items sizes", async () => {
+  it("should dispatch action when failure", async () => {
     //given
     let dispatchArgs = /** @type {any[]} */ ([]);
     const dispatch = mockFunction((...args) => (dispatchArgs = args));
