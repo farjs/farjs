@@ -5,16 +5,10 @@ import farjs.filelist.theme.FileListTheme
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
-import scommons.react.raw.NativeRef
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
-
-case class ViewerContentProps(inputRef: NativeRef,
-                              viewport: ViewerFileViewport,
-                              setViewport: js.Function1[Option[ViewerFileViewport], Unit],
-                              onKeypress: String => Boolean)
 
 object ViewerContent extends FunctionComponent[ViewerContentProps] {
   
@@ -29,11 +23,11 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
     val (showEncodingsPopup, setShowEncodingsPopup) = useState(false)
     val (showSearchPopup, setShowSearchPopup) = useState(false)
     val (searchTerm, setSearchTerm) = useState("")
-    val props = compProps.wrapped
+    val props = compProps.plain
     val viewport = props.viewport
     
     def updated(viewport: ViewerFileViewport): Unit = {
-      props.setViewport(Some(viewport))
+      props.setViewport(viewport)
     }
     
     def onMoveUp(lines: Int, from: Double = viewport.position): Unit = {

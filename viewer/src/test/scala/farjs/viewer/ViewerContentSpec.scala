@@ -39,19 +39,19 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
     val inputRef = raw.React.createRef()
     val fileReader = new ViewerFileReader
-    val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
+    val setViewport = mockFunction[js.UndefOr[ViewerFileViewport], Unit]
     var props = getViewerContentProps(inputRef, fileReader, setViewport)
     var viewport = props.viewport
     val readF = js.Promise.resolve[js.Array[ViewerFileLine]](js.Array[ViewerFileLine]("test \nfile content".split('\n').map(c => ViewerFileLine(c, c.length)).toList: _*))
     fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readF)
-    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.plain := props)()))
   
-    setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
-      inside(maybeViewport) { case Some(vp) =>
+    setViewport.expects(*).onCall { maybeViewport: js.UndefOr[ViewerFileViewport] =>
+      inside(maybeViewport.toOption) { case Some(vp) =>
         viewport = vp
         TestRenderer.act { () =>
-          props = props.copy(viewport = vp)
-          renderer.update(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
+          props = ViewerContentProps.copy(props)(viewport = vp)
+          renderer.update(withThemeContext(<(ViewerContent())(^.plain := props)()))
         }
       }
     }.anyNumberOfTimes()
@@ -62,19 +62,19 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     //given
     val inputRef = raw.React.createRef()
     val fileReader = new ViewerFileReader
-    val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
+    val setViewport = mockFunction[js.UndefOr[ViewerFileViewport], Unit]
     var props = getViewerContentProps(inputRef, fileReader, setViewport)
     var viewport = props.viewport
     val readP = Promise[js.Array[ViewerFileLine]]()
     fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readP.future.toJSPromise)
-    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.plain := props)()))
 
-    setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
-      inside(maybeViewport) { case Some(vp) =>
+    setViewport.expects(*).onCall { maybeViewport: js.UndefOr[ViewerFileViewport] =>
+      inside(maybeViewport.toOption) { case Some(vp) =>
         viewport = vp
         TestRenderer.act { () =>
-          props = props.copy(viewport = vp)
-          renderer.update(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
+          props = ViewerContentProps.copy(props)(viewport = vp)
+          renderer.update(withThemeContext(<(ViewerContent())(^.plain := props)()))
         }
       }
     }
@@ -245,22 +245,22 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     //given
     val inputRef = raw.React.createRef()
     val fileReader = new ViewerFileReader
-    val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
+    val setViewport = mockFunction[js.UndefOr[ViewerFileViewport], Unit]
     var props = {
       val p = getViewerContentProps(inputRef, fileReader, setViewport)
-      p.copy(viewport = p.viewport.copy(size = 10))
+      ViewerContentProps.copy(p)(viewport = p.viewport.copy(size = 10))
     }
     var viewport = props.viewport
     val readF = js.Promise.resolve[js.Array[ViewerFileLine]](js.Array("1\n2\n3\n4\n5\n".split('\n').map(c => ViewerFileLine(c, c.length + 1)).toList: _*))
     fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readF)
-    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.plain := props)()))
 
-    setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
-      inside(maybeViewport) { case Some(vp) =>
+    setViewport.expects(*).onCall { maybeViewport: js.UndefOr[ViewerFileViewport] =>
+      inside(maybeViewport.toOption) { case Some(vp) =>
         viewport = vp
         TestRenderer.act { () =>
-          props = props.copy(viewport = vp)
-          renderer.update(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
+          props = ViewerContentProps.copy(props)(viewport = vp)
+          renderer.update(withThemeContext(<(ViewerContent())(^.plain := props)()))
         }
       }
     }.anyNumberOfTimes()
@@ -412,19 +412,19 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     //given
     val inputRef = raw.React.createRef()
     val fileReader = new ViewerFileReader
-    val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
+    val setViewport = mockFunction[js.UndefOr[ViewerFileViewport], Unit]
     var props = getViewerContentProps(inputRef, fileReader, setViewport, onKeypress = _ => true)
     var viewport = props.viewport
     val readF = js.Promise.resolve[js.Array[ViewerFileLine]](js.Array[ViewerFileLine]("test \nfile content".split('\n').map(c => ViewerFileLine(c, c.length)).toList: _*))
     fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readF)
-    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.plain := props)()))
 
-    setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
-      inside(maybeViewport) { case Some(vp) =>
+    setViewport.expects(*).onCall { maybeViewport: js.UndefOr[ViewerFileViewport] =>
+      inside(maybeViewport.toOption) { case Some(vp) =>
         viewport = vp
         TestRenderer.act { () =>
-          props = props.copy(viewport = vp)
-          renderer.update(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
+          props = ViewerContentProps.copy(props)(viewport = vp)
+          renderer.update(withThemeContext(<(ViewerContent())(^.plain := props)()))
         }
       }
     }.anyNumberOfTimes()
@@ -482,7 +482,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         "file content"
       ))
     }.flatMap { _ =>
-      val updatedProps = props.copy(
+      val updatedProps = ViewerContentProps.copy(props)(
         viewport = viewport.copy(
           encoding = "utf-16",
           size = 11,
@@ -503,7 +503,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
       //when
       TestRenderer.act { () =>
-        renderer.update(withThemeContext(<(ViewerContent())(^.wrapped := updatedProps)()))
+        renderer.update(withThemeContext(<(ViewerContent())(^.plain := updatedProps)()))
       }
 
       //then
@@ -525,7 +525,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
         "file content"
       ))
     }.flatMap { _ =>
-      val updatedProps = props.copy()
+      val updatedProps = ViewerContentProps.copy(props)()
       updatedProps should not be theSameInstanceAs (props)
       updatedProps.viewport.encoding shouldBe viewport.encoding
       updatedProps.viewport.size shouldBe viewport.size
@@ -534,7 +534,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
 
       //when
       TestRenderer.act { () =>
-        renderer.update(withThemeContext(<(ViewerContent())(^.wrapped := updatedProps)()))
+        renderer.update(withThemeContext(<(ViewerContent())(^.plain := updatedProps)()))
       }
 
       //then
@@ -551,7 +551,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     //given
     val inputRef = raw.React.createRef()
     val fileReader = new ViewerFileReader
-    val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
+    val setViewport = mockFunction[js.UndefOr[ViewerFileViewport], Unit]
     var props = getViewerContentProps(inputRef, fileReader, setViewport)
     var viewport = props.viewport
     val readF = js.Promise.resolve[js.Array[ViewerFileLine]](js.Array("test \nfile content\n".split('\n').map(c => ViewerFileLine(c, c.length + 1)).toList: _*))
@@ -560,15 +560,15 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     percent shouldBe 76
 
     //when
-    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.plain := props)()))
 
     //then
-    setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
-      inside(maybeViewport) { case Some(vp) =>
+    setViewport.expects(*).onCall { maybeViewport: js.UndefOr[ViewerFileViewport] =>
+      inside(maybeViewport.toOption) { case Some(vp) =>
         viewport = vp
         TestRenderer.act { () =>
-          props = props.copy(viewport = vp)
-          renderer.update(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
+          props = ViewerContentProps.copy(props)(viewport = vp)
+          renderer.update(withThemeContext(<(ViewerContent())(^.plain := props)()))
         }
       }
     }
@@ -587,10 +587,10 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     //given
     val inputRef = raw.React.createRef()
     val fileReader = new ViewerFileReader
-    val setViewport = mockFunction[Option[ViewerFileViewport], Unit]
+    val setViewport = mockFunction[js.UndefOr[ViewerFileViewport], Unit]
     var props = {
       val p = getViewerContentProps(inputRef, fileReader, setViewport)
-      p.copy(viewport = p.viewport.copy(size = 0))
+      ViewerContentProps.copy(p)(viewport = p.viewport.copy(size = 0))
     }
     var viewport = props.viewport
     val readF = js.Promise.resolve[js.Array[ViewerFileLine]](js.Array[ViewerFileLine]("test content".split('\n').map(c => ViewerFileLine(c, c.length)).toList: _*))
@@ -598,15 +598,15 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val percent = 0
 
     //when
-    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.plain := props)()))
 
     //then
-    setViewport.expects(*).onCall { maybeViewport: Option[ViewerFileViewport] =>
-      inside(maybeViewport) { case Some(vp) =>
+    setViewport.expects(*).onCall { maybeViewport: js.UndefOr[ViewerFileViewport] =>
+      inside(maybeViewport.toOption) { case Some(vp) =>
         viewport = vp
         TestRenderer.act { () =>
-          props = props.copy(viewport = vp)
-          renderer.update(withThemeContext(<(ViewerContent())(^.wrapped := props)()))
+          props = ViewerContentProps.copy(props)(viewport = vp)
+          renderer.update(withThemeContext(<(ViewerContent())(^.plain := props)()))
         }
       }
     }
@@ -622,7 +622,7 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
   
   private def getViewerContentProps(inputRef: NativeRef,
                                     fileReader: ViewerFileReader,
-                                    setViewport: Option[ViewerFileViewport] => Unit,
+                                    setViewport: js.Function1[js.UndefOr[ViewerFileViewport], Unit],
                                     onKeypress: String => Boolean = _ => false) = {
     ViewerContentProps(
       inputRef = inputRef,

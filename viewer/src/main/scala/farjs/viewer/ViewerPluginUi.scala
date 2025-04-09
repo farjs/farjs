@@ -15,7 +15,7 @@ class ViewerPluginUi(filePath: String, size: Double)
 
   protected def render(compProps: Props): ReactElement = {
     val inputRef = raw.React.useRef(null)
-    val (viewport, setViewport) = useState(Option.empty[ViewerFileViewport])
+    val (viewport, setViewport) = useState(js.undefined: js.UndefOr[ViewerFileViewport])
     val props = compProps.plain
 
     val onKeypress: js.Function1[String, Boolean] = { keyFull =>
@@ -27,7 +27,7 @@ class ViewerPluginUi(filePath: String, size: Double)
       processed
     }
 
-    val headerProps = viewport match {
+    val headerProps = viewport.toOption match {
       case None =>
         ViewerHeaderProps(filePath)
       case Some(vp) =>
@@ -39,7 +39,7 @@ class ViewerPluginUi(filePath: String, size: Double)
           percent = vp.progress
         )
     }
-    val menuItems = viewport match {
+    val menuItems = viewport.toOption match {
       case None => defaultMenuItems
       case Some(vp) =>
         var items = defaultMenuItems

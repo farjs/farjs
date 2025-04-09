@@ -20,9 +20,9 @@ case class ViewerControllerProps(inputRef: NativeRef,
                                  dispatch: Dispatch,
                                  filePath: String,
                                  size: Double,
-                                 viewport: Option[ViewerFileViewport],
-                                 setViewport: js.Function1[Option[ViewerFileViewport], Unit] = _ => (),
-                                 onKeypress: String => Boolean = _ => false)
+                                 viewport: js.UndefOr[ViewerFileViewport],
+                                 setViewport: js.Function1[js.UndefOr[ViewerFileViewport], Unit] = _ => (),
+                                 onKeypress: js.Function1[String, Boolean] = _ => false)
 
 object ViewerController extends FunctionComponent[ViewerControllerProps] {
 
@@ -48,7 +48,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
         _ <- viewerFileReader.open(props.filePath).toFuture
       } yield {
         val history = maybeHistory.toOption.flatMap(h => FileViewHistory.fromHistory(h).toOption)
-        props.setViewport(Some(ViewerFileViewport(
+        props.setViewport(ViewerFileViewport(
           fileReader = viewerFileReader,
           encoding = history.map(_.params.encoding).getOrElse(Encoding.platformEncoding),
           size = props.size,
@@ -57,7 +57,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
           wrap = history.flatMap(_.params.wrap.toOption).getOrElse(false),
           column = history.flatMap(_.params.column.toOption).getOrElse(0),
           position = history.map(_.params.position).getOrElse(0.0)
-        )))
+        ))
       }
       openF.andThen { case Failure(NonFatal(_)) =>
         props.dispatch(TaskAction(Task("Opening file", openF)))
@@ -93,7 +93,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
           val linesCount = viewport.linesData.size
           
           <.>()(
-            <(viewerContent())(^.wrapped := ViewerContentProps(
+            <(viewerContent())(^.plain := ViewerContentProps(
               inputRef = props.inputRef,
               viewport = viewport.copy(
                 width = width,

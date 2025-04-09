@@ -13,10 +13,10 @@ object QuickViewFile extends FunctionComponent[QuickViewFileProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
-    val (viewport, setViewport) = useState(Option.empty[ViewerFileViewport])
+    val (viewport, setViewport) = useState(js.undefined: js.UndefOr[ViewerFileViewport])
     val inputRef = raw.React.useRef(props.panelStack.panelInput)
 
-    def onKeypress(key: String): Boolean = {
+    val onKeypress: js.Function1[String, Boolean] = { key =>
       var processed = true
       key match {
         case "f3" =>

@@ -31,7 +31,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
       width = 1,
       height = 2
     )
-    findComponentProps(renderer.root, viewerController).setViewport(Some(viewport))
+    findComponentProps(renderer.root, viewerController).setViewport(viewport)
     val popupProps = findPopupProps(renderer.root)
     
     //then
@@ -55,7 +55,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
       width = 1,
       height = 2
     )
-    findComponentProps(renderer.root, viewerController).setViewport(Some(viewport))
+    findComponentProps(renderer.root, viewerController).setViewport(viewport)
     val popupProps = findPopupProps(renderer.root)
     
     //then
@@ -101,7 +101,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     )
     
     //when
-    viewerProps.setViewport(Some(viewport))
+    viewerProps.setViewport(viewport)
     
     //then
     inside(findComponents(renderer.root, viewerHeader)) {
@@ -114,7 +114,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
           percent shouldBe 50
       }
     }
-    findComponentProps(renderer.root, viewerController).viewport shouldBe Some(viewport)
+    findComponentProps(renderer.root, viewerController).viewport shouldBe viewport
     val bottomMenuProps = inside(findComponents(renderer.root, bottomMenuComp)) {
       case List(comp) => comp.props.asInstanceOf[BottomMenuProps]
     }
@@ -170,7 +170,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
                 resDispatch shouldBe dispatch
                 resFilePath shouldBe filePath
                 resSize shouldBe size
-                viewport shouldBe None
+                viewport shouldBe js.undefined
             }))()
           ),
   

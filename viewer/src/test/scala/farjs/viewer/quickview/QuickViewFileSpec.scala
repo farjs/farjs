@@ -26,7 +26,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     val props = QuickViewFileProps(dispatch, panelStack, "some/file/path", size = 123)
     val renderer = createTestRenderer(<(QuickViewFile())(^.plain := props)())
     val viewProps = findComponentProps(renderer.root, viewerController)
-    viewProps.viewport shouldBe None
+    viewProps.viewport shouldBe js.undefined
 
     val viewport = ViewerFileViewport(
       fileReader = new MockViewerFileReader,
@@ -42,10 +42,10 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     )
     
     //when
-    viewProps.setViewport(Some(viewport))
+    viewProps.setViewport(viewport)
     
     //then
-    findComponentProps(renderer.root, viewerController).viewport shouldBe Some(viewport)
+    findComponentProps(renderer.root, viewerController).viewport shouldBe viewport
   }
 
   it should "emit onViewerOpenLeft event when onKeypress(F3)" in {
@@ -141,7 +141,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
           dispatch shouldBe props.dispatch
           filePath shouldBe props.filePath
           size shouldBe props.size
-          viewport shouldBe None
+          viewport shouldBe js.undefined
       }))()
     ))
   }
