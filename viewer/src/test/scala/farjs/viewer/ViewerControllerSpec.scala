@@ -77,7 +77,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
 
     //when
     val renderer = createTestRenderer(withThemeContext(withHistoryProvider(
-      <(ViewerController())(^.wrapped := props)(), historyMocks.provider
+      <(ViewerController())(^.plain := props)(), historyMocks.provider
     )))
 
     //then
@@ -115,7 +115,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
 
     //when
     val renderer = createTestRenderer(withThemeContext(withHistoryProvider(
-      <(ViewerController())(^.wrapped := props)(), historyMocks.provider
+      <(ViewerController())(^.plain := props)(), historyMocks.provider
     )))
 
     //then
@@ -179,7 +179,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
 
     //when
     val renderer = createTestRenderer(withThemeContext(withHistoryProvider(
-      <(ViewerController())(^.wrapped := props)(), historyMocks.provider
+      <(ViewerController())(^.plain := props)(), historyMocks.provider
     )))
 
     //then
@@ -200,7 +200,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
       //when
       TestRenderer.act { () =>
         renderer.update(withThemeContext(withHistoryProvider(
-          <(ViewerController())(^.wrapped := props.copy(viewport = resViewport))(), historyMocks.provider
+          <(ViewerController())(^.plain := ViewerControllerProps.copy(props)(viewport = resViewport))(), historyMocks.provider
         )))
       }
 
@@ -241,11 +241,11 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
       .returning(js.Promise.resolve[js.UndefOr[History]](js.undefined: js.UndefOr[History]))
 
     val renderer = createTestRenderer(withThemeContext(withHistoryProvider(
-      <(ViewerController())(^.wrapped := props)(), historyMocks.provider
+      <(ViewerController())(^.plain := props)(), historyMocks.provider
     )))
     
     eventually(assertViewerController(renderer.root, props)).map { _ =>
-      val updatedProps = props.copy(viewport = ViewerFileViewport(
+      val updatedProps = ViewerControllerProps.copy(props)(viewport = ViewerFileViewport(
         fileReader = new MockViewerFileReader,
         encoding = "win",
         size = 123,
@@ -261,7 +261,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
       //when
       TestRenderer.act { () =>
         renderer.update(withThemeContext(withHistoryProvider(
-          <(ViewerController())(^.wrapped := updatedProps)(), historyMocks.provider
+          <(ViewerController())(^.plain := updatedProps)(), historyMocks.provider
         )))
       }
 

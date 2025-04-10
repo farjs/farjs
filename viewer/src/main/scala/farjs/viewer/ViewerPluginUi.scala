@@ -66,7 +66,7 @@ class ViewerPluginUi(filePath: String, size: Double)
           ^.rbWidth := "100%",
           ^.rbHeight := "100%-2"
         )(
-          <(viewerController())(^.wrapped := ViewerControllerProps(
+          <(viewerController())(^.plain := ViewerControllerProps(
             inputRef = inputRef,
             dispatch = props.dispatch,
             filePath = filePath,

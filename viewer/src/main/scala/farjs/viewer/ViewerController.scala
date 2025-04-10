@@ -5,24 +5,15 @@ import farjs.file.{Encoding, FileReader, FileViewHistory, FileViewHistoryParams}
 import farjs.filelist.history.HistoryProvider
 import farjs.filelist.theme.FileListTheme
 import farjs.ui.task.{Task, TaskAction}
-import farjs.ui.{Dispatch, WithSize, WithSizeProps}
+import farjs.ui.{WithSize, WithSizeProps}
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
-import scommons.react.raw.NativeRef
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.util.Failure
 import scala.util.control.NonFatal
-
-case class ViewerControllerProps(inputRef: NativeRef,
-                                 dispatch: Dispatch,
-                                 filePath: String,
-                                 size: Double,
-                                 viewport: js.UndefOr[ViewerFileViewport],
-                                 setViewport: js.Function1[js.UndefOr[ViewerFileViewport], Unit] = _ => (),
-                                 onKeypress: js.Function1[String, Boolean] = _ => false)
 
 object ViewerController extends FunctionComponent[ViewerControllerProps] {
 
@@ -35,7 +26,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
   protected def render(compProps: Props): ReactElement = {
     val theme = FileListTheme.useTheme()
     val historyProvider = HistoryProvider.useHistoryProvider()
-    val props = compProps.wrapped
+    val props = compProps.plain
     val viewportRef = useRef(props.viewport)
     viewportRef.current = props.viewport
     
@@ -89,7 +80,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
       <.box(
         ^.rbStyle := contentStyle(theme)
       )(
-        props.viewport.map { viewport =>
+        props.viewport.toOption.map { viewport =>
           val linesCount = viewport.linesData.size
           
           <.>()(

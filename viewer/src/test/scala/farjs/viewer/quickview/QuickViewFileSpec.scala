@@ -25,7 +25,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     )
     val props = QuickViewFileProps(dispatch, panelStack, "some/file/path", size = 123)
     val renderer = createTestRenderer(<(QuickViewFile())(^.plain := props)())
-    val viewProps = findComponentProps(renderer.root, viewerController)
+    val viewProps = findComponentProps(renderer.root, viewerController, plain = true)
     viewProps.viewport shouldBe js.undefined
 
     val viewport = ViewerFileViewport(
@@ -45,7 +45,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     viewProps.setViewport(viewport)
     
     //then
-    findComponentProps(renderer.root, viewerController).viewport shouldBe viewport
+    findComponentProps(renderer.root, viewerController, plain = true).viewport shouldBe viewport
   }
 
   it should "emit onViewerOpenLeft event when onKeypress(F3)" in {
@@ -61,7 +61,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     )
     val props = QuickViewFileProps(dispatch, panelStack, "some/file/path", size = 123)
     val renderer = createTestRenderer(<(QuickViewFile())(^.plain := props)())
-    val viewProps = findComponentProps(renderer.root, viewerController)
+    val viewProps = findComponentProps(renderer.root, viewerController, plain = true)
 
     //then
     emitMock.expects("keypress", *, *).onCall { (_, _, key) =>
@@ -87,7 +87,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     )
     val props = QuickViewFileProps(dispatch, panelStack, "some/file/path", size = 123)
     val renderer = createTestRenderer(<(QuickViewFile())(^.plain := props)())
-    val viewProps = findComponentProps(renderer.root, viewerController)
+    val viewProps = findComponentProps(renderer.root, viewerController, plain = true)
 
     //then
     emitMock.expects("keypress", *, *).onCall { (_, _, key) =>
@@ -112,7 +112,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     )
     val props = QuickViewFileProps(dispatch, panelStack, "some/file/path", size = 123)
     val renderer = createTestRenderer(<(QuickViewFile())(^.plain := props)())
-    val viewProps = findComponentProps(renderer.root, viewerController)
+    val viewProps = findComponentProps(renderer.root, viewerController, plain = true)
 
     //when & then
     viewProps.onKeypress("unknown") shouldBe false
@@ -135,7 +135,7 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     
     //then
     assertComponents(renderer.root.children, List(
-      <(viewerController())(^.assertWrapped(inside(_) {
+      <(viewerController())(^.assertPlain[ViewerControllerProps](inside(_) {
         case ViewerControllerProps(inputRef, dispatch, filePath, size, viewport, _, _) =>
           inputRef.current should be theSameInstanceAs props.panelStack.panelInput
           dispatch shouldBe props.dispatch

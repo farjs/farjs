@@ -31,7 +31,7 @@ object QuickViewFile extends FunctionComponent[QuickViewFileProps] {
       processed
     }
 
-    <(viewerController())(^.wrapped := ViewerControllerProps(
+    <(viewerController())(^.plain := ViewerControllerProps(
       inputRef = inputRef,
       dispatch = props.dispatch,
       filePath = props.filePath,

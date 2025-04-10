@@ -31,7 +31,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
       width = 1,
       height = 2
     )
-    findComponentProps(renderer.root, viewerController).setViewport(viewport)
+    findComponentProps(renderer.root, viewerController, plain = true).setViewport(viewport)
     val popupProps = findPopupProps(renderer.root)
     
     //then
@@ -55,7 +55,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
       width = 1,
       height = 2
     )
-    findComponentProps(renderer.root, viewerController).setViewport(viewport)
+    findComponentProps(renderer.root, viewerController, plain = true).setViewport(viewport)
     val popupProps = findPopupProps(renderer.root)
     
     //then
@@ -88,7 +88,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
     val pluginUi = new ViewerPluginUi("item 1", 0)
     val props = FileListPluginUiProps(dispatch, onClose)
     val renderer = createTestRenderer(<(pluginUi())(^.plain := props)())
-    val viewerProps = findComponentProps(renderer.root, viewerController)
+    val viewerProps = findComponentProps(renderer.root, viewerController, plain = true)
     val viewport = ViewerFileViewport(
       fileReader = new MockViewerFileReader(),
       encoding = "utf-8",
@@ -114,7 +114,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
           percent shouldBe 50
       }
     }
-    findComponentProps(renderer.root, viewerController).viewport shouldBe viewport
+    findComponentProps(renderer.root, viewerController, plain = true).viewport shouldBe viewport
     val bottomMenuProps = inside(findComponents(renderer.root, bottomMenuComp)) {
       case List(comp) => comp.props.asInstanceOf[BottomMenuProps]
     }
@@ -164,7 +164,7 @@ class ViewerPluginUiSpec extends TestSpec with TestRendererUtils {
             ^.rbWidth := "100%",
             ^.rbHeight := "100%-2"
           )(
-            <(viewerController())(^.assertWrapped(inside(_) {
+            <(viewerController())(^.assertPlain[ViewerControllerProps](inside(_) {
               case ViewerControllerProps(inputRef, resDispatch, resFilePath, resSize, viewport, _, _) =>
                 inputRef.current shouldBe inputMock
                 resDispatch shouldBe dispatch
