@@ -1,13 +1,14 @@
 package farjs.viewer.quickview
 
-import farjs.filelist.stack.WithStackProps
 import farjs.ui.Dispatch
+import scommons.react.raw.NativeRef
 
 import scala.scalajs.js
 
 sealed trait QuickViewFileProps extends js.Object {
   val dispatch: Dispatch
-  val panelStack: WithStackProps
+  val inputRef: NativeRef
+  val isRight: Boolean
   val filePath: String
   val size: Double
 }
@@ -15,22 +16,25 @@ sealed trait QuickViewFileProps extends js.Object {
 object QuickViewFileProps {
 
   def apply(dispatch: Dispatch,
-            panelStack: WithStackProps,
+            inputRef: NativeRef,
+            isRight: Boolean,
             filePath: String,
             size: Double): QuickViewFileProps = {
 
     js.Dynamic.literal(
       dispatch = dispatch,
-      panelStack = panelStack,
+      inputRef = inputRef,
+      isRight = isRight,
       filePath = filePath,
       size = size
     ).asInstanceOf[QuickViewFileProps]
   }
 
-  def unapply(arg: QuickViewFileProps): Option[(Dispatch, WithStackProps, String, Double)] = {
+  def unapply(arg: QuickViewFileProps): Option[(Dispatch, NativeRef, Boolean, String, Double)] = {
     Some((
       arg.dispatch,
-      arg.panelStack,
+      arg.inputRef,
+      arg.isRight,
       arg.filePath,
       arg.size
     ))

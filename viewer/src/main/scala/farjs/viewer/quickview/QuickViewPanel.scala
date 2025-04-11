@@ -1,14 +1,15 @@
 package farjs.viewer.quickview
 
-import farjs.filelist.{FileListData, FileListState}
 import farjs.filelist.api.FileListItem
 import farjs.filelist.stack.{WithStack, WithStacks}
 import farjs.filelist.theme.FileListTheme
+import farjs.filelist.{FileListData, FileListState}
 import farjs.ui._
 import farjs.ui.border._
 import scommons.nodejs.path
 import scommons.react._
 import scommons.react.blessed._
+import scommons.react.raw.React
 
 object QuickViewPanel extends FunctionComponent[Unit] {
 
@@ -21,6 +22,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
   protected def render(compProps: Props): ReactElement = {
     val stacks = WithStacks.useStacks()
     val panelStack = WithStack.useStack()
+    val inputRef = React.useRef(panelStack.panelInput)
     val width = panelStack.width
     val height = panelStack.height
     
@@ -84,7 +86,8 @@ object QuickViewPanel extends FunctionComponent[Unit] {
                 ^.key := filePath,
                 ^.plain := QuickViewFileProps(
                   dispatch = dispatch,
-                  panelStack = panelStack,
+                  inputRef = inputRef,
+                  isRight = panelStack.isRight,
                   filePath = filePath,
                   size = currItem.size
                 )

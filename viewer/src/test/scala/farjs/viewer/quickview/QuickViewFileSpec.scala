@@ -1,10 +1,8 @@
 package farjs.viewer.quickview
 
-import farjs.filelist.stack._
 import farjs.viewer._
 import farjs.viewer.quickview.QuickViewFile._
-import scommons.react.ReactClass
-import scommons.react.blessed._
+import scommons.react.raw.React
 import scommons.react.test._
 
 import scala.scalajs.js
@@ -16,14 +14,8 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
   it should "update viewport when setViewport" in {
     //given
     val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
-    val panelStack = WithStackProps(
-      isRight = false,
-      panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
-      stack = new PanelStack(isActive = true, js.Array(
-        PanelStackItem("quickViewComp".asInstanceOf[ReactClass], dispatch)
-      ), null)
-    )
-    val props = QuickViewFileProps(dispatch, panelStack, "some/file/path", size = 123)
+    val inputRef = React.createRef()
+    val props = QuickViewFileProps(dispatch, inputRef, isRight = false, "some/file/path", size = 123)
     val renderer = createTestRenderer(<(QuickViewFile())(^.plain := props)())
     val viewProps = findComponentProps(renderer.root, viewerController, plain = true)
     viewProps.viewport shouldBe js.undefined
@@ -52,14 +44,9 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val emitMock = mockFunction[String, js.Any, js.Dynamic, Boolean]
-    val panelStack = WithStackProps(
-      isRight = true,
-      panelInput = js.Dynamic.literal("emit" -> emitMock).asInstanceOf[BlessedElement],
-      stack = new PanelStack(isActive = true, js.Array(
-        PanelStackItem("quickViewComp".asInstanceOf[ReactClass], dispatch)
-      ), null)
-    )
-    val props = QuickViewFileProps(dispatch, panelStack, "some/file/path", size = 123)
+    val inputRef = React.createRef()
+    inputRef.current = js.Dynamic.literal("emit" -> emitMock)
+    val props = QuickViewFileProps(dispatch, inputRef, isRight = true, "some/file/path", size = 123)
     val renderer = createTestRenderer(<(QuickViewFile())(^.plain := props)())
     val viewProps = findComponentProps(renderer.root, viewerController, plain = true)
 
@@ -78,14 +65,9 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     //given
     val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val emitMock = mockFunction[String, js.Any, js.Dynamic, Boolean]
-    val panelStack = WithStackProps(
-      isRight = false,
-      panelInput = js.Dynamic.literal("emit" -> emitMock).asInstanceOf[BlessedElement],
-      stack = new PanelStack(isActive = true, js.Array(
-        PanelStackItem("quickViewComp".asInstanceOf[ReactClass], dispatch)
-      ), null)
-    )
-    val props = QuickViewFileProps(dispatch, panelStack, "some/file/path", size = 123)
+    val inputRef = React.createRef()
+    inputRef.current = js.Dynamic.literal("emit" -> emitMock)
+    val props = QuickViewFileProps(dispatch, inputRef, isRight = false, "some/file/path", size = 123)
     val renderer = createTestRenderer(<(QuickViewFile())(^.plain := props)())
     val viewProps = findComponentProps(renderer.root, viewerController, plain = true)
 
@@ -103,14 +85,8 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
   it should "return false if unknown key when onKeypress" in {
     //given
     val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
-    val panelStack = WithStackProps(
-      isRight = false,
-      panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
-      stack = new PanelStack(isActive = true, js.Array(
-        PanelStackItem("quickViewComp".asInstanceOf[ReactClass], dispatch)
-      ), null)
-    )
-    val props = QuickViewFileProps(dispatch, panelStack, "some/file/path", size = 123)
+    val inputRef = React.createRef()
+    val props = QuickViewFileProps(dispatch, inputRef, isRight = false, "some/file/path", size = 123)
     val renderer = createTestRenderer(<(QuickViewFile())(^.plain := props)())
     val viewProps = findComponentProps(renderer.root, viewerController, plain = true)
 
@@ -121,14 +97,8 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
   it should "render component" in {
     //given
     val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
-    val panelStack = WithStackProps(
-      isRight = false,
-      panelInput = js.Dynamic.literal().asInstanceOf[BlessedElement],
-      stack = new PanelStack(isActive = true, js.Array(
-        PanelStackItem("quickViewComp".asInstanceOf[ReactClass], dispatch)
-      ), null)
-    )
-    val props = QuickViewFileProps(dispatch, panelStack, "some/file/path", size = 123)
+    val inputRef = React.createRef()
+    val props = QuickViewFileProps(dispatch, inputRef, isRight = false, "some/file/path", size = 123)
     
     //when
     val renderer = createTestRenderer(<(QuickViewFile())(^.plain := props)())
@@ -136,8 +106,8 @@ class QuickViewFileSpec extends TestSpec with TestRendererUtils {
     //then
     assertComponents(renderer.root.children, List(
       <(viewerController())(^.assertPlain[ViewerControllerProps](inside(_) {
-        case ViewerControllerProps(inputRef, dispatch, filePath, size, viewport, _, _) =>
-          inputRef.current should be theSameInstanceAs props.panelStack.panelInput
+        case ViewerControllerProps(resInputRef, dispatch, filePath, size, viewport, _, _) =>
+          resInputRef should be theSameInstanceAs inputRef
           dispatch shouldBe props.dispatch
           filePath shouldBe props.filePath
           size shouldBe props.size
