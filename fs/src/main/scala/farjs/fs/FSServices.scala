@@ -1,25 +1,21 @@
 package farjs.fs
 
 import farjs.fs.popups.FolderShortcutsService
-import scommons.react._
-import scommons.react.hooks._
+import scommons.react.raw.NativeContext
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
-case class FSServices(folderShortcuts: FolderShortcutsService)
+trait FSServices extends js.Object {
 
-object FSServices {
+  val folderShortcuts: FolderShortcutsService
+}
 
-  val Context: ReactContext[FSServices] = ReactContext[FSServices](defaultValue = null)
+@js.native
+@JSImport("../fs/FSServices.mjs", JSImport.Default)
+object FSServices extends js.Object {
 
-  def useServices: FSServices = {
-    val ctx = useContext(Context)
-    if (ctx == null) {
-      throw js.JavaScriptException(js.Error(
-        "FSServices.Context is not found." +
-          "\nPlease, make sure you use FSServices.Context.Provider in parent components"
-      ))
-    }
-    ctx
-  }
+  val Context: NativeContext = js.native
+  
+  def useServices(): FSServices = js.native
 }

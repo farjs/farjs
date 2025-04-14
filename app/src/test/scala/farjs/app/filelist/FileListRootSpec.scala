@@ -3,7 +3,7 @@ package farjs.app.filelist
 import farjs.filelist.history.HistoryProvider
 import farjs.fs.FSServices
 import scommons.react._
-import scommons.react.hooks._
+import scommons.react.raw.React
 import scommons.react.test._
 
 import java.util.concurrent.atomic.AtomicReference
@@ -52,7 +52,7 @@ class FileListRootSpec extends TestSpec with TestRendererUtils {
     (historyProviderRef, fsRef, new FunctionComponent[Unit] {
       protected def render(props: Props): ReactElement = {
         historyProviderRef.set(HistoryProvider.useHistoryProvider())
-        fsRef.set(useContext(FSServices.Context))
+        fsRef.set(React.useContext(FSServices.Context).asInstanceOf[FSServices])
         <.>()()
       }
     }.apply())

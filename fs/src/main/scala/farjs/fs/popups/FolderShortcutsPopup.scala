@@ -16,7 +16,7 @@ object FolderShortcutsPopup extends FunctionComponent[FolderShortcutsPopupProps]
   
   protected def render(compProps: Props): ReactElement = {
     val stacks = WithStacks.useStacks()
-    val services = FSServices.useServices
+    val services = FSServices.useServices()
     val (maybeItems, setItems) = useState(Option.empty[List[js.UndefOr[String]]])
     val (selected, setSelected) = useState(0)
     val props = compProps.plain
