@@ -23,7 +23,7 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val onCancel = mockFunction[Unit]
     val props = AddToArchPopupProps("zipName", AddToArchAction.Add, _ => (), onCancel)
-    val renderer = createTestRenderer(withThemeContext(<(AddToArchPopup())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(AddToArchPopup())(^.plain := props)()))
     val modal = inside(findComponents(renderer.root, modalComp)) {
       case List(modal) => modal.props.asInstanceOf[ModalProps]
     }
@@ -39,7 +39,7 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
     //given
     val zipName = "initial zip name"
     val props = AddToArchPopupProps(zipName, AddToArchAction.Add, _ => (), () => ())
-    val renderer = createTestRenderer(withThemeContext(<(AddToArchPopup())(^.wrapped := props)()))
+    val renderer = createTestRenderer(withThemeContext(<(AddToArchPopup())(^.plain := props)()))
     val textBox = inside(findComponents(renderer.root, textBoxComp)) {
       case List(c) => c.props.asInstanceOf[TextBoxProps]
     }
@@ -60,7 +60,7 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
     val props = AddToArchPopupProps("test", AddToArchAction.Add, onAction, onCancel)
-    val comp = testRender(withThemeContext(<(AddToArchPopup())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(AddToArchPopup())(^.plain := props)()))
     val textBox = inside(findComponents(comp, textBoxComp)) {
       case List(c) => c.props.asInstanceOf[TextBoxProps]
     }
@@ -78,7 +78,7 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
     val props = AddToArchPopupProps("test", AddToArchAction.Add, onAction, onCancel)
-    val comp = testRender(withThemeContext(<(AddToArchPopup())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(AddToArchPopup())(^.plain := props)()))
     val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
@@ -97,7 +97,7 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
     val props = AddToArchPopupProps("", AddToArchAction.Add, onAction, onCancel)
-    val comp = testRender(withThemeContext(<(AddToArchPopup())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(AddToArchPopup())(^.plain := props)()))
     val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
@@ -116,7 +116,7 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
     val onAction = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
     val props = AddToArchPopupProps("", AddToArchAction.Add, onAction, onCancel)
-    val comp = testRender(withThemeContext(<(AddToArchPopup())(^.wrapped := props)()))
+    val comp = testRender(withThemeContext(<(AddToArchPopup())(^.plain := props)()))
     val buttonsProps = inside(findComponents(comp, buttonsPanelComp)) {
       case List(bp) => bp.props.asInstanceOf[ButtonsPanelProps]
     }
@@ -135,7 +135,7 @@ class AddToArchPopupSpec extends TestSpec with TestRendererUtils {
     val props = AddToArchPopupProps("test zip", AddToArchAction.Add, _ => (), () => ())
 
     //when
-    val result = testRender(withThemeContext(<(AddToArchPopup())(^.wrapped := props)()))
+    val result = testRender(withThemeContext(<(AddToArchPopup())(^.plain := props)()))
 
     //then
     assertAddToArchPopup(result, props, List("[ Add ]", "[ Cancel ]"))

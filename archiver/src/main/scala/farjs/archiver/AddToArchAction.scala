@@ -1,10 +1,12 @@
 package farjs.archiver
 
-sealed trait AddToArchAction
+import scala.scalajs.js
+
+sealed trait AddToArchAction extends js.Object
 
 object AddToArchAction {
 
-  case object Add extends AddToArchAction
-  case object Copy extends AddToArchAction
-  case object Move extends AddToArchAction
+  val Add: AddToArchAction = "Add".asInstanceOf[AddToArchAction]
+  val Copy: AddToArchAction = "Copy".asInstanceOf[AddToArchAction]
+  val Move: AddToArchAction = "Move".asInstanceOf[AddToArchAction]
 }

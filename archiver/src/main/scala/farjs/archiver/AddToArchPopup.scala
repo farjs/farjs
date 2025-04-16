@@ -10,11 +10,6 @@ import scommons.react.hooks._
 
 import scala.scalajs.js
 
-case class AddToArchPopupProps(zipName: String,
-                               action: AddToArchAction,
-                               onAction: String => Unit,
-                               onCancel: () => Unit)
-
 object AddToArchPopup extends FunctionComponent[AddToArchPopupProps] {
 
   private[archiver] var modalComp: ReactClass = Modal
@@ -24,7 +19,7 @@ object AddToArchPopup extends FunctionComponent[AddToArchPopupProps] {
   private[archiver] var buttonsPanelComp: ReactClass = ButtonsPanel
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val (zipName, setZipName) = useState(props.zipName)
     val (width, height) = (75, 8)
     val contentWidth = width - (paddingHorizontal + 2) * 2

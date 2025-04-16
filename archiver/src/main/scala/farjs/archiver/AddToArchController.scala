@@ -37,7 +37,7 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
     val (progress, setProgress) = useState(0)
     val props = compProps.wrapped
     
-    def onAction(zipFile: String): Unit = {
+    val onAction: js.Function1[String, Unit] = { zipFile =>
       setShowAddPopup(false)
       setShowStatusPopup(true)
 
@@ -78,7 +78,7 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
     
     <.>()(
       if (showAddPopup) Some(
-        <(addToArchPopup())(^.wrapped := AddToArchPopupProps(
+        <(addToArchPopup())(^.plain := AddToArchPopupProps(
           zipName = props.zipName,
           action = props.action,
           onAction = onAction,

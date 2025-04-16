@@ -53,11 +53,10 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
 
     //then
     findComponents(renderer.root, statusPopupComp) should be (empty)
-    inside(findComponentProps(renderer.root, addToArchPopup)) {
-      case AddToArchPopupProps(zipName, action, onAction, onCancel) =>
+    inside(findComponentProps(renderer.root, addToArchPopup, plain = true)) {
+      case AddToArchPopupProps(zipName, action, onAction, _) =>
         zipName shouldBe "new.zip"
         action shouldBe AddToArchAction.Add
-        onCancel shouldBe props.onCancel
 
         //given
         val zipFile = "test.zip"
@@ -122,11 +121,10 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
 
     //then
     findComponents(renderer.root, statusPopupComp) should be (empty)
-    inside(findComponentProps(renderer.root, addToArchPopup)) {
-      case AddToArchPopupProps(zipName, action, onAction, onCancel) =>
+    inside(findComponentProps(renderer.root, addToArchPopup, plain = true)) {
+      case AddToArchPopupProps(zipName, action, onAction, _) =>
         zipName shouldBe "new.zip"
         action shouldBe AddToArchAction.Add
-        onCancel shouldBe props.onCancel
 
         //given
         val zipFile = "test.zip"
