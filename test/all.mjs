@@ -28,6 +28,7 @@ await import("./filelist/popups/SelectPopup.test.mjs");
 await import("./filelist/FileListUi.test.mjs");
 await import("./filelist/FileListUiPlugin.test.mjs");
 
+await import("./fs/popups/FolderShortcutsPopup.test.mjs");
 await import("./fs/popups/FolderShortcutsService.test.mjs");
 await import("./fs/popups/MockFolderShortcutsService.test.mjs");
 await import("./fs/FSServices.test.mjs");

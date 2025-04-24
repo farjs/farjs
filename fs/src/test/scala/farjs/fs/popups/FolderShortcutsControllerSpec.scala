@@ -2,11 +2,12 @@ package farjs.fs.popups
 
 import farjs.fs.popups.FolderShortcutsController._
 import org.scalatest.Succeeded
+import scommons.react.ReactClass
 import scommons.react.test._
 
 class FolderShortcutsControllerSpec extends TestSpec with TestRendererUtils {
 
-  FolderShortcutsController.folderShortcutsPopup = mockUiComponent("FolderShortcutsPopup")
+  FolderShortcutsController.folderShortcutsPopup = "FolderShortcutsPopup".asInstanceOf[ReactClass]
 
   it should "call onChangeDir when onChangeDir" in {
     //given
@@ -21,7 +22,9 @@ class FolderShortcutsControllerSpec extends TestSpec with TestRendererUtils {
     onChangeDir.expects(dir)
 
     //when
-    findComponentProps(renderer.root, folderShortcutsPopup, plain = true).onChangeDir(dir)
+    inside(findComponents(renderer.root, folderShortcutsPopup)) {
+      case List(c) => c.props.asInstanceOf[FolderShortcutsPopupProps].onChangeDir(dir)
+    }
   }
 
   it should "call onClose when onClose" in {
@@ -30,7 +33,9 @@ class FolderShortcutsControllerSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val props = FolderShortcutsControllerProps(showPopup = true, onChangeDir, onClose)
     val comp = testRender(<(FolderShortcutsController())(^.plain := props)())
-    val popup = findComponentProps(comp, folderShortcutsPopup, plain = true)
+    val popup = inside(findComponents(comp, folderShortcutsPopup)) {
+      case List(c) => c.props.asInstanceOf[FolderShortcutsPopupProps]
+    }
 
     //then
     onClose.expects()
@@ -48,9 +53,9 @@ class FolderShortcutsControllerSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(FolderShortcutsController())(^.plain := props)())
 
     //then
-    assertTestComponent(result, folderShortcutsPopup, plain = true) {
+    assertNativeComponent(result, <(folderShortcutsPopup)(^.assertPlain[FolderShortcutsPopupProps](inside(_) {
       case FolderShortcutsPopupProps(_, _) => Succeeded
-    }
+    }))())
   }
 
   it should "render empty component" in {
