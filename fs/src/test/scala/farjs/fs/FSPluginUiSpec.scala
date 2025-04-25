@@ -18,7 +18,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
 
   FSPluginUi.drive = mockUiComponent("DriveController")
   FSPluginUi.foldersHistory = mockUiComponent("FoldersHistoryController")
-  FSPluginUi.folderShortcuts = mockUiComponent("FolderShortcutsController")
+  FSPluginUi.folderShortcuts = "FolderShortcutsController".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class Actions {
@@ -186,7 +186,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
           resOnClose should be theSameInstanceAs onClose
       }))(),
 
-      <(folderShortcuts())(^.assertPlain[FolderShortcutsControllerProps](inside(_) {
+      <(folderShortcuts)(^.assertPlain[FolderShortcutsControllerProps](inside(_) {
         case FolderShortcutsControllerProps(showPopup, onChangeDir, resOnClose) =>
           showPopup shouldBe false
           onChangeDir shouldBe onChangeDirInActivePanel

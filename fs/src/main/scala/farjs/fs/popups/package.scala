@@ -8,6 +8,10 @@ import scala.scalajs.js.annotation.JSImport
 package object popups {
 
   @js.native
+  @JSImport("../fs/popups/FolderShortcutsController.mjs", JSImport.Default)
+  object FolderShortcutsController extends ReactClass
+
+  @js.native
   @JSImport("../fs/popups/FolderShortcutsPopup.mjs", JSImport.Default)
   object FolderShortcutsPopup extends ReactClass
 }

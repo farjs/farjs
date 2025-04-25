@@ -12,7 +12,7 @@ object FSPluginUi {
 
   private[fs] var drive: UiComponent[DriveControllerProps] = DriveController
   private[fs] var foldersHistory: UiComponent[FoldersHistoryControllerProps] = FoldersHistoryController
-  private[fs] var folderShortcuts: UiComponent[FolderShortcutsControllerProps] = FolderShortcutsController
+  private[fs] var folderShortcuts: ReactClass = FolderShortcutsController
 
   def unapply(arg: FSPluginUi): Option[(Option[Boolean], Boolean, Boolean)] = {
     Some((
@@ -75,7 +75,7 @@ class FSPluginUi(val showDrivePopupOnLeft: Option[Boolean] = None,
         onClose = props.onClose
       ))(),
       
-      <(folderShortcuts())(^.plain := FolderShortcutsControllerProps(
+      <(folderShortcuts)(^.plain := FolderShortcutsControllerProps(
         showPopup = showFolderShortcutsPopup,
         onChangeDir = onChangeDirInActivePanel,
         onClose = props.onClose
