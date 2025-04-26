@@ -597,6 +597,29 @@ describe("ViewerFileViewport.test.mjs", () => {
     );
   });
 
+  it("should return new instance with existing data when updated", () => {
+    //given
+    const fileReader = new MockViewerFileReader();
+    const viewport = createViewerFileViewport(
+      fileReader,
+      "utf8",
+      123,
+      80,
+      25,
+      true,
+      1,
+      2,
+      [ViewerFileLine("test line", 3)]
+    );
+    const data = {};
+
+    //when
+    const result = viewport.updated(data);
+
+    //then
+    assert.deepEqual({ ...result }, { ...viewport });
+  });
+
   it("should return new instance with defatult params when create", () => {
     //given
     const fileReader = new MockViewerFileReader();
