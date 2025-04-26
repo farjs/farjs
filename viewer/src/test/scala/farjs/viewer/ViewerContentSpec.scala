@@ -248,7 +248,11 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val setViewport = mockFunction[js.UndefOr[ViewerFileViewport], Unit]
     var props = {
       val p = getViewerContentProps(inputRef, fileReader, setViewport)
-      ViewerContentProps.copy(p)(viewport = p.viewport.copy(size = 10))
+      ViewerContentProps.copy(p)(viewport = p.viewport.updated(
+        new ViewerFileViewportData {
+          override val size = 10
+        }
+      ))
     }
     var viewport = props.viewport
     val readF = js.Promise.resolve[js.Array[ViewerFileLine]](js.Array("1\n2\n3\n4\n5\n".split('\n').map(c => ViewerFileLine(c, c.length + 1)).toList: _*))
@@ -483,11 +487,13 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       ))
     }.flatMap { _ =>
       val updatedProps = ViewerContentProps.copy(props)(
-        viewport = viewport.copy(
-          encoding = "utf-16",
-          size = 11,
-          width = 61,
-          height = 21
+        viewport = viewport.updated(
+          new ViewerFileViewportData {
+            override val encoding = "utf-16"
+            override val size = 11
+            override val width = 61
+            override val height = 21
+          }
         )
       )
       updatedProps.viewport.encoding should not be viewport.encoding
@@ -590,7 +596,11 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
     val setViewport = mockFunction[js.UndefOr[ViewerFileViewport], Unit]
     var props = {
       val p = getViewerContentProps(inputRef, fileReader, setViewport)
-      ViewerContentProps.copy(p)(viewport = p.viewport.copy(size = 0))
+      ViewerContentProps.copy(p)(viewport = p.viewport.updated(
+        new ViewerFileViewportData {
+          override val size = 0
+        }        
+      ))
     }
     var viewport = props.viewport
     val readF = js.Promise.resolve[js.Array[ViewerFileLine]](js.Array[ViewerFileLine]("test content".split('\n').map(c => ViewerFileLine(c, c.length)).toList: _*))

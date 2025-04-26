@@ -295,10 +295,10 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
                   val content = <(viewerContent())(^.assertPlain[ViewerContentProps](inside(_) {
                     case ViewerContentProps(inputRef, resViewport, setViewport, onKeypress) =>
                       inputRef shouldBe props.inputRef
-                      resViewport shouldBe viewport.copy(
-                        width = width,
-                        height = height
-                      )
+                      
+                      resViewport.width shouldBe width
+                      resViewport.height shouldBe height
+                      
                       setViewport should be theSameInstanceAs props.setViewport
                       onKeypress should be theSameInstanceAs props.onKeypress
                   }))()

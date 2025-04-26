@@ -82,13 +82,17 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
       )(
         props.viewport.toOption.map { viewport =>
           val linesCount = viewport.linesData.size
+          val newWidth = width
+          val newHeight = height
           
           <.>()(
             <(viewerContent())(^.plain := ViewerContentProps(
               inputRef = props.inputRef,
-              viewport = viewport.copy(
-                width = width,
-                height = height
+              viewport = viewport.updated(
+                new ViewerFileViewportData {
+                  override val width = newWidth
+                  override val height = newHeight
+                }
               ),
               setViewport = props.setViewport,
               onKeypress = props.onKeypress

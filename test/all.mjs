@@ -34,7 +34,9 @@ await import("./fs/popups/FolderShortcutsService.test.mjs");
 await import("./fs/popups/MockFolderShortcutsService.test.mjs");
 await import("./fs/FSServices.test.mjs");
 
+await import("./viewer/MockViewerFileReader.test.mjs");
 await import("./viewer/ViewerFileReader.test.mjs");
+await import("./viewer/ViewerFileViewport.test.mjs");
 await import("./viewer/ViewerHeader.test.mjs");
 await import("./viewer/ViewerInput.test.mjs");
 await import("./viewer/ViewerSearch.test.mjs");

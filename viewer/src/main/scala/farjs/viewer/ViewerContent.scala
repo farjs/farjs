@@ -55,13 +55,20 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
           if (wrap) 0
           else viewport.column
 
-        updated(viewport.copy(wrap = wrap, column = column))
+        val newWrap = wrap
+        val newColumn = column
+        updated(viewport.updated(new ViewerFileViewportData {
+          override val wrap = newWrap
+          override val column = newColumn
+        }))
       }
     }
     
-    val onEncoding: js.Function1[String, Unit] = { encoding =>
+    val onEncoding: js.Function1[String, Unit] = { newEncoding =>
       readF.current = readF.current.andThen { _ =>
-        updated(viewport.copy(encoding = encoding))
+        updated(viewport.updated(new ViewerFileViewportData {
+          override val encoding = newEncoding
+        }))
       }
     }
     
@@ -69,7 +76,9 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
       readF.current = readF.current.andThen { _ =>
         val col = viewport.column + dx
         if (col >= 0 && col < 1000) {
-          updated(viewport.copy(column = col))
+          updated(viewport.updated(new ViewerFileViewportData {
+            override val column = col
+          }))
         }
       }
     }
