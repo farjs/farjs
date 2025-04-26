@@ -17,7 +17,7 @@ object FarjsViewer extends ScalaJsModule {
 
         coverageExcludedPackages :=
           //to avoid Scala.js error: Found a dangling UndefinedParam
-          "farjs.viewer.ViewerFileReader"
+          "farjs.viewer.ViewerFileReader;farjs.viewer.ViewerContent"
       )
   }
 
