@@ -6,8 +6,6 @@ import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.scalajs.js
 
 object ViewerContent extends FunctionComponent[ViewerContentProps] {
@@ -19,37 +17,38 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val theme = FileListTheme.useTheme()
-    val readF = useRef(Future.unit)
+    val props = compProps.plain
+    val viewport = props.viewport
+    val readF = useRef(js.Promise.resolve[ViewerFileViewport](viewport))
     val (showEncodingsPopup, setShowEncodingsPopup) = useState(false)
     val (showSearchPopup, setShowSearchPopup) = useState(false)
     val (searchTerm, setSearchTerm) = useState("")
-    val props = compProps.plain
-    val viewport = props.viewport
     
-    def updated(viewport: ViewerFileViewport): Unit = {
+    val updated: js.Function1[ViewerFileViewport, js.Promise[ViewerFileViewport]] = { viewport =>
       props.setViewport(viewport)
+      js.Promise.resolve[ViewerFileViewport](viewport)
     }
     
     def onMoveUp(lines: Int, from: Double = viewport.position): Unit = {
-      if (readF.current.isCompleted) {
-        readF.current = viewport.moveUp(lines, from).toFuture.map(updated)
-      }
+      readF.current = readF.current.`then`[ViewerFileViewport](
+        (viewport => viewport.moveUp(lines, from)): js.Function1[ViewerFileViewport, js.Thenable[ViewerFileViewport]]
+      ).`then`[ViewerFileViewport](updated)
     }
     
     def onMoveDown(lines: Int): Unit = {
-      if (readF.current.isCompleted) {
-        readF.current = viewport.moveDown(lines).toFuture.map(updated)
-      }
+      readF.current = readF.current.`then`[ViewerFileViewport](
+        (viewport => viewport.moveDown(lines)): js.Function1[ViewerFileViewport, js.Thenable[ViewerFileViewport]]
+      ).`then`[ViewerFileViewport](updated)
     }
     
     def onReload(from: Double = viewport.position): Unit = {
-      readF.current = readF.current.andThen { _ =>
-        readF.current = viewport.reload(from).toFuture.map(updated)
-      }
+      readF.current = readF.current.`then`[ViewerFileViewport](
+        (viewport => viewport.reload(from)): js.Function1[ViewerFileViewport, js.Thenable[ViewerFileViewport]]
+      ).`then`[ViewerFileViewport](updated)
     }
     
     def onWrap(): Unit = {
-      readF.current = readF.current.andThen { _ =>
+      readF.current = readF.current.`then`[ViewerFileViewport]({ viewport =>
         val wrap = !viewport.wrap
         val column =
           if (wrap) 0
@@ -61,26 +60,27 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
           override val wrap = newWrap
           override val column = newColumn
         }))
-      }
+      }: js.Function1[ViewerFileViewport, js.Thenable[ViewerFileViewport]])
     }
     
     val onEncoding: js.Function1[String, Unit] = { newEncoding =>
-      readF.current = readF.current.andThen { _ =>
+      readF.current = readF.current.`then`[ViewerFileViewport]({ viewport =>
         updated(viewport.updated(new ViewerFileViewportData {
           override val encoding = newEncoding
         }))
-      }
+      }: js.Function1[ViewerFileViewport, js.Thenable[ViewerFileViewport]])
     }
     
     def onColumn(dx: Int): Unit = {
-      readF.current = readF.current.andThen { _ =>
+      readF.current = readF.current.`then`[ViewerFileViewport]({ viewport =>
         val col = viewport.column + dx
         if (col >= 0 && col < 1000) {
           updated(viewport.updated(new ViewerFileViewportData {
             override val column = col
           }))
         }
-      }
+        else js.Promise.resolve[ViewerFileViewport](viewport)
+      }: js.Function1[ViewerFileViewport, js.Thenable[ViewerFileViewport]])
     }
     
     val onKeypress: js.Function1[String, Unit] = { keyFull =>
@@ -104,9 +104,9 @@ object ViewerContent extends FunctionComponent[ViewerContentProps] {
     }
     
     useLayoutEffect({ () =>
-      readF.current = readF.current.andThen { _ =>
-        readF.current = viewport.reload().toFuture.map(updated)
-      }
+      readF.current = readF.current.`then`[ViewerFileViewport](
+        (_ => viewport.reload()): js.Function1[ViewerFileViewport, js.Thenable[ViewerFileViewport]]
+      ).`then`[ViewerFileViewport](updated)
       ()
     }, List(viewport.encoding, viewport.size, viewport.width, viewport.height, viewport.wrap))
 

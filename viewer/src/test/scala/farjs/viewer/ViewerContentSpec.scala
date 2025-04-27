@@ -12,9 +12,8 @@ import scommons.react.raw.NativeRef
 import scommons.react.test._
 import scommons.react.{ReactClass, raw}
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters.JSRichFutureNonThenable
 
 class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
@@ -56,48 +55,6 @@ class ViewerContentSpec extends AsyncTestSpec with BaseTestSpec with TestRendere
       }
     }.anyNumberOfTimes()
     assertViewerContent(renderer.root, props, content = Nil)
-  }
-
-  it should "not move viewport if not completed when onWheel(up/down)" in {
-    //given
-    val inputRef = raw.React.createRef()
-    val fileReader = new ViewerFileReader
-    val setViewport = mockFunction[js.UndefOr[ViewerFileViewport], Unit]
-    var props = getViewerContentProps(inputRef, fileReader, setViewport)
-    var viewport = props.viewport
-    val readP = Promise[js.Array[ViewerFileLine]]()
-    fileReader.readNextLines.expects(viewport.height, 0.0, viewport.encoding).returning(readP.future.toJSPromise)
-    val renderer = createTestRenderer(withThemeContext(<(ViewerContent())(^.plain := props)()))
-
-    setViewport.expects(*).onCall { maybeViewport: js.UndefOr[ViewerFileViewport] =>
-      inside(maybeViewport.toOption) { case Some(vp) =>
-        viewport = vp
-        TestRenderer.act { () =>
-          props = ViewerContentProps.copy(props)(viewport = vp)
-          renderer.update(withThemeContext(<(ViewerContent())(^.plain := props)()))
-        }
-      }
-    }
-    assertViewerContent(renderer.root, props, content = Nil)
-
-    //then
-    fileReader.readPrevLines.expects(*, *, *, *).never()
-    fileReader.readNextLines.expects(*, *, *).never()
-
-    //when
-    findComponents(renderer.root, viewerInput).head.props.asInstanceOf[ViewerInputProps].onWheel(true)
-    findComponents(renderer.root, viewerInput).head.props.asInstanceOf[ViewerInputProps].onWheel(false)
-    findComponents(renderer.root, viewerInput).head.props.asInstanceOf[ViewerInputProps].onWheel(true)
-    findComponents(renderer.root, viewerInput).head.props.asInstanceOf[ViewerInputProps].onWheel(false)
-
-    //then
-    assertViewerContent(renderer.root, props, content = Nil)
-    readP.success(js.Array("completed".split('\n').map(c => ViewerFileLine(c, c.length)).toList: _*))
-    eventually {
-      assertViewerContent(renderer.root, props, List(
-        "completed"
-      ))
-    }
   }
 
   it should "move viewport when onWheel" in {
