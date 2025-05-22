@@ -24,7 +24,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
   with TestRendererUtils with OptionValues {
 
   ViewerController.withSizeComp = "WithSize".asInstanceOf[ReactClass]
-  ViewerController.viewerContent = mockUiComponent("ViewerContent")
+  ViewerController.viewerContent = "ViewerContent".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class ViewerFileReader {
@@ -292,7 +292,7 @@ class ViewerControllerSpec extends AsyncTestSpec with BaseTestSpec
               props.viewport.toOption match {
                 case Some(viewport) =>
                   val linesCount = viewport.linesData.size
-                  val content = <(viewerContent())(^.assertPlain[ViewerContentProps](inside(_) {
+                  val content = <(viewerContent)(^.assertPlain[ViewerContentProps](inside(_) {
                     case ViewerContentProps(inputRef, resViewport, setViewport, onKeypress) =>
                       inputRef shouldBe props.inputRef
                       

@@ -18,7 +18,7 @@ import scala.util.control.NonFatal
 object ViewerController extends FunctionComponent[ViewerControllerProps] {
 
   private[viewer] var withSizeComp: ReactClass = WithSize
-  private[viewer] var viewerContent: UiComponent[ViewerContentProps] = ViewerContent
+  private[viewer] var viewerContent: ReactClass = ViewerContent
 
   private[viewer] var createFileReader: js.Function0[ViewerFileReader] =
     () => new ViewerFileReader(new FileReader())
@@ -86,7 +86,7 @@ object ViewerController extends FunctionComponent[ViewerControllerProps] {
           val newHeight = height
           
           <.>()(
-            <(viewerContent())(^.plain := ViewerContentProps(
+            <(viewerContent)(^.plain := ViewerContentProps(
               inputRef = props.inputRef,
               viewport = viewport.updated(
                 new ViewerFileViewportData {

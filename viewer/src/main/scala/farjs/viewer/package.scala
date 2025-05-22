@@ -1,12 +1,21 @@
 package farjs
 
 import farjs.filelist.FileListData
+import farjs.filelist.theme.FileListTheme
 import scommons.react.ReactClass
+import scommons.react.blessed.BlessedStyle
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport
 
 package object viewer {
+
+  @js.native
+  @JSImport("../viewer/ViewerContent.mjs", JSImport.Default)
+  object ViewerContent extends ReactClass {
+    
+    def contentStyle(theme: FileListTheme): BlessedStyle = js.native
+  }
 
   @js.native
   @JSImport("../viewer/ViewerHeader.mjs", JSImport.Default)
