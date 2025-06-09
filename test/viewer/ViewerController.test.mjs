@@ -255,18 +255,20 @@ describe("ViewerController.test.mjs", () => {
       )
     );
     assertViewerController(renderer.root, props);
+    const updatedProps = { ...props, viewport: resViewport };
 
-    //when
+    //when & then
     TestRenderer.act(() => {
       renderer.update(
         withThemeContext(
           withHistoryProvider(
-            h(ViewerController, { ...props, viewport: resViewport }),
+            h(ViewerController, updatedProps),
             historyProvider
           )
         )
       );
     });
+    assertViewerController(renderer.root, updatedProps);
 
     //when
     TestRenderer.act(() => {
@@ -425,7 +427,7 @@ function assertViewerController(result, props, scrollIndicators = []) {
               onKeypress: mockFunction(),
             }),
 
-            viewport.column > 0
+            viewport.column > 0 && linesCount > 0
               ? h("text", {
                   style: ViewerController.scrollStyle(theme),
                   width: 1,
