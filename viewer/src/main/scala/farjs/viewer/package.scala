@@ -18,6 +18,14 @@ package object viewer {
   }
 
   @js.native
+  @JSImport("../viewer/ViewerController.mjs", JSImport.Default)
+  object ViewerController extends ReactClass {
+
+    var _createFileReader: js.Function0[ViewerFileReader] = js.native
+    def scrollStyle(theme: FileListTheme): BlessedStyle = js.native
+  }
+
+  @js.native
   @JSImport("../viewer/ViewerHeader.mjs", JSImport.Default)
   object ViewerHeader extends ReactClass
 

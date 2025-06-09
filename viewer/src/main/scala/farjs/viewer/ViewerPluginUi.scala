@@ -66,7 +66,7 @@ class ViewerPluginUi(filePath: String, size: Double)
           ^.rbWidth := "100%",
           ^.rbHeight := "100%-2"
         )(
-          <(viewerController())(^.plain := ViewerControllerProps(
+          <(viewerController)(^.plain := ViewerControllerProps(
             inputRef = inputRef,
             dispatch = props.dispatch,
             filePath = filePath,
@@ -88,7 +88,7 @@ object ViewerPluginUi {
 
   private[viewer] var popupComp: ReactClass = Popup
   private[viewer] var viewerHeader: ReactClass = ViewerHeader
-  private[viewer] var viewerController: UiComponent[ViewerControllerProps] = ViewerController
+  private[viewer] var viewerController: ReactClass = ViewerController
   private[viewer] var bottomMenuComp: ReactClass = BottomMenu
 
   private[viewer] val defaultMenuItems = js.Array(

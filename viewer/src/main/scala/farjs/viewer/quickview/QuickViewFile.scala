@@ -9,7 +9,7 @@ import scala.scalajs.js
 
 object QuickViewFile extends FunctionComponent[QuickViewFileProps] {
 
-  private[quickview] var viewerController: UiComponent[ViewerControllerProps] = ViewerController
+  private[quickview] var viewerController: ReactClass = ViewerController
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
@@ -30,7 +30,7 @@ object QuickViewFile extends FunctionComponent[QuickViewFileProps] {
       processed
     }
 
-    <(viewerController())(^.plain := ViewerControllerProps(
+    <(viewerController)(^.plain := ViewerControllerProps(
       inputRef = props.inputRef,
       dispatch = props.dispatch,
       filePath = props.filePath,
