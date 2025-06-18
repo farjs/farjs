@@ -17,7 +17,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
   private[quickview] var horizontalLineComp: ReactClass = HorizontalLine
   private[quickview] var textLineComp: ReactClass = TextLine
   private[quickview] var quickViewDirComp: ReactClass = QuickViewDir
-  private[quickview] var quickViewFileComp: UiComponent[QuickViewFileProps] = QuickViewFile
+  private[quickview] var quickViewFileComp: ReactClass = QuickViewFile
 
   protected def render(compProps: Props): ReactElement = {
     val stacks = WithStacks.useStacks()
@@ -82,7 +82,7 @@ object QuickViewPanel extends FunctionComponent[Unit] {
               ^.rbHeight := height - 5,
               ^.rbStyle := theme.regularItem
             )(
-              <(quickViewFileComp())(
+              <(quickViewFileComp)(
                 ^.key := filePath,
                 ^.plain := QuickViewFileProps(
                   dispatch = dispatch,

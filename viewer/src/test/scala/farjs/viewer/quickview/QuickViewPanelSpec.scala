@@ -22,7 +22,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
   QuickViewPanel.horizontalLineComp = "HorizontalLine".asInstanceOf[ReactClass]
   QuickViewPanel.textLineComp = "TextLine".asInstanceOf[ReactClass]
   QuickViewPanel.quickViewDirComp = "QuickViewDir".asInstanceOf[ReactClass]
-  QuickViewPanel.quickViewFileComp = mockUiComponent("QuickViewFile")
+  QuickViewPanel.quickViewFileComp = "QuickViewFile".asInstanceOf[ReactClass]
 
   private val currComp = "QuickViewPanel".asInstanceOf[ReactClass]
   private val (width, height) = (25, 15)
@@ -191,7 +191,7 @@ class QuickViewPanelSpec extends TestSpec with TestRendererUtils {
             ^.rbHeight := height - 5,
             ^.rbStyle := theme.regularItem
           )(
-            <(quickViewFileComp())(^.assertPlain[QuickViewFileProps](inside(_) {
+            <(quickViewFileComp)(^.assertPlain[QuickViewFileProps](inside(_) {
               case QuickViewFileProps(resDispatch, inputRef, isRight, filePath, size) =>
                 resDispatch shouldBe dispatch
                 inputRef.current should be theSameInstanceAs panelStack.panelInput
