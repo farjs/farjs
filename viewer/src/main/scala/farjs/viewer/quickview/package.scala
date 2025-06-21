@@ -14,4 +14,8 @@ package object quickview {
   @js.native
   @JSImport("../viewer/quickview/QuickViewFile.mjs", JSImport.Default)
   object QuickViewFile extends ReactClass
+
+  @js.native
+  @JSImport("../viewer/quickview/QuickViewPanel.mjs", JSImport.Default)
+  object QuickViewPanel extends ReactClass
 }

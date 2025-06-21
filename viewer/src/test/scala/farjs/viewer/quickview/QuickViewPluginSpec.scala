@@ -18,7 +18,7 @@ class QuickViewPluginSpec extends AsyncTestSpec with OptionValues {
   it should "remove plugin from left panel when onKeyTrigger" in {
     //given
     var stackState = js.Array[PanelStackItem[_]](
-      PanelStackItem(QuickViewPanel(), js.undefined, js.undefined, QuickViewParams()),
+      PanelStackItem(QuickViewPanel, js.undefined, js.undefined, QuickViewParams()),
       PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, js.undefined)
     )
     val leftStack = new PanelStack(isActive = true, stackState, { f =>
@@ -40,7 +40,7 @@ class QuickViewPluginSpec extends AsyncTestSpec with OptionValues {
   it should "remove plugin from right panel when onKeyTrigger" in {
     //given
     var stackState = js.Array[PanelStackItem[_]](
-      PanelStackItem(QuickViewPanel(), js.undefined, js.undefined, QuickViewParams()),
+      PanelStackItem(QuickViewPanel, js.undefined, js.undefined, QuickViewParams()),
       PanelStackItem("fsComp".asInstanceOf[ReactClass], js.undefined, js.undefined, js.undefined)
     )
     val leftStack = new PanelStack(isActive = true, js.Array(
@@ -77,7 +77,7 @@ class QuickViewPluginSpec extends AsyncTestSpec with OptionValues {
     
     //then
     stackState.length shouldBe 2
-    stackState.head.component shouldBe QuickViewPanel()
+    stackState.head.component shouldBe QuickViewPanel
     assertQuickViewParams(stackState.head.state.asInstanceOf[QuickViewParams], QuickViewParams())
   }
   
@@ -99,7 +99,7 @@ class QuickViewPluginSpec extends AsyncTestSpec with OptionValues {
 
     //then
     stackState.length shouldBe 2
-    stackState.head.component shouldBe QuickViewPanel()
+    stackState.head.component shouldBe QuickViewPanel
     assertQuickViewParams(stackState.head.state.asInstanceOf[QuickViewParams], QuickViewParams())
   }
 }

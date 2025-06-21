@@ -8,7 +8,7 @@ import scala.scalajs.js
 
 object QuickViewPlugin extends FileListPlugin(js.Array("C-q")) {
 
-  private val panelComp: ReactClass = QuickViewPanel()
+  private val panelComp: ReactClass = QuickViewPanel
 
   override def onKeyTrigger(key: String,
                             stacks: WithStacksProps,
