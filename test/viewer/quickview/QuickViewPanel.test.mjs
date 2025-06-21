@@ -61,8 +61,16 @@ const {
 
 const currComp = () => h("test stub");
 const fsComp = () => h("test stub");
-
 const [width, height] = [25, 15];
+
+/** @type {QuickViewParams} */
+const params = {
+  name: "",
+  parent: "",
+  folders: 0,
+  files: 0,
+  filesSize: 0,
+};
 
 describe("QuickViewPanel.test.mjs", () => {
   it("should render dir view", () => {
@@ -80,14 +88,6 @@ describe("QuickViewPanel.test.mjs", () => {
           { ...FileListItem("dir", true), size: 1 },
         ],
       },
-    };
-    /** @type {QuickViewParams} */
-    const params = {
-      name: "",
-      parent: "",
-      folders: 0,
-      files: 0,
-      filesSize: 0,
     };
     /** @type {readonly PanelStackItem<any>[]} */
     let stackState = [
@@ -132,7 +132,7 @@ describe("QuickViewPanel.test.mjs", () => {
 
     //then
     const dir = FileListItem.currDir;
-    assertQuickViewPanel(result, dispatch, actions, state, stack, dir);
+    assertQuickViewPanel(result, stack, dispatch, actions, state, dir);
   });
 
   it("should render file view", () => {
@@ -152,14 +152,6 @@ describe("QuickViewPanel.test.mjs", () => {
           { ...FileListItem("dir", true), size: 1 },
         ],
       },
-    };
-    /** @type {QuickViewParams} */
-    const params = {
-      name: "",
-      parent: "",
-      folders: 0,
-      files: 0,
-      filesSize: 0,
     };
     /** @type {readonly PanelStackItem<any>[]} */
     let stackState = [
@@ -203,39 +195,144 @@ describe("QuickViewPanel.test.mjs", () => {
     ).root;
 
     //then
-    assertQuickViewPanel(result, dispatch, actions, state, stack, file);
+    assertQuickViewPanel(result, stack, dispatch, actions, state, file);
+  });
+
+  it("should render empty view if no items", () => {
+    //given
+    const dispatch = mockFunction();
+    const actions = new MockFileListActions();
+    const state = {
+      ...FileListState(),
+      currDir: {
+        path: "/sub-dir",
+        isRoot: false,
+        items: [],
+      },
+    };
+    /** @type {readonly PanelStackItem<any>[]} */
+    let stackState = [
+      new PanelStackItem(currComp, undefined, undefined, params),
+    ];
+    /** @type {WithStackProps} */
+    const leftPanelStack = {
+      isRight: false,
+      panelInput: /** @type {BlessedElement} */ ({}),
+      stack: new PanelStack(
+        true,
+        [new PanelStackItem(fsComp, dispatch, actions, state)],
+        mockFunction()
+      ),
+      width,
+      height,
+    };
+    /** @type {WithStackProps} */
+    const rightPanelStack = {
+      isRight: true,
+      panelInput: /** @type {BlessedElement} */ ({}),
+      stack: new PanelStack(
+        false,
+        stackState,
+        (f) => (stackState = f(stackState))
+      ),
+      width,
+      height,
+    };
+    const stack = rightPanelStack;
+
+    //when
+    const result = TestRenderer.create(
+      withStacksContext(
+        withStackContext(withThemeContext(h(QuickViewPanel, null)), stack),
+        WithStacksProps(
+          WithStacksData(leftPanelStack.stack, leftPanelStack.panelInput),
+          WithStacksData(rightPanelStack.stack, rightPanelStack.panelInput)
+        )
+      )
+    ).root;
+
+    //then
+    assertQuickViewPanel(result, stack, dispatch, actions, state);
+  });
+
+  it("should render empty view if no state", () => {
+    //given
+    const dispatch = mockFunction();
+    const actions = new MockFileListActions();
+    /** @type {readonly PanelStackItem<any>[]} */
+    let stackState = [
+      new PanelStackItem(currComp, undefined, undefined, params),
+    ];
+    /** @type {WithStackProps} */
+    const leftPanelStack = {
+      isRight: false,
+      panelInput: /** @type {BlessedElement} */ ({}),
+      stack: new PanelStack(
+        true,
+        [new PanelStackItem(fsComp, dispatch, actions, undefined)],
+        mockFunction()
+      ),
+      width,
+      height,
+    };
+    /** @type {WithStackProps} */
+    const rightPanelStack = {
+      isRight: true,
+      panelInput: /** @type {BlessedElement} */ ({}),
+      stack: new PanelStack(
+        false,
+        stackState,
+        (f) => (stackState = f(stackState))
+      ),
+      width,
+      height,
+    };
+    const stack = rightPanelStack;
+
+    //when
+    const result = TestRenderer.create(
+      withStacksContext(
+        withStackContext(withThemeContext(h(QuickViewPanel, null)), stack),
+        WithStacksProps(
+          WithStacksData(leftPanelStack.stack, leftPanelStack.panelInput),
+          WithStacksData(rightPanelStack.stack, rightPanelStack.panelInput)
+        )
+      )
+    ).root;
+
+    //then
+    assertQuickViewPanel(result, stack, dispatch, actions);
   });
 });
 
 /**
  * @param {TestRenderer.ReactTestInstance} result
+ * @param {WithStackProps} panelStack
  * @param {Dispatch} dispatch
  * @param {FileListActions} actions
- * @param {FileListState} state
- * @param {WithStackProps} panelStack
- * @param {FileListItem} currItem
+ * @param {FileListState} [state]
+ * @param {FileListItem} [currItem]
  */
 function assertQuickViewPanel(
   result,
+  panelStack,
   dispatch,
   actions,
   state,
-  panelStack,
   currItem
 ) {
   assert.deepEqual(QuickViewPanel.displayName, "QuickViewPanel");
 
   const theme = FileListTheme.defaultTheme.fileList;
-  const inputRef = (() => {
-    /** @type {React.MutableRefObject<BlessedElement | null>} */
-    const inputRef = currItem.isDir
-      ? React.createRef()
-      : result.findByType(quickViewFileComp).props.inputRef;
 
-    if (!currItem.isDir) {
-      assert.deepEqual(inputRef.current === panelStack.panelInput, true);
+  /** @type {React.MutableRefObject<BlessedElement | null>} */
+  const inputRef = (() => {
+    if (!currItem || currItem.isDir) {
+      return React.createRef();
     }
 
+    const inputRef = result.findByType(quickViewFileComp).props.inputRef;
+    assert.deepEqual(inputRef.current === panelStack.panelInput, true);
     return inputRef;
   })();
 
@@ -244,65 +341,71 @@ function assertQuickViewPanel(
     h(
       "box",
       { style: theme.regularItem },
-      h(doubleBorderComp, {
-        width,
-        height,
-        style: theme.regularItem,
-      }),
-      h(horizontalLineComp, {
-        left: 0,
-        top: height - 4,
-        length: width,
-        lineCh: SingleChars.horizontal,
-        style: theme.regularItem,
-        startCh: DoubleChars.leftSingle,
-        endCh: DoubleChars.rightSingle,
-      }),
-      h(textLineComp, {
-        align: TextAlign.center,
-        left: 1,
-        top: 0,
-        width: width - 2,
-        text: "Quick view",
-        style: theme.regularItem,
-        focused: panelStack.stack.isActive,
-      }),
+      ...[
+        h(doubleBorderComp, {
+          width,
+          height,
+          style: theme.regularItem,
+        }),
+        h(horizontalLineComp, {
+          left: 0,
+          top: height - 4,
+          length: width,
+          lineCh: SingleChars.horizontal,
+          style: theme.regularItem,
+          startCh: DoubleChars.leftSingle,
+          endCh: DoubleChars.rightSingle,
+        }),
+        h(textLineComp, {
+          align: TextAlign.center,
+          left: 1,
+          top: 0,
+          width: width - 2,
+          text: "Quick view",
+          style: theme.regularItem,
+          focused: panelStack.stack.isActive,
+        }),
 
-      currItem.isDir
-        ? h(quickViewDirComp, {
-            dispatch,
-            actions,
-            state,
-            stack: panelStack.stack,
-            width,
-            currItem,
-          })
-        : h(
-            "box",
-            {
-              left: 1,
-              top: 1,
-              width: width - 2,
-              height: height - 5,
-              style: theme.regularItem,
-            },
-            h(quickViewFileComp, {
-              dispatch,
-              inputRef,
-              isRight: panelStack.isRight,
-              filePath: path.join(state.currDir.path, currItem.name),
-              size: currItem.size,
-            })
-          ),
+        ...(currItem && state
+          ? [
+              currItem.isDir
+                ? h(quickViewDirComp, {
+                    dispatch,
+                    actions,
+                    state,
+                    stack: panelStack.stack,
+                    width,
+                    currItem,
+                  })
+                : h(
+                    "box",
+                    {
+                      left: 1,
+                      top: 1,
+                      width: width - 2,
+                      height: height - 5,
+                      style: theme.regularItem,
+                    },
+                    h(quickViewFileComp, {
+                      dispatch,
+                      inputRef,
+                      isRight: panelStack.isRight,
+                      filePath: path.join(state.currDir.path, currItem.name),
+                      size: currItem.size,
+                    })
+                  ),
 
-      h("text", {
-        width: width - 2,
-        height: 2,
-        left: 1,
-        top: height - 3,
-        style: theme.regularItem,
-        content: currItem.name,
-      })
+              h("text", {
+                width: width - 2,
+                height: 2,
+                left: 1,
+                top: height - 3,
+                style: theme.regularItem,
+                content: currItem.name,
+              }),
+            ]
+          : []),
+      ]
     )
   );
 }
