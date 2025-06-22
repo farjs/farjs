@@ -47,3 +47,4 @@ await import("./viewer/ViewItemsPopup.test.mjs");
 await import("./viewer/quickview/QuickViewDir.test.mjs");
 await import("./viewer/quickview/QuickViewFile.test.mjs");
 await import("./viewer/quickview/QuickViewPanel.test.mjs");
+await import("./viewer/quickview/QuickViewPlugin.test.mjs");

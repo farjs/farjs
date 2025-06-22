@@ -1,5 +1,6 @@
 package farjs.viewer
 
+import farjs.filelist.FileListPlugin
 import scommons.react.ReactClass
 
 import scala.scalajs.js
@@ -18,4 +19,8 @@ package object quickview {
   @js.native
   @JSImport("../viewer/quickview/QuickViewPanel.mjs", JSImport.Default)
   object QuickViewPanel extends ReactClass
+
+  @js.native
+  @JSImport("../viewer/quickview/QuickViewPlugin.mjs", JSImport.Default)
+  object QuickViewPlugin extends FileListPlugin(js.native)
 }
