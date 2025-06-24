@@ -34,6 +34,13 @@ package object viewer {
   object ViewerInput extends ReactClass
 
   @js.native
+  @JSImport("../viewer/ViewerPluginUi.mjs", JSImport.Default)
+  object ViewerPluginUi extends js.Function2[String, Double, ReactClass] {
+
+    def apply(filePath: String, size: Double): ReactClass = js.native
+  }
+
+  @js.native
   @JSImport("../viewer/ViewerSearch.mjs", JSImport.Default)
   object ViewerSearch extends ReactClass
 

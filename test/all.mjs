@@ -42,6 +42,7 @@ await import("./viewer/ViewerFileReader.test.mjs");
 await import("./viewer/ViewerFileViewport.test.mjs");
 await import("./viewer/ViewerHeader.test.mjs");
 await import("./viewer/ViewerInput.test.mjs");
+await import("./viewer/ViewerPluginUi.test.mjs");
 await import("./viewer/ViewerSearch.test.mjs");
 await import("./viewer/ViewItemsPopup.test.mjs");
 await import("./viewer/quickview/QuickViewDir.test.mjs");

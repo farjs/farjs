@@ -27,7 +27,7 @@ object ViewerPlugin extends FileListPlugin(js.Array(
         data.toOption.map { d =>
           val history = d.asInstanceOf[FileViewHistory]
           val size = fs.lstatSync(history.path).size
-          new ViewerPluginUi(history.path, size).apply()
+          ViewerPluginUi(history.path, size)
         }
       }
       else {
@@ -43,8 +43,7 @@ object ViewerPlugin extends FileListPlugin(js.Array(
             case Some(item) if actions.api.isLocal && !item.isDir =>
               val filePath = path.join(state.currDir.path, item.name)
               val size = fs.lstatSync(filePath).size
-              val ui = new ViewerPluginUi(filePath, size)
-              Some(ui.apply())
+              Some(ViewerPluginUi(filePath, size))
             case Some(item) if state.selectedNames.nonEmpty || item.isDir =>
               Some(ViewItemsPopup(data))
             case _ => None
