@@ -28,7 +28,12 @@ describe("FolderShortcutDao.test.mjs", () => {
 
     //then
     const results = await dao.getAll();
-    assert.deepEqual(results, [entity]);
+    assert.deepEqual(
+      results.map((r) => {
+        return { ...r };
+      }),
+      [entity]
+    );
   });
 
   it("should update existing record when save", async () => {
@@ -44,7 +49,12 @@ describe("FolderShortcutDao.test.mjs", () => {
 
     //then
     const results = await dao.getAll();
-    assert.deepEqual(results, [entity]);
+    assert.deepEqual(
+      results.map((r) => {
+        return { ...r };
+      }),
+      [entity]
+    );
   });
 
   it("should delete existing record when delete", async () => {
@@ -54,14 +64,24 @@ describe("FolderShortcutDao.test.mjs", () => {
     const [existing] = await dao.getAll();
     const entity = getFolderShortcut(existing.id + 1, "test/path2");
     await dao.save(entity);
-    assert.deepEqual(await dao.getAll(), [existing, entity]);
+    assert.deepEqual(
+      (await dao.getAll()).map((r) => {
+        return { ...r };
+      }),
+      [{ ...existing }, entity]
+    );
 
     //when
     await dao.delete(entity.id);
 
     //then
     const results = await dao.getAll();
-    assert.deepEqual(results, [existing]);
+    assert.deepEqual(
+      results.map((r) => {
+        return { ...r };
+      }),
+      [{ ...existing }]
+    );
   });
 
   it("should delete all records when deleteAll", async () => {
@@ -75,7 +95,12 @@ describe("FolderShortcutDao.test.mjs", () => {
 
     //then
     const results = await dao.getAll();
-    assert.deepEqual(results, []);
+    assert.deepEqual(
+      results.map((r) => {
+        return { ...r };
+      }),
+      []
+    );
   });
 });
 

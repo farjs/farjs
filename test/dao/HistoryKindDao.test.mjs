@@ -32,7 +32,7 @@ describe("HistoryKindDao.test.mjs", () => {
     const results = await dao.getAll();
 
     assert.deepEqual(res.id > 0, true);
-    assert.deepEqual(res, { ...entity, id: res.id });
+    assert.deepEqual({ ...res }, { ...entity, id: res.id });
     assert.deepEqual(results, [res]);
   });
 
@@ -49,7 +49,7 @@ describe("HistoryKindDao.test.mjs", () => {
     //then
     const results = await dao.getAll();
 
-    assert.deepEqual(res, { ...entity, id: existing.id });
+    assert.deepEqual({ ...res }, { ...entity, id: existing.id });
     assert.deepEqual(results, [res]);
   });
 });

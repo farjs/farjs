@@ -67,11 +67,11 @@
   "preferGlobal": true,
   "browserslist": "maintained node versions",
   "engines": {
-    "node": ">=18",
+    "node": ">=16",
     "bun": ">=0.8"
   },
   "dependencies": {
-    "@farjs/better-sqlite3-migrate": "^2.0.0",
+    "@farjs/better-sqlite3-migrate": "^3.0.0",
     "@farjs/filelist": "0.6.1",
     "@farjs/ui": "0.8.0",
     "iconv-lite": "0.6.3"

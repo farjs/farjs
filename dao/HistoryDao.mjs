@@ -68,7 +68,7 @@ function HistoryDao(db, kind, maxItemsCount) {
         ).run(
           kind.id,
           entity.item,
-          entity.params ? JSON.stringify(entity.params) : undefined,
+          entity.params ? JSON.stringify(entity.params) : null,
           updatedAt
         );
 
