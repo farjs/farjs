@@ -1,6 +1,6 @@
 package farjs
 
-import farjs.filelist.FileListData
+import farjs.filelist.{FileListData, FileListPlugin}
 import farjs.filelist.theme.FileListTheme
 import scommons.react.ReactClass
 import scommons.react.blessed.BlessedStyle
@@ -32,6 +32,10 @@ package object viewer {
   @js.native
   @JSImport("../viewer/ViewerInput.mjs", JSImport.Default)
   object ViewerInput extends ReactClass
+
+  @js.native
+  @JSImport("../viewer/ViewerPlugin.mjs", JSImport.Default)
+  object ViewerPlugin extends FileListPlugin(js.native)
 
   @js.native
   @JSImport("../viewer/ViewerPluginUi.mjs", JSImport.Default)
