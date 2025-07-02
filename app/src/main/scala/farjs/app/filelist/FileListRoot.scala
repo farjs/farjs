@@ -8,9 +8,10 @@ import farjs.filelist._
 import farjs.filelist.history.HistoryProvider
 import farjs.fs.{FSPlugin, FSServices}
 import farjs.ui.Dispatch
-import farjs.viewer.ViewerPlugin
-import farjs.viewer.quickview.QuickViewPlugin
 import scommons.react._
+
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
 class FileListRoot(dispatch: Dispatch,
                    module: FileListModule,
@@ -36,6 +37,14 @@ class FileListRoot(dispatch: Dispatch,
 object FileListRoot {
   
   private[filelist] var fileListComp: ReactClass = FileListBrowser()
+
+  @js.native
+  @JSImport("../viewer/quickview/QuickViewPlugin.mjs", JSImport.Default)
+  object QuickViewPlugin extends FileListPlugin(js.native)
+
+  @js.native
+  @JSImport("../viewer/ViewerPlugin.mjs", JSImport.Default)
+  object ViewerPlugin extends FileListPlugin(js.native)
 
   private lazy val plugins: Seq[FileListPlugin] = List(
     QuickViewPlugin,

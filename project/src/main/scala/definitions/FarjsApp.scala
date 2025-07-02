@@ -44,7 +44,6 @@ object FarjsApp extends ScalaJsModule {
     FarjsFile.definition % "compile->compile;test->test",
     FarjsFs.definition,
     FarjsArchiver.definition,
-    FarjsViewer.definition,
     FarjsCopyMove.definition
   )
 }
