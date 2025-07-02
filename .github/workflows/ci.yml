@@ -88,7 +88,6 @@ jobs:
             ./file/target/scala-2.13/coverage-report/cobertura.xml
             ./filelist/target/scala-2.13/coverage-report/cobertura.xml
             ./fs/target/scala-2.13/coverage-report/cobertura.xml
-            ./viewer/target/scala-2.13/coverage-report/cobertura.xml
           format: cobertura
         if: ${{ env.TAG_NAME == '' }}
 
