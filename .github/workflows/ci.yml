@@ -85,7 +85,6 @@ jobs:
           files: ./app/target/scala-2.13/coverage-report/cobertura.xml
             ./archiver/target/scala-2.13/coverage-report/cobertura.xml
             ./copymove/target/scala-2.13/coverage-report/cobertura.xml
-            ./file/target/scala-2.13/coverage-report/cobertura.xml
             ./filelist/target/scala-2.13/coverage-report/cobertura.xml
             ./fs/target/scala-2.13/coverage-report/cobertura.xml
           format: cobertura

@@ -3,7 +3,6 @@ package farjs.app.filelist
 import farjs.app.filelist.FileListRoot._
 import farjs.archiver.ArchiverPlugin
 import farjs.copymove.CopyMovePlugin
-import farjs.file.FilePlugin
 import farjs.filelist._
 import farjs.filelist.history.HistoryProvider
 import farjs.fs.{FSPlugin, FSServices}
@@ -45,6 +44,10 @@ object FileListRoot {
   @js.native
   @JSImport("../viewer/ViewerPlugin.mjs", JSImport.Default)
   object ViewerPlugin extends FileListPlugin(js.native)
+
+  @js.native
+  @JSImport("../file/FilePlugin.mjs", JSImport.Default)
+  object FilePlugin extends FileListPlugin(js.native)
 
   private lazy val plugins: Seq[FileListPlugin] = List(
     QuickViewPlugin,
