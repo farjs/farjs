@@ -32,6 +32,7 @@ await import("./fs/popups/FolderShortcutsController.test.mjs");
 await import("./fs/popups/FolderShortcutsPopup.test.mjs");
 await import("./fs/popups/FolderShortcutsService.test.mjs");
 await import("./fs/popups/MockFolderShortcutsService.test.mjs");
+await import("./fs/FSFoldersHistory.test.mjs");
 await import("./fs/FSServices.test.mjs");
 
 await import("./viewer/MockViewerFileReader.test.mjs");

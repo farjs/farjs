@@ -2,7 +2,7 @@ package farjs.fs.popups
 
 import farjs.filelist.history.HistoryProviderSpec.withHistoryProvider
 import farjs.filelist.history._
-import farjs.fs.FSFoldersHistory.foldersHistoryKind
+import farjs.fs.FSFoldersHistory
 import farjs.fs.popups.FoldersHistoryPopup._
 import farjs.ui.popup.ListPopupProps
 import org.scalatest.{Assertion, Succeeded}
@@ -15,6 +15,8 @@ import scala.scalajs.js
 class FoldersHistoryPopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   FoldersHistoryPopup.listPopup = "ListPopup".asInstanceOf[ReactClass]
+
+  private val foldersHistoryKind = FSFoldersHistory.asInstanceOf[js.Dynamic].foldersHistoryKind.asInstanceOf[HistoryKind]
 
   //noinspection TypeAnnotation
   class HistoryMocks {

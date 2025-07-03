@@ -16,7 +16,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils with OptionValues {
   FSPanel.fileListPanelComp = "FileListPanel".asInstanceOf[ReactClass]
   FSPanel.fsFreeSpaceComp = mockUiComponent("FSFreeSpace")
   FSPanel.fsService = new FsService().fsService
-  FSPanel.fsFoldersHistory = mockUiComponent("FSFoldersHistory")
+  FSPanel.fsFoldersHistory = "FSFoldersHistory".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class FsService {
@@ -97,7 +97,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils with OptionValues {
           currDir shouldBe props.state.currDir
       }))(),
 
-      <(fsFoldersHistory())(^.assertPlain[FSFoldersHistoryProps](inside(_) {
+      <(fsFoldersHistory)(^.assertPlain[FSFoldersHistoryProps](inside(_) {
         case FSFoldersHistoryProps(currDirPath) =>
           currDirPath shouldBe props.state.currDir.path
       }))()

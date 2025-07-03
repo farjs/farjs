@@ -12,7 +12,7 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
   private[fs] var fileListPanelComp: ReactClass = FileListPanel
   private[fs] var fsFreeSpaceComp: UiComponent[FSFreeSpaceProps] = FSFreeSpace
   private[fs] var fsService: FSService = FSService.instance
-  private[fs] var fsFoldersHistory: UiComponent[FSFoldersHistoryProps] = FSFoldersHistory
+  private[fs] var fsFoldersHistory: ReactClass = FSFoldersHistory
   
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
@@ -41,7 +41,7 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
         currDir = props.state.currDir
       ))(),
 
-      <(fsFoldersHistory())(^.plain := FSFoldersHistoryProps(
+      <(fsFoldersHistory)(^.plain := FSFoldersHistoryProps(
         currDirPath = props.state.currDir.path
       ))()
     )
