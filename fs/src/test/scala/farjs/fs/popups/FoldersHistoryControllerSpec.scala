@@ -2,11 +2,12 @@ package farjs.fs.popups
 
 import farjs.fs.popups.FoldersHistoryController._
 import org.scalatest.Succeeded
+import scommons.react.ReactClass
 import scommons.react.test._
 
 class FoldersHistoryControllerSpec extends TestSpec with TestRendererUtils {
 
-  FoldersHistoryController.foldersHistoryPopup = mockUiComponent("FoldersHistoryPopup")
+  FoldersHistoryController.foldersHistoryPopup = "FoldersHistoryPopup".asInstanceOf[ReactClass]
 
   it should "call onChangeDir when onChangeDir" in {
     //given
@@ -21,7 +22,9 @@ class FoldersHistoryControllerSpec extends TestSpec with TestRendererUtils {
     onChangeDir.expects(dir)
 
     //when
-    findComponentProps(renderer.root, foldersHistoryPopup, plain = true).onChangeDir(dir)
+    inside(findComponents(renderer.root, foldersHistoryPopup)) {
+      case List(c) => c.props.asInstanceOf[FoldersHistoryPopupProps].onChangeDir(dir)
+    }
   }
 
   it should "call onClose when onClose" in {
@@ -30,7 +33,9 @@ class FoldersHistoryControllerSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val props = FoldersHistoryControllerProps(showPopup = true, onChangeDir, onClose)
     val comp = testRender(<(FoldersHistoryController())(^.plain := props)())
-    val popup = findComponentProps(comp, foldersHistoryPopup, plain = true)
+    val popup = inside(findComponents(comp, foldersHistoryPopup)) {
+      case List(c) => c.props.asInstanceOf[FoldersHistoryPopupProps]
+    }
 
     //then
     onClose.expects()
@@ -48,9 +53,9 @@ class FoldersHistoryControllerSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(FoldersHistoryController())(^.plain := props)())
 
     //then
-    assertTestComponent(result, foldersHistoryPopup, plain = true) {
+    assertNativeComponent(result, <(foldersHistoryPopup)(^.assertPlain[FoldersHistoryPopupProps](inside(_) {
       case FoldersHistoryPopupProps(_, _) => Succeeded
-    }
+    }))())
   }
 
   it should "render empty component" in {
