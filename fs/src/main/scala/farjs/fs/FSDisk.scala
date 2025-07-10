@@ -1,11 +1,47 @@
 package farjs.fs
 
+import scala.scalajs.js
 import scala.util.matching.Regex
 
-case class FSDisk(root: String, size: Double, free: Double, name: String)
+sealed trait FSDisk extends js.Object {
+  val root: String
+  val size: Double
+  val free: Double
+  val name: String
+}
 
 object FSDisk {
-  
+
+  def apply(root: String, size: Double, free: Double, name: String): FSDisk = {
+    js.Dynamic.literal(
+      root = root,
+      size = size,
+      free = free,
+      name = name
+    ).asInstanceOf[FSDisk]
+  }
+
+  def unapply(arg: FSDisk): Option[(String, Double, Double, String)] = {
+    Some((
+      arg.root,
+      arg.size,
+      arg.free,
+      arg.name
+    ))
+  }
+
+  def copy(p: FSDisk)(root: String = p.root,
+                      size: Double = p.size,
+                      free: Double = p.free,
+                      name: String = p.name): FSDisk = {
+    FSDisk(
+      root = root,
+      size = size,
+      free = free,
+      name = name
+    )
+  }
+
   private lazy val dfRegex =
     """(Filesystem\s+|1024-blocks|\s+Used|\s+Available|\s+Capacity|\s+Mounted on\s*)""".r
   

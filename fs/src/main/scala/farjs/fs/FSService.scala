@@ -75,7 +75,7 @@ class FSService(platform: Platform, childProcess: ChildProcess) {
         FSDisk.fromDfCommand(output)
           .filter(d => !excludeRoots.exists(d.root.startsWith))
           .map { d =>
-            d.copy(name = d.name.stripPrefix("/Volumes/"))
+            FSDisk.copy(d)(name = d.name.stripPrefix("/Volumes/"))
           }
       }
     }

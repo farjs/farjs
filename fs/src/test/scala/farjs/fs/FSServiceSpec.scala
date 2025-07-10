@@ -1,7 +1,8 @@
 package farjs.fs
 
 import farjs.filelist.MockChildProcess
-import org.scalatest.Succeeded
+import farjs.fs.FSDiskSpec.{assertFSDisk, assertFSDisks}
+import org.scalatest.{OptionValues, Succeeded}
 import scommons.nodejs.ChildProcess._
 import scommons.nodejs.Process.Platform
 import scommons.nodejs.test.AsyncTestSpec
@@ -10,7 +11,7 @@ import scommons.nodejs.{path => nodePath, _}
 import scala.concurrent.Future
 import scala.scalajs.js
 
-class FSServiceSpec extends AsyncTestSpec {
+class FSServiceSpec extends AsyncTestSpec with OptionValues {
 
   //noinspection TypeAnnotation
   class ChildProcess {
@@ -130,7 +131,7 @@ class FSServiceSpec extends AsyncTestSpec {
 
     //then
     resultF.map { res =>
-      res shouldBe Some(
+      assertFSDisk(res.value, 
         FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM")
       )
     }
@@ -163,7 +164,7 @@ class FSServiceSpec extends AsyncTestSpec {
 
     //then
     resultF.map { res =>
-      res shouldBe Some(
+      assertFSDisk(res.value,
         FSDisk("/", size = 250790436864.0, free = 41586692096.0, "/")
       )
     }
@@ -194,9 +195,9 @@ class FSServiceSpec extends AsyncTestSpec {
 
     //then
     resultF.map { res =>
-      res shouldBe List(
+      assertFSDisks(res, List(
         FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM")
-      )
+      ))
     }
   }
 
@@ -233,10 +234,10 @@ class FSServiceSpec extends AsyncTestSpec {
 
     //then
     resultF.map { res =>
-      res shouldBe List(
+      assertFSDisks(res, List(
         FSDisk("/", size = 250790436864.0, free = 41586692096.0, "/"),
         FSDisk("/Volumes/FLASHDRIVE", size = 2004385792.0, free = 1989279744.0, "FLASHDRIVE")
-      )
+      ))
     }
   }
 }
