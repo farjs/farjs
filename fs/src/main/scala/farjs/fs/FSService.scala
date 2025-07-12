@@ -70,13 +70,13 @@ class FSService(platform: Platform, childProcess: ChildProcess) {
 
     future.map { case (stdout, _) =>
       val output = stdout.asInstanceOf[String]
-      if (platform == Platform.win32) FSDisk.fromWmicLogicalDisk(output)
+      if (platform == Platform.win32) FSDisk.fromWmicLogicalDisk(output).toList
       else {
         FSDisk.fromDfCommand(output)
           .filter(d => !excludeRoots.exists(d.root.startsWith))
           .map { d =>
             FSDisk.copy(d)(name = d.name.stripPrefix("/Volumes/"))
-          }
+          }.toList
       }
     }
   }

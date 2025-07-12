@@ -20,7 +20,7 @@ class FSDiskSpec extends TestSpec {
         |""".stripMargin)
     
     //then
-    assertFSDisks(results, List(
+    assertFSDisks(results.toList, List(
       FSDisk("/", size = 250790436864.0, free = 41586692096.0, "/"),
       FSDisk("/private/var/vm", size = 250790436864.0, free = 41586692096.0, "/private/var/vm"),
       FSDisk("/Volumes/Recovery", size = 250790436864.0, free = 41586692096.0, "/Volumes/Recovery")
@@ -37,7 +37,7 @@ class FSDiskSpec extends TestSpec {
         |""".stripMargin)
     
     //then
-    assertFSDisks(results, List(
+    assertFSDisks(results.toList, List(
       FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
       FSDisk("D:", size = 842915639296.0, free = 352966430720.0, "DATA"),
       FSDisk("E:", size = 0.0, free = 0.0, "")
