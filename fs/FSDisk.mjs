@@ -1,3 +1,5 @@
+import { lazyFn } from "@farjs/filelist/utils.mjs";
+
 /**
  * @typedef {{
  *  readonly root: string;
@@ -78,27 +80,14 @@ function toNumber(s) {
 }
 
 /** @type {() => RegExp} */
-function dfRegex() {
-  if (!dfRegex._value) {
-    dfRegex._value =
-      /(Filesystem\s+|1024-blocks|\s+Used|\s+Available|\s+Capacity|\s+Mounted on\s*)/;
-  }
-
-  return dfRegex._value;
-}
-/** @type {RegExp | undefined} */
-dfRegex._value = undefined;
+const dfRegex = lazyFn(
+  () =>
+    /(Filesystem\s+|1024-blocks|\s+Used|\s+Available|\s+Capacity|\s+Mounted on\s*)/
+);
 
 /** @type {() => RegExp} */
-function wmicLogicalDiskRegex() {
-  if (!wmicLogicalDiskRegex._value) {
-    wmicLogicalDiskRegex._value =
-      /(Caption\s*|FreeSpace\s*|Size\s*|VolumeName\s*)/;
-  }
-
-  return wmicLogicalDiskRegex._value;
-}
-/** @type {RegExp | undefined} */
-wmicLogicalDiskRegex._value = undefined;
+const wmicLogicalDiskRegex = lazyFn(
+  () => /(Caption\s*|FreeSpace\s*|Size\s*|VolumeName\s*)/
+);
 
 export default FSDisk;

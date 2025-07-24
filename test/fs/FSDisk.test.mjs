@@ -41,6 +41,18 @@ describe("FSDisk.test.mjs", () => {
     ]);
   });
 
+  it("should use default values if not found in df output", () => {
+    //when & then
+    assert.deepEqual(
+      fromDfCommand(
+        `Filesystem
+/dev/disk1s1
+`
+      ),
+      [{ root: "", size: 0, free: 0, name: "" }]
+    );
+  });
+
   it("should parse wmic logicaldisk output", () => {
     //when
     const results = fromWmicLogicalDisk(
@@ -57,5 +69,17 @@ E:
       { root: "D:", size: 842915639296, free: 352966430720, name: "DATA" },
       { root: "E:", size: 0, free: 0, name: "" },
     ]);
+  });
+
+  it("should use default values if not found in wmic logicaldisk output", () => {
+    //when & then
+    assert.deepEqual(
+      fromWmicLogicalDisk(
+        `Test
+T:
+`
+      ),
+      [{ root: "", size: 0, free: 0, name: "" }]
+    );
   });
 });

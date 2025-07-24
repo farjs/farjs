@@ -3,7 +3,7 @@
  * @typedef {import("../FileListUi.mjs").FileListUiData} FileListUiData
  */
 import React from "react";
-import { isEqualSets } from "@farjs/filelist/utils.mjs";
+import { isEqualSets, lazyFn } from "@farjs/filelist/utils.mjs";
 import HistoryProvider from "@farjs/filelist/history/HistoryProvider.mjs";
 import SelectPopup from "./SelectPopup.mjs";
 import FileListItem from "@farjs/filelist/api/FileListItem.mjs";
@@ -84,15 +84,15 @@ SelectController._fileMaskToRegex = (mask) => {
   );
 };
 
-/** @type {RegExp} */
-const escapeRegex = /[.*+\-?^${}()|\[\]\\]/;
+/** @type {() => RegExp} */
+const escapeRegex = lazyFn(() => /[.*+\-?^${}()|\[\]\\]/);
 
 // got from:
 //   https://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript/63838890#63838890
 //
 /** @type {(regex: string) => string} */
 function escapeSpecials(mask) {
-  return mask.replace(new RegExp(escapeRegex, "g"), "\\$&"); // $& means the whole matched string
+  return mask.replace(new RegExp(escapeRegex(), "g"), "\\$&"); // $& means the whole matched string
 }
 
 export default SelectController;
