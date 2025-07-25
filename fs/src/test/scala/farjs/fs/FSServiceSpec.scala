@@ -43,7 +43,7 @@ class FSServiceSpec extends AsyncTestSpec with OptionValues {
     }
 
     //when
-    val resultF = service.openItem(parent, item)
+    val resultF = service.openItem(parent, item).toFuture
 
     //then
     resultF.map(_ => Succeeded)
@@ -69,7 +69,7 @@ class FSServiceSpec extends AsyncTestSpec with OptionValues {
     }
 
     //when
-    val resultF = service.openItem(parent, item)
+    val resultF = service.openItem(parent, item).toFuture
 
     //then
     resultF.map(_ => Succeeded)
@@ -95,7 +95,7 @@ class FSServiceSpec extends AsyncTestSpec with OptionValues {
     }
 
     //when
-    val resultF = service.openItem(parent, item)
+    val resultF = service.openItem(parent, item).toFuture
 
     //then
     resultF.map(_ => Succeeded)
@@ -127,11 +127,11 @@ class FSServiceSpec extends AsyncTestSpec with OptionValues {
     }
 
     //when
-    val resultF = service.readDisk(path)
+    val resultF = service.readDisk(path).toFuture
 
     //then
     resultF.map { res =>
-      assertFSDisk(res.value, 
+      assertFSDisk(res.toOption.value,
         FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM")
       )
     }
@@ -160,11 +160,11 @@ class FSServiceSpec extends AsyncTestSpec with OptionValues {
     }
 
     //when
-    val resultF = service.readDisk(path)
+    val resultF = service.readDisk(path).toFuture
 
     //then
     resultF.map { res =>
-      assertFSDisk(res.value,
+      assertFSDisk(res.toOption.value,
         FSDisk("/", size = 250790436864.0, free = 41586692096.0, "/")
       )
     }
@@ -191,11 +191,11 @@ class FSServiceSpec extends AsyncTestSpec with OptionValues {
     }
 
     //when
-    val resultF = service.readDisks()
+    val resultF = service.readDisks().toFuture
 
     //then
     resultF.map { res =>
-      assertFSDisks(res, List(
+      assertFSDisks(res.toList, List(
         FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM")
       ))
     }
@@ -230,11 +230,11 @@ class FSServiceSpec extends AsyncTestSpec with OptionValues {
     }
 
     //when
-    val resultF = service.readDisks()
+    val resultF = service.readDisks().toFuture
 
     //then
     resultF.map { res =>
-      assertFSDisks(res, List(
+      assertFSDisks(res.toList, List(
         FSDisk("/", size = 250790436864.0, free = 41586692096.0, "/"),
         FSDisk("/Volumes/FLASHDRIVE", size = 2004385792.0, free = 1989279744.0, "FLASHDRIVE")
       ))

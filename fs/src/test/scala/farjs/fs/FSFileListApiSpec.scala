@@ -18,7 +18,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
 
   //noinspection TypeAnnotation
   class FsService {
-    val readDisk = mockFunction[String, Future[Option[FSDisk]]]
+    val readDisk = mockFunction[String, js.Promise[js.UndefOr[FSDisk]]]
 
     val fsService = new MockFSService(
       readDiskMock = readDisk
@@ -503,7 +503,7 @@ class FSFileListApiSpec extends AsyncTestSpec {
     val drive = FSDisk("/some/path", 0, 0, "SomeDrive")
 
     //then
-    fsService.readDisk.expects(path).returning(Future.successful(Some(drive)))
+    fsService.readDisk.expects(path).returning(js.Promise.resolve[js.UndefOr[FSDisk]](drive))
 
     //when
     val resultF = apiImp.getDriveRoot(path).toFuture

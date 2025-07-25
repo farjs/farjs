@@ -6,7 +6,7 @@ import scommons.react._
 import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.control.NonFatal
+import scala.scalajs.js
 
 object FSFreeSpace extends FunctionComponent[FSFreeSpaceProps] {
 
@@ -19,10 +19,10 @@ object FSFreeSpace extends FunctionComponent[FSFreeSpaceProps] {
 
     useLayoutEffect({ () =>
       val currDir = props.currDir
-      fsService.readDisk(currDir.path).recover {
-        case NonFatal(_) => None
+      fsService.readDisk(currDir.path).toFuture.recover {
+        case _ => js.undefined
       }.foreach { maybeDisk =>
-        maybeDisk.foreach { disk =>
+        maybeDisk.toOption.foreach { disk =>
           if (isSameInstance(currDir, currDirRef.current)) {
             props.dispatch(FileListDiskSpaceUpdatedAction(disk.free))
           }

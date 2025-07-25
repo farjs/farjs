@@ -46,8 +46,8 @@ object DrivePopup extends FunctionComponent[DrivePopupProps] {
     }
 
     useLayoutEffect({ () =>
-      val disksF = fsService.readDisks().map { disks =>
-        setDisks(disks)
+      val disksF = fsService.readDisks().toFuture.map { disks =>
+        setDisks(disks.toList)
       }
       props.dispatch(TaskAction(Task("Reading disks", disksF)))
       ()

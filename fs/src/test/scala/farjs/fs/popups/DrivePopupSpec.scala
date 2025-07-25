@@ -25,7 +25,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   //noinspection TypeAnnotation
   class FsService {
-    val readDisks = mockFunction[Future[List[FSDisk]]]
+    val readDisks = mockFunction[js.Promise[js.Array[FSDisk]]]
 
     val fsService = new MockFSService(
       readDisksMock = readDisks
@@ -46,7 +46,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     dispatch.expects(*).onCall { action: Any =>
       disksF = action.asInstanceOf[TaskAction].task.result.toFuture
     }
-    fsService.readDisks.expects().returning(Future.successful(List(
+    fsService.readDisks.expects().returning(js.Promise.resolve[js.Array[FSDisk]](js.Array(
       FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
       FSDisk("D:", size = 842915639296.0, free = 352966430720.0, "DATA"),
       FSDisk("E:", size = 0.0, free = 0.0, "")
@@ -104,7 +104,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     dispatch.expects(*).onCall { action: Any =>
       disksF = action.asInstanceOf[TaskAction].task.result.toFuture
     }
-    fsService.readDisks.expects().returning(Future.successful(List(
+    fsService.readDisks.expects().returning(js.Promise.resolve[js.Array[FSDisk]](js.Array(
       FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
       FSDisk("D:", size = 842915639296.0, free = 352966430720.0, "DATA"),
       FSDisk("E:", size = 0.0, free = 0.0, "")
@@ -162,7 +162,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     dispatch.expects(*).onCall { action: Any =>
       disksF = action.asInstanceOf[TaskAction].task.result.toFuture
     }
-    fsService.readDisks.expects().returning(Future.successful(List(
+    fsService.readDisks.expects().returning(js.Promise.resolve[js.Array[FSDisk]](js.Array(
       FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
       FSDisk("D:", size = 842915639296.0, free = 352966430720.0, "DATA"),
       FSDisk("E:", size = 0.0, free = 0.0, "")
@@ -219,7 +219,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     dispatch.expects(*).onCall { action: Any =>
       disksF = action.asInstanceOf[TaskAction].task.result.toFuture
     }
-    fsService.readDisks.expects().returning(Future.successful(List(
+    fsService.readDisks.expects().returning(js.Promise.resolve[js.Array[FSDisk]](js.Array(
       FSDisk("C:", size = 1.0, free = 2.0, "Test")
     )))
     val renderer = createTestRenderer(withContext(<(DrivePopup())(^.plain := props)()))
@@ -259,7 +259,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     dispatch.expects(*).onCall { action: Any =>
       disksF = action.asInstanceOf[TaskAction].task.result.toFuture
     }
-    fsService.readDisks.expects().returning(Future.successful(List(
+    fsService.readDisks.expects().returning(js.Promise.resolve[js.Array[FSDisk]](js.Array(
       FSDisk("C:", size = 156595318784.0, free = 81697124352.0, "SYSTEM"),
       FSDisk("D:", size = 842915639296.0, free = 352966430720.0, "DATA"),
       FSDisk("E:", size = 0.0, free = 0.0, "")
@@ -295,7 +295,7 @@ class DrivePopupSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     dispatch.expects(*).onCall { action: Any =>
       disksF = action.asInstanceOf[TaskAction].task.result.toFuture
     }
-    fsService.readDisks.expects().returning(Future.successful(List(
+    fsService.readDisks.expects().returning(js.Promise.resolve[js.Array[FSDisk]](js.Array(
       FSDisk("/", size = 156595318784.0, free = 81697124352.0, "/"),
       FSDisk("/Volumes/TestDrive", size = 842915639296.0, free = 352966430720.0, "TestDrive")
     )))

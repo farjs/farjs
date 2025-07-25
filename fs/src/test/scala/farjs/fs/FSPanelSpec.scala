@@ -8,7 +8,6 @@ import org.scalatest.OptionValues
 import scommons.react.ReactClass
 import scommons.react.test._
 
-import scala.concurrent.Future
 import scala.scalajs.js
 
 class FSPanelSpec extends TestSpec with TestRendererUtils with OptionValues {
@@ -20,7 +19,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils with OptionValues {
 
   //noinspection TypeAnnotation
   class FsService {
-    val openItem = mockFunction[String, String, Future[Unit]]
+    val openItem = mockFunction[String, String, js.Promise[Unit]]
 
     val fsService = new MockFSService(
       openItemMock = openItem
@@ -55,7 +54,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils with OptionValues {
     val panelProps = inside(findComponents(comp, fileListPanelComp)) {
       case List(c) => c.props.asInstanceOf[FileListPanelProps]
     }
-    val taskFuture = Future.unit
+    val taskFuture = js.Promise.resolve[Unit](js.undefined: Unit)
 
     //then
     fsService.openItem.expects("/sub-dir", "item 1").returning(taskFuture)

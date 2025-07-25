@@ -169,10 +169,7 @@ class FSFileListApi(
   }.toJSPromise
 
   override def getDriveRoot(path: String): js.Promise[js.UndefOr[String]] = {
-    fsService.readDisk(path).map {
-      case None => js.undefined: js.UndefOr[String]
-      case Some(d) => d.root: js.UndefOr[String]
-    }.toJSPromise
+    fsService.readDisk(path).toFuture.map(_.map(_.root)).toJSPromise
   }
 
   private def toFileListItem(targetDir: String, name: String): FileListItem = {
