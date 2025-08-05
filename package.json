@@ -72,7 +72,7 @@
   },
   "dependencies": {
     "@farjs/better-sqlite3-migrate": "^3.0.0",
-    "@farjs/filelist": "0.6.2",
+    "@farjs/filelist": "0.6.3",
     "@farjs/ui": "0.8.0",
     "iconv-lite": "0.6.3"
   },
