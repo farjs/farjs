@@ -3,10 +3,10 @@ name: Windows CI
 on:
   push:
     paths-ignore:
-      - '*.md'
-    branches: [ main ]
+      - "*.md"
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 env:
   NODE_OPTIONS: "--max_old_space_size=5120"
@@ -16,38 +16,46 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 20
     steps:
+      - name: Git checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Git checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          # cache: 'npm'
+          # cache-dependency-path: '**/package-lock.json'
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-#        cache: 'npm'
-#        cache-dependency-path: '**/package-lock.json'
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: "8"
+          distribution: "adopt"
+          cache: "sbt"
 
-    - name: Set up JDK 8
-      uses: actions/setup-java@v4
-      with:
-        java-version: '8'
-        distribution: 'adopt'
-        cache: 'sbt'
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/AppData/Roaming/npm
+            D:/a/farjs/farjs/node_modules
+            D:/a/farjs/farjs/package-lock.json
+          key: ${{ runner.os }}-node_modules-cache-v4-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-cache-v4-
 
-    - name: Cache node_modules
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/AppData/Roaming/npm
-          D:/a/farjs/farjs/node_modules
-          D:/a/farjs/farjs/package-lock.json
-        key: ${{ runner.os }}-node_modules-cache-v4-${{ hashFiles('package.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node_modules-cache-v4-
+      - name: Run js tests
+        run: |
+          npm i
+          npx tsc
+          npx quick-lint-js ./**/*.mjs
+          npm run formatCheck
+          npm run sql-bundle
+          npx c8 -r lcovonly --all --exclude "dist/**" --exclude "test/**" node --experimental-test-coverage ./test/all.mjs
+        env:
+          NODE_V8_COVERAGE: coverage0
 
-    - name: Run tests
-      run: |
-        npm i
-        sbt test
+      - name: Run scala tests
+        run: sbt test
