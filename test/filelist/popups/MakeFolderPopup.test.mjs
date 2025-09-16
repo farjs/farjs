@@ -5,7 +5,7 @@
 import React from "react";
 import TestRenderer from "react-test-renderer";
 import assert from "node:assert/strict";
-import { assertComponents, mockComponent } from "react-assert";
+import { actAsync, assertComponents, mockComponent } from "react-assert";
 import mockFunction from "mock-fn";
 import Modal from "@farjs/ui/popup/Modal.mjs";
 import TextLine from "@farjs/ui/TextLine.mjs";
@@ -66,9 +66,14 @@ describe("MakeFolderPopup.test.mjs", () => {
     const getP = Promise.resolve(service);
     const getAllP = Promise.resolve([]);
 
-    const renderer = TestRenderer.create(
-      withHistoryProvider(withThemeContext(h(MakeFolderPopup, props)), provider)
-    );
+    const renderer = await actAsync(() => {
+      return TestRenderer.create(
+        withHistoryProvider(
+          withThemeContext(h(MakeFolderPopup, props)),
+          provider
+        )
+      );
+    });
     await getP;
     await getAllP;
     assert.deepEqual(get.times, 1);
@@ -101,9 +106,14 @@ describe("MakeFolderPopup.test.mjs", () => {
     const getP = Promise.resolve(service);
     const getAllP = Promise.resolve(items);
 
-    const renderer = TestRenderer.create(
-      withHistoryProvider(withThemeContext(h(MakeFolderPopup, props)), provider)
-    );
+    const renderer = await actAsync(() => {
+      return TestRenderer.create(
+        withHistoryProvider(
+          withThemeContext(h(MakeFolderPopup, props)),
+          provider
+        )
+      );
+    });
     await getP;
     await getAllP;
     assert.deepEqual(get.times, 1);
@@ -115,7 +125,9 @@ describe("MakeFolderPopup.test.mjs", () => {
     const newFolderName = "new folder name";
 
     //when
-    comboBoxProps.onChange(newFolderName);
+    TestRenderer.act(() => {
+      comboBoxProps.onChange(newFolderName);
+    });
 
     //then
     const updatedProps = renderer.root.findByType(comboBoxComp).props;
@@ -138,9 +150,14 @@ describe("MakeFolderPopup.test.mjs", () => {
     const getP = Promise.resolve(service);
     const getAllP = Promise.resolve(items);
 
-    const renderer = TestRenderer.create(
-      withHistoryProvider(withThemeContext(h(MakeFolderPopup, props)), provider)
-    );
+    const renderer = await actAsync(() => {
+      return TestRenderer.create(
+        withHistoryProvider(
+          withThemeContext(h(MakeFolderPopup, props)),
+          provider
+        )
+      );
+    });
     await getP;
     await getAllP;
     assert.deepEqual(get.times, 1);
@@ -151,7 +168,9 @@ describe("MakeFolderPopup.test.mjs", () => {
     assert.deepEqual(checkBoxProps.value, false);
 
     //when
-    checkBoxProps.onChange();
+    TestRenderer.act(() => {
+      checkBoxProps.onChange();
+    });
 
     //then
     const updatedProps = renderer.root.findByType(checkBoxComp).props;
@@ -177,9 +196,14 @@ describe("MakeFolderPopup.test.mjs", () => {
     const getP = Promise.resolve(service);
     const getAllP = Promise.resolve(items);
 
-    const renderer = TestRenderer.create(
-      withHistoryProvider(withThemeContext(h(MakeFolderPopup, props)), provider)
-    );
+    const renderer = await actAsync(() => {
+      return TestRenderer.create(
+        withHistoryProvider(
+          withThemeContext(h(MakeFolderPopup, props)),
+          provider
+        )
+      );
+    });
     await getP;
     await getAllP;
     assert.deepEqual(get.times, 1);
@@ -216,9 +240,14 @@ describe("MakeFolderPopup.test.mjs", () => {
     const getP = Promise.resolve(service);
     const getAllP = Promise.resolve(items);
 
-    const renderer = TestRenderer.create(
-      withHistoryProvider(withThemeContext(h(MakeFolderPopup, props)), provider)
-    );
+    const renderer = await actAsync(() => {
+      return TestRenderer.create(
+        withHistoryProvider(
+          withThemeContext(h(MakeFolderPopup, props)),
+          provider
+        )
+      );
+    });
     await getP;
     await getAllP;
     assert.deepEqual(get.times, 1);
@@ -252,9 +281,14 @@ describe("MakeFolderPopup.test.mjs", () => {
     const getP = Promise.resolve(service);
     const getAllP = Promise.resolve([]);
 
-    const renderer = TestRenderer.create(
-      withHistoryProvider(withThemeContext(h(MakeFolderPopup, props)), provider)
-    );
+    const renderer = await actAsync(() => {
+      return TestRenderer.create(
+        withHistoryProvider(
+          withThemeContext(h(MakeFolderPopup, props)),
+          provider
+        )
+      );
+    });
     await getP;
     await getAllP;
     assert.deepEqual(get.times, 1);
@@ -287,9 +321,14 @@ describe("MakeFolderPopup.test.mjs", () => {
     const getP = Promise.resolve(service);
     const getAllP = Promise.resolve([]);
 
-    const renderer = TestRenderer.create(
-      withHistoryProvider(withThemeContext(h(MakeFolderPopup, props)), provider)
-    );
+    const renderer = await actAsync(() => {
+      return TestRenderer.create(
+        withHistoryProvider(
+          withThemeContext(h(MakeFolderPopup, props)),
+          provider
+        )
+      );
+    });
     await getP;
     await getAllP;
     assert.deepEqual(get.times, 1);
@@ -323,8 +362,15 @@ describe("MakeFolderPopup.test.mjs", () => {
     const getAllP = Promise.resolve(items);
 
     //when
-    const result = TestRenderer.create(
-      withHistoryProvider(withThemeContext(h(MakeFolderPopup, props)), provider)
+    const result = (
+      await actAsync(() => {
+        return TestRenderer.create(
+          withHistoryProvider(
+            withThemeContext(h(MakeFolderPopup, props)),
+            provider
+          )
+        );
+      })
     ).root;
 
     //then

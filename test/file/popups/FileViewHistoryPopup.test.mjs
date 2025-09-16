@@ -5,7 +5,7 @@
 import React from "react";
 import TestRenderer from "react-test-renderer";
 import assert from "node:assert/strict";
-import { assertComponents, mockComponent } from "react-assert";
+import { actAsync, assertComponents, mockComponent } from "react-assert";
 import mockFunction from "mock-fn";
 import MockHistoryService from "@farjs/filelist/history/MockHistoryService.mjs";
 import MockHistoryProvider from "@farjs/filelist/history/MockHistoryProvider.mjs";
@@ -59,9 +59,11 @@ describe("FileViewHistoryPopup.test.mjs", () => {
     const getP = Promise.resolve(service);
     const getAllP = Promise.resolve(items);
 
-    const renderer = TestRenderer.create(
-      withHistoryProvider(h(FileViewHistoryPopup, props), provider)
-    );
+    const renderer = await actAsync(() => {
+      return TestRenderer.create(
+        withHistoryProvider(h(FileViewHistoryPopup, props), provider)
+      );
+    });
     await getP;
     await getAllP;
     assert.deepEqual(get.times, 1);
@@ -107,8 +109,12 @@ describe("FileViewHistoryPopup.test.mjs", () => {
     const getAllP = Promise.resolve(items);
 
     //when
-    const result = TestRenderer.create(
-      withHistoryProvider(h(FileViewHistoryPopup, props), provider)
+    const result = (
+      await actAsync(() => {
+        return TestRenderer.create(
+          withHistoryProvider(h(FileViewHistoryPopup, props), provider)
+        );
+      })
     ).root;
 
     //then

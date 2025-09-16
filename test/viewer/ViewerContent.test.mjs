@@ -169,8 +169,12 @@ describe("ViewerContent.test.mjs", () => {
     const ctx = await TestContext();
 
     //when & then
-    ctx.renderer.root.findByType(viewerInput).props.onKeypress("f7");
-    ctx.renderer.root.findByType(textSearchPopup).props.onCancel();
+    TestRenderer.act(() => {
+      ctx.renderer.root.findByType(viewerInput).props.onKeypress("f7");
+    });
+    TestRenderer.act(() => {
+      ctx.renderer.root.findByType(textSearchPopup).props.onCancel();
+    });
 
     //then
     assert.deepEqual(ctx.renderer.root.findAllByType(textSearchPopup), []);
@@ -179,15 +183,21 @@ describe("ViewerContent.test.mjs", () => {
   it("should trigger search when onKeypress(F7)", async () => {
     //given
     const ctx = await TestContext();
-    ctx.renderer.root.findByType(viewerInput).props.onKeypress("f7");
+    TestRenderer.act(() => {
+      ctx.renderer.root.findByType(viewerInput).props.onKeypress("f7");
+    });
     const searchTerm = "test";
 
     //when & then
-    ctx.renderer.root.findByType(textSearchPopup).props.onSearch(searchTerm);
+    TestRenderer.act(() => {
+      ctx.renderer.root.findByType(textSearchPopup).props.onSearch(searchTerm);
+    });
     assert.deepEqual(ctx.renderer.root.findAllByType(textSearchPopup), []);
 
     //when & then
-    ctx.renderer.root.findByType(viewerSearch).props.onComplete();
+    TestRenderer.act(() => {
+      ctx.renderer.root.findByType(viewerSearch).props.onComplete();
+    });
     assert.deepEqual(ctx.renderer.root.findAllByType(viewerSearch), []);
   });
 
@@ -224,7 +234,9 @@ describe("ViewerContent.test.mjs", () => {
       assertViewerContent(ctx.renderer.root, ctx.props, expected, true);
     }
 
-    ctx.renderer.root.findByType(viewerInput).props.onKeypress("f8");
+    TestRenderer.act(() => {
+      ctx.renderer.root.findByType(viewerInput).props.onKeypress("f8");
+    });
     assert.deepEqual(
       ctx.renderer.root.findAllByType(encodingsPopup).length > 0,
       true
@@ -235,7 +247,9 @@ describe("ViewerContent.test.mjs", () => {
     await check("utf-8", "reload2", ["reload2"]);
 
     //when & then
-    ctx.renderer.root.findByType(encodingsPopup).props.onClose();
+    TestRenderer.act(() => {
+      ctx.renderer.root.findByType(encodingsPopup).props.onClose();
+    });
     assert.deepEqual(ctx.renderer.root.findAllByType(encodingsPopup).length, 0);
   });
 

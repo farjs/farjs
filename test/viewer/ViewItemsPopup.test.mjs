@@ -6,7 +6,7 @@
 import React from "react";
 import TestRenderer from "react-test-renderer";
 import assert from "node:assert/strict";
-import { assertComponents, mockComponent } from "react-assert";
+import { actAsync, assertComponents, mockComponent } from "react-assert";
 import mockFunction from "mock-fn";
 import StatusPopup from "@farjs/ui/popup/StatusPopup.mjs";
 import FileListDir from "@farjs/filelist/api/FileListDir.mjs";
@@ -58,7 +58,11 @@ describe("ViewItemsPopup.test.mjs", () => {
     const props = { dispatch, onClose };
     const data = FileListData(dispatch, actions, state);
     const viewItemsPopup = ViewItemsPopup(data);
-    const comp = TestRenderer.create(h(viewItemsPopup, props)).root;
+    const comp = (
+      await actAsync(() => {
+        return TestRenderer.create(h(viewItemsPopup, props));
+      })
+    ).root;
     await Promise.resolve();
 
     const popupProps = comp.findByType(statusPopupComp).props;
@@ -122,7 +126,11 @@ describe("ViewItemsPopup.test.mjs", () => {
     const props = { dispatch, onClose };
     const data = FileListData(dispatch, actions, state);
     const viewItemsPopup = ViewItemsPopup(data);
-    const comp = TestRenderer.create(h(viewItemsPopup, props)).root;
+    const comp = (
+      await actAsync(() => {
+        return TestRenderer.create(h(viewItemsPopup, props));
+      })
+    ).root;
     await Promise.resolve();
 
     const popupProps = comp.findByType(statusPopupComp).props;
@@ -174,7 +182,11 @@ describe("ViewItemsPopup.test.mjs", () => {
     const props = { dispatch, onClose };
     const data = FileListData(dispatch, actions, state);
     const viewItemsPopup = ViewItemsPopup(data);
-    const comp = TestRenderer.create(h(viewItemsPopup, props)).root;
+    const comp = (
+      await actAsync(() => {
+        return TestRenderer.create(h(viewItemsPopup, props));
+      })
+    ).root;
     await Promise.resolve();
 
     const popupProps = comp.findByType(statusPopupComp).props;

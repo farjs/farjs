@@ -71,7 +71,9 @@ describe("TextSearchPopup.test.mjs", () => {
     const newSearchText = "new searchText";
 
     //when
-    comboBoxProps.onChange(newSearchText);
+    TestRenderer.act(() => {
+      comboBoxProps.onChange(newSearchText);
+    });
 
     //then
     const updatedProps = renderer.root.findByType(comboBoxComp).props;
@@ -88,7 +90,9 @@ describe("TextSearchPopup.test.mjs", () => {
       withThemeContext(h(TextSearchPopup, props))
     );
     const comboBoxProps = renderer.root.findByType(comboBoxComp).props;
-    comboBoxProps.onChange("test");
+    TestRenderer.act(() => {
+      comboBoxProps.onChange("test");
+    });
     const updatedProps = renderer.root.findByType(comboBoxComp).props;
     assert.deepEqual(updatedProps.value, "test");
 
@@ -111,7 +115,9 @@ describe("TextSearchPopup.test.mjs", () => {
       withThemeContext(h(TextSearchPopup, props))
     );
     const comboBoxProps = renderer.root.findByType(comboBoxComp).props;
-    comboBoxProps.onChange("test");
+    TestRenderer.act(() => {
+      comboBoxProps.onChange("test");
+    });
     const updatedProps = renderer.root.findByType(comboBoxComp).props;
     assert.deepEqual(updatedProps.value, "test");
     const buttonsProps = renderer.root.findByType(buttonsPanelComp).props;

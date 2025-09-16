@@ -5,7 +5,7 @@
 import React from "react";
 import TestRenderer from "react-test-renderer";
 import assert from "node:assert/strict";
-import { assertComponents, mockComponent } from "react-assert";
+import { actAsync, assertComponents, mockComponent } from "react-assert";
 import mockFunction from "mock-fn";
 import TextAlign from "@farjs/ui/TextAlign.mjs";
 import TextLine from "@farjs/ui/TextLine.mjs";
@@ -76,9 +76,9 @@ describe("QuickViewDir.test.mjs", () => {
     };
     const stack = new PanelStack(false, stackState, stackUpdater);
     const props = { dispatch, actions, state, stack, width: 25, currItem };
-    const renderer = TestRenderer.create(
-      withThemeContext(h(QuickViewDir, props))
-    );
+    const renderer = await actAsync(() => {
+      return TestRenderer.create(withThemeContext(h(QuickViewDir, props)));
+    });
     await Promise.resolve();
     assert.deepEqual(renderer.root.findAllByType(statusPopupComp), []);
 
@@ -86,7 +86,7 @@ describe("QuickViewDir.test.mjs", () => {
     const newParams = { ...params, name: "" };
     stack.update((_) => _.withState(newParams));
     const newStack = new PanelStack(false, stackState, stackUpdater);
-    TestRenderer.act(() => {
+    await actAsync(() => {
       renderer.update(
         withThemeContext(h(QuickViewDir, { ...props, stack: newStack }))
       );
@@ -105,7 +105,9 @@ describe("QuickViewDir.test.mjs", () => {
       { ...FileListItem("file 1"), size: 1 },
     ]);
     assert.deepEqual(result, true);
-    resolve(result);
+    await actAsync(() => {
+      resolve(result);
+    });
     await scanDirsP;
 
     //then
@@ -157,9 +159,9 @@ describe("QuickViewDir.test.mjs", () => {
     };
     const stack = new PanelStack(false, stackState, stackUpdater);
     const props = { dispatch, actions, state, stack, width: 25, currItem };
-    const renderer = TestRenderer.create(
-      withThemeContext(h(QuickViewDir, props))
-    );
+    const renderer = await actAsync(() => {
+      return TestRenderer.create(withThemeContext(h(QuickViewDir, props)));
+    });
     await Promise.resolve();
     assert.deepEqual(renderer.root.findAllByType(statusPopupComp), []);
 
@@ -167,7 +169,7 @@ describe("QuickViewDir.test.mjs", () => {
     const newParams = { ...params, parent: "" };
     stack.update((_) => _.withState(newParams));
     const newStack = new PanelStack(false, stackState, stackUpdater);
-    TestRenderer.act(() => {
+    await actAsync(() => {
       renderer.update(
         withThemeContext(h(QuickViewDir, { ...props, stack: newStack }))
       );
@@ -186,7 +188,9 @@ describe("QuickViewDir.test.mjs", () => {
       { ...FileListItem("file 1"), size: 1 },
     ]);
     assert.deepEqual(result, true);
-    resolve(result);
+    await actAsync(() => {
+      resolve(result);
+    });
     await scanDirsP;
 
     //then
@@ -238,9 +242,9 @@ describe("QuickViewDir.test.mjs", () => {
     };
     const stack = new PanelStack(false, stackState, stackUpdater);
     const props = { dispatch, actions, state, stack, width: 25, currItem };
-    const renderer = TestRenderer.create(
-      withThemeContext(h(QuickViewDir, props))
-    );
+    const renderer = await actAsync(() => {
+      return TestRenderer.create(withThemeContext(h(QuickViewDir, props)));
+    });
     await Promise.resolve();
 
     const popupProps = renderer.root.findByType(statusPopupComp).props;
@@ -250,7 +254,9 @@ describe("QuickViewDir.test.mjs", () => {
     assert.deepEqual(resItems, [currDir.items[0]]);
 
     //when & then
-    popupProps.onClose();
+    await actAsync(() => {
+      popupProps.onClose();
+    });
     /** @type {boolean} */
     const result = onNextDir("/path", [
       FileListItem("dir 2", true),
@@ -258,7 +264,9 @@ describe("QuickViewDir.test.mjs", () => {
       { ...FileListItem("file 1"), size: 1 },
     ]);
     assert.deepEqual(result, false);
-    resolve(result);
+    await actAsync(() => {
+      resolve(result);
+    });
     await scanDirsP;
 
     //then
@@ -311,9 +319,9 @@ describe("QuickViewDir.test.mjs", () => {
     };
     const stack = new PanelStack(false, stackState, stackUpdater);
     const props = { dispatch, actions, state, stack, width: 25, currItem };
-    const renderer = TestRenderer.create(
-      withThemeContext(h(QuickViewDir, props))
-    );
+    const renderer = await actAsync(() => {
+      return TestRenderer.create(withThemeContext(h(QuickViewDir, props)));
+    });
     await Promise.resolve();
 
     const popupProps = renderer.root.findByType(statusPopupComp).props;
@@ -324,7 +332,9 @@ describe("QuickViewDir.test.mjs", () => {
     const error = Error("test error");
 
     //when
-    reject(error);
+    await actAsync(() => {
+      reject(error);
+    });
     await Promise.resolve();
 
     //then

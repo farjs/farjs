@@ -4,7 +4,7 @@
 import React from "react";
 import TestRenderer from "react-test-renderer";
 import assert from "node:assert/strict";
-import { assertComponents, mockComponent } from "react-assert";
+import { actAsync, assertComponents, mockComponent } from "react-assert";
 import mockFunction from "mock-fn";
 import ListPopup from "@farjs/ui/popup/ListPopup.mjs";
 import PanelStack from "@farjs/filelist/stack/PanelStack.mjs";
@@ -53,11 +53,18 @@ describe("FolderShortcutsPopup.test.mjs", () => {
     );
     const getAll = mockFunction(() => itemsP);
     const shortcutsService = new MockFolderShortcutsService({ getAll });
-    const comp = TestRenderer.create(
-      withStacksContext(
-        withServicesContext(h(FolderShortcutsPopup, props), shortcutsService),
-        stacksProps
-      )
+    const comp = (
+      await actAsync(() => {
+        return TestRenderer.create(
+          withStacksContext(
+            withServicesContext(
+              h(FolderShortcutsPopup, props),
+              shortcutsService
+            ),
+            stacksProps
+          )
+        );
+      })
     ).root;
     await itemsP;
     const popupProps = comp.findByType(listPopup).props;
@@ -82,11 +89,18 @@ describe("FolderShortcutsPopup.test.mjs", () => {
     const itemsP = Promise.resolve(Array(10).fill(undefined));
     const getAll = mockFunction(() => itemsP);
     const shortcutsService = new MockFolderShortcutsService({ getAll });
-    const comp = TestRenderer.create(
-      withStacksContext(
-        withServicesContext(h(FolderShortcutsPopup, props), shortcutsService),
-        stacksProps
-      )
+    const comp = (
+      await actAsync(() => {
+        return TestRenderer.create(
+          withStacksContext(
+            withServicesContext(
+              h(FolderShortcutsPopup, props),
+              shortcutsService
+            ),
+            stacksProps
+          )
+        );
+      })
     ).root;
     await itemsP;
     const popupProps = comp.findByType(listPopup).props;
@@ -115,11 +129,18 @@ describe("FolderShortcutsPopup.test.mjs", () => {
     );
     const getAll = mockFunction(() => itemsP);
     const shortcutsService = new MockFolderShortcutsService({ getAll });
-    const comp = TestRenderer.create(
-      withStacksContext(
-        withServicesContext(h(FolderShortcutsPopup, props), shortcutsService),
-        stacksProps
-      )
+    const comp = (
+      await actAsync(() => {
+        return TestRenderer.create(
+          withStacksContext(
+            withServicesContext(
+              h(FolderShortcutsPopup, props),
+              shortcutsService
+            ),
+            stacksProps
+          )
+        );
+      })
     ).root;
     await itemsP;
     assert.deepEqual(getAll.times, 1);
@@ -174,20 +195,31 @@ describe("FolderShortcutsPopup.test.mjs", () => {
       getAll,
       delete: deleteMock,
     });
-    const comp = TestRenderer.create(
-      withStacksContext(
-        withServicesContext(h(FolderShortcutsPopup, props), shortcutsService),
-        stacksProps
-      )
+    const comp = (
+      await actAsync(() => {
+        return TestRenderer.create(
+          withStacksContext(
+            withServicesContext(
+              h(FolderShortcutsPopup, props),
+              shortcutsService
+            ),
+            stacksProps
+          )
+        );
+      })
     ).root;
     await itemsP;
     assert.deepEqual(getAll.times, 1);
-    comp.findByType(listPopup).props.onSelect(1);
+    TestRenderer.act(() => {
+      comp.findByType(listPopup).props.onSelect(1);
+    });
     const popupProps = comp.findByType(listPopup).props;
     assert.deepEqual(popupProps.items[1], "1: item 2");
 
     //when
-    const result = popupProps.onKeypress("-");
+    const result = await actAsync(() => {
+      return popupProps.onKeypress("-");
+    });
 
     //then
     await deleteP;
@@ -229,20 +261,31 @@ describe("FolderShortcutsPopup.test.mjs", () => {
       getAll,
       save,
     });
-    const comp = TestRenderer.create(
-      withStacksContext(
-        withServicesContext(h(FolderShortcutsPopup, props), shortcutsService),
-        stacksProps
-      )
+    const comp = (
+      await actAsync(() => {
+        return TestRenderer.create(
+          withStacksContext(
+            withServicesContext(
+              h(FolderShortcutsPopup, props),
+              shortcutsService
+            ),
+            stacksProps
+          )
+        );
+      })
     ).root;
     await itemsP;
     assert.deepEqual(getAll.times, 1);
-    comp.findByType(listPopup).props.onSelect(1);
+    TestRenderer.act(() => {
+      comp.findByType(listPopup).props.onSelect(1);
+    });
     const popupProps = comp.findByType(listPopup).props;
     assert.deepEqual(popupProps.items[1], "1: <none>");
 
     //when
-    const result = popupProps.onKeypress("+");
+    const result = await actAsync(() => {
+      return popupProps.onKeypress("+");
+    });
 
     //then
     await saveP;
@@ -262,11 +305,18 @@ describe("FolderShortcutsPopup.test.mjs", () => {
     const itemsP = Promise.resolve(Array(10).fill("item"));
     const getAll = mockFunction(() => itemsP);
     const shortcutsService = new MockFolderShortcutsService({ getAll });
-    const comp = TestRenderer.create(
-      withStacksContext(
-        withServicesContext(h(FolderShortcutsPopup, props), shortcutsService),
-        stacksProps
-      )
+    const comp = (
+      await actAsync(() => {
+        return TestRenderer.create(
+          withStacksContext(
+            withServicesContext(
+              h(FolderShortcutsPopup, props),
+              shortcutsService
+            ),
+            stacksProps
+          )
+        );
+      })
     ).root;
     await itemsP;
     assert.deepEqual(getAll.times, 1);
@@ -290,11 +340,18 @@ describe("FolderShortcutsPopup.test.mjs", () => {
     const itemsP = Promise.resolve(Array(10).fill("item"));
     const getAll = mockFunction(() => itemsP);
     const shortcutsService = new MockFolderShortcutsService({ getAll });
-    const comp = TestRenderer.create(
-      withStacksContext(
-        withServicesContext(h(FolderShortcutsPopup, props), shortcutsService),
-        stacksProps
-      )
+    const comp = (
+      await actAsync(() => {
+        return TestRenderer.create(
+          withStacksContext(
+            withServicesContext(
+              h(FolderShortcutsPopup, props),
+              shortcutsService
+            ),
+            stacksProps
+          )
+        );
+      })
     ).root;
     await itemsP;
     assert.deepEqual(getAll.times, 1);
@@ -330,11 +387,18 @@ describe("FolderShortcutsPopup.test.mjs", () => {
     const shortcutsService = new MockFolderShortcutsService({ getAll });
 
     //when
-    const result = TestRenderer.create(
-      withStacksContext(
-        withServicesContext(h(FolderShortcutsPopup, props), shortcutsService),
-        stacksProps
-      )
+    const result = (
+      await actAsync(() => {
+        return TestRenderer.create(
+          withStacksContext(
+            withServicesContext(
+              h(FolderShortcutsPopup, props),
+              shortcutsService
+            ),
+            stacksProps
+          )
+        );
+      })
     ).root;
 
     //then

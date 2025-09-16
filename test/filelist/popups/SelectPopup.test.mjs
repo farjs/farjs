@@ -5,7 +5,7 @@
 import React from "react";
 import TestRenderer from "react-test-renderer";
 import assert from "node:assert/strict";
-import { assertComponents, mockComponent } from "react-assert";
+import { actAsync, assertComponents, mockComponent } from "react-assert";
 import mockFunction from "mock-fn";
 import Modal from "@farjs/ui/popup/Modal.mjs";
 import ComboBox from "@farjs/ui/ComboBox.mjs";
@@ -48,9 +48,11 @@ describe("SelectPopup.test.mjs", () => {
     const getP = Promise.resolve(service);
     const getAllP = Promise.resolve([]);
 
-    const renderer = TestRenderer.create(
-      withHistoryProvider(withThemeContext(h(SelectPopup, props)), provider)
-    );
+    const renderer = await actAsync(() => {
+      return TestRenderer.create(
+        withHistoryProvider(withThemeContext(h(SelectPopup, props)), provider)
+      );
+    });
     await getP;
     await getAllP;
     assert.deepEqual(get.times, 1);
@@ -83,9 +85,11 @@ describe("SelectPopup.test.mjs", () => {
     const getP = Promise.resolve(service);
     const getAllP = Promise.resolve(items);
 
-    const renderer = TestRenderer.create(
-      withHistoryProvider(withThemeContext(h(SelectPopup, props)), provider)
-    );
+    const renderer = await actAsync(() => {
+      return TestRenderer.create(
+        withHistoryProvider(withThemeContext(h(SelectPopup, props)), provider)
+      );
+    });
     await getP;
     await getAllP;
     assert.deepEqual(get.times, 1);
@@ -97,7 +101,9 @@ describe("SelectPopup.test.mjs", () => {
     const newPattern = "new pattern";
 
     //when
-    comboBoxProps.onChange(newPattern);
+    TestRenderer.act(() => {
+      comboBoxProps.onChange(newPattern);
+    });
 
     //then
     const updatedProps = renderer.root.findByType(comboBoxComp).props;
@@ -123,9 +129,11 @@ describe("SelectPopup.test.mjs", () => {
     const getP = Promise.resolve(service);
     const getAllP = Promise.resolve(items);
 
-    const renderer = TestRenderer.create(
-      withHistoryProvider(withThemeContext(h(SelectPopup, props)), provider)
-    );
+    const renderer = await actAsync(() => {
+      return TestRenderer.create(
+        withHistoryProvider(withThemeContext(h(SelectPopup, props)), provider)
+      );
+    });
     await getP;
     await getAllP;
     assert.deepEqual(get.times, 1);
@@ -159,9 +167,11 @@ describe("SelectPopup.test.mjs", () => {
     const getP = Promise.resolve(service);
     const getAllP = Promise.resolve([]);
 
-    const renderer = TestRenderer.create(
-      withHistoryProvider(withThemeContext(h(SelectPopup, props)), provider)
-    );
+    const renderer = await actAsync(() => {
+      return TestRenderer.create(
+        withHistoryProvider(withThemeContext(h(SelectPopup, props)), provider)
+      );
+    });
     await getP;
     await getAllP;
     assert.deepEqual(get.times, 1);
@@ -195,8 +205,12 @@ describe("SelectPopup.test.mjs", () => {
     const getAllP = Promise.resolve(items);
 
     //when
-    const result = TestRenderer.create(
-      withHistoryProvider(withThemeContext(h(SelectPopup, props)), provider)
+    const result = (
+      await actAsync(() => {
+        return TestRenderer.create(
+          withHistoryProvider(withThemeContext(h(SelectPopup, props)), provider)
+        );
+      })
     ).root;
 
     //then
@@ -227,8 +241,12 @@ describe("SelectPopup.test.mjs", () => {
     const getAllP = Promise.resolve(items);
 
     //when
-    const result = TestRenderer.create(
-      withHistoryProvider(withThemeContext(h(SelectPopup, props)), provider)
+    const result = (
+      await actAsync(() => {
+        return TestRenderer.create(
+          withHistoryProvider(withThemeContext(h(SelectPopup, props)), provider)
+        );
+      })
     ).root;
 
     //then

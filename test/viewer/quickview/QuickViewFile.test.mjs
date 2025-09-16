@@ -43,7 +43,9 @@ describe("QuickViewFile.test.mjs", () => {
     );
 
     //when
-    viewProps.setViewport(viewport);
+    TestRenderer.act(() => {
+      viewProps.setViewport(viewport);
+    });
 
     //then
     const updatedViewProps = renderer.root.findByType(viewerController).props;

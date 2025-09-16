@@ -126,7 +126,9 @@ describe("ViewerPluginUi.test.mjs", () => {
     );
 
     //when
-    renderer.root.findByType(viewerController).props.setViewport(viewport);
+    TestRenderer.act(() => {
+      renderer.root.findByType(viewerController).props.setViewport(viewport);
+    });
 
     //then
     const headerProps = renderer.root.findByType(viewerHeader).props;
