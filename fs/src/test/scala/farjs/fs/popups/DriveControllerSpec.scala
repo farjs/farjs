@@ -1,13 +1,14 @@
 package farjs.fs.popups
 
 import farjs.fs.popups.DriveController._
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.scalajs.js
 
 class DriveControllerSpec extends TestSpec with TestRendererUtils {
 
-  DriveController.drivePopup = mockUiComponent("DrivePopup")
+  DriveController.drivePopup = "DrivePopup".asInstanceOf[ReactClass]
 
   it should "call onChangeDir when onChangeDir on the left" in {
     //given
@@ -23,7 +24,9 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
     onChangeDir.expects(dir, true)
 
     //when
-    findComponentProps(renderer.root, drivePopup, plain = true).onChangeDir(dir)
+    inside(findComponents(renderer.root, drivePopup)) {
+      case List(c) => c.props.asInstanceOf[DrivePopupProps].onChangeDir(dir)
+    }
   }
 
   it should "call onChangeDir when onChangeDir on the right" in {
@@ -40,7 +43,9 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
     onChangeDir.expects(dir, false)
 
     //when
-    findComponentProps(renderer.root, drivePopup, plain = true).onChangeDir(dir)
+    inside(findComponents(renderer.root, drivePopup)) {
+      case List(c) => c.props.asInstanceOf[DrivePopupProps].onChangeDir(dir)
+    }
   }
 
   it should "call onClose when onClose" in {
@@ -50,7 +55,9 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
     val onClose = mockFunction[Unit]
     val props = DriveControllerProps(dispatch, showDrivePopupOnLeft = true, onChangeDir, onClose)
     val comp = testRender(<(DriveController())(^.plain := props)())
-    val popup = findComponentProps(comp, drivePopup, plain = true)
+    val popup = inside(findComponents(comp, drivePopup)) {
+      case List(c) => c.props.asInstanceOf[DrivePopupProps]
+    }
 
     //then
     onClose.expects()
@@ -69,11 +76,11 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(DriveController())(^.plain := props)())
 
     //then
-    assertTestComponent(result, drivePopup, plain = true) {
+    assertNativeComponent(result, <(drivePopup)(^.assertPlain[DrivePopupProps](inside(_) {
       case DrivePopupProps(dispatch, _, _, showOnLeft) =>
         dispatch shouldBe props.dispatch
         showOnLeft shouldBe true
-    }
+    }))())
   }
 
   it should "render popup on the right" in {
@@ -85,11 +92,11 @@ class DriveControllerSpec extends TestSpec with TestRendererUtils {
     val result = testRender(<(DriveController())(^.plain := props)())
 
     //then
-    assertTestComponent(result, drivePopup, plain = true) {
+    assertNativeComponent(result, <(drivePopup)(^.assertPlain[DrivePopupProps](inside(_) {
       case DrivePopupProps(dispatch, _, _, showOnLeft) =>
         dispatch shouldBe props.dispatch
         showOnLeft shouldBe false
-    }
+    }))())
   }
 
   it should "render empty component" in {

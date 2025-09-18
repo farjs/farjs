@@ -4,14 +4,14 @@ import scommons.react._
 
 object DriveController extends FunctionComponent[DriveControllerProps] {
 
-  private[popups] var drivePopup: UiComponent[DrivePopupProps] = DrivePopup
+  private[popups] var drivePopup: ReactClass = DrivePopup
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
 
     props.showDrivePopupOnLeft.toOption match {
       case Some(showOnLeft) =>
-        <(drivePopup())(^.plain := DrivePopupProps(
+        <(drivePopup)(^.plain := DrivePopupProps(
           dispatch = props.dispatch,
           onChangeDir = { dir =>
             props.onClose()
