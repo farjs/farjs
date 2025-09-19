@@ -8,6 +8,10 @@ import scala.scalajs.js.annotation.JSImport
 package object popups {
 
   @js.native
+  @JSImport("../fs/popups/DriveController.mjs", JSImport.Default)
+  object DriveController extends ReactClass
+
+  @js.native
   @JSImport("../fs/popups/DrivePopup.mjs", JSImport.Default)
   object DrivePopup extends ReactClass
 

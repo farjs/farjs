@@ -16,7 +16,7 @@ import scala.scalajs.js
 
 class FSPluginUiSpec extends TestSpec with TestRendererUtils {
 
-  FSPluginUi.drive = mockUiComponent("DriveController")
+  FSPluginUi.drive = "DriveController".asInstanceOf[ReactClass]
   FSPluginUi.foldersHistory = "FoldersHistoryController".asInstanceOf[ReactClass]
   FSPluginUi.folderShortcuts = "FolderShortcutsController".asInstanceOf[ReactClass]
 
@@ -96,7 +96,9 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
       left = WithStacksData(otherStack, null),
       right = WithStacksData(currStack, null)
     ))
-    val driveProps = findComponentProps(renderer.root, drive, plain = true)
+    val driveProps = inside(findComponents(renderer.root, drive)) {
+      case List(c) => c.props.asInstanceOf[DriveControllerProps]
+    }
     val action = TaskAction(Task("Changing Dir",
       Future.successful(FileListDir("/", isRoot = true, items = js.Array()))
     ))
@@ -178,7 +180,7 @@ class FSPluginUiSpec extends TestSpec with TestRendererUtils {
       case List(c) => c.props.asInstanceOf[FoldersHistoryControllerProps].onChangeDir
     }
     assertComponents(result.children, List(
-      <(drive())(^.assertPlain[DriveControllerProps](inside(_) {
+      <(drive)(^.assertPlain[DriveControllerProps](inside(_) {
         case DriveControllerProps(resDispatch, showDrivePopupOnLeft, _, resOnClose) =>
           resDispatch shouldBe dispatch
           showDrivePopupOnLeft shouldBe js.undefined

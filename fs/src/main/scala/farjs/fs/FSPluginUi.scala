@@ -10,7 +10,7 @@ import scala.scalajs.js
 
 object FSPluginUi {
 
-  private[fs] var drive: UiComponent[DriveControllerProps] = DriveController
+  private[fs] var drive: ReactClass = DriveController
   private[fs] var foldersHistory: ReactClass = FoldersHistoryController
   private[fs] var folderShortcuts: ReactClass = FolderShortcutsController
 
@@ -57,7 +57,7 @@ class FSPluginUi(val showDrivePopupOnLeft: Option[Boolean] = None,
       onChangeDir(stacks.left.stack.isActive)
 
     <.>()(
-      <(drive())(^.plain := DriveControllerProps(
+      <(drive)(^.plain := DriveControllerProps(
         dispatch = props.dispatch,
         showDrivePopupOnLeft = showDrivePopupOnLeft match {
           case Some(v) => v
