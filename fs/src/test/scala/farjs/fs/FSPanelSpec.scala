@@ -13,7 +13,7 @@ import scala.scalajs.js
 class FSPanelSpec extends TestSpec with TestRendererUtils with OptionValues {
 
   FSPanel.fileListPanelComp = "FileListPanel".asInstanceOf[ReactClass]
-  FSPanel.fsFreeSpaceComp = mockUiComponent("FSFreeSpace")
+  FSPanel.fsFreeSpaceComp = "FSFreeSpace".asInstanceOf[ReactClass]
   FSPanel.fsService = new FsService().fsService
   FSPanel.fsFoldersHistory = "FSFoldersHistory".asInstanceOf[ReactClass]
 
@@ -90,7 +90,7 @@ class FSPanelSpec extends TestSpec with TestRendererUtils with OptionValues {
           resState shouldBe state
       }))(),
 
-      <(fsFreeSpaceComp())(^.assertPlain[FSFreeSpaceProps](inside(_) {
+      <(fsFreeSpaceComp)(^.assertPlain[FSFreeSpaceProps](inside(_) {
         case FSFreeSpaceProps(resDispatch, currDir) =>
           resDispatch shouldBe dispatch
           currDir shouldBe props.state.currDir

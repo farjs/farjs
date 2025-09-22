@@ -10,7 +10,7 @@ import scala.scalajs.js
 object FSPanel extends FunctionComponent[FileListPanelProps] {
 
   private[fs] var fileListPanelComp: ReactClass = FileListPanel
-  private[fs] var fsFreeSpaceComp: UiComponent[FSFreeSpaceProps] = FSFreeSpace
+  private[fs] var fsFreeSpaceComp: ReactClass = FSFreeSpace
   private[fs] var fsService: FSService = FSService.instance
   private[fs] var fsFoldersHistory: ReactClass = FSFoldersHistory
   
@@ -36,7 +36,7 @@ object FSPanel extends FunctionComponent[FileListPanelProps] {
     <.>()(
       <(fileListPanelComp)(^.plain := FileListPanelProps.copy(props)(onKeypress = onKeypress))(),
 
-      <(fsFreeSpaceComp())(^.plain := FSFreeSpaceProps(
+      <(fsFreeSpaceComp)(^.plain := FSFreeSpaceProps(
         dispatch = props.dispatch,
         currDir = props.state.currDir
       ))(),

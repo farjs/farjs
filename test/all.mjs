@@ -38,6 +38,7 @@ await import("./fs/popups/FolderShortcutsService.test.mjs");
 await import("./fs/popups/MockFolderShortcutsService.test.mjs");
 await import("./fs/FSDisk.test.mjs");
 await import("./fs/FSFoldersHistory.test.mjs");
+await import("./fs/FSFreeSpace.test.mjs");
 await import("./fs/FSService.test.mjs");
 await import("./fs/FSServices.test.mjs");
 await import("./fs/MockFSService.test.mjs");
