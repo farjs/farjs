@@ -10,7 +10,7 @@ import scala.scalajs.js
 class FSPlugin(reducer: js.Function2[FileListState, js.Any, FileListState])
   extends FileListPlugin(js.Array("M-l", "M-r", "M-h", "C-d")) {
 
-  val component: ReactClass = FileListPanelController(FSPanel.apply())
+  val component: ReactClass = FileListPanelController(FSPanel)
 
   def init(parentDispatch: Dispatch, stack: PanelStack): Unit = {
     stack.updateFor[FileListState](component, { item =>
