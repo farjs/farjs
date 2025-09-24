@@ -89,12 +89,13 @@ class FSPluginSpec extends AsyncTestSpec with OptionValues {
     )).map(_ => Succeeded)
   }
 
-  it should "return Some(ui) if trigger key when createUi" in {
+  it should "return Some(ui) if trigger key when createUiOptions" in {
     //when & then
-    inside(FSPlugin.createUi("M-l")) { case Some(FSPluginUi(Some(true), false, false)) => }
-    inside(FSPlugin.createUi("M-r")) { case Some(FSPluginUi(Some(false), false, false)) => }
-    inside(FSPlugin.createUi("M-h")) { case Some(FSPluginUi(None, true, false)) => }
-    inside(FSPlugin.createUi("C-d")) { case Some(FSPluginUi(None, false, true)) => }
+    inside(FSPlugin.createUiOptions("M-l")) { case Some(FSPluginUiOptions(Some(true), false, false)) => }
+    inside(FSPlugin.createUiOptions("M-r")) { case Some(FSPluginUiOptions(Some(false), false, false)) => }
+    inside(FSPlugin.createUiOptions("M-h")) { case Some(FSPluginUiOptions(None, true, false)) => }
+    inside(FSPlugin.createUiOptions("C-d")) { case Some(FSPluginUiOptions(None, false, true)) => }
+    inside(FSPlugin.createUiOptions("unknown")) { case None => }
     Succeeded
   }
 }

@@ -43,18 +43,18 @@ class FSPlugin(reducer: js.Function2[FileListState, js.Any, FileListState])
                             stacks: WithStacksProps,
                             data: js.UndefOr[js.Dynamic] = js.undefined): js.Promise[js.UndefOr[ReactClass]] = {
 
-    js.Promise.resolve[js.UndefOr[ReactClass]](createUi(key).map(_.apply()) match {
+    js.Promise.resolve[js.UndefOr[ReactClass]](createUiOptions(key).map(FSPluginUi(_)) match {
       case Some(r) => r
       case None => js.undefined
     })
   }
   
-  private[fs] final def createUi(key: String): Option[FSPluginUi] = {
+  private[fs] final def createUiOptions(key: String): Option[FSPluginUiOptions] = {
     key match {
-      case "M-l" => Some(new FSPluginUi(showDrivePopupOnLeft = Some(true)))
-      case "M-r" => Some(new FSPluginUi(showDrivePopupOnLeft = Some(false)))
-      case "M-h" => Some(new FSPluginUi(showFoldersHistoryPopup = true))
-      case "C-d" => Some(new FSPluginUi(showFolderShortcutsPopup = true))
+      case "M-l" => Some(FSPluginUiOptions(showDrivePopupOnLeft = true, showFoldersHistoryPopup = false, showFolderShortcutsPopup = false))
+      case "M-r" => Some(FSPluginUiOptions(showDrivePopupOnLeft = false, showFoldersHistoryPopup = false, showFolderShortcutsPopup = false))
+      case "M-h" => Some(FSPluginUiOptions(showDrivePopupOnLeft = js.undefined, showFoldersHistoryPopup = true, showFolderShortcutsPopup = false))
+      case "C-d" => Some(FSPluginUiOptions(showDrivePopupOnLeft = js.undefined, showFoldersHistoryPopup = false, showFolderShortcutsPopup = true))
       case _ => None
     }
   }

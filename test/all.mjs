@@ -40,6 +40,7 @@ await import("./fs/FSDisk.test.mjs");
 await import("./fs/FSFoldersHistory.test.mjs");
 await import("./fs/FSFreeSpace.test.mjs");
 await import("./fs/FSPanel.test.mjs");
+await import("./fs/FSPluginUi.test.mjs");
 await import("./fs/FSService.test.mjs");
 await import("./fs/FSServices.test.mjs");
 await import("./fs/MockFSService.test.mjs");

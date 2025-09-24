@@ -18,4 +18,11 @@ package object fs {
   @js.native
   @JSImport("../fs/FSPanel.mjs", JSImport.Default)
   object FSPanel extends ReactClass
+
+  @js.native
+  @JSImport("../fs/FSPluginUi.mjs", JSImport.Default)
+  object FSPluginUi extends js.Function1[FSPluginUiOptions, ReactClass] {
+
+    override def apply(options: FSPluginUiOptions): ReactClass = js.native
+  }
 }
