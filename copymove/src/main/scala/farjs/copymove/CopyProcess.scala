@@ -18,7 +18,7 @@ import scala.util.{Failure, Success}
 object CopyProcess extends FunctionComponent[CopyProcessProps] {
 
   private[copymove] var copyProgressPopup: UiComponent[CopyProgressPopupProps] = CopyProgressPopup
-  private[copymove] var fileExistsPopup: UiComponent[FileExistsPopupProps] = FileExistsPopup
+  private[copymove] var fileExistsPopup: ReactClass = FileExistsPopup
   private[copymove] var messageBoxComp: ReactClass = MessageBox
   
   private[copymove] var timers: Timers = nodejs.global
@@ -175,7 +175,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
       ))(),
 
       state.existing.map { existing =>
-        <(fileExistsPopup())(^.plain := FileExistsPopupProps(
+        <(fileExistsPopup)(^.plain := FileExistsPopupProps(
           newItem = d.item,
           existing = existing,
           onAction = { action =>
