@@ -29,7 +29,7 @@ import scala.scalajs.js.UndefOr
 
 class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  CopyProcess.copyProgressPopup = mockUiComponent("CopyProgressPopup")
+  CopyProcess.copyProgressPopup = "CopyProgressPopup".asInstanceOf[ReactClass]
   CopyProcess.fileExistsPopup = "FileExistsPopup".asInstanceOf[ReactClass]
   CopyProcess.messageBoxComp = "MessageBox".asInstanceOf[ReactClass]
   
@@ -94,13 +94,19 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     for (_ <- 1 to 10) {
       onTimer()
     }
-    findComponentProps(renderer.root, copyProgressPopup, plain = true).timeSeconds shouldBe 1
+    val progressProps = inside(findComponents(renderer.root, copyProgressPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyProgressPopupProps]
+    }
+    progressProps.timeSeconds shouldBe 1
     
     //when & then
     for (_ <- 1 to 10) {
       onTimer()
     }
-    findComponentProps(renderer.root, copyProgressPopup, plain = true).timeSeconds shouldBe 2
+    val progressProps2 = inside(findComponents(renderer.root, copyProgressPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyProgressPopupProps]
+    }
+    progressProps2.timeSeconds shouldBe 2
     
     //then
     clearIntervalMock.expects(timerId)
@@ -138,12 +144,17 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       timerId
     }
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.plain := props)()))
-    val progressProps = findComponentProps(renderer.root, copyProgressPopup, plain = true)
+    val progressProps = inside(findComponents(renderer.root, copyProgressPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyProgressPopupProps]
+    }
     progressProps.onCancel()
 
     //when & then
     onTimer()
-    findComponentProps(renderer.root, copyProgressPopup, plain = true).timeSeconds shouldBe 0
+    val progressProps2 = inside(findComponents(renderer.root, copyProgressPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyProgressPopupProps]
+    }
+    progressProps2.timeSeconds shouldBe 0
     
     //cleanup
     clearIntervalMock.expects(timerId)
@@ -182,7 +193,9 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     eventually {
       onProgressFn should not be null
     }.flatMap { _ =>
-      val progressProps = findComponentProps(renderer.root, copyProgressPopup, plain = true)
+      val progressProps = inside(findComponents(renderer.root, copyProgressPopup)) {
+        case List(c) => c.props.asInstanceOf[CopyProgressPopupProps]
+      }
       progressProps.onCancel()
       val cancelProps = inside(findComponents(renderer.root, messageBoxComp)) {
         case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
@@ -222,7 +235,9 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val props = CopyProcessProps(from, to, move = false,
       "/from/path", js.Array(), "/to/path", 12345, _ => (), () => ())
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.plain := props)()))
-    val progressProps = findComponentProps(renderer.root, copyProgressPopup, plain = true)
+    val progressProps = inside(findComponents(renderer.root, copyProgressPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyProgressPopupProps]
+    }
     progressProps.onCancel()
     val cancelProps = inside(findComponents(renderer.root, messageBoxComp)) {
       case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
@@ -246,7 +261,9 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
     val props = CopyProcessProps(from, to, move = false,
       "/from/path", js.Array(), "/to/path", 12345, _ => (), () => ())
     val renderer = createTestRenderer(withThemeContext(<(CopyProcess())(^.plain := props)()))
-    val progressProps = findComponentProps(renderer.root, copyProgressPopup, plain = true)
+    val progressProps = inside(findComponents(renderer.root, copyProgressPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyProgressPopupProps]
+    }
 
     //when
     progressProps.onCancel()
@@ -715,7 +732,9 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
       onProgressFn should not be null
     }.flatMap { _ =>
       //when
-      val progressProps = findComponentProps(renderer.root, copyProgressPopup, plain = true)
+      val progressProps = inside(findComponents(renderer.root, copyProgressPopup)) {
+        case List(c) => c.props.asInstanceOf[CopyProgressPopupProps]
+      }
       progressProps.onCancel()
       
       //then
@@ -1135,7 +1154,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
 
     renderer.update(withThemeContext(<(CopyProcess())(^.plain := props)()))
 
-    assertTestComponent(renderer.root.children.head, copyProgressPopup, plain = true) {
+    assertNativeComponent(renderer.root.children.head, <(copyProgressPopup)(^.assertPlain[CopyProgressPopupProps](inside(_) {
       case CopyProgressPopupProps(
         move,
         resItem,
@@ -1157,7 +1176,7 @@ class CopyProcessSpec extends AsyncTestSpec with BaseTestSpec with TestRendererU
         timeSeconds shouldBe 0
         leftSeconds shouldBe 0
         bytesPerSecond shouldBe 0
-    }
+    }))())
   }
 }
 

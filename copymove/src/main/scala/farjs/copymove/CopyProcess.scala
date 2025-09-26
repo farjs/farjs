@@ -17,7 +17,7 @@ import scala.util.{Failure, Success}
 
 object CopyProcess extends FunctionComponent[CopyProcessProps] {
 
-  private[copymove] var copyProgressPopup: UiComponent[CopyProgressPopupProps] = CopyProgressPopup
+  private[copymove] var copyProgressPopup: ReactClass = CopyProgressPopup
   private[copymove] var fileExistsPopup: ReactClass = FileExistsPopup
   private[copymove] var messageBoxComp: ReactClass = MessageBox
   
@@ -158,7 +158,7 @@ object CopyProcess extends FunctionComponent[CopyProcessProps] {
     val bytesPerSecond = divide(d.total + d.itemBytes, timeSeconds)
     
     <.>()(
-      <(copyProgressPopup())(^.plain := CopyProgressPopupProps(
+      <(copyProgressPopup)(^.plain := CopyProgressPopupProps(
         move = props.move,
         item = d.item.name,
         to = d.to,
