@@ -323,9 +323,57 @@ describe("CopyItemsPopup.test.mjs", () => {
     assert.deepEqual(onAction.times, 0);
   });
 
-  it("should render component when copy", async () => {
+  it("should render component when copy single item", async () => {
     //given
-    const props = getCopyItemsPopupProps({ move: false });
+    const props = getCopyItemsPopupProps({
+      move: false,
+      items: [FileListItem("file 1")],
+    });
+    let getArgs = /** @type {any[]} */ ([]);
+    const get = mockFunction((...args) => {
+      getArgs = args;
+      return getP;
+    });
+    const getAll = mockFunction(() => getAllP);
+    const service = new MockHistoryService({ getAll });
+    const provider = new MockHistoryProvider({ get });
+    const items = ["path", "path 2"];
+    /** @type {readonly History[]} */
+    const historyItems = items.map((_) => {
+      return { item: _ };
+    });
+    const getP = Promise.resolve(service);
+    const getAllP = Promise.resolve(historyItems);
+
+    //when
+    const result = (
+      await actAsync(() => {
+        return TestRenderer.create(
+          withHistoryProvider(
+            withThemeContext(h(CopyItemsPopup, props)),
+            provider
+          )
+        );
+      })
+    ).root;
+
+    //then
+    await getP;
+    await getAllP;
+    assert.deepEqual(get.times, 1);
+    assert.deepEqual(getArgs, [CopyItemsPopup.copyItemsHistoryKind]);
+    assert.deepEqual(getAll.times, 1);
+
+    //then
+    assertCopyItemsPopup(result, props, items, ["[ Copy ]", "[ Cancel ]"]);
+  });
+
+  it("should render component when copy multiple items", async () => {
+    //given
+    const props = getCopyItemsPopupProps({
+      move: false,
+      items: [FileListItem("file 1"), FileListItem("file 2")],
+    });
     let getArgs = /** @type {any[]} */ ([]);
     const get = mockFunction((...args) => {
       getArgs = args;
@@ -367,7 +415,7 @@ describe("CopyItemsPopup.test.mjs", () => {
 
   it("should render component when move", async () => {
     //given
-    const props = getCopyItemsPopupProps({ move: true });
+    const props = getCopyItemsPopupProps({ move: true, items: [] });
     let getArgs = /** @type {any[]} */ ([]);
     const get = mockFunction((...args) => {
       getArgs = args;
