@@ -5,7 +5,7 @@ import farjs.copymove.CopyMoveUiAction._
 import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.history.{History, HistoryKind, HistoryProvider}
+import farjs.filelist.history.{History, HistoryProvider}
 import farjs.ui.popup._
 import farjs.ui.task.{Task, TaskAction}
 import farjs.ui.theme.Theme
@@ -20,10 +20,8 @@ import scala.util.Success
 
 object CopyMoveUi {
 
-  val copyItemsHistoryKind: HistoryKind = HistoryKind("farjs.copyItems", 50)
-
   private[copymove] var copyItemsStats: UiComponent[CopyItemsStatsProps] = CopyItemsStats
-  private[copymove] var copyItemsPopup: UiComponent[CopyItemsPopupProps] = CopyItemsPopup
+  private[copymove] var copyItemsPopup: ReactClass = CopyItemsPopup
   private[copymove] var copyProcessComp: UiComponent[CopyProcessProps] = CopyProcess
   private[copymove] var messageBoxComp: ReactClass = MessageBox
   private[copymove] var moveProcessComp: UiComponent[MoveProcessProps] = MoveProcess
@@ -64,7 +62,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
       props.onClose()
 
       for {
-        copyItemsHistory <- historyProvider.get(copyItemsHistoryKind).toFuture
+        copyItemsHistory <- historyProvider.get(CopyItemsPopup.copyItemsHistoryKind).toFuture
         _ <- copyItemsHistory.save(History(path, js.undefined)).toFuture
       } yield ()
 
@@ -144,7 +142,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
 
     <.>()(
       if (showPopup) Some {
-        <(copyItemsPopup())(^.plain := CopyItemsPopupProps(
+        <(copyItemsPopup)(^.plain := CopyItemsPopupProps(
           move = isMove,
           path =
             if (!isInplace) maybeTo.map(_.state.currDir.path).getOrElse("")

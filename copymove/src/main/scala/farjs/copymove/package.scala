@@ -1,11 +1,19 @@
 package farjs
 
+import farjs.filelist.history.HistoryKind
 import scommons.react.ReactClass
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport
 
 package object copymove {
+
+  @js.native
+  @JSImport("../copymove/CopyItemsPopup.mjs", JSImport.Default)
+  object CopyItemsPopup extends ReactClass {
+
+    val copyItemsHistoryKind: HistoryKind = js.native
+  }
 
   @js.native
   @JSImport("../copymove/CopyProgressPopup.mjs", JSImport.Default)

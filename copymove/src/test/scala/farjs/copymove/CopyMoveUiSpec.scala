@@ -1,5 +1,6 @@
 package farjs.copymove
 
+import farjs.copymove.CopyItemsPopup.copyItemsHistoryKind
 import farjs.copymove.CopyMoveUi._
 import farjs.copymove.CopyMoveUiAction._
 import farjs.copymove.CopyMoveUiSpec._
@@ -26,7 +27,7 @@ import scala.scalajs.js
 class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
   CopyMoveUi.copyItemsStats = mockUiComponent("CopyItemsStats")
-  CopyMoveUi.copyItemsPopup = mockUiComponent("CopyItemsPopup")
+  CopyMoveUi.copyItemsPopup = "CopyItemsPopup".asInstanceOf[ReactClass]
   CopyMoveUi.copyProcessComp = mockUiComponent("CopyProcess")
   CopyMoveUi.messageBoxComp = "MessageBox".asInstanceOf[ReactClass]
   CopyMoveUi.moveProcessComp = mockUiComponent("MoveProcess")
@@ -83,7 +84,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       maybeTo = Some(FileListData(toDispatch, toActions, toState))
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
-    val copyPopup = findComponentProps(renderer.root, copyItemsPopup, plain = true)
+    val copyPopup = inside(findComponents(renderer.root, copyItemsPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyItemsPopupProps]
+    }
     val toDir = FileListDir("/to/path", isRoot = false, js.Array())
     val to = "test to path"
 
@@ -138,7 +141,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       maybeTo = Some(FileListData(toDispatch, toActions, toState))
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
-    val copyPopup = findComponentProps(renderer.root, copyItemsPopup, plain = true)
+    val copyPopup = inside(findComponents(renderer.root, copyItemsPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyItemsPopupProps]
+    }
     val toDir = FileListDir("/to/path", isRoot = false, js.Array())
     val to = "test to path"
 
@@ -195,7 +200,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       maybeTo = Some(FileListData(toDispatch, toActions, toState))
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
-    val copyPopup = findComponentProps(renderer.root, copyItemsPopup, plain = true)
+    val copyPopup = inside(findComponents(renderer.root, copyItemsPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyItemsPopupProps]
+    }
 
     //then
     onClose.expects()
@@ -224,7 +231,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       maybeTo = Some(FileListData(toDispatch, toActions, toState))
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
-    val copyPopup = findComponentProps(renderer.root, copyItemsPopup, plain = true)
+    val copyPopup = inside(findComponents(renderer.root, copyItemsPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyItemsPopupProps]
+    }
     val toDir = FileListDir("/folder", isRoot = false, js.Array())
     val to = "test to path"
 
@@ -280,7 +289,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       maybeTo = Some(FileListData(toDispatch, toActions, toState))
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
-    val copyPopup = findComponentProps(renderer.root, copyItemsPopup, plain = true)
+    val copyPopup = inside(findComponents(renderer.root, copyItemsPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyItemsPopupProps]
+    }
     val toDir = FileListDir(path.join("folder", "dir 1"), isRoot = false, js.Array())
     val to = "test to path"
 
@@ -338,7 +349,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       maybeTo = Some(FileListData(toDispatch, toActions, toState))
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
-    val copyPopup = findComponentProps(renderer.root, copyItemsPopup, plain = true)
+    val copyPopup = inside(findComponents(renderer.root, copyItemsPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyItemsPopupProps]
+    }
     val toDir = FileListDir(path.join("folder", "dir 1", "dir 2"), isRoot = false, js.Array())
     val to = "test to path"
 
@@ -397,7 +410,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       maybeTo = Some(FileListData(toDispatch, toActions, toState))
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
-    val copyPopup = findComponentProps(renderer.root, copyItemsPopup, plain = true)
+    val copyPopup = inside(findComponents(renderer.root, copyItemsPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyItemsPopupProps]
+    }
     val toDir = FileListDir("/to/path", isRoot = false, js.Array())
     val to = "test to path"
     val driveRoot = "same"
@@ -449,7 +464,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       maybeTo = Some(FileListData(toDispatch, toActions, toState))
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
-    val copyPopup = findComponentProps(renderer.root, copyItemsPopup, plain = true)
+    val copyPopup = inside(findComponents(renderer.root, copyItemsPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyItemsPopupProps]
+    }
     val to = "test to path"
 
     //when
@@ -489,7 +506,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       maybeTo = Some(FileListData(toDispatch, toActions, toState))
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
-    val copyPopup = findComponentProps(renderer.root, copyItemsPopup, plain = true)
+    val copyPopup = inside(findComponents(renderer.root, copyItemsPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyItemsPopupProps]
+    }
     val to = "test to path"
 
     //when
@@ -538,7 +557,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       maybeTo = Some(FileListData(toDispatch, toActions, toState))
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
-    val copyPopup = findComponentProps(renderer.root, copyItemsPopup, plain = true)
+    val copyPopup = inside(findComponents(renderer.root, copyItemsPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyItemsPopupProps]
+    }
     val toDir = FileListDir("/folder/dir to", isRoot = false, js.Array())
     val to = "test to path"
 
@@ -602,7 +623,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       maybeTo = Some(FileListData(toDispatch, toActions, toState))
     )
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)()))
-    val copyPopup = findComponentProps(renderer.root, copyItemsPopup, plain = true)
+    val copyPopup = inside(findComponents(renderer.root, copyItemsPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyItemsPopupProps]
+    }
     val to = "test/to/path"
 
     //when
@@ -658,7 +681,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )
     val historyMocks = new HistoryMocks
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)(), historyMocks.provider))
-    val copyPopup = findComponentProps(renderer.root, copyItemsPopup, plain = true)
+    val copyPopup = inside(findComponents(renderer.root, copyItemsPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyItemsPopupProps]
+    }
 
     val toDir = FileListDir("/to/path/dir 1", isRoot = false, js.Array())
     val to = "test to path"
@@ -752,7 +777,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     )
     val historyMocks = new HistoryMocks
     val renderer = createTestRenderer(withContext(<(copyMoveUi())(^.plain := props)(), historyMocks.provider))
-    val copyPopup = findComponentProps(renderer.root, copyItemsPopup, plain = true)
+    val copyPopup = inside(findComponents(renderer.root, copyItemsPopup)) {
+      case List(c) => c.props.asInstanceOf[CopyItemsPopupProps]
+    }
     val to = "test to path"
     copyPopup.onAction(to)
 
@@ -825,12 +852,12 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     inside(renderer.root.children.toList) { case List(result) =>
-      assertTestComponent(result, copyItemsPopup, plain = true) {
+      assertNativeComponent(result, <(copyItemsPopup)(^.assertPlain[CopyItemsPopupProps](inside(_) {
         case CopyItemsPopupProps(move, path, items, _, _) =>
           move shouldBe false
           path shouldBe "/test-path"
           items.toList shouldBe Seq(item)
-      }
+      }))())
     }
   }
 
@@ -856,12 +883,12 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     inside(renderer.root.children.toList) { case List(result) =>
-      assertTestComponent(result, copyItemsPopup, plain = true) {
+      assertNativeComponent(result, <(copyItemsPopup)(^.assertPlain[CopyItemsPopupProps](inside(_) {
         case CopyItemsPopupProps(move, path, items, _, _) =>
           move shouldBe false
           path shouldBe item.name
           items.toList shouldBe Seq(item)
-      }
+      }))())
     }
   }
 
@@ -893,12 +920,12 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     inside(renderer.root.children.toList) { case List(result) =>
-      assertTestComponent(result, copyItemsPopup, plain = true) {
+      assertNativeComponent(result, <(copyItemsPopup)(^.assertPlain[CopyItemsPopupProps](inside(_) {
         case CopyItemsPopupProps(move, path, resItems, _, _) =>
           move shouldBe true
           path shouldBe "/folder"
           resItems.toList shouldBe items.toList
-      }
+      }))())
     }
   }
 
@@ -930,12 +957,12 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     inside(renderer.root.children.toList) { case List(result) =>
-      assertTestComponent(result, copyItemsPopup, plain = true) {
+      assertNativeComponent(result, <(copyItemsPopup)(^.assertPlain[CopyItemsPopupProps](inside(_) {
         case CopyItemsPopupProps(move, path, resItems, _, _) =>
           move shouldBe true
           path shouldBe "/folder"
           resItems.toList shouldBe items.toList
-      }
+      }))())
     }
   }
 
@@ -968,12 +995,12 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     inside(renderer.root.children.toList) { case List(result) =>
-      assertTestComponent(result, copyItemsPopup, plain = true) {
+      assertNativeComponent(result, <(copyItemsPopup)(^.assertPlain[CopyItemsPopupProps](inside(_) {
         case CopyItemsPopupProps(move, path, resItems, _, _) =>
           move shouldBe true
           path shouldBe item.name
           resItems.toList shouldBe List(item)
-      }
+      }))())
     }
   }
 }
