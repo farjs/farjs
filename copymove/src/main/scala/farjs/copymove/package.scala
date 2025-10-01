@@ -16,6 +16,10 @@ package object copymove {
   }
 
   @js.native
+  @JSImport("../copymove/CopyItemsStats.mjs", JSImport.Default)
+  object CopyItemsStats extends ReactClass
+
+  @js.native
   @JSImport("../copymove/CopyProgressPopup.mjs", JSImport.Default)
   object CopyProgressPopup extends ReactClass
 

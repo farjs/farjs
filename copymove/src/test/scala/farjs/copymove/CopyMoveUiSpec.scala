@@ -26,7 +26,7 @@ import scala.scalajs.js
 
 class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  CopyMoveUi.copyItemsStats = mockUiComponent("CopyItemsStats")
+  CopyMoveUi.copyItemsStats = "CopyItemsStats".asInstanceOf[ReactClass]
   CopyMoveUi.copyItemsPopup = "CopyItemsPopup".asInstanceOf[ReactClass]
   CopyMoveUi.copyProcessComp = mockUiComponent("CopyProcess")
   CopyMoveUi.messageBoxComp = "MessageBox".asInstanceOf[ReactClass]
@@ -104,19 +104,21 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     eventually {
-      assertTestComponent(renderer.root.children(0), copyItemsStats, plain = true) {
+      assertNativeComponent(renderer.root.children(0), <(copyItemsStats)(^.assertPlain[CopyItemsStatsProps](inside(_) {
         case CopyItemsStatsProps(_, resActions, fromPath, items, title, _, _) =>
           resActions shouldBe actions.actions
           fromPath shouldBe currDir.path
           items.toList shouldBe currDir.items.toList
           title shouldBe "Copy"
-      }
+      }))())
     }.map { _ =>
       //then
       onClose.expects()
 
       //when
-      findComponentProps(renderer.root, copyItemsStats, plain = true).onCancel()
+      inside(findComponents(renderer.root, copyItemsStats)) {
+        case List(c) => c.props.asInstanceOf[CopyItemsStatsProps].onCancel()
+      }
       
       Succeeded
     }
@@ -163,19 +165,21 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
     //then
     eventually {
-      assertTestComponent(renderer.root.children(0), copyItemsStats, plain = true) {
+      assertNativeComponent(renderer.root.children(0), <(copyItemsStats)(^.assertPlain[CopyItemsStatsProps](inside(_) {
         case CopyItemsStatsProps(_, resActions, fromPath, items, title, _, _) =>
           resActions shouldBe actions.actions
           fromPath shouldBe currDir.path
           items.toList shouldBe currDir.items.toList
           title shouldBe "Move"
-      }
+      }))())
     }.map { _ =>
       //then
       onClose.expects()
 
       //when
-      findComponentProps(renderer.root, copyItemsStats, plain = true).onCancel()
+      inside(findComponents(renderer.root, copyItemsStats)) {
+        case List(c) => c.props.asInstanceOf[CopyItemsStatsProps].onCancel()
+      }
 
       Succeeded
     }
@@ -515,7 +519,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     copyPopup.onAction(to)
 
     //then
-    eventually(findComponentProps(renderer.root, copyItemsStats, plain = true)).map { statsPopup =>
+    eventually(inside(findComponents(renderer.root, copyItemsStats)) {
+      case List(c) => c.props.asInstanceOf[CopyItemsStatsProps]
+    }).map { statsPopup =>
       val total = 123456789
       statsPopup.onDone(total)
 
@@ -578,7 +584,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     copyPopup.onAction(to)
 
     //then
-    eventually(findComponentProps(renderer.root, copyItemsStats, plain = true)).map { statsPopup =>
+    eventually(inside(findComponents(renderer.root, copyItemsStats)) {
+      case List(c) => c.props.asInstanceOf[CopyItemsStatsProps]
+    }).map { statsPopup =>
       val total = 123456789
       statsPopup.onDone(total)
 
@@ -632,7 +640,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     copyPopup.onAction(to)
 
     //then
-    eventually(findComponentProps(renderer.root, copyItemsStats, plain = true)).map { statsPopup =>
+    eventually(inside(findComponents(renderer.root, copyItemsStats)) {
+      case List(c) => c.props.asInstanceOf[CopyItemsStatsProps]
+    }).map { statsPopup =>
       val total = 123456789
       statsPopup.onDone(total)
 
@@ -697,7 +707,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     copyPopup.onAction(to)
     
     eventually {
-      val statsPopup = findComponentProps(renderer.root, copyItemsStats, plain = true)
+      val statsPopup = inside(findComponents(renderer.root, copyItemsStats)) {
+        case List(c) => c.props.asInstanceOf[CopyItemsStatsProps]
+      }
       statsPopup.onDone(123)
 
       findProps(renderer.root, copyProcessComp, plain = true) should not be empty
@@ -784,7 +796,9 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
     copyPopup.onAction(to)
 
     eventually {
-      val statsPopup = findComponentProps(renderer.root, copyItemsStats, plain = true)
+      val statsPopup = inside(findComponents(renderer.root, copyItemsStats)) {
+        case List(c) => c.props.asInstanceOf[CopyItemsStatsProps]
+      }
       statsPopup.onDone(123)
 
       findProps(renderer.root, copyProcessComp, plain = true) should not be empty

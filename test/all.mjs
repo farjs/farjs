@@ -2,6 +2,7 @@ await import("./app/service/HistoryProviderImpl.test.mjs");
 await import("./app/service/HistoryServiceImpl.test.mjs");
 
 await import("./copymove/CopyItemsPopup.test.mjs");
+await import("./copymove/CopyItemsStats.test.mjs");
 await import("./copymove/CopyProgressPopup.test.mjs");
 await import("./copymove/FileExistsPopup.test.mjs");
 

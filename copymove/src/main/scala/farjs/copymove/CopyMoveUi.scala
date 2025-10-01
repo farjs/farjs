@@ -20,7 +20,7 @@ import scala.util.Success
 
 object CopyMoveUi {
 
-  private[copymove] var copyItemsStats: UiComponent[CopyItemsStatsProps] = CopyItemsStats
+  private[copymove] var copyItemsStats: ReactClass = CopyItemsStats
   private[copymove] var copyItemsPopup: ReactClass = CopyItemsPopup
   private[copymove] var copyProcessComp: UiComponent[CopyProcessProps] = CopyProcess
   private[copymove] var messageBoxComp: ReactClass = MessageBox
@@ -161,7 +161,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
         ))()
       }
       else if (showStats) Some {
-        <(copyItemsStats())(^.plain := CopyItemsStatsProps(
+        <(copyItemsStats)(^.plain := CopyItemsStatsProps(
           dispatch = from.dispatch,
           actions = from.actions,
           fromPath = from.state.currDir.path,
