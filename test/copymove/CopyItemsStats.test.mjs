@@ -42,6 +42,10 @@ describe("CopyItemsStats.test.mjs", () => {
     const props = getCopyItemsStatsProps({
       dispatch,
       actions,
+      items: [
+        FileListItem("dir 1", true),
+        { ...FileListItem("file 1"), size: 10 },
+      ],
       onDone,
       onCancel,
     });
