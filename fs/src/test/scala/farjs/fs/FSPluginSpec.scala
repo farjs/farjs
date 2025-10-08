@@ -35,7 +35,7 @@ class FSPluginSpec extends AsyncTestSpec with OptionValues {
     //then
     inside(stackData.head) { case PanelStackItem(component, dispatch, actions, resState) =>
       component shouldBe plugin.component
-      actions shouldBe FSFileListActions
+      actions shouldBe FSFileListActions.instance
       val currState = inside(resState.toOption) {
         case Some(s) =>
           val state = s.asInstanceOf[FileListState]

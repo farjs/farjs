@@ -15,7 +15,7 @@ class FSPlugin(reducer: js.Function2[FileListState, js.Any, FileListState])
   def init(parentDispatch: Dispatch, stack: PanelStack): Unit = {
     stack.updateFor[FileListState](component, { item =>
       PanelStackItem.copy(initDispatch(parentDispatch, reducer, stack, item))(
-        actions = FSFileListActions,
+        actions = FSFileListActions.instance,
         state = FileListState()
       )
     })

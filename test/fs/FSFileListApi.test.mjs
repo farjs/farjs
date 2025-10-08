@@ -12,6 +12,7 @@ import FileListCapability from "@farjs/filelist/api/FileListCapability.mjs";
 import { stripPrefix } from "@farjs/filelist/utils.mjs";
 import MockFSService from "../../fs/MockFSService.mjs";
 import FSFileListApi from "../../fs/FSFileListApi.mjs";
+import FSFileListActions from "../../fs/FSFileListActions.mjs";
 
 const { describe, it } = await (async () => {
   // @ts-ignore
@@ -24,7 +25,7 @@ const { describe, it } = await (async () => {
 
 const { _toFileListItem } = FSFileListApi;
 
-const apiImp = new FSFileListApi();
+const apiImp = FSFileListActions.instance.api;
 const FSConstants = fs.constants;
 const fsMocks = {
   lstatSync: mockFunction(),
