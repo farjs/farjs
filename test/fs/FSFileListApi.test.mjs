@@ -721,15 +721,15 @@ describe("FSFileListApi.test.mjs", () => {
     function of(s) {
       return (
         flag(s[0], "d", FSConstants.S_IFDIR) |
-        flag(s[1], "r", FSConstants.S_IRUSR ?? 0) |
-        flag(s[2], "w", FSConstants.S_IWUSR ?? 0) |
-        flag(s[3], "x", FSConstants.S_IXUSR ?? 0) |
-        flag(s[4], "r", FSConstants.S_IRGRP ?? 0) |
-        flag(s[5], "w", FSConstants.S_IWGRP ?? 0) |
-        flag(s[6], "x", FSConstants.S_IXGRP ?? 0) |
-        flag(s[7], "r", FSConstants.S_IROTH ?? 0) |
-        flag(s[8], "w", FSConstants.S_IWOTH ?? 0) |
-        flag(s[9], "x", FSConstants.S_IXOTH ?? 0)
+        flag(s[1], "r", FSConstants.S_IRUSR) |
+        flag(s[2], "w", FSConstants.S_IWUSR) |
+        flag(s[3], "x", FSConstants.S_IXUSR) |
+        flag(s[4], "r", FSConstants.S_IRGRP) |
+        flag(s[5], "w", FSConstants.S_IWGRP) |
+        flag(s[6], "x", FSConstants.S_IXGRP) |
+        flag(s[7], "r", FSConstants.S_IROTH) |
+        flag(s[8], "w", FSConstants.S_IWOTH) |
+        flag(s[9], "x", FSConstants.S_IXOTH)
       );
     }
 

@@ -246,20 +246,20 @@ FSFileListApi._toFileListItem = (name, stats) => {
 
 const FSConstants = nodeFs.constants;
 const S_IFDIR = FSConstants.S_IFDIR;
-const S_IRUSR = FSConstants.S_IRUSR ?? 0;
-const S_IWUSR = FSConstants.S_IWUSR ?? 0;
-const S_IXUSR = FSConstants.S_IXUSR ?? 0;
-const S_IRGRP = FSConstants.S_IRGRP ?? 0;
-const S_IWGRP = FSConstants.S_IWGRP ?? 0;
-const S_IXGRP = FSConstants.S_IXGRP ?? 0;
-const S_IROTH = FSConstants.S_IROTH ?? 0;
-const S_IWOTH = FSConstants.S_IWOTH ?? 0;
-const S_IXOTH = FSConstants.S_IXOTH ?? 0;
+const S_IRUSR = FSConstants.S_IRUSR;
+const S_IWUSR = FSConstants.S_IWUSR;
+const S_IXUSR = FSConstants.S_IXUSR;
+const S_IRGRP = FSConstants.S_IRGRP;
+const S_IWGRP = FSConstants.S_IWGRP;
+const S_IXGRP = FSConstants.S_IXGRP;
+const S_IROTH = FSConstants.S_IROTH;
+const S_IWOTH = FSConstants.S_IWOTH;
+const S_IXOTH = FSConstants.S_IXOTH;
 
 /** @type {(dir: string) => boolean} */
 FSFileListApi._isRoot = (dir) => {
   const pathObj = path.parse(dir);
-  return pathObj.root === pathObj.dir && (pathObj.base ?? "").length === 0;
+  return pathObj.root === pathObj.dir && pathObj.base.length === 0;
 };
 
 /** @type {(mode: number) => string} */
