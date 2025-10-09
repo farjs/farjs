@@ -1,9 +1,9 @@
 package farjs.app.filelist
 
+import farjs.app.filelist.FileListRoot.FSServices
 import farjs.app.raw.BetterSqlite3Database
 import farjs.app.service.{FolderShortcutsServiceImpl, HistoryProviderImpl}
 import farjs.domain.dao._
-import farjs.fs.FSServices
 
 class FileListModule(db: BetterSqlite3Database) {
 

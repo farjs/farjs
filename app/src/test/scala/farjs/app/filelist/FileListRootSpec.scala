@@ -1,7 +1,7 @@
 package farjs.app.filelist
 
+import farjs.app.filelist.FileListRoot.FSServices
 import farjs.filelist.history.HistoryProvider
-import farjs.fs.FSServices
 import scommons.react._
 import scommons.react.raw.React
 import scommons.react.test._

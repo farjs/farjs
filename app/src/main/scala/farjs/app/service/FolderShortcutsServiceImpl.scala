@@ -1,7 +1,7 @@
 package farjs.app.service
 
+import farjs.app.filelist.FileListRoot.FolderShortcutsService
 import farjs.domain.dao.FolderShortcutDao
-import farjs.fs.popups.FolderShortcutsService
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport

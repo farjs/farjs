@@ -1,10 +1,10 @@
 package farjs.app.filelist
 
 import farjs.app.filelist.FileListBrowser._
+import farjs.app.filelist.FileListRoot.FSPlugin
 import farjs.filelist._
 import farjs.filelist.api._
 import farjs.filelist.stack._
-import farjs.fs.FSPlugin
 import farjs.ui.menu.BottomMenuProps
 import farjs.ui.task.{Task, TaskAction}
 import org.scalatest.{Assertion, Succeeded}

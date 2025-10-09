@@ -1,9 +1,9 @@
 package farjs.app
 
+import farjs.app.filelist.FileListRoot.FSFileListActions
 import farjs.app.filelist.{FileListModule, FileListRoot}
 import farjs.app.raw.BetterSqlite3Database
 import farjs.filelist.theme.FileListTheme
-import farjs.fs.FSFileListActions
 import farjs.ui.app._
 import farjs.ui.portal.WithPortals
 import farjs.ui.task.{TaskError, TaskManager}

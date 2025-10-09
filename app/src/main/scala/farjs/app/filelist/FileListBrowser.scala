@@ -1,8 +1,8 @@
 package farjs.app.filelist
 
+import farjs.app.filelist.FileListRoot.FSPlugin
 import farjs.filelist._
 import farjs.filelist.stack._
-import farjs.fs.FSPlugin
 import farjs.ui.Dispatch
 import farjs.ui.menu._
 import farjs.ui.task.{Task, TaskAction}
