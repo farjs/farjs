@@ -26,7 +26,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
   private[filelist] var withStackComp: ReactClass = WithStack
   private[filelist] var bottomMenuComp: ReactClass = BottomMenu
   private[filelist] var menuBarTrigger: ReactClass = MenuBarTrigger
-  private[filelist] var fsPlugin: FSPlugin = FSPlugin
+  private[filelist] var fsPlugin: FSPlugin = FSPlugin.instance
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.wrapped
@@ -201,7 +201,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
         }
         pluginRes.map { maybePluginItem =>
           maybePluginItem.foreach { item =>
-            stack.push(FSPlugin.initDispatch(dispatch, FileListStateReducer, stack, item))
+            stack.push(FSPlugin.instance.initDispatch(dispatch, FileListStateReducer, stack, item))
           }
         }
       }

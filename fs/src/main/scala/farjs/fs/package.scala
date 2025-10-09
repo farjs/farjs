@@ -16,14 +16,6 @@ package object fs {
   }
 
   @js.native
-  @JSImport("../fs/FSFoldersHistory.mjs", JSImport.Default)
-  object FSFoldersHistory extends ReactClass
-
-  @js.native
-  @JSImport("../fs/FSFreeSpace.mjs", JSImport.Default)
-  object FSFreeSpace extends ReactClass
-
-  @js.native
   @JSImport("../fs/FSPanel.mjs", JSImport.Default)
   object FSPanel extends ReactClass
 

@@ -6,58 +6,27 @@ import farjs.ui.Dispatch
 import scommons.react.ReactClass
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
+@js.native
+@JSImport("../fs/FSPlugin.mjs", JSImport.Default)
 class FSPlugin(reducer: js.Function2[FileListState, js.Any, FileListState])
-  extends FileListPlugin(js.Array("M-l", "M-r", "M-h", "C-d")) {
+  extends FileListPlugin(js.native) {
 
-  val component: ReactClass = FileListPanelController(FSPanel)
+  val component: ReactClass = js.native
 
-  def init(parentDispatch: Dispatch, stack: PanelStack): Unit = {
-    stack.updateFor[FileListState](component, { item =>
-      PanelStackItem.copy(initDispatch(parentDispatch, reducer, stack, item))(
-        actions = FSFileListActions.instance,
-        state = FileListState()
-      )
-    })
-  }
+  def init(parentDispatch: Dispatch, stack: PanelStack): Unit = js.native
 
   def initDispatch(parentDispatch: Dispatch,
                    reducer: js.Function2[FileListState, js.Any, FileListState],
                    stack: PanelStack,
                    item: PanelStackItem[FileListState]
-                  ): PanelStackItem[FileListState] = {
-
-    val dispatch: js.Function1[js.Any, Unit] = { action =>
-      stack.updateFor[FileListState](item.component, { item =>
-        item.updateState { state =>
-          reducer(state, action)
-        }
-      })
-      parentDispatch(action)
-    }
-
-    PanelStackItem.copy(item)(dispatch = dispatch)
-  }
-
-  override def onKeyTrigger(key: String,
-                            stacks: WithStacksProps,
-                            data: js.UndefOr[js.Dynamic] = js.undefined): js.Promise[js.UndefOr[ReactClass]] = {
-
-    js.Promise.resolve[js.UndefOr[ReactClass]](createUiOptions(key).map(FSPluginUi(_)) match {
-      case Some(r) => r
-      case None => js.undefined
-    })
-  }
-  
-  private[fs] final def createUiOptions(key: String): Option[FSPluginUiOptions] = {
-    key match {
-      case "M-l" => Some(FSPluginUiOptions(showDrivePopupOnLeft = true, showFoldersHistoryPopup = false, showFolderShortcutsPopup = false))
-      case "M-r" => Some(FSPluginUiOptions(showDrivePopupOnLeft = false, showFoldersHistoryPopup = false, showFolderShortcutsPopup = false))
-      case "M-h" => Some(FSPluginUiOptions(showDrivePopupOnLeft = js.undefined, showFoldersHistoryPopup = true, showFolderShortcutsPopup = false))
-      case "C-d" => Some(FSPluginUiOptions(showDrivePopupOnLeft = js.undefined, showFoldersHistoryPopup = false, showFolderShortcutsPopup = true))
-      case _ => None
-    }
-  }
+                  ): PanelStackItem[FileListState] = js.native
 }
 
-object FSPlugin extends FSPlugin(FileListStateReducer)
+@js.native
+@JSImport("../fs/FSPlugin.mjs", JSImport.Default)
+object FSPlugin extends js.Object {
+
+  val instance: FSPlugin = js.native
+}

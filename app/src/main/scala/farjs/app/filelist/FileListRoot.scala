@@ -54,7 +54,7 @@ object FileListRoot {
     ArchiverPlugin,
     ViewerPlugin,
     CopyMovePlugin,
-    FSPlugin,
+    FSPlugin.instance,
     FileListUiPlugin,
     FilePlugin
   )
