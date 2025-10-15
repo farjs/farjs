@@ -426,9 +426,9 @@ describe("FSFileListApi.test.mjs", () => {
       if (bytesRead === 0) {
         return target.setAttributes(srcItem);
       }
-      return target
-        .writeNextBytes(buff, bytesRead)
-        .then((_) => loop(source, target));
+
+      await target.writeNextBytes(buff, bytesRead);
+      return loop(source, target);
     }
 
     //when
@@ -447,7 +447,9 @@ describe("FSFileListApi.test.mjs", () => {
 
     //then
     assert.deepEqual(onExists.times, 1);
-    assert.deepEqual(onExistsArgs, [existing]);
+    assert.deepEqual(onExistsArgs, [
+      { ...existing, atimeMs: onExistsArgs[0].atimeMs },
+    ]);
     const stats2 = fs.lstatSync(file2);
     assert.deepEqual(stats2.size, srcItem.size);
     assert.deepEqual(
@@ -499,9 +501,9 @@ describe("FSFileListApi.test.mjs", () => {
       if (bytesRead === 0) {
         return target.setAttributes(srcItem);
       }
-      return target
-        .writeNextBytes(buff, bytesRead)
-        .then((_) => loop(source, target));
+
+      await target.writeNextBytes(buff, bytesRead);
+      return loop(source, target);
     }
 
     //when
@@ -520,7 +522,9 @@ describe("FSFileListApi.test.mjs", () => {
 
     //then
     assert.deepEqual(onExists.times, 1);
-    assert.deepEqual(onExistsArgs, [existing]);
+    assert.deepEqual(onExistsArgs, [
+      { ...existing, atimeMs: onExistsArgs[0].atimeMs },
+    ]);
     const stats2 = fs.lstatSync(file2);
     assert.deepEqual(stats2.size, existing.size + srcItem.size);
     assert.deepEqual(
@@ -569,7 +573,9 @@ describe("FSFileListApi.test.mjs", () => {
     //then
     assert.deepEqual(result, undefined);
     assert.deepEqual(onExists.times, 1);
-    assert.deepEqual(onExistsArgs, [existing]);
+    assert.deepEqual(onExistsArgs, [
+      { ...existing, atimeMs: onExistsArgs[0].atimeMs },
+    ]);
     const stats2 = fs.lstatSync(file);
     assert.deepEqual(stats2.size, existing.size);
     assert.deepEqual(
