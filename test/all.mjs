@@ -5,6 +5,7 @@ await import("./copymove/CopyItemsPopup.test.mjs");
 await import("./copymove/CopyItemsStats.test.mjs");
 await import("./copymove/CopyProgressPopup.test.mjs");
 await import("./copymove/FileExistsPopup.test.mjs");
+await import("./copymove/MoveProcess.test.mjs");
 
 await import("./dao/FolderShortcutDao.test.mjs");
 await import("./dao/HistoryDao.test.mjs");

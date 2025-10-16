@@ -26,4 +26,8 @@ package object copymove {
   @js.native
   @JSImport("../copymove/FileExistsPopup.mjs", JSImport.Default)
   object FileExistsPopup extends ReactClass
+
+  @js.native
+  @JSImport("../copymove/MoveProcess.mjs", JSImport.Default)
+  object MoveProcess extends ReactClass
 }

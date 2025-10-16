@@ -24,7 +24,7 @@ object CopyMoveUi {
   private[copymove] var copyItemsPopup: ReactClass = CopyItemsPopup
   private[copymove] var copyProcessComp: UiComponent[CopyProcessProps] = CopyProcess
   private[copymove] var messageBoxComp: ReactClass = MessageBox
-  private[copymove] var moveProcessComp: UiComponent[MoveProcessProps] = MoveProcess
+  private[copymove] var moveProcessComp: ReactClass = MoveProcess
 }
 
 class CopyMoveUi(show: CopyMoveUiAction,
@@ -175,7 +175,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
         ))()
       }
       else if (showMove) maybeToPath.map { case (path, toPath) =>
-        <(moveProcessComp())(^.plain := MoveProcessProps(
+        <(moveProcessComp)(^.plain := MoveProcessProps(
           dispatch = from.dispatch,
           actions = from.actions,
           fromPath = from.state.currDir.path,
