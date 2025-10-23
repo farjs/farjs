@@ -22,7 +22,7 @@ object CopyMoveUi {
 
   private[copymove] var copyItemsStats: ReactClass = CopyItemsStats
   private[copymove] var copyItemsPopup: ReactClass = CopyItemsPopup
-  private[copymove] var copyProcessComp: UiComponent[CopyProcessProps] = CopyProcess
+  private[copymove] var copyProcessComp: ReactClass = CopyProcess
   private[copymove] var messageBoxComp: ReactClass = MessageBox
   private[copymove] var moveProcessComp: ReactClass = MoveProcess
 }
@@ -195,7 +195,7 @@ class CopyMoveUi(show: CopyMoveUiAction,
           (path, toPath) <- maybeToPath
           total <- maybeTotal
         } yield {
-          <(copyProcessComp())(^.plain := CopyProcessProps(
+          <(copyProcessComp)(^.plain := CopyProcessProps(
             from = from,
             to =
               if (!inplace) maybeTo.getOrElse(from)

@@ -3,6 +3,7 @@ await import("./app/service/HistoryServiceImpl.test.mjs");
 
 await import("./copymove/CopyItemsPopup.test.mjs");
 await import("./copymove/CopyItemsStats.test.mjs");
+await import("./copymove/CopyProcess.test.mjs");
 await import("./copymove/CopyProgressPopup.test.mjs");
 await import("./copymove/FileExistsPopup.test.mjs");
 await import("./copymove/MoveProcess.test.mjs");

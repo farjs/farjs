@@ -28,7 +28,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
 
   CopyMoveUi.copyItemsStats = "CopyItemsStats".asInstanceOf[ReactClass]
   CopyMoveUi.copyItemsPopup = "CopyItemsPopup".asInstanceOf[ReactClass]
-  CopyMoveUi.copyProcessComp = mockUiComponent("CopyProcess")
+  CopyMoveUi.copyProcessComp = "CopyProcess".asInstanceOf[ReactClass]
   CopyMoveUi.messageBoxComp = "MessageBox".asInstanceOf[ReactClass]
   CopyMoveUi.moveProcessComp = "MoveProcess".asInstanceOf[ReactClass]
 
@@ -525,7 +525,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       val total = 123456789
       statsPopup.onDone(total)
 
-      assertTestComponent(renderer.root.children.head, copyProcessComp, plain = true) {
+      assertNativeComponent(renderer.root.children.head, <(copyProcessComp)(^.assertPlain[CopyProcessProps](inside(_) {
         case CopyProcessProps(resFrom, resTo, move, fromPath, items, resToPath, resTotal, _, _) =>
           inside(resFrom) { case FileListData(resDispatch, resActions, resState) =>
             resDispatch shouldBe dispatch
@@ -538,7 +538,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
           assertCopyProcessItems(items.toList, List(CopyProcessItem(item, to)))
           resToPath shouldBe currDir.path
           resTotal shouldBe total
-      }
+      }))())
     }
   }
 
@@ -590,7 +590,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       val total = 123456789
       statsPopup.onDone(total)
 
-      assertTestComponent(renderer.root.children.head, copyProcessComp, plain = true) {
+      assertNativeComponent(renderer.root.children.head, <(copyProcessComp)(^.assertPlain[CopyProcessProps](inside(_) {
         case CopyProcessProps(resFrom, resTo, move, fromPath, items, resToPath, resTotal, _, _) =>
           inside(resFrom) { case FileListData(_, resActions, resState) =>
             resActions shouldBe actions.actions
@@ -606,7 +606,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
           assertCopyProcessItems(items.toList, List(CopyProcessItem(item, item.name)))
           resToPath shouldBe toDir.path
           resTotal shouldBe total
-      }
+      }))())
     }
   }
 
@@ -646,7 +646,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       val total = 123456789
       statsPopup.onDone(total)
 
-      assertTestComponent(renderer.root.children.head, copyProcessComp, plain = true) {
+      assertNativeComponent(renderer.root.children.head, <(copyProcessComp)(^.assertPlain[CopyProcessProps](inside(_) {
         case CopyProcessProps(resFrom, resTo, move, fromPath, items, resToPath, resTotal, _, _) =>
           inside(resFrom) { case FileListData(resDispatch, resActions, resState) =>
             resDispatch shouldBe dispatch
@@ -663,7 +663,7 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
           assertCopyProcessItems(items.toList, List(CopyProcessItem(item, item.name)))
           resToPath shouldBe to
           resTotal shouldBe total
-      }
+      }))())
     }
   }
 
@@ -712,9 +712,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       }
       statsPopup.onDone(123)
 
-      findProps(renderer.root, copyProcessComp, plain = true) should not be empty
+      findComponents(renderer.root, copyProcessComp) should not be empty
     }.flatMap { _ =>
-      val progressPopup = findComponentProps(renderer.root, copyProcessComp, plain = true)
+      val progressPopup = inside(findComponents(renderer.root, copyProcessComp)) {
+        case List(c) => c.props.asInstanceOf[CopyProcessProps]
+      }
       progressPopup.onTopItem(dir)
 
       val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
@@ -801,9 +803,11 @@ class CopyMoveUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUt
       }
       statsPopup.onDone(123)
 
-      findProps(renderer.root, copyProcessComp, plain = true) should not be empty
+      findComponents(renderer.root, copyProcessComp) should not be empty
     }.flatMap { _ =>
-      val progressPopup = findComponentProps(renderer.root, copyProcessComp, plain = true)
+      val progressPopup = inside(findComponents(renderer.root, copyProcessComp)) {
+        case List(c) => c.props.asInstanceOf[CopyProcessProps]
+      }
       progressPopup.onTopItem(dir)
 
       val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
