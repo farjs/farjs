@@ -723,67 +723,55 @@ describe("CopyProcess.test.mjs", () => {
     //given
     const onTopItem = mockFunction();
     const onDone = mockFunction();
-    /** @type {(v: boolean) => void} */
-    let resolve = () => {};
-    const progressP = new Promise((res) => (resolve = res));
-    let writeFileArgs = /** @type {any[]} */ ([]);
-    const writeFile = mockFunction((...args) => {
-      writeFileArgs = args;
-      return resolvedWriteRes;
+    let readDirArgs = /** @type {any[]} */ ([]);
+    const readDir = mockFunction((...args) => {
+      readDirArgs = args;
+      return Promise.resolve(dirList);
     });
-    let copyFileArgs = /** @type {any[]} */ ([]);
-    const copyFile = mockFunction((...args) => {
-      copyFileArgs = args;
-      return progressP;
+    /** @type {(v: string) => void} */
+    let resolve = () => {};
+    const mkDirsP = new Promise((res) => (resolve = res));
+    let mkDirsArgs = /** @type {any[]} */ ([]);
+    const mkDirs = mockFunction((...args) => {
+      mkDirsArgs = args;
+      return mkDirsP;
     });
     const dispatch = mockFunction();
     const actions = new MockFileListActions({
-      copyFile,
+      api: new MockFileListApi({ readDir }),
     });
     const from = FileListData(dispatch, actions, FileListState());
     const toDispatch = mockFunction();
     const toActions = new MockFileListActions({
-      api: new MockFileListApi({ writeFile }),
+      api: new MockFileListApi({ mkDirs }),
     });
     const to = FileListData(toDispatch, toActions, FileListState());
+    const dir = FileListItem("dir 1", true);
     const item = FileListItem("file 1");
     const props = getCopyProcessProps(from, to, {
-      items: [
-        { item, toName: "newName1" },
-        { item: FileListItem("file 2"), toName: "file 2" },
-      ],
+      items: [{ item: dir, toName: "newName" }],
       total: 12345,
       onTopItem,
       onDone,
     });
+    /** @type {FileListDir} */
+    const dirList = { path: "/from/path/dir 1", isRoot: false, items: [item] };
     const renderer = await actAsync(() => {
       return TestRenderer.create(withThemeContext(h(CopyProcess, props)));
     });
-    assert.deepEqual(writeFile.times, 1);
-    assert.deepEqual(writeFileArgs, ["/to/path", "newName1", writeFileArgs[2]]);
-    assert.deepEqual(copyFile.times, 1);
-    assert.deepEqual(copyFileArgs, [
-      "/from/path",
-      item,
-      copyFileArgs[2],
-      copyFileArgs[3],
-    ]);
-    const onProgressFn = copyFileArgs[3];
+    assert.deepEqual(readDir.times, 1);
+    assert.deepEqual(readDirArgs, ["/from/path", "dir 1"]);
+    assert.deepEqual(mkDirs.times, 1);
+    assert.deepEqual(mkDirsArgs, [["/to/path", "newName"]]);
 
     //when
     TestRenderer.act(() => {
       renderer.unmount();
     });
 
-    //then
-    const result = await actAsync(() => {
-      return onProgressFn(123);
-    });
-    assert.deepEqual(result, false);
-
     //when & then
     await actAsync(() => {
-      resolve(result);
+      resolve("/to/path/newName");
     });
     assert.deepEqual(onTopItem.times, 0);
     assert.deepEqual(onDone.times, 1);
