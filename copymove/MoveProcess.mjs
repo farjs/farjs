@@ -1,6 +1,7 @@
 /**
  * @import { Dispatch } from "@farjs/filelist/FileListData.mjs"
  * @import { FileListItem } from "@farjs/filelist/api/FileListItem.mjs"
+ * @import { CopyProcessItem } from "./CopyProcess.mjs"
  */
 import path from "path";
 import nodeFs from "fs";
@@ -28,10 +29,7 @@ const h = React.createElement;
  *  readonly dispatch: Dispatch;
  *  readonly actions: FileListActions;
  *  readonly fromPath: string;
- *  readonly items: readonly {
- *    readonly item: FileListItem;
- *    readonly toName: string;
- *  }[];
+ *  readonly items: readonly CopyProcessItem[];
  *  readonly toPath: string;
  *  onTopItem(topItem: FileListItem): void;
  *  onDone(): void;

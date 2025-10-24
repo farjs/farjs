@@ -1,11 +1,13 @@
 package farjs.copymove
 
-sealed trait CopyMoveUiAction
+import scala.scalajs.js
+
+sealed trait CopyMoveUiAction extends js.Object
 
 object CopyMoveUiAction {
 
-  case object ShowCopyToTarget extends CopyMoveUiAction
-  case object ShowCopyInplace extends CopyMoveUiAction
-  case object ShowMoveToTarget extends CopyMoveUiAction
-  case object ShowMoveInplace extends CopyMoveUiAction
+  val ShowCopyToTarget: CopyMoveUiAction = "ShowCopyToTarget".asInstanceOf[CopyMoveUiAction]
+  val ShowCopyInplace: CopyMoveUiAction = "ShowCopyInplace".asInstanceOf[CopyMoveUiAction]
+  val ShowMoveToTarget: CopyMoveUiAction = "ShowMoveToTarget".asInstanceOf[CopyMoveUiAction]
+  val ShowMoveInplace: CopyMoveUiAction = "ShowMoveInplace".asInstanceOf[CopyMoveUiAction]
 }
