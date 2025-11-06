@@ -25,13 +25,13 @@ object CopyMovePlugin extends FileListPlugin(js.Array("f5", "f6", "S-f5", "S-f6"
       case "f5" | "f6" =>
         maybeFrom.zip(maybeTo).flatMap { case (from, to) =>
           onCopyMove(key == "f6", from, to, toInput).map { action =>
-            new CopyMoveUi(action, from, Some(to)).apply()
+            CopyMoveUi(CopyMoveUiOptions(action, from, to))
           }
         }
       case "S-f5" | "S-f6" =>
         maybeFrom.flatMap { from =>
           onCopyMoveInplace(key == "S-f6", from).map { action =>
-            new CopyMoveUi(action, from, None).apply()
+            CopyMoveUi(CopyMoveUiOptions(action, from, js.undefined))
           }
         }
       case _ => None

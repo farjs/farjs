@@ -34,4 +34,11 @@ package object copymove {
   @js.native
   @JSImport("../copymove/MoveProcess.mjs", JSImport.Default)
   object MoveProcess extends ReactClass
+
+  @js.native
+  @JSImport("../copymove/CopyMoveUi.mjs", JSImport.Default)
+  object CopyMoveUi extends js.Function1[CopyMoveUiOptions, ReactClass] {
+
+    override def apply(options: CopyMoveUiOptions): ReactClass = js.native
+  }
 }
