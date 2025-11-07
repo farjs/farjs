@@ -210,13 +210,12 @@ function CopyMoveUi({ show, from, maybeTo }) {
       ? h(copyItemsPopup, {
           move: isMove(),
           path: (() => {
-            const maybePath = !isInplace()
-              ? [maybeTo]
-                  .filter((_) => _ !== undefined)
-                  .map((_) => _.state.currDir.path)
-              : [FileListState.currentItem(from.state)]
-                  .filter((_) => _ !== undefined)
-                  .map((_) => _.name);
+            const maybePath =
+              !isInplace() && maybeTo
+                ? [maybeTo.state.currDir.path]
+                : [FileListState.currentItem(from.state)]
+                    .filter((_) => _ !== undefined)
+                    .map((_) => _.name);
             return maybePath.length > 0 ? maybePath[0] : "";
           })(),
           items,
@@ -261,7 +260,7 @@ function CopyMoveUi({ show, from, maybeTo }) {
       ? ((total, [path, toPath]) => {
           return h(copyProcessComp, {
             from,
-            to: !inplace ? maybeTo ?? from : from,
+            to: !inplace && maybeTo ? maybeTo : from,
             move,
             fromPath: from.state.currDir.path,
             items: !inplace

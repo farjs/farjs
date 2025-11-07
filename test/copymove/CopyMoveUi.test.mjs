@@ -1243,6 +1243,33 @@ describe("CopyMoveUi.test.mjs", () => {
     //then
     assertCopyMoveUi(result, pluginUi, props, true, "/folder", items);
   });
+
+  it("should render CopyItemsPopup(items=0) when move inplace", async () => {
+    //given
+    const dispatch = mockFunction();
+    const actions = new MockFileListActions();
+    const state = {
+      ...FileListState(),
+      currDir: FileListDir("/folder", false, []),
+    };
+    const onClose = mockFunction();
+    const props = { dispatch, onClose };
+    const pluginUi = CopyMoveUi({
+      show: "ShowMoveInplace",
+      from: FileListData(dispatch, actions, state),
+    });
+
+    //when
+    const result = TestRenderer.create(
+      withHistoryProvider(
+        withThemeContext(h(pluginUi, props)),
+        new MockHistoryProvider()
+      )
+    ).root;
+
+    //then
+    assertCopyMoveUi(result, pluginUi, props, true, "", []);
+  });
 });
 
 /**
