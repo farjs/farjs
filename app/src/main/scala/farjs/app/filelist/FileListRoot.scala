@@ -2,7 +2,6 @@ package farjs.app.filelist
 
 import farjs.app.filelist.FileListRoot._
 import farjs.archiver.ArchiverPlugin
-import farjs.copymove.CopyMovePlugin
 import farjs.filelist._
 import farjs.filelist.history.HistoryProvider
 import farjs.filelist.stack.{PanelStack, PanelStackItem}
@@ -101,6 +100,13 @@ object FileListRoot {
   object FSPlugin extends js.Object {
 
     val instance: FSPlugin = js.native
+  }
+
+  @js.native
+  @JSImport("../copymove/CopyMovePlugin.mjs", JSImport.Default)
+  object CopyMovePlugin extends js.Object {
+
+    val instance: FileListPlugin = js.native
   }
 
   private lazy val plugins: Seq[FileListPlugin] = List(
