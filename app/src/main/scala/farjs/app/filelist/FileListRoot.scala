@@ -107,7 +107,7 @@ object FileListRoot {
     QuickViewPlugin,
     ArchiverPlugin,
     ViewerPlugin,
-    CopyMovePlugin,
+    CopyMovePlugin.instance,
     FSPlugin.instance,
     FileListUiPlugin,
     FilePlugin

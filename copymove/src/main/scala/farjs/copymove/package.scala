@@ -1,5 +1,6 @@
 package farjs
 
+import farjs.filelist.FileListPlugin
 import farjs.filelist.history.HistoryKind
 import scommons.react.ReactClass
 
@@ -34,6 +35,13 @@ package object copymove {
   @js.native
   @JSImport("../copymove/MoveProcess.mjs", JSImport.Default)
   object MoveProcess extends ReactClass
+
+  @js.native
+  @JSImport("../copymove/CopyMovePlugin.mjs", JSImport.Default)
+  object CopyMovePlugin extends js.Object {
+
+    val instance: FileListPlugin = js.native
+  }
 
   @js.native
   @JSImport("../copymove/CopyMoveUi.mjs", JSImport.Default)
