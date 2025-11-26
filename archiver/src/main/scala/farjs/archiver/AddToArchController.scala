@@ -2,9 +2,6 @@ package farjs.archiver
 
 import farjs.archiver.zip.ZipApi
 import farjs.filelist.FileListActions._
-import farjs.filelist.api.FileListItem
-import farjs.filelist.{FileListActions, FileListState}
-import farjs.ui.Dispatch
 import farjs.ui.popup.{StatusPopup, StatusPopupProps}
 import farjs.ui.task.{Task, TaskAction}
 import scommons.react._
@@ -14,15 +11,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
 import scala.util.{Failure, Success}
-
-case class AddToArchControllerProps(dispatch: Dispatch,
-                                    actions: FileListActions,
-                                    state: FileListState,
-                                    zipName: String,
-                                    items: Seq[FileListItem],
-                                    action: AddToArchAction,
-                                    onComplete: String => Unit,
-                                    onCancel: () => Unit)
 
 object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
 
@@ -35,7 +23,7 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
     val (showAddPopup, setShowAddPopup) = useState(true)
     val (showStatusPopup, setShowStatusPopup) = useState(false)
     val (progress, setProgress) = useState(0)
-    val props = compProps.wrapped
+    val props = compProps.plain
     
     val onAction: js.Function1[String, Unit] = { zipFile =>
       setShowAddPopup(false)
@@ -46,7 +34,7 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
       var totalItems = 0
       var addedItems = 0.0
       val resultF = for {
-        _ <- props.actions.scanDirs(parent, js.Array(currItems: _*), onNextDir = { (_, items) =>
+        _ <- props.actions.scanDirs(parent, currItems, onNextDir = { (_, items) =>
           totalItems += items.size
           true
         }).toFuture

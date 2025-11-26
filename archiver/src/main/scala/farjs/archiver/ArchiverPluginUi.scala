@@ -7,6 +7,7 @@ import farjs.filelist.api.{FileListDir, FileListItem}
 import scommons.react._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.scalajs.js
 
 class ArchiverPluginUi(data: FileListData, zipName: String, items: Seq[FileListItem])
     extends FunctionComponent[FileListPluginUiProps] {
@@ -14,12 +15,12 @@ class ArchiverPluginUi(data: FileListData, zipName: String, items: Seq[FileListI
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
     
-    <(addToArchController())(^.wrapped := AddToArchControllerProps(
+    <(addToArchController())(^.plain := AddToArchControllerProps(
       dispatch = data.dispatch,
       actions = data.actions,
       state = data.state,
       zipName = zipName,
-      items = items,
+      items = js.Array(items: _*),
       action = AddToArchAction.Add,
       onComplete = { zipFile =>
         props.onClose()

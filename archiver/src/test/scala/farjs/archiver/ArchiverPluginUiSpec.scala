@@ -39,7 +39,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val pluginUi = new ArchiverPluginUi(data, "item 1.zip", items)
     val props = FileListPluginUiProps(dispatch, onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
-    val controller = findComponentProps(comp, addToArchController)
+    val controller = findComponentProps(comp, addToArchController, plain = true)
     
     //then
     onClose.expects()
@@ -70,7 +70,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val pluginUi = new ArchiverPluginUi(data, "item 1.zip", items)
     val props = FileListPluginUiProps(dispatch, onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
-    val controller = findComponentProps(comp, addToArchController)
+    val controller = findComponentProps(comp, addToArchController, plain = true)
     
     val zipFile = "test.zip"
     val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
@@ -112,13 +112,13 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
 
     //then
     assertComponents(result.children, List(
-      <(addToArchController())(^.assertWrapped(inside(_) {
+      <(addToArchController())(^.assertPlain[AddToArchControllerProps](inside(_) {
         case AddToArchControllerProps(resDispatch, resActions, state, zipName, resItems, action, _, _) =>
           resDispatch shouldBe dispatch
           resActions shouldBe actions
           state shouldBe data.state
           zipName shouldBe "item 1.zip"
-          resItems shouldBe items
+          resItems.toList shouldBe items
           action shouldBe AddToArchAction.Add
       }))()
     ))

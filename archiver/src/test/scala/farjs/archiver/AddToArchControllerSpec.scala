@@ -44,12 +44,12 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
         FileListItem("item 2")
       ) ++ items),
       selectedNames = js.Set("dir 3")
-    ), zipName = "new.zip", items, AddToArchAction.Add, onComplete, onCancel)
+    ), zipName = "new.zip", js.Array(items: _*), AddToArchAction.Add, onComplete, onCancel)
     val addToArchApi = mockFunction[String, String, Set[String], () => Unit, Future[Unit]]
     AddToArchController.addToArchApi = addToArchApi
 
     //when
-    val renderer = createTestRenderer(<(AddToArchController())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(AddToArchController())(^.plain := props)())
 
     //then
     findComponents(renderer.root, statusPopupComp) should be (empty)
@@ -112,12 +112,12 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
         FileListItem("item 2")
       ) ++ items),
       selectedNames = js.Set("dir 3")
-    ), zipName = "new.zip", items, AddToArchAction.Add, onComplete, onCancel)
+    ), zipName = "new.zip", js.Array(items: _*), AddToArchAction.Add, onComplete, onCancel)
     val addToArchApi = mockFunction[String, String, Set[String], () => Unit, Future[Unit]]
     AddToArchController.addToArchApi = addToArchApi
 
     //when
-    val renderer = createTestRenderer(<(AddToArchController())(^.wrapped := props)())
+    val renderer = createTestRenderer(<(AddToArchController())(^.plain := props)())
 
     //then
     findComponents(renderer.root, statusPopupComp) should be (empty)

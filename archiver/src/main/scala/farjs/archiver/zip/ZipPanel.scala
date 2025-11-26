@@ -120,12 +120,12 @@ class ZipPanel(zipPath: String,
       ) else None,
 
       zipData.map { case (dispatch, actions, state, items, move) =>
-        <(addToArchController())(^.wrapped := AddToArchControllerProps(
+        <(addToArchController())(^.plain := AddToArchControllerProps(
           dispatch = dispatch,
           actions = actions,
           state = state,
           zipName = zipPath,
-          items = items,
+          items = js.Array(items: _*),
           action =
             if (move) AddToArchAction.Move
             else AddToArchAction.Copy,
