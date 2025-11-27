@@ -14,7 +14,7 @@ import scala.util.{Failure, Success}
 
 object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
 
-  private[archiver] var addToArchPopup: UiComponent[AddToArchPopupProps] = AddToArchPopup
+  private[archiver] var addToArchPopup: ReactClass = AddToArchPopup
   private[archiver] var addToArchApi: (String, String, Set[String], () => Unit) => Future[Unit] =
     ZipApi.addToZip
   private[archiver] var statusPopupComp: ReactClass = StatusPopup
@@ -66,7 +66,7 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
     
     <.>()(
       if (showAddPopup) Some(
-        <(addToArchPopup())(^.plain := AddToArchPopupProps(
+        <(addToArchPopup)(^.plain := AddToArchPopupProps(
           zipName = props.zipName,
           action = props.action,
           onAction = onAction,

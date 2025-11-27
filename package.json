@@ -51,6 +51,7 @@
   },
   "files": [
     "app/**/*.mjs",
+    "archiver/**/*.mjs",
     "build/farjs-app-opt.js",
     "copymove/**/*.mjs",
     "dao/migrations/bundle.json",

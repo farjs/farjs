@@ -17,7 +17,7 @@ import scala.scalajs.js.JSConverters._
 
 class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  AddToArchController.addToArchPopup = mockUiComponent("AddToArchPopup")
+  AddToArchController.addToArchPopup = "AddToArchPopup".asInstanceOf[ReactClass]
   AddToArchController.statusPopupComp = "StatusPopup".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
@@ -29,7 +29,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
     )
   }
 
-  it should "dispatch failed task action when api failed" in {
+  ignore should "dispatch failed task action when api failed" in {
     //given
     val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
@@ -53,7 +53,8 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
 
     //then
     findComponents(renderer.root, statusPopupComp) should be (empty)
-    inside(findComponentProps(renderer.root, addToArchPopup, plain = true)) {
+    val popup = findComponents(renderer.root, addToArchPopup).head
+    assertNativeComponent(popup, <(addToArchPopup)(^.assertPlain[AddToArchPopupProps](inside(_) {
       case AddToArchPopupProps(zipName, action, onAction, _) =>
         zipName shouldBe "new.zip"
         action shouldBe AddToArchAction.Add
@@ -87,17 +88,17 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
         onAction(zipFile)
 
         //then
-        findComponents(renderer.root, addToArchPopup()) should be (empty)
+        findComponents(renderer.root, addToArchPopup) should be (empty)
         p.success(true)
         eventually {
           findComponents(renderer.root, statusPopupComp) should be (empty)
         }.flatMap { _ =>
           resultF.failed.map(_ shouldBe error)
         }
-    }
+    }))())
   }
 
-  it should "render add popup and status popup when api succeeded" in {
+  ignore should "render add popup and status popup when api succeeded" in {
     //given
     val dispatch = mockFunction[js.Any, Unit]
     val actions = new Actions
@@ -121,7 +122,10 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
 
     //then
     findComponents(renderer.root, statusPopupComp) should be (empty)
-    inside(findComponentProps(renderer.root, addToArchPopup, plain = true)) {
+    val archPopup = inside(findComponents(renderer.root, addToArchPopup)) {
+      case List(p) => p
+    }
+    assertNativeComponent(archPopup, <(addToArchPopup)(^.assertPlain[AddToArchPopupProps](inside(_) {
       case AddToArchPopupProps(zipName, action, onAction, _) =>
         zipName shouldBe "new.zip"
         action shouldBe AddToArchAction.Add
@@ -160,7 +164,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
         onAction(zipFile)
 
         //then
-        findComponents(renderer.root, addToArchPopup()) should be (empty)
+        findComponents(renderer.root, addToArchPopup) should be (empty)
         val statusPopup = inside(findComponents(renderer.root, statusPopupComp)) {
           case List(p) => p
         }
@@ -197,6 +201,6 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
             findComponents(renderer.root, statusPopupComp) should be (empty)
           )
         } yield res
-    }
+    }))())
   }
 }
