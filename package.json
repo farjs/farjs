@@ -79,16 +79,16 @@
     "iconv-lite": "0.6.3"
   },
   "devDependencies": {
-    "@types/node": "^16.6.2",
-    "@types/react": "^17.0.1",
-    "@types/react-blessed": "^0.7.3",
-    "@types/react-test-renderer": "^17.0.1",
-    "c8": "^7.13.0",
+    "@types/node": "^16.18.126",
+    "@types/react": "^17.0.90",
+    "@types/react-blessed": "^0.7.8",
+    "@types/react-test-renderer": "^17.0.9",
+    "c8": "^7.14.0",
     "mock-fn": "^1.1.0",
     "prettier": "^2.8.8",
-    "quick-lint-js": "^3.0.0",
+    "quick-lint-js": "^3.2.0",
     "react-assert": "^1.2.0",
-    "react-test-renderer": "^17.0.1",
-    "typescript": "^5.7.3"
+    "react-test-renderer": "^17.0.2",
+    "typescript": "^5.9.3"
   }
 }

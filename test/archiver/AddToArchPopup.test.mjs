@@ -74,7 +74,9 @@ describe("AddToArchPopup.test.mjs", () => {
     const newZipName = "new zip name";
 
     //when
-    textBoxProps.onChange(newZipName);
+    TestRenderer.act(() => {
+      textBoxProps.onChange(newZipName);
+    });
 
     //then
     const updatedProps = renderer.root.findByType(textBoxComp).props;
@@ -92,7 +94,9 @@ describe("AddToArchPopup.test.mjs", () => {
     );
     const textBoxProps = renderer.root.findByType(textBoxComp).props;
     const newZipName = "new zip name";
-    textBoxProps.onChange(newZipName);
+    TestRenderer.act(() => {
+      textBoxProps.onChange(newZipName);
+    });
     const updatedProps = renderer.root.findByType(textBoxComp).props;
 
     //when
@@ -115,7 +119,9 @@ describe("AddToArchPopup.test.mjs", () => {
     );
     const textBoxProps = renderer.root.findByType(textBoxComp).props;
     const newZipName = "new zip name";
-    textBoxProps.onChange(newZipName);
+    TestRenderer.act(() => {
+      textBoxProps.onChange(newZipName);
+    });
     /** @type {readonly ButtonsPanelAction[]} */
     const actions = renderer.root.findByType(buttonsPanelComp).props.actions;
 
@@ -138,7 +144,9 @@ describe("AddToArchPopup.test.mjs", () => {
     );
     const textBoxProps = renderer.root.findByType(textBoxComp).props;
     const newZipName = "";
-    textBoxProps.onChange(newZipName);
+    TestRenderer.act(() => {
+      textBoxProps.onChange(newZipName);
+    });
     /** @type {readonly ButtonsPanelAction[]} */
     const actions = renderer.root.findByType(buttonsPanelComp).props.actions;
 
