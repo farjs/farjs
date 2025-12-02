@@ -62,25 +62,25 @@ describe("AddToArchPopup.test.mjs", () => {
     assert.deepEqual(onCancel.times, 1);
   });
 
-  it("should set zipName when onChange in TextBox", () => {
+  it("should set archName when onChange in TextBox", () => {
     //given
-    const zipName = "initial zip name";
-    const props = getAddToArchPopupProps({ zipName });
+    const archName = "initial arch name";
+    const props = getAddToArchPopupProps({ archName });
     const renderer = TestRenderer.create(
       withThemeContext(h(AddToArchPopup, props))
     );
     const textBoxProps = renderer.root.findByType(textBoxComp).props;
-    assert.deepEqual(textBoxProps.value, zipName);
-    const newZipName = "new zip name";
+    assert.deepEqual(textBoxProps.value, archName);
+    const newArchName = "new arch name";
 
     //when
     TestRenderer.act(() => {
-      textBoxProps.onChange(newZipName);
+      textBoxProps.onChange(newArchName);
     });
 
     //then
     const updatedProps = renderer.root.findByType(textBoxComp).props;
-    assert.deepEqual(updatedProps.value, newZipName);
+    assert.deepEqual(updatedProps.value, newArchName);
   });
 
   it("should call onAction when onEnter in TextBox", () => {
@@ -93,9 +93,9 @@ describe("AddToArchPopup.test.mjs", () => {
       withThemeContext(h(AddToArchPopup, props))
     );
     const textBoxProps = renderer.root.findByType(textBoxComp).props;
-    const newZipName = "new zip name";
+    const newArchName = "new arch name";
     TestRenderer.act(() => {
-      textBoxProps.onChange(newZipName);
+      textBoxProps.onChange(newArchName);
     });
     const updatedProps = renderer.root.findByType(textBoxComp).props;
 
@@ -104,7 +104,7 @@ describe("AddToArchPopup.test.mjs", () => {
 
     //then
     assert.deepEqual(onAction.times, 1);
-    assert.deepEqual(onActionArgs, [newZipName]);
+    assert.deepEqual(onActionArgs, [newArchName]);
     assert.deepEqual(onCancel.times, 0);
   });
 
@@ -118,9 +118,9 @@ describe("AddToArchPopup.test.mjs", () => {
       withThemeContext(h(AddToArchPopup, props))
     );
     const textBoxProps = renderer.root.findByType(textBoxComp).props;
-    const newZipName = "new zip name";
+    const newArchName = "new arch name";
     TestRenderer.act(() => {
-      textBoxProps.onChange(newZipName);
+      textBoxProps.onChange(newArchName);
     });
     /** @type {readonly ButtonsPanelAction[]} */
     const actions = renderer.root.findByType(buttonsPanelComp).props.actions;
@@ -130,11 +130,11 @@ describe("AddToArchPopup.test.mjs", () => {
 
     //then
     assert.deepEqual(onAction.times, 1);
-    assert.deepEqual(onActionArgs, [newZipName]);
+    assert.deepEqual(onActionArgs, [newArchName]);
     assert.deepEqual(onCancel.times, 0);
   });
 
-  it("should not call onAction if zipName is empty", () => {
+  it("should not call onAction if archName is empty", () => {
     //given
     const onAction = mockFunction();
     const onCancel = mockFunction();
@@ -143,9 +143,9 @@ describe("AddToArchPopup.test.mjs", () => {
       withThemeContext(h(AddToArchPopup, props))
     );
     const textBoxProps = renderer.root.findByType(textBoxComp).props;
-    const newZipName = "";
+    const newArchName = "";
     TestRenderer.act(() => {
-      textBoxProps.onChange(newZipName);
+      textBoxProps.onChange(newArchName);
     });
     /** @type {readonly ButtonsPanelAction[]} */
     const actions = renderer.root.findByType(buttonsPanelComp).props.actions;
@@ -198,7 +198,8 @@ describe("AddToArchPopup.test.mjs", () => {
  */
 function getAddToArchPopupProps(props = {}) {
   return {
-    zipName: "test zipName",
+    archName: "test archName",
+    archType: "arch",
     action: "Add",
     onAction: mockFunction(),
     onCancel: mockFunction(),
@@ -235,7 +236,7 @@ function assertAddToArchPopup(result, props, actions) {
         left: contentLeft,
         top: 1,
         width: contentWidth,
-        text: "Add to zip archive:",
+        text: "Add to arch archive:",
         style: theme,
         padding: 0,
       }),
@@ -243,7 +244,7 @@ function assertAddToArchPopup(result, props, actions) {
         left: contentLeft,
         top: 2,
         width: contentWidth,
-        value: props.zipName,
+        value: props.archName,
         onChange: mockFunction(),
         onEnter: mockFunction(),
       }),

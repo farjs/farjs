@@ -55,8 +55,9 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
     findComponents(renderer.root, statusPopupComp) should be (empty)
     val popup = findComponents(renderer.root, addToArchPopup).head
     assertNativeComponent(popup, <(addToArchPopup)(^.assertPlain[AddToArchPopupProps](inside(_) {
-      case AddToArchPopupProps(zipName, action, onAction, _) =>
-        zipName shouldBe "new.zip"
+      case AddToArchPopupProps(archName, archType, action, onAction, _) =>
+        archName shouldBe "new.zip"
+        archType shouldBe "zip"
         action shouldBe AddToArchAction.Add
 
         //given
@@ -126,8 +127,9 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
       case List(p) => p
     }
     assertNativeComponent(archPopup, <(addToArchPopup)(^.assertPlain[AddToArchPopupProps](inside(_) {
-      case AddToArchPopupProps(zipName, action, onAction, _) =>
-        zipName shouldBe "new.zip"
+      case AddToArchPopupProps(archName, archType, action, onAction, _) =>
+        archName shouldBe "new.zip"
+        archType shouldBe "zip"
         action shouldBe AddToArchAction.Add
 
         //given

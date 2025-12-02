@@ -21,9 +21,10 @@ const h = React.createElement;
 
 /**
  * @typedef {{
- *  readonly zipName: string;
+ *  readonly archName: string;
+ *  readonly archType: string;
  *  readonly action: AddToArchAction;
- *  onAction(zipName: string): void;
+ *  onAction(archName: string): void;
  *  onCancel(): void;
  * }} AddToArchPopupProps
  */
@@ -40,7 +41,7 @@ const AddToArchPopup = (props) => {
     buttonsPanelComp,
   } = AddToArchPopup;
 
-  const [zipName, setZipName] = useState(props.zipName);
+  const [archName, setArchName] = useState(props.archName);
 
   const [width, height] = [75, 8];
   const contentWidth = width - (ModalContent.paddingHorizontal + 2) * 2;
@@ -48,8 +49,8 @@ const AddToArchPopup = (props) => {
   const theme = Theme.useTheme().popup.regular;
 
   const onAction = () => {
-    if (zipName.length > 0) {
-      props.onAction(zipName);
+    if (archName.length > 0) {
+      props.onAction(archName);
     }
   };
 
@@ -73,7 +74,7 @@ const AddToArchPopup = (props) => {
       left: contentLeft,
       top: 1,
       width: contentWidth,
-      text: `${props.action} to zip archive:`,
+      text: `${props.action} to ${props.archType} archive:`,
       style: theme,
       padding: 0,
     }),
@@ -81,8 +82,8 @@ const AddToArchPopup = (props) => {
       left: contentLeft,
       top: 2,
       width: contentWidth,
-      value: zipName,
-      onChange: setZipName,
+      value: archName,
+      onChange: setArchName,
       onEnter: onAction,
     }),
 

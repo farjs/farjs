@@ -25,7 +25,7 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
     val (progress, setProgress) = useState(0)
     val props = compProps.plain
     
-    val onAction: js.Function1[String, Unit] = { zipFile =>
+    val onAction: js.Function1[String, Unit] = { archFile =>
       setShowAddPopup(false)
       setShowStatusPopup(true)
 
@@ -38,7 +38,7 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
           totalItems += items.size
           true
         }).toFuture
-        _ <- addToArchApi(zipFile, parent, currItems.map(_.name).toSet, { () =>
+        _ <- addToArchApi(archFile, parent, currItems.map(_.name).toSet, { () =>
           addedItems += 1
           setProgress(math.min((addedItems / totalItems) * 100, 100).toInt)
         })
@@ -52,7 +52,7 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
         }
 
         setShowStatusPopup(false)
-        props.onComplete(zipFile)
+        props.onComplete(archFile)
       }
       resultF.onComplete {
         case Success(_) =>
@@ -67,7 +67,8 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
     <.>()(
       if (showAddPopup) Some(
         <(addToArchPopup)(^.plain := AddToArchPopupProps(
-          zipName = props.zipName,
+          archName = props.zipName,
+          archType = "zip",
           action = props.action,
           onAction = onAction,
           onCancel = props.onCancel

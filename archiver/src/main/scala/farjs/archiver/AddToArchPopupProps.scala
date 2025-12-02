@@ -3,7 +3,8 @@ package farjs.archiver
 import scala.scalajs.js
 
 sealed trait AddToArchPopupProps extends js.Object {
-  val zipName: String
+  val archName: String
+  val archType: String
   val action: AddToArchAction
   val onAction: js.Function1[String, Unit]
   val onCancel: js.Function0[Unit]
@@ -11,22 +12,25 @@ sealed trait AddToArchPopupProps extends js.Object {
 
 object AddToArchPopupProps {
 
-  def apply(zipName: String,
+  def apply(archName: String,
+            archType: String,
             action: AddToArchAction,
             onAction: js.Function1[String, Unit],
             onCancel: js.Function0[Unit]): AddToArchPopupProps = {
 
     js.Dynamic.literal(
-      zipName = zipName,
+      archName = archName,
+      archType = archType,
       action = action,
       onAction = onAction,
       onCancel = onCancel
     ).asInstanceOf[AddToArchPopupProps]
   }
 
-  def unapply(arg: AddToArchPopupProps): Option[(String, AddToArchAction, js.Function1[String, Unit], js.Function0[Unit])] = {
+  def unapply(arg: AddToArchPopupProps): Option[(String, String, AddToArchAction, js.Function1[String, Unit], js.Function0[Unit])] = {
     Some((
-      arg.zipName,
+      arg.archName,
+      arg.archType,
       arg.action,
       arg.onAction,
       arg.onCancel
