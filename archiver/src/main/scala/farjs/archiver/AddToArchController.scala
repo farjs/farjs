@@ -1,6 +1,5 @@
 package farjs.archiver
 
-import farjs.archiver.zip.ZipApi
 import farjs.filelist.FileListActions._
 import farjs.ui.popup.{StatusPopup, StatusPopupProps}
 import farjs.ui.task.{Task, TaskAction}
@@ -8,15 +7,12 @@ import scommons.react._
 import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.scalajs.js
 import scala.util.{Failure, Success}
 
 object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
 
   private[archiver] var addToArchPopup: ReactClass = AddToArchPopup
-  private[archiver] var addToArchApi: (String, String, Set[String], () => Unit) => Future[Unit] =
-    ZipApi.addToZip
   private[archiver] var statusPopupComp: ReactClass = StatusPopup
 
   protected def render(compProps: Props): ReactElement = {
@@ -38,10 +34,10 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
           totalItems += items.size
           true
         }).toFuture
-        _ <- addToArchApi(archFile, parent, currItems.map(_.name).toSet, { () =>
+        _ <- props.addToArchApi(archFile, parent, new js.Set(currItems.map(_.name)), { () =>
           addedItems += 1
           setProgress(math.min((addedItems / totalItems) * 100, 100).toInt)
-        })
+        }).toFuture
       } yield {
         if (props.state.selectedNames.nonEmpty) {
           props.dispatch(FileListParamsChangedAction(
@@ -59,7 +55,7 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
         case Failure(_) =>
           setShowStatusPopup(false)
           props.dispatch(TaskAction(
-            Task(s"${props.action} item(s) to zip archive", resultF)
+            Task(s"${props.archAction} item(s) to ${props.archType} archive", resultF)
           ))
       }
     }
@@ -67,9 +63,9 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
     <.>()(
       if (showAddPopup) Some(
         <(addToArchPopup)(^.plain := AddToArchPopupProps(
-          archName = props.zipName,
-          archType = "zip",
-          action = props.action,
+          archName = props.archName,
+          archType = props.archType,
+          action = props.archAction,
           onAction = onAction,
           onCancel = props.onCancel
         ))()
@@ -77,7 +73,7 @@ object AddToArchController extends FunctionComponent[AddToArchControllerProps] {
 
       if (showStatusPopup) Some(
         <(statusPopupComp)(^.plain := StatusPopupProps(
-          text = s"${props.action} item(s) to zip archive\n$progress%"
+          text = s"${props.archAction} item(s) to ${props.archType} archive\n$progress%"
         ))()
       ) else None
     )

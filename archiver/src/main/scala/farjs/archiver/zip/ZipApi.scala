@@ -163,11 +163,11 @@ object ZipApi {
     )
   }
 
-  def addToZip(zipFile: String, parent: String, items: Set[String], onNextItem: () => Unit): Future[Unit] = {
-    for {
+  def addToZip(zipFile: String, parent: String, items: js.Set[String], onNextItem: js.Function0[Unit]): js.Promise[Unit] = {
+    val resF = for {
       subprocess <- childProcess.spawn(
         command = "zip",
-        args = List("-r", zipFile) ++ items,
+        args = List("-r", zipFile) ++ items.toList,
         options = Some(new raw.ChildProcessOptions {
           override val cwd = parent
           override val windowsHide = true
@@ -180,6 +180,8 @@ object ZipApi {
       }
       _ <- subprocess.exitF
     } yield ()
+
+    resF.toJSPromise
   }
 
   def readZip(zipPath: String): Future[Map[String, List[ZipEntry]]] = {

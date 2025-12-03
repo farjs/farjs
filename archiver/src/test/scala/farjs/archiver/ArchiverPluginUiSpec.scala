@@ -113,13 +113,14 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     //then
     assertComponents(result.children, List(
       <(addToArchController())(^.assertPlain[AddToArchControllerProps](inside(_) {
-        case AddToArchControllerProps(resDispatch, resActions, state, zipName, resItems, action, _, _) =>
+        case AddToArchControllerProps(resDispatch, resActions, state, archName, archType, archAction, _, resItems, _, _) =>
           resDispatch shouldBe dispatch
           resActions shouldBe actions
           state shouldBe data.state
-          zipName shouldBe "item 1.zip"
+          archName shouldBe "item 1.zip"
+          archType shouldBe "zip"
+          archAction shouldBe AddToArchAction.Add
           resItems.toList shouldBe items
-          action shouldBe AddToArchAction.Add
       }))()
     ))
   }

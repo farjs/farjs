@@ -124,11 +124,13 @@ class ZipPanel(zipPath: String,
           dispatch = dispatch,
           actions = actions,
           state = state,
-          zipName = zipPath,
-          items = js.Array(items: _*),
-          action =
+          archName = zipPath,
+          archType = "zip",
+          archAction =
             if (move) AddToArchAction.Move
             else AddToArchAction.Copy,
+          addToArchApi = ZipApi.addToZip _,
+          items = js.Array(items: _*),
           onComplete = { _ =>
             setZipData(None)
 

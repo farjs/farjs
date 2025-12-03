@@ -10,9 +10,11 @@ sealed trait AddToArchControllerProps extends js.Object {
   val dispatch: Dispatch
   val actions: FileListActions
   val state: FileListState
-  val zipName: String
+  val archName: String
+  val archType: String
+  val archAction: AddToArchAction
+  val addToArchApi: js.Function4[String, String, js.Set[String], js.Function0[Unit], js.Promise[Unit]]
   val items: js.Array[FileListItem]
-  val action: AddToArchAction
   val onComplete: js.Function1[String, Unit]
   val onCancel: js.Function0[Unit]
 }
@@ -22,9 +24,11 @@ object AddToArchControllerProps {
   def apply(dispatch: Dispatch,
             actions: FileListActions,
             state: FileListState,
-            zipName: String,
+            archName: String,
+            archType: String,
+            archAction: AddToArchAction,
+            addToArchApi: js.Function4[String, String, js.Set[String], js.Function0[Unit], js.Promise[Unit]],
             items: js.Array[FileListItem],
-            action: AddToArchAction,
             onComplete: js.Function1[String, Unit],
             onCancel: js.Function0[Unit]): AddToArchControllerProps = {
 
@@ -32,22 +36,28 @@ object AddToArchControllerProps {
       dispatch = dispatch,
       actions = actions,
       state = state,
-      zipName = zipName,
+      archName = archName,
+      archType = archType,
+      archAction = archAction,
+      addToArchApi = addToArchApi,
       items = items,
-      action = action,
       onComplete = onComplete,
       onCancel = onCancel
     ).asInstanceOf[AddToArchControllerProps]
   }
 
-  def unapply(arg: AddToArchControllerProps): Option[(Dispatch, FileListActions, FileListState, String, js.Array[FileListItem], AddToArchAction, js.Function1[String, Unit], js.Function0[Unit])] = {
+  def unapply(arg: AddToArchControllerProps): Option[
+    (Dispatch, FileListActions, FileListState, String, String, AddToArchAction, js.Function4[String, String, js.Set[String], js.Function0[Unit], js.Promise[Unit]], js.Array[FileListItem], js.Function1[String, Unit], js.Function0[Unit])
+  ] = {
     Some((
       arg.dispatch,
       arg.actions,
       arg.state,
-      arg.zipName,
+      arg.archName,
+      arg.archType,
+      arg.archAction,
+      arg.addToArchApi,
       arg.items,
-      arg.action,
       arg.onComplete,
       arg.onCancel
     ))

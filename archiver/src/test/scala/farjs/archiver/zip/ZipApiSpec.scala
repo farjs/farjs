@@ -11,7 +11,6 @@ import scommons.nodejs.stream.Readable
 import scommons.nodejs.test.AsyncTestSpec
 import scommons.nodejs.util.{StreamReader, SubProcess}
 
-import scala.collection.immutable.ListSet
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 import scala.scalajs.js
@@ -357,7 +356,7 @@ class ZipApiSpec extends AsyncTestSpec {
     ZipApi.childProcess = childProcess.childProcess
     val parent = "test dir"
     val zipFile = "test.zip"
-    val items = ListSet("item 1", "item 2")
+    val items = js.Set("item 1", "item 2")
     val onNextItem = mockFunction[Unit]
 
     //then
@@ -375,7 +374,7 @@ class ZipApiSpec extends AsyncTestSpec {
     onNextItem.expects().repeat(3)
 
     //when
-    val resultF = ZipApi.addToZip(zipFile, parent, items, onNextItem)
+    val resultF = ZipApi.addToZip(zipFile, parent, items, onNextItem).toFuture
 
     //then
     resultF.map(_ => Succeeded)

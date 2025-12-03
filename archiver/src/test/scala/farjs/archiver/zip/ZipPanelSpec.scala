@@ -352,13 +352,14 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     //then
     inside(findComponentProps(renderer.root, addToArchController, plain = true)) {
-      case AddToArchControllerProps(resDispatch, resActions, state, zipName, resItems, action, _, onCancel) =>
+      case AddToArchControllerProps(resDispatch, resActions, state, archName, archType, archAction, _, resItems, _, onCancel) =>
         resDispatch shouldBe fsDispatch
         resActions shouldBe fsActions
         state shouldBe fsState
-        zipName shouldBe "dir/file.zip"
+        archName shouldBe "dir/file.zip"
+        archType shouldBe "zip"
+        archAction shouldBe AddToArchAction.Copy
         resItems.toList shouldBe items
-        action shouldBe AddToArchAction.Copy
 
         //when
         onCancel()
@@ -416,13 +417,14 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     //then
     inside(findComponentProps(renderer.root, addToArchController, plain = true)) {
-      case AddToArchControllerProps(resDispatch, resActions, state, zipName, resItems, action, onComplete, _) =>
+      case AddToArchControllerProps(resDispatch, resActions, state, archName, archType, archAction, _, resItems, onComplete, _) =>
         resDispatch shouldBe fsDispatch
         resActions shouldBe fsActions
         state shouldBe fsState
-        zipName shouldBe "dir/file.zip"
+        archName shouldBe "dir/file.zip"
+        archType shouldBe "zip"
+        archAction shouldBe AddToArchAction.Copy
         resItems.toList shouldBe items
-        action shouldBe AddToArchAction.Copy
 
         //given
         val zipFile = "test.zip"
@@ -492,12 +494,13 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
 
     //then
     inside(findComponentProps(renderer.root, addToArchController, plain = true)) {
-      case AddToArchControllerProps(_, resActions, state, zipName, resItems, action, onComplete, _) =>
+      case AddToArchControllerProps(_, resActions, state, archName, archType, archAction, _, resItems, onComplete, _) =>
         resActions shouldBe fsActions.actions
         state shouldBe fsState
-        zipName shouldBe "dir/file.zip"
+        archName shouldBe "dir/file.zip"
+        archType shouldBe "zip"
+        archAction shouldBe AddToArchAction.Move
         resItems.toList shouldBe items
-        action shouldBe AddToArchAction.Move
 
         //given
         val zipFile = "test.zip"

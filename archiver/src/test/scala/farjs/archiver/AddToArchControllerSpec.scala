@@ -36,6 +36,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
     val items = List(FileListItem("dir 3", isDir = true))
     val onComplete = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
+    val addToArchApi = mockFunction[String, String, js.Set[String], js.Function0[Unit], js.Promise[Unit]]
     val props = AddToArchControllerProps(dispatch, actions.actions, FileListState(
       index = 1,
       currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
@@ -44,9 +45,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
         FileListItem("item 2")
       ) ++ items),
       selectedNames = js.Set("dir 3")
-    ), zipName = "new.zip", js.Array(items: _*), AddToArchAction.Add, onComplete, onCancel)
-    val addToArchApi = mockFunction[String, String, Set[String], () => Unit, Future[Unit]]
-    AddToArchController.addToArchApi = addToArchApi
+    ), archName = "new.zip", archType = "zip", AddToArchAction.Add, addToArchApi, js.Array(items: _*), onComplete, onCancel)
 
     //when
     val renderer = createTestRenderer(<(AddToArchController())(^.plain := props)())
@@ -74,8 +73,8 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
           p.future.toJSPromise
         }
         val error = new Exception("test error")
-        val addToZipF = Future.failed(error)
-        addToArchApi.expects(zipFile, props.state.currDir.path, Set("dir 3"), *).returning(addToZipF)
+        val addToZipF = Future.failed(error).toJSPromise
+        addToArchApi.expects(zipFile, props.state.currDir.path, *, *).returning(addToZipF)
         onComplete.expects(*).never()
         var resultF: Future[_] = null
         dispatch.expects(*).onCall { action: Any =>
@@ -106,6 +105,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
     val items = List(FileListItem("dir 3", isDir = true))
     val onComplete = mockFunction[String, Unit]
     val onCancel = mockFunction[Unit]
+    val addToArchApi = mockFunction[String, String, js.Set[String], js.Function0[Unit], js.Promise[Unit]]
     val props = AddToArchControllerProps(dispatch, actions.actions, FileListState(
       index = 1,
       currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(
@@ -114,9 +114,7 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
         FileListItem("item 2")
       ) ++ items),
       selectedNames = js.Set("dir 3")
-    ), zipName = "new.zip", js.Array(items: _*), AddToArchAction.Add, onComplete, onCancel)
-    val addToArchApi = mockFunction[String, String, Set[String], () => Unit, Future[Unit]]
-    AddToArchController.addToArchApi = addToArchApi
+    ), archName = "new.zip", archType = "zip", AddToArchAction.Add, addToArchApi, js.Array(items: _*), onComplete, onCancel)
 
     //when
     val renderer = createTestRenderer(<(AddToArchController())(^.plain := props)())
@@ -146,9 +144,10 @@ class AddToArchControllerSpec extends AsyncTestSpec with BaseTestSpec with TestR
         }
         val p = Promise[Unit]()
         var onNextItemFunc: () => Unit = null
-        addToArchApi.expects(zipFile, props.state.currDir.path, Set("dir 3"), *).onCall { (_, _, _, onNextItem) =>
+        addToArchApi.expects(zipFile, props.state.currDir.path, *, *).onCall { (_, _, items, onNextItem) =>
+          items.toList shouldBe List("dir 3")
           onNextItemFunc = onNextItem
-          p.future
+          p.future.toJSPromise
         }
         dispatch.expects(*).onCall { action: Any =>
           assertFileListParamsChangedAction(action,

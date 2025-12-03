@@ -1,6 +1,7 @@
 package farjs.archiver
 
 import farjs.archiver.ArchiverPluginUi._
+import farjs.archiver.zip.ZipApi
 import farjs.filelist.FileListActions._
 import farjs.filelist._
 import farjs.filelist.api.{FileListDir, FileListItem}
@@ -19,16 +20,18 @@ class ArchiverPluginUi(data: FileListData, zipName: String, items: Seq[FileListI
       dispatch = data.dispatch,
       actions = data.actions,
       state = data.state,
-      zipName = zipName,
+      archName = zipName,
+      archType = "zip",
+      archAction = AddToArchAction.Add,
+      addToArchApi = ZipApi.addToZip _,
       items = js.Array(items: _*),
-      action = AddToArchAction.Add,
-      onComplete = { zipFile =>
+      onComplete = { archFile =>
         props.onClose()
 
         val action = data.actions.updateDir(data.dispatch, data.state.currDir.path)
         data.dispatch(action)
         action.task.result.toFuture.foreach { updatedDir =>
-          data.dispatch(FileListItemCreatedAction(zipFile, updatedDir.asInstanceOf[FileListDir]))
+          data.dispatch(FileListItemCreatedAction(archFile, updatedDir.asInstanceOf[FileListDir]))
         }
       },
       onCancel = props.onClose
