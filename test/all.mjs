@@ -1,6 +1,7 @@
 await import("./app/service/HistoryProviderImpl.test.mjs");
 await import("./app/service/HistoryServiceImpl.test.mjs");
 
+await import("./archiver/AddToArchController.test.mjs");
 await import("./archiver/AddToArchPopup.test.mjs");
 
 await import("./copymove/CopyItemsPopup.test.mjs");

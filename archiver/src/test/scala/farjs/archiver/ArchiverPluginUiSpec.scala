@@ -9,6 +9,7 @@ import farjs.ui.Dispatch
 import farjs.ui.task.{Task, TaskAction}
 import org.scalatest.Succeeded
 import scommons.nodejs.test.AsyncTestSpec
+import scommons.react.ReactClass
 import scommons.react.test._
 
 import scala.concurrent.Future
@@ -16,7 +17,7 @@ import scala.scalajs.js
 
 class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils {
 
-  ArchiverPluginUi.addToArchController = mockUiComponent("AddToArchController")
+  ArchiverPluginUi.addToArchController = "AddToArchController".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
   class Actions {
@@ -39,7 +40,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val pluginUi = new ArchiverPluginUi(data, "item 1.zip", items)
     val props = FileListPluginUiProps(dispatch, onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
-    val controller = findComponentProps(comp, addToArchController, plain = true)
+    val controller = findComponents(comp, addToArchController).head.props
     
     //then
     onClose.expects()
@@ -70,7 +71,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     val pluginUi = new ArchiverPluginUi(data, "item 1.zip", items)
     val props = FileListPluginUiProps(dispatch, onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
-    val controller = findComponentProps(comp, addToArchController, plain = true)
+    val controller = findComponents(comp, addToArchController).head.props
     
     val zipFile = "test.zip"
     val updatedDir = FileListDir("/updated/dir", isRoot = false, js.Array(
@@ -112,7 +113,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
 
     //then
     assertComponents(result.children, List(
-      <(addToArchController())(^.assertPlain[AddToArchControllerProps](inside(_) {
+      <(addToArchController)(^.assertPlain[AddToArchControllerProps](inside(_) {
         case AddToArchControllerProps(resDispatch, resActions, state, archName, archType, archAction, _, resItems, _, _) =>
           resDispatch shouldBe dispatch
           resActions shouldBe actions

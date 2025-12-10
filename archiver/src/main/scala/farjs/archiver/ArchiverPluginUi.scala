@@ -16,7 +16,7 @@ class ArchiverPluginUi(data: FileListData, zipName: String, items: Seq[FileListI
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
     
-    <(addToArchController())(^.plain := AddToArchControllerProps(
+    <(addToArchController)(^.plain := AddToArchControllerProps(
       dispatch = data.dispatch,
       actions = data.actions,
       state = data.state,
@@ -41,5 +41,5 @@ class ArchiverPluginUi(data: FileListData, zipName: String, items: Seq[FileListI
 
 object ArchiverPluginUi {
 
-  private[archiver] var addToArchController: UiComponent[AddToArchControllerProps] = AddToArchController
+  private[archiver] var addToArchController: ReactClass = AddToArchController
 }

@@ -120,7 +120,7 @@ class ZipPanel(zipPath: String,
       ) else None,
 
       zipData.map { case (dispatch, actions, state, items, move) =>
-        <(addToArchController())(^.plain := AddToArchControllerProps(
+        <(addToArchController)(^.plain := AddToArchControllerProps(
           dispatch = dispatch,
           actions = actions,
           state = state,
@@ -154,6 +154,6 @@ class ZipPanel(zipPath: String,
 object ZipPanel {
 
   private[zip] var fileListPanelComp: ReactClass = FileListPanel
-  private[zip] var addToArchController: UiComponent[AddToArchControllerProps] = AddToArchController
+  private[zip] var addToArchController: ReactClass = AddToArchController
   private[zip] var messageBoxComp: ReactClass = MessageBox
 }

@@ -24,7 +24,7 @@ import scala.scalajs.js
 class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils with OptionValues {
 
   ZipPanel.fileListPanelComp = "FileListPanel".asInstanceOf[ReactClass]
-  ZipPanel.addToArchController = mockUiComponent("AddToArchController")
+  ZipPanel.addToArchController = "AddToArchController".asInstanceOf[ReactClass]
   ZipPanel.messageBoxComp = "MessageBox".asInstanceOf[ReactClass]
 
   //noinspection TypeAnnotation
@@ -264,7 +264,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListCopy) shouldBe false
 
     //then
-    findProps(comp, addToArchController, plain = true) should be (empty)
+    findComponents(comp, addToArchController) should be (empty)
   }
 
   it should "not render AddToArchController if .. when onKeypress(onFileListCopy)" in {
@@ -308,7 +308,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListCopy) shouldBe false
 
     //then
-    findProps(comp, addToArchController, plain = true) should be (empty)
+    findComponents(comp, addToArchController) should be (empty)
   }
 
   it should "render AddToArchController and handle onCancel when onKeypress(onFileListCopy)" in {
@@ -351,7 +351,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListCopy) shouldBe true
 
     //then
-    inside(findComponentProps(renderer.root, addToArchController, plain = true)) {
+    val controllerProps = inside(findComponents(renderer.root, addToArchController)) {
+      case List(c) => c.props.asInstanceOf[AddToArchControllerProps]
+    }
+    inside(controllerProps) {
       case AddToArchControllerProps(resDispatch, resActions, state, archName, archType, archAction, _, resItems, _, onCancel) =>
         resDispatch shouldBe fsDispatch
         resActions shouldBe fsActions
@@ -365,7 +368,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         onCancel()
 
         //then
-        findComponents(renderer.root, addToArchController()) should be (empty)
+        findComponents(renderer.root, addToArchController) should be (empty)
     }
   }
 
@@ -416,7 +419,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListCopy) shouldBe true
 
     //then
-    inside(findComponentProps(renderer.root, addToArchController, plain = true)) {
+    val controllerProps = inside(findComponents(renderer.root, addToArchController)) {
+      case List(c) => c.props.asInstanceOf[AddToArchControllerProps]
+    }
+    inside(controllerProps) {
       case AddToArchControllerProps(resDispatch, resActions, state, archName, archType, archAction, _, resItems, onComplete, _) =>
         resDispatch shouldBe fsDispatch
         resActions shouldBe fsActions
@@ -441,7 +447,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         onComplete(zipFile)
 
         //then
-        findComponents(renderer.root, addToArchController()) should be (empty)
+        findComponents(renderer.root, addToArchController) should be (empty)
         updateAction.task.result.toFuture.map(_ => Succeeded)
     }
   }
@@ -493,7 +499,10 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListMove) shouldBe true
 
     //then
-    inside(findComponentProps(renderer.root, addToArchController, plain = true)) {
+    val controllerProps = inside(findComponents(renderer.root, addToArchController)) {
+      case List(c) => c.props.asInstanceOf[AddToArchControllerProps]
+    }
+    inside(controllerProps) {
       case AddToArchControllerProps(_, resActions, state, archName, archType, archAction, _, resItems, onComplete, _) =>
         resActions shouldBe fsActions.actions
         state shouldBe fsState
@@ -523,7 +532,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
         onComplete(zipFile)
 
         //then
-        findComponents(renderer.root, addToArchController()) should be (empty)
+        findComponents(renderer.root, addToArchController) should be (empty)
         for {
           _ <- updateAction.task.result.toFuture
           _ <- deleteAction.task.result.toFuture
@@ -572,7 +581,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     panelProps.onKeypress.toOption.value(null, FileListEvent.onFileListCopy) shouldBe true
 
     //then
-    findProps(renderer.root, addToArchController, plain = true) should be (empty)
+    findComponents(renderer.root, addToArchController) should be (empty)
     val msgBox = inside(findComponents(renderer.root, messageBoxComp)) {
       case List(msgBox) => msgBox.props.asInstanceOf[MessageBoxProps]
     }
