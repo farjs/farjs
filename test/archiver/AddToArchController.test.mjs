@@ -54,10 +54,11 @@ describe("AddToArchController.test.mjs", () => {
     const onComplete = mockFunction();
     let dispatchArgs = /** @type {any[]} */ ([]);
     const dispatch = mockFunction((...args) => (dispatchArgs = args));
+    const error = Error("test error");
     let scanDirsArgs = /** @type {any[]} */ ([]);
     const scanDirs = mockFunction((...args) => {
       scanDirsArgs = args;
-      return Promise.reject(Error("test error"));
+      return Promise.reject(error);
     });
     const actions = new MockFileListActions({ scanDirs });
     const items = [FileListItem("dir 3", true)];
@@ -104,6 +105,13 @@ describe("AddToArchController.test.mjs", () => {
     /** @type {TaskAction<?>} */
     const action = dispatchArgs[0];
     assert.deepEqual(action.task.message, "Add item(s) to zip archive");
+    let capturedError = null;
+    try {
+      await action.task.result;
+    } catch (err) {
+      capturedError = err;
+    }
+    assert.deepEqual(capturedError, error);
     assert.deepEqual(onComplete.times, 0);
   });
 
