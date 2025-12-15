@@ -31,7 +31,7 @@ object ArchiverPlugin extends FileListPlugin(js.Array("S-f7")) {
       
       if (actions.api.isLocal && items.nonEmpty) {
         val zipName = s"${items.head.name}.zip"
-        val ui = new ArchiverPluginUi(FileListData(dispatch, actions, state), zipName, items)
+        val ui = new ArchiverPluginUi(FileListData(dispatch, actions, state), zipName, "zip", ZipApi.addToZip _, js.Array(items: _*))
         Some(ui.apply())
       }
       else None

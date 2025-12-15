@@ -32,12 +32,13 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[js.Any, Unit]
+    val addToArchApi = mockFunction[String, String, js.Set[String], js.Function0[Unit], js.Promise[Unit]]
     val actions = new MockFileListActions
     val items = List(FileListItem("item 1"))
     val data = FileListData(dispatch, actions, FileListState(
       currDir = FileListDir("/sub-dir", isRoot = false, items = js.Array(items: _*))
     ))
-    val pluginUi = new ArchiverPluginUi(data, "item 1.zip", items)
+    val pluginUi = new ArchiverPluginUi(data, "item 1.zip", "zip", addToArchApi, js.Array(items: _*))
     val props = FileListPluginUiProps(dispatch, onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
     val controller = findComponents(comp, addToArchController).head.props
@@ -55,6 +56,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     //given
     val onClose = mockFunction[Unit]
     val dispatch = mockFunction[js.Any, Unit]
+    val addToArchApi = mockFunction[String, String, js.Set[String], js.Function0[Unit], js.Promise[Unit]]
     val actions = new Actions
     val items = List(
       FileListItem("item 2"),
@@ -68,7 +70,7 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
       ) ++ items),
       selectedNames = js.Set("item 3", "item 2")
     ))
-    val pluginUi = new ArchiverPluginUi(data, "item 1.zip", items)
+    val pluginUi = new ArchiverPluginUi(data, "item 1.zip", "zip", addToArchApi, js.Array(items: _*))
     val props = FileListPluginUiProps(dispatch, onClose)
     val comp = testRender(<(pluginUi())(^.plain := props)())
     val controller = findComponents(comp, addToArchController).head.props
@@ -101,11 +103,12 @@ class ArchiverPluginUiSpec extends AsyncTestSpec with BaseTestSpec with TestRend
     //given
     val onClose = mockFunction[Unit]
     val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
+    val addToArchApi = mockFunction[String, String, js.Set[String], js.Function0[Unit], js.Promise[Unit]]
     val actions = new MockFileListActions
     val state = FileListState()
     val data = FileListData(dispatch, actions, state)
     val items = List(FileListItem("item 1"))
-    val pluginUi = new ArchiverPluginUi(data, "item 1.zip", items)
+    val pluginUi = new ArchiverPluginUi(data, "item 1.zip", "zip", addToArchApi, js.Array(items: _*))
     val props = FileListPluginUiProps(dispatch, onClose)
     
     //when
