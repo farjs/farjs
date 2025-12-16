@@ -21,7 +21,7 @@ class FileListRoot(dispatch: Dispatch,
     <(HistoryProvider.Context.Provider)(^.contextValue := module.historyProvider)(
       <(FSServices.Context.Provider)(^.contextValue := module.fsServices)(
         <(withPortalsComp)()(
-          <(fileListComp)(^.wrapped := FileListBrowserProps(
+          <(fileListComp)(^.plain := FileListBrowserProps(
             dispatch = dispatch,
             plugins = plugins
           ))(),
@@ -109,7 +109,7 @@ object FileListRoot {
     val instance: FileListPlugin = js.native
   }
 
-  private lazy val plugins: Seq[FileListPlugin] = List(
+  private lazy val plugins: js.Array[FileListPlugin] = js.Array(
     QuickViewPlugin,
     ArchiverPlugin,
     ViewerPlugin,

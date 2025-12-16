@@ -17,10 +17,6 @@ import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.util.Failure
 
-case class FileListBrowserProps(dispatch: Dispatch,
-                                isRightInitiallyActive: Boolean = false,
-                                plugins: Seq[FileListPlugin] = Nil)
-
 object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
 
   private[filelist] var withStackComp: ReactClass = WithStack
@@ -29,7 +25,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
   private[filelist] var fsPlugin: FSPlugin = FSPlugin.instance
 
   protected def render(compProps: Props): ReactElement = {
-    val props = compProps.wrapped
+    val props = compProps.plain
     val leftButtonRef = useRef[BlessedElement](null)
     val rightButtonRef = useRef[BlessedElement](null)
     val (isRight, setIsRight) = useStateUpdater(false)
@@ -172,7 +168,7 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     /* F12 */ "DevTools"
   )
 
-  private def openCurrItem(plugins: Seq[FileListPlugin],
+  private def openCurrItem(plugins: js.Array[FileListPlugin],
                            dispatch: Dispatch,
                            stack: PanelStack,
                            actions: FileListActions,

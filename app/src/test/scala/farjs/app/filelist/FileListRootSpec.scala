@@ -31,11 +31,11 @@ class FileListRootSpec extends TestSpec with TestRendererUtils {
     fsCtx.get() shouldBe module.fsServices
     assertComponents(result.children, List(
       <(withPortalsComp)()(
-        <(servicesComp)(^.assertWrapped(inside(_) {
+        <(servicesComp)(^.assertPlain[FileListBrowserProps](inside(_) {
           case FileListBrowserProps(resDispatch, isRightInitiallyActive, plugins) =>
             resDispatch should be theSameInstanceAs dispatch
             isRightInitiallyActive shouldBe false
-            plugins should not be empty
+            plugins.toList should not be empty
         }))(),
 
         "test_child"
