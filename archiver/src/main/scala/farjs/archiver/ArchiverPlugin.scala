@@ -23,24 +23,28 @@ object ArchiverPlugin extends FileListPlugin(js.Array("S-f7")) {
                             stacks: WithStacksProps,
                             data: js.UndefOr[js.Dynamic] = js.undefined): js.Promise[js.UndefOr[ReactClass]] = {
 
+    val res = createUiParams(stacks).map(ArchiverPluginUi)
+
+    js.Promise.resolve[js.UndefOr[ReactClass]](res match {
+      case Some(r) => r
+      case None => js.undefined
+    })
+  }
+  
+  private def createUiParams(stacks: WithStacksProps): Option[ArchiverPluginUiParams] = {
     val stackItem = WithStacksProps.active(stacks).stack.peek[FileListState]()
-    val res = stackItem.getData().toOption.flatMap { case FileListData(dispatch, actions, state) =>
+    stackItem.getData().toOption.flatMap { case FileListData(dispatch, actions, state) =>
       val items =
         if (state.selectedNames.nonEmpty) FileListState.selectedItems(state).toList
         else FileListState.currentItem(state).filter(_ != FileListItem.up).toList
       
       if (actions.api.isLocal && items.nonEmpty) {
         val zipName = s"${items.head.name}.zip"
-        val ui = new ArchiverPluginUi(FileListData(dispatch, actions, state), zipName, "zip", ZipApi.addToZip _, js.Array(items: _*))
-        Some(ui.apply())
+        val params = ArchiverPluginUiParams(FileListData(dispatch, actions, state), zipName, "zip", ZipApi.addToZip _, js.Array(items: _*))
+        Some(params)
       }
       else None
     }
-
-    js.Promise.resolve[js.UndefOr[ReactClass]](res match {
-      case Some(r) => r
-      case None => js.undefined
-    })
   }
   
   override def onFileTrigger(filePath: String,

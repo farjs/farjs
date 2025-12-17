@@ -23,7 +23,7 @@ const h = React.createElement;
  *  readonly archType: String
  *  readonly archAction: AddToArchAction
  *  addToArchApi(archFile: string, parent: string, items: Set<string>, onProgress: () => void): Promise<void>
- *  readonly items: FileListItem[]
+ *  readonly items: readonly FileListItem[]
  *  onComplete(archFile: string): void;
  *  onCancel(): void;
  * }} AddToArchControllerProps
