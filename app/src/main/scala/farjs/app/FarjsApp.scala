@@ -93,13 +93,13 @@ object FarjsApp {
   private def prepareDB(): Future[BetterSqlite3Database] = {
     val dbF = for {
       _ <- FSFileListActions.instance.api.mkDirs(js.Array(FarjsData.getDataDir: _*)).toFuture
-      db = new BetterSqlite3Database(FarjsData.getDBFilePath)
-      _ <- FarjsDBMigrations.apply(db)
+      db <- FarjsDBMigrations(FarjsData.getDBFilePath).toFuture
     } yield db
 
     dbF.recover {
       case error =>
         Console.err.println(s"Failed to prepare DB, error: $error")
+        TaskError.errorHandler(error)
         throw error
     }
   }
