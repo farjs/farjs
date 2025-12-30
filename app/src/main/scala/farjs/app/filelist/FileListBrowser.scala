@@ -1,28 +1,20 @@
 package farjs.app.filelist
 
+import farjs.app.filelist.FileListBrowser._
 import farjs.app.filelist.FileListRoot.FSPlugin
 import farjs.filelist._
 import farjs.filelist.stack._
 import farjs.ui.Dispatch
 import farjs.ui.menu._
-import farjs.ui.task.{Task, TaskAction}
-import scommons.nodejs.path
 import scommons.react._
 import scommons.react.blessed._
 import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.scalajs.js
-import scala.scalajs.js.typedarray.Uint8Array
-import scala.util.Failure
+import scala.scalajs.js.annotation.JSImport
 
-object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
-
-  private[filelist] var withStackComp: ReactClass = WithStack
-  private[filelist] var bottomMenuComp: ReactClass = BottomMenu
-  private[filelist] var menuBarTrigger: ReactClass = MenuBarTrigger
-  private[filelist] var fsPlugin: FSPlugin = FSPlugin.instance
+class FileListBrowser(pluginHandler: FileListPluginHandler) extends FunctionComponent[FileListBrowserProps] {
 
   protected def render(compProps: Props): ReactElement = {
     val props = compProps.plain
@@ -74,23 +66,11 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
           setIsRight(!_)
           screen.focusNext()
         case "enter" | "C-pagedown" =>
-          val stack = getStack(isRightActive)
-          val stackItem = stack.peek[js.Any]()
-          stackItem.getData().collect {
-            case FileListData(_, actions, state) if actions.api.isLocal
-                && FileListState.currentItem(state).exists(!_.isDir) =>
-              openCurrItem(props.plugins, props.dispatch, stack, actions, state)
-          }
-        case keyFull =>
-          props.plugins.find(_.triggerKeys.contains(keyFull)).foreach { plugin =>
-            val pluginRes = plugin.onKeyTrigger(keyFull, stacks, key.data).toFuture
-            pluginRes.foreach { maybePluginUi =>
-              maybePluginUi.foreach { pluginUi =>
-                setCurrPluginUi(Some(pluginUi))
-              }
-            }
-            pluginRes.andThen { case Failure(_) =>
-              props.dispatch(TaskAction(Task("Opening Plugin", pluginRes)))
+          pluginHandler.openCurrItem(props.dispatch, getStack(isRightActive))
+        case _ =>
+          pluginHandler.openPluginUi(props.dispatch, key, stacks).toFuture.foreach { maybePluginUi =>
+            maybePluginUi.foreach { pluginUi =>
+              setCurrPluginUi(Some(pluginUi))
             }
           }
       }
@@ -152,6 +132,14 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
       }
     )
   }
+}
+
+object FileListBrowser {
+
+  private[filelist] var withStackComp: ReactClass = WithStack
+  private[filelist] var bottomMenuComp: ReactClass = BottomMenu
+  private[filelist] var menuBarTrigger: ReactClass = MenuBarTrigger
+  private[filelist] var fsPlugin: FSPlugin = FSPlugin.instance
 
   private[filelist] val menuItems = js.Array(
     /*  F1 */ "",
@@ -167,44 +155,18 @@ object FileListBrowser extends FunctionComponent[FileListBrowserProps] {
     /* F11 */ "",
     /* F12 */ "DevTools"
   )
+}
 
-  private def openCurrItem(plugins: js.Array[FileListPlugin],
-                           dispatch: Dispatch,
-                           stack: PanelStack,
-                           actions: FileListActions,
-                           state: FileListState): Unit = {
+trait FileListPluginHandler extends js.Object {
 
-    FileListState.currentItem(state).foreach { item =>
-      def onClose: () => Unit = { () =>
-        stack.pop()
-      }
+  def openCurrItem(dispatch: Dispatch, stack: PanelStack): Unit
 
-      val filePath = path.join(state.currDir.path, item.name)
-      val openF = (for {
-        source <- actions.api.readFile(state.currDir.path, item, 0.0).toFuture
-        buff = new Uint8Array(64 * 1024)
-        bytesRead <- source.readNextBytes(buff).toFuture
-        _ <- source.close().toFuture
-      } yield {
-        buff.subarray(0, bytesRead)
-      }).flatMap { fileHeader =>
-        val zero = Future.successful(js.undefined: js.UndefOr[PanelStackItem[FileListState]])
-        val pluginRes = plugins.foldLeft(zero) { (resF, plugin) =>
-          resF.flatMap {
-            case res if res.isEmpty => plugin.onFileTrigger(filePath, fileHeader, onClose).toFuture
-            case _ => resF
-          }
-        }
-        pluginRes.map { maybePluginItem =>
-          maybePluginItem.foreach { item =>
-            stack.push(FSPlugin.instance.initDispatch(dispatch, FileListStateReducer, stack, item))
-          }
-        }
-      }
+  def openPluginUi(dispatch: Dispatch, key: KeyboardKey, stacks: WithStacksProps): js.Promise[js.UndefOr[ReactClass]]
+}
 
-      openF.andThen {
-        case Failure(_) => dispatch(TaskAction(Task("Opening File", openF)))
-      }
-    }
-  }
+@js.native
+@JSImport("../app/filelist/FileListPluginHandler.mjs", JSImport.Default)
+object FileListPluginHandler extends js.Function1[js.Array[FileListPlugin], FileListPluginHandler] {
+
+  def apply(plugins: js.Array[FileListPlugin]): FileListPluginHandler = js.native
 }

@@ -32,10 +32,9 @@ class FileListRootSpec extends TestSpec with TestRendererUtils {
     assertComponents(result.children, List(
       <(withPortalsComp)()(
         <(servicesComp)(^.assertPlain[FileListBrowserProps](inside(_) {
-          case FileListBrowserProps(resDispatch, isRightInitiallyActive, plugins) =>
+          case FileListBrowserProps(resDispatch, isRightInitiallyActive) =>
             resDispatch should be theSameInstanceAs dispatch
             isRightInitiallyActive shouldBe false
-            plugins.toList should not be empty
         }))(),
 
         "test_child"

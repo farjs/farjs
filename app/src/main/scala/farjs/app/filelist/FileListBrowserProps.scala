@@ -1,6 +1,5 @@
 package farjs.app.filelist
 
-import farjs.filelist.FileListPlugin
 import farjs.ui.Dispatch
 
 import scala.scalajs.js
@@ -8,27 +7,21 @@ import scala.scalajs.js
 sealed trait FileListBrowserProps extends js.Object {
   val dispatch: Dispatch
   val isRightInitiallyActive: Boolean
-  val plugins: js.Array[FileListPlugin]
 }
 
 object FileListBrowserProps {
 
-  def apply(dispatch: Dispatch,
-            isRightInitiallyActive: Boolean = false,
-            plugins: js.Array[FileListPlugin] = js.Array()): FileListBrowserProps = {
-
+  def apply(dispatch: Dispatch, isRightInitiallyActive: Boolean = false): FileListBrowserProps = {
     js.Dynamic.literal(
       dispatch = dispatch,
-      isRightInitiallyActive = isRightInitiallyActive,
-      plugins = plugins
+      isRightInitiallyActive = isRightInitiallyActive
     ).asInstanceOf[FileListBrowserProps]
   }
 
-  def unapply(arg: FileListBrowserProps): Option[(Dispatch, Boolean, js.Array[FileListPlugin])] = {
+  def unapply(arg: FileListBrowserProps): Option[(Dispatch, Boolean)] = {
     Some((
       arg.dispatch,
-      arg.isRightInitiallyActive,
-      arg.plugins
+      arg.isRightInitiallyActive
     ))
   }
 }

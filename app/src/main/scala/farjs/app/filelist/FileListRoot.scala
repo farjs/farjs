@@ -22,8 +22,7 @@ class FileListRoot(dispatch: Dispatch,
       <(FSServices.Context.Provider)(^.contextValue := module.fsServices)(
         <(withPortalsComp)()(
           <(fileListComp)(^.plain := FileListBrowserProps(
-            dispatch = dispatch,
-            plugins = plugins
+            dispatch = dispatch
           ))(),
 
           compProps.children
@@ -35,7 +34,7 @@ class FileListRoot(dispatch: Dispatch,
 
 object FileListRoot {
   
-  private[filelist] var fileListComp: ReactClass = FileListBrowser()
+  private[filelist] var fileListComp: ReactClass = new FileListBrowser(FileListPluginHandler(plugins)).apply()
 
   @js.native
   @JSImport("../viewer/quickview/QuickViewPlugin.mjs", JSImport.Default)
