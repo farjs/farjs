@@ -34,7 +34,7 @@ class FileListRoot(dispatch: Dispatch,
 
 object FileListRoot {
   
-  private[filelist] var fileListComp: ReactClass = new FileListBrowser(FileListPluginHandler(plugins)).apply()
+  private[filelist] var fileListComp: ReactClass = FileListBrowser(FileListPluginHandler(plugins))
 
   @js.native
   @JSImport("../viewer/quickview/QuickViewPlugin.mjs", JSImport.Default)
