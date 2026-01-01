@@ -310,7 +310,10 @@ describe("FileListBrowser.test.mjs", () => {
       openPluginUi: mockFunction(),
     };
     const fileListBrowser = FileListBrowser(pluginHandler);
-    const props = getFileListBrowserProps({ dispatch });
+    const props = getFileListBrowserProps({
+      dispatch,
+      isRightInitiallyActive: true,
+    });
     const focusMock = mockFunction();
     const buttonMock = { focus: focusMock };
     const comp = TestRenderer.create(h(fileListBrowser, props), {
@@ -319,20 +322,20 @@ describe("FileListBrowser.test.mjs", () => {
       },
     }).root;
     assert.deepEqual(focusMock.times, 1);
-    const leftButton = comp.findAllByType("button")[0];
-    const [leftStack, _] = comp
+    const rightButton = comp.findAllByType("button")[1];
+    const [_, rightStack] = comp
       .findAllByType(withStackComp)
       .map((_) => _.props);
     const keyFull = "C-pagedown";
 
     //when
     TestRenderer.act(() => {
-      leftButton.props.onKeypress(null, { full: keyFull });
+      rightButton.props.onKeypress(null, { full: keyFull });
     });
 
     //then
     assert.deepEqual(openCurrItem.times, 1);
-    assert.deepEqual(openCurrItemArgs, [props.dispatch, leftStack.stack]);
+    assert.deepEqual(openCurrItemArgs, [props.dispatch, rightStack.stack]);
   });
 
   it("should call pluginHandler.openPluginUi and render plugin ui when onKeypress(triggerKey)", async () => {

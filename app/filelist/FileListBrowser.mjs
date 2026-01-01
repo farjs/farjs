@@ -70,13 +70,9 @@ function FileListBrowser(pluginHandler) {
       setRightStackData
     );
 
-    /** @type {(isRightActive: boolean) => BlessedElement} */
-    function getInput(isRightActive) {
-      const [leftEl, rightEl] = isRight
-        ? [rightButtonRef.current, leftButtonRef.current]
-        : [leftButtonRef.current, rightButtonRef.current];
-
-      return isRightActive ? rightEl : leftEl;
+    /** @type {(isRight: boolean) => BlessedElement} */
+    function getInput(isRight) {
+      return isRight ? rightButtonRef.current : leftButtonRef.current;
     }
 
     /** @type {(isRight: boolean) => PanelStack} */
