@@ -2,7 +2,6 @@ package farjs.app
 
 import farjs.app.filelist.FileListRoot.FSFileListActions
 import farjs.app.filelist.{FileListModule, FileListRoot}
-import farjs.app.raw.BetterSqlite3Database
 import farjs.filelist.theme.FileListTheme
 import farjs.ui.app._
 import farjs.ui.portal.WithPortals
@@ -13,10 +12,7 @@ import scommons.react._
 import scommons.react.blessed._
 import scommons.react.blessed.raw.{Blessed, ReactBlessed}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 @JSExportTopLevel(name = "FarjsApp")
@@ -72,7 +68,7 @@ object FarjsApp {
         loadMainUi = { dispatch =>
           onReady.foreach(_.apply())
 
-          prepareDB().map { db =>
+          FarjsDBMigrations.prepareDB(FSFileListActions.instance, FarjsData.instance).`then`[LoadResult] { db =>
             val fileListModule = new FileListModule(db)
             val mainUi = new FileListRoot(dispatch, fileListModule, WithPortals.create(screen)).apply()
             val theme =
@@ -80,7 +76,7 @@ object FarjsApp {
               else FileListTheme.defaultTheme
 
             LoadResult(theme, mainUi)
-          }.toJSPromise
+          }
         },
         initialDevTool = if (showDevTools) DevTool.Logs else DevTool.Hidden,
         defaultTheme = FileListTheme.defaultTheme
@@ -88,19 +84,5 @@ object FarjsApp {
       screen
     )
     screen
-  }
-
-  private def prepareDB(): Future[BetterSqlite3Database] = {
-    val dbF = for {
-      _ <- FSFileListActions.instance.api.mkDirs(FarjsData.instance.getDataDir()).toFuture
-      db <- FarjsDBMigrations(FarjsData.instance.getDBFilePath()).toFuture
-    } yield db
-
-    dbF.recover {
-      case error =>
-        Console.err.println(s"Failed to prepare DB, error: $error")
-        TaskError.errorHandler(error)
-        throw error
-    }
   }
 }
