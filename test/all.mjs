@@ -2,6 +2,7 @@ await import("./app/filelist/FileListBrowser.test.mjs");
 await import("./app/filelist/FileListPluginHandler.test.mjs");
 await import("./app/service/HistoryProviderImpl.test.mjs");
 await import("./app/service/HistoryServiceImpl.test.mjs");
+await import("./app/FarjsData.test.mjs");
 await import("./app/FarjsDBMigrations.test.mjs");
 
 await import("./archiver/AddToArchController.test.mjs");

@@ -1,34 +1,22 @@
 package farjs.app
 
-import farjs.app.FarjsData.appName
 import scommons.nodejs.Process.Platform
-import scommons.nodejs.raw.NodeJs.{process => nodeProc}
-import scommons.nodejs.{path => nodePath, _}
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
-class FarjsData(platform: Platform) {
+trait FarjsData extends js.Object {
 
-  def getDBFilePath: String = nodePath.join((getDataDir :+ "farjs.db"): _*)
+  def getDBFilePath(): String
 
-  def getDataDir: List[String] = {
-    val home = os.homedir()
-
-    if (platform == Platform.darwin) {
-      List(home, "Library", "Application Support", appName)
-    }
-    else if (platform == Platform.win32) {
-      val appData = nodeProc.asInstanceOf[js.Dynamic].env.APPDATA.asInstanceOf[js.UndefOr[String]]
-      appData.toOption match {
-        case Some(dataDir) => List(dataDir, appName)
-        case None => List(home, s".$appName")
-      }
-    }
-    else List(home, ".local", "share", appName)
-  }
+  def getDataDir(): js.Array[String]
 }
 
-object FarjsData extends FarjsData(process.platform) {
+@js.native
+@JSImport("../app/FarjsData.mjs", JSImport.Default)
+object FarjsData extends js.Function1[Platform, FarjsData] {
 
-  private val appName = "FAR.js"
+  val instance: FarjsData = js.native
+
+  def apply(platform: Platform): FarjsData = js.native
 }
