@@ -135,7 +135,7 @@ class ZipApi(
             stdout.readable.destroy(js.undefined)
           }
 
-          exitP.`then`[Unit](_ => ())
+          exitP.toFuture.map(_ => ()).toJSPromise
         }
       }
     }.toJSPromise
