@@ -1,8 +1,8 @@
 package farjs.filelist
 
-import scommons.nodejs.ChildProcess._
-import scommons.nodejs._
-import scommons.nodejs.util.SubProcess
+import farjs.filelist.util.ChildProcess._
+import farjs.filelist.util.{ChildProcess, SubProcess}
+import scommons.nodejs.raw
 
 import scala.concurrent.Future
 import scala.scalajs.js

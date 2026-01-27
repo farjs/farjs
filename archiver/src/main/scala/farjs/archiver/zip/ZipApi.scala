@@ -1,8 +1,8 @@
 package farjs.archiver.zip
 
 import farjs.filelist.api._
-import scommons.nodejs.util.{StreamReader, SubProcess}
-import scommons.nodejs.{Buffer, ChildProcess, child_process, raw}
+import farjs.filelist.util.{ChildProcess, StreamReader, SubProcess}
+import scommons.nodejs.{Buffer, raw}
 
 import scala.collection.mutable
 import scala.concurrent.Future
@@ -10,7 +10,6 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.typedarray.Uint8Array
-import scala.util.control.NonFatal
 
 class ZipApi(
   val zipPath: String,
@@ -101,16 +100,23 @@ class ZipApi(
     val filePath = s"$parent/${item.name}".stripPrefix(rootPath).stripPrefix("/")
     val subprocessF = extract(zipPath, filePath)
 
-    subprocessF.map { case SubProcess(_, stdout, exitF) =>
+    subprocessF.map { case SubProcess(_, stdout, exitP) =>
       new FileSource {
         private var pos = 0
 
         override val file: String = filePath
 
         override def readNextBytes(buff: Uint8Array): js.Promise[Int] = {
-          stdout.readNextBytes(buff.length).flatMap {
+          stdout.readNextBytes(buff.length).toFuture.map(_.toOption).flatMap {
             case None =>
-              if (pos != item.size) exitF.map(_ => 0)
+              if (pos != item.size) {
+                exitP.toFuture.map { maybeError =>
+                  maybeError.toOption match {
+                    case None => 0
+                    case Some(error) => throw js.JavaScriptException(error)
+                  }
+                }
+              }
               else Future.successful(0)
             case Some(content) => Future.successful {
               val bytesRead = content.length
@@ -129,9 +135,7 @@ class ZipApi(
             stdout.readable.destroy(js.undefined)
           }
 
-          exitF.recover {
-            case NonFatal(_) => ()
-          }.toJSPromise
+          exitP.`then`[Unit](_ => ())
         }
       }
     }.toJSPromise
@@ -150,7 +154,7 @@ class ZipApi(
 
 object ZipApi {
 
-  private[zip] var childProcess: ChildProcess = child_process
+  private[zip] var childProcess: ChildProcess = ChildProcess.child_process
   
   def convertToFileListItem(zip: ZipEntry): FileListItem = {
     FileListItem.copy(FileListItem(
@@ -177,8 +181,8 @@ object ZipApi {
         if (line.contains("adding: ")) {
           onNextItem()
         }
-      }
-      _ <- subprocess.exitF
+      }.toFuture
+      _ <- subprocess.exitP.toFuture
     } yield ()
 
     resF.toJSPromise
@@ -194,7 +198,7 @@ object ZipApi {
     )
 
     def loop(reader: StreamReader, result: js.Array[Buffer]): Future[js.Array[Buffer]] = {
-      reader.readNextBytes(64 * 1024).flatMap {
+      reader.readNextBytes(64 * 1024).toFuture.map(_.toOption).flatMap {
         case None => Future.successful(result)
         case Some(content) =>
           result.push(content)
@@ -206,9 +210,14 @@ object ZipApi {
       subprocess <- subprocessF
       chunks <- loop(subprocess.stdout, new js.Array[Buffer](0))
       output = Buffer.concat(chunks).toString
-      _ <- subprocess.exitF.recover {
-        case js.JavaScriptException(error)
-          if error.toString.contains("code=1") && output.contains("Empty zipfile.") =>
+      _ <- subprocess.exitP.toFuture.map { maybeError =>
+        maybeError.toOption match {
+          case None =>
+          case Some(error) =>
+            if (!error.toString.contains("code=1") || !output.contains("Empty zipfile.")) {
+              throw new RuntimeException(error.toString)
+            }
+        }
       }
     } yield {
       ZipApi.groupByParent(ZipEntry.fromUnzipCommand(output))

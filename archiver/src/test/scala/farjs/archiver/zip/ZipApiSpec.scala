@@ -3,13 +3,13 @@ package farjs.archiver.zip
 import farjs.filelist.MockChildProcess
 import farjs.filelist.api.FileListItemSpec.assertFileListItems
 import farjs.filelist.api._
+import farjs.filelist.util.ChildProcess.ChildProcessOptions
+import farjs.filelist.util.{StreamReader, SubProcess}
 import org.scalatest.Succeeded
-import scommons.nodejs.ChildProcess.ChildProcessOptions
-import scommons.nodejs._
 import scommons.nodejs.raw.CreateReadStreamOptions
 import scommons.nodejs.stream.Readable
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.nodejs.util.{StreamReader, SubProcess}
+import scommons.nodejs._
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
@@ -127,7 +127,7 @@ class ZipApiSpec extends AsyncTestSpec {
     val expectedFilePath = "dir 1/example.txt"
     val rawProcess = literal().asInstanceOf[raw.ChildProcess]
     val stdout = new StreamReader(stdoutStream)
-    val subProcess = SubProcess(rawProcess, stdout, Future.unit)
+    val subProcess = SubProcess(rawProcess, stdout, js.Promise.resolve[Unit](js.undefined: Unit))
     val api = new ZipApi(zipPath, rootPath, entriesByParentF) {
       override def extract(zipPath: String, filePath: String): Future[SubProcess] = {
         zipPath shouldBe "/dir/filePath.zip"
@@ -180,7 +180,7 @@ class ZipApiSpec extends AsyncTestSpec {
     val expectedFilePath = "dir 1/example.txt"
     val rawProcess = literal().asInstanceOf[raw.ChildProcess]
     val stdout = new StreamReader(stdoutStream)
-    val subProcess = SubProcess(rawProcess, stdout, Future.unit)
+    val subProcess = SubProcess(rawProcess, stdout, js.Promise.resolve[Unit](js.undefined: Unit))
     val api = new ZipApi(zipPath, rootPath, entriesByParentF) {
       override def extract(zipPath: String, filePath: String): Future[SubProcess] = {
         zipPath shouldBe "/dir/filePath.zip"
@@ -204,10 +204,10 @@ class ZipApiSpec extends AsyncTestSpec {
         bytesRead shouldBe 0
       }
       _ <- source.close().toFuture
-      maybeContent <- stdout.readNextBytes(5)
+      maybeContent <- stdout.readNextBytes(5).toFuture
     } yield {
       source.file shouldBe expectedFilePath
-      maybeContent shouldBe None
+      maybeContent shouldBe js.undefined
     }).andThen {
       case _ =>
         fs.unlinkSync(file)
@@ -226,7 +226,8 @@ class ZipApiSpec extends AsyncTestSpec {
     val expectedFilePath = "dir 1/example.txt"
     val rawProcess = literal().asInstanceOf[raw.ChildProcess]
     val stdout = new StreamReader(stdoutStream)
-    val subProcess = SubProcess(rawProcess, stdout, Future.failed(new Exception("test error")))
+    val error = js.Error("test error")
+    val subProcess = SubProcess(rawProcess, stdout, js.Promise.resolve[js.UndefOr[js.Error]](error))
     val api = new ZipApi(zipPath, rootPath, entriesByParentF) {
       override def extract(zipPath: String, filePath: String): Future[SubProcess] = {
         zipPath shouldBe "/dir/filePath.zip"
@@ -247,7 +248,7 @@ class ZipApiSpec extends AsyncTestSpec {
       _ <- source.close().toFuture
     } yield {
       source.file shouldBe expectedFilePath
-      error.getMessage shouldBe "test error"
+      error.getMessage shouldBe "Error: test error"
     }
   }
 
@@ -256,7 +257,7 @@ class ZipApiSpec extends AsyncTestSpec {
     val expectedOutput = "hello, World!!!"
     val stdout = new StreamReader(Readable.from(Buffer.from(expectedOutput)))
     val rawProcess = literal().asInstanceOf[raw.ChildProcess]
-    val subProcess = SubProcess(rawProcess, stdout, Future.unit)
+    val subProcess = SubProcess(rawProcess, stdout, js.Promise.resolve[Unit](js.undefined: Unit))
     val childProcess = new ChildProcess
     ZipApi.childProcess = childProcess.childProcess
     val zipPath = "/dir/filePath.zip"
@@ -277,7 +278,7 @@ class ZipApiSpec extends AsyncTestSpec {
     val resultF = api.extract(zipPath, filePath)
 
     def loop(reader: StreamReader, result: String): Future[String] = {
-      reader.readNextBytes(5).flatMap {
+      reader.readNextBytes(5).toFuture.map(_.toOption).flatMap {
         case None => Future.successful(result)
         case Some(content) =>
           loop(reader, result + content.toString)
@@ -351,7 +352,7 @@ class ZipApiSpec extends AsyncTestSpec {
         |  adding: 1/1.txt (stored 2.3%)
         |""".stripMargin)))
     val rawProcess = literal().asInstanceOf[raw.ChildProcess]
-    val subProcess = SubProcess(rawProcess, stdout, Future.unit)
+    val subProcess = SubProcess(rawProcess, stdout, js.Promise.resolve[Unit](js.undefined: Unit))
     val childProcess = new ChildProcess
     ZipApi.childProcess = childProcess.childProcess
     val parent = "test dir"
@@ -389,8 +390,8 @@ class ZipApiSpec extends AsyncTestSpec {
         |""".stripMargin
     val stdout = new StreamReader(Readable.from(Buffer.from(expectedOutput)))
     val rawProcess = literal().asInstanceOf[raw.ChildProcess]
-    val error = js.JavaScriptException(js.Error("sub-process exited with code=1"))
-    val subProcess = SubProcess(rawProcess, stdout, Future.failed(error))
+    val error = js.Error("sub-process exited with code=1")
+    val subProcess = SubProcess(rawProcess, stdout, js.Promise.resolve[js.UndefOr[js.Error]](error))
     val childProcess = new ChildProcess
     ZipApi.childProcess = childProcess.childProcess
     val zipPath = "/dir/filePath.zip"
@@ -422,7 +423,7 @@ class ZipApiSpec extends AsyncTestSpec {
         |""".stripMargin
     val stdout = new StreamReader(Readable.from(Buffer.from(expectedOutput)))
     val rawProcess = literal().asInstanceOf[raw.ChildProcess]
-    val subProcess = SubProcess(rawProcess, stdout, Future.unit)
+    val subProcess = SubProcess(rawProcess, stdout, js.Promise.resolve[Unit](js.undefined: Unit))
     val childProcess = new ChildProcess
     ZipApi.childProcess = childProcess.childProcess
     val zipPath = "/dir/filePath.zip"
