@@ -42,7 +42,7 @@ const CopyItemsPopup = (props) => {
 
   const historyProvider = HistoryProvider.useHistoryProvider();
   const [maybeItems, setItems] = useState(
-    /** @type {readonly string[] | undefined} */ (undefined)
+    /** @type {readonly string[] | undefined} */ (undefined),
   );
   const [path, setPath] = useState(props.path);
 
@@ -57,8 +57,8 @@ const CopyItemsPopup = (props) => {
     count > 1
       ? `${count} items`
       : maybeFirstItem !== undefined
-      ? `"${maybeFirstItem.name}"`
-      : "";
+        ? `"${maybeFirstItem.name}"`
+        : "";
 
   const onCopy = () => {
     if (path.length > 0) {
@@ -77,7 +77,7 @@ const CopyItemsPopup = (props) => {
 
   const readHistory = async () => {
     const copyItemsHistory = await historyProvider.get(
-      CopyItemsPopup.copyItemsHistoryKind
+      CopyItemsPopup.copyItemsHistoryKind,
     );
     const items = await copyItemsHistory.getAll();
     const itemsReversed = items.map((_) => _.item).reverse();
@@ -131,7 +131,7 @@ const CopyItemsPopup = (props) => {
         actions: actions,
         style: theme,
         margin: 2,
-      })
+      }),
     );
   }
 

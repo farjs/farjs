@@ -32,7 +32,7 @@ function ViewerPluginUi(filePath, size) {
       useRef()
     );
     const [viewport, setViewport] = useState(
-      /** @type {ViewerFileViewport | undefined} */ (undefined)
+      /** @type {ViewerFileViewport | undefined} */ (undefined),
     );
 
     /** @type {(keyFull: string) => boolean} */
@@ -97,11 +97,11 @@ function ViewerPluginUi(filePath, size) {
             viewport,
             setViewport,
             onKeypress: () => false,
-          })
+          }),
         ),
 
-        h("box", { top: "100%-1" }, h(bottomMenuComp, { items: menuItems }))
-      )
+        h("box", { top: "100%-1" }, h(bottomMenuComp, { items: menuItems })),
+      ),
     );
   };
 

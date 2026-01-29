@@ -29,7 +29,7 @@ class FSFileListApi extends FileListApi {
    */
   constructor(
     fs = { ...nodeFs, ...fsPromises },
-    fsService = FSService.instance
+    fsService = FSService.instance,
   ) {
     super(
       true,
@@ -40,7 +40,7 @@ class FSFileListApi extends FileListApi {
         FileListCapability.mkDirs,
         FileListCapability.copyInplace,
         FileListCapability.moveInplace,
-      ])
+      ]),
     );
 
     /** @private @readonly @type {FS} */
@@ -92,7 +92,7 @@ class FSFileListApi extends FileListApi {
 
     return loop(
       parent,
-      items.map((i) => [i.name, i.isDir])
+      items.map((i) => [i.name, i.isDir]),
     );
   }
 
@@ -159,7 +159,7 @@ class FSFileListApi extends FileListApi {
     const [handle, position] = await this.fs
       .open(
         filePath,
-        FSConstants.O_CREAT | FSConstants.O_WRONLY | FSConstants.O_EXCL
+        FSConstants.O_CREAT | FSConstants.O_WRONLY | FSConstants.O_EXCL,
       )
       .then(
         (handle) => [handle, 0],
@@ -176,7 +176,7 @@ class FSFileListApi extends FileListApi {
           }
 
           throw error;
-        }
+        },
       );
 
     if (handle) {
@@ -190,7 +190,7 @@ class FSFileListApi extends FileListApi {
           const { bytesWritten } = await handle.write(buff, 0, length, pos);
           if (bytesWritten !== length) {
             throw Error(
-              `File write error: bytesWritten(${bytesWritten}) != expected(${length}), file: ${filePath}`
+              `File write error: bytesWritten(${bytesWritten}) != expected(${length}), file: ${filePath}`,
             );
           }
           pos += bytesWritten;

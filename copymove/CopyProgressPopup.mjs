@@ -124,7 +124,7 @@ to
       top: 9,
       style: theme,
       content: `Time: ${_toTime(props.timeSeconds)} Left: ${_toTime(
-        props.leftSeconds
+        props.leftSeconds,
       )}`,
     }),
     h(textLineComp, {
@@ -138,7 +138,7 @@ to
     }),
 
     //for capturing inputs
-    h("button", { width: 0, height: 0 })
+    h("button", { width: 0, height: 0 }),
   );
 };
 
@@ -168,10 +168,10 @@ CopyProgressPopup._toSpeed = (bits) => {
     return bits >= 100000000000
       ? [bits / 1000000000, "Gb"]
       : bits >= 100000000
-      ? [bits / 1000000, "Mb"]
-      : bits >= 100000
-      ? [bits / 1000, "Kb"]
-      : [bits, "b"];
+        ? [bits / 1000000, "Mb"]
+        : bits >= 100000
+          ? [bits / 1000, "Kb"]
+          : [bits, "b"];
   })();
 
   return `${formatSize(speed)}${mod}`;

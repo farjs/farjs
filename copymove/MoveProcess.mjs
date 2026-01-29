@@ -50,7 +50,7 @@ const MoveProcess = (props) => {
   const { statusPopupComp, messageBoxComp } = MoveProcess;
 
   const [state, setState] = useState(
-    () => /** @type {MoveState} */ ({ currItem: "" })
+    () => /** @type {MoveState} */ ({ currItem: "" }),
   );
   const inProgress = useRef(false);
   const existsPromise = useRef({
@@ -100,7 +100,7 @@ const MoveProcess = (props) => {
       () => {
         props.onDone();
         props.dispatch(TaskAction(Task("Moving items", resultP)));
-      }
+      },
     );
   };
 
@@ -149,7 +149,7 @@ const MoveProcess = (props) => {
           ],
           style: currTheme.popup.error,
         })
-      : null
+      : null,
   );
 };
 

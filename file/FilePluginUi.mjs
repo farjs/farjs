@@ -28,7 +28,7 @@ function FilePluginUi({ showFileViewHistoryPopup }) {
       h(fileViewHistory, {
         showPopup: showFileViewHistoryPopup,
         onClose: props.onClose,
-      })
+      }),
     );
   };
 

@@ -4,7 +4,7 @@ import https from "https";
 import { readFile } from "fs/promises";
 
 const packageJson = JSON.parse(
-  await readFile(new URL("../package.json", import.meta.url), "utf8")
+  await readFile(new URL("../package.json", import.meta.url), "utf8"),
 );
 
 export function fetchLatestVersion() {
@@ -28,12 +28,12 @@ export function fetchLatestVersion() {
             let error;
             if (statusCode !== 200) {
               error = new Error(
-                "Request Failed.\n" + `Status Code: ${statusCode}`
+                "Request Failed.\n" + `Status Code: ${statusCode}`,
               );
             } else if (!/^application\/json/.test(contentType)) {
               error = new Error(
                 "Invalid content-type.\n" +
-                  `Expected application/json but received ${contentType}`
+                  `Expected application/json but received ${contentType}`,
               );
             }
             if (error) {
@@ -58,7 +58,7 @@ export function fetchLatestVersion() {
           } catch (e) {
             reject(e);
           }
-        }
+        },
       )
       .once("error", (e) => {
         reject(e);
@@ -91,8 +91,8 @@ export function checkNpmVersion(npmVersion) {
     npm i -g ${packageJson.name}
 
   See the changelog here: https://github.com/farjs/farjs/releases
-`
-      )
+`,
+      ),
     );
   }
 }

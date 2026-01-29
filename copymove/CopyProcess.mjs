@@ -69,7 +69,7 @@ const CopyProcess = (props) => {
   const { copyProgressPopup, fileExistsPopup, messageBoxComp } = CopyProcess;
 
   const [state, setState] = useState(
-    /** @type {() => CopyState} */ () => ({ time100ms: 0, cancel: false })
+    /** @type {() => CopyState} */ () => ({ time100ms: 0, cancel: false }),
   );
   const inProgress = useRef(false);
   const cancelPromise = useRef({
@@ -104,81 +104,87 @@ const CopyProcess = (props) => {
      * @returns {Promise<boolean[]>}
      */
     function loop(copied, parent, targetDir, items) {
-      return items.reduce(async (resP, cpItem) => {
-        const [prevCopied, prevInProgress] = await resP;
-        const { item, toName } = cpItem;
-        if (item.isDir && prevInProgress && inProgress.current) {
-          const dirList = await props.from.actions.api.readDir(
-            parent,
-            item.name
-          );
-          const dstDir = await props.to.actions.api.mkDirs([targetDir, toName]);
-          const [isCopied, done] = await loop(
-            prevCopied,
-            dirList.path,
-            dstDir,
-            dirList.items.map((i) => ({ item: i, toName: i.name }))
-          );
-          if (isCopied && done && props.move) {
-            await props.from.actions.api.delete(parent, [item]);
-          }
-          return [isCopied, done];
-        }
-        if (!item.isDir && prevInProgress && inProgress.current) {
-          data.current = {
-            ...data.current,
-            item: item,
-            to: path.join(targetDir, toName),
-            itemPercent: 0,
-            itemBytes: 0,
-          };
-          let isCopied = true;
-          const done = await props.from.actions.copyFile(
-            parent,
-            item,
-            props.to.actions.api.writeFile(
+      return items.reduce(
+        async (resP, cpItem) => {
+          const [prevCopied, prevInProgress] = await resP;
+          const { item, toName } = cpItem;
+          if (item.isDir && prevInProgress && inProgress.current) {
+            const dirList = await props.from.actions.api.readDir(
+              parent,
+              item.name,
+            );
+            const dstDir = await props.to.actions.api.mkDirs([
               targetDir,
               toName,
-              async (existing) => {
-                if (inProgress.current && data.current.askWhenExists) {
-                  setState((s) => ({ ...s, existing }));
-                  /** @type {(val: boolean | undefined) => void} */
-                  let resolve = () => {};
-                  const p = new Promise((res) => (resolve = res));
-                  existsPromise.current = { p, resolve };
-                }
-                const maybeOverwrite = await existsPromise.current.p;
-                if (maybeOverwrite === undefined) {
-                  isCopied = false;
-                }
-                return maybeOverwrite;
-              }
-            ),
-            async (position) => {
-              data.current = {
-                ...data.current,
-                itemPercent: Math.trunc(divide(position, item.size) * 100),
-                itemBytes: position,
-              };
-              await cancelPromise.current.p;
-              return inProgress.current;
+            ]);
+            const [isCopied, done] = await loop(
+              prevCopied,
+              dirList.path,
+              dstDir,
+              dirList.items.map((i) => ({ item: i, toName: i.name })),
+            );
+            if (isCopied && done && props.move) {
+              await props.from.actions.api.delete(parent, [item]);
             }
-          );
-          if (isCopied && done && props.move) {
-            await props.from.actions.api.delete(parent, [item]);
+            return [isCopied, done];
           }
-          if (done) {
-            const d = data.current;
+          if (!item.isDir && prevInProgress && inProgress.current) {
             data.current = {
               ...data.current,
+              item: item,
+              to: path.join(targetDir, toName),
+              itemPercent: 0,
               itemBytes: 0,
-              total: d.total + d.itemBytes,
             };
+            let isCopied = true;
+            const done = await props.from.actions.copyFile(
+              parent,
+              item,
+              props.to.actions.api.writeFile(
+                targetDir,
+                toName,
+                async (existing) => {
+                  if (inProgress.current && data.current.askWhenExists) {
+                    setState((s) => ({ ...s, existing }));
+                    /** @type {(val: boolean | undefined) => void} */
+                    let resolve = () => {};
+                    const p = new Promise((res) => (resolve = res));
+                    existsPromise.current = { p, resolve };
+                  }
+                  const maybeOverwrite = await existsPromise.current.p;
+                  if (maybeOverwrite === undefined) {
+                    isCopied = false;
+                  }
+                  return maybeOverwrite;
+                },
+              ),
+              async (position) => {
+                data.current = {
+                  ...data.current,
+                  itemPercent: Math.trunc(divide(position, item.size) * 100),
+                  itemBytes: position,
+                };
+                await cancelPromise.current.p;
+                return inProgress.current;
+              },
+            );
+            if (isCopied && done && props.move) {
+              await props.from.actions.api.delete(parent, [item]);
+            }
+            if (done) {
+              const d = data.current;
+              data.current = {
+                ...data.current,
+                itemBytes: 0,
+                total: d.total + d.itemBytes,
+              };
+            }
+            return [prevCopied && isCopied, done];
           }
-          return [prevCopied && isCopied, done];
-        }
-        return [prevCopied, prevInProgress];
-      }, Promise.resolve([copied, inProgress.current]));
+          return [prevCopied, prevInProgress];
+        },
+        Promise.resolve([copied, inProgress.current]),
+      );
     }
 
     const resultP = props.items.reduce(async (resP, topItem) => {
@@ -188,7 +194,7 @@ const CopyProcess = (props) => {
           true,
           props.fromPath,
           props.toPath,
-          [topItem]
+          [topItem],
         );
         if (isCopied && done) {
           props.onTopItem(topItem.item);
@@ -203,7 +209,7 @@ const CopyProcess = (props) => {
       () => {
         props.onDone();
         props.from.dispatch(TaskAction(Task("Copy/Move Items", resultP)));
-      }
+      },
     );
   };
 
@@ -244,14 +250,14 @@ const CopyProcess = (props) => {
       itemPercent: d.itemPercent,
       total: props.total,
       totalPercent: Math.trunc(
-        divide(d.total + d.itemBytes, props.total) * 100
+        divide(d.total + d.itemBytes, props.total) * 100,
       ),
       timeSeconds: timeSeconds,
       leftSeconds: Math.trunc(
         divide(
           Math.max(props.total - (d.total + d.itemBytes), 0),
-          bytesPerSecond
-        )
+          bytesPerSecond,
+        ),
       ),
       bytesPerSecond,
       onCancel: () => {
@@ -313,7 +319,7 @@ const CopyProcess = (props) => {
           ],
           style: currTheme.popup.error,
         })
-      : null
+      : null,
   );
 };
 

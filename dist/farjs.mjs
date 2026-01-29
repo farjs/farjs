@@ -17,7 +17,7 @@ const onReady = () => {
       },
       (error) => {
         console.log(`Failed to fetch latest version from npm, error: ${error}`);
-      }
+      },
     );
   });
 };

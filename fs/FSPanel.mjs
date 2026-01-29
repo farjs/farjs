@@ -54,7 +54,7 @@ const FSPanel = (props) => {
 
     h(fsFoldersHistory, {
       currDirPath: props.state.currDir.path,
-    })
+    }),
   );
 };
 

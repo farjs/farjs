@@ -61,9 +61,9 @@ const AddToArchController = (props) => {
         () => {
           addedItems += 1;
           setProgress(
-            Math.trunc(Math.min((addedItems * 100) / totalItems, 100))
+            Math.trunc(Math.min((addedItems * 100) / totalItems, 100)),
           );
-        }
+        },
       );
 
       if (props.state.selectedNames.size > 0) {
@@ -87,9 +87,9 @@ const AddToArchController = (props) => {
         TaskAction(
           Task(
             `${props.archAction} item(s) to ${props.archType} archive`,
-            resultP
-          )
-        )
+            resultP,
+          ),
+        ),
       );
     });
   };
@@ -111,7 +111,7 @@ const AddToArchController = (props) => {
       ? h(statusPopupComp, {
           text: `${props.archAction} item(s) to ${props.archType} archive\n${progress}%`,
         })
-      : null
+      : null,
   );
 };
 

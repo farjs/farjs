@@ -44,7 +44,7 @@ function HistoryDao(db, kind, maxItemsCount) {
     getAll: async () =>
       db.transaction(() => {
         const query = db.prepare(
-          /* sql */ `SELECT item, params FROM ${tableName} WHERE kind_id = ? ORDER BY updated_at;`
+          /* sql */ `SELECT item, params FROM ${tableName} WHERE kind_id = ? ORDER BY updated_at;`,
         );
         return query.all(kind.id).map(rowExtractor);
       })(),
@@ -52,7 +52,7 @@ function HistoryDao(db, kind, maxItemsCount) {
     getByItem: async (item) =>
       db.transaction(() => {
         const query = db.prepare(
-          /* sql */ `SELECT item, params FROM ${tableName} WHERE kind_id = ? AND item = ?;`
+          /* sql */ `SELECT item, params FROM ${tableName} WHERE kind_id = ? AND item = ?;`,
         );
         const row = query.get(kind.id, item);
         return row ? rowExtractor(row) : undefined;
@@ -64,19 +64,19 @@ function HistoryDao(db, kind, maxItemsCount) {
           /* sql */ `INSERT INTO ${tableName} (kind_id, item, params, updated_at) VALUES (?, ?, ?, ?)
             ON CONFLICT (kind_id, item) DO UPDATE SET
               params = excluded.params,
-              updated_at = excluded.updated_at;`
+              updated_at = excluded.updated_at;`,
         ).run(
           kind.id,
           entity.item,
           entity.params ? JSON.stringify(entity.params) : null,
-          updatedAt
+          updatedAt,
         );
 
         db.prepare(
           /* sql */ `DELETE FROM ${tableName} WHERE kind_id = ? AND updated_at <
             (SELECT min(updated_at) FROM (
               SELECT updated_at FROM ${tableName} WHERE kind_id = ? ORDER BY updated_at DESC LIMIT ?
-            ));`
+            ));`,
         ).run(kind.id, kind.id, maxItemsCount);
       })(),
 

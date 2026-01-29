@@ -27,7 +27,7 @@ function HistoryKindDao(db) {
     getAll: async () =>
       db.transaction(() => {
         const query = db.prepare(
-          /* sql */ `SELECT id, name FROM ${tableName} ORDER BY id;`
+          /* sql */ `SELECT id, name FROM ${tableName} ORDER BY id;`,
         );
         return /** @type {HistoryKindEntity[]} */ (query.all());
       })(),
@@ -35,11 +35,11 @@ function HistoryKindDao(db) {
     upsert: async (entity) =>
       db.transaction(() => {
         db.prepare(
-          /* sql */ `INSERT INTO ${tableName} (name) VALUES (?) ON CONFLICT (name) DO NOTHING;`
+          /* sql */ `INSERT INTO ${tableName} (name) VALUES (?) ON CONFLICT (name) DO NOTHING;`,
         ).run(entity.name);
 
         const query = db.prepare(
-          /* sql */ `SELECT id, name FROM ${tableName} WHERE name = ?;`
+          /* sql */ `SELECT id, name FROM ${tableName} WHERE name = ?;`,
         );
         return /** @type {HistoryKindEntity} */ (query.get(entity.name));
       })(),

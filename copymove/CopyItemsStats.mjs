@@ -63,7 +63,7 @@ const CopyItemsStats = (props) => {
       () => {
         props.onCancel();
         props.dispatch(TaskAction(Task(`${props.title} dir scan`, resultP)));
-      }
+      },
     );
   };
 

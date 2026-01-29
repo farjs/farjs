@@ -87,13 +87,13 @@ class ViewerFileReader {
           if (rightNewLineIdx < 0) {
             return ViewerFileLine(
               Encoding.decode(suffix, encoding, 0, suffix.length),
-              suffix.length
+              suffix.length,
             );
           }
           if (leftNewLineIdx < 0) {
             return ViewerFileLine(
               Encoding.decode(suffix, encoding, 0, rightNewLineIdx),
-              suffix.length
+              suffix.length,
             );
           }
           return ViewerFileLine(
@@ -101,9 +101,9 @@ class ViewerFileReader {
               suffix,
               encoding,
               leftNewLineIdx + 1,
-              rightNewLineIdx
+              rightNewLineIdx,
             ),
-            suffix.length - leftNewLineIdx - 1
+            suffix.length - leftNewLineIdx - 1,
           );
         })();
         res.unshift(line);
@@ -128,7 +128,7 @@ class ViewerFileReader {
           const buf = fileBuf.subarray(0, bytesRead);
           const resBuf = Buffer.concat(
             [buf, leftBuf],
-            buf.length + leftBuf.length
+            buf.length + leftBuf.length,
           );
           leftBuf = Buffer.from([]);
 
@@ -141,7 +141,7 @@ class ViewerFileReader {
           if (res.length < lines && leftBuf.length > 0) {
             const line = ViewerFileLine(
               Encoding.decode(leftBuf, encoding, 0, leftBuf.length).trim(),
-              leftBuf.length
+              leftBuf.length,
             );
             res.unshift(line);
           }
@@ -184,12 +184,12 @@ class ViewerFileReader {
           if (newLineIndex < 0) {
             return ViewerFileLine(
               Encoding.decode(prefix, encoding, 0, prefix.length),
-              prefix.length
+              prefix.length,
             );
           }
           return ViewerFileLine(
             Encoding.decode(prefix, encoding, 0, newLineIndex),
-            newLineIndex + 1
+            newLineIndex + 1,
           );
         })();
         res.push(line);
@@ -208,7 +208,7 @@ class ViewerFileReader {
           const buf = fileBuf.subarray(0, bytesRead);
           const resBuf = Buffer.concat(
             [leftBuf, buf],
-            leftBuf.length + buf.length
+            leftBuf.length + buf.length,
           );
           leftBuf = Buffer.from([]);
 
@@ -223,7 +223,7 @@ class ViewerFileReader {
           if (res.length < lines && leftBuf.length > 0) {
             const line = ViewerFileLine(
               Encoding.decode(leftBuf, encoding, 0, leftBuf.length),
-              leftBuf.length
+              leftBuf.length,
             );
             res.push(line);
           }

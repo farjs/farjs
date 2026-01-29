@@ -89,7 +89,7 @@ class CopyMovePlugin extends FileListPlugin {
   _onCopyMove(move, from, to, toInput) {
     const currItem = FileListState.currentItem(
       from.state,
-      (i) => i !== FileListItem.up
+      (i) => i !== FileListItem.up,
     );
 
     if (

@@ -42,13 +42,13 @@ class FSPlugin extends FileListPlugin {
         parentDispatch,
         self.reducer,
         stack,
-        item
+        item,
       );
       return new PanelStackItem(
         newItem.component,
         newItem.dispatch,
         FSFileListActions.instance,
-        FileListState()
+        FileListState(),
       );
     });
   }
@@ -75,7 +75,7 @@ class FSPlugin extends FileListPlugin {
       item.component,
       dispatch,
       item.actions,
-      item.state
+      item.state,
     );
   }
 

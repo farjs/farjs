@@ -55,10 +55,10 @@ function CopyMoveUi({ show, from, maybeTo }) {
 
     const historyProvider = HistoryProvider.useHistoryProvider();
     const [maybeTotal, setTotal] = useState(
-      /** @type {number | undefined} */ (undefined)
+      /** @type {number | undefined} */ (undefined),
     );
     const [maybeToPath, setToPath] = useState(
-      /** @type {[string, string] | undefined} */ (undefined)
+      /** @type {[string, string] | undefined} */ (undefined),
     );
     const [inplace, setInplace] = useState(false);
     const [move, setMove] = useState(false);
@@ -97,7 +97,7 @@ function CopyMoveUi({ show, from, maybeTo }) {
 
       const updateAction = from.actions.updateDir(
         from.dispatch,
-        from.state.currDir.path
+        from.state.currDir.path,
       );
       from.dispatch(updateAction);
       updateAction.task.result.then((updatedDir) => {
@@ -113,8 +113,8 @@ function CopyMoveUi({ show, from, maybeTo }) {
           maybeTo.dispatch(
             maybeTo.actions.updateDir(
               maybeTo.dispatch,
-              maybeTo.state.currDir.path
-            )
+              maybeTo.state.currDir.path,
+            ),
           );
         }
       });
@@ -138,7 +138,7 @@ function CopyMoveUi({ show, from, maybeTo }) {
       !isInplace() && fromSelected.length > 0
         ? fromSelected
         : [FileListState.currentItem(from.state)].filter(
-            (_) => _ !== undefined
+            (_) => _ !== undefined,
           );
 
     /**
@@ -151,7 +151,7 @@ function CopyMoveUi({ show, from, maybeTo }) {
       const dirP = (async () => {
         const dir = await from.actions.api.readDir(
           from.state.currDir.path,
-          path
+          path,
         );
         const sameDrive = move ? await checkSameDrive(from, dir.path) : false;
         return [dir.path, sameDrive];
@@ -170,8 +170,8 @@ function CopyMoveUi({ show, from, maybeTo }) {
       const resolveP = !from.actions.api.isLocal
         ? Promise.resolve([path, false])
         : !inplace
-        ? resolveTargetDir(move, path)
-        : Promise.resolve([path, true]);
+          ? resolveTargetDir(move, path)
+          : Promise.resolve([path, true]);
 
       resolveP.then(([toPath, sameDrive]) => {
         setInplace(inplace);
@@ -196,10 +196,10 @@ function CopyMoveUi({ show, from, maybeTo }) {
       if (toPath.startsWith(from.state.currDir.path + path.sep)) {
         const toSuffix = stripPrefix(
           toPath,
-          from.state.currDir.path + path.sep
+          from.state.currDir.path + path.sep,
         );
         const self = items.find(
-          (i) => toSuffix === i.name || toSuffix.startsWith(i.name + path.sep)
+          (i) => toSuffix === i.name || toSuffix.startsWith(i.name + path.sep),
         );
         return self && `Cannot ${op} the item\n${self.name}\ninto itself`;
       }
@@ -223,56 +223,56 @@ function CopyMoveUi({ show, from, maybeTo }) {
           onCancel: props.onClose,
         })
       : maybeError !== undefined
-      ? h(messageBoxComp, {
-          title: "Error",
-          message: maybeError,
-          actions: [MessageBoxAction.OK(props.onClose)],
-          style: currTheme.popup.error,
-        })
-      : showStats
-      ? h(copyItemsStats, {
-          dispatch: from.dispatch,
-          actions: from.actions,
-          fromPath: from.state.currDir.path,
-          items,
-          title: move ? "Move" : "Copy",
-          onDone: (total) => {
-            setTotal(total);
-            setShowStats(false);
-          },
-          onCancel: props.onClose,
-        })
-      : showMove && maybeToPath !== undefined
-      ? (([path, toPath]) => {
-          return h(moveProcessComp, {
-            dispatch: from.dispatch,
-            actions: from.actions,
-            fromPath: from.state.currDir.path,
-            items: !inplace
-              ? items.map((item) => ({ item, toName: item.name }))
-              : items.map((item) => ({ item, toName: toPath })),
-            toPath: !inplace ? toPath : from.state.currDir.path,
-            onTopItem,
-            onDone: onDone(path, toPath),
-          });
-        })(maybeToPath)
-      : maybeTotal !== undefined && maybeToPath !== undefined
-      ? ((total, [path, toPath]) => {
-          return h(copyProcessComp, {
-            from,
-            to: !inplace && maybeTo ? maybeTo : from,
-            move,
-            fromPath: from.state.currDir.path,
-            items: !inplace
-              ? items.map((item) => ({ item, toName: item.name }))
-              : items.map((item) => ({ item, toName: toPath })),
-            toPath: !inplace ? toPath : from.state.currDir.path,
-            total,
-            onTopItem,
-            onDone: onDone(path, toPath),
-          });
-        })(maybeTotal, maybeToPath)
-      : null;
+        ? h(messageBoxComp, {
+            title: "Error",
+            message: maybeError,
+            actions: [MessageBoxAction.OK(props.onClose)],
+            style: currTheme.popup.error,
+          })
+        : showStats
+          ? h(copyItemsStats, {
+              dispatch: from.dispatch,
+              actions: from.actions,
+              fromPath: from.state.currDir.path,
+              items,
+              title: move ? "Move" : "Copy",
+              onDone: (total) => {
+                setTotal(total);
+                setShowStats(false);
+              },
+              onCancel: props.onClose,
+            })
+          : showMove && maybeToPath !== undefined
+            ? (([path, toPath]) => {
+                return h(moveProcessComp, {
+                  dispatch: from.dispatch,
+                  actions: from.actions,
+                  fromPath: from.state.currDir.path,
+                  items: !inplace
+                    ? items.map((item) => ({ item, toName: item.name }))
+                    : items.map((item) => ({ item, toName: toPath })),
+                  toPath: !inplace ? toPath : from.state.currDir.path,
+                  onTopItem,
+                  onDone: onDone(path, toPath),
+                });
+              })(maybeToPath)
+            : maybeTotal !== undefined && maybeToPath !== undefined
+              ? ((total, [path, toPath]) => {
+                  return h(copyProcessComp, {
+                    from,
+                    to: !inplace && maybeTo ? maybeTo : from,
+                    move,
+                    fromPath: from.state.currDir.path,
+                    items: !inplace
+                      ? items.map((item) => ({ item, toName: item.name }))
+                      : items.map((item) => ({ item, toName: toPath })),
+                    toPath: !inplace ? toPath : from.state.currDir.path,
+                    total,
+                    onTopItem,
+                    onDone: onDone(path, toPath),
+                  });
+                })(maybeTotal, maybeToPath)
+              : null;
   };
 
   CopyMoveUiComp.displayName = "CopyMoveUi";
@@ -293,7 +293,7 @@ CopyMoveUi.copyProcessComp = CopyProcess;
  */
 async function checkSameDrive(from, toPath) {
   const maybeFromRoot = await from.actions.api.getDriveRoot(
-    from.state.currDir.path
+    from.state.currDir.path,
   );
   const maybeToRoot = await from.actions.api.getDriveRoot(toPath);
   return (

@@ -43,7 +43,7 @@ function ArchiverPluginUi({ data, archName, archType, addToArchApi, items }) {
 
         const action = data.actions.updateDir(
           data.dispatch,
-          data.state.currDir.path
+          data.state.currDir.path,
         );
         data.dispatch(action);
         action.task.result.then((updatedDir) => {

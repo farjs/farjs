@@ -86,7 +86,7 @@ function ViewItemsPopup(data) {
         () => {
           props.onClose();
           dispatch(TaskAction(Task("Viewing Items", resultP)));
-        }
+        },
       );
     }
 

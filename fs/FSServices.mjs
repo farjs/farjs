@@ -14,7 +14,7 @@ const FSServices = {
     if (!ctx) {
       throw Error(
         "FSServices.Context is not found." +
-          "\nPlease, make sure you use FSServices.Context.Provider in parent components"
+          "\nPlease, make sure you use FSServices.Context.Provider in parent components",
       );
     }
     return ctx;

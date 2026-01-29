@@ -101,7 +101,7 @@ const AddToArchPopup = (props) => {
       actions,
       style: theme,
       margin: 2,
-    })
+    }),
   );
 };
 

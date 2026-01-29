@@ -65,7 +65,7 @@ class FileListUiPluginImpl extends FileListPlugin {
       (FileListState.selectedItems(data.state).length > 0 ||
         FileListState.currentItem(
           data.state,
-          (_) => _.name !== FileListItem.up.name
+          (_) => _.name !== FileListItem.up.name,
         ))
     ) {
       return toFileListUiData({ showDeletePopup: true });

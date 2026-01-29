@@ -38,7 +38,7 @@ const FSFreeSpace = (props) => {
           props.dispatch(action);
         }
       },
-      () => undefined
+      () => undefined,
     );
   }, [props.currDir]);
 

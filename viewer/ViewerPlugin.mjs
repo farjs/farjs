@@ -61,7 +61,7 @@ class ViewerPluginImpl extends FileListPlugin {
       const { actions, state } = fileListData;
       const item = FileListState.currentItem(
         state,
-        (_) => _ !== FileListItem.up
+        (_) => _ !== FileListItem.up,
       );
 
       if (item && actions.api.isLocal && !item.isDir) {

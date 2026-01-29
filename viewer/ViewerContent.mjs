@@ -75,7 +75,7 @@ const ViewerContent = (props) => {
   /** @type {(encoding: string) => void} */
   function onEncoding(encoding) {
     readP.current = readP.current.then((viewport) =>
-      updated(viewport.updated({ encoding }))
+      updated(viewport.updated({ encoding })),
     );
   }
 
@@ -192,7 +192,7 @@ const ViewerContent = (props) => {
             setSearchTerm("");
           },
         })
-      : null
+      : null,
   );
 };
 

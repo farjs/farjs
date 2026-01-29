@@ -52,7 +52,7 @@ function FileListUi(data) {
       h(menuController, uiData),
       h(deleteController, uiData),
       h(makeFolderController, uiData),
-      h(selectController, uiData)
+      h(selectController, uiData),
     );
   };
 

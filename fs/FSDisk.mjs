@@ -65,7 +65,7 @@ function parseOutput(regexIn, output) {
         const until = i === lastColumnIdx ? line.length : end;
 
         return [column, line.slice(start, until).trim()];
-      })
+      }),
     );
   });
   return res;
@@ -82,12 +82,12 @@ function toNumber(s) {
 /** @type {() => RegExp} */
 const dfRegex = lazyFn(
   () =>
-    /(Filesystem\s+|1024-blocks|\s+Used|\s+Available|\s+Capacity|\s+Mounted on\s*)/
+    /(Filesystem\s+|1024-blocks|\s+Used|\s+Available|\s+Capacity|\s+Mounted on\s*)/,
 );
 
 /** @type {() => RegExp} */
 const wmicLogicalDiskRegex = lazyFn(
-  () => /(Caption\s*|FreeSpace\s*|Size\s*|VolumeName\s*)/
+  () => /(Caption\s*|FreeSpace\s*|Size\s*|VolumeName\s*)/,
 );
 
 export default FSDisk;

@@ -56,7 +56,7 @@ class ViewerFileViewportImpl {
     wrap,
     column,
     position,
-    linesData
+    linesData,
   ) {
     /** @readonly @type {ViewerFileReader} */ this.fileReader = fileReader;
     /** @readonly @type {string} */ this.encoding = encoding;
@@ -85,7 +85,7 @@ class ViewerFileViewportImpl {
       this.linesData.forEach((line) => {
         const lineStr = UiString(line.line).slice(
           this.column,
-          this.column + this.width
+          this.column + this.width,
         );
         const chars = Array.from(lineStr);
         for (let j = 0; j < chars.length; j += 1) {
@@ -254,12 +254,12 @@ class ViewerFileViewportImpl {
                 //takeRight
                 line.slice(
                   Math.min(line.length - Math.max(width, 0), line.length),
-                  line.length
+                  line.length,
                 ),
                 //dropRight
                 line.slice(
                   0,
-                  Math.min(line.length - Math.max(width, 0), line.length)
+                  Math.min(line.length - Math.max(width, 0), line.length),
                 ),
               ];
             }
@@ -284,7 +284,7 @@ class ViewerFileViewportImpl {
         //takeRight
         return r.slice(
           Math.min(r.length - Math.max(lines, 0), r.length),
-          r.length
+          r.length,
         );
       }
 
@@ -317,7 +317,7 @@ class ViewerFileViewportImpl {
       wrap ?? this.wrap,
       column ?? this.column,
       position ?? this.position,
-      linesData ?? this.linesData
+      linesData ?? this.linesData,
     );
   }
 }
@@ -343,7 +343,7 @@ export function createViewerFileViewport(
   wrap = false,
   column = 0,
   position = 0,
-  linesData = []
+  linesData = [],
 ) {
   return new ViewerFileViewportImpl(
     fileReader,
@@ -354,6 +354,6 @@ export function createViewerFileViewport(
     wrap,
     column,
     position,
-    linesData
+    linesData,
   );
 }

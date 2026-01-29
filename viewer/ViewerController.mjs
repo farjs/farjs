@@ -48,7 +48,7 @@ const ViewerController = (props) => {
     /** @type {(viewerFileReader: ViewerFileReader) => Promise<void>} */
     async function open(viewerFileReader) {
       const fileViewsHistory = await historyProvider.get(
-        FileViewHistory.fileViewsHistoryKind
+        FileViewHistory.fileViewsHistoryKind,
       );
       const historyItem = FileViewHistory.pathToItem(props.filePath, false);
       const maybeHistory = await fileViewsHistory.getOne(historyItem);
@@ -66,8 +66,8 @@ const ViewerController = (props) => {
           0,
           history ? history.params.wrap : false,
           history ? history.params.column : 0,
-          history ? history.params.position : 0
-        )
+          history ? history.params.position : 0,
+        ),
       );
     }
 
@@ -81,7 +81,7 @@ const ViewerController = (props) => {
         column: vp.column,
       });
       const fileViewsHistory = await historyProvider.get(
-        FileViewHistory.fileViewsHistoryKind
+        FileViewHistory.fileViewsHistoryKind,
       );
       await fileViewsHistory.save(FileViewHistory.toHistory(history));
     }
@@ -145,15 +145,15 @@ const ViewerController = (props) => {
                       width: 1,
                       height: 1,
                       content: ">",
-                    })
+                    }),
                   ),
-                ]
+                ],
               ),
             ];
           }
 
           return [];
-        })()
+        })(),
       );
     },
   });

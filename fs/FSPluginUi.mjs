@@ -29,7 +29,7 @@ function FSPluginUi(
     showDrivePopupOnLeft: undefined,
     showFoldersHistoryPopup: false,
     showFolderShortcutsPopup: false,
-  }
+  },
 ) {
   /**
    * @param {FileListPluginUiProps} props
@@ -84,7 +84,7 @@ function FSPluginUi(
         showPopup: showFolderShortcutsPopup,
         onChangeDir: onChangeDirInActivePanel,
         onClose: props.onClose,
-      })
+      }),
     );
   };
 

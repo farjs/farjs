@@ -110,7 +110,7 @@ Existing`,
       text: (() => {
         const date = new Date(props.newItem.mtimeMs);
         return `${formatSize(
-          props.newItem.size
+          props.newItem.size,
         )} ${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
       })(),
       style: theme,
@@ -124,7 +124,7 @@ Existing`,
       text: (() => {
         const date = new Date(props.existing.mtimeMs);
         return `${formatSize(
-          props.existing.size
+          props.existing.size,
         )} ${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
       })(),
       style: theme,
@@ -145,7 +145,7 @@ Existing`,
       actions: actions,
       style: theme,
       padding: 1,
-    })
+    }),
   );
 };
 

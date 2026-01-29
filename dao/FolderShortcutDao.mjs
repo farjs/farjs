@@ -28,7 +28,7 @@ function FolderShortcutDao(db) {
     getAll: async () =>
       db.transaction(() => {
         const query = db.prepare(
-          /* sql */ `SELECT id, path FROM ${tableName} ORDER BY id;`
+          /* sql */ `SELECT id, path FROM ${tableName} ORDER BY id;`,
         );
         return query.all();
       })(),
@@ -37,7 +37,7 @@ function FolderShortcutDao(db) {
       db.transaction(() => {
         db.prepare(
           /* sql */ `INSERT INTO ${tableName} (id, path) VALUES (?, ?)
-            ON CONFLICT (id) DO UPDATE SET path = excluded.path;`
+            ON CONFLICT (id) DO UPDATE SET path = excluded.path;`,
         ).run(entity.id, entity.path);
       })(),
 

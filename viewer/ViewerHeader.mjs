@@ -92,7 +92,7 @@ const ViewerHeader = (props) => {
           text: `${props.percent}%`,
           style: style,
           padding: 0,
-        })
+        }),
       );
     },
   });

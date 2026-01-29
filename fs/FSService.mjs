@@ -37,8 +37,8 @@ function FSService(platform = process.platform, childProcess = nodeCp) {
           platform === "darwin"
             ? `open "${name}"`
             : platform === "win32"
-            ? `start "" "${name}"`
-            : `xdg-open "${name}"`;
+              ? `start "" "${name}"`
+              : `xdg-open "${name}"`;
 
         childProcess.exec(
           command,
@@ -49,7 +49,7 @@ function FSService(platform = process.platform, childProcess = nodeCp) {
           (error) => {
             if (error) reject(error);
             else resolve();
-          }
+          },
         );
       });
     },
@@ -80,7 +80,7 @@ function FSService(platform = process.platform, childProcess = nodeCp) {
 
               disks.length > 0 ? resolve(disks[0]) : resolve(undefined);
             }
-          }
+          },
         );
       });
     },
@@ -108,14 +108,14 @@ function FSService(platform = process.platform, childProcess = nodeCp) {
               resolve(
                 disks
                   .filter(
-                    (d) => !excludeRoots.find((_) => d.name.startsWith(_))
+                    (d) => !excludeRoots.find((_) => d.name.startsWith(_)),
                   )
                   .map((d) => {
                     return { ...d, name: stripPrefix(d.name, "/Volumes/") };
-                  })
+                  }),
               );
             }
-          }
+          },
         );
       });
     },
