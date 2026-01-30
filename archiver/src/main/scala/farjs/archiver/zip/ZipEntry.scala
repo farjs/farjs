@@ -1,6 +1,7 @@
 package farjs.archiver.zip
 
-import farjs.archiver.DateTimeUtil
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
 case class ZipEntry(
   parent: String,
@@ -13,28 +14,40 @@ case class ZipEntry(
 
 object ZipEntry {
 
-  private val itemRegex = """([d|-].+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+)""".r
-
-  def fromUnzipCommand(output: String): List[ZipEntry] = {
-    output.trim.split('\n').flatMap { line =>
-      for {
-        itemRegex(permissions, _, _, length, _, _, datetime, pathName) <- itemRegex.findFirstMatchIn(line)
-      } yield {
-        val path = pathName.stripSuffix("/")
-        val lastSlash = path.lastIndexOf('/')
-        val (parent, name) =
-          if (lastSlash != -1) path.splitAt(lastSlash)
-          else ("", path)
-
-        ZipEntry(
-          parent = parent,
-          name = name.stripPrefix("/"),
-          isDir = pathName.endsWith("/"),
-          size = length.toDouble,
-          datetimeMs = DateTimeUtil.parseDateTime(datetime),
-          permissions = permissions
-        )
-      }
-    }.toList
+  def fromUnzipCommand(output: String): js.Array[ZipEntry] = {
+    ZipEntryNative.fromUnzipCommand(output).map { entry =>
+      ZipEntry(
+        parent = entry.parent,
+        name = entry.name,
+        isDir = entry.isDir,
+        size = entry.size,
+        datetimeMs = entry.datetimeMs,
+        permissions = entry.permissions
+      )
+    }
   }
+}
+
+sealed trait ZipEntryNative extends js.Object {
+  val parent: String
+  val name: String
+  val isDir: Boolean
+  val size: Double
+  val datetimeMs: Double
+  val permissions: String
+}
+
+@js.native
+@JSImport("../archiver/zip/ZipEntry.mjs", JSImport.Default)
+object ZipEntryNative extends js.Function6[String, String, js.UndefOr[Boolean], js.UndefOr[Double], js.UndefOr[Double], js.UndefOr[String], ZipEntryNative] {
+
+  def apply(parent: String,
+            name: String,
+            isDir: js.UndefOr[Boolean] = js.native,
+            size: js.UndefOr[Double] = js.native,
+            datetimeMs: js.UndefOr[Double] = js.native,
+            permissions: js.UndefOr[String] = js.native
+           ): ZipEntryNative = js.native
+
+  def fromUnzipCommand(output: String): js.Array[ZipEntryNative] = js.native
 }

@@ -220,7 +220,7 @@ object ZipApi {
         }
       }
     } yield {
-      ZipApi.groupByParent(ZipEntry.fromUnzipCommand(output))
+      ZipApi.groupByParent(ZipEntry.fromUnzipCommand(output).toList)
     }
   }
   

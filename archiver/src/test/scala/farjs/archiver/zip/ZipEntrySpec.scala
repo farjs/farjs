@@ -16,7 +16,7 @@ class ZipEntrySpec extends TestSpec {
         |""".stripMargin)
     
     //then
-    results shouldBe Nil
+    results.toList shouldBe Nil
   }
 
   it should "parse unzip -ZT output" in {
@@ -31,7 +31,7 @@ class ZipEntrySpec extends TestSpec {
         |""".stripMargin)
     
     //then
-    results shouldBe List(
+    results.toList shouldBe List(
       ZipEntry("", "test", isDir = true, 0, dt("2019-06-28T16:09:03"), "drwxr-xr-x"),
       ZipEntry("test", "dir", isDir = true, 0, dt("2019-06-28T16:19:23"), "drwxr-xr-x"),
       ZipEntry("test/dir", "file.txt", isDir = false, 123456789, dt("2019-06-28T16:19:24"), "-rw-r--r--")
