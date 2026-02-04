@@ -21,7 +21,7 @@ import scala.util.Failure
 
 class ZipPanel(zipPath: String,
                rootPath: String,
-               entriesByParentF: Future[Map[String, List[ZipEntry]]],
+               entriesByParentF: Future[Map[String, List[FileListItem]]],
                onClose: () => Unit
               ) extends FunctionComponent[FileListPanelProps] {
 
@@ -54,7 +54,7 @@ class ZipPanel(zipPath: String,
           props.dispatch(FileListDirChangedAction(FileListItem.currDir.name, FileListDir(
             path = rootPath,
             isRoot = false,
-            items = js.Array(entriesByParent.getOrElse("", Nil).map(ZipApi.convertToFileListItem): _*)
+            items = js.Array(entriesByParent.getOrElse("", Nil): _*)
           )))
         }.andThen {
           case Failure(_) =>

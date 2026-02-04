@@ -15,8 +15,8 @@ class ZipActionsSpec extends AsyncTestSpec {
 
   it should "re-create ZipApi when updateDir" in {
     //given
-    val readZip = mockFunction[String, Future[Map[String, List[ZipEntry]]]]
-    val createApi = mockFunction[String, String, Future[Map[String, List[ZipEntry]]], ZipApi]
+    val readZip = mockFunction[String, Future[Map[String, List[FileListItem]]]]
+    val createApi = mockFunction[String, String, Future[Map[String, List[FileListItem]]], ZipApi]
     ArchiverPlugin.readZip = readZip
     ArchiverPlugin.createApi = createApi
     val actions = new ZipActions(new ZipApi("file.zip", "root.path", Future.successful(Map.empty)))

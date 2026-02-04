@@ -14,7 +14,7 @@ import scala.scalajs.js.typedarray.Uint8Array
 class ZipApi(
   val zipPath: String,
   val rootPath: String,
-  private var entriesByParentF: Future[Map[String, List[ZipEntry]]]
+  private var entriesByParentF: Future[Map[String, List[FileListItem]]]
 ) extends FileListApi(false, js.Set(
   FileListCapability.read,
   FileListCapability.delete
@@ -38,7 +38,7 @@ class ZipApi(
       FileListDir(
         path = targetDir,
         isRoot = false,
-        items = js.Array(entries.map(ZipApi.convertToFileListItem): _*)
+        items = js.Array(entries: _*)
       )
     }.toJSPromise
   }
@@ -156,17 +156,6 @@ object ZipApi {
 
   private[zip] var childProcess: ChildProcess = ChildProcess.child_process
   
-  def convertToFileListItem(zip: ZipEntry): FileListItem = {
-    FileListItem.copy(FileListItem(
-      name = zip.name,
-      isDir = zip.isDir
-    ))(
-      size = zip.size,
-      mtimeMs = zip.datetimeMs,
-      permissions = zip.permissions
-    )
-  }
-
   def addToZip(zipFile: String, parent: String, items: js.Set[String], onNextItem: js.Function0[Unit]): js.Promise[Unit] = {
     val resF = for {
       subprocess <- childProcess.spawn(
@@ -188,7 +177,7 @@ object ZipApi {
     resF.toJSPromise
   }
 
-  def readZip(zipPath: String): Future[Map[String, List[ZipEntry]]] = {
+  def readZip(zipPath: String): Future[Map[String, List[FileListItem]]] = {
     val subprocessF = childProcess.spawn(
       command = "unzip",
       args = List("-ZT", zipPath),
@@ -224,7 +213,7 @@ object ZipApi {
     }
   }
   
-  private[zip] def groupByParent(entries: List[ZipEntry]): Map[String, List[ZipEntry]] = {
+  private[zip] def groupByParent(entries: List[ZipEntry]): Map[String, List[FileListItem]] = {
     val processedDirs = mutable.Set[String]()
     
     @annotation.tailrec
@@ -252,7 +241,7 @@ object ZipApi {
               parent = parent,
               name = name,
               isDir = true,
-              datetimeMs = entry.datetimeMs,
+              datetimeMs = entry.mtimeMs,
               permissions = "drw-r--r--"
             ),
             entriesByParent = updatedEntries

@@ -1,14 +1,12 @@
+/**
+ * @import { FileListItem } from "@farjs/filelist/api/FileListItem.mjs"
+ */
 import { lazyFn, stripPrefix, stripSuffix } from "@farjs/filelist/utils.mjs";
 import DateTimeUtil from "../DateTimeUtil.mjs";
 
 /**
- * @typedef {{
+ * @typedef {FileListItem & {
  *  readonly parent: string;
- *  readonly name: string;
- *  readonly isDir: boolean;
- *  readonly size: number;
- *  readonly datetimeMs: number;
- *  readonly permissions: string;
  * }} ZipEntry
  */
 
@@ -22,12 +20,17 @@ import DateTimeUtil from "../DateTimeUtil.mjs";
  * @returns {ZipEntry}
  */
 function ZipEntry(parent, name, isDir, size, datetimeMs, permissions) {
+  const entryTimeMs = datetimeMs ?? 0;
   return {
     parent,
     name,
     isDir: isDir ?? false,
+    isSymLink: false,
     size: size ?? 0,
-    datetimeMs: datetimeMs ?? 0,
+    atimeMs: entryTimeMs,
+    mtimeMs: entryTimeMs,
+    ctimeMs: entryTimeMs,
+    birthtimeMs: entryTimeMs,
     permissions: permissions ?? "",
   };
 }
@@ -55,14 +58,14 @@ ZipEntry.fromUnzipCommand = (output) => {
             ? [path.substring(0, lastSlash), path.substring(lastSlash + 1)]
             : ["", path];
 
-        return {
+        return ZipEntry(
           parent,
-          name: stripPrefix(name, "/"),
-          isDir: pathName.endsWith("/"),
+          stripPrefix(name, "/"),
+          pathName.endsWith("/"),
           size,
-          datetimeMs: DateTimeUtil.parseDateTime(datetime),
+          DateTimeUtil.parseDateTime(datetime),
           permissions,
-        };
+        );
       }
       return undefined;
     })

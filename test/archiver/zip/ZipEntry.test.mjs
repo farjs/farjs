@@ -19,8 +19,12 @@ describe("ZipEntry.test.mjs", () => {
       parent: "test/parent",
       name: "test.name",
       isDir: false,
+      isSymLink: false,
       size: 0,
-      datetimeMs: 0,
+      atimeMs: 0,
+      mtimeMs: 0,
+      ctimeMs: 0,
+      birthtimeMs: 0,
       permissions: "",
     });
   });

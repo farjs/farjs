@@ -720,8 +720,8 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
           path = rootPath,
           isRoot = false,
           items = js.Array(
-            FileListItem.copy(FileListItem("dir 1", isDir = true))(mtimeMs = 1.0),
-            FileListItem.copy(FileListItem("file 1"))(size = 2.0, mtimeMs = 3.0)
+            ZipEntry("", "dir 1", isDir = true, size = 0, datetimeMs = 1.0),
+            ZipEntry("", "file 1", isDir = false, size = 2.0, datetimeMs = 3.0)
           )
         ))
       )

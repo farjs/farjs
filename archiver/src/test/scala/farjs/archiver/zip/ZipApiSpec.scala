@@ -5,7 +5,7 @@ import farjs.filelist.api.FileListItemSpec.assertFileListItems
 import farjs.filelist.api._
 import farjs.filelist.util.ChildProcess.ChildProcessOptions
 import farjs.filelist.util.{StreamReader, SubProcess}
-import org.scalatest.Succeeded
+import org.scalatest.{Assertion, Succeeded}
 import scommons.nodejs.raw.CreateReadStreamOptions
 import scommons.nodejs.stream.Readable
 import scommons.nodejs.test.AsyncTestSpec
@@ -71,8 +71,8 @@ class ZipApiSpec extends AsyncTestSpec {
       path shouldBe rootPath
       isRoot shouldBe false
       assertFileListItems(items.toList, List(
-        FileListItem.copy(FileListItem("file 1"))(size = 2.0, mtimeMs = 3.0, permissions = "-rw-r--r--"),
-        FileListItem.copy(FileListItem("dir 1", isDir = true))(mtimeMs = 1.0, permissions = "drwxr-xr-x")
+        ZipEntry("", "file 1", isDir = false, size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--"),
+        ZipEntry("", "dir 1", isDir = true, size = 0.0, datetimeMs = 1.0, permissions = "drwxr-xr-x")
       ))
     })
   }
@@ -91,7 +91,7 @@ class ZipApiSpec extends AsyncTestSpec {
       path shouldBe s"$rootPath/dir 1"
       isRoot shouldBe false
       assertFileListItems(items.toList, List(
-        FileListItem.copy(FileListItem("dir 2", isDir = true))(mtimeMs = 4.0, permissions = "drwxr-xr-x")
+        ZipEntry("", "dir 2", isDir = true, size = 0.0, datetimeMs = 4.0, permissions = "drwxr-xr-x")
       ))
     })
   }
@@ -110,7 +110,7 @@ class ZipApiSpec extends AsyncTestSpec {
       path shouldBe s"$rootPath/dir 1/dir 2"
       isRoot shouldBe false
       assertFileListItems(items.toList, List(
-        FileListItem.copy(FileListItem("file 2"))(size = 5.0, mtimeMs = 6.0, permissions = "-rw-r--r--")
+        ZipEntry("", "file 2", isDir = false, size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--")
       ))
     })
   }
@@ -441,7 +441,7 @@ class ZipApiSpec extends AsyncTestSpec {
 
     //then
     resultF.map { res =>
-      res shouldBe Map(
+      assertEntries(res, Map(
         "test/dir" -> List(
           ZipEntry("test/dir", "file.txt", isDir = false, 1, js.Date.parse("2019-06-28T16:19:23"), "-rw-r--r--")
         ),
@@ -451,7 +451,7 @@ class ZipApiSpec extends AsyncTestSpec {
         "" -> List(
           ZipEntry("", "test", isDir = true, 0, js.Date.parse("2019-06-28T16:19:23"), "drw-r--r--")
         )
-      )
+      ))
     }
   }
   
@@ -468,7 +468,7 @@ class ZipApiSpec extends AsyncTestSpec {
     val result = ZipApi.groupByParent(entriesF)
     
     //then
-    result shouldBe Map(
+    assertEntries(result, Map(
       "dir 1/dir 2/dir 3" -> List(
         ZipEntry("dir 1/dir 2/dir 3", "file 4", size = 9.0, datetimeMs = 10.0, permissions = "-rw-r--r--"),
         ZipEntry("dir 1/dir 2/dir 3", "file 3", size = 7.0, datetimeMs = 8.0, permissions = "-rw-r--r--")
@@ -484,6 +484,16 @@ class ZipApiSpec extends AsyncTestSpec {
       "" -> List(
         ZipEntry("", "dir 1", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--")
       )
-    )
+    ))
+  }
+  
+  private def assertEntries(result: Map[String, List[FileListItem]], expected: Map[String, List[FileListItem]]): Assertion = {
+    result.size shouldBe expected.size
+    result.keySet shouldBe expected.keySet
+    result.foreach { case (parent, resEntries) =>
+      val expEntries = expected(parent)
+      assertFileListItems(resEntries, expEntries)
+    }
+    Succeeded
   }
 }

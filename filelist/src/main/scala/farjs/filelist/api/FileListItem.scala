@@ -4,17 +4,17 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport
 
 @js.native
-sealed trait FileListItem extends js.Object {
+trait FileListItem extends js.Object {
 
-  val name: String = js.native
-  val isDir: Boolean = js.native
-  val isSymLink: Boolean = js.native
-  val size: Double = js.native
-  val atimeMs: Double = js.native
-  val mtimeMs: Double = js.native
-  val ctimeMs: Double = js.native
-  val birthtimeMs: Double = js.native
-  val permissions: String = js.native //optional, format: drwx---rwx
+  val name: String
+  val isDir: Boolean
+  val isSymLink: Boolean
+  val size: Double
+  val atimeMs: Double
+  val mtimeMs: Double
+  val ctimeMs: Double
+  val birthtimeMs: Double
+  val permissions: String // format: drwx---rwx
 }
 
 @js.native
@@ -35,6 +35,30 @@ object FileListItem {
   def apply(name: String): FileListItem = NativeFileListItem(name, js.undefined)
   
   def apply(name: String, isDir: Boolean): FileListItem = NativeFileListItem(name, isDir)
+
+  def apply(name: String,
+            isDir: Boolean,
+            isSymLink: Boolean,
+            size: Double,
+            atimeMs: Double,
+            mtimeMs: Double,
+            ctimeMs: Double,
+            birthtimeMs: Double,
+            permissions: String // format: drwx---rwx
+           ): FileListItem = {
+
+    js.Dynamic.literal(
+      name = name,
+      isDir = isDir,
+      isSymLink = isSymLink,
+      size = size,
+      atimeMs = atimeMs,
+      mtimeMs = mtimeMs,
+      ctimeMs = ctimeMs,
+      birthtimeMs = birthtimeMs,
+      permissions = permissions
+    ).asInstanceOf[FileListItem]
+  }
 
   def unapply(arg: FileListItem): Option[(String, Boolean, Boolean, Double, Double, Double, Double, Double, String)] = {
     Some((
