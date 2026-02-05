@@ -291,11 +291,16 @@ class ZipApiSpec extends AsyncTestSpec {
     }
   }
 
-  it should "execute zip command recursively when delete" in {
+  it should "spawn zip command recursively when delete" in {
     //given
+    val stdout = new StreamReader(Readable.from(Buffer.from(
+      """  deleting 1
+        |  deleting 2
+        |""".stripMargin)))
+    val rawProcess = literal().asInstanceOf[raw.ChildProcess]
+    val subProcess = SubProcess(rawProcess, stdout, js.Promise.resolve[Unit](js.undefined: Unit))
     val childProcess = new ChildProcess
     ZipApi.childProcess = childProcess.childProcess
-    val result = (new js.Object, new js.Object)
     val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
     val api = new ZipApi(zipPath, rootPath, Future.successful(Map(
@@ -318,14 +323,17 @@ class ZipApiSpec extends AsyncTestSpec {
     )
 
     //then
-    val commands = ArrayBuffer.empty[String]
-    childProcess.exec.expects(*, *).twice().onCall { (command, options) =>
-      commands += command
-      assertObject(options.get, new ChildProcessOptions {
-        override val windowsHide = true
-      })
-
-      (null, Future.successful(result))
+    val resArgs = ArrayBuffer.empty[Seq[String]]
+    childProcess.spawn.expects(
+      "zip",
+      *,
+      *
+    ).twice().onCall { (_, args, options) =>
+      inside(options) { case Some(opts) =>
+        opts.windowsHide shouldBe true
+      }
+      resArgs += args
+      Future.successful(subProcess)
     }
 
     //when
@@ -337,9 +345,9 @@ class ZipApiSpec extends AsyncTestSpec {
     //then
     resultF.map { res =>
       res.items.toList should be (empty)
-      commands shouldBe List(
-        s"""zip -qd "$zipPath" "dir 1/dir 2/file 2" "dir 1/dir 2/dir 3/"""",
-        s"""zip -qd "$zipPath" "dir 1/file 1" "dir 1/dir 2/""""
+      resArgs shouldBe List(
+        List("-qd", zipPath, "dir 1/dir 2/file 2", "dir 1/dir 2/dir 3/"),
+        List("-qd", zipPath, "dir 1/file 1", "dir 1/dir 2/")
       )
     }
   }

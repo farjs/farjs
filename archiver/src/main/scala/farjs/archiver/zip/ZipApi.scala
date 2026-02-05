@@ -81,15 +81,25 @@ class ZipApi(
           s"$parent/$name".stripPrefix(rootPath).stripPrefix("/")
         }
   
-        val (_, future) = ZipApi.childProcess.exec(
-          command = s"""zip -qd "$zipPath" ${paths.mkString("\"", "\" \"", "\"")}""",
+        val future = ZipApi.childProcess.spawn(
+          command = "zip",
+          args = List("-qd", zipPath) ++ paths.toList,
           options = Some(new raw.ChildProcessOptions {
             override val windowsHide = true
           })
         )
 
         deleteFromState(parent, items)
-        future.map(_ => ())
+        for {
+          s <- future
+          _ = s.stdout.readable.destroy()
+          _ <- s.exitP.toFuture.map { maybeError =>
+            maybeError.toOption match {
+              case None =>
+              case Some(error) => throw js.JavaScriptException(error)
+            }
+          }
+        } yield ()
       }
     }
 
