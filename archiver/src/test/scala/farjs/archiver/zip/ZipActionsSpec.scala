@@ -15,28 +15,28 @@ class ZipActionsSpec extends AsyncTestSpec {
 
   it should "re-create ZipApi when updateDir" in {
     //given
-    val readZip = mockFunction[String, Future[Map[String, List[FileListItem]]]]
-    val createApi = mockFunction[String, String, Future[Map[String, List[FileListItem]]], ZipApi]
+    val readZip = mockFunction[String, Future[js.Map[String, js.Array[FileListItem]]]]
+    val createApi = mockFunction[String, String, Future[js.Map[String, js.Array[FileListItem]]], ZipApi]
     ArchiverPlugin.readZip = readZip
     ArchiverPlugin.createApi = createApi
-    val actions = new ZipActions(new ZipApi("file.zip", "root.path", Future.successful(Map.empty)))
+    val actions = new ZipActions(new ZipApi("file.zip", "root.path", Future.successful(new js.Map[String, js.Array[FileListItem]]())))
     val dispatch = mockFunction[js.Any, Unit]
     val currDir = FileListDir("/", isRoot = true, items = js.Array(FileListItem("file 1")))
     val path = "/test/path"
-    val api = new ZipApi("file.zip", "root.path", Future.successful(Map.empty)) {
+    val api = new ZipApi("file.zip", "root.path", Future.successful(new js.Map[String, js.Array[FileListItem]]())) {
       override def readDir(path: String, dir: js.UndefOr[String]): js.Promise[FileListDir] = {
         js.Promise.resolve[FileListDir](currDir)
       }
     }
-    val entriesByParent = Future.successful(Map(
-      "" -> List(
+    val entriesByParent = Future.successful(new js.Map[String, js.Array[FileListItem]](js.Array(
+      "" -> js.Array[FileListItem](
         ZipEntry("", "file 1", size = 100),
         ZipEntry("", "dir 1", isDir = true)
       ),
-      "dir 1" -> List(
+      "dir 1" -> js.Array[FileListItem](
         ZipEntry("dir 1", "file 2", size = 23)
       )
-    ))
+    )))
 
     //then
     readZip.expects("file.zip").returning(entriesByParent)

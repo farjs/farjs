@@ -14,7 +14,7 @@ import scala.scalajs.js.typedarray.Uint8Array
 
 class ArchiverPluginSpec extends AsyncTestSpec {
 
-  ArchiverPlugin.readZip = _ => Future.successful(Map.empty)
+  ArchiverPlugin.readZip = _ => Future.successful(new js.Map[String, js.Array[FileListItem]]())
   ArchiverPlugin.createApi = { // replace potential mock from prev test with default impl
     (zipPath, rootPath, entriesByParentF) =>
       new ZipApi(zipPath, rootPath, entriesByParentF)

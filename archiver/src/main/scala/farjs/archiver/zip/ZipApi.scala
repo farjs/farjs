@@ -14,7 +14,7 @@ import scala.scalajs.js.typedarray.Uint8Array
 class ZipApi(
   val zipPath: String,
   val rootPath: String,
-  private var entriesByParentF: Future[Map[String, List[FileListItem]]]
+  private var entriesByParentF: Future[js.Map[String, js.Array[FileListItem]]]
 ) extends FileListApi(false, js.Set(
   FileListCapability.read,
   FileListCapability.delete
@@ -33,12 +33,12 @@ class ZipApi(
     
     entriesByParentF.map { entriesByParent =>
       val path = targetDir.stripPrefix(rootPath).stripPrefix("/")
-      val entries = entriesByParent.getOrElse(path, Nil)
+      val entries = entriesByParent.getOrElse(path, js.Array())
 
       FileListDir(
         path = targetDir,
         isRoot = false,
-        items = js.Array(entries: _*)
+        items = entries
       )
     }.toJSPromise
   }
@@ -47,14 +47,14 @@ class ZipApi(
 
     def deleteFromState(parent: String, items: js.Array[FileListItem]): Unit = {
       entriesByParentF = entriesByParentF.map { entriesByParent =>
-        items.foldLeft(entriesByParent) { (entries, item) =>
-          val res = entries.updatedWith(parent.stripPrefix(rootPath).stripPrefix("/")) {
+        items.foldLeft(new js.Map[String, js.Array[FileListItem]](entriesByParent)) { (entries, item) =>
+          entries.updateWith(parent.stripPrefix(rootPath).stripPrefix("/")) {
             _.map(_.filter(_.name != item.name))
           }
           if (item.isDir) {
-            res.removed(s"$parent/${item.name}".stripPrefix(rootPath).stripPrefix("/"))
+            entries.delete(s"$parent/${item.name}".stripPrefix(rootPath).stripPrefix("/"))
           }
-          else res
+          entries
         }
       }
     }
@@ -187,7 +187,7 @@ object ZipApi {
     resF.toJSPromise
   }
 
-  def readZip(zipPath: String): Future[Map[String, List[FileListItem]]] = {
+  def readZip(zipPath: String): Future[js.Map[String, js.Array[FileListItem]]] = {
     val subprocessF = childProcess.spawn(
       command = "unzip",
       args = List("-ZT", zipPath),
@@ -223,20 +223,22 @@ object ZipApi {
     }
   }
   
-  private[zip] def groupByParent(entries: List[ZipEntry]): Map[String, List[FileListItem]] = {
+  private[zip] def groupByParent(entries: List[ZipEntry]): js.Map[String, js.Array[FileListItem]] = {
     val processedDirs = mutable.Set[String]()
     
     @annotation.tailrec
-    def ensureDirs(entry: ZipEntry, entriesByParent: Map[String, List[ZipEntry]]): Map[String, List[ZipEntry]] = {
-      val values = entriesByParent.getOrElse(entry.parent, Nil)
-      if (entry.name == "" || values.exists(_.name == entry.name)) entriesByParent
+    def ensureDirs(entry: ZipEntry, entriesByParent: js.Map[String, js.Array[ZipEntry]]): Unit = {
+      val values = entriesByParent.getOrElse(entry.parent, js.Array[ZipEntry]())
+      if (entry.name == "" || values.exists(_.name == entry.name)) ()
       else {
-        val updatedEntries = entriesByParent.updatedWith(entry.parent) {
-          case None => Some(entry :: Nil)
-          case Some(values) => Some(entry :: values)
+        entriesByParent.updateWith(entry.parent) {
+          case None => Some(js.Array[ZipEntry](entry))
+          case Some(values) =>
+            values.push(entry)
+            Some(values)
         }
 
-        if (processedDirs.contains(entry.parent)) updatedEntries
+        if (processedDirs.contains(entry.parent)) ()
         else {
           processedDirs += entry.parent
           val (parent, name) = {
@@ -254,17 +256,17 @@ object ZipApi {
               datetimeMs = entry.mtimeMs,
               permissions = "drw-r--r--"
             ),
-            entriesByParent = updatedEntries
+            entriesByParent = entriesByParent
           )
         }
       }
     }
     
-    var entriesByParent = Map.empty[String, List[ZipEntry]]
+    val entriesByParent = new js.Map[String, js.Array[ZipEntry]]()
     entries.foreach { entry =>
-      entriesByParent = ensureDirs(entry, entriesByParent)
+      ensureDirs(entry, entriesByParent)
     }
 
-    entriesByParent
+    entriesByParent.asInstanceOf[js.Map[String, js.Array[FileListItem]]]
   }
 }

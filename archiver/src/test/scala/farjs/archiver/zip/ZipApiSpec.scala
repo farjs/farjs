@@ -19,18 +19,18 @@ import scala.scalajs.js.typedarray.Uint8Array
 
 class ZipApiSpec extends AsyncTestSpec {
 
-  private val entriesByParentF = Future.successful(Map(
-    "" -> List(
+  private val entriesByParentF = Future.successful(new js.Map[String, js.Array[FileListItem]](js.Array(
+    "" -> js.Array[FileListItem](
       ZipEntry("", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--"),
       ZipEntry("", "dir 1", isDir = true, datetimeMs = 1.0, permissions = "drwxr-xr-x")
     ),
-    "dir 1" -> List(
+    "dir 1" -> js.Array[FileListItem](
       ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 4.0, permissions = "drwxr-xr-x")
     ),
-    "dir 1/dir 2" -> List(
+    "dir 1/dir 2" -> js.Array[FileListItem](
       ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--")
     )
-  ))
+  )))
 
   //noinspection TypeAnnotation
   class ChildProcess {
@@ -303,19 +303,19 @@ class ZipApiSpec extends AsyncTestSpec {
     ZipApi.childProcess = childProcess.childProcess
     val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
-    val api = new ZipApi(zipPath, rootPath, Future.successful(Map(
-      "" -> List(
+    val api = new ZipApi(zipPath, rootPath, Future.successful(new js.Map[String, js.Array[FileListItem]](js.Array(
+      "" -> js.Array[FileListItem](
         ZipEntry("", "dir 1", isDir = true, datetimeMs = 1.0, permissions = "drwxr-xr-x")
       ),
-      "dir 1" -> List(
+      "dir 1" -> js.Array[FileListItem](
         ZipEntry("dir 1", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--"),
         ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 4.0, permissions = "drwxr-xr-x")
       ),
-      "dir 1/dir 2" -> List(
+      "dir 1/dir 2" -> js.Array[FileListItem](
         ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--"),
         ZipEntry("dir 1/dir 2", "dir 3", isDir = true, datetimeMs = 7.0, permissions = "drwxr-xr-x")
       )
-    )))
+    ))))
     val parent = s"$rootPath/dir 1"
     val items = js.Array(
       FileListItem("file 1"),
@@ -417,7 +417,7 @@ class ZipApiSpec extends AsyncTestSpec {
 
     //then
     resultF.map { res =>
-      res shouldBe Map.empty
+      res.toMap shouldBe Map.empty
     }
   }
   
@@ -478,16 +478,16 @@ class ZipApiSpec extends AsyncTestSpec {
     //then
     assertEntries(result, Map(
       "dir 1/dir 2/dir 3" -> List(
-        ZipEntry("dir 1/dir 2/dir 3", "file 4", size = 9.0, datetimeMs = 10.0, permissions = "-rw-r--r--"),
-        ZipEntry("dir 1/dir 2/dir 3", "file 3", size = 7.0, datetimeMs = 8.0, permissions = "-rw-r--r--")
+        ZipEntry("dir 1/dir 2/dir 3", "file 3", size = 7.0, datetimeMs = 8.0, permissions = "-rw-r--r--"),
+        ZipEntry("dir 1/dir 2/dir 3", "file 4", size = 9.0, datetimeMs = 10.0, permissions = "-rw-r--r--")
       ),
       "dir 1/dir 2" -> List(
-        ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--"),
-        ZipEntry("dir 1/dir 2", "dir 3", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--")
+        ZipEntry("dir 1/dir 2", "dir 3", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--"),
+        ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--")
       ),
       "dir 1" -> List(
-        ZipEntry("dir 1", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--"),
-        ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--")
+        ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--"),
+        ZipEntry("dir 1", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--")
       ),
       "" -> List(
         ZipEntry("", "dir 1", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--")
@@ -495,12 +495,12 @@ class ZipApiSpec extends AsyncTestSpec {
     ))
   }
   
-  private def assertEntries(result: Map[String, List[FileListItem]], expected: Map[String, List[FileListItem]]): Assertion = {
+  private def assertEntries(result: js.Map[String, js.Array[FileListItem]], expected: Map[String, List[FileListItem]]): Assertion = {
     result.size shouldBe expected.size
     result.keySet shouldBe expected.keySet
     result.foreach { case (parent, resEntries) =>
       val expEntries = expected(parent)
-      assertFileListItems(resEntries, expEntries)
+      assertFileListItems(resEntries.toList, expEntries)
     }
     Succeeded
   }

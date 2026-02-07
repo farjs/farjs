@@ -39,18 +39,18 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     )
   }
 
-  private val entriesByParentF = Future.successful(Map(
-    "" -> List(
+  private val entriesByParentF = Future.successful(new js.Map[String, js.Array[FileListItem]](js.Array(
+    "" -> js.Array[FileListItem](
       ZipEntry("", "dir 1", isDir = true, datetimeMs = 1.0),
       ZipEntry("", "file 1", size = 2.0, datetimeMs = 3.0)
     ),
-    "dir 1" -> List(
+    "dir 1" -> js.Array[FileListItem](
       ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 4.0)
     ),
-    "dir 1/dir 2" -> List(
+    "dir 1/dir 2" -> js.Array[FileListItem](
       ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0)
     )
-  ))
+  )))
 
   it should "return false when onKeypress(unknown key)" in {
     //given
@@ -660,7 +660,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     )
     val props = FileListPanelProps(dispatch, actions, state)
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel("dir/file.zip", rootPath, Future.successful(Map.empty), onClose)
+    val zipPanel = new ZipPanel("dir/file.zip", rootPath, Future.successful(new js.Map[String, js.Array[FileListItem]]()), onClose)
     val fsDispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val fsActions = new MockFileListActions
     val fsState = FileListState()
