@@ -4,7 +4,6 @@ import farjs.filelist.api._
 import farjs.filelist.util.{ChildProcess, StreamReader, SubProcess}
 import scommons.nodejs.{Buffer, raw}
 
-import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
@@ -219,54 +218,7 @@ object ZipApi {
         }
       }
     } yield {
-      ZipApi.groupByParent(ZipEntry.fromUnzipCommand(output).toList)
+      ZipEntry.groupByParent(ZipEntry.fromUnzipCommand(output))
     }
-  }
-  
-  private[zip] def groupByParent(entries: List[ZipEntry]): js.Map[String, js.Array[FileListItem]] = {
-    val processedDirs = mutable.Set[String]()
-    
-    @annotation.tailrec
-    def ensureDirs(entry: ZipEntry, entriesByParent: js.Map[String, js.Array[ZipEntry]]): Unit = {
-      val values = entriesByParent.getOrElse(entry.parent, js.Array[ZipEntry]())
-      if (entry.name == "" || values.exists(_.name == entry.name)) ()
-      else {
-        entriesByParent.updateWith(entry.parent) {
-          case None => Some(js.Array[ZipEntry](entry))
-          case Some(values) =>
-            values.push(entry)
-            Some(values)
-        }
-
-        if (processedDirs.contains(entry.parent)) ()
-        else {
-          processedDirs += entry.parent
-          val (parent, name) = {
-            val lastSlash = entry.parent.lastIndexOf('/')
-            if (lastSlash != -1) {
-              (entry.parent.take(lastSlash), entry.parent.drop(lastSlash + 1))
-            }
-            else ("", entry.parent)
-          }
-          ensureDirs(
-            entry = ZipEntry(
-              parent = parent,
-              name = name,
-              isDir = true,
-              datetimeMs = entry.mtimeMs,
-              permissions = "drw-r--r--"
-            ),
-            entriesByParent = entriesByParent
-          )
-        }
-      }
-    }
-    
-    val entriesByParent = new js.Map[String, js.Array[ZipEntry]]()
-    entries.foreach { entry =>
-      ensureDirs(entry, entriesByParent)
-    }
-
-    entriesByParent.asInstanceOf[js.Map[String, js.Array[FileListItem]]]
   }
 }

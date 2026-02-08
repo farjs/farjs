@@ -10,7 +10,7 @@ const { describe, it } = await (async () => {
     : import(module);
 })();
 
-const fromUnzipCommand = ZipEntry.fromUnzipCommand;
+const { fromUnzipCommand, groupByParent } = ZipEntry;
 
 describe("ZipEntry.test.mjs", () => {
   it("should create ZipEntry with default params", () => {
@@ -84,6 +84,45 @@ r--r--  2.1 unx 12345 bX 01902811924 test/dir/file.txt
 18 files, 694287 bytes uncompressed, 591996 bytes compressed:  14.7%
 `),
       [ZipEntry("", "test", true, 0, dt("2019-06-28T16:09:03"), "drwxr-xr-x")],
+    );
+  });
+
+  it("should infer dirs when groupByParent", () => {
+    //given
+    const zipEntries = [
+      ZipEntry("dir 1/dir 2/dir 3", "file 3", false, 7, 8, "-rw-r--r--"),
+      ZipEntry("dir 1/dir 2/dir 3", "file 4", false, 9, 10, "-rw-r--r--"),
+      ZipEntry("dir 1/dir 2", "file 2", false, 5, 6, "-rw-r--r--"),
+      ZipEntry("dir 1", "file 1", false, 2, 3, "-rw-r--r--"),
+    ];
+
+    //when & then
+    deepEqual(
+      groupByParent(zipEntries),
+      new Map([
+        [
+          "dir 1/dir 2/dir 3",
+          [
+            ZipEntry("dir 1/dir 2/dir 3", "file 3", false, 7, 8, "-rw-r--r--"),
+            ZipEntry("dir 1/dir 2/dir 3", "file 4", false, 9, 10, "-rw-r--r--"),
+          ],
+        ],
+        [
+          "dir 1/dir 2",
+          [
+            ZipEntry("dir 1/dir 2", "dir 3", true, 0, 8, "drw-r--r--"),
+            ZipEntry("dir 1/dir 2", "file 2", false, 5, 6, "-rw-r--r--"),
+          ],
+        ],
+        [
+          "dir 1",
+          [
+            ZipEntry("dir 1", "dir 2", true, 0, 8, "drw-r--r--"),
+            ZipEntry("dir 1", "file 1", false, 2, 3, "-rw-r--r--"),
+          ],
+        ],
+        ["", [ZipEntry("", "dir 1", true, 0, 8, "drw-r--r--")]],
+      ]),
     );
   });
 });

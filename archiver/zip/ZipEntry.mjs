@@ -72,6 +72,49 @@ ZipEntry.fromUnzipCommand = (output) => {
     .filter((_) => _ !== undefined);
 };
 
+/**
+ * @param {readonly ZipEntry[]} entries
+ * @returns {Map<string, readonly FileListItem[]>}
+ */
+ZipEntry.groupByParent = (entries) => {
+  /** @type {Set<string>} */
+  const processedDirs = new Set();
+  /** @type {Map<string, FileListItem[]>} */
+  const entriesByParent = new Map();
+
+  /** @type {(entry: ZipEntry) => void} */
+  function ensureDirs(entry) {
+    while (true) {
+      const values = entriesByParent.get(entry.parent) ?? [];
+      if (entry.name === "" || values.find((_) => _.name === entry.name)) {
+        return;
+      }
+
+      values.push(entry);
+      entriesByParent.set(entry.parent, values);
+      if (processedDirs.has(entry.parent)) {
+        return;
+      }
+
+      processedDirs.add(entry.parent);
+      const [parent, name] = (() => {
+        const lastSlash = entry.parent.lastIndexOf("/");
+        return lastSlash !== -1
+          ? [
+              entry.parent.substring(0, lastSlash),
+              entry.parent.substring(lastSlash + 1),
+            ]
+          : ["", entry.parent];
+      })();
+
+      entry = ZipEntry(parent, name, true, 0, entry.mtimeMs, "drw-r--r--");
+    }
+  }
+
+  entries.forEach(ensureDirs);
+  return entriesByParent;
+};
+
 /** @type {() => RegExp} */
 const itemRegex = lazyFn(
   () => /([d|-].+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+)/,

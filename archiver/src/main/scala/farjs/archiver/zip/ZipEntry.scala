@@ -23,4 +23,6 @@ object ZipEntry extends js.Function6[String, String, js.UndefOr[Boolean], js.Und
            ): ZipEntry = js.native
 
   def fromUnzipCommand(output: String): js.Array[ZipEntry] = js.native
+
+  def groupByParent(entries: js.Array[ZipEntry]): js.Map[String, js.Array[FileListItem]] = js.native
 }

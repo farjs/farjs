@@ -463,38 +463,6 @@ class ZipApiSpec extends AsyncTestSpec {
     }
   }
   
-  it should "infer dirs when groupByParent" in {
-    //given
-    val entriesF = List(
-      ZipEntry("dir 1/dir 2/dir 3", "file 3", size = 7.0, datetimeMs = 8.0, permissions = "-rw-r--r--"),
-      ZipEntry("dir 1/dir 2/dir 3", "file 4", size = 9.0, datetimeMs = 10.0, permissions = "-rw-r--r--"),
-      ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--"),
-      ZipEntry("dir 1", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--")
-    )
-    
-    //when
-    val result = ZipApi.groupByParent(entriesF)
-    
-    //then
-    assertEntries(result, Map(
-      "dir 1/dir 2/dir 3" -> List(
-        ZipEntry("dir 1/dir 2/dir 3", "file 3", size = 7.0, datetimeMs = 8.0, permissions = "-rw-r--r--"),
-        ZipEntry("dir 1/dir 2/dir 3", "file 4", size = 9.0, datetimeMs = 10.0, permissions = "-rw-r--r--")
-      ),
-      "dir 1/dir 2" -> List(
-        ZipEntry("dir 1/dir 2", "dir 3", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--"),
-        ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--")
-      ),
-      "dir 1" -> List(
-        ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--"),
-        ZipEntry("dir 1", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--")
-      ),
-      "" -> List(
-        ZipEntry("", "dir 1", isDir = true, datetimeMs = 8.0, permissions = "drw-r--r--")
-      )
-    ))
-  }
-  
   private def assertEntries(result: js.Map[String, js.Array[FileListItem]], expected: Map[String, List[FileListItem]]): Assertion = {
     result.size shouldBe expected.size
     result.keySet shouldBe expected.keySet
