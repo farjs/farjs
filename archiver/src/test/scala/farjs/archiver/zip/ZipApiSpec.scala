@@ -5,11 +5,11 @@ import farjs.filelist.api.FileListItemSpec.assertFileListItems
 import farjs.filelist.api._
 import farjs.filelist.util.ChildProcess.ChildProcessOptions
 import farjs.filelist.util.{StreamReader, SubProcess}
-import org.scalatest.{Assertion, Succeeded}
+import org.scalatest.Succeeded
+import scommons.nodejs._
 import scommons.nodejs.raw.CreateReadStreamOptions
 import scommons.nodejs.stream.Readable
 import scommons.nodejs.test.AsyncTestSpec
-import scommons.nodejs._
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
@@ -387,89 +387,5 @@ class ZipApiSpec extends AsyncTestSpec {
 
     //then
     resultF.map(_ => Succeeded)
-  }
-
-  it should "return empty map if empty zip when readZip" in {
-    //given
-    val expectedOutput =
-      """Archive:  ./1.zip
-        |Zip file size: 22 bytes, number of entries: 0
-        |Empty zipfile.
-        |""".stripMargin
-    val stdout = new StreamReader(Readable.from(Buffer.from(expectedOutput)))
-    val rawProcess = literal().asInstanceOf[raw.ChildProcess]
-    val error = js.Error("sub-process exited with code=1")
-    val subProcess = SubProcess(rawProcess, stdout, js.Promise.resolve[js.UndefOr[js.Error]](error))
-    val childProcess = new ChildProcess
-    ZipApi.childProcess = childProcess.childProcess
-    val zipPath = "/dir/filePath.zip"
-
-    //then
-    childProcess.spawn.expects("unzip", List("-ZT", zipPath), *).onCall { (_, _, options) =>
-      inside(options) { case Some(opts) =>
-        opts.windowsHide shouldBe true
-      }
-      Future.successful(subProcess)
-    }
-
-    //when
-    val resultF = ZipApi.readZip(zipPath)
-
-    //then
-    resultF.map { res =>
-      res.toMap shouldBe Map.empty
-    }
-  }
-  
-  it should "spawn unzip and parse output when readZip" in {
-    //given
-    val expectedOutput =
-      """Archive:  /test/dir/file.zip
-        |Zip file size: 595630 bytes, number of entries: 18
-        |-rw-r--r--  2.1 unx     1 bX defN 20190628.161923 test/dir/file.txt
-        |18 files
-        |""".stripMargin
-    val stdout = new StreamReader(Readable.from(Buffer.from(expectedOutput)))
-    val rawProcess = literal().asInstanceOf[raw.ChildProcess]
-    val subProcess = SubProcess(rawProcess, stdout, js.Promise.resolve[Unit](js.undefined: Unit))
-    val childProcess = new ChildProcess
-    ZipApi.childProcess = childProcess.childProcess
-    val zipPath = "/dir/filePath.zip"
-
-    //then
-    childProcess.spawn.expects("unzip", List("-ZT", zipPath), *).onCall { (_, _, options) =>
-      inside(options) { case Some(opts) =>
-        opts.windowsHide shouldBe true
-      }
-      Future.successful(subProcess)
-    }
-
-    //when
-    val resultF = ZipApi.readZip(zipPath)
-
-    //then
-    resultF.map { res =>
-      assertEntries(res, Map(
-        "test/dir" -> List(
-          ZipEntry("test/dir", "file.txt", isDir = false, 1, js.Date.parse("2019-06-28T16:19:23"), "-rw-r--r--")
-        ),
-        "test" -> List(
-          ZipEntry("test", "dir", isDir = true, 0, js.Date.parse("2019-06-28T16:19:23"), "drw-r--r--")
-        ),
-        "" -> List(
-          ZipEntry("", "test", isDir = true, 0, js.Date.parse("2019-06-28T16:19:23"), "drw-r--r--")
-        )
-      ))
-    }
-  }
-  
-  private def assertEntries(result: js.Map[String, js.Array[FileListItem]], expected: Map[String, List[FileListItem]]): Assertion = {
-    result.size shouldBe expected.size
-    result.keySet shouldBe expected.keySet
-    result.foreach { case (parent, resEntries) =>
-      val expEntries = expected(parent)
-      assertFileListItems(resEntries.toList, expEntries)
-    }
-    Succeeded
   }
 }

@@ -1,13 +1,14 @@
 package farjs.archiver.zip
 
 import farjs.filelist.api._
-import farjs.filelist.util.{ChildProcess, StreamReader, SubProcess}
-import scommons.nodejs.{Buffer, raw}
+import farjs.filelist.util.{ChildProcess, SubProcess}
+import scommons.nodejs.raw
 
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.annotation.JSImport
 import scala.scalajs.js.typedarray.Uint8Array
 
 class ZipApi(
@@ -186,39 +187,13 @@ object ZipApi {
     resF.toJSPromise
   }
 
-  def readZip(zipPath: String): Future[js.Map[String, js.Array[FileListItem]]] = {
-    val subprocessF = childProcess.spawn(
-      command = "unzip",
-      args = List("-ZT", zipPath),
-      options = Some(new raw.ChildProcessOptions {
-        override val windowsHide = true
-      })
-    )
+  def readZip(zipPath: String): Future[js.Map[String, js.Array[FileListItem]]] =
+    ZipApiNative.readZip(zipPath).toFuture
+}
 
-    def loop(reader: StreamReader, result: js.Array[Buffer]): Future[js.Array[Buffer]] = {
-      reader.readNextBytes(64 * 1024).toFuture.map(_.toOption).flatMap {
-        case None => Future.successful(result)
-        case Some(content) =>
-          result.push(content)
-          loop(reader, result)
-      }
-    }
+@js.native
+@JSImport("../archiver/zip/ZipApi.mjs", JSImport.Default)
+object ZipApiNative extends js.Object {
 
-    for {
-      subprocess <- subprocessF
-      chunks <- loop(subprocess.stdout, new js.Array[Buffer](0))
-      output = Buffer.concat(chunks).toString
-      _ <- subprocess.exitP.toFuture.map { maybeError =>
-        maybeError.toOption match {
-          case None =>
-          case Some(error) =>
-            if (!error.toString.contains("code=1") || !output.contains("Empty zipfile.")) {
-              throw new RuntimeException(error.toString)
-            }
-        }
-      }
-    } yield {
-      ZipEntry.groupByParent(ZipEntry.fromUnzipCommand(output))
-    }
-  }
+  def readZip(zipPath: String): js.Promise[js.Map[String, js.Array[FileListItem]]] = js.native
 }
