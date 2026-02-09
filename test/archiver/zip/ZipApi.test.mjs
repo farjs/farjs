@@ -18,9 +18,113 @@ const { describe, it } = await (async () => {
     : import(module);
 })();
 
-const { readZip } = ZipApi;
+const { addToZip, readZip } = ZipApi;
 
 describe("ZipApi.test.mjs", () => {
+  it("should fail if exitCode != 0 when addToZip", async () => {
+    //given
+    const stdout = new StreamReader(Readable.from([]));
+    const error = new SubProcessError(1, "test error");
+    /** @type {SubProcess} */
+    const subProcess = {
+      child: /** @type {any} */ ({}),
+      stdout,
+      exitP: Promise.resolve(error),
+    };
+    let spawnArgs = /** @type {any[]} */ ([]);
+    const spawn = mockFunction((...args) => {
+      spawnArgs = args;
+      return subProcess.child;
+    });
+    let wrapArgs = /** @type {any[]} */ ([]);
+    const wrap = mockFunction((...args) => {
+      wrapArgs = args;
+      return Promise.resolve(subProcess);
+    });
+    // @ts-ignore
+    ZipApi.spawn = spawn;
+    ZipApi.wrap = wrap;
+    const parent = "test dir";
+    const zipFile = "test.zip";
+    const items = new Set(["item 1", "item 2"]);
+    const onNextItem = mockFunction();
+
+    let resError = null;
+    try {
+      //when
+      await addToZip(zipFile, parent, items, onNextItem);
+    } catch (error) {
+      resError = error;
+    }
+
+    //then
+    deepEqual(spawn.times, 1);
+    deepEqual(spawnArgs, [
+      "zip",
+      ["-r", "test.zip", "item 1", "item 2"],
+      {
+        cwd: parent,
+        windowsHide: true,
+      },
+    ]);
+    deepEqual(wrap.times, 1);
+    deepEqual(wrapArgs, [subProcess.child]);
+    deepEqual(onNextItem.times, 0);
+    deepEqual(resError === error, true);
+  });
+
+  it("should spawn zip command when addToZip", async () => {
+    //given
+    const stdout = new StreamReader(
+      Readable.from(
+        Buffer.from(`  adding: 1/ (stored 0%)
+  adding: 1/2.txt (stored 1%)
+  adding: 1/1.txt (stored 2.3%)
+`),
+      ),
+    );
+    /** @type {SubProcess} */
+    const subProcess = {
+      child: /** @type {any} */ ({}),
+      stdout,
+      exitP: Promise.resolve(undefined),
+    };
+    let spawnArgs = /** @type {any[]} */ ([]);
+    const spawn = mockFunction((...args) => {
+      spawnArgs = args;
+      return subProcess.child;
+    });
+    let wrapArgs = /** @type {any[]} */ ([]);
+    const wrap = mockFunction((...args) => {
+      wrapArgs = args;
+      return Promise.resolve(subProcess);
+    });
+    // @ts-ignore
+    ZipApi.spawn = spawn;
+    ZipApi.wrap = wrap;
+    const parent = "test dir";
+    const zipFile = "test.zip";
+    const items = new Set(["item 1", "item 2"]);
+    const onNextItem = mockFunction();
+
+    //when
+    await addToZip(zipFile, parent, items, onNextItem);
+
+    //then
+    deepEqual(spawn.times, 1);
+    deepEqual(spawnArgs, [
+      "zip",
+      ["-r", "test.zip", "item 1", "item 2"],
+      {
+        cwd: parent,
+        windowsHide: true,
+      },
+    ]);
+    deepEqual(wrap.times, 1);
+    deepEqual(wrapArgs, [subProcess.child]);
+    deepEqual(onNextItem.times, 3);
+  });
+
   it("should fail if exitCode != 1 when readZip", async () => {
     //given
     const expectedOutput = `Archive:  ./1.zip

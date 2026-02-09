@@ -166,26 +166,8 @@ object ZipApi {
 
   private[zip] var childProcess: ChildProcess = ChildProcess.child_process
   
-  def addToZip(zipFile: String, parent: String, items: js.Set[String], onNextItem: js.Function0[Unit]): js.Promise[Unit] = {
-    val resF = for {
-      subprocess <- childProcess.spawn(
-        command = "zip",
-        args = List("-r", zipFile) ++ items.toList,
-        options = Some(new raw.ChildProcessOptions {
-          override val cwd = parent
-          override val windowsHide = true
-        })
-      )
-      _ <- subprocess.stdout.readAllLines { line =>
-        if (line.contains("adding: ")) {
-          onNextItem()
-        }
-      }.toFuture
-      _ <- subprocess.exitP.toFuture
-    } yield ()
-
-    resF.toJSPromise
-  }
+  def addToZip(zipFile: String, parent: String, items: js.Set[String], onNextItem: js.Function0[Unit]): js.Promise[Unit] =
+    ZipApiNative.addToZip(zipFile, parent, items, onNextItem)
 
   def readZip(zipPath: String): Future[js.Map[String, js.Array[FileListItem]]] =
     ZipApiNative.readZip(zipPath).toFuture
@@ -195,5 +177,7 @@ object ZipApi {
 @JSImport("../archiver/zip/ZipApi.mjs", JSImport.Default)
 object ZipApiNative extends js.Object {
 
+  def addToZip(zipFile: String, parent: String, items: js.Set[String], onNextItem: js.Function0[Unit]): js.Promise[Unit] = js.native
+  
   def readZip(zipPath: String): js.Promise[js.Map[String, js.Array[FileListItem]]] = js.native
 }

@@ -8,6 +8,31 @@ import ZipEntry from "./ZipEntry.mjs";
 
 class ZipApi {
   /**
+   * @param {string} zipFile
+   * @param {string} parent
+   * @param {Set<string>} items
+   * @param {() => void} onNextItem
+   * @returns {Promise<void>}
+   */
+  static async addToZip(zipFile, parent, items, onNextItem) {
+    const subProcess = await ZipApi.wrap(
+      ZipApi.spawn("zip", ["-r", zipFile, ...items], {
+        cwd: parent,
+        windowsHide: true,
+      }),
+    );
+    await subProcess.stdout.readAllLines((line) => {
+      if (line.includes("adding: ")) {
+        onNextItem();
+      }
+    });
+    const error = await subProcess.exitP;
+    if (error && error.exitCode !== 0) {
+      throw error;
+    }
+  }
+
+  /**
    * @param {string} zipPath
    * @returns {Promise<Map<string, readonly FileListItem[]>>}
    */

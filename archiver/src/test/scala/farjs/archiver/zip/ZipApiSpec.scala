@@ -5,7 +5,6 @@ import farjs.filelist.api.FileListItemSpec.assertFileListItems
 import farjs.filelist.api._
 import farjs.filelist.util.ChildProcess.ChildProcessOptions
 import farjs.filelist.util.{StreamReader, SubProcess}
-import org.scalatest.Succeeded
 import scommons.nodejs._
 import scommons.nodejs.raw.CreateReadStreamOptions
 import scommons.nodejs.stream.Readable
@@ -350,42 +349,5 @@ class ZipApiSpec extends AsyncTestSpec {
         List("-qd", zipPath, "dir 1/file 1", "dir 1/dir 2/")
       )
     }
-  }
-
-  it should "spawn zip command when addToZip" in {
-    //given
-    val stdout = new StreamReader(Readable.from(Buffer.from(
-      """  adding: 1/ (stored 0%)
-        |  adding: 1/2.txt (stored 1%)
-        |  adding: 1/1.txt (stored 2.3%)
-        |""".stripMargin)))
-    val rawProcess = literal().asInstanceOf[raw.ChildProcess]
-    val subProcess = SubProcess(rawProcess, stdout, js.Promise.resolve[Unit](js.undefined: Unit))
-    val childProcess = new ChildProcess
-    ZipApi.childProcess = childProcess.childProcess
-    val parent = "test dir"
-    val zipFile = "test.zip"
-    val items = js.Set("item 1", "item 2")
-    val onNextItem = mockFunction[Unit]
-
-    //then
-    childProcess.spawn.expects(
-      "zip",
-      List("-r", "test.zip", "item 1", "item 2"),
-      *
-    ).onCall { (_, _, options) =>
-      inside(options) { case Some(opts) =>
-        opts.cwd shouldBe parent
-        opts.windowsHide shouldBe true
-      }
-      Future.successful(subProcess)
-    }
-    onNextItem.expects().repeat(3)
-
-    //when
-    val resultF = ZipApi.addToZip(zipFile, parent, items, onNextItem).toFuture
-
-    //then
-    resultF.map(_ => Succeeded)
   }
 }
