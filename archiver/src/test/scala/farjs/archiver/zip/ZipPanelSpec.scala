@@ -20,6 +20,7 @@ import scommons.react.test._
 
 import scala.concurrent.Future
 import scala.scalajs.js
+import scala.scalajs.js.JavaScriptException
 
 class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtils with OptionValues {
 
@@ -39,7 +40,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     )
   }
 
-  private val entriesByParentF = Future.successful(new js.Map[String, js.Array[FileListItem]](js.Array(
+  private val entriesByParentF = js.Promise.resolve[js.Map[String, js.Array[FileListItem]]](new js.Map[String, js.Array[FileListItem]](js.Array(
     "" -> js.Array[FileListItem](
       ZipEntry("", "dir 1", isDir = true, datetimeMs = 1.0),
       ZipEntry("", "file 1", size = 2.0, datetimeMs = 3.0)
@@ -609,7 +610,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     val state = FileListState()
     val props = FileListPanelProps(dispatch, actions, state)
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel("dir/file.zip", rootPath, Future.failed(new Exception("test")), onClose)
+    val zipPanel = new ZipPanel("dir/file.zip", rootPath, js.Promise.reject(JavaScriptException(js.Error("test"))), onClose)
     val dir = FileListDir(rootPath, isRoot = false, js.Array())
     val fsDispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val fsActions = new MockFileListActions
@@ -660,7 +661,7 @@ class ZipPanelSpec extends AsyncTestSpec with BaseTestSpec with TestRendererUtil
     )
     val props = FileListPanelProps(dispatch, actions, state)
     val rootPath = "zip://filePath.zip"
-    val zipPanel = new ZipPanel("dir/file.zip", rootPath, Future.successful(new js.Map[String, js.Array[FileListItem]]()), onClose)
+    val zipPanel = new ZipPanel("dir/file.zip", rootPath, js.Promise.resolve[js.Map[String, js.Array[FileListItem]]](new js.Map[String, js.Array[FileListItem]]()), onClose)
     val fsDispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
     val fsActions = new MockFileListActions
     val fsState = FileListState()

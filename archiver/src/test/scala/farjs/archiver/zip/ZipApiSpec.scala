@@ -18,7 +18,7 @@ import scala.scalajs.js.typedarray.Uint8Array
 
 class ZipApiSpec extends AsyncTestSpec {
 
-  private val entriesByParentF = Future.successful(new js.Map[String, js.Array[FileListItem]](js.Array(
+  private val entriesByParentF = js.Promise.resolve[js.Map[String, js.Array[FileListItem]]](new js.Map[String, js.Array[FileListItem]](js.Array(
     "" -> js.Array[FileListItem](
       ZipEntry("", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--"),
       ZipEntry("", "dir 1", isDir = true, datetimeMs = 1.0, permissions = "drwxr-xr-x")
@@ -128,10 +128,10 @@ class ZipApiSpec extends AsyncTestSpec {
     val stdout = new StreamReader(stdoutStream)
     val subProcess = SubProcess(rawProcess, stdout, js.Promise.resolve[Unit](js.undefined: Unit))
     val api = new ZipApi(zipPath, rootPath, entriesByParentF) {
-      override def extract(zipPath: String, filePath: String): Future[SubProcess] = {
+      override def extract(zipPath: String, filePath: String): js.Promise[SubProcess] = {
         zipPath shouldBe "/dir/filePath.zip"
         filePath shouldBe expectedFilePath
-        Future.successful(subProcess)
+        js.Promise.resolve[SubProcess](subProcess)
       }
     }
     val item = FileListItem.copy(FileListItem("example.txt"))(size = expectedOutput.length)
@@ -181,10 +181,10 @@ class ZipApiSpec extends AsyncTestSpec {
     val stdout = new StreamReader(stdoutStream)
     val subProcess = SubProcess(rawProcess, stdout, js.Promise.resolve[Unit](js.undefined: Unit))
     val api = new ZipApi(zipPath, rootPath, entriesByParentF) {
-      override def extract(zipPath: String, filePath: String): Future[SubProcess] = {
+      override def extract(zipPath: String, filePath: String): js.Promise[SubProcess] = {
         zipPath shouldBe "/dir/filePath.zip"
         filePath shouldBe expectedFilePath
-        Future.successful(subProcess)
+        js.Promise.resolve[SubProcess](subProcess)
       }
     }
     val item = FileListItem.copy(FileListItem("example.txt"))(size = expectedOutput.length * 2)
@@ -228,10 +228,10 @@ class ZipApiSpec extends AsyncTestSpec {
     val error = js.Error("test error")
     val subProcess = SubProcess(rawProcess, stdout, js.Promise.resolve[js.UndefOr[js.Error]](error))
     val api = new ZipApi(zipPath, rootPath, entriesByParentF) {
-      override def extract(zipPath: String, filePath: String): Future[SubProcess] = {
+      override def extract(zipPath: String, filePath: String): js.Promise[SubProcess] = {
         zipPath shouldBe "/dir/filePath.zip"
         filePath shouldBe expectedFilePath
-        Future.successful(subProcess)
+        js.Promise.resolve[SubProcess](subProcess)
       }
     }
     val item = FileListItem.copy(FileListItem("example.txt"))(size = 5)
@@ -285,7 +285,7 @@ class ZipApiSpec extends AsyncTestSpec {
     }
 
     //then
-    resultF.flatMap(res => loop(res.stdout, "")).map { output =>
+    resultF.toFuture.flatMap(res => loop(res.stdout, "")).map { output =>
       output shouldBe expectedOutput
     }
   }
@@ -302,7 +302,7 @@ class ZipApiSpec extends AsyncTestSpec {
     ZipApi.childProcess = childProcess.childProcess
     val zipPath = "/dir/filePath.zip"
     val rootPath = "zip://filePath.zip"
-    val api = new ZipApi(zipPath, rootPath, Future.successful(new js.Map[String, js.Array[FileListItem]](js.Array(
+    val api = new ZipApi(zipPath, rootPath, js.Promise.resolve[js.Map[String, js.Array[FileListItem]]](new js.Map[String, js.Array[FileListItem]](js.Array(
       "" -> js.Array[FileListItem](
         ZipEntry("", "dir 1", isDir = true, datetimeMs = 1.0, permissions = "drwxr-xr-x")
       ),

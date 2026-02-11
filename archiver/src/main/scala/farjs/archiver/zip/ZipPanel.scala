@@ -15,13 +15,12 @@ import scommons.react.blessed.BlessedScreen
 import scommons.react.hooks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.scalajs.js
 import scala.util.Failure
 
 class ZipPanel(zipPath: String,
                rootPath: String,
-               entriesByParentF: Future[js.Map[String, js.Array[FileListItem]]],
+               entriesByParentF: js.Promise[js.Map[String, js.Array[FileListItem]]],
                onClose: () => Unit
               ) extends FunctionComponent[FileListPanelProps] {
 
@@ -46,7 +45,7 @@ class ZipPanel(zipPath: String,
 
     useLayoutEffect({ () =>
       if (props.state.currDir.items.isEmpty) {
-        val zipF = entriesByParentF.map { entriesByParent =>
+        val zipF = entriesByParentF.toFuture.map { entriesByParent =>
           val totalSize = entriesByParent.foldLeft(0.0) { (total, entry) =>
             total + entry._2.foldLeft(0.0)(_ + _.size)
           }

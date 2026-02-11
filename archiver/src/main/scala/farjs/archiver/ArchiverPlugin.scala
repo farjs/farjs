@@ -7,14 +7,13 @@ import farjs.filelist.stack.{PanelStackItem, WithStacksProps}
 import scommons.nodejs.path
 import scommons.react.ReactClass
 
-import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 
 object ArchiverPlugin extends FileListPlugin(js.Array("S-f7")) {
 
-  private[archiver] final var readZip: String => Future[js.Map[String, js.Array[FileListItem]]] = ZipApi.readZip
-  private[archiver] final var createApi: (String, String, Future[js.Map[String, js.Array[FileListItem]]]) => ZipApi = {
+  private[archiver] final var readZip: String => js.Promise[js.Map[String, js.Array[FileListItem]]] = ZipApi.readZip
+  private[archiver] final var createApi: (String, String, js.Promise[js.Map[String, js.Array[FileListItem]]]) => ZipApi = {
     (zipPath, rootPath, entriesByParentF) =>
       new ZipApi(zipPath, rootPath, entriesByParentF)
   }

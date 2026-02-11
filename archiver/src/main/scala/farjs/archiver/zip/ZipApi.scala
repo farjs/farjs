@@ -14,7 +14,7 @@ import scala.scalajs.js.typedarray.Uint8Array
 class ZipApi(
   val zipPath: String,
   val rootPath: String,
-  private var entriesByParentF: Future[js.Map[String, js.Array[FileListItem]]]
+  private var entriesByParentF: js.Promise[js.Map[String, js.Array[FileListItem]]]
 ) extends FileListApi(false, js.Set(
   FileListCapability.read,
   FileListCapability.delete
@@ -31,7 +31,7 @@ class ZipApi(
       else s"$path/$dir"
     }.getOrElse(path)
     
-    entriesByParentF.map { entriesByParent =>
+    entriesByParentF.toFuture.map { entriesByParent =>
       val path = targetDir.stripPrefix(rootPath).stripPrefix("/")
       val entries = entriesByParent.getOrElse(path, js.Array())
 
@@ -46,7 +46,7 @@ class ZipApi(
   override def delete(parent: String, items: js.Array[FileListItem]): js.Promise[Unit] = {
 
     def deleteFromState(parent: String, items: js.Array[FileListItem]): Unit = {
-      entriesByParentF = entriesByParentF.map { entriesByParent =>
+      entriesByParentF = entriesByParentF.toFuture.map { entriesByParent =>
         items.foldLeft(new js.Map[String, js.Array[FileListItem]](entriesByParent)) { (entries, item) =>
           entries.updateWith(parent.stripPrefix(rootPath).stripPrefix("/")) {
             _.map(_.filter(_.name != item.name))
@@ -56,7 +56,7 @@ class ZipApi(
           }
           entries
         }
-      }
+      }.toJSPromise
     }
     
     def delDirItems(parent: String, items: js.Array[FileListItem]): Future[Unit] = {
@@ -110,7 +110,7 @@ class ZipApi(
     val filePath = s"$parent/${item.name}".stripPrefix(rootPath).stripPrefix("/")
     val subprocessF = extract(zipPath, filePath)
 
-    subprocessF.map { case SubProcess(_, stdout, exitP) =>
+    subprocessF.toFuture.map { case SubProcess(_, stdout, exitP) =>
       new FileSource {
         private var pos = 0
 
@@ -151,14 +151,14 @@ class ZipApi(
     }.toJSPromise
   }
 
-  def extract(zipPath: String, filePath: String): Future[SubProcess] = {
+  def extract(zipPath: String, filePath: String): js.Promise[SubProcess] = {
     ZipApi.childProcess.spawn(
       command = "unzip",
       args = List("-p", zipPath, filePath),
       options = Some(new raw.ChildProcessOptions {
         override val windowsHide = true
       })
-    )
+    ).toJSPromise
   }
 }
 
@@ -169,8 +169,8 @@ object ZipApi {
   def addToZip(zipFile: String, parent: String, items: js.Set[String], onNextItem: js.Function0[Unit]): js.Promise[Unit] =
     ZipApiNative.addToZip(zipFile, parent, items, onNextItem)
 
-  def readZip(zipPath: String): Future[js.Map[String, js.Array[FileListItem]]] =
-    ZipApiNative.readZip(zipPath).toFuture
+  def readZip(zipPath: String): js.Promise[js.Map[String, js.Array[FileListItem]]] =
+    ZipApiNative.readZip(zipPath)
 }
 
 @js.native
