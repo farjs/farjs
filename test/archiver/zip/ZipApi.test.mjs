@@ -1,11 +1,13 @@
 /**
- * @import { SubProcess } from "@farjs/filelist/util/SubProcess.mjs"
+ * @typedef {import("@farjs/filelist/util/SubProcess.mjs").SubProcess} SubProcess
  */
 import { Readable } from "stream";
 import { deepEqual } from "node:assert/strict";
 import mockFunction from "mock-fn";
 import StreamReader from "@farjs/filelist/util/StreamReader.mjs";
-import { SubProcessError } from "@farjs/filelist/util/SubProcess.mjs";
+import SubProcess, {
+  SubProcessError,
+} from "@farjs/filelist/util/SubProcess.mjs";
 import ZipEntry from "../../../archiver/zip/ZipEntry.mjs";
 import ZipApi from "../../../archiver/zip/ZipApi.mjs";
 
@@ -34,16 +36,15 @@ describe("ZipApi.test.mjs", () => {
     let spawnArgs = /** @type {any[]} */ ([]);
     const spawn = mockFunction((...args) => {
       spawnArgs = args;
-      return subProcess.child;
+      return /** @type {any} */ (subProcess.child);
     });
     let wrapArgs = /** @type {any[]} */ ([]);
     const wrap = mockFunction((...args) => {
       wrapArgs = args;
       return Promise.resolve(subProcess);
     });
-    // @ts-ignore
-    ZipApi.spawn = spawn;
-    ZipApi.wrap = wrap;
+    SubProcess.spawn = spawn;
+    SubProcess.wrap = wrap;
     const parent = "test dir";
     const zipFile = "test.zip";
     const items = new Set(["item 1", "item 2"]);
@@ -92,16 +93,15 @@ describe("ZipApi.test.mjs", () => {
     let spawnArgs = /** @type {any[]} */ ([]);
     const spawn = mockFunction((...args) => {
       spawnArgs = args;
-      return subProcess.child;
+      return /** @type {any} */ (subProcess.child);
     });
     let wrapArgs = /** @type {any[]} */ ([]);
     const wrap = mockFunction((...args) => {
       wrapArgs = args;
       return Promise.resolve(subProcess);
     });
-    // @ts-ignore
-    ZipApi.spawn = spawn;
-    ZipApi.wrap = wrap;
+    SubProcess.spawn = spawn;
+    SubProcess.wrap = wrap;
     const parent = "test dir";
     const zipFile = "test.zip";
     const items = new Set(["item 1", "item 2"]);
@@ -142,16 +142,15 @@ Empty zipfile.
     let spawnArgs = /** @type {any[]} */ ([]);
     const spawn = mockFunction((...args) => {
       spawnArgs = args;
-      return subProcess.child;
+      return /** @type {any} */ (subProcess.child);
     });
     let wrapArgs = /** @type {any[]} */ ([]);
     const wrap = mockFunction((...args) => {
       wrapArgs = args;
       return Promise.resolve(subProcess);
     });
-    // @ts-ignore
-    ZipApi.spawn = spawn;
-    ZipApi.wrap = wrap;
+    SubProcess.spawn = spawn;
+    SubProcess.wrap = wrap;
     const zipPath = "/dir/filePath.zip";
 
     let resError = null;
@@ -192,16 +191,15 @@ Zip file size: 22 bytes, number of entries: 0
     let spawnArgs = /** @type {any[]} */ ([]);
     const spawn = mockFunction((...args) => {
       spawnArgs = args;
-      return subProcess.child;
+      return /** @type {any} */ (subProcess.child);
     });
     let wrapArgs = /** @type {any[]} */ ([]);
     const wrap = mockFunction((...args) => {
       wrapArgs = args;
       return Promise.resolve(subProcess);
     });
-    // @ts-ignore
-    ZipApi.spawn = spawn;
-    ZipApi.wrap = wrap;
+    SubProcess.spawn = spawn;
+    SubProcess.wrap = wrap;
     const zipPath = "/dir/filePath.zip";
 
     let resError = null;
@@ -243,16 +241,15 @@ Empty zipfile.
     let spawnArgs = /** @type {any[]} */ ([]);
     const spawn = mockFunction((...args) => {
       spawnArgs = args;
-      return subProcess.child;
+      return /** @type {any} */ (subProcess.child);
     });
     let wrapArgs = /** @type {any[]} */ ([]);
     const wrap = mockFunction((...args) => {
       wrapArgs = args;
       return Promise.resolve(subProcess);
     });
-    // @ts-ignore
-    ZipApi.spawn = spawn;
-    ZipApi.wrap = wrap;
+    SubProcess.spawn = spawn;
+    SubProcess.wrap = wrap;
     const zipPath = "/dir/filePath.zip";
 
     //when
@@ -289,16 +286,15 @@ Zip file size: 595630 bytes, number of entries: 18
     let spawnArgs = /** @type {any[]} */ ([]);
     const spawn = mockFunction((...args) => {
       spawnArgs = args;
-      return subProcess.child;
+      return /** @type {any} */ (subProcess.child);
     });
     let wrapArgs = /** @type {any[]} */ ([]);
     const wrap = mockFunction((...args) => {
       wrapArgs = args;
       return Promise.resolve(subProcess);
     });
-    // @ts-ignore
-    ZipApi.spawn = spawn;
-    ZipApi.wrap = wrap;
+    SubProcess.spawn = spawn;
+    SubProcess.wrap = wrap;
     const zipPath = "/dir/filePath.zip";
 
     //when

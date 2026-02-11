@@ -2,7 +2,6 @@
  * @import { FileListItem } from "@farjs/filelist/api/FileListItem.mjs"
  * @import StreamReader from "@farjs/filelist/util/StreamReader.mjs"
  */
-import child_process from "child_process";
 import SubProcess from "@farjs/filelist/util/SubProcess.mjs";
 import ZipEntry from "./ZipEntry.mjs";
 
@@ -15,8 +14,8 @@ class ZipApi {
    * @returns {Promise<void>}
    */
   static async addToZip(zipFile, parent, items, onNextItem) {
-    const subProcess = await ZipApi.wrap(
-      ZipApi.spawn("zip", ["-r", zipFile, ...items], {
+    const subProcess = await SubProcess.wrap(
+      SubProcess.spawn("zip", ["-r", zipFile, ...items], {
         cwd: parent,
         windowsHide: true,
       }),
@@ -48,8 +47,8 @@ class ZipApi {
       return result;
     }
 
-    const subProcess = await ZipApi.wrap(
-      ZipApi.spawn("unzip", ["-ZT", zipPath], {
+    const subProcess = await SubProcess.wrap(
+      SubProcess.spawn("unzip", ["-ZT", zipPath], {
         windowsHide: true,
       }),
     );
@@ -62,9 +61,6 @@ class ZipApi {
 
     return ZipEntry.groupByParent(ZipEntry.fromUnzipCommand(output));
   }
-
-  static spawn = child_process.spawn;
-  static wrap = SubProcess.wrap;
 }
 
 export default ZipApi;
