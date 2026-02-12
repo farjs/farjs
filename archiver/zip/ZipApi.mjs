@@ -1,11 +1,45 @@
 /**
  * @import { FileListItem } from "@farjs/filelist/api/FileListItem.mjs"
  * @import StreamReader from "@farjs/filelist/util/StreamReader.mjs"
+ * @typedef {import("@farjs/filelist/util/SubProcess.mjs").SubProcess} SubProcess
  */
+import FileListCapability from "@farjs/filelist/api/FileListCapability.mjs";
+import FileListApi from "@farjs/filelist/api/FileListApi.mjs";
 import SubProcess from "@farjs/filelist/util/SubProcess.mjs";
 import ZipEntry from "./ZipEntry.mjs";
 
-class ZipApi {
+class ZipApi extends FileListApi {
+  /**
+   * @param {string} zipPath
+   * @param {string} rootPath
+   * @param {Promise<Map<string, readonly FileListItem[]>>} entriesByParentP
+   */
+  constructor(zipPath, rootPath, entriesByParentP) {
+    super(false, new Set([FileListCapability.read, FileListCapability.delete]));
+
+    /** @private @readonly @type {string} */
+    this.zipPath = zipPath;
+
+    /** @private @readonly @type {string} */
+    this.rootPath = rootPath;
+
+    /** @private @type {Promise<Map<string, readonly FileListItem[]>>} */
+    this.entriesByParentP = entriesByParentP;
+  }
+
+  /**
+   * @param {string} zipPath
+   * @param {string} filePath
+   * @returns {Promise<SubProcess>}
+   */
+  extract(zipPath, filePath) {
+    return SubProcess.wrap(
+      SubProcess.spawn("unzip", ["-p", zipPath, filePath], {
+        windowsHide: true,
+      }),
+    );
+  }
+
   /**
    * @param {string} zipFile
    * @param {string} parent

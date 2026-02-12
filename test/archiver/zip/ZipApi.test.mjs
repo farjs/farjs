@@ -4,6 +4,7 @@
 import { Readable } from "stream";
 import { deepEqual } from "node:assert/strict";
 import mockFunction from "mock-fn";
+import FileListCapability from "@farjs/filelist/api/FileListCapability.mjs";
 import StreamReader from "@farjs/filelist/util/StreamReader.mjs";
 import SubProcess, {
   SubProcessError,
@@ -22,7 +23,94 @@ const { describe, it } = await (async () => {
 
 const { addToZip, readZip } = ZipApi;
 
+const entriesByParentP = Promise.resolve(
+  new Map([
+    [
+      "",
+      [
+        ZipEntry("", "file 1", false, 2, 3, "-rw-r--r--"),
+        ZipEntry("", "dir 1", true, 0, 1, "drwxr-xr-x"),
+      ],
+    ],
+    ["dir 1", [ZipEntry("dir 1", "dir 2", true, 0, 4, "drwxr-xr-x")]],
+    [
+      "dir 1/dir 2",
+      [ZipEntry("dir 1/dir 2", "file 2", false, 5, 6, "-rw-r--r--")],
+    ],
+  ]),
+);
+
 describe("ZipApi.test.mjs", () => {
+  it("should return supported capabilities", () => {
+    //given
+    const zipPath = "/dir/filePath.zip";
+    const rootPath = "zip://filePath.zip";
+    const api = new ZipApi(zipPath, rootPath, entriesByParentP);
+
+    //when & then
+    deepEqual(api.isLocal, false);
+
+    //when & then
+    deepEqual(
+      api.capabilities,
+      new Set([FileListCapability.read, FileListCapability.delete]),
+    );
+  });
+
+  it("should spawn ChildProcess when extract", async () => {
+    //given
+    const expectedOutput = "hello, World!!!";
+    const stdout = new StreamReader(Readable.from(Buffer.from(expectedOutput)));
+    /** @type {SubProcess} */
+    const subProcess = {
+      child: /** @type {any} */ ({}),
+      stdout,
+      exitP: Promise.resolve(undefined),
+    };
+    let spawnArgs = /** @type {any[]} */ ([]);
+    const spawn = mockFunction((...args) => {
+      spawnArgs = args;
+      return /** @type {any} */ (subProcess.child);
+    });
+    let wrapArgs = /** @type {any[]} */ ([]);
+    const wrap = mockFunction((...args) => {
+      wrapArgs = args;
+      return Promise.resolve(subProcess);
+    });
+    SubProcess.spawn = spawn;
+    SubProcess.wrap = wrap;
+    const zipPath = "/dir/filePath.zip";
+    const rootPath = "zip://filePath.zip";
+    const api = new ZipApi(zipPath, rootPath, entriesByParentP);
+    const filePath = `${rootPath}/dir 1/file 2.txt`;
+
+    //when
+    const result = await api.extract(zipPath, filePath);
+
+    //then
+    deepEqual(spawn.times, 1);
+    deepEqual(spawnArgs, [
+      "unzip",
+      ["-p", zipPath, filePath],
+      {
+        windowsHide: true,
+      },
+    ]);
+    deepEqual(wrap.times, 1);
+    deepEqual(wrapArgs, [subProcess.child]);
+
+    /** @type {(reader: StreamReader, result: string) => Promise<string>} */
+    async function loop(reader, result) {
+      const content = await reader.readNextBytes(5);
+      if (content) {
+        return loop(reader, result + content.toString());
+      }
+
+      return result;
+    }
+    deepEqual(await loop(result.stdout, ""), expectedOutput);
+  });
+
   it("should fail if exitCode != 0 when addToZip", async () => {
     //given
     const stdout = new StreamReader(Readable.from([]));

@@ -251,45 +251,6 @@ class ZipApiSpec extends AsyncTestSpec {
     }
   }
 
-  it should "spawn ChildProcess when extract" in {
-    //given
-    val expectedOutput = "hello, World!!!"
-    val stdout = new StreamReader(Readable.from(Buffer.from(expectedOutput)))
-    val rawProcess = literal().asInstanceOf[raw.ChildProcess]
-    val subProcess = SubProcess(rawProcess, stdout, js.Promise.resolve[Unit](js.undefined: Unit))
-    val childProcess = new ChildProcess
-    ZipApi.childProcess = childProcess.childProcess
-    val zipPath = "/dir/filePath.zip"
-    val rootPath = "zip://filePath.zip"
-    val api = new ZipApi(zipPath, rootPath, entriesByParentF)
-    val filePath = s"$rootPath/dir 1/file 2.txt"
-
-    //then
-    childProcess.spawn.expects("unzip", List("-p", zipPath, filePath), *).onCall { (_, _, options) =>
-      inside(options) { case Some(opts) =>
-        opts.windowsHide shouldBe true
-        childProcess.childProcess
-      }
-      Future.successful(subProcess)
-    }
-
-    //when
-    val resultF = api.extract(zipPath, filePath)
-
-    def loop(reader: StreamReader, result: String): Future[String] = {
-      reader.readNextBytes(5).toFuture.map(_.toOption).flatMap {
-        case None => Future.successful(result)
-        case Some(content) =>
-          loop(reader, result + content.toString)
-      }
-    }
-
-    //then
-    resultF.toFuture.flatMap(res => loop(res.stdout, "")).map { output =>
-      output shouldBe expectedOutput
-    }
-  }
-
   it should "spawn zip command recursively when delete" in {
     //given
     val stdout = new StreamReader(Readable.from(Buffer.from(

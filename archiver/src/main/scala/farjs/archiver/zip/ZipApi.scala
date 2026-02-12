@@ -12,13 +12,10 @@ import scala.scalajs.js.annotation.JSImport
 import scala.scalajs.js.typedarray.Uint8Array
 
 class ZipApi(
-  val zipPath: String,
-  val rootPath: String,
-  private var entriesByParentF: js.Promise[js.Map[String, js.Array[FileListItem]]]
-) extends FileListApi(false, js.Set(
-  FileListCapability.read,
-  FileListCapability.delete
-)) {
+  zipPathIn: String,
+  rootPathIn: String,
+  entriesByParentIn: js.Promise[js.Map[String, js.Array[FileListItem]]]
+) extends ZipApiNative(zipPathIn, rootPathIn, entriesByParentIn) {
 
   override def readDir(parent: String, maybeDir: js.UndefOr[String]): js.Promise[FileListDir] = {
     val path = if (parent == "") rootPath else parent
@@ -31,7 +28,7 @@ class ZipApi(
       else s"$path/$dir"
     }.getOrElse(path)
     
-    entriesByParentF.toFuture.map { entriesByParent =>
+    entriesByParentP.toFuture.map { entriesByParent =>
       val path = targetDir.stripPrefix(rootPath).stripPrefix("/")
       val entries = entriesByParent.getOrElse(path, js.Array())
 
@@ -46,7 +43,7 @@ class ZipApi(
   override def delete(parent: String, items: js.Array[FileListItem]): js.Promise[Unit] = {
 
     def deleteFromState(parent: String, items: js.Array[FileListItem]): Unit = {
-      entriesByParentF = entriesByParentF.toFuture.map { entriesByParent =>
+      entriesByParentP = entriesByParentP.toFuture.map { entriesByParent =>
         items.foldLeft(new js.Map[String, js.Array[FileListItem]](entriesByParent)) { (entries, item) =>
           entries.updateWith(parent.stripPrefix(rootPath).stripPrefix("/")) {
             _.map(_.filter(_.name != item.name))
@@ -150,16 +147,6 @@ class ZipApi(
       }
     }.toJSPromise
   }
-
-  def extract(zipPath: String, filePath: String): js.Promise[SubProcess] = {
-    ZipApi.childProcess.spawn(
-      command = "unzip",
-      args = List("-p", zipPath, filePath),
-      options = Some(new raw.ChildProcessOptions {
-        override val windowsHide = true
-      })
-    ).toJSPromise
-  }
 }
 
 object ZipApi {
@@ -171,6 +158,17 @@ object ZipApi {
 
   def readZip(zipPath: String): js.Promise[js.Map[String, js.Array[FileListItem]]] =
     ZipApiNative.readZip(zipPath)
+}
+
+@js.native
+@JSImport("../archiver/zip/ZipApi.mjs", JSImport.Default)
+class ZipApiNative(
+                    val zipPath: String,
+                    val rootPath: String,
+                    protected var entriesByParentP: js.Promise[js.Map[String, js.Array[FileListItem]]]
+                  ) extends FileListApi(js.native, js.native) {
+
+  def extract(zipPath: String, filePath: String): js.Promise[SubProcess] = js.native
 }
 
 @js.native
