@@ -1,10 +1,14 @@
 /**
- * @import { FileListItem } from "@farjs/filelist/api/FileListItem.mjs"
  * @import StreamReader from "@farjs/filelist/util/StreamReader.mjs"
+ * @typedef {import("@farjs/filelist/api/FileListDir.mjs").FileListDir} FileListDir
+ * @typedef {import("@farjs/filelist/api/FileListItem.mjs").FileListItem} FileListItem
  * @typedef {import("@farjs/filelist/util/SubProcess.mjs").SubProcess} SubProcess
  */
-import FileListCapability from "@farjs/filelist/api/FileListCapability.mjs";
 import FileListApi from "@farjs/filelist/api/FileListApi.mjs";
+import FileListDir from "@farjs/filelist/api/FileListDir.mjs";
+import FileListItem from "@farjs/filelist/api/FileListItem.mjs";
+import FileListCapability from "@farjs/filelist/api/FileListCapability.mjs";
+import { stripPrefix } from "@farjs/filelist/utils.mjs";
 import SubProcess from "@farjs/filelist/util/SubProcess.mjs";
 import ZipEntry from "./ZipEntry.mjs";
 
@@ -25,6 +29,31 @@ class ZipApi extends FileListApi {
 
     /** @private @type {Promise<Map<string, readonly FileListItem[]>>} */
     this.entriesByParentP = entriesByParentP;
+  }
+
+  /**
+   * @param {string} parent
+   * @param {string} [dir]
+   * @returns {Promise<FileListDir>}
+   */
+  async readDir(parent, dir) {
+    const path = parent === "" ? this.rootPath : parent;
+    const targetDir =
+      dir === undefined
+        ? path
+        : (() => {
+            if (dir === FileListItem.up.name) {
+              const lastSlash = path.lastIndexOf("/");
+              return path.substring(0, Math.max(lastSlash, 0));
+            }
+
+            return dir === FileListItem.currDir.name ? path : `${path}/${dir}`;
+          })();
+
+    const entriesByParent = await this.entriesByParentP;
+    const parentPath = stripPrefix(stripPrefix(targetDir, this.rootPath), "/");
+    const entries = entriesByParent.get(parentPath) ?? [];
+    return FileListDir(targetDir, false, entries);
   }
 
   /**

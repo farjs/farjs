@@ -4,6 +4,7 @@
 import { Readable } from "stream";
 import { deepEqual } from "node:assert/strict";
 import mockFunction from "mock-fn";
+import FileListItem from "@farjs/filelist/api/FileListItem.mjs";
 import FileListCapability from "@farjs/filelist/api/FileListCapability.mjs";
 import StreamReader from "@farjs/filelist/util/StreamReader.mjs";
 import SubProcess, {
@@ -55,6 +56,80 @@ describe("ZipApi.test.mjs", () => {
       api.capabilities,
       new Set([FileListCapability.read, FileListCapability.delete]),
     );
+  });
+
+  it("should return root dir content when readDir('', .)", async () => {
+    //given
+    const zipPath = "/dir/filePath.zip";
+    const rootPath = "zip://filePath.zip";
+    const api = new ZipApi(zipPath, rootPath, entriesByParentP);
+
+    //when
+    const result = await api.readDir("", FileListItem.currDir.name);
+
+    //then
+    deepEqual(result, {
+      path: rootPath,
+      isRoot: false,
+      items: [
+        ZipEntry("", "file 1", false, 2, 3, "-rw-r--r--"),
+        ZipEntry("", "dir 1", true, 0, 1, "drwxr-xr-x"),
+      ],
+    });
+  });
+
+  it("should return root dir content when readDir(..)", async () => {
+    //given
+    const zipPath = "/dir/filePath.zip";
+    const rootPath = "zip://filePath.zip";
+    const api = new ZipApi(zipPath, rootPath, entriesByParentP);
+
+    //when
+    const result = await api.readDir(
+      `${rootPath}/dir 1/dir 2`,
+      FileListItem.up.name,
+    );
+
+    //then
+    deepEqual(result, {
+      path: `${rootPath}/dir 1`,
+      isRoot: false,
+      items: [ZipEntry("dir 1", "dir 2", true, 0, 4, "drwxr-xr-x")],
+    });
+  });
+
+  it("should return sub-dir content when readDir", async () => {
+    //given
+    const zipPath = "/dir/filePath.zip";
+    const rootPath = "zip://filePath.zip";
+    const api = new ZipApi(zipPath, rootPath, entriesByParentP);
+
+    //when
+    const result = await api.readDir(`${rootPath}/dir 1`, "dir 2");
+
+    //then
+    deepEqual(result, {
+      path: `${rootPath}/dir 1/dir 2`,
+      isRoot: false,
+      items: [ZipEntry("dir 1/dir 2", "file 2", false, 5, 6, "-rw-r--r--")],
+    });
+  });
+
+  it("should return empty content if not existing dir when readDir", async () => {
+    //given
+    const zipPath = "/dir/filePath.zip";
+    const rootPath = "zip://filePath.zip";
+    const api = new ZipApi(zipPath, rootPath, entriesByParentP);
+
+    //when
+    const result = await api.readDir(`${rootPath}/dir 1`, "dir 3");
+
+    //then
+    deepEqual(result, {
+      path: `${rootPath}/dir 1/dir 3`,
+      isRoot: false,
+      items: [],
+    });
   });
 
   it("should spawn ChildProcess when extract", async () => {

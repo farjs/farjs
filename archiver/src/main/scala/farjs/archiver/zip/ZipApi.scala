@@ -17,29 +17,6 @@ class ZipApi(
   entriesByParentIn: js.Promise[js.Map[String, js.Array[FileListItem]]]
 ) extends ZipApiNative(zipPathIn, rootPathIn, entriesByParentIn) {
 
-  override def readDir(parent: String, maybeDir: js.UndefOr[String]): js.Promise[FileListDir] = {
-    val path = if (parent == "") rootPath else parent
-    val targetDir = maybeDir.map { dir =>
-      if (dir == FileListItem.up.name) {
-        val lastSlash = path.lastIndexOf('/')
-        path.take(lastSlash)
-      }
-      else if (dir == FileListItem.currDir.name) path
-      else s"$path/$dir"
-    }.getOrElse(path)
-    
-    entriesByParentP.toFuture.map { entriesByParent =>
-      val path = targetDir.stripPrefix(rootPath).stripPrefix("/")
-      val entries = entriesByParent.getOrElse(path, js.Array())
-
-      FileListDir(
-        path = targetDir,
-        isRoot = false,
-        items = entries
-      )
-    }.toJSPromise
-  }
-
   override def delete(parent: String, items: js.Array[FileListItem]): js.Promise[Unit] = {
 
     def deleteFromState(parent: String, items: js.Array[FileListItem]): Unit = {
