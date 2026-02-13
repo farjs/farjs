@@ -58,6 +58,26 @@ describe("ZipApi.test.mjs", () => {
     );
   });
 
+  it("should return root dir content when readDir('')", async () => {
+    //given
+    const zipPath = "/dir/filePath.zip";
+    const rootPath = "zip://filePath.zip";
+    const api = new ZipApi(zipPath, rootPath, entriesByParentP);
+
+    //when
+    const result = await api.readDir("");
+
+    //then
+    deepEqual(result, {
+      path: rootPath,
+      isRoot: false,
+      items: [
+        ZipEntry("", "file 1", false, 2, 3, "-rw-r--r--"),
+        ZipEntry("", "dir 1", true, 0, 1, "drwxr-xr-x"),
+      ],
+    });
+  });
+
   it("should return root dir content when readDir('', .)", async () => {
     //given
     const zipPath = "/dir/filePath.zip";
