@@ -10,7 +10,6 @@ import scommons.nodejs.raw.CreateReadStreamOptions
 import scommons.nodejs.stream.Readable
 import scommons.nodejs.test.AsyncTestSpec
 
-import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
@@ -248,67 +247,6 @@ class ZipApiSpec extends AsyncTestSpec {
     } yield {
       source.file shouldBe expectedFilePath
       error.getMessage shouldBe "Error: test error"
-    }
-  }
-
-  it should "spawn zip command recursively when delete" in {
-    //given
-    val stdout = new StreamReader(Readable.from(Buffer.from(
-      """  deleting 1
-        |  deleting 2
-        |""".stripMargin)))
-    val rawProcess = literal().asInstanceOf[raw.ChildProcess]
-    val subProcess = SubProcess(rawProcess, stdout, js.Promise.resolve[Unit](js.undefined: Unit))
-    val childProcess = new ChildProcess
-    ZipApi.childProcess = childProcess.childProcess
-    val zipPath = "/dir/filePath.zip"
-    val rootPath = "zip://filePath.zip"
-    val api = new ZipApi(zipPath, rootPath, js.Promise.resolve[js.Map[String, js.Array[FileListItem]]](new js.Map[String, js.Array[FileListItem]](js.Array(
-      "" -> js.Array[FileListItem](
-        ZipEntry("", "dir 1", isDir = true, datetimeMs = 1.0, permissions = "drwxr-xr-x")
-      ),
-      "dir 1" -> js.Array[FileListItem](
-        ZipEntry("dir 1", "file 1", size = 2.0, datetimeMs = 3.0, permissions = "-rw-r--r--"),
-        ZipEntry("dir 1", "dir 2", isDir = true, datetimeMs = 4.0, permissions = "drwxr-xr-x")
-      ),
-      "dir 1/dir 2" -> js.Array[FileListItem](
-        ZipEntry("dir 1/dir 2", "file 2", size = 5.0, datetimeMs = 6.0, permissions = "-rw-r--r--"),
-        ZipEntry("dir 1/dir 2", "dir 3", isDir = true, datetimeMs = 7.0, permissions = "drwxr-xr-x")
-      )
-    ))))
-    val parent = s"$rootPath/dir 1"
-    val items = js.Array(
-      FileListItem("file 1"),
-      FileListItem("dir 2", isDir = true)
-    )
-
-    //then
-    val resArgs = ArrayBuffer.empty[Seq[String]]
-    childProcess.spawn.expects(
-      "zip",
-      *,
-      *
-    ).twice().onCall { (_, args, options) =>
-      inside(options) { case Some(opts) =>
-        opts.windowsHide shouldBe true
-      }
-      resArgs += args
-      Future.successful(subProcess)
-    }
-
-    //when
-    val resultF = for {
-      _ <- api.delete(parent, items).toFuture
-      res <- api.readDir(parent, js.undefined).toFuture
-    } yield res
-
-    //then
-    resultF.map { res =>
-      res.items.toList should be (empty)
-      resArgs shouldBe List(
-        List("-qd", zipPath, "dir 1/dir 2/file 2", "dir 1/dir 2/dir 3/"),
-        List("-qd", zipPath, "dir 1/file 1", "dir 1/dir 2/")
-      )
     }
   }
 }

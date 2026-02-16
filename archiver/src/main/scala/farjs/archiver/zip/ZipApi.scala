@@ -2,7 +2,6 @@ package farjs.archiver.zip
 
 import farjs.filelist.api._
 import farjs.filelist.util.{ChildProcess, SubProcess}
-import scommons.nodejs.raw
 
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
@@ -16,69 +15,6 @@ class ZipApi(
   rootPathIn: String,
   entriesByParentIn: js.Promise[js.Map[String, js.Array[FileListItem]]]
 ) extends ZipApiNative(zipPathIn, rootPathIn, entriesByParentIn) {
-
-  override def delete(parent: String, items: js.Array[FileListItem]): js.Promise[Unit] = {
-
-    def deleteFromState(parent: String, items: js.Array[FileListItem]): Unit = {
-      entriesByParentP = entriesByParentP.toFuture.map { entriesByParent =>
-        items.foldLeft(new js.Map[String, js.Array[FileListItem]](entriesByParent)) { (entries, item) =>
-          entries.updateWith(parent.stripPrefix(rootPath).stripPrefix("/")) {
-            _.map(_.filter(_.name != item.name))
-          }
-          if (item.isDir) {
-            entries.delete(s"$parent/${item.name}".stripPrefix(rootPath).stripPrefix("/"))
-          }
-          entries
-        }
-      }.toJSPromise
-    }
-    
-    def delDirItems(parent: String, items: js.Array[FileListItem]): Future[Unit] = {
-      items.foldLeft(Future.successful(())) { case (res, item) =>
-        res.flatMap { _ =>
-          if (item.isDir) {
-            val dir = s"$parent/${item.name}"
-            readDir(dir, js.undefined).toFuture.flatMap { fileListDir =>
-              if (fileListDir.items.nonEmpty) {
-                delDirItems(dir, fileListDir.items)
-              }
-              else Future.successful {
-                deleteFromState(parent, js.Array(item))
-              }
-            }
-          }
-          else Future.successful(())
-        }
-      }.flatMap { _ =>
-        val paths = items.map { item =>
-          val name = if (item.isDir) s"${item.name}/" else item.name
-          s"$parent/$name".stripPrefix(rootPath).stripPrefix("/")
-        }
-  
-        val future = ZipApi.childProcess.spawn(
-          command = "zip",
-          args = List("-qd", zipPath) ++ paths.toList,
-          options = Some(new raw.ChildProcessOptions {
-            override val windowsHide = true
-          })
-        )
-
-        deleteFromState(parent, items)
-        for {
-          s <- future
-          _ = s.stdout.readable.destroy()
-          _ <- s.exitP.toFuture.map { maybeError =>
-            maybeError.toOption match {
-              case None =>
-              case Some(error) => throw js.JavaScriptException(error)
-            }
-          }
-        } yield ()
-      }
-    }
-
-    delDirItems(parent, items).toJSPromise
-  }
 
   override def readFile(parent: String, item: FileListItem, position: Double): js.Promise[FileSource] = {
     val filePath = s"$parent/${item.name}".stripPrefix(rootPath).stripPrefix("/")

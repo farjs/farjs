@@ -152,7 +152,150 @@ describe("ZipApi.test.mjs", () => {
     });
   });
 
-  it("should spawn ChildProcess when extract", async () => {
+  it("should spawn zip command recursively when delete", async () => {
+    //given
+    const stdout = new StreamReader(
+      Readable.from(
+        Buffer.from(`  deleting 1
+  deleting 2
+`),
+      ),
+    );
+    /** @type {SubProcess} */
+    const subProcess = {
+      child: /** @type {any} */ ({}),
+      stdout,
+      exitP: Promise.resolve(undefined),
+    };
+    let spawnArgs = /** @type {any[]} */ ([]);
+    const spawn = mockFunction((...args) => {
+      spawnArgs.push(args);
+      return /** @type {any} */ (subProcess.child);
+    });
+    let wrapArgs = /** @type {any[]} */ ([]);
+    const wrap = mockFunction((...args) => {
+      wrapArgs.push(args);
+      return Promise.resolve(subProcess);
+    });
+    SubProcess.spawn = spawn;
+    SubProcess.wrap = wrap;
+    const zipPath = "/dir/filePath.zip";
+    const rootPath = "zip://filePath.zip";
+    const api = new ZipApi(
+      zipPath,
+      rootPath,
+      Promise.resolve(
+        new Map([
+          ["", [ZipEntry("", "dir 1", true, 0, 1, "drwxr-xr-x")]],
+          [
+            "dir 1",
+            [
+              ZipEntry("dir 1", "file 1", false, 2, 3, "-rw-r--r--"),
+              ZipEntry("dir 1", "dir 2", true, 0, 4, "drwxr-xr-x"),
+            ],
+          ],
+          [
+            "dir 1/dir 2",
+            [
+              ZipEntry("dir 1/dir 2", "file 2", false, 5, 6, "-rw-r--r--"),
+              ZipEntry("dir 1/dir 2", "dir 3", true, 0, 7, "drwxr-xr-x"),
+            ],
+          ],
+        ]),
+      ),
+    );
+    const parent = rootPath;
+    const items = [FileListItem("dir 1", true)];
+
+    //when
+    await api.delete(parent, items);
+    const result = await api.readDir(parent);
+
+    //then
+    deepEqual(result.items, []);
+    deepEqual(spawn.times, 3);
+    deepEqual(spawnArgs, [
+      [
+        "zip",
+        ["-qd", zipPath, "dir 1/dir 2/file 2", "dir 1/dir 2/dir 3/"],
+        {
+          windowsHide: true,
+        },
+      ],
+      [
+        "zip",
+        ["-qd", zipPath, "dir 1/file 1", "dir 1/dir 2/"],
+        {
+          windowsHide: true,
+        },
+      ],
+      [
+        "zip",
+        ["-qd", zipPath, "dir 1/"],
+        {
+          windowsHide: true,
+        },
+      ],
+    ]);
+    deepEqual(wrap.times, 3);
+    deepEqual(wrapArgs, [
+      [subProcess.child],
+      [subProcess.child],
+      [subProcess.child],
+    ]);
+  });
+
+  it("should fail if exitError when delete", async () => {
+    //given
+    const stdout = new StreamReader(Readable.from([]));
+    const error = new SubProcessError(1, "test error");
+    /** @type {SubProcess} */
+    const subProcess = {
+      child: /** @type {any} */ ({}),
+      stdout,
+      exitP: Promise.resolve(error),
+    };
+    let spawnArgs = /** @type {any[]} */ ([]);
+    const spawn = mockFunction((...args) => {
+      spawnArgs = args;
+      return /** @type {any} */ (subProcess.child);
+    });
+    let wrapArgs = /** @type {any[]} */ ([]);
+    const wrap = mockFunction((...args) => {
+      wrapArgs = args;
+      return Promise.resolve(subProcess);
+    });
+    SubProcess.spawn = spawn;
+    SubProcess.wrap = wrap;
+    const zipPath = "/dir/filePath.zip";
+    const rootPath = "zip://filePath.zip";
+    const api = new ZipApi(zipPath, rootPath, entriesByParentP);
+    const parent = rootPath;
+    const items = [FileListItem("dir 1", true)];
+
+    let resError = null;
+    try {
+      //when
+      await api.delete(parent, items);
+    } catch (error) {
+      resError = error;
+    }
+
+    //then
+    deepEqual(spawn.times, 1);
+    deepEqual(spawnArgs, [
+      "zip",
+      ["-qd", zipPath, "dir 1/dir 2/file 2"],
+      {
+        windowsHide: true,
+      },
+    ]);
+    deepEqual(wrap.times, 1);
+    deepEqual(wrapArgs, [subProcess.child]);
+    deepEqual(resError === error, true);
+  });
+
+  it("should spawn unzip command when extract", async () => {
     //given
     const expectedOutput = "hello, World!!!";
     const stdout = new StreamReader(Readable.from(Buffer.from(expectedOutput)));

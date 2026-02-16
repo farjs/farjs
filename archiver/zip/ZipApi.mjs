@@ -31,11 +31,7 @@ class ZipApi extends FileListApi {
     this.entriesByParentP = entriesByParentP;
   }
 
-  /**
-   * @param {string} parent
-   * @param {string} [dir]
-   * @returns {Promise<FileListDir>}
-   */
+  /** @type {FileListApi['readDir']} */
   async readDir(parent, dir) {
     const path = parent === "" ? this.rootPath : parent;
     const targetDir =
@@ -54,6 +50,67 @@ class ZipApi extends FileListApi {
     const parentPath = stripPrefix(stripPrefix(targetDir, this.rootPath), "/");
     const entries = entriesByParent.get(parentPath) ?? [];
     return FileListDir(targetDir, false, entries);
+  }
+
+  /** @type {FileListApi['delete']} */
+  delete(parent, items) {
+    const self = this;
+
+    /** @type {(parent: string, items: readonly FileListItem[]) => void} */
+    function deleteFromState(parent, items) {
+      self.entriesByParentP = self.entriesByParentP.then((entriesByParent) => {
+        return items.reduce((entries, item) => {
+          const currItems = entries.get(parent);
+          if (currItems !== undefined) {
+            const newItems = currItems.filter((_) => _.name !== item.name);
+            entries.set(parent, newItems);
+          }
+          if (item.isDir) {
+            entries.delete(stripPrefix(`${parent}/${item.name}`, "/"));
+          }
+          return entries;
+        }, new Map(entriesByParent));
+      });
+    }
+
+    /** @type {(parent: string, items: readonly FileListItem[]) => Promise<void>} */
+    async function delDirItems(parent, items) {
+      await items.reduce(async (resP, item) => {
+        await resP;
+
+        if (item.isDir) {
+          const dir = stripPrefix(`${parent}/${item.name}`, "/");
+          const fileListDir = await self.readDir(`${self.rootPath}/${dir}`);
+          if (fileListDir.items.length > 0) {
+            return await delDirItems(dir, fileListDir.items);
+          }
+
+          deleteFromState(parent, [item]);
+        }
+      }, Promise.resolve());
+
+      const paths = items.map((item) => {
+        const name = item.isDir ? `${item.name}/` : item.name;
+        return stripPrefix(`${parent}/${name}`, "/");
+      });
+
+      const subProcessP = SubProcess.wrap(
+        SubProcess.spawn("zip", ["-qd", self.zipPath, ...paths], {
+          windowsHide: true,
+        }),
+      );
+
+      deleteFromState(parent, items);
+      const s = await subProcessP;
+      s.stdout.readable.destroy();
+      const error = await s.exitP;
+      if (error) {
+        throw error;
+      }
+    }
+
+    const parentPath = stripPrefix(stripPrefix(parent, self.rootPath), "/");
+    return delDirItems(parentPath, items);
   }
 
   /**
