@@ -52,6 +52,47 @@ class ZipApi extends FileListApi {
     return FileListDir(targetDir, false, entries);
   }
 
+  /** @type {FileListApi['readFile']} */
+  async readFile(parent, item) {
+    const filePath = stripPrefix(
+      stripPrefix(`${parent}/${item.name}`, this.rootPath),
+      "/",
+    );
+    const { stdout, exitP } = await this.extract(this.zipPath, filePath);
+
+    let pos = 0;
+    return {
+      file: filePath,
+
+      readNextBytes: async (buff) => {
+        const content = await stdout.readNextBytes(buff.length);
+        if (content !== undefined) {
+          const bytesRead = content.length;
+          content.copy(buff, 0, 0, bytesRead);
+          pos += bytesRead;
+          return bytesRead;
+        }
+
+        if (pos !== item.size) {
+          const error = await exitP;
+          if (error) {
+            throw error;
+          }
+        }
+
+        return 0;
+      },
+
+      close: async () => {
+        if (pos !== item.size) {
+          stdout.readable.destroy();
+        }
+
+        await exitP;
+      },
+    };
+  }
+
   /** @type {FileListApi['delete']} */
   delete(parent, items) {
     const self = this;

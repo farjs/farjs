@@ -1,6 +1,10 @@
 /**
+ * @import { FileSource } from "@farjs/filelist/api/FileListApi.mjs"
  * @typedef {import("@farjs/filelist/util/SubProcess.mjs").SubProcess} SubProcess
  */
+import os from "os";
+import fs from "fs";
+import path from "path";
 import { Readable } from "stream";
 import { deepEqual } from "node:assert/strict";
 import mockFunction from "mock-fn";
@@ -293,6 +297,187 @@ describe("ZipApi.test.mjs", () => {
     deepEqual(wrap.times, 1);
     deepEqual(wrapArgs, [subProcess.child]);
     deepEqual(resError === error, true);
+  });
+
+  it("should read content fully when readFile", async () => {
+    //given
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"));
+    const file = path.join(tmpDir, "example.txt");
+    const expectedOutput = "hello, World!!!";
+    fs.writeFileSync(file, expectedOutput);
+    const stdoutStream = fs.createReadStream(file);
+    /** @type {SubProcess} */
+    const subProcess = {
+      child: /** @type {any} */ ({}),
+      stdout: new StreamReader(stdoutStream),
+      exitP: Promise.resolve(undefined),
+    };
+    SubProcess.spawn = mockFunction();
+    SubProcess.wrap = mockFunction();
+    let extractArgs = /** @type {any[]} */ ([]);
+    const extract = mockFunction((...args) => {
+      extractArgs = args;
+      return Promise.resolve(subProcess);
+    });
+    const zipPath = "/dir/filePath.zip";
+    const rootPath = "zip://filePath.zip";
+    class TestZipApi extends ZipApi {
+      constructor() {
+        super(zipPath, rootPath, entriesByParentP);
+        this.extract = extract;
+      }
+    }
+    const api = new TestZipApi();
+    const item = {
+      ...FileListItem("example.txt"),
+      size: expectedOutput.length,
+    };
+
+    /** @type {(source: FileSource, chunks?: Buffer[]) => Promise<string>} */
+    async function loop(source, chunks = []) {
+      const buff = Buffer.alloc(5);
+      const bytesRead = await source.readNextBytes(buff);
+      if (bytesRead > 0) {
+        chunks.push(buff.subarray(0, bytesRead));
+        return loop(source, chunks);
+      }
+
+      return Buffer.concat(chunks).toString();
+    }
+
+    //when
+    const source = await api.readFile(`${rootPath}/dir 1`, item, 0);
+    const output = await loop(source);
+    await source.close();
+
+    //then
+    const expectedFilePath = "dir 1/example.txt";
+    deepEqual(source.file, expectedFilePath);
+    deepEqual(output, expectedOutput);
+
+    deepEqual(extract.times, 1);
+    deepEqual(extractArgs, ["/dir/filePath.zip", expectedFilePath]);
+
+    //cleanup
+    fs.unlinkSync(file);
+    deepEqual(fs.existsSync(file), false);
+
+    fs.rmdirSync(tmpDir);
+    deepEqual(fs.existsSync(tmpDir), false);
+  });
+
+  it("should destroy stream on close if partially read when readFile", async () => {
+    //given
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "farjs-test-"));
+    const file = path.join(tmpDir, "example.txt");
+    const expectedOutput = "hello";
+    fs.writeFileSync(file, expectedOutput);
+    const stdoutStream = fs.createReadStream(file, {
+      highWaterMark: 5,
+    });
+    const stdout = new StreamReader(stdoutStream);
+    /** @type {SubProcess} */
+    const subProcess = {
+      child: /** @type {any} */ ({}),
+      stdout,
+      exitP: Promise.resolve(undefined),
+    };
+    SubProcess.spawn = mockFunction();
+    SubProcess.wrap = mockFunction();
+    let extractArgs = /** @type {any[]} */ ([]);
+    const extract = mockFunction((...args) => {
+      extractArgs = args;
+      return Promise.resolve(subProcess);
+    });
+    const zipPath = "/dir/filePath.zip";
+    const rootPath = "zip://filePath.zip";
+    class TestZipApi extends ZipApi {
+      constructor() {
+        super(zipPath, rootPath, entriesByParentP);
+        this.extract = extract;
+      }
+    }
+    const api = new TestZipApi();
+    const item = {
+      ...FileListItem("example.txt"),
+      size: expectedOutput.length * 2,
+    };
+    const buff = Buffer.alloc(5);
+
+    //when
+    const source = await api.readFile(`${rootPath}/dir 1`, item, 0);
+    //when & then
+    deepEqual(await source.readNextBytes(buff), expectedOutput.length);
+    deepEqual(await source.readNextBytes(buff), 0);
+    await source.close();
+
+    //then
+    const expectedFilePath = "dir 1/example.txt";
+    deepEqual(source.file, expectedFilePath);
+    deepEqual(await stdout.readNextBytes(5), undefined);
+
+    deepEqual(extract.times, 1);
+    deepEqual(extractArgs, ["/dir/filePath.zip", expectedFilePath]);
+
+    //cleanup
+    fs.unlinkSync(file);
+    deepEqual(fs.existsSync(file), false);
+
+    fs.rmdirSync(tmpDir);
+    deepEqual(fs.existsSync(tmpDir), false);
+  });
+
+  it("should fail on readNextBytes if error when readFile", async () => {
+    //given
+    const stdout = new StreamReader(Readable.from([]));
+    const error = new SubProcessError(1, "test error");
+    /** @type {SubProcess} */
+    const subProcess = {
+      child: /** @type {any} */ ({}),
+      stdout,
+      exitP: Promise.resolve(error),
+    };
+    SubProcess.spawn = mockFunction();
+    SubProcess.wrap = mockFunction();
+    let extractArgs = /** @type {any[]} */ ([]);
+    const extract = mockFunction((...args) => {
+      extractArgs = args;
+      return Promise.resolve(subProcess);
+    });
+    const zipPath = "/dir/filePath.zip";
+    const rootPath = "zip://filePath.zip";
+    class TestZipApi extends ZipApi {
+      constructor() {
+        super(zipPath, rootPath, entriesByParentP);
+        this.extract = extract;
+      }
+    }
+    const api = new TestZipApi();
+    const item = {
+      ...FileListItem("example.txt"),
+      size: 5,
+    };
+    const source = await api.readFile(`${rootPath}/dir 1`, item, 0);
+    const buff = Buffer.alloc(5);
+
+    let resError = null;
+    try {
+      //when
+      await source.readNextBytes(buff);
+    } catch (error) {
+      resError = error;
+    }
+
+    //when & then
+    await source.close();
+
+    //then
+    deepEqual(resError === error, true);
+    const expectedFilePath = "dir 1/example.txt";
+    deepEqual(source.file, expectedFilePath);
+
+    deepEqual(extract.times, 1);
+    deepEqual(extractArgs, ["/dir/filePath.zip", expectedFilePath]);
   });
 
   it("should spawn unzip command when extract", async () => {
