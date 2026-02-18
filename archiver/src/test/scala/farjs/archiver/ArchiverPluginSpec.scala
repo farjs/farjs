@@ -1,6 +1,6 @@
 package farjs.archiver
 
-import farjs.archiver.zip.ZipApi
+import farjs.archiver.zip.{ZipActions, ZipApi}
 import farjs.filelist.api.{FileListDir, FileListItem, MockFileListApi}
 import farjs.filelist.stack._
 import farjs.filelist.{FileListState, MockFileListActions}
@@ -14,8 +14,8 @@ import scala.scalajs.js.typedarray.Uint8Array
 
 class ArchiverPluginSpec extends AsyncTestSpec {
 
-  ArchiverPlugin.readZip = _ => js.Promise.resolve[js.Map[String, js.Array[FileListItem]]](new js.Map[String, js.Array[FileListItem]]())
-  ArchiverPlugin.createApi = { // replace potential mock from prev test with default impl
+  ZipActions.readZip = _ => js.Promise.resolve[js.Map[String, js.Array[FileListItem]]](new js.Map[String, js.Array[FileListItem]]())
+  ZipActions.createApi = { // replace potential mock from prev test with default impl
     (zipPath, rootPath, entriesByParentF) =>
       new ZipApi(zipPath, rootPath, entriesByParentF)
   }

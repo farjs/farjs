@@ -21,10 +21,10 @@ class ZipApi extends FileListApi {
   constructor(zipPath, rootPath, entriesByParentP) {
     super(false, new Set([FileListCapability.read, FileListCapability.delete]));
 
-    /** @private @readonly @type {string} */
+    /** @readonly @type {string} */
     this.zipPath = zipPath;
 
-    /** @private @readonly @type {string} */
+    /** @readonly @type {string} */
     this.rootPath = rootPath;
 
     /** @private @type {Promise<Map<string, readonly FileListItem[]>>} */

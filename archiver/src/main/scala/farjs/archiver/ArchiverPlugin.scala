@@ -12,12 +12,6 @@ import scala.scalajs.js.typedarray.Uint8Array
 
 object ArchiverPlugin extends FileListPlugin(js.Array("S-f7")) {
 
-  private[archiver] final var readZip: String => js.Promise[js.Map[String, js.Array[FileListItem]]] = ZipApi.readZip
-  private[archiver] final var createApi: (String, String, js.Promise[js.Map[String, js.Array[FileListItem]]]) => ZipApi = {
-    (zipPath, rootPath, entriesByParentF) =>
-      new ZipApi(zipPath, rootPath, entriesByParentF)
-  }
-
   override def onKeyTrigger(key: String,
                             stacks: WithStacksProps,
                             data: js.UndefOr[js.Dynamic] = js.undefined): js.Promise[js.UndefOr[ReactClass]] = {
@@ -54,12 +48,12 @@ object ArchiverPlugin extends FileListPlugin(js.Array("S-f7")) {
       if (pathLower.endsWith(".zip") || pathLower.endsWith(".jar") || checkFileHeader(fileHeader)) {
         val fileName = path.parse(filePath).base
         val rootPath = s"zip://$fileName"
-        val entriesByParentF = readZip(filePath)
+        val entriesByParentF = ZipActions.readZip(filePath)
         
         Some(PanelStackItem[FileListState](
           component = FileListPanelController(new ZipPanel(filePath, rootPath, entriesByParentF, onClose).apply()),
           dispatch = js.undefined,
-          actions = new ZipActions(createApi(filePath, rootPath, entriesByParentF)),
+          actions = new ZipActions(ZipActions.createApi(filePath, rootPath, entriesByParentF)),
           state = FileListState(
             currDir = FileListDir(rootPath, isRoot = false, items = js.Array())
           )

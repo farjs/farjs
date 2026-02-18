@@ -9,6 +9,7 @@ await import("./archiver/AddToArchController.test.mjs");
 await import("./archiver/AddToArchPopup.test.mjs");
 await import("./archiver/ArchiverPluginUi.test.mjs");
 await import("./archiver/DateTimeUtil.test.mjs");
+await import("./archiver/zip/ZipActions.test.mjs");
 await import("./archiver/zip/ZipApi.test.mjs");
 await import("./archiver/zip/ZipEntry.test.mjs");
 
