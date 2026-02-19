@@ -222,6 +222,13 @@ class ZipApi extends FileListApi {
 
     return ZipEntry.groupByParent(ZipEntry.fromUnzipCommand(output));
   }
+
+  /**
+   * @type {(zipPath: string, rootPath: string, entriesByParentP: Promise<Map<string, readonly FileListItem[]>>) => ZipApi}
+   */
+  static create = (zipPath, rootPath, entriesByParentP) => {
+    return new ZipApi(zipPath, rootPath, entriesByParentP);
+  };
 }
 
 export default ZipApi;

@@ -867,6 +867,20 @@ Zip file size: 595630 bytes, number of entries: 18
       ]),
     );
   });
+
+  it("should return new ZipApi when create", () => {
+    //given
+    const zipPath = "/dir/filePath.zip";
+    const rootPath = "zip://filePath.zip";
+    const entriesByParentP = Promise.resolve(new Map());
+
+    //when
+    const result = ZipApi.create(zipPath, rootPath, entriesByParentP);
+
+    //then
+    deepEqual(result.zipPath, zipPath);
+    deepEqual(result.rootPath, rootPath);
+  });
 });
 
 /** @type {(s: string) => number} */

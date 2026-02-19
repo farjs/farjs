@@ -3,7 +3,6 @@
  *  FileListDirUpdatedAction,
  *  FileListDiskSpaceUpdatedAction,
  * } from "@farjs/filelist/FileListActions.mjs"
- * @import { FileListItem } from "@farjs/filelist/api/FileListItem.mjs"
  */
 import Task from "@farjs/ui/task/Task.mjs";
 import TaskAction from "@farjs/ui/task/TaskAction.mjs";
@@ -59,12 +58,7 @@ class ZipActions extends FileListActions {
 
   static readZip = ZipApi.readZip;
 
-  /**
-   * @type {(zipPath: string, rootPath: string, entriesByParentP: Promise<Map<string, readonly FileListItem[]>>) => ZipApi}
-   */
-  static createApi = (zipPath, rootPath, entriesByParentP) => {
-    return new ZipApi(zipPath, rootPath, entriesByParentP);
-  };
+  static createApi = ZipApi.create;
 }
 
 export default ZipActions;
