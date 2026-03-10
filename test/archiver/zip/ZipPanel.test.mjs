@@ -871,7 +871,7 @@ describe("ZipPanel.test.mjs", () => {
     deepEqual(renderer.root.findAllByType(messageBoxComp), []);
   });
 
-  it("should dispatch action with empty dir if failed entries future", async () => {
+  it("should dispatch action with empty dir if rejected entries Promise", async () => {
     //given
     let dispatchArgs = /** @type {any[]} */ ([]);
     const dispatch = mockFunction((...args) => dispatchArgs.push(...args));
@@ -933,6 +933,69 @@ describe("ZipPanel.test.mjs", () => {
       currDir: FileListDir(rootPath, false, []),
     };
     deepEqual(dispatchArgs[1], dirUpdatedAction);
+  });
+
+  it("should dispatch actions with empty root dir if empty state", async () => {
+    //given
+    let dispatchArgs = /** @type {any[]} */ ([]);
+    const dispatch = mockFunction((...args) => dispatchArgs.push(...args));
+    const onClose = mockFunction();
+    const props = getFileListPanelProps({
+      dispatch,
+      state: FileListState(),
+    });
+    const rootPath = "zip://filePath.zip";
+    const zipPanel = ZipPanel(
+      "dir/file.zip",
+      rootPath,
+      Promise.resolve(new Map()),
+      onClose,
+    );
+    const fsDispatch = mockFunction();
+    const fsActions = new MockFileListActions();
+    const fsState = FileListState();
+    const leftStack = new PanelStack(
+      true,
+      [new PanelStackItem(fsComp, fsDispatch, fsActions, fsState)],
+      mockFunction(),
+    );
+    const rightStack = new PanelStack(
+      false,
+      [new PanelStackItem(zipComp)],
+      mockFunction(),
+    );
+
+    //when
+    const result = TestRenderer.create(
+      withStacksContext(withThemeContext(h(zipPanel, props)), {
+        left: WithStacksData(leftStack),
+        right: WithStacksData(rightStack),
+      }),
+    ).root;
+
+    //then
+    assertZipPanel(result, zipPanel, props);
+    deepEqual(onClose.times, 0);
+    deepEqual(dispatch.times, 1);
+    /** @type {TaskAction<any>} */
+    const taskAction = dispatchArgs[0];
+    deepEqual(taskAction.task.message, "Reading zip archive");
+    await taskAction.task.result;
+
+    deepEqual(dispatch.times, 3);
+    /** @type {FileListDiskSpaceUpdatedAction} */
+    const diskSpaceUpdatedAction = {
+      action: "FileListDiskSpaceUpdatedAction",
+      diskSpace: 0,
+    };
+    deepEqual(dispatchArgs[1], diskSpaceUpdatedAction);
+    /** @type {FileListDirChangedAction} */
+    const dirUpdatedAction = {
+      action: "FileListDirChangedAction",
+      dir: FileListItem.currDir.name,
+      currDir: FileListDir(rootPath, false, []),
+    };
+    deepEqual(dispatchArgs[2], dirUpdatedAction);
   });
 
   it("should not dispatch actions if state is not empty when mount", async () => {
