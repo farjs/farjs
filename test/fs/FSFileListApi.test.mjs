@@ -49,7 +49,7 @@ describe("FSFileListApi.test.mjs", () => {
         FileListCapability.mkDirs,
         FileListCapability.copyInplace,
         FileListCapability.moveInplace,
-      ])
+      ]),
     );
   });
 
@@ -362,12 +362,12 @@ describe("FSFileListApi.test.mjs", () => {
     const source = await apiImp.readFile(
       tmpDir,
       FileListItem("example.txt"),
-      0.0
+      0.0,
     );
     assert.deepEqual(source.file, file1);
     const target = await apiImp.writeFile(tmpDir, "example2.txt", onExists);
     if (!target) {
-      assert.fail("target is undefined!");
+      return assert.fail("target is undefined!");
     }
     await loop(source, target);
     await target.close();
@@ -379,17 +379,17 @@ describe("FSFileListApi.test.mjs", () => {
     assert.deepEqual(stats2.size, stats1.size);
     assert.deepEqual(
       toDateTimeStr(stats2.atimeMs),
-      toDateTimeStr(stats1.atimeMs)
+      toDateTimeStr(stats1.atimeMs),
     );
     assert.deepEqual(
       toDateTimeStr(stats2.mtimeMs),
-      toDateTimeStr(stats1.mtimeMs)
+      toDateTimeStr(stats1.mtimeMs),
     );
     assert.deepEqual(
       fs.readFileSync(file2, {
         encoding: "utf8",
       }),
-      "hello, World!!!"
+      "hello, World!!!",
     );
 
     //cleanup
@@ -435,11 +435,11 @@ describe("FSFileListApi.test.mjs", () => {
     const source = await apiImp.readFile(
       tmpDir,
       FileListItem("example.txt"),
-      0.0
+      0.0,
     );
     const target = await apiImp.writeFile(tmpDir, "example2.txt", onExists);
     if (!target) {
-      assert.fail("target is undefined!");
+      return assert.fail("target is undefined!");
     }
     await loop(source, target);
     await target.close();
@@ -454,17 +454,17 @@ describe("FSFileListApi.test.mjs", () => {
     assert.deepEqual(stats2.size, srcItem.size);
     assert.deepEqual(
       toDateTimeStr(stats2.atimeMs),
-      toDateTimeStr(srcItem.atimeMs)
+      toDateTimeStr(srcItem.atimeMs),
     );
     assert.deepEqual(
       toDateTimeStr(stats2.mtimeMs),
-      toDateTimeStr(srcItem.mtimeMs)
+      toDateTimeStr(srcItem.mtimeMs),
     );
     assert.deepEqual(
       fs.readFileSync(file2, {
         encoding: "utf8",
       }),
-      "hello, World"
+      "hello, World",
     );
 
     //cleanup
@@ -510,11 +510,11 @@ describe("FSFileListApi.test.mjs", () => {
     const source = await apiImp.readFile(
       tmpDir,
       FileListItem("example.txt"),
-      0.0
+      0.0,
     );
     const target = await apiImp.writeFile(tmpDir, "example2.txt", onExists);
     if (!target) {
-      assert.fail("target is undefined!");
+      return assert.fail("target is undefined!");
     }
     await loop(source, target);
     await target.close();
@@ -529,17 +529,17 @@ describe("FSFileListApi.test.mjs", () => {
     assert.deepEqual(stats2.size, existing.size + srcItem.size);
     assert.deepEqual(
       toDateTimeStr(stats2.atimeMs),
-      toDateTimeStr(srcItem.atimeMs)
+      toDateTimeStr(srcItem.atimeMs),
     );
     assert.deepEqual(
       toDateTimeStr(stats2.mtimeMs),
-      toDateTimeStr(srcItem.mtimeMs)
+      toDateTimeStr(srcItem.mtimeMs),
     );
     assert.deepEqual(
       fs.readFileSync(file2, {
         encoding: "utf8",
       }),
-      "hellohello, World!!!"
+      "hellohello, World!!!",
     );
 
     //cleanup
@@ -580,17 +580,17 @@ describe("FSFileListApi.test.mjs", () => {
     assert.deepEqual(stats2.size, existing.size);
     assert.deepEqual(
       toDateTimeStr(stats2.atimeMs),
-      toDateTimeStr(existing.atimeMs)
+      toDateTimeStr(existing.atimeMs),
     );
     assert.deepEqual(
       toDateTimeStr(stats2.mtimeMs),
-      toDateTimeStr(existing.mtimeMs)
+      toDateTimeStr(existing.mtimeMs),
     );
     assert.deepEqual(
       fs.readFileSync(file, {
         encoding: "utf8",
       }),
-      "hello"
+      "hello",
     );
 
     //cleanup
@@ -642,7 +642,7 @@ describe("FSFileListApi.test.mjs", () => {
     const filePath = path.join(tmpDir, "example2.txt");
     const handle = await fs.promises.open(
       filePath,
-      FSConstants.O_CREAT | FSConstants.O_WRONLY | FSConstants.O_EXCL
+      FSConstants.O_CREAT | FSConstants.O_WRONLY | FSConstants.O_EXCL,
     );
 
     let openArgs = /** @type {any[]} */ ([]);
@@ -677,8 +677,8 @@ describe("FSFileListApi.test.mjs", () => {
     assert.deepEqual(
       resError,
       Error(
-        `File write error: bytesWritten(123) != expected(3), file: ${filePath}`
-      )
+        `File write error: bytesWritten(123) != expected(3), file: ${filePath}`,
+      ),
     );
     assert.deepEqual(onExists.times, 0);
     assert.deepEqual(open.times, 1);

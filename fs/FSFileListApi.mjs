@@ -145,7 +145,7 @@ class FSFileListApi extends FileListApi {
         return bytesRead;
       },
 
-      close: handle.close,
+      close: () => handle.close(),
     };
     return source;
   }
@@ -202,7 +202,7 @@ class FSFileListApi extends FileListApi {
           await handle.utimes(src.atimeMs / 1000, src.mtimeMs / 1000);
         },
 
-        close: handle.close,
+        close: () => handle.close(),
 
         delete: async () => self.fs.unlinkSync(filePath),
       };
