@@ -12,6 +12,7 @@ await import("./archiver/DateTimeUtil.test.mjs");
 await import("./archiver/zip/ZipActions.test.mjs");
 await import("./archiver/zip/ZipApi.test.mjs");
 await import("./archiver/zip/ZipEntry.test.mjs");
+await import("./archiver/zip/ZipPanel.test.mjs");
 
 await import("./copymove/CopyItemsPopup.test.mjs");
 await import("./copymove/CopyItemsStats.test.mjs");

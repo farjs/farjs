@@ -51,7 +51,7 @@ object ArchiverPlugin extends FileListPlugin(js.Array("S-f7")) {
         val entriesByParentF = ZipActions.readZip(filePath)
         
         Some(PanelStackItem[FileListState](
-          component = FileListPanelController(new ZipPanel(filePath, rootPath, entriesByParentF, onClose).apply()),
+          component = FileListPanelController(ZipPanel(filePath, rootPath, entriesByParentF, onClose)),
           dispatch = js.undefined,
           actions = new ZipActions(ZipActions.createApi(filePath, rootPath, entriesByParentF)),
           state = FileListState(

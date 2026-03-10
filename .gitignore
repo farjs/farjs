@@ -10,6 +10,7 @@ dao/migrations/bundle.json
 .lib/
 .idea/
 .bsp/
+.metals/
 target/
 build/
 node_modules/

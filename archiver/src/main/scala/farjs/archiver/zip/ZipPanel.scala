@@ -1,158 +1,18 @@
 package farjs.archiver.zip
 
-import farjs.archiver._
-import farjs.archiver.zip.ZipPanel._
-import farjs.filelist.FileListActions._
-import farjs.filelist._
-import farjs.filelist.api.{FileListDir, FileListItem}
-import farjs.filelist.stack.{WithStacks, WithStacksProps}
-import farjs.ui.Dispatch
-import farjs.ui.popup.{MessageBox, MessageBoxAction, MessageBoxProps}
-import farjs.ui.task.{Task, TaskAction}
-import farjs.ui.theme.Theme
+import farjs.filelist.api.FileListItem
 import scommons.react._
-import scommons.react.blessed.BlessedScreen
-import scommons.react.hooks._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
-import scala.util.Failure
+import scala.scalajs.js.annotation.JSImport
 
-class ZipPanel(zipPath: String,
-               rootPath: String,
-               entriesByParentF: js.Promise[js.Map[String, js.Array[FileListItem]]],
-               onClose: () => Unit
-              ) extends FunctionComponent[FileListPanelProps] {
+@js.native
+@JSImport("../archiver/zip/ZipPanel.mjs", JSImport.Default)
+object ZipPanel extends js.Function4[String, String, js.Promise[js.Map[String, js.Array[FileListItem]]], js.Function0[Unit], ReactClass] {
 
-  protected def render(compProps: Props): ReactElement = {
-    val stacks = WithStacks.useStacks()
-    val (zipData, setZipData) =
-      useState(Option.empty[(Dispatch, FileListActions, FileListState, Seq[FileListItem], Boolean)])
-    val (showWarning, setShowWarning) = useState(false)
-    val props = compProps.plain
-    val theme = Theme.useTheme().popup
-    
-    def onClosePanel(): Unit = {
-      val stackData = {
-        val stackItem = WithStacksProps.active(stacks).stack.peekLast[FileListState]()
-        stackItem.getData()
-      }
-      stackData.foreach { case FileListData(dispatch, actions, state) =>
-        dispatch(actions.updateDir(dispatch, state.currDir.path))
-      }
-      onClose()
-    }
-
-    useLayoutEffect({ () =>
-      if (props.state.currDir.items.isEmpty) {
-        val zipF = entriesByParentF.toFuture.map { entriesByParent =>
-          val totalSize = entriesByParent.foldLeft(0.0) { (total, entry) =>
-            total + entry._2.foldLeft(0.0)(_ + _.size)
-          }
-          props.dispatch(FileListDiskSpaceUpdatedAction(totalSize))
-          props.dispatch(FileListDirChangedAction(FileListItem.currDir.name, FileListDir(
-            path = rootPath,
-            isRoot = false,
-            items = entriesByParent.getOrElse("", js.Array[FileListItem]())
-          )))
-        }.andThen {
-          case Failure(_) =>
-            props.dispatch(FileListDirChangedAction(FileListItem.currDir.name, FileListDir(
-              path = rootPath,
-              isRoot = false,
-              items = js.Array()
-            )))
-        }
-
-        props.dispatch(TaskAction(Task("Reading zip archive", zipF)))
-      }
-      ()
-    }, Nil)
-    
-    val onKeypress: js.Function2[BlessedScreen, String, Boolean] = { (screen, key) =>
-      var processed = true
-      key match {
-        case "C-pageup" if props.state.currDir.path == rootPath =>
-          onClosePanel()
-        case "enter" | "C-pagedown" if (
-          FileListState.currentItem(props.state).exists(i => i.isDir && i.name == FileListItem.up.name)
-            && props.state.currDir.path == rootPath
-          ) =>
-          onClosePanel()
-        case k@(FileListEvent.onFileListCopy | FileListEvent.onFileListMove) =>
-          if (props.state.currDir.path != rootPath) setShowWarning(true)
-          else {
-            val stackData = {
-              val stackItem = WithStacksProps.active(stacks).stack.peek[FileListState]()
-              stackItem.getData()
-            }
-            stackData.foreach { case FileListData(dispatch, actions, state) =>
-              val items =
-                if (state.selectedNames.nonEmpty) FileListState.selectedItems(state).toList
-                else FileListState.currentItem(state).filter(_ != FileListItem.up).toList
-
-              if (actions.api.isLocal && items.nonEmpty) {
-                setZipData(Some((dispatch, actions, state, items, k == FileListEvent.onFileListMove)))
-              }
-              else processed = false
-            }
-          }
-        case _ =>
-          processed = false
-      }
-
-      processed
-    }
-
-    <.>()(
-      <(fileListPanelComp)(^.plain := FileListPanelProps.copy(props)(onKeypress = onKeypress))(),
-
-      if (showWarning) Some(
-        <(messageBoxComp)(^.plain := MessageBoxProps(
-          title = "Warning",
-          message = "Items can only be added to zip root.",
-          actions = js.Array(MessageBoxAction.OK { () =>
-            setShowWarning(false)
-          }),
-          style = theme.regular
-        ))()
-      ) else None,
-
-      zipData.map { case (dispatch, actions, state, items, move) =>
-        <(addToArchController)(^.plain := AddToArchControllerProps(
-          dispatch = dispatch,
-          actions = actions,
-          state = state,
-          archName = zipPath,
-          archType = "zip",
-          archAction =
-            if (move) AddToArchAction.Move
-            else AddToArchAction.Copy,
-          addToArchApi = ZipApi.addToZip _,
-          items = js.Array(items: _*),
-          onComplete = { _ =>
-            setZipData(None)
-
-            val updateAction = props.actions.updateDir(props.dispatch, props.state.currDir.path)
-            props.dispatch(updateAction)
-            if (move) {
-              updateAction.task.result.toFuture.foreach { _ =>
-                dispatch(actions.deleteItems(dispatch, state.currDir.path, js.Array(items: _*)))
-              }
-            }
-          },
-          onCancel = { () =>
-            setZipData(None)
-          }
-        ))()
-      }
-    )
-  }
-}
-
-object ZipPanel {
-
-  private[zip] var fileListPanelComp: ReactClass = FileListPanel
-  private[zip] var addToArchController: ReactClass = AddToArchController
-  private[zip] var messageBoxComp: ReactClass = MessageBox
+  override def apply(zipPath: String,
+                     rootPath: String,
+                     entriesByParentF: js.Promise[js.Map[String, js.Array[FileListItem]]],
+                     onClose: js.Function0[Unit]
+                    ): ReactClass = js.native
 }
