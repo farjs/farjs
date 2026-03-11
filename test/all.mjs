@@ -7,6 +7,7 @@ await import("./app/FarjsDBMigrations.test.mjs");
 
 await import("./archiver/AddToArchController.test.mjs");
 await import("./archiver/AddToArchPopup.test.mjs");
+await import("./archiver/ArchiverPlugin.test.mjs");
 await import("./archiver/ArchiverPluginUi.test.mjs");
 await import("./archiver/DateTimeUtil.test.mjs");
 await import("./archiver/zip/ZipActions.test.mjs");

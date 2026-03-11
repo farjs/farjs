@@ -109,7 +109,7 @@ const ZipPanel = (zipPath, rootPath, entriesByParentP, onClose) => {
 
                 const currItem = FileListState.currentItem(
                   state,
-                  (_) => _ != FileListItem.up,
+                  (_) => _ !== FileListItem.up,
                 );
                 return currItem ? [currItem] : [];
               })();

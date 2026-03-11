@@ -110,7 +110,7 @@ object FileListRoot {
 
   private lazy val plugins: js.Array[FileListPlugin] = js.Array(
     QuickViewPlugin,
-    ArchiverPlugin,
+    ArchiverPlugin.instance,
     ViewerPlugin,
     CopyMovePlugin.instance,
     FSPlugin.instance,
