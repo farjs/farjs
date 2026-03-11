@@ -1,7 +1,6 @@
 package farjs.app.filelist
 
 import farjs.app.filelist.FileListRoot._
-import farjs.archiver.ArchiverPlugin
 import farjs.filelist._
 import farjs.filelist.history.HistoryProvider
 import farjs.filelist.stack.{PanelStack, PanelStackItem}
@@ -106,6 +105,17 @@ object FileListRoot {
   object CopyMovePlugin extends js.Object {
 
     val instance: FileListPlugin = js.native
+  }
+
+  @js.native
+  @JSImport("../archiver/ArchiverPlugin.mjs", JSImport.Default)
+  class ArchiverPlugin extends FileListPlugin(js.native)
+
+  @js.native
+  @JSImport("../archiver/ArchiverPlugin.mjs", JSImport.Default)
+  object ArchiverPlugin extends js.Object {
+
+    val instance: ArchiverPlugin = js.native
   }
 
   private lazy val plugins: js.Array[FileListPlugin] = js.Array(
