@@ -1,6 +1,7 @@
 package farjs.app.filelist
 
 import farjs.app.filelist.FileListRoot.FSServices
+import farjs.app.raw.BetterSqlite3Database
 import farjs.filelist.history.HistoryProvider
 import scommons.react._
 import scommons.react.raw.React
@@ -18,7 +19,7 @@ class FileListRootSpec extends TestSpec with TestRendererUtils {
     val (historyProviderCtx, fsCtx, servicesComp) = getServicesCtxHook
     FileListRoot.fileListComp = servicesComp
     val dispatch: js.Function1[js.Any, Unit] = mockFunction[js.Any, Unit]
-    val module = mock[FileListModule]
+    val module = new FileListModule(new BetterSqlite3Database(":memory:"))
     val rootComp = new FileListRoot(dispatch, module, withPortalsComp)
     
     //when

@@ -2,18 +2,15 @@ package farjs.app.filelist
 
 import farjs.app.filelist.FileListRoot.FSServices
 import farjs.app.raw.BetterSqlite3Database
-import farjs.app.service.{FolderShortcutsServiceImpl, HistoryProviderImpl}
-import farjs.domain.dao._
+import farjs.filelist.history.HistoryProvider
 
-class FileListModule(db: BetterSqlite3Database) {
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
 
-  private val historyKindDao = HistoryKindDao(db)
-  val historyProvider = HistoryProviderImpl(db, historyKindDao)
+@js.native
+@JSImport("../app/filelist/FileListModule.mjs", JSImport.Default)
+class FileListModule(db: BetterSqlite3Database) extends js.Object {
 
-  val folderShortcutDao: FolderShortcutDao = FolderShortcutDao(db)
-  val folderShortcutsService = FolderShortcutsServiceImpl(folderShortcutDao)
-
-  val fsServices = new FSServices {
-    val folderShortcuts = folderShortcutsService
-  }
+  val historyProvider: HistoryProvider = js.native
+  val fsServices: FSServices = js.native
 }
