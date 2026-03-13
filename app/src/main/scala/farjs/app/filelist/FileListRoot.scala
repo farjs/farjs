@@ -1,9 +1,6 @@
 package farjs.app.filelist
 
-import farjs.app.filelist.FileListRoot._
-import farjs.filelist._
-import farjs.filelist.history.HistoryProvider
-import farjs.filelist.stack.{PanelStack, PanelStackItem}
+import farjs.filelist.FileListActions
 import farjs.ui.Dispatch
 import scommons.react._
 import scommons.react.raw.NativeContext
@@ -11,120 +8,42 @@ import scommons.react.raw.NativeContext
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport
 
-class FileListRoot(dispatch: Dispatch,
-                   module: FileListModule,
-                   withPortalsComp: ReactClass
-                  ) extends FunctionComponent[Unit] {
+@js.native
+@JSImport("../app/filelist/FileListRoot.mjs", JSImport.Default)
+object FileListRoot extends js.Function3[Dispatch, FileListModule, ReactClass, ReactClass] {
 
-  protected def render(compProps: Props): ReactElement = {
-    <(HistoryProvider.Context.Provider)(^.contextValue := module.historyProvider)(
-      <(FSServices.Context.Provider)(^.contextValue := module.fsServices)(
-        <(withPortalsComp)()(
-          <(fileListComp)(^.plain := FileListBrowserProps(
-            dispatch = dispatch
-          ))(),
-
-          compProps.children
-        )
-      )
-    )
-  }
+  override def apply(dispatch: Dispatch,
+                     module: FileListModule,
+                     withPortalsComp: ReactClass
+                    ): ReactClass = js.native
 }
 
-object FileListRoot {
-  
-  private[filelist] var fileListComp: ReactClass = FileListBrowser(FileListPluginHandler(plugins))
+trait FolderShortcutsService extends js.Object {
 
-  @js.native
-  @JSImport("../viewer/quickview/QuickViewPlugin.mjs", JSImport.Default)
-  private object QuickViewPlugin extends FileListPlugin(js.native)
+  def getAll(): js.Promise[js.Array[js.UndefOr[String]]]
 
-  @js.native
-  @JSImport("../viewer/ViewerPlugin.mjs", JSImport.Default)
-  private object ViewerPlugin extends FileListPlugin(js.native)
+  def save(index: Int, path: String): js.Promise[Unit]
 
-  @js.native
-  @JSImport("../file/FilePlugin.mjs", JSImport.Default)
-  private object FilePlugin extends FileListPlugin(js.native)
+  def delete(index: Int): js.Promise[Unit]
+}
 
-  trait FolderShortcutsService extends js.Object {
+trait FSServices extends js.Object {
 
-    def getAll(): js.Promise[js.Array[js.UndefOr[String]]]
+  val folderShortcuts: FolderShortcutsService
+}
 
-    def save(index: Int, path: String): js.Promise[Unit]
+@js.native
+@JSImport("../fs/FSServices.mjs", JSImport.Default)
+object FSServices extends js.Object {
 
-    def delete(index: Int): js.Promise[Unit]
-  }
+  val Context: NativeContext = js.native
 
-  trait FSServices extends js.Object {
+  def useServices(): FSServices = js.native
+}
 
-    val folderShortcuts: FolderShortcutsService
-  }
+@js.native
+@JSImport("../fs/FSFileListActions.mjs", JSImport.Default)
+object FSFileListActions extends js.Object {
 
-  @js.native
-  @JSImport("../fs/FSServices.mjs", JSImport.Default)
-  object FSServices extends js.Object {
-
-    val Context: NativeContext = js.native
-
-    def useServices(): FSServices = js.native
-  }
-
-  @js.native
-  @JSImport("../fs/FSFileListActions.mjs", JSImport.Default)
-  object FSFileListActions extends js.Object {
-
-    val instance: FileListActions = js.native
-  }
-
-  @js.native
-  @JSImport("../fs/FSPlugin.mjs", JSImport.Default)
-  class FSPlugin(reducer: js.Function2[FileListState, js.Any, FileListState])
-    extends FileListPlugin(js.native) {
-
-    val component: ReactClass = js.native
-
-    def init(parentDispatch: Dispatch, stack: PanelStack): Unit = js.native
-
-    def initDispatch(parentDispatch: Dispatch,
-                     reducer: js.Function2[FileListState, js.Any, FileListState],
-                     stack: PanelStack,
-                     item: PanelStackItem[FileListState]
-                    ): PanelStackItem[FileListState] = js.native
-  }
-
-  @js.native
-  @JSImport("../fs/FSPlugin.mjs", JSImport.Default)
-  object FSPlugin extends js.Object {
-
-    val instance: FSPlugin = js.native
-  }
-
-  @js.native
-  @JSImport("../copymove/CopyMovePlugin.mjs", JSImport.Default)
-  object CopyMovePlugin extends js.Object {
-
-    val instance: FileListPlugin = js.native
-  }
-
-  @js.native
-  @JSImport("../archiver/ArchiverPlugin.mjs", JSImport.Default)
-  class ArchiverPlugin extends FileListPlugin(js.native)
-
-  @js.native
-  @JSImport("../archiver/ArchiverPlugin.mjs", JSImport.Default)
-  object ArchiverPlugin extends js.Object {
-
-    val instance: ArchiverPlugin = js.native
-  }
-
-  private lazy val plugins: js.Array[FileListPlugin] = js.Array(
-    QuickViewPlugin,
-    ArchiverPlugin.instance,
-    ViewerPlugin,
-    CopyMovePlugin.instance,
-    FSPlugin.instance,
-    FileListUiPlugin,
-    FilePlugin
-  )
+  val instance: FileListActions = js.native
 }

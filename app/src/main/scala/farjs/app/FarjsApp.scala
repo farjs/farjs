@@ -1,7 +1,6 @@
 package farjs.app
 
-import farjs.app.filelist.FileListRoot.FSFileListActions
-import farjs.app.filelist.{FileListModule, FileListRoot}
+import farjs.app.filelist.{FSFileListActions, FileListModule, FileListRoot}
 import farjs.filelist.theme.FileListTheme
 import farjs.ui.app._
 import farjs.ui.portal.WithPortals
@@ -70,7 +69,7 @@ object FarjsApp {
 
           FarjsDBMigrations.prepareDB(FSFileListActions.instance, FarjsData.instance).`then`[LoadResult] { db =>
             val fileListModule = new FileListModule(db)
-            val mainUi = new FileListRoot(dispatch, fileListModule, WithPortals.create(screen)).apply()
+            val mainUi = FileListRoot(dispatch, fileListModule, WithPortals.create(screen))
             val theme =
               if (screen.terminal == TerminalName.`xterm-256color`) FileListTheme.xterm256Theme
               else FileListTheme.defaultTheme
