@@ -1,87 +1,26 @@
 package farjs.app
 
-import farjs.app.filelist.{FSFileListActions, FileListModule, FileListRoot}
-import farjs.filelist.theme.FileListTheme
-import farjs.ui.app._
-import farjs.ui.portal.WithPortals
-import farjs.ui.task.{TaskError, TaskManager}
-import farjs.ui.tool.DevTool
-import scommons.nodejs.{process, global => nodeGlobal}
-import scommons.react._
-import scommons.react.blessed._
-import scommons.react.blessed.raw.{Blessed, ReactBlessed}
-
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel, JSImport}
 
 @JSExportTopLevel(name = "FarjsApp")
 object FarjsApp {
 
-  private val g: js.Dynamic = nodeGlobal.asInstanceOf[js.Dynamic]
-  
-  private type BlessedRenderer = js.Function2[ReactElement, BlessedScreen, Unit]
-
   @JSExport("start")
   def start(showDevTools: Boolean = false,
             onReady: js.UndefOr[js.Function0[Unit]] = js.undefined,
-            onExit: js.UndefOr[js.Function0[Unit]] = js.undefined): BlessedScreen = {
+            onExit: js.UndefOr[js.Function0[Unit]] = js.undefined): Unit = {
 
-    def createRenderer(): BlessedRenderer = ReactBlessed.createBlessedRenderer(Blessed)
-
-    val screen = {
-      val screen = Blessed.screen(new BlessedScreenConfig {
-        override val autoPadding = true
-        override val smartCSR = true
-        override val tabSize = 1
-        override val fullUnicode = true
-        override val cursorShape = "underline"
-      })
-      val screenObj = screen.asInstanceOf[js.Dynamic]
-      screenObj.savedRenderer = createRenderer()
-      screenObj.savedConsoleLog = g.console.log
-      screenObj.savedConsoleError = g.console.error
-
-      screen.key(js.Array("C-e"), { (_, _) =>
-        // cleanup/unmount components
-        screen.destroy()
-
-        g.console.log = screenObj.savedConsoleLog
-        g.console.error = screenObj.savedConsoleError
-        onExit.toOption match {
-          case Some(onExit) => onExit()
-          case None => process.exit(0)
-        }
-      })
-      screen
-    }
-
-    val screenObj = screen.asInstanceOf[js.Dynamic]
-    val renderer = screenObj.savedRenderer.asInstanceOf[js.UndefOr[BlessedRenderer]]
-      .getOrElse(createRenderer())
-
-    //overwrite default error handler to handle scala/java exceptions
-    TaskManager.errorHandler = TaskError.errorHandler
-
-    renderer(
-      <(AppRoot)(^.plain := AppRootProps(
-        loadMainUi = { dispatch =>
-          onReady.foreach(_.apply())
-
-          FarjsDBMigrations.prepareDB(FSFileListActions.instance, FarjsData.instance).`then`[LoadResult] { db =>
-            val fileListModule = new FileListModule(db)
-            val mainUi = FileListRoot(dispatch, fileListModule, WithPortals.create(screen))
-            val theme =
-              if (screen.terminal == TerminalName.`xterm-256color`) FileListTheme.xterm256Theme
-              else FileListTheme.defaultTheme
-
-            LoadResult(theme, mainUi)
-          }
-        },
-        initialDevTool = if (showDevTools) DevTool.Logs else DevTool.Hidden,
-        defaultTheme = FileListTheme.defaultTheme
-      ))(),
-      screen
-    )
-    screen
+    FarjsAppNative.start(showDevTools, onReady, onExit)
   }
+
+}
+
+@js.native
+@JSImport("../app/FarjsApp.mjs", JSImport.Default)
+object FarjsAppNative extends js.Object {
+
+  def start(showDevTools: Boolean,
+            onReady: js.UndefOr[js.Function0[Unit]],
+            onExit: js.UndefOr[js.Function0[Unit]]): Unit = js.native
 }
