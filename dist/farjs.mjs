@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-// @ts-ignore
-import { FarjsApp } from "../build/farjs-app-opt.js";
+import FarjsApp from "../app/FarjsApp.mjs";
 
 process.title = "FAR.js";
 

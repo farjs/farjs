@@ -52,7 +52,6 @@
   "files": [
     "app/**/*.mjs",
     "archiver/**/*.mjs",
-    "build/farjs-app-opt.js",
     "copymove/**/*.mjs",
     "dao/migrations/bundle.json",
     "dao/**/*.mjs",
@@ -64,8 +63,8 @@
     "viewer/**/*.mjs"
   ],
   "type": "module",
-  "main": "./build/farjs-app-opt.js",
-  "exports": "./build/farjs-app-opt.js",
+  "main": "./app/FarjsApp.mjs",
+  "exports": "./app/FarjsApp.mjs",
   "preferGlobal": true,
   "browserslist": "maintained node versions",
   "engines": {

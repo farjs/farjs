@@ -35,16 +35,6 @@ jobs:
       #        cache: 'npm'
       #        cache-dependency-path: '**/package-lock.json'
 
-      - name: Setup JDK 8
-        uses: actions/setup-java@v4
-        with:
-          java-version: "8"
-          distribution: "adopt"
-          cache: "sbt"
-
-      - name: Setup Sbt
-        uses: sbt/setup-sbt@v1
-
       - name: Cache node_modules
         uses: actions/cache@v4
         with:
@@ -71,37 +61,12 @@ jobs:
           NODE_V8_COVERAGE=coverage0 npx c8 -r lcovonly --all --exclude "dist/**" --exclude "test/**" node --experimental-test-coverage ./test/all.mjs
         if: ${{ env.TAG_NAME == '' }}
 
-      - name: Report js coverage to Coveralls
+      - name: Report coverage to Coveralls
         uses: coverallsapp/github-action@v2
-        with:
-          parallel: true
-          flag-name: js
-        if: ${{ env.TAG_NAME == '' }}
-
-      - name: Run scala tests
-        run: sbt coverage test coverageReport
-        if: ${{ env.TAG_NAME == '' }}
-
-      - name: Report scala coverage to Coveralls
-        uses: coverallsapp/github-action@v2
-        with:
-          parallel: true
-          flag-name: scala
-          files: ./app/target/scala-2.13/coverage-report/cobertura.xml
-            ./filelist/target/scala-2.13/coverage-report/cobertura.xml
-          format: cobertura
-        if: ${{ env.TAG_NAME == '' }}
-
-      - name: Close parallel build in Coveralls
-        uses: coverallsapp/github-action@v2
-        with:
-          parallel-finished: true
         if: ${{ env.TAG_NAME == '' }}
 
       - name: Build SNAPSHOT artifact
-        run: |
-          sbt clean "project farjs-app" fullOptJS
-          npm pack
+        run: npm pack
         if: ${{ env.TAG_NAME == '' }}
 
       - name: Upload SNAPSHOT artifact
@@ -115,7 +80,6 @@ jobs:
         run: |
           VERSION="$(echo "$TAG_NAME" | cut -d'v' -f 2)"
           echo "Publish a release version=$VERSION for tag $TAG_NAME"
-          sbt clean "project farjs-app" fullOptJS
           npm --no-git-tag-version --allow-same-version version $VERSION
           npm publish
         if: ${{ env.TAG_NAME != '' }}

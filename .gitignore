@@ -1,24 +1,8 @@
-*.class
 *.log
 package-lock.json
 bun.lockb
 dao/migrations/bundle.json
 
-# sbt specific
-.cache
-.history
-.lib/
 .idea/
-.bsp/
 .metals/
-target/
-build/
 node_modules/
-lib_managed/
-src_managed/
-project/boot/
-project/plugins/project/
-
-# Scala-IDE specific
-.scala_dependencies
-.worksheet
