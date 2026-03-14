@@ -80,6 +80,8 @@ jobs:
         run: |
           VERSION="$(echo "$TAG_NAME" | cut -d'v' -f 2)"
           echo "Publish a release version=$VERSION for tag $TAG_NAME"
+          npm i
+          npm run sql-bundle
           npm --no-git-tag-version --allow-same-version version $VERSION
           npm publish
         if: ${{ env.TAG_NAME != '' }}
