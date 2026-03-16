@@ -13,7 +13,7 @@ import CopyMoveUi from "./CopyMoveUi.mjs";
 
 class CopyMovePlugin extends FileListPlugin {
   constructor() {
-    super(["f5", "f6", "S-f5", "S-f6"]);
+    super();
   }
 
   /** @type {FileListPlugin['onKeyTrigger']} */
@@ -113,6 +113,4 @@ class CopyMovePlugin extends FileListPlugin {
   }
 }
 
-CopyMovePlugin.instance = new CopyMovePlugin();
-
-export default CopyMovePlugin;
+export default new CopyMovePlugin();

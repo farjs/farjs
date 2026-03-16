@@ -17,7 +17,7 @@ import MockFileListActions from "@farjs/filelist/MockFileListActions.mjs";
 import FileEvent from "../../file/FileEvent.mjs";
 import FileViewHistory from "../../file/FileViewHistory.mjs";
 import ViewerEvent from "../../viewer/ViewerEvent.mjs";
-import ViewerPlugin from "../../viewer/ViewerPlugin.mjs";
+import ViewerPluginLoader from "../../viewer/ViewerPluginLoader.mjs";
 
 const h = React.createElement;
 
@@ -50,7 +50,7 @@ describe("ViewerPlugin.test.mjs", () => {
     ];
 
     //when & then
-    assert.deepEqual(ViewerPlugin.triggerKeys, expected);
+    assert.deepEqual(ViewerPluginLoader.triggerKeys, expected);
   });
 
   it("should return rejected Promise if no such file when onKeyTrigger(onFileView)", async () => {
@@ -69,22 +69,22 @@ describe("ViewerPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, leftState)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
     let capturedError = null;
 
     //when
     try {
-      await ViewerPlugin.onKeyTrigger(FileEvent.onFileView, stacks, data);
+      await ViewerPluginLoader.onKeyTrigger(FileEvent.onFileView, stacks, data);
     } catch (err) {
       capturedError = err;
     }
@@ -119,23 +119,23 @@ describe("ViewerPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when
-    const result = await ViewerPlugin.onKeyTrigger(
+    const result = await ViewerPluginLoader.onKeyTrigger(
       FileEvent.onFileView,
       stacks,
-      data
+      data,
     );
 
     //@ts-ignore
@@ -161,22 +161,22 @@ describe("ViewerPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when
-    const result = await ViewerPlugin.onKeyTrigger(
+    const result = await ViewerPluginLoader.onKeyTrigger(
       FileEvent.onFileView,
-      stacks
+      stacks,
     );
 
     //then
@@ -188,20 +188,20 @@ describe("ViewerPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when
-    const result = await ViewerPlugin.onKeyTrigger("f3", stacks);
+    const result = await ViewerPluginLoader.onKeyTrigger("f3", stacks);
 
     //then
     assert.deepEqual(result, undefined);
@@ -222,20 +222,20 @@ describe("ViewerPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when
-    const result = await ViewerPlugin.onKeyTrigger("f3", stacks);
+    const result = await ViewerPluginLoader.onKeyTrigger("f3", stacks);
 
     //then
     assert.deepEqual(result, undefined);
@@ -258,20 +258,20 @@ describe("ViewerPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when
-    const result = await ViewerPlugin.onKeyTrigger("f3", stacks);
+    const result = await ViewerPluginLoader.onKeyTrigger("f3", stacks);
 
     //then
     assert.deepEqual(result, undefined);
@@ -301,22 +301,22 @@ describe("ViewerPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, leftState)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
     let capturedError = null;
 
     //when
     try {
-      await ViewerPlugin.onKeyTrigger("f3", stacks);
+      await ViewerPluginLoader.onKeyTrigger("f3", stacks);
     } catch (err) {
       capturedError = err;
     }
@@ -353,20 +353,20 @@ describe("ViewerPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, leftState)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when
-    const result = await ViewerPlugin.onKeyTrigger("f3", stacks);
+    const result = await ViewerPluginLoader.onKeyTrigger("f3", stacks);
 
     //@ts-ignore
     fs.lstatSync = savedLstasSync;
@@ -400,22 +400,22 @@ describe("ViewerPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, leftState)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when
-    const result = await ViewerPlugin.onKeyTrigger(
+    const result = await ViewerPluginLoader.onKeyTrigger(
       ViewerEvent.onViewerOpenLeft,
-      stacks
+      stacks,
     );
 
     //@ts-ignore
@@ -450,22 +450,22 @@ describe("ViewerPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp, dispatch, actions, rightState)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when
-    const result = await ViewerPlugin.onKeyTrigger(
+    const result = await ViewerPluginLoader.onKeyTrigger(
       ViewerEvent.onViewerOpenRight,
-      stacks
+      stacks,
     );
 
     //@ts-ignore
@@ -493,20 +493,20 @@ describe("ViewerPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, leftState)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when
-    const result = await ViewerPlugin.onKeyTrigger("f3", stacks);
+    const result = await ViewerPluginLoader.onKeyTrigger("f3", stacks);
 
     //then
     assert.deepEqual(result?.displayName, "ViewItemsPopup");
@@ -527,20 +527,20 @@ describe("ViewerPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, leftState)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when
-    const result = await ViewerPlugin.onKeyTrigger("f3", stacks);
+    const result = await ViewerPluginLoader.onKeyTrigger("f3", stacks);
 
     //then
     assert.deepEqual(result?.displayName, "ViewItemsPopup");

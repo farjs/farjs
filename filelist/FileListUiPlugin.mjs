@@ -13,7 +13,7 @@ import FileListUi from "./FileListUi.mjs";
 
 class FileListUiPluginImpl extends FileListPlugin {
   constructor() {
-    super(["f1", "f7", "f8", "delete", "f9", "f10", "M-s", "M-d"]);
+    super();
   }
 
   /**
@@ -83,6 +83,4 @@ class FileListUiPluginImpl extends FileListPlugin {
   }
 }
 
-const FileListUiPlugin = new FileListUiPluginImpl();
-
-export default FileListUiPlugin;
+export default new FileListUiPluginImpl();

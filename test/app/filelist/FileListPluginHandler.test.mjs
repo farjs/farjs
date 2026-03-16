@@ -21,7 +21,7 @@ import MockFileSource from "@farjs/filelist/api/MockFileSource.mjs";
 import MockFileListApi from "@farjs/filelist/api/MockFileListApi.mjs";
 import MockFileListActions from "@farjs/filelist/MockFileListActions.mjs";
 import FileListState from "@farjs/filelist/FileListState.mjs";
-import FileListPlugin from "@farjs/filelist/FileListPlugin.mjs";
+import FileListPluginLoader from "@farjs/filelist/FileListPluginLoader.mjs";
 import FileListPluginHandler from "../../../app/filelist/FileListPluginHandler.mjs";
 
 const { describe, it } = await (async () => {
@@ -36,7 +36,7 @@ const { describe, it } = await (async () => {
 const fsComp = () => null;
 const stacks = WithStacksProps(
   WithStacksData(new PanelStack(true, [], mockFunction())),
-  WithStacksData(new PanelStack(false, [], mockFunction()))
+  WithStacksData(new PanelStack(false, [], mockFunction())),
 );
 
 describe("FileListPluginHandler.test.mjs", () => {
@@ -44,9 +44,9 @@ describe("FileListPluginHandler.test.mjs", () => {
     //given
     const dispatch = mockFunction();
     const onFileTrigger = mockFunction();
-    class TestPlugin extends FileListPlugin {
+    class TestPlugin extends FileListPluginLoader {
       constructor() {
-        super([]);
+        super([], mockFunction());
         this.onFileTrigger = onFileTrigger;
       }
     }
@@ -54,7 +54,7 @@ describe("FileListPluginHandler.test.mjs", () => {
     const stack = new PanelStack(
       true,
       [new PanelStackItem(fsComp)],
-      mockFunction()
+      mockFunction(),
     );
 
     //when
@@ -69,9 +69,9 @@ describe("FileListPluginHandler.test.mjs", () => {
     //given
     const dispatch = mockFunction();
     const onFileTrigger = mockFunction();
-    class TestPlugin extends FileListPlugin {
+    class TestPlugin extends FileListPluginLoader {
       constructor() {
-        super([]);
+        super([], mockFunction());
         this.onFileTrigger = onFileTrigger;
       }
     }
@@ -86,7 +86,7 @@ describe("FileListPluginHandler.test.mjs", () => {
     const stack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
 
     //when
@@ -101,9 +101,9 @@ describe("FileListPluginHandler.test.mjs", () => {
     //given
     const dispatch = mockFunction();
     const onFileTrigger = mockFunction();
-    class TestPlugin extends FileListPlugin {
+    class TestPlugin extends FileListPluginLoader {
       constructor() {
-        super([]);
+        super([], mockFunction());
         this.onFileTrigger = onFileTrigger;
       }
     }
@@ -116,7 +116,7 @@ describe("FileListPluginHandler.test.mjs", () => {
     const stack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
 
     //when
@@ -132,9 +132,9 @@ describe("FileListPluginHandler.test.mjs", () => {
     let dispatchArgs = /** @type {any[]} */ ([]);
     const dispatch = mockFunction((...args) => (dispatchArgs = args));
     const onFileTrigger = mockFunction();
-    class TestPlugin extends FileListPlugin {
+    class TestPlugin extends FileListPluginLoader {
       constructor() {
-        super([]);
+        super([], mockFunction());
         this.onFileTrigger = onFileTrigger;
       }
     }
@@ -156,7 +156,7 @@ describe("FileListPluginHandler.test.mjs", () => {
     const stack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
 
     //when
@@ -196,15 +196,15 @@ describe("FileListPluginHandler.test.mjs", () => {
       onFileTrigger2Args = args;
       return Promise.resolve(pluginStackItem);
     });
-    class TestPlugin1 extends FileListPlugin {
+    class TestPlugin1 extends FileListPluginLoader {
       constructor() {
-        super([]);
+        super([], mockFunction());
         this.onFileTrigger = onFileTrigger1;
       }
     }
-    class TestPlugin2 extends FileListPlugin {
+    class TestPlugin2 extends FileListPluginLoader {
       constructor() {
-        super([]);
+        super([], mockFunction());
         this.onFileTrigger = onFileTrigger2;
       }
     }
@@ -298,9 +298,9 @@ describe("FileListPluginHandler.test.mjs", () => {
     const dispatch = mockFunction();
     const onKeyTrigger = mockFunction();
     const keyFull = "C-p";
-    class TestPlugin extends FileListPlugin {
+    class TestPlugin extends FileListPluginLoader {
       constructor() {
-        super(["test"]);
+        super(["test"], mockFunction());
         this.onKeyTrigger = onKeyTrigger;
       }
     }
@@ -331,9 +331,9 @@ describe("FileListPluginHandler.test.mjs", () => {
       return Promise.reject(error);
     });
     const keyFull = "C-p";
-    class TestPlugin extends FileListPlugin {
+    class TestPlugin extends FileListPluginLoader {
       constructor() {
-        super([keyFull]);
+        super([keyFull], mockFunction());
         this.onKeyTrigger = onKeyTrigger;
       }
     }
@@ -374,9 +374,9 @@ describe("FileListPluginHandler.test.mjs", () => {
       return Promise.resolve(uiComp);
     });
     const keyFull = "C-p";
-    class TestPlugin extends FileListPlugin {
+    class TestPlugin extends FileListPluginLoader {
       constructor() {
-        super([keyFull]);
+        super([keyFull], mockFunction());
         this.onKeyTrigger = onKeyTrigger;
       }
     }

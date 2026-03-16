@@ -2,7 +2,7 @@
  * @typedef {import("@farjs/filelist/FileListState.mjs").FileListState} FileListState
  */
 import React from "react";
-import assert from "node:assert/strict";
+import { deepEqual, fail } from "node:assert/strict";
 import mockFunction from "mock-fn";
 import FileListItem from "@farjs/filelist/api/FileListItem.mjs";
 import WithStacksProps from "@farjs/filelist/stack/WithStacksProps.mjs";
@@ -13,6 +13,7 @@ import FileListState from "@farjs/filelist/FileListState.mjs";
 import MockFileListActions from "@farjs/filelist/MockFileListActions.mjs";
 import FSFileListActions from "../../fs/FSFileListActions.mjs";
 import FSPlugin from "../../fs/FSPlugin.mjs";
+import FSPluginLoader from "../../fs/FSPluginLoader.mjs";
 
 const h = React.createElement;
 
@@ -33,7 +34,7 @@ describe("FSPlugin.test.mjs", () => {
     const expected = ["M-l", "M-r", "M-h", "C-d"];
 
     //when & then
-    assert.deepEqual(FSPlugin.instance.triggerKeys, expected);
+    deepEqual(FSPluginLoader.triggerKeys, expected);
   });
 
   it("should initialize dispatch, actions and state when init", () => {
@@ -47,7 +48,7 @@ describe("FSPlugin.test.mjs", () => {
     const plugin = new FSPlugin(reducer);
     let parentDispatchArgs = /** @type {any[]} */ ([]);
     const parentDispatch = mockFunction(
-      (...args) => (parentDispatchArgs = args)
+      (...args) => (parentDispatchArgs = args),
     );
     const item = new PanelStackItem(plugin.component);
     /** @type {readonly PanelStackItem<any>[]} */
@@ -55,7 +56,7 @@ describe("FSPlugin.test.mjs", () => {
     const stack = new PanelStack(
       true,
       stackData,
-      (f) => (stackData = f(stackData))
+      (f) => (stackData = f(stackData)),
     );
 
     //when
@@ -63,15 +64,15 @@ describe("FSPlugin.test.mjs", () => {
 
     //then
     const { component, dispatch, actions, state } = stackData[0];
-    assert.deepEqual(component === plugin.component, true);
-    assert.deepEqual(actions === FSFileListActions.instance, true);
+    deepEqual(component === plugin.component, true);
+    deepEqual(actions === FSFileListActions.instance, true);
     if (!dispatch) {
-      assert.fail("dispatch is undefined!");
+      fail("dispatch is undefined!");
     }
     if (!state) {
-      assert.fail("state is undefined!");
+      fail("state is undefined!");
     }
-    assert.deepEqual(state, FileListState());
+    deepEqual(state, FileListState());
 
     //given
     const action = "test action";
@@ -80,20 +81,20 @@ describe("FSPlugin.test.mjs", () => {
     dispatch(action);
 
     //then
-    assert.deepEqual(reducer.times, 1);
-    assert.deepEqual(reducerArgs, [state, action]);
-    assert.deepEqual(parentDispatch.times, 1);
-    assert.deepEqual(parentDispatchArgs, [action]);
+    deepEqual(reducer.times, 1);
+    deepEqual(reducerArgs, [state, action]);
+    deepEqual(parentDispatch.times, 1);
+    deepEqual(parentDispatchArgs, [action]);
     const {
       component: resComponent,
       dispatch: resDispatch,
       actions: resActions,
       state: resState,
     } = stackData[0];
-    assert.deepEqual(resComponent === plugin.component, true);
-    assert.deepEqual(resDispatch === dispatch, true);
-    assert.deepEqual(resActions === actions, true);
-    assert.deepEqual(resState === updatedState, true);
+    deepEqual(resComponent === plugin.component, true);
+    deepEqual(resDispatch === dispatch, true);
+    deepEqual(resActions === actions, true);
+    deepEqual(resState === updatedState, true);
   });
 
   it("should return undefined/value if non-/trigger key when onKeyTrigger", async () => {
@@ -111,26 +112,23 @@ describe("FSPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when & then
-    assert.deepEqual(
-      await FSPlugin.instance.onKeyTrigger("test_key", stacks),
-      undefined
-    );
-    assert.deepEqual(
-      (await FSPlugin.instance.onKeyTrigger("M-l", stacks)) !== undefined,
-      true
+    deepEqual(await FSPluginLoader.onKeyTrigger("test_key", stacks), undefined);
+    deepEqual(
+      (await FSPluginLoader.onKeyTrigger("M-l", stacks)) !== undefined,
+      true,
     );
   });
 
@@ -139,26 +137,26 @@ describe("FSPlugin.test.mjs", () => {
     const { _createUiOptions } = FSPlugin.instance;
 
     //when & then
-    assert.deepEqual(_createUiOptions("M-l"), {
+    deepEqual(_createUiOptions("M-l"), {
       showDrivePopupOnLeft: true,
       showFoldersHistoryPopup: false,
       showFolderShortcutsPopup: false,
     });
-    assert.deepEqual(_createUiOptions("M-r"), {
+    deepEqual(_createUiOptions("M-r"), {
       showDrivePopupOnLeft: false,
       showFoldersHistoryPopup: false,
       showFolderShortcutsPopup: false,
     });
-    assert.deepEqual(_createUiOptions("M-h"), {
+    deepEqual(_createUiOptions("M-h"), {
       showDrivePopupOnLeft: undefined,
       showFoldersHistoryPopup: true,
       showFolderShortcutsPopup: false,
     });
-    assert.deepEqual(_createUiOptions("C-d"), {
+    deepEqual(_createUiOptions("C-d"), {
       showDrivePopupOnLeft: undefined,
       showFoldersHistoryPopup: false,
       showFolderShortcutsPopup: true,
     });
-    assert.deepEqual(_createUiOptions("unknown"), undefined);
+    deepEqual(_createUiOptions("unknown"), undefined);
   });
 });

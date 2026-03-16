@@ -8,7 +8,7 @@
  * @import PanelStackItem from "@farjs/filelist/stack/PanelStackItem.mjs"
  * @import { WithStacksProps } from "@farjs/filelist/stack/WithStacksProps.mjs"
  * @import { Dispatch, ReactComponent } from "@farjs/filelist/FileListData.mjs"
- * @import FileListPlugin from "@farjs/filelist/FileListPlugin.mjs"
+ * @import FileListPluginLoader from "@farjs/filelist/FileListPluginLoader.mjs"
  */
 import path from "path";
 import Task from "@farjs/ui/task/Task.mjs";
@@ -25,7 +25,7 @@ import FSPlugin from "../../fs/FSPlugin.mjs";
  */
 
 /**
- * @param {readonly FileListPlugin[]} plugins
+ * @param {readonly FileListPluginLoader[]} plugins
  * @returns {FileListPluginHandler}
  */
 function FileListPluginHandler(plugins) {
@@ -48,7 +48,7 @@ function FileListPluginHandler(plugins) {
             const source = await actions.api.readFile(
               state.currDir.path,
               item,
-              0
+              0,
             );
             const buff = new Uint8Array(64 * 1024);
             const bytesRead = await source.readNextBytes(buff);
@@ -71,8 +71,8 @@ function FileListPluginHandler(plugins) {
                   dispatch,
                   FileListStateReducer,
                   stack,
-                  pluginItem
-                )
+                  pluginItem,
+                ),
               );
             }
           }

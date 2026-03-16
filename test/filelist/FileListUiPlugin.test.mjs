@@ -1,7 +1,7 @@
 /**
  * @typedef {import("../../filelist/FileListUi.mjs").FileListUiData} FileListUiData
  */
-import assert from "node:assert/strict";
+import { deepEqual } from "node:assert/strict";
 import mockFunction from "mock-fn";
 import FileListItem from "@farjs/filelist/api/FileListItem.mjs";
 import WithStacksData from "@farjs/filelist/stack/WithStacksData.mjs";
@@ -10,9 +10,10 @@ import PanelStackItem from "@farjs/filelist/stack/PanelStackItem.mjs";
 import WithStacksProps from "@farjs/filelist/stack/WithStacksProps.mjs";
 import FileListState from "@farjs/filelist/FileListState.mjs";
 import MockFileListActions from "@farjs/filelist/MockFileListActions.mjs";
-import FileListUiPlugin from "../../filelist/FileListUiPlugin.mjs";
 import MockFileListApi from "@farjs/filelist/api/MockFileListApi.mjs";
 import FileListCapability from "@farjs/filelist/api/FileListCapability.mjs";
+import FileListUiPlugin from "../../filelist/FileListUiPlugin.mjs";
+import FileListUiPluginLoader from "../../filelist/FileListUiPluginLoader.mjs";
 
 const { describe, it } = await (async () => {
   // @ts-ignore
@@ -29,7 +30,7 @@ describe("FileListUiPlugin.test.mjs", () => {
     const expected = ["f1", "f7", "f8", "delete", "f9", "f10", "M-s", "M-d"];
 
     //when & then
-    assert.deepEqual(FileListUiPlugin.triggerKeys, expected);
+    deepEqual(FileListUiPluginLoader.triggerKeys, expected);
   });
 
   it("should return undefined if non-trigger key when onKeyTrigger", async () => {
@@ -50,23 +51,26 @@ describe("FileListUiPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when
-    const result = await FileListUiPlugin.onKeyTrigger("test_key", stacks);
+    const result = await FileListUiPluginLoader.onKeyTrigger(
+      "test_key",
+      stacks,
+    );
 
     //then
-    assert.deepEqual(result, undefined);
+    deepEqual(result, undefined);
   });
 
   it("should return ui component if trigger key when onKeyTrigger", async () => {
@@ -87,23 +91,23 @@ describe("FileListUiPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when
-    const result = await FileListUiPlugin.onKeyTrigger("f1", stacks);
+    const result = await FileListUiPluginLoader.onKeyTrigger("f1", stacks);
 
     //then
-    assert.deepEqual(result !== undefined, true);
+    deepEqual(result !== undefined, true);
   });
 
   it("should return ui data if trigger key=f1/f9/f10/Alt-S/Alt-D when _createUiData", () => {
@@ -129,7 +133,7 @@ describe("FileListUiPlugin.test.mjs", () => {
       const result = FileListUiPlugin._createUiData(key, data);
 
       //then
-      assert.deepEqual(result, {
+      deepEqual(result, {
         ...partial,
         onClose: result?.onClose,
         data,
@@ -167,20 +171,17 @@ describe("FileListUiPlugin.test.mjs", () => {
     };
 
     //when & then
-    assert.deepEqual(
-      FileListUiPlugin._createUiData("f7", undefined),
-      undefined
-    );
-    assert.deepEqual(
+    deepEqual(FileListUiPlugin._createUiData("f7", undefined), undefined);
+    deepEqual(
       FileListUiPlugin._createUiData("f7", noCapabilityData),
-      undefined
+      undefined,
     );
 
     //when
     const result = FileListUiPlugin._createUiData("f7", data);
 
     //then
-    assert.deepEqual(result, {
+    deepEqual(result, {
       showMkFolderPopup: true,
       onClose: result?.onClose,
       data,
@@ -231,22 +232,16 @@ describe("FileListUiPlugin.test.mjs", () => {
     };
 
     //when & then
-    assert.deepEqual(
-      FileListUiPlugin._createUiData("f8", undefined),
-      undefined
-    );
-    assert.deepEqual(
+    deepEqual(FileListUiPlugin._createUiData("f8", undefined), undefined);
+    deepEqual(
       FileListUiPlugin._createUiData("f8", noCapabilityData),
-      undefined
+      undefined,
     );
-    assert.deepEqual(
-      FileListUiPlugin._createUiData("f8", noItemData),
-      undefined
-    );
+    deepEqual(FileListUiPlugin._createUiData("f8", noItemData), undefined);
 
     //when & then
     const result1 = FileListUiPlugin._createUiData("f8", selectedItemsData);
-    assert.deepEqual(result1, {
+    deepEqual(result1, {
       showDeletePopup: true,
       onClose: result1?.onClose,
       data: selectedItemsData,
@@ -254,7 +249,7 @@ describe("FileListUiPlugin.test.mjs", () => {
 
     //when & then
     const result2 = FileListUiPlugin._createUiData("delete", data);
-    assert.deepEqual(result2, {
+    deepEqual(result2, {
       showDeletePopup: true,
       onClose: result2?.onClose,
       data,

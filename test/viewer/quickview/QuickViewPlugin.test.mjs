@@ -9,7 +9,7 @@ import PanelStack from "@farjs/filelist/stack/PanelStack.mjs";
 import WithStacksProps from "@farjs/filelist/stack/WithStacksProps.mjs";
 import WithStacksData from "@farjs/filelist/stack/WithStacksData.mjs";
 import QuickViewPanel from "../../../viewer/quickview/QuickViewPanel.mjs";
-import QuickViewPlugin from "../../../viewer/quickview/QuickViewPlugin.mjs";
+import QuickViewPluginLoader from "../../../viewer/quickview/QuickViewPluginLoader.mjs";
 
 const h = React.createElement;
 
@@ -39,7 +39,7 @@ describe("QuickViewPlugin.test.mjs", () => {
     const expected = ["C-q"];
 
     //when & then
-    assert.deepEqual(QuickViewPlugin.triggerKeys, expected);
+    assert.deepEqual(QuickViewPluginLoader.triggerKeys, expected);
   });
 
   it("should remove plugin from left panel when onKeyTrigger", async () => {
@@ -52,20 +52,20 @@ describe("QuickViewPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       stackState,
-      (f) => (stackState = f(stackState))
+      (f) => (stackState = f(stackState)),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp, undefined, undefined, undefined)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when
-    const result = await QuickViewPlugin.onKeyTrigger("", stacks);
+    const result = await QuickViewPluginLoader.onKeyTrigger("", stacks);
 
     //then
     assert.deepEqual(result, undefined);
@@ -83,20 +83,20 @@ describe("QuickViewPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, undefined, undefined, undefined)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       stackState,
-      (f) => (stackState = f(stackState))
+      (f) => (stackState = f(stackState)),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when
-    const result = await QuickViewPlugin.onKeyTrigger("", stacks);
+    const result = await QuickViewPluginLoader.onKeyTrigger("", stacks);
 
     //then
     assert.deepEqual(result, undefined);
@@ -113,20 +113,20 @@ describe("QuickViewPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       false,
       stackState,
-      (f) => (stackState = f(stackState))
+      (f) => (stackState = f(stackState)),
     );
     const rightStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, undefined, undefined, undefined)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when
-    const result = await QuickViewPlugin.onKeyTrigger("", stacks);
+    const result = await QuickViewPluginLoader.onKeyTrigger("", stacks);
 
     //then
     assert.deepEqual(result, undefined);
@@ -144,20 +144,20 @@ describe("QuickViewPlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, undefined, undefined, undefined)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       stackState,
-      (f) => (stackState = f(stackState))
+      (f) => (stackState = f(stackState)),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when
-    const result = await QuickViewPlugin.onKeyTrigger("", stacks);
+    const result = await QuickViewPluginLoader.onKeyTrigger("", stacks);
 
     //then
     assert.deepEqual(result, undefined);

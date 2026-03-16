@@ -22,7 +22,7 @@ class FSPlugin extends FileListPlugin {
    * @param {Reducer} reducer
    */
   constructor(reducer) {
-    super(["M-l", "M-r", "M-h", "C-d"]);
+    super();
 
     /** @readonly @type {ReactComponent} */
     this.component = FileListPanelController(FSPanel);

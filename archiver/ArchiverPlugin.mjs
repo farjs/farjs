@@ -17,7 +17,7 @@ import ArchiverPluginUi from "./ArchiverPluginUi.mjs";
 
 class ArchiverPlugin extends FileListPlugin {
   constructor() {
-    super(["S-f7"]);
+    super();
   }
 
   /** @type {FileListPlugin['onKeyTrigger']} */
@@ -107,6 +107,4 @@ class ArchiverPlugin extends FileListPlugin {
 const P = "P".charCodeAt(0);
 const K = "K".charCodeAt(0);
 
-ArchiverPlugin.instance = new ArchiverPlugin();
-
-export default ArchiverPlugin;
+export default new ArchiverPlugin();

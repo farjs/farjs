@@ -5,7 +5,7 @@
  * @import { CopyMoveUiAction } from "../../copymove/CopyMoveUi.mjs"
  */
 import React from "react";
-import assert from "node:assert/strict";
+import { deepEqual, notDeepEqual } from "node:assert/strict";
 import mockFunction from "mock-fn";
 import FileListCapability from "@farjs/filelist/api/FileListCapability.mjs";
 import FileListItem from "@farjs/filelist/api/FileListItem.mjs";
@@ -15,9 +15,10 @@ import PanelStack from "@farjs/filelist/stack/PanelStack.mjs";
 import PanelStackItem from "@farjs/filelist/stack/PanelStackItem.mjs";
 import FileListState from "@farjs/filelist/FileListState.mjs";
 import MockFileListActions from "@farjs/filelist/MockFileListActions.mjs";
-import CopyMovePlugin from "../../copymove/CopyMovePlugin.mjs";
 import MockFileListApi from "@farjs/filelist/api/MockFileListApi.mjs";
 import FileListEvent from "@farjs/filelist/FileListEvent.mjs";
+import CopyMovePlugin from "../../copymove/CopyMovePlugin.mjs";
+import CopyMovePluginLoader from "../../copymove/CopyMovePluginLoader.mjs";
 
 const h = React.createElement;
 
@@ -39,7 +40,7 @@ describe("CopyMovePlugin.test.mjs", () => {
     const expected = ["f5", "f6", "S-f5", "S-f6"];
 
     //when & then
-    assert.deepEqual(CopyMovePlugin.instance.triggerKeys, expected);
+    deepEqual(CopyMovePluginLoader.triggerKeys, expected);
   });
 
   it("should return undefined if .. when onKeyTrigger", async () => {
@@ -67,23 +68,23 @@ describe("CopyMovePlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     /** @type {(key: string) => Promise<void>} */
     async function check(key) {
-      assert.deepEqual(
-        await CopyMovePlugin.instance.onKeyTrigger(key, stacks),
-        undefined
+      deepEqual(
+        await CopyMovePluginLoader.onKeyTrigger(key, stacks),
+        undefined,
       );
     }
 
@@ -111,23 +112,23 @@ describe("CopyMovePlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(otherComp, dispatch, actions, "otherState")],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(otherComp, dispatch, actions, "otherState")],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     /** @type {(key: string) => Promise<void>} */
     async function check(key) {
-      assert.deepEqual(
-        await CopyMovePlugin.instance.onKeyTrigger(key, stacks),
-        undefined
+      deepEqual(
+        await CopyMovePluginLoader.onKeyTrigger(key, stacks),
+        undefined,
       );
     }
 
@@ -163,22 +164,22 @@ describe("CopyMovePlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when & then
-    assert.deepEqual(
-      await CopyMovePlugin.instance.onKeyTrigger("unknown", stacks),
-      undefined
+    deepEqual(
+      await CopyMovePluginLoader.onKeyTrigger("unknown", stacks),
+      undefined,
     );
   });
 
@@ -201,22 +202,22 @@ describe("CopyMovePlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       false,
       [new PanelStackItem(otherComp)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when & then
-    assert.notDeepEqual(
-      await CopyMovePlugin.instance.onKeyTrigger("S-f5", stacks),
-      undefined
+    notDeepEqual(
+      await CopyMovePluginLoader.onKeyTrigger("S-f5", stacks),
+      undefined,
     );
   });
 
@@ -243,22 +244,22 @@ describe("CopyMovePlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when & then
-    assert.notDeepEqual(
-      await CopyMovePlugin.instance.onKeyTrigger("f5", stacks),
-      undefined
+    notDeepEqual(
+      await CopyMovePluginLoader.onKeyTrigger("f5", stacks),
+      undefined,
     );
   });
 
@@ -286,28 +287,28 @@ describe("CopyMovePlugin.test.mjs", () => {
     const leftStack = new PanelStack(
       false,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const rightStack = new PanelStack(
       true,
       [new PanelStackItem(fsComp, dispatch, actions, state)],
-      mockFunction()
+      mockFunction(),
     );
     const stacks = WithStacksProps(
       WithStacksData(leftStack),
-      WithStacksData(rightStack)
+      WithStacksData(rightStack),
     );
 
     //when & then
-    assert.notDeepEqual(
-      await CopyMovePlugin.instance.onKeyTrigger("f6", stacks),
-      undefined
+    notDeepEqual(
+      await CopyMovePluginLoader.onKeyTrigger("f6", stacks),
+      undefined,
     );
   });
 
   it("should return action when _onCopyMoveInplace", () => {
     //given
-    const { _onCopyMoveInplace } = CopyMovePlugin.instance;
+    const { _onCopyMoveInplace } = CopyMovePlugin;
     const currState = {
       ...FileListState(),
       currDir: {
@@ -371,9 +372,9 @@ describe("CopyMovePlugin.test.mjs", () => {
 
       //then
       if (!never) {
-        assert.deepEqual(res, action);
+        deepEqual(res, action);
       } else {
-        assert.deepEqual(res, undefined);
+        deepEqual(res, undefined);
       }
     }
 
@@ -426,7 +427,7 @@ describe("CopyMovePlugin.test.mjs", () => {
 
   it("should return action or emit FileListEvent when _onCopyMove", () => {
     //given
-    const { _onCopyMove } = CopyMovePlugin.instance;
+    const { _onCopyMove } = CopyMovePlugin;
     let emitArgs = /** @type {any[]} */ ([]);
     const emitMock = mockFunction((...args) => {
       emitArgs = args;
@@ -519,7 +520,7 @@ describe("CopyMovePlugin.test.mjs", () => {
 
       //then
       if (event !== undefined) {
-        assert.deepEqual(emitArgs, [
+        deepEqual(emitArgs, [
           "keypress",
           undefined,
           {
@@ -529,9 +530,9 @@ describe("CopyMovePlugin.test.mjs", () => {
         ]);
       }
       if (!never) {
-        assert.deepEqual(res, action);
+        deepEqual(res, action);
       } else {
-        assert.deepEqual(res, undefined);
+        deepEqual(res, undefined);
       }
     }
 

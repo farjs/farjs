@@ -2,7 +2,13 @@
  * @typedef {import("../../file/FilePluginUi.mjs").FilePluginUiParams} FilePluginUiParams
  */
 import assert from "node:assert/strict";
+import mockFunction from "mock-fn";
+import PanelStack from "@farjs/filelist/stack/PanelStack.mjs";
+import PanelStackItem from "@farjs/filelist/stack/PanelStackItem.mjs";
+import WithStacksData from "@farjs/filelist/stack/WithStacksData.mjs";
+import WithStacksProps from "@farjs/filelist/stack/WithStacksProps.mjs";
 import FilePlugin from "../../file/FilePlugin.mjs";
+import FilePluginLoader from "../../file/FilePluginLoader.mjs";
 
 const { describe, it } = await (async () => {
   // @ts-ignore
@@ -13,18 +19,27 @@ const { describe, it } = await (async () => {
     : import(module);
 })();
 
+const fsComp = () => null;
+
+const stack = new PanelStack(
+  true,
+  [new PanelStackItem(fsComp)],
+  mockFunction(),
+);
+const stacks = WithStacksProps(WithStacksData(stack), WithStacksData(stack));
+
 describe("FilePlugin.test.mjs", () => {
   it("should define triggerKeys", () => {
     //given
     const expected = ["M-v"];
 
     //when & then
-    assert.deepEqual(FilePlugin.triggerKeys, expected);
+    assert.deepEqual(FilePluginLoader.triggerKeys, expected);
   });
 
   it("should return undefined if non-trigger key when onKeyTrigger", async () => {
     //when
-    const result = await FilePlugin.onKeyTrigger("test_key");
+    const result = await FilePluginLoader.onKeyTrigger("test_key", stacks);
 
     //then
     assert.deepEqual(result, undefined);
@@ -32,7 +47,7 @@ describe("FilePlugin.test.mjs", () => {
 
   it("should return ui component if trigger key when onKeyTrigger", async () => {
     //when
-    const result = await FilePlugin.onKeyTrigger("M-v");
+    const result = await FilePluginLoader.onKeyTrigger("M-v", stacks);
 
     //then
     assert.deepEqual(result !== undefined, true);

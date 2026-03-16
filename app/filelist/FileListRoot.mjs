@@ -1,17 +1,17 @@
 /**
  * @import { Dispatch, ReactComponent } from "@farjs/filelist/FileListData.mjs"
- * @import FileListPlugin from "@farjs/filelist/FileListPlugin.mjs"
+ * @import FileListPluginLoader from "@farjs/filelist/FileListPluginLoader.mjs"
  */
 import React from "react";
 import HistoryProvider from "@farjs/filelist/history/HistoryProvider.mjs";
-import ArchiverPlugin from "../../archiver/ArchiverPlugin.mjs";
-import CopyMovePlugin from "../../copymove/CopyMovePlugin.mjs";
-import ViewerPlugin from "../../viewer/ViewerPlugin.mjs";
-import QuickViewPlugin from "../../viewer/quickview/QuickViewPlugin.mjs";
-import FSPlugin from "../../fs/FSPlugin.mjs";
 import FSServices from "../../fs/FSServices.mjs";
-import FilePlugin from "../../file/FilePlugin.mjs";
-import FileListUiPlugin from "../../filelist/FileListUiPlugin.mjs";
+import FSPluginLoader from "../../fs/FSPluginLoader.mjs";
+import FilePluginLoader from "../../file/FilePluginLoader.mjs";
+import FileListUiPluginLoader from "../../filelist/FileListUiPluginLoader.mjs";
+import ArchiverPluginLoader from "../../archiver/ArchiverPluginLoader.mjs";
+import CopyMovePluginLoader from "../../copymove/CopyMovePluginLoader.mjs";
+import QuickViewPluginLoader from "../../viewer/quickview/QuickViewPluginLoader.mjs";
+import ViewerPluginLoader from "../../viewer/ViewerPluginLoader.mjs";
 import FileListBrowser from "./FileListBrowser.mjs";
 import FileListModule from "./FileListModule.mjs";
 import FileListPluginHandler from "./FileListPluginHandler.mjs";
@@ -56,15 +56,15 @@ function FileListRoot(
   return FileListRootComp;
 }
 
-/** @type {readonly FileListPlugin[]} */
+/** @type {readonly FileListPluginLoader[]} */
 const plugins = [
-  QuickViewPlugin,
-  ArchiverPlugin.instance,
-  ViewerPlugin,
-  CopyMovePlugin.instance,
-  FSPlugin.instance,
-  FileListUiPlugin,
-  FilePlugin,
+  QuickViewPluginLoader,
+  ArchiverPluginLoader,
+  ViewerPluginLoader,
+  CopyMovePluginLoader,
+  FSPluginLoader,
+  FileListUiPluginLoader,
+  FilePluginLoader,
 ];
 
 FileListRoot.fileListComp = FileListBrowser(FileListPluginHandler(plugins));

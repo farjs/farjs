@@ -16,6 +16,7 @@ import MockFileListActions from "@farjs/filelist/MockFileListActions.mjs";
 import ZipApi from "../../archiver/zip/ZipApi.mjs";
 import ZipActions from "../../archiver/zip/ZipActions.mjs";
 import ArchiverPlugin from "../../archiver/ArchiverPlugin.mjs";
+import ArchiverPluginLoader from "../../archiver/ArchiverPluginLoader.mjs";
 
 const h = React.createElement;
 
@@ -33,7 +34,7 @@ ZipActions.readZip = () => Promise.resolve(new Map());
 ZipActions.createApi = (zipPath, rootPath, entriesByParentF) =>
   new ZipApi(zipPath, rootPath, entriesByParentF);
 
-const plugin = ArchiverPlugin.instance;
+const plugin = ArchiverPluginLoader;
 const fsComp = () => h("test stub");
 
 describe("ArchiverPlugin.test.mjs", () => {
@@ -169,7 +170,7 @@ describe("ArchiverPlugin.test.mjs", () => {
     );
 
     //when
-    const result = plugin._createUiParams(stacks);
+    const result = ArchiverPlugin._createUiParams(stacks);
 
     //then
     /** @type {ArchiverPluginUiParams} */
@@ -213,7 +214,7 @@ describe("ArchiverPlugin.test.mjs", () => {
     );
 
     //when
-    const result = plugin._createUiParams(stacks);
+    const result = ArchiverPlugin._createUiParams(stacks);
 
     //then
     /** @type {ArchiverPluginUiParams} */

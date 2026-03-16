@@ -7,7 +7,7 @@ import FilePluginUi from "./FilePluginUi.mjs";
 
 class FilePluginImpl extends FileListPlugin {
   constructor() {
-    super(["M-v"]);
+    super();
   }
 
   /**
@@ -35,6 +35,4 @@ class FilePluginImpl extends FileListPlugin {
   }
 }
 
-const FilePlugin = new FilePluginImpl();
-
-export default FilePlugin;
+export default new FilePluginImpl();

@@ -10,7 +10,7 @@ import QuickViewPanel from "./QuickViewPanel.mjs";
 
 class QuickViewPluginImpl extends FileListPlugin {
   constructor() {
-    super(["C-q"]);
+    super();
 
     /** @type {ReactComponent} */
     this.panelComp = QuickViewPanel;
@@ -47,7 +47,7 @@ class QuickViewPluginImpl extends FileListPlugin {
 
       const stack = WithStacksProps.nonActive(stacks).stack;
       stack.push(
-        new PanelStackItem(this.panelComp, undefined, undefined, params)
+        new PanelStackItem(this.panelComp, undefined, undefined, params),
       );
     }
 

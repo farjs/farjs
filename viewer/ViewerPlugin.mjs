@@ -17,12 +17,7 @@ import ViewerPluginUi from "./ViewerPluginUi.mjs";
 
 class ViewerPluginImpl extends FileListPlugin {
   constructor() {
-    super([
-      "f3",
-      ViewerEvent.onViewerOpenLeft,
-      ViewerEvent.onViewerOpenRight,
-      FileEvent.onFileView,
-    ]);
+    super();
   }
 
   /**
@@ -79,6 +74,4 @@ class ViewerPluginImpl extends FileListPlugin {
   }
 }
 
-const ViewerPlugin = new ViewerPluginImpl();
-
-export default ViewerPlugin;
+export default new ViewerPluginImpl();
