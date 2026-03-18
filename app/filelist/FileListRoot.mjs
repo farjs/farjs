@@ -1,6 +1,6 @@
 /**
  * @import { Dispatch, ReactComponent } from "@farjs/filelist/FileListData.mjs"
- * @import FileListPluginLoader from "@farjs/filelist/FileListPluginLoader.mjs"
+ * @import { FileListPluginLoader } from "@farjs/filelist/FileListPluginLoader.mjs"
  */
 import React from "react";
 import HistoryProvider from "@farjs/filelist/history/HistoryProvider.mjs";

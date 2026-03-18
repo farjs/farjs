@@ -1,10 +1,6 @@
-import { lazyFn } from "@farjs/filelist/utils.mjs";
 import FileListPluginLoader from "@farjs/filelist/FileListPluginLoader.mjs";
 
-export default new FileListPluginLoader(
-  ["M-l", "M-r", "M-h", "C-d"],
-  lazyFn(() => {
-    const module = "./FSPlugin.mjs";
-    return import(module).then((_) => _.default.instance);
-  }),
-);
+export default FileListPluginLoader(["M-l", "M-r", "M-h", "C-d"], async () => {
+  const module = "./FSPlugin.mjs";
+  return (await import(module)).default.instance;
+});

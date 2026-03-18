@@ -8,7 +8,7 @@
  * @import PanelStackItem from "@farjs/filelist/stack/PanelStackItem.mjs"
  * @import { WithStacksProps } from "@farjs/filelist/stack/WithStacksProps.mjs"
  * @import { Dispatch, ReactComponent } from "@farjs/filelist/FileListData.mjs"
- * @import FileListPluginLoader from "@farjs/filelist/FileListPluginLoader.mjs"
+ * @import { FileListPluginLoader } from "@farjs/filelist/FileListPluginLoader.mjs"
  */
 import path from "path";
 import Task from "@farjs/ui/task/Task.mjs";
