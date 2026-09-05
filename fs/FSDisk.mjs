@@ -50,7 +50,11 @@ function parseOutput(regexIn, output) {
   let regexRes = null;
   while ((regexRes = regex.exec(headLine)) !== null) {
     const indices = regexRes.indices;
-    if (indices !== undefined) {
+    if (
+      indices !== undefined &&
+      indices.length > 0 &&
+      indices[1] !== undefined
+    ) {
       const start = indices[1][0];
       const end = indices[1][1];
       const column = headLine.substring(start, end).trim();
