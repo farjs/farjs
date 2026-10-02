@@ -7,7 +7,6 @@
 [![Downloads](https://img.shields.io/npm/dm/farjs-app.svg)](https://www.pkgstats.com/pkg:farjs-app)
 [![Publish Size](https://badgen.net/packagephobia/publish/farjs-app)](https://packagephobia.com/result?p=farjs-app)
 [![Install Size](https://badgen.net/packagephobia/install/farjs-app)](https://packagephobia.com/result?p=farjs-app)
-[![NO AI](https://raw.githubusercontent.com/nuxy/no-ai-badge/master/badge.svg)](https://github.com/nuxy/no-ai-badge#no-ai-badge)
 
 ## FAR.js
 
